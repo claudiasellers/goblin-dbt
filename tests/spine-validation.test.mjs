@@ -24,7 +24,7 @@ test("every interactive tool declares its close; client and server registries ag
   const played = readFileSync("src/lib/skillRuntime/playerTools.ts", "utf8");
   const playedIds = [...played.slice(played.indexOf("PLAYER_TOOLS")).matchAll(/^\s*'([a-z-]+)': '/gm)].map((m) => m[1]);
   const components = [...[...block.matchAll(/'([a-z-]+)':/g)].map((m) => m[1]), ...playedIds];
-  assert.equal(components.length, 18);
+  assert.equal(components.length, 19);
   for (const id of components) {
     assert.ok(tools.SPINE_TOOLS[id], `${id}: add it to functions/src/spine/tools.ts`);
     assert.ok(close.TOOL_CLOSE_KIND[id], `${id}: add it to src/lib/spine/close.ts`);
@@ -224,7 +224,7 @@ test("the five silent tools use the session and render the close on completion",
   assert.match(ps, /useToolSession\(\)/);
   assert.match(ps, /session\.markComplete\(\)/);
   const page = readFileSync("src/pages/ToolPage.tsx", "utf8");
-  assert.match(page, /<ToolSessionProvider key=\{location\.key\} toolId=\{tool\.id\}>/);
+  assert.match(page, /<ToolSessionProvider key=\{location\.key\} toolId=\{tool\.id\} deferStart=\{!!tool\.deferSession\}>/);
   assert.doesNotMatch(page, /trackToolUsage\(/, "startToolSession writes the compat ToolUsage");
 });
 

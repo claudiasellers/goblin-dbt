@@ -80,3 +80,22 @@ test("Check the Facts' link: a grid word or nothing, never pre-selected", async 
   assert.deepEqual(parseCheckFactsEntry("?feel=made_up", grid), { firstEmotionId: null });
   assert.deepEqual(parseCheckFactsEntry("", grid), { firstEmotionId: null });
 });
+
+test("build.py refuses a broken persist-nothing skill (R15, IE-08): quick exit, no keep or follow-up before the answer, real re-entry steps", () => {
+  const broken = (mutation) => {
+    try {
+      py("-c", `import sys, copy; sys.path.insert(0, 'scripts/skills'); import build, ending_relationships as e
+sk = copy.deepcopy(e.SKILL)
+${mutation}
+build.check(sk)`);
+      return null;
+    } catch (err) { return String(err.stderr); }
+  };
+  assert.equal(broken("pass"), null, "the shipped skill passes");
+  assert.match(broken("del sk['quickExit']"), /Quick exit/);
+  assert.match(broken("sk['quickExit'] = 'yes'"), /quickExit is true or absent/);
+  assert.match(broken("sk['persist']['after'] = 'nope'"), /persist.after is a step/);
+  assert.match(broken("sk['steps'][0]['followUp'] = {'type': 'ending_revisit'}"), /no keep or follow-up before persist.after/);
+  assert.match(broken("sk['resumeAt'] = ['nope']"), /resumeAt names a step/);
+  assert.notEqual(broken("sk['persist']['nothingWhen'] = {'eq': ['$a.nope', 'x']}"), null, "the condition names real fields");
+});

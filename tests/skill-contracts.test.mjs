@@ -36,8 +36,10 @@ const fields = (sk) => sk.steps.flatMap((s) => s.fields ?? []);
 
 for (const sk of fixture.skills) {
   test(`${sk.id}: every step is reachable from the start, and every ask or embed step goes somewhere`, () => {
-    const seen = new Set([sk.start]);
-    const queue = [sk.start];
+    // A `resumeAt` step is a start of its own: a check-in the run scheduled re-enters there (IE-08).
+    const roots = [sk.start, ...(sk.resumeAt ?? [])];
+    const seen = new Set(roots);
+    const queue = [...roots];
     while (queue.length) {
       const id = queue.shift();
       const st = sk.steps.find((s) => s.id === id);

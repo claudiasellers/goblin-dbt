@@ -260,6 +260,127 @@
         "notification": "A plan you made is ready."
       },
       {
+        "id": "ending_after",
+        "ownerModule": "ie",
+        "tier": "quality",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/ending-relationships?run={sourceSessionId}&at=after&followUp={followUpId}",
+        "staleAfterHours": 168,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "Open it when you're ready.",
+          "title": "A check-in you asked for"
+        },
+        "choices": [
+          {
+            "id": "dismiss",
+            "label": "Not any more",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "chips": {
+            "this_week": {
+              "days": 7,
+              "kind": "at_local",
+              "time": "10:00"
+            },
+            "today": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "10:00"
+            },
+            "unsure": {
+              "days": 7,
+              "kind": "at_local",
+              "time": "10:00"
+            }
+          },
+          "kind": "chip"
+        },
+        "notification": "A check-in you asked for is ready."
+      },
+      {
+        "id": "ending_again",
+        "ownerModule": "ie",
+        "tier": "quality",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/ending-relationships?run={sourceSessionId}&at=after&followUp={followUpId}",
+        "staleAfterHours": 168,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "Open it when you're ready.",
+          "title": "A check-in you asked for"
+        },
+        "choices": [
+          {
+            "id": "dismiss",
+            "label": "Not any more",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "chips": {
+            "month": {
+              "days": 30,
+              "kind": "at_local",
+              "time": "10:00"
+            },
+            "this_week": {
+              "days": 7,
+              "kind": "at_local",
+              "time": "10:00"
+            }
+          },
+          "kind": "chip"
+        },
+        "notification": "A check-in you asked for is ready."
+      },
+      {
+        "id": "ending_revisit",
+        "ownerModule": "ie",
+        "tier": "quality",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/ending-relationships?followUp={followUpId}",
+        "staleAfterHours": 168,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "Open it when you're ready.",
+          "title": "A check-in you asked for"
+        },
+        "choices": [
+          {
+            "id": "dismiss",
+            "label": "Not any more",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "days": 14,
+          "kind": "at_local",
+          "time": "10:00"
+        },
+        "notification": "A check-in you asked for is ready."
+      },
+      {
         "id": "nightmare_rehearse",
         "ownerModule": "er",
         "tier": "practice",

@@ -168,7 +168,7 @@ test("the read-through reminder: a chip on the keep step schedules nightmare_reh
   assert.equal(type.deepLinkTemplate, "/tool/nightmare-rescript?run={sourceSessionId}&at=rehearse&enterAt=rehearse&followUp={followUpId}");
   assert.deepEqual(skill.options.remind.map((o) => o.value).sort(), Object.keys(type.window.chips).sort());
   assert.doesNotMatch(`${type.copy.title} ${type.copy.body} ${type.notification}`, /nightmare|dream/i, "Today and notifications never name it");
-  assert.match(readFileSync("functions/src/spine/toolSession.ts", "utf8"), /f\.type IN \['resume_skill', 'nightmare_rehearse'\]/, "opening it resolves it");
+  assert.match(readFileSync("functions/src/spine/toolSession.ts", "utf8"), /OPEN_RESOLVES = \[[^\]]*'nightmare_rehearse'/, "opening it resolves it");
   const atPlan = run([...READ, pick("after", "all_right"), next, embed(["held"], 15), pick("keepit", "no")]);
   const plan = M.stepOf(skill, "plan");
   assert.equal(M.followUpFor(ctx(), plan, atPlan), null, "no chip, no reminder");

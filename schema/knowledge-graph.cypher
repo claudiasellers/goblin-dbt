@@ -1430,6 +1430,16 @@ SET fast += {
   skill_type: "self_respect_effectiveness"
 };
 
+// IE Handout 13 (PRD IE-08): ending a relationship that's hurting you; safety first (docs/design/ending-relationships.md).
+MERGE (ending:TherapyConcept {id: "dbt_ending_relationships"})
+SET ending += {
+  name: "Ending relationships",
+  description: "Deciding whether to end a relationship that is harmful, interferes with your goals, or is hard to fix, and doing it safely and clearly",
+  modality: "DBT",
+  module: "Interpersonal Effectiveness",
+  skill_type: "relationship_effectiveness"
+};
+
 
 // ============================================================
 // MINDFULNESS AS CROSS-MODALITY CONCEPT

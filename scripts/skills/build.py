@@ -113,6 +113,14 @@ def check_embed_props(name, props, copy, fields, w):
             assert isinstance(v, str) and ID.match(v), (w, f"{name}.{k} is an id", v)
 
 
+RUNTIME_KEYS = ("persist", "quickExit", "resumeAt")
+
+
+def runtime_of(sk):
+    """The skill's runtime switches (persist-nothing R15, quick exit, re-entry steps), served only when set."""
+    return {k: sk[k] for k in RUNTIME_KEYS if sk.get(k)}
+
+
 def check(skill):
     sid = skill["id"]
     copy = skill["copy"]
@@ -294,6 +302,21 @@ def check(skill):
             f = next((f for s in skill["steps"] for f in s.get("fields", []) if f["id"] == inl["thenVsNowFrom"]), None)
             values = {x[1] for x in skill["options"] if f and x[0] == f["options"].get("list")}
             assert f and values and values <= THEN_VS_NOW, (sid, "the change check's options are then-vs-now answers", values)
+    per = skill.get("persist")
+    if per:
+        # R15: the session waits until the run leaves `after`, then writes nothing while `nothingWhen` holds.
+        assert per["after"] in steps, (sid, "persist.after is a step", per)
+        check_cond(per["nothingWhen"], fields, derived, sid, accepts)
+        assert skill.get("quickExit"), (sid, "a skill that can write nothing has a Quick exit on every screen")
+        # Nothing may be kept or scheduled before the safety answer (a keep / follow-up before `after` would run
+        # while the visit hasn't decided whether to save: the machine refuses them, the build says so).
+        order = [s["id"] for s in skill["steps"]]
+        for s in skill["steps"]:
+            if order.index(s["id"]) <= order.index(per["after"]):
+                assert "keep" not in s and "followUp" not in s, (sid, s["id"], "no keep or follow-up before persist.after")
+    assert "quickExit" not in skill or skill["quickExit"] is True, (sid, "quickExit is true or absent")
+    for at in skill.get("resumeAt", []):
+        assert at in steps, (sid, "resumeAt names a step", at)
     every = json.dumps([copy, [o[2] for o in skill["options"]]], ensure_ascii=False)
     assert "!" not in every and not re.search(r"\b(should|just|but|overreact\w*)\b", every, re.I), (sid, "house voice")
 
@@ -321,7 +344,7 @@ A(f"""// ============================================================
 for sk in SKILLS:
     sid = sk["id"]
     A(f"\n// --- {sid} ({sk['version']}) ---")
-    A(f"MERGE (s:Skill {{id: {q(sid)}}})\nSET s += {props({'toolId': sk['toolId'], 'version': sk['version'], 'contentVersion': CONTENT_VERSION, 'start': sk['start'], 'ownMax': sk['ownMax'], 'emotionFields': sk['emotionFields'], 'accepts': sk.get('accepts', [])})}, s.inlineJson = {js(sk.get('inline'))}, s.copyJson = {js(sk['copy'])}, s.tablesJson = {js(sk['tables'])}, s.deriveJson = {js(sk['derive'])};")
+    A(f"MERGE (s:Skill {{id: {q(sid)}}})\nSET s += {props({'toolId': sk['toolId'], 'version': sk['version'], 'contentVersion': CONTENT_VERSION, 'start': sk['start'], 'ownMax': sk['ownMax'], 'emotionFields': sk['emotionFields'], 'accepts': sk.get('accepts', [])})}, s.inlineJson = {js(sk.get('inline'))}, s.runtimeJson = {js(runtime_of(sk))}, s.copyJson = {js(sk['copy'])}, s.tablesJson = {js(sk['tables'])}, s.deriveJson = {js(sk['derive'])};")
     A(f"MATCH (t:TherapyConcept {{id: {q(sk['concept'])}}}), (s:Skill {{id: {q(sid)}}})\nMERGE (t)-[:HAS_SKILL]->(s);")
     if "addresses" in sk:
         # The concept's ADDRESSES set (Find the feeling's word routes, the routing tie-break), owned by this skill:
