@@ -328,6 +328,17 @@ test("the second gate pass: never *it can wait* on the danger path; hopeless wor
     rec = M.runRecord(ctx(), run([pick("how", "not_yet"), next, pick("again", "today")], ctx(), r));
   }
   assert.ok(rec.path.length < 20, "earlier review loops don't pile up");
+  // An ordinary resume of one long visit (past PATH_MAX with Back and forth) keeps the danger answer too.
+  let long = run([...READY, pick("problem", "fear-safety-threat"), next, pick("solutions", g.id), next]);
+  for (let i = 0; i < 30; i++) long = run([{ type: "back" }, next], ctx(), long);
+  long = run([pick("size", `${g.id}:small`), next], ctx(), long);
+  assert.equal(long.stepId, "commit");
+  assert.ok(!long.path.includes("problem"), "the problem screen has fallen off the capped path");
+  const resumed = M.resumeRun(ctx(), M.runRecord(ctx(), long), "size");
+  assert.equal(resumed.stepId, "size");
+  assert.equal(resumed.answers.problem?.ids[0], "fear-safety-threat", "the danger answer comes back");
+  assert.equal(M.crisisFor(ctx(), M.stepOf(skill, "size"), resumed)?.variant, "other_person", "and its banner");
+  assert.equal(resumed.answers.when, undefined);
   assert.match(M.copyText(ctx(), M.stepOf(skill, "review_next").title, run([pick("how", "did_it"), next, pick("help", "not_really"), next], ctx(), back)), /If you're not safe now, call/);
   // Too loud with a hopeless word: someone to talk to, there too.
   const loud = run([pick("feel", "despair"), next, pick("ready", "too_loud"), next]);

@@ -166,7 +166,8 @@ Added by F1 (docs/design/dbt-modules-plan.md §4, 10 Nov 2026):
   reached `after` again doesn't reopen. `again` names steps after it that keep the plan standing (Problem Solve's *Not yet*, which books the card again), so a run they ended reopens too. Reopened, the path runs to where the plan was last made, then the step, so earlier loops don't pile up. Every step's answers come back, including steps the capped path no longer
   holds. The player doesn't count the run's emotion ids again on a reopened visit (the feeling was the first visit's).
 - **The path keeps its newest steps.** Forward and Back append and keep the last 48 (`PATH_MAX`), as resume does, so a
-  long run that loops still records where it got to.
+  long run that loops still records where it got to. A resume drops only the answers of steps the path reached after the resume point
+  (and nowhere at or before it); a step that fell off the front of the path still brings its answers back.
 - **A hand-off's title heads its card**, with its title slots, as an ask step's does (Problem Solve's *Your next step:
   …*). A title slot names a field (`labelOf`); when the field has the person's own words, the slot is their words.
 - **Answers a step clears** (`clears: [field…]`, ER-12). Arriving at the step by a forward move drops those fields'

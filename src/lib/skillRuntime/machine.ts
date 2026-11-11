@@ -485,14 +485,18 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { ke
   // Reopened: the path up to where the plan was last made, so earlier review loops (whose answers the step clears)
   // don't pile up, and the newest steps are the ones kept.
   const upTo = reopened ? path.slice(0, Math.max(path.lastIndexOf(reopensAt!.reopens!.after), 0) + 1) : path.slice(0, path.lastIndexOf(stepId) + 1);
-  // Only the answers of the steps up to the one reopened: a step after it will be asked again, and an answer
-  // read back there would be a pre-fill (a reminder chip picked last time would schedule again unasked).
-  // Reopened, every step's answers come back: the record keeps the newest PATH_MAX steps only, so a long run's first
-  // steps (the feeling, the problem) may be off the path its answers still describe.
-  const onPath = new Set((reopened ? ctx.skill.steps.map((st) => st.id) : upTo).flatMap((id) => {
+  // A step after the resume point will be asked again, and an answer read back there would be a pre-fill (a reminder
+  // chip picked last time would schedule again unasked).
+  const fieldsOf = (id: string) => {
     const st = stepOf(ctx.skill, id);
     return [...(st.fields ?? []).map((f) => f.id), ...(st.answerAs ? [st.answerAs] : [])];
-  }));
+  };
+  // Dropped: only the fields of steps the path reached after the resume point and nowhere at or before it (they are
+  // asked again). A step that fell off the front of the capped path still brings its answers back (the feeling, the
+  // problem, a danger answer and its banner). Reopened, nothing on the path is after the step.
+  const before = new Set(upTo.flatMap(fieldsOf));
+  const after = new Set(reopened ? [] : path.slice(upTo.length).flatMap(fieldsOf).filter((f) => !before.has(f)));
+  const onPath = new Set(ctx.skill.steps.flatMap((st) => fieldsOf(st.id)).filter((f) => !after.has(f)));
   // A chip that books a reminder (a followUp's `whenFrom`) is always a fresh tap: `scheduled` isn't restored, so a
   // pick read back would book it a second time unasked.
   const books = new Set(ctx.skill.steps.flatMap((st) => (st.followUp?.whenFrom ? [st.followUp.whenFrom] : [])));
