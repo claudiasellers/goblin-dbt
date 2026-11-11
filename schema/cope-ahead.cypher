@@ -227,7 +227,7 @@ SET n += {kind: "words", label: "Say “I might cry, and I want to keep going”
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "tears_ok"})
 MERGE (t)-[:HAS_MOVE]->(m);
 MERGE (n:CopeMove {id: "no_sorry"})
-SET n += {kind: "words", label: "Say “I understand” instead of sorry", line: "say “I understand” instead of sorry", forPulls: ["hide"], general: false, forMoments: [], forSituations: ["conversation", "someone"], order: 17, version: "cope-ahead-v1"};
+SET n += {kind: "words", label: "Say “I understand” instead of an extra sorry", line: "say “I understand” instead of an extra sorry", forPulls: ["hide"], general: false, forMoments: [], forSituations: ["conversation", "someone"], order: 17, version: "cope-ahead-v1"};
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "no_sorry"})
 MERGE (t)-[:HAS_MOVE]->(m);
 MERGE (n:CopeMove {id: "notes"})

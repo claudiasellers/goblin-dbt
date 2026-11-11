@@ -106,13 +106,25 @@ MOVES = [
     ("name_it", "words", "Name what's happening", "name what's happening out loud", ["fight"], False, None, [], ["conversation", "someone"]),
     ("validate_first", "words", "Say “I can see this is hard for you too”", "say “I can see this is hard for you too”", ["fight", "hide"], False, None, [], ["conversation", "someone"]),
     ("tears_ok", "words", "Say “I might cry, and I want to keep going”", "say “I might cry, and I want to keep going”", ["hide", "blank"], False, None, [], ["conversation", "someone"]),
-    ("no_sorry", "words", "Say “I understand” instead of sorry", "say “I understand” instead of sorry", ["hide"], False, None, [], ["conversation", "someone"]),
+    ("no_sorry", "words", "Say “I understand” instead of an extra sorry", "say “I understand” instead of an extra sorry", ["hide"], False, None, [], ["conversation", "someone"]),
     ("notes", "action", "Look at the points I wrote down", "look at the points I wrote down", ["blank", "hide"], False, None, [], ["conversation", "work_school"]),
     ("pause", "tool", "Hold to wait", "open Hold to wait", ["fight", "chase"], False, "pause", [], []),
     ("five_senses", "tool", "5-4-3-2-1", "do 5-4-3-2-1", ["blank", "hide", "fight"], True, "five-senses", [], []),
     ("cool_down", "tool", "Circuit Breaker", "do Circuit Breaker", ["fight", "chase"], False, "cool-down", [], []),
     ("urge_surfing", "tool", "Urge Surfing", "use Urge Surfing", ["chase", "fight"], False, "urge-surfing", [], []),
 ]
+
+# A danger moment's plan holds only moves that keep the person safe (Gate 3, ER-B2): its own move (listed first),
+# plus these, where they fit the pull. No conversation moves (validate, keep going, no sorry, the one thing, come
+# back) when someone might hurt them, and nothing that waits it out or only puts the phone away when they might hurt
+# themselves. Every other move is left out for that moment.
+DANGER_SAFE_MOVES = {
+    "might_hurt": ["long_out", "feet", "cold_water", "hold_something", "step_out", "text_trust", "five_senses", "cool_down"],
+    "might_hurt_self": ["long_out", "feet", "cold_water", "hold_something", "give_minute", "step_out", "text_trust",
+                        "pause", "five_senses", "cool_down", "urge_surfing"],
+}
+assert set(DANGER_SAFE_MOVES) == set(DANGER)
+assert all(m in {x[0] for x in MOVES} and not next(x for x in MOVES if x[0] == m)[7] for ms in DANGER_SAFE_MOVES.values() for m in ms)
 
 # DEAR MAN's 11 CopeAhead moves (schema/dear-man-debrief-content.cypher; scripts/dear-man/content.py) → the
 # CopeMove that is the same move (plan D10: absorbed, linked SAME_MOVE_AS, never renamed or deleted: parts map

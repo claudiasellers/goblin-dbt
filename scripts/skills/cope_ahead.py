@@ -62,6 +62,7 @@ COPY.update({
     "next": "Next",
     "hold_label": "Hold",
     "hold_running": "Breathe out, slowly",
+    "safety_open": "Talk to someone now",
     "done_kept": "Your plan is in Me, under My plans.",
     "done_line": "You've walked through it, start to finish.",
     # A part with no name, in the parts step's chips (the parts copy's own wording).
@@ -89,8 +90,15 @@ MOVE_FITS = {"all": [
     {"any": [{"not": {"set": "$opt.sits"}}, {"has": ["$opt.sits", a("situation")]}]},
     {"any": [{"all": [PULL_PICKED, {"has": ["$opt.pulls", a("pull")]}]}, {"all": [{"not": PULL_PICKED}, {"eq": ["$opt.general", True]}]}]},
 ]}
-# The danger moment's own move, or the moves that fit (a danger move never shows anywhere else).
-MOVE_WHERE = {"any": [{"has": ["$opt.forMoments", a("moment")]}, {"all": [{"not": {"set": "$opt.forMoments"}}, MOVE_FITS]}]}
+# The danger moment's own move, or the moves that fit (a danger move never shows anywhere else). For a danger
+# moment, only the moves Cope Ahead's content names safe for it (`DANGER_SAFE_MOVES`, the option's `safeIn`).
+DANGER_IDS = list(DANGER)
+MOVE_WHERE = {"any": [{"has": ["$opt.forMoments", a("moment")]}, {"all": [
+    {"not": {"set": "$opt.forMoments"}}, MOVE_FITS,
+    {"any": [{"not": {"in": [a("moment"), DANGER_IDS]}}, {"has": ["$opt.safeIn", a("moment")]}]}]}]}
+# *I might hurt myself*: *Talk to someone now* (safety.open, C6.5) as a quiet link under the moment and the plan.
+SELF_HARM = {"eq": [a("moment"), "might_hurt_self"]}
+SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": SELF_HARM}
 # *Once more*: another of the situation's moments (never the plan's, never danger: that list has none).
 NEW_MOMENT_WHERE = {"all": [FOR_SITUATION, {"not": {"eq": ["$opt.value", a("moment")]}}]}
 CRISIS = [{"variant": "other_person", "when": {"eq": [a("moment"), "might_hurt"]}},
@@ -134,7 +142,7 @@ STEPS = [
     {
         "id": "hard", "kind": "ask", "title": "moment_title", "crisis": CRISIS,
         "fields": [{"id": "moment", "options": {"list": "moment", "where": FOR_SITUATION}, "max": 1, "required": True,
-                    "own": {"hint": "moment_own_hint", "countsAsPick": True}}],
+                    "own": {"hint": "moment_own_hint", "countsAsPick": True}, "links": [SAFETY_LINK]}],
         "next": [{"to": "plan"}],
     },
     {
@@ -147,12 +155,12 @@ STEPS = [
             # The "If": the moment, or (a chip, pressed) the pull.
             {"id": "forpull", "options": {"list": "forpull"}, "max": 1, "showWhen": PULL_PICKED},
             {"id": "moves", "options": {"list": "move", "where": MOVE_WHERE}, "max": 2, "swap": True, "required": True,
-             "own": {"hint": "plan_own_hint", "countsAsPick": True, "max": MOVE_OWN_MAX}},
+             "own": {"hint": "plan_own_hint", "countsAsPick": True, "max": MOVE_OWN_MAX}, "links": [SAFETY_LINK]},
         ],
         "next": [{"to": "walk"}],
     },
     {
-        "id": "walk", "kind": "embed", "embed": "rehearsal", "answerAs": "rehearsed",
+        "id": "walk", "kind": "embed", "embed": "rehearsal", "links": [SAFETY_LINK], "answerAs": "rehearsed", "crisis": CRISIS,
         "props": {**PLAN_FIELDS, "pass": 1},
         "next": [{"to": "more"}],
     },
@@ -174,7 +182,7 @@ STEPS = [
         "next": [{"to": "redo"}],
     },
     {
-        "id": "redo", "kind": "embed", "embed": "rehearsal", "answerAs": "rehearsed2",
+        "id": "redo", "kind": "embed", "embed": "rehearsal", "links": [SAFETY_LINK], "answerAs": "rehearsed2", "crisis": CRISIS,
         "props": {"momentField": "new_moment", "movesField": "moves", "pullField": "pull", "pass": 2,
                   "changeField": "change_move", "changedMovesField": "new_moves"},
         "next": [{"to": "calm"}],
@@ -194,7 +202,7 @@ STEPS = [
     },
     {
         # The plan on the paper; *Keep this* is the yes (R4); *Yes* asks how it went, at screen 1's when (R5).
-        "id": "keep", "kind": "ask", "title": "keep_title",
+        "id": "keep", "kind": "ask", "title": "keep_title", "crisis": CRISIS,
         "slots": [{"after": "$title", "embed": "keepCard", "props": {**PLAN_FIELDS, "partField": "part"}, "showWhen": ALWAYS, "record": "plan_card"}],
         "fields": [
             {"id": "keepit", "options": {"list": "keepit"}, "max": 1, "required": True},
@@ -216,6 +224,7 @@ STEPS = [
 
 EXITS = [
     {"id": "five_senses", "toolId": "five-senses"},   # settle with 5-4-3-2-1 (the plan already saved)
+    {"id": "safety_open", "safety": True},             # *Talk to someone now* on *I might hurt myself* (C6.5)
     {"id": "done", "done": True},
 ]
 
@@ -235,8 +244,9 @@ def options():
     # A danger moment's own move first (it shows only for that moment), then the rest in Cope Ahead's order.
     moves = sorted(CA.MOVES, key=lambda m: 0 if m[7] else 1)
     for mid, kind, label, _line, pulls, general, tool, for_moments, for_sits in moves:
+        safe_in = [d for d, ms in CA.DANGER_SAFE_MOVES.items() if mid in ms]
         extra = {"kind": kind, "pulls": pulls, "general": general, "forMoments": for_moments, "sits": for_sits,
-                 **({"tool": tool} if tool else {})}
+                 "safeIn": safe_in, **({"tool": tool} if tool else {})}
         out.append(("move", mid, label, extra, ("CopeMove", mid)))
         if not for_moments:
             out.append(("new_move", mid, label, extra, ("CopeMove", mid)))

@@ -2856,6 +2856,7 @@
           "next": "Next",
           "hold_label": "Hold",
           "hold_running": "Breathe out, slowly",
+          "safety_open": "Talk to someone now",
           "done_kept": "Your plan is in Me, under My plans.",
           "done_line": "You've walked through it, start to finish.",
           "profile_unnamed": "One you haven't named"
@@ -3104,7 +3105,19 @@
                 "own": {
                   "hint": "moment_own_hint",
                   "countsAsPick": true
-                }
+                },
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "eq": [
+                        "$a.moment",
+                        "might_hurt_self"
+                      ]
+                    }
+                  }
+                ]
               }
             ],
             "next": [
@@ -3270,6 +3283,27 @@
                                 ]
                               }
                             ]
+                          },
+                          {
+                            "any": [
+                              {
+                                "not": {
+                                  "in": [
+                                    "$a.moment",
+                                    [
+                                      "might_hurt",
+                                      "might_hurt_self"
+                                    ]
+                                  ]
+                                }
+                              },
+                              {
+                                "has": [
+                                  "$opt.safeIn",
+                                  "$a.moment"
+                                ]
+                              }
+                            ]
                           }
                         ]
                       }
@@ -3283,7 +3317,19 @@
                   "hint": "plan_own_hint",
                   "countsAsPick": true,
                   "max": 90
-                }
+                },
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "eq": [
+                        "$a.moment",
+                        "might_hurt_self"
+                      ]
+                    }
+                  }
+                ]
               }
             ],
             "next": [
@@ -3298,7 +3344,39 @@
             "id": "walk",
             "kind": "embed",
             "embed": "rehearsal",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "eq": [
+                    "$a.moment",
+                    "might_hurt_self"
+                  ]
+                }
+              }
+            ],
             "answerAs": "rehearsed",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.moment",
+                    "might_hurt"
+                  ]
+                }
+              },
+              {
+                "variant": "crisis",
+                "when": {
+                  "eq": [
+                    "$a.moment",
+                    "might_hurt_self"
+                  ]
+                }
+              }
+            ],
             "props": {
               "momentField": "moment",
               "movesField": "moves",
@@ -3521,7 +3599,39 @@
             "id": "redo",
             "kind": "embed",
             "embed": "rehearsal",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "eq": [
+                    "$a.moment",
+                    "might_hurt_self"
+                  ]
+                }
+              }
+            ],
             "answerAs": "rehearsed2",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.moment",
+                    "might_hurt"
+                  ]
+                }
+              },
+              {
+                "variant": "crisis",
+                "when": {
+                  "eq": [
+                    "$a.moment",
+                    "might_hurt_self"
+                  ]
+                }
+              }
+            ],
             "props": {
               "momentField": "new_moment",
               "movesField": "moves",
@@ -3606,6 +3716,26 @@
             "id": "keep",
             "kind": "ask",
             "title": "keep_title",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.moment",
+                    "might_hurt"
+                  ]
+                }
+              },
+              {
+                "variant": "crisis",
+                "when": {
+                  "eq": [
+                    "$a.moment",
+                    "might_hurt_self"
+                  ]
+                }
+              }
+            ],
             "slots": [
               {
                 "after": "$title",
@@ -3719,6 +3849,14 @@
             "query": {},
             "carry": [],
             "done": false
+          },
+          {
+            "id": "safety_open",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": false,
+            "safety": true
           }
         ],
         "options": {
@@ -4138,7 +4276,8 @@
               "forMoments": [
                 "might_hurt"
               ],
-              "sits": []
+              "sits": [],
+              "safeIn": []
             },
             {
               "value": "reach_help",
@@ -4149,7 +4288,8 @@
               "forMoments": [
                 "might_hurt_self"
               ],
-              "sits": []
+              "sits": [],
+              "safeIn": []
             },
             {
               "value": "long_out",
@@ -4162,7 +4302,11 @@
               ],
               "general": true,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ]
             },
             {
               "value": "feet",
@@ -4175,7 +4319,11 @@
               ],
               "general": true,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ]
             },
             {
               "value": "cold_water",
@@ -4188,7 +4336,11 @@
               ],
               "general": false,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ]
             },
             {
               "value": "hold_something",
@@ -4200,7 +4352,11 @@
               ],
               "general": false,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ]
             },
             {
               "value": "give_minute",
@@ -4213,7 +4369,10 @@
               ],
               "general": true,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": [
+                "might_hurt_self"
+              ]
             },
             {
               "value": "come_back",
@@ -4225,7 +4384,8 @@
               ],
               "general": false,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": []
             },
             {
               "value": "say_hard",
@@ -4237,7 +4397,8 @@
               ],
               "general": true,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": []
             },
             {
               "value": "one_thing",
@@ -4249,7 +4410,8 @@
               ],
               "general": false,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": []
             },
             {
               "value": "step_out",
@@ -4262,7 +4424,11 @@
               ],
               "general": true,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ]
             },
             {
               "value": "stay_ten",
@@ -4273,7 +4439,8 @@
               ],
               "general": false,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": []
             },
             {
               "value": "text_trust",
@@ -4285,7 +4452,11 @@
               ],
               "general": true,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ]
             },
             {
               "value": "phone_away",
@@ -4296,7 +4467,8 @@
               ],
               "general": false,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": []
             },
             {
               "value": "name_it",
@@ -4310,7 +4482,8 @@
               "sits": [
                 "conversation",
                 "someone"
-              ]
+              ],
+              "safeIn": []
             },
             {
               "value": "validate_first",
@@ -4325,7 +4498,8 @@
               "sits": [
                 "conversation",
                 "someone"
-              ]
+              ],
+              "safeIn": []
             },
             {
               "value": "tears_ok",
@@ -4340,11 +4514,12 @@
               "sits": [
                 "conversation",
                 "someone"
-              ]
+              ],
+              "safeIn": []
             },
             {
               "value": "no_sorry",
-              "label": "Say “I understand” instead of sorry",
+              "label": "Say “I understand” instead of an extra sorry",
               "kind": "words",
               "pulls": [
                 "hide"
@@ -4354,7 +4529,8 @@
               "sits": [
                 "conversation",
                 "someone"
-              ]
+              ],
+              "safeIn": []
             },
             {
               "value": "notes",
@@ -4369,7 +4545,8 @@
               "sits": [
                 "conversation",
                 "work_school"
-              ]
+              ],
+              "safeIn": []
             },
             {
               "value": "pause",
@@ -4382,6 +4559,9 @@
               "general": false,
               "forMoments": [],
               "sits": [],
+              "safeIn": [
+                "might_hurt_self"
+              ],
               "tool": "pause"
             },
             {
@@ -4396,6 +4576,10 @@
               "general": true,
               "forMoments": [],
               "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ],
               "tool": "five-senses"
             },
             {
@@ -4409,6 +4593,10 @@
               "general": false,
               "forMoments": [],
               "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ],
               "tool": "cool-down"
             },
             {
@@ -4422,6 +4610,9 @@
               "general": false,
               "forMoments": [],
               "sits": [],
+              "safeIn": [
+                "might_hurt_self"
+              ],
               "tool": "urge-surfing"
             }
           ],
@@ -4437,7 +4628,11 @@
               ],
               "general": true,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ]
             },
             {
               "value": "feet",
@@ -4450,7 +4645,11 @@
               ],
               "general": true,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ]
             },
             {
               "value": "cold_water",
@@ -4463,7 +4662,11 @@
               ],
               "general": false,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ]
             },
             {
               "value": "hold_something",
@@ -4475,7 +4678,11 @@
               ],
               "general": false,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ]
             },
             {
               "value": "give_minute",
@@ -4488,7 +4695,10 @@
               ],
               "general": true,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": [
+                "might_hurt_self"
+              ]
             },
             {
               "value": "come_back",
@@ -4500,7 +4710,8 @@
               ],
               "general": false,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": []
             },
             {
               "value": "say_hard",
@@ -4512,7 +4723,8 @@
               ],
               "general": true,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": []
             },
             {
               "value": "one_thing",
@@ -4524,7 +4736,8 @@
               ],
               "general": false,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": []
             },
             {
               "value": "step_out",
@@ -4537,7 +4750,11 @@
               ],
               "general": true,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ]
             },
             {
               "value": "stay_ten",
@@ -4548,7 +4765,8 @@
               ],
               "general": false,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": []
             },
             {
               "value": "text_trust",
@@ -4560,7 +4778,11 @@
               ],
               "general": true,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ]
             },
             {
               "value": "phone_away",
@@ -4571,7 +4793,8 @@
               ],
               "general": false,
               "forMoments": [],
-              "sits": []
+              "sits": [],
+              "safeIn": []
             },
             {
               "value": "name_it",
@@ -4585,7 +4808,8 @@
               "sits": [
                 "conversation",
                 "someone"
-              ]
+              ],
+              "safeIn": []
             },
             {
               "value": "validate_first",
@@ -4600,7 +4824,8 @@
               "sits": [
                 "conversation",
                 "someone"
-              ]
+              ],
+              "safeIn": []
             },
             {
               "value": "tears_ok",
@@ -4615,11 +4840,12 @@
               "sits": [
                 "conversation",
                 "someone"
-              ]
+              ],
+              "safeIn": []
             },
             {
               "value": "no_sorry",
-              "label": "Say “I understand” instead of sorry",
+              "label": "Say “I understand” instead of an extra sorry",
               "kind": "words",
               "pulls": [
                 "hide"
@@ -4629,7 +4855,8 @@
               "sits": [
                 "conversation",
                 "someone"
-              ]
+              ],
+              "safeIn": []
             },
             {
               "value": "notes",
@@ -4644,7 +4871,8 @@
               "sits": [
                 "conversation",
                 "work_school"
-              ]
+              ],
+              "safeIn": []
             },
             {
               "value": "pause",
@@ -4657,6 +4885,9 @@
               "general": false,
               "forMoments": [],
               "sits": [],
+              "safeIn": [
+                "might_hurt_self"
+              ],
               "tool": "pause"
             },
             {
@@ -4671,6 +4902,10 @@
               "general": true,
               "forMoments": [],
               "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ],
               "tool": "five-senses"
             },
             {
@@ -4684,6 +4919,10 @@
               "general": false,
               "forMoments": [],
               "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ],
               "tool": "cool-down"
             },
             {
@@ -4697,6 +4936,9 @@
               "general": false,
               "forMoments": [],
               "sits": [],
+              "safeIn": [
+                "might_hurt_self"
+              ],
               "tool": "urge-surfing"
             }
           ],

@@ -89,11 +89,13 @@ Today asks afterwards (screen 7).
 - **A danger chip** shows `CrisisBanner` compact under the screen, alongside, never instead, and the
   flow goes on. Two of them:
   - *They might hurt me* (on *A conversation I'm dreading* and *Seeing someone in particular*): the
-    plan's first move becomes *Leave and get somewhere safe*. The banner is the `other_person` variant,
+    plan's first move is *Leave and get somewhere safe* (pressed on the hand-built page; listed first on the
+    skill runtime, with only safe moves beside it). The banner is the `other_person` variant,
     because a crisis line is the wrong first call when the danger is another person: *"If you're in danger
     now, call 911."*, then the National Domestic Violence Hotline (call or text), with 988 last.
   - *I might hurt myself* (on *A day that's hard every year* and *Being on my own*): the first move
-    becomes *Call or text someone who can help, now*. The banner is the default one.
+    is *Call or text someone who can help, now*. The banner is the default one; on the skill runtime
+    *Talk to someone now* (safety.open) sits under the moment, the plan and the rehearsal.
 
   The person can still change the move. Nothing is blocked, and the visit saves as usual.
 
@@ -492,7 +494,13 @@ the legacy-exits test ties to the switch).
 
 **Departures from the hand-built page** (each smaller than it reads; reported for sign-off):
 
-- A danger moment's move is listed **first but not pre-selected** (R12: the person taps it). The banner is unchanged.
+- A danger moment's move is listed **first but not pre-selected**, and the plan offers **only safe moves** beside it
+  (`DANGER_SAFE_MOVES` in `scripts/cope-ahead/content.py`: body and orienting moves, stepping out, texting someone; no
+  conversation moves when someone might hurt them, nothing that waits it out when they might hurt themselves). With
+  every chip on the screen a safe one, the person picks the plan's words (C1: nothing pre-filled) rather than the app
+  pressing one. The banner shows on the moment, plan, rehearsal and keep screens; *I might hurt myself* adds *Talk to
+  someone now* (safety.open, C6.5) under the moment, the plan and the rehearsal.
+- No *check the facts* step (Handout 19 step 1): Check the Facts is its own skill and hands off here with the situation.
 - Moves are up to two, picked directly; there is no *Add one more* chip (a third tap swaps out the oldest).
 - Feelings have no *Not sure* chip: the question is optional, so Next is *Not sure*.
 - Feelings are one field, `feel`, whose words follow the situation (`emotionsFrom`, a lookup through

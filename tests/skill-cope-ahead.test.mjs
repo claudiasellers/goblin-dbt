@@ -84,7 +84,34 @@ test("a danger moment: CrisisBanner alongside on the moment and plan screens (ot
   }
   const calm = run([pick("situation", "conversation"), next, next, pick("moment", "go_blank")]);
   assert.equal(M.crisisFor(ctx(), M.stepOf(skill, "hard"), calm), null);
+  assert.deepEqual(M.fieldLinks(ctx(), M.stepOf(skill, "hard").fields[0], calm), [], "no safety link on a calm moment");
   assert.ok(!chips(ctx(), run([next], ctx(), calm), "plan", "moves").some((x) => x === "leave_safe" || x === "reach_help"), "a danger move never shows elsewhere");
+});
+
+test("a danger moment's plan holds only safe moves, for every situation and pull; I might hurt myself links to Talk to someone now", () => {
+  const SAFE = {
+    might_hurt: ["leave_safe", "long_out", "feet", "cold_water", "hold_something", "step_out", "text_trust", "five_senses", "cool_down"],
+    might_hurt_self: ["reach_help", "long_out", "feet", "cold_water", "hold_something", "give_minute", "step_out", "text_trust", "pause", "five_senses", "cool_down", "urge_surfing"],
+  };
+  for (const sit of CA.situations) {
+    for (const moment of sit.hardMoments.filter((m) => m in SAFE)) {
+      for (const pull of ["fight", "chase", "hide", "blank", "not_sure", null]) {
+        const s = run([pick("situation", sit.id), next, ...(pull ? [pick("pull", pull)] : []), next, pick("moment", moment), next]);
+        const moves = chips(ctx(), s, "plan", "moves");
+        const unsafe = moves.filter((x) => !SAFE[moment].includes(x));
+        assert.deepEqual(unsafe, [], `${sit.id} / ${moment} / ${pull}`);
+        assert.equal(moves[0], SAFE[moment][0], "its own move first");
+        // The rehearsal and the keep card carry the banner too.
+        for (const st of ["walk", "keep"]) assert.ok(M.crisisFor(ctx(), M.stepOf(skill, st), s), `${st} keeps the banner`);
+        const field = (st, id) => M.stepOf(skill, st).fields.find((f) => f.id === id);
+        const links = [...M.fieldLinks(ctx(), field("hard", "moment"), s), ...M.fieldLinks(ctx(), field("plan", "moves"), s),
+          ...M.stepLinks(ctx(), M.stepOf(skill, "walk"), s)].map((l) => l.exit.id);
+        if (moment === "might_hurt_self") assert.deepEqual([...new Set(links)], ["safety_open"]);
+        else assert.deepEqual(links, []);
+      }
+    }
+  }
+  assert.ok(skill.exits.some((x) => x.id === "safety_open" && x.safety));
 });
 
 test("moves follow the pull (else the general ones) and the situation; changing the pull drops moves it no longer offers", () => {
@@ -231,6 +258,25 @@ test("ext.ca from the run: the after card, the part tag and Reflect read what th
   assert.equal(five.situationId, "other");
   assert.equal(five.situationOwn, "the dentist");
   assert.equal(five.ifFrom, "moment");
+});
+
+test("resume after When is it?: the answer comes back, and the after card is booked once, at that time", () => {
+  const toKeep = [pick("situation", "conversation"), pick("when", "tomorrow"), next, next, pick("moment", "go_blank"), next,
+    pick("moves", "feet"), next, done, pick("again", "no"), next, pick("settle", "ok"), next];
+  const s = run(toKeep);
+  assert.equal(s.stepId, "keep");
+  const back = M.resumeRun(ctx(), M.runRecord(ctx(), s), "keep");
+  assert.deepEqual(back.answers.when, { ids: ["tomorrow"], own: null }, "screen 1's answer, read back (not a reminder chip)");
+  const yes = run([pick("keepit", "yes"), pick("ask", "yes")], ctx(), back);
+  assert.deepEqual(M.followUpFor(ctx(), M.stepOf(skill, "keep"), yes), { type: "cope_ahead_after", chip: "tomorrow" });
+  assert.equal(M.followUpFor(ctx(), M.stepOf(skill, "keep"), run([pick("keepit", "yes"), pick("ask", "no")], ctx(), back)), null, "only on Yes");
+  // Booked, then resumed past it: the keep step stays booked, so going back to it books nothing more.
+  const booked = run([pick("keepit", "yes"), pick("ask", "yes"), { type: "scheduled", stepId: "keep", followUpType: "cope_ahead_after", id: "f1" }, next], ctx(), s);
+  const later = M.resumeRun(ctx(), M.runRecord(ctx(), booked), "end");
+  assert.equal(later.stepId, "end");
+  assert.ok(later.scheduled.keep, "already booked");
+  assert.equal(M.followUpFor(ctx(), M.stepOf(skill, "keep"), { ...later, answers: { ...later.answers, ask: { ids: ["yes"], own: null } } }), null);
+  assert.deepEqual(M.resumeRun(ctx(), M.runRecord(ctx(), booked), "keep").scheduled, {}, "resumed at the booking step itself: a fresh Next");
 });
 
 test("the embeds' plan: own words are the label past the ids; once more plays the new moment, with the changed moves only after Change", () => {

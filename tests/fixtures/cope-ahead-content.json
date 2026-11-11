@@ -643,8 +643,8 @@
   {
    "id": "no_sorry",
    "kind": "words",
-   "label": "Say “I understand” instead of sorry",
-   "line": "say “I understand” instead of sorry",
+   "label": "Say “I understand” instead of an extra sorry",
+   "line": "say “I understand” instead of an extra sorry",
    "forPulls": [
     "hide"
    ],
