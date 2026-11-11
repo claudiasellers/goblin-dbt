@@ -218,7 +218,7 @@ test("copy: no rating, no numbers to read, nothing about food or shopping as a m
 test("the player: safetyFirst opens the resources once per arrival; the run's urge ids reach the session; the wait embed never locks", () => {
   const p = readFileSync("src/components/skillPlayer/SkillPlayer.tsx", "utf8");
   assert.match(p, /toolSession\.setUrgeIds\(runUrgeIds\(ctx, st\)\)/);
-  assert.match(p, /contextFrom\(skill, location\.search, location\.state, band\.current\(\)\?\.value \?\? null\)/, "the person's own current reading is the carry");
+  assert.match(p, /contextFrom\(skill, location\.search, location\.state, band\.current\(\)\?\.value \?\? null, pageCtx\)/, "the person's own current reading is the carry");
   assert.match(p, /answerToolOutcome\(toolSession\.id, \{ dismissed: true \}\)/, "a noClose ending never reappears as Today's outcome card");
   assert.match(p, /if \(output\.ids\.length && !output\.ids\.includes\('skipped'\)\) toolSession\.markPracticed\(\);/, "a held hold is practice");
   assert.match(p, /if \(resuming \|\| safetyAt\.current === st\.path\.length\) return;/);

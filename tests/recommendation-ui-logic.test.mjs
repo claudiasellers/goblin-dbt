@@ -83,13 +83,12 @@ test("both result screens render RecommendationCards below the banner and the be
   }
 });
 
-test("CheckIn sends band source, FTF blank and the surface; DEAR MAN's debrief uses the same cards", () => {
+test("CheckIn sends band source, FTF blank and the surface; DEAR MAN's debrief no longer shows cards (IE-B2)", () => {
   const ci = read("src/pages/CheckIn.tsx");
   assert.match(ci, /bandSource: routingBandSource\(cap\)/);
   assert.match(ci, /\.\.\.\(ftfBlank\.current \? \{ blank: true \} : \{\}\)/);
   assert.match(ci, /surface: 'checkin'/);
   assert.match(read("src/pages/tools/FindTheFeeling.tsx"), /blank: state\.pull === 'blank'/);
   const dm = read("src/pages/tools/DearMan.tsx");
-  assert.match(dm, /surface: 'dear_man_debrief'/);
-  assert.match(dm, /recommendationCards\(stateResult\)/);
+  assert.doesNotMatch(dm, /surface: 'dear_man_debrief'|recommendationCards/);
 });

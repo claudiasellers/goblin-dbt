@@ -18,11 +18,18 @@ export function personRoute(risk: PersonRisk | null | undefined): PersonRoute {
   return 'ok';
 }
 
-/** True when the flow asks the safety question before going on: never asked, too long ago, or unreadable. */
-export function needsSafetyAsk(p: { safe: PersonSafe | null; safeAskedAt: string | null }, now: number): boolean {
+/**
+ * True when the flow asks the safety question before going on: never asked, too long ago, unreadable, or a debrief
+ * since said *I don't feel safe with them* (`safetyRecheckAt` after the last answer; IE-B2).
+ */
+export function needsSafetyAsk(p: { safe: PersonSafe | null; safeAskedAt: string | null; safetyRecheckAt?: string | null }, now: number): boolean {
   if (!p.safe || !p.safeAskedAt) return true;
   const at = Date.parse(p.safeAskedAt);
   if (!Number.isFinite(at)) return true;
+  if (p.safetyRecheckAt) {
+    const re = Date.parse(p.safetyRecheckAt);
+    if (!Number.isFinite(re) || re >= at) return true;
+  }
   return now - at > PEOPLE_SAFE_REASK_DAYS * 86_400_000;
 }
 

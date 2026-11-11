@@ -423,6 +423,21 @@ COPE_AHEAD = [
     {"id": "ca_time_limit", "label": "Set a time limit for the conversation", "rehearsal": "Before you start, say: 'I want to talk about this for 15 minutes and then check in about how we're both doing.' A time limit makes hard conversations feel survivable. It also gives you a natural exit point that doesn't feel like running.", "isUniversal": False, "responses": ["mr_got_loud", "mr_cried"]},
     {"id": "ca_success_anchor", "label": "Anchor to what worked this time", "rehearsal": "You stayed on course. Before you forget how that felt, describe it to yourself: what did you do with your body? Your voice? What did you focus on? Write it down. This is your playbook for next time.", "isUniversal": False, "responses": ["mr_stayed_course"]},
 ]
+# TroubleshootFactor (IE-11, DBT IE Handout 9: factors reducing interpersonal effectiveness), phrased as things that
+# happen, not faults. The debrief's *What got in the way most?* (scripts/skills/dear_man_debrief.py) presents them;
+# a TurningPoint SUGGESTS_FACTOR the ones it often points to (knowledge, not routing); `opens` names the tools the fix
+# offers (app tool ids; planned ones included).
+TROUBLESHOOT_FACTORS = [
+    {"id": "no_words", "label": "I couldn't find the words", "handout": "skill", "opens": ["rehearse", "cope-ahead", "dear-man"], "suggestedBy": ["tp_no_words"], "sortOrder": 1},
+    {"id": "unclear", "label": "I wasn't sure what I wanted from it", "handout": "indecision", "opens": ["dear-man"], "suggestedBy": [], "sortOrder": 2},
+    {"id": "feelings", "label": "My feelings took over", "handout": "emotions", "opens": ["cope-ahead", "dear-man"], "suggestedBy": ["tp_crying_shutdown", "tp_escalated", "tp_defensive"], "sortOrder": 3},
+    {"id": "belief", "label": "A worry or belief stopped me", "handout": "worries", "opens": ["check-the-facts", "dear-man"], "suggestedBy": ["tp_apologized", "tp_gave_in"], "sortOrder": 4},
+    {"id": "quick_win", "label": "I settled for ending it quickly", "handout": "short_term_goals", "opens": ["fast", "dear-man"], "suggestedBy": ["tp_gave_in"], "sortOrder": 5},
+    {"id": "power", "label": "They had more power in this", "handout": "environment", "opens": ["fast", "ending-relationships", "let-it-be"], "suggestedBy": [], "sortOrder": 6},
+    {"id": "cant_give", "label": "What I wanted isn't something they can give", "handout": "environment", "opens": ["fast", "finding-connection"], "suggestedBy": [], "sortOrder": 7},
+    # Handout 9's environment, the other half: asking skilfully doesn't decide their answer (Gate 3, IE-B2).
+    {"id": "not_willing", "label": "I asked well, and they still said no", "handout": "environment", "opens": ["fast"], "suggestedBy": [], "sortOrder": 8},
+]
 # DearManFeelingChip nodes added for the debrief.
 DEBRIEF_FEELING_CHIPS = [
     {"id": "drained", "label": "Drained", "sortOrder": 19},
@@ -469,8 +484,22 @@ SAFETY_COPY = {"id": "dear_man_safety_copy",
     "riskBadly": "It tends to go badly",
     "riskUnsaid": "I'd rather not say",
     "safetyRouteHeading": "Planning a hard talk with {who} can wait. Your safety comes first.",
+    "safetyRouteDebriefHeading": "With {who}, your safety comes first. Looking back can wait.",
     "safetyRouteBody": "The people below can help you think it through, any time, and you don't have to be sure.",
     "safetyRouteEnding": "Thinking about ending the relationship",
     "safetyRouteBack": "This is about someone else",
-    "badlyHeadsUp": "When talks with them tend to go badly, it can help to keep it short, about one thing, and in writing if that suits."}
+    "badlyHeadsUp": "When talks with them tend to go badly, it can help to keep it short, about one thing, and in writing if that suits.",
+    # The debrief (IE-B2, docs/design/dear-man-debrief.md): the picker's question, after the conversation.
+    "personWhoDebrief": "Who was the conversation with?",
+    # The prep's saved screen: when it is, so "How did it go?" comes after (the ask_outcome follow-up). Names no one.
+    "askOutcomeQuestion": "When is the conversation? I can ask how it went, after.",
+    "askOutcomeToday": "Later today",
+    "askOutcomeTomorrow": "Tomorrow",
+    "askOutcomeWeek": "This week",
+    "askOutcomeUnsure": "Not sure",
+    "askOutcomeFailed": "That didn't save. You can try again.",
+    "askOutcomeSet": "I'll ask how it went.",
+    # A refused ask to be heard, counted by the debrief: Let go (FAST), offered on the next ask to be heard by them.
+    "letGoLine": "Last time you asked {who} to hear you, it didn't land. You can ask again. If it goes the same way, letting it go is a way to keep your self-respect too.",
+    "letGoLink": "Letting it go, and keeping my self-respect"}
 

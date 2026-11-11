@@ -1,5 +1,5 @@
 // DEAR MAN's debrief: who showed up? (docs/design/parts.md, the DEAR MAN row): src/lib/debriefWho.ts,
-// src/components/parts/DebriefWho.tsx and its step in src/pages/tools/DearMan.tsx. tagPart's debrief
+// src/components/parts/DebriefWho.tsx and its step in the debrief skill (src/components/skillPlayer/DebriefWhoEmbed.tsx). tagPart's debrief
 // rules are pinned in functions/test/unit/parts.test.cjs.
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -70,16 +70,20 @@ test("payloads: Yes / A bit a debrief tag with its strength; ext.er.whoShowedUp 
   assert.doesNotMatch(card, /await /, "never holds up the debrief");
 });
 
-test("DEAR MAN: its own step after Underneath, before the reflection; never under P2 or the overlay", () => {
-  const dm = read("src/pages/tools/DearMan.tsx");
-  assert.match(dm, /setPhase\(whoShown \|\| copePending \? 'debrief-parts' : 'debrief-reflection'\)/, "from Underneath");
-  assert.match(dm, /case 'debrief-parts': setPhase\('debrief-underneath'\); break;/);
-  assert.match(dm, /case 'debrief-reflection': setPhase\(whoShown \? 'debrief-parts' : 'debrief-underneath'\); break;/);
-  assert.match(dm, /if \(phase === 'debrief-parts' && !whoShown && !copePending\) setPhase\('debrief-reflection'\);/, "gate fails: straight on");
-  assert.match(dm, /const whoShown = showDebriefWho\(\{ partsOn, partCount: copeSlices\?\.parts\.length \?\? 0, ready: debriefWhoReady\(copeCopy\),\s*answered: tagRowAnswered\(session\.id, 'debrief'\) \}\);/);
-  assert.match(dm, /if \(!whoShown \|\| !copeCopy \|\| !copeSlices\) return null;/);
-  assert.match(dm, /onAnswer=\{\(a\) => session\.setExt\(\{ er: \{ whoShowedUp: a \} \}\)\}/, "the named form's answer only");
-  assert.match(dm, /copeAheadPartId=\{copeAheadPartId\} toolSessionId=\{session\.id\}/, "prep's pick from this visit");
-  assert.ok(!resume.TOO_MUCH_PHASES.includes("debrief-parts"), "no too-much overlay over it");
-  assert.ok(dm.indexOf("phase === 'debrief-parts'") < dm.indexOf("// ─── DEBRIEF: REFLECTION ───"));
+test("DEAR MAN's debrief skill: its own step after Underneath, before the reflection; never under P2 or the overlay", () => {
+  const skills = JSON.parse(read("src/data/content/skills.json")).content.skills;
+  const dm = skills.find((s) => s.id === "dear_man_debrief");
+  const step = (id) => dm.steps.find((s) => s.id === id);
+  assert.deepEqual(step("underneath").next.map((n) => n.to), ["who"], "from Underneath");
+  assert.equal(step("who").kind, "embed");
+  assert.equal(step("who").embed, "debriefWho");
+  assert.deepEqual(step("who").next.map((n) => n.to), ["reflect"]);
+  const embed = read("src/components/skillPlayer/DebriefWhoEmbed.tsx");
+  assert.match(embed, /const shown = settled && showDebriefWho\(\{\s*partsOn, partCount: profile\.slices\?\.parts\.length \?\? 0, ready: debriefWhoReady\(content \?\? null\),\s*answered: answeredOnArrival,\s*\}\);/);
+  assert.match(embed, /const \[answeredOnArrival\] = useState\(\(\) => tagRowAnswered\(session\.id, 'debrief'\)\);/, "read once: answering never takes the screen away");
+  assert.match(embed, /useEffect\(\(\) => \{ if \(settled && !shown\) finish\('not_shown'\); \}\);/, "gate fails: straight on");
+  assert.match(embed, /copeAheadPartId=\{ctx\?\.partId \?\? null\} toolSessionId=\{session\.id\}/, "the prep's pick, carried in as the part");
+  assert.match(embed, /onDone=\{\(\) => finish\(answer\.current \?\? \(ctx\?\.partId \? 'skip' : 'general'\)\)\}/, "the named form's answer only");
+  assert.ok(!resume.TOO_MUCH_PHASES.some((p) => p.startsWith("debrief")), "no too-much overlay over the debrief");
+  assert.doesNotMatch(read("src/pages/tools/DearMan.tsx"), /DebriefWho|debrief-parts/, "the prep page carries no debrief step");
 });

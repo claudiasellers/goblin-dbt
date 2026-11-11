@@ -25,9 +25,12 @@ test("every Phase A follow-up type exists; reserved ones are off", () => {
   const types = Object.fromEntries(followUpTypes().map((t) => [t.id, t]));
   for (const id of ["oa_plan", "recover_next_day", "recover_rehearse", "recover_log", "ps_step", "tool_outcome",
     "regulation_recheck", "pattern_offer", "profile_revisit", "resume_skill"]) assert.ok(types[id], id);
-  for (const id of ["safety_checkin", "chain_nextday", "missed_step", "diary_daily", "practice_daily", "ask_outcome"]) {
+  for (const id of ["safety_checkin", "chain_nextday", "missed_step", "diary_daily", "practice_daily"]) {
     assert.ok(types[id]?.reserved && !types[id].enabled, id);
   }
+  // IE-B2: DEAR MAN's "How did it go?" is on, a deep link into the debrief, and names no one.
+  assert.ok(types.ask_outcome?.enabled && !types.ask_outcome.reserved, "ask_outcome");
+  assert.equal(types.ask_outcome.mode, "deeplink");
   assert.equal(types.safety_checkin.tier, "safety");
   assert.equal(types.regulation_recheck.enabled, false, "D-09: off until push");
   assert.equal(types.profile_revisit.enabled, false);

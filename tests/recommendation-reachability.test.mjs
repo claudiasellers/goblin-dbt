@@ -180,15 +180,13 @@ test("goldens after reachability: grid words move the pattern; anger has its own
   assert.equal(answered.pattern.id, "chronic_vigilance");
 });
 
-test("the check-in asks high-unpleasant discriminating questions too; the DEAR MAN debrief shows the banner above its tools", () => {
+test("the check-in asks high-unpleasant discriminating questions too; DEAR MAN's debrief no longer routes (IE-B2)", () => {
   const ci = read("src/pages/CheckIn.tsx");
   assert.match(ci, /if \(asksDiscriminatingQuestions\(inferredQuadrant\)\) \{\s*try \{\s*const questions = await getDiscriminatingQuestions\(inferredQuadrant\);/);
   assert.match(ci, /return quadrant === 'high-unpleasant' \|\| quadrant === 'low-unpleasant';/);
   assert.deepEqual(graph.questions["high-unpleasant"], ["hu_experience_quality", "hu_body_activation"], "the graph has them");
-  const dm = read("src/pages/tools/DearMan.tsx");
-  const route = dm.slice(dm.indexOf("// ─── DEBRIEF: ROUTE ───"));
-  const banner = route.indexOf("{isCrisisFlag(stateResult?.safetyFlag) && <CrisisBanner />}");
-  assert.ok(banner > 0 && banner < route.indexOf("{topTools.length > 0 && ("), "banner above the debrief's tools");
+  // Claudia, 11 Nov: the debrief's end cards and its silent check-in are gone (docs/design/dear-man-debrief.md).
+  assert.doesNotMatch(read("src/pages/tools/DearMan.tsx"), /getStateAndTools|saveCheckIn/);
 });
 
 test("\"I can't tell — it's all too much\" reads as overwhelm, not crisis: it never raises the banner or overrides the word (Claudia, 2026-09-30)", async () => {

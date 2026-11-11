@@ -365,6 +365,26 @@ FOLLOW_UP_TYPES += [
     },
 ]
 
+# DEAR MAN's "How did it go?" (IE-B2, docs/design/dear-man-debrief.md): the prep's saved screen asks when the
+# conversation is; the card opens the debrief (`?mode=debrief`), and opening it resolves it (toolSession.ts
+# OPEN_RESOLVES). Session-bound (copeAheadAfter.ts FOLLOW_UP_SESSION_TOOL): only a DEAR MAN visit schedules one. The
+# copy names no one: a Today card or notification can be seen by someone else.
+FOLLOW_UP_TYPES += [
+    {
+        "id": "ask_outcome", "ownerModule": "ie", "tier": "quality", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/dear-man?mode=debrief&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"today": {"kind": "at_local", "days": 0, "time": "20:00"},
+                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "19:00"},
+                                             "this_week": {"kind": "at_local", "days": 4, "time": "19:00"},
+                                             "unsure": {"kind": "at_local", "days": 4, "time": "19:00"}}},
+        "staleAfterHours": 120, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Ready to look back?", "body": "A few taps, when you're ready."},
+        "choices": [{"id": "dismiss", "label": "No need", "status": "dismissed"}],
+        "notification": "Ready to look back?",
+    },
+]
+
 # Reserved rows: authored now so the ids exist, enabled false until their owners ship.
 RESERVED = [
     ("safety_checkin", "core", "safety"),   # CORE-01; sorts first, push-cap exempt
@@ -372,7 +392,6 @@ RESERVED = [
     ("missed_step", "core", "quality"),     # CORE-11
     ("diary_daily", "core", "practice"),    # CORE-04 (needs rrule)
     ("practice_daily", "mf", "practice"),   # MF (needs rrule)
-    ("ask_outcome", "ie", "quality"),       # IE prediction log
 ]
 for rid, owner, tier in RESERVED:
     FOLLOW_UP_TYPES.append({

@@ -32,7 +32,7 @@ export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
   // People (IE-03): active only (a set-aside person is never offered), the most recently used first.
   people: `MATCH (:User {id: $uid})-[:HAS_PERSON]->(p:Person {status: 'active'})
     WITH p ORDER BY coalesce(p.lastUsedAt, p.updatedAt, p.createdAt) DESC, p.id LIMIT 30
-    RETURN p {.id, .kind, .area, .status, .source, .valueJson,
+    RETURN p {.id, .kind, .area, .status, .source, .valueJson, .refusalsValidation, .safetyRecheckAt,
               confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p`,
   // Parts off (absent = off) returns no rows at all; set-aside parts are never read by a tool.
   // Nulls sort first under DESC in Cypher, hence the IS NULL keys: never-visited parts go last.
@@ -174,7 +174,10 @@ const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
     return r.records.flatMap((rec) => {
       const p = rec.get('p') as Record<string, unknown>;
       const v = personValue(p.valueJson, decrypt);
-      return v ? [{ id: String(p.id), ...v, meta: metaFrom(p, now) }] : [];
+      // DEAR MAN's debrief counts refused asks to be heard (dearMan/debriefProjection.ts); the prep offers Let go at 1.
+      const refusals = Number(p.refusalsValidation ?? 0);
+      return v ? [{ id: String(p.id), ...v, refusalsValidation: Number.isFinite(refusals) ? Math.max(0, Math.floor(refusals)) : 0,
+        safetyRecheckAt: typeof p.safetyRecheckAt === 'string' ? p.safetyRecheckAt : null, meta: metaFrom(p, now) }] : [];
     });
   },
   parts: async (tx, uid, now) => {

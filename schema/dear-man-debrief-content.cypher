@@ -512,3 +512,100 @@ SET f.label = 'Wound up',
 MERGE (f:DearManFeelingChip {id: 'defeated'})
 SET f.label = 'Defeated',
     f.sortOrder = 23;
+
+// ── TroubleshootFactor nodes (IE-11, Handout 9) ──
+// What got in the way most, after an ask that went partly or not at all. SUGGESTS_FACTOR: a turning point that
+// often points to the factor (knowledge, not routing). IMPLEMENTS: part of DEAR MAN's debrief.
+
+MERGE (tf:TroubleshootFactor {id: 'no_words'})
+SET tf.label = "I couldn't find the words",
+    tf.handout = 'skill',
+    tf.opens = ['rehearse', 'cope-ahead', 'dear-man'],
+    tf.sortOrder = 1;
+
+MATCH (tf:TroubleshootFactor {id: 'no_words'}), (tc:TherapyConcept {id: 'dbt_dear_man'})
+MERGE (tf)-[:IMPLEMENTS]->(tc);
+
+MATCH (tp:TurningPoint {id: 'tp_no_words'}), (tf:TroubleshootFactor {id: 'no_words'})
+MERGE (tp)-[:SUGGESTS_FACTOR]->(tf);
+
+MERGE (tf:TroubleshootFactor {id: 'unclear'})
+SET tf.label = "I wasn't sure what I wanted from it",
+    tf.handout = 'indecision',
+    tf.opens = ['dear-man'],
+    tf.sortOrder = 2;
+
+MATCH (tf:TroubleshootFactor {id: 'unclear'}), (tc:TherapyConcept {id: 'dbt_dear_man'})
+MERGE (tf)-[:IMPLEMENTS]->(tc);
+
+MERGE (tf:TroubleshootFactor {id: 'feelings'})
+SET tf.label = 'My feelings took over',
+    tf.handout = 'emotions',
+    tf.opens = ['cope-ahead', 'dear-man'],
+    tf.sortOrder = 3;
+
+MATCH (tf:TroubleshootFactor {id: 'feelings'}), (tc:TherapyConcept {id: 'dbt_dear_man'})
+MERGE (tf)-[:IMPLEMENTS]->(tc);
+
+MATCH (tp:TurningPoint {id: 'tp_crying_shutdown'}), (tf:TroubleshootFactor {id: 'feelings'})
+MERGE (tp)-[:SUGGESTS_FACTOR]->(tf);
+
+MATCH (tp:TurningPoint {id: 'tp_escalated'}), (tf:TroubleshootFactor {id: 'feelings'})
+MERGE (tp)-[:SUGGESTS_FACTOR]->(tf);
+
+MATCH (tp:TurningPoint {id: 'tp_defensive'}), (tf:TroubleshootFactor {id: 'feelings'})
+MERGE (tp)-[:SUGGESTS_FACTOR]->(tf);
+
+MERGE (tf:TroubleshootFactor {id: 'belief'})
+SET tf.label = 'A worry or belief stopped me',
+    tf.handout = 'worries',
+    tf.opens = ['check-the-facts', 'dear-man'],
+    tf.sortOrder = 4;
+
+MATCH (tf:TroubleshootFactor {id: 'belief'}), (tc:TherapyConcept {id: 'dbt_dear_man'})
+MERGE (tf)-[:IMPLEMENTS]->(tc);
+
+MATCH (tp:TurningPoint {id: 'tp_apologized'}), (tf:TroubleshootFactor {id: 'belief'})
+MERGE (tp)-[:SUGGESTS_FACTOR]->(tf);
+
+MATCH (tp:TurningPoint {id: 'tp_gave_in'}), (tf:TroubleshootFactor {id: 'belief'})
+MERGE (tp)-[:SUGGESTS_FACTOR]->(tf);
+
+MERGE (tf:TroubleshootFactor {id: 'quick_win'})
+SET tf.label = 'I settled for ending it quickly',
+    tf.handout = 'short_term_goals',
+    tf.opens = ['fast', 'dear-man'],
+    tf.sortOrder = 5;
+
+MATCH (tf:TroubleshootFactor {id: 'quick_win'}), (tc:TherapyConcept {id: 'dbt_dear_man'})
+MERGE (tf)-[:IMPLEMENTS]->(tc);
+
+MATCH (tp:TurningPoint {id: 'tp_gave_in'}), (tf:TroubleshootFactor {id: 'quick_win'})
+MERGE (tp)-[:SUGGESTS_FACTOR]->(tf);
+
+MERGE (tf:TroubleshootFactor {id: 'power'})
+SET tf.label = 'They had more power in this',
+    tf.handout = 'environment',
+    tf.opens = ['fast', 'ending-relationships', 'let-it-be'],
+    tf.sortOrder = 6;
+
+MATCH (tf:TroubleshootFactor {id: 'power'}), (tc:TherapyConcept {id: 'dbt_dear_man'})
+MERGE (tf)-[:IMPLEMENTS]->(tc);
+
+MERGE (tf:TroubleshootFactor {id: 'cant_give'})
+SET tf.label = "What I wanted isn't something they can give",
+    tf.handout = 'environment',
+    tf.opens = ['fast', 'finding-connection'],
+    tf.sortOrder = 7;
+
+MATCH (tf:TroubleshootFactor {id: 'cant_give'}), (tc:TherapyConcept {id: 'dbt_dear_man'})
+MERGE (tf)-[:IMPLEMENTS]->(tc);
+
+MERGE (tf:TroubleshootFactor {id: 'not_willing'})
+SET tf.label = 'I asked well, and they still said no',
+    tf.handout = 'environment',
+    tf.opens = ['fast'],
+    tf.sortOrder = 8;
+
+MATCH (tf:TroubleshootFactor {id: 'not_willing'}), (tc:TherapyConcept {id: 'dbt_dear_man'})
+MERGE (tf)-[:IMPLEMENTS]->(tc);
