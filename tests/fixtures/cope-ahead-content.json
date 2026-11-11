@@ -619,8 +619,8 @@
   {
    "id": "urge_surfing",
    "kind": "tool",
-   "label": "Urge Surfing",
-   "line": "use Urge Surfing",
+   "label": "Ride it out",
+   "line": "ride it out",
    "forPulls": [
     "chase",
     "fight"

@@ -15,11 +15,13 @@ import hold_to_wait  # noqa: E402
 import dear_man_debrief  # noqa: E402
 import pros_cons  # noqa: E402
 import first_body  # noqa: E402
+import ride_it_out  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
 SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKILL, *fast.SKILLS, nightmare_rescript.SKILL, problem_solve.SKILL,
-          ending_relationships.SKILL, hold_to_wait.SKILL, dear_man_debrief.SKILL, pros_cons.SKILL, first_body.SKILL]
+          ending_relationships.SKILL, hold_to_wait.SKILL, dear_man_debrief.SKILL, pros_cons.SKILL, first_body.SKILL,
+          ride_it_out.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -52,6 +54,11 @@ EMBEDS = {
     "breathPacer": {"ids": ["done", "partly", "skipped", "dizzy"], "measures": ["durationSec"]},
     "squeezeRelease": {"ids": ["done", "partly", "skipped"], "measures": ["durationSec", "doneCount"]},
     "orientFind": {"ids": ["done", "partly", "skipped"], "measures": ["doneCount"]},
+    # DT-05's wave (plan C3b `urgeWave`, DT-owned; src/lib/urgeWave.ts): the checks answered in order (categorical,
+    # plan C1 rule 2), then how the ride ended; and its trace at the close, read once.
+    "urgeWave": {"ids": ["still_here", "fading", "gone", "bigger", "ended_gone", "ended_bigger", "ended_not_now",
+                         "ended_left", "ended_long"], "measures": ["durationSec", "doneCount"]},
+    "waveTrace": {"ids": ["read"]},
 }
 # What each embed takes from the skill (embeds.ts EMBED_PROPS; the contract test keeps the two equal). build.py
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
@@ -206,6 +213,25 @@ EMBED_PROPS = {
         "task": {"type": "copy"},
         "foundLabel": {"type": "copy"},
         "done": {"type": "copy"},
+        "next": {"type": "copy"},
+    },
+    "urgeWave": {
+        "checkSec": {"type": "int", "min": 20, "max": 180},
+        "maxChecks": {"type": "int", "min": 1, "max": 10},
+        "checkTitle": {"type": "copy"},
+        "riding": {"type": "copy"},
+        "still_here": {"type": "copy"},
+        "fading": {"type": "copy"},
+        "gone": {"type": "copy"},
+        "bigger": {"type": "copy"},
+        "notNow": {"type": "copy", "optional": True},
+        "next": {"type": "copy"},
+    },
+    "waveTrace": {
+        "rideField": {"type": "field"},
+        "againField": {"type": "field", "optional": True},
+        "downLine": {"type": "copy"},
+        "heldLine": {"type": "copy"},
         "next": {"type": "copy"},
     },
 }

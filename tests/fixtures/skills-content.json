@@ -20661,6 +20661,1910 @@
      }
     ]
    }
+  },
+  {
+   "id": "ride_it_out",
+   "toolId": "urge-surfing",
+   "version": "ro-v1",
+   "start": "pull",
+   "accepts": [
+    "band"
+   ],
+   "ownMax": 90,
+   "emotionFields": [],
+   "copy": {
+    "pull_title": "What's the urge?",
+    "pull_hint": "Pick the closest. There's no wrong answer here.",
+    "pull_own": "Say it your way",
+    "safe_title": "Thank you for saying it. Right now, are you safe from acting on it?",
+    "safe_hint": "You can answer honestly. Whatever you say, the support stays on the screen.",
+    "heads_up_title": "Your body's loud right now. It can help to settle it first.",
+    "heads_up_hint": "You can do something for your body first, or ride it now.",
+    "settle_line": "Body first. Ride it out is here when you're ready.",
+    "ride_title": "Urges rise and fall. The job is not to act while it's high.",
+    "ride_again_title": "Back to watching it. You don't have to do anything with it.",
+    "riding": "Watch it. You don't have to do anything with it.",
+    "check_title": "How is it now?",
+    "still_here": "Still here",
+    "fading": "Fading",
+    "gone": "Gone",
+    "bigger": "Bigger",
+    "not_now": "Tell it: not now",
+    "ride_next": "Stop here",
+    "bigger_title": "It's getting bigger. Want to try something else for a bit?",
+    "bigger_hint": "When it keeps growing, changing what you're doing can help.",
+    "not_now_title": "Tell it: not now. Want something else instead?",
+    "not_now_hint": "Pick one, or five minutes with nothing else.",
+    "round_title": "Not now. Five minutes.",
+    "round_walk": "Not now. A walk for five minutes, even round the room.",
+    "round_wash": "Not now. Cold water on your hands or face, then five minutes.",
+    "round_call": "Not now. Call or text someone for five minutes.",
+    "round_cold": "Not now. Hold something cold for five minutes.",
+    "round_squeeze": "Not now. Squeeze a pillow or a ball for five minutes.",
+    "round_phone": "Not now. Phone in another room for five minutes.",
+    "round_hands": "Not now. Give your hands a job for five minutes.",
+    "round_start": "Start five minutes",
+    "round_running": "Not now",
+    "round_lead": "Get ready",
+    "round_done": "That's five minutes.",
+    "round_next": "Next",
+    "after_round_title": "How is it now?",
+    "after_round_hint": "Any answer is fine.",
+    "shape_title": "Here's the wave you rode.",
+    "shape_down": "It rose, crested and came down.",
+    "shape_held": "You rode it as far as it went today.",
+    "shape_next": "Next",
+    "switch_line": "Let's change what you're doing. Your body first, or a way to wait.",
+    "end_gone": "You watched it come down without acting on it.",
+    "end_passed": "You told it not now, and it eased.",
+    "end_line": "You stayed with it. That's the skill.",
+    "hurt_end_line": "You stayed with it. The support is still here if it comes back.",
+    "reach_line": "Please reach out to someone now, using the support on this screen. You don't have to hold this alone.",
+    "safety_open": "Talk to someone now",
+    "next": "Next",
+    "done": "Done"
+   },
+   "tables": {},
+   "derive": [],
+   "steps": [
+    {
+     "id": "pull",
+     "kind": "ask",
+     "title": "pull_title",
+     "hint": "pull_hint",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.pull",
+           "hurt"
+          ]
+         },
+         {
+          "in": [
+           "$a.safe",
+           [
+            "unsure",
+            "no"
+           ]
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "fields": [
+      {
+       "id": "pull",
+       "options": {
+        "list": "pull"
+       },
+       "max": 1,
+       "required": true,
+       "own": {
+        "hint": "pull_own",
+        "countsAsPick": true
+       },
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "safe",
+       "when": {
+        "eq": [
+         "$a.pull",
+         "hurt"
+        ]
+       }
+      },
+      {
+       "to": "heads_up",
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       }
+      },
+      {
+       "to": "ride",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "safe",
+     "kind": "ask",
+     "title": "safe_title",
+     "hint": "safe_hint",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.pull",
+           "hurt"
+          ]
+         },
+         {
+          "in": [
+           "$a.safe",
+           [
+            "unsure",
+            "no"
+           ]
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "safetyFirst": {
+      "all": []
+     },
+     "fields": [
+      {
+       "id": "safe",
+       "options": {
+        "list": "safe"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "reach",
+       "when": {
+        "in": [
+         "$a.safe",
+         [
+          "unsure",
+          "no"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "heads_up",
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       }
+      },
+      {
+       "to": "ride",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "heads_up",
+     "kind": "ask",
+     "title": "heads_up_title",
+     "hint": "heads_up_hint",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.pull",
+           "hurt"
+          ]
+         },
+         {
+          "in": [
+           "$a.safe",
+           [
+            "unsure",
+            "no"
+           ]
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "fields": [
+      {
+       "id": "heads_up",
+       "options": {
+        "list": "heads_up"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "settle",
+       "when": {
+        "in": [
+         "$a.heads_up",
+         [
+          "body",
+          "hold"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "ride",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "ride",
+     "kind": "embed",
+     "embed": "urgeWave",
+     "answerAs": "ride",
+     "title": "ride_title",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.pull",
+           "hurt"
+          ]
+         },
+         {
+          "in": [
+           "$a.safe",
+           [
+            "unsure",
+            "no"
+           ]
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "props": {
+      "checkSec": 75,
+      "maxChecks": 10,
+      "checkTitle": "check_title",
+      "riding": "riding",
+      "still_here": "still_here",
+      "fading": "fading",
+      "gone": "gone",
+      "bigger": "bigger",
+      "next": "ride_next",
+      "notNow": "not_now"
+     },
+     "next": [
+      {
+       "to": "bigger",
+       "when": {
+        "has": [
+         "$a.ride.ids",
+         "ended_bigger"
+        ]
+       }
+      },
+      {
+       "to": "not_now",
+       "when": {
+        "has": [
+         "$a.ride.ids",
+         "ended_not_now"
+        ]
+       }
+      },
+      {
+       "to": "shape",
+       "when": {
+        "any": [
+         {
+          "has": [
+           "$a.ride.ids",
+           "still_here"
+          ]
+         },
+         {
+          "has": [
+           "$a.ride.ids",
+           "fading"
+          ]
+         },
+         {
+          "has": [
+           "$a.ride.ids",
+           "gone"
+          ]
+         },
+         {
+          "has": [
+           "$a.ride.ids",
+           "bigger"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "hurt_end",
+       "when": {
+        "eq": [
+         "$a.pull",
+         "hurt"
+        ]
+       }
+      },
+      {
+       "to": "end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "bigger",
+     "kind": "ask",
+     "title": "bigger_title",
+     "hint": "bigger_hint",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.pull",
+           "hurt"
+          ]
+         },
+         {
+          "in": [
+           "$a.safe",
+           [
+            "unsure",
+            "no"
+           ]
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "fields": [
+      {
+       "id": "bigger",
+       "options": {
+        "list": "bigger"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "ride2",
+       "when": {
+        "eq": [
+         "$a.bigger",
+         "keep"
+        ]
+       }
+      },
+      {
+       "to": "switch",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "not_now",
+     "kind": "ask",
+     "title": "not_now_title",
+     "hint": "not_now_hint",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.pull",
+           "hurt"
+          ]
+         },
+         {
+          "in": [
+           "$a.safe",
+           [
+            "unsure",
+            "no"
+           ]
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "fields": [
+      {
+       "id": "swap",
+       "options": {
+        "list": "swap",
+        "where": {
+         "any": [
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.pull",
+              "send"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.send",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.pull",
+              "check"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.check",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.pull",
+              "hurt"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.hurt",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.pull",
+              "hit"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.hit",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.pull",
+              "leave"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.leave",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.pull",
+              "use"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.use",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "not": {
+              "in": [
+               "$a.pull",
+               [
+                "send",
+                "check",
+                "hurt",
+                "hit",
+                "leave",
+                "use"
+               ]
+              ]
+             }
+            },
+            {
+             "eq": [
+              "$opt.other",
+              true
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "round",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "round",
+     "kind": "embed",
+     "embed": "doseTimer",
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$a.swap",
+         "walk"
+        ]
+       },
+       "key": "round_walk"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.swap",
+         "wash"
+        ]
+       },
+       "key": "round_wash"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.swap",
+         "call"
+        ]
+       },
+       "key": "round_call"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.swap",
+         "cold"
+        ]
+       },
+       "key": "round_cold"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.swap",
+         "squeeze"
+        ]
+       },
+       "key": "round_squeeze"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.swap",
+         "phone"
+        ]
+       },
+       "key": "round_phone"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.swap",
+         "hands"
+        ]
+       },
+       "key": "round_hands"
+      },
+      {
+       "key": "round_title"
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.pull",
+           "hurt"
+          ]
+         },
+         {
+          "in": [
+           "$a.safe",
+           [
+            "unsure",
+            "no"
+           ]
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "props": {
+      "art": "none",
+      "seconds": 300,
+      "leadIn": 3,
+      "start": "round_start",
+      "running": "round_running",
+      "lead": "round_lead",
+      "done": "round_done",
+      "next": "round_next"
+     },
+     "next": [
+      {
+       "to": "after_round",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "after_round",
+     "kind": "ask",
+     "title": "after_round_title",
+     "hint": "after_round_hint",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.pull",
+           "hurt"
+          ]
+         },
+         {
+          "in": [
+           "$a.safe",
+           [
+            "unsure",
+            "no"
+           ]
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "fields": [
+      {
+       "id": "after_round",
+       "options": {
+        "list": "after_round"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "hurt_end",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.after_round",
+           "passed"
+          ]
+         },
+         {
+          "eq": [
+           "$a.pull",
+           "hurt"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "passed",
+       "when": {
+        "eq": [
+         "$a.after_round",
+         "passed"
+        ]
+       }
+      },
+      {
+       "to": "round2",
+       "when": {
+        "eq": [
+         "$a.after_round",
+         "again"
+        ]
+       }
+      },
+      {
+       "to": "ride2",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "round2",
+     "kind": "embed",
+     "embed": "doseTimer",
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$a.swap",
+         "walk"
+        ]
+       },
+       "key": "round_walk"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.swap",
+         "wash"
+        ]
+       },
+       "key": "round_wash"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.swap",
+         "call"
+        ]
+       },
+       "key": "round_call"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.swap",
+         "cold"
+        ]
+       },
+       "key": "round_cold"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.swap",
+         "squeeze"
+        ]
+       },
+       "key": "round_squeeze"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.swap",
+         "phone"
+        ]
+       },
+       "key": "round_phone"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.swap",
+         "hands"
+        ]
+       },
+       "key": "round_hands"
+      },
+      {
+       "key": "round_title"
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.pull",
+           "hurt"
+          ]
+         },
+         {
+          "in": [
+           "$a.safe",
+           [
+            "unsure",
+            "no"
+           ]
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "props": {
+      "art": "none",
+      "seconds": 300,
+      "leadIn": 3,
+      "start": "round_start",
+      "running": "round_running",
+      "lead": "round_lead",
+      "done": "round_done",
+      "next": "round_next"
+     },
+     "next": [
+      {
+       "to": "after_round2",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "after_round2",
+     "kind": "ask",
+     "title": "after_round_title",
+     "hint": "after_round_hint",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.pull",
+           "hurt"
+          ]
+         },
+         {
+          "in": [
+           "$a.safe",
+           [
+            "unsure",
+            "no"
+           ]
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "fields": [
+      {
+       "id": "after_round2",
+       "options": {
+        "list": "after_round",
+        "where": {
+         "not": {
+          "eq": [
+           "$opt.again",
+           true
+          ]
+         }
+        }
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "hurt_end",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.after_round2",
+           "passed"
+          ]
+         },
+         {
+          "eq": [
+           "$a.pull",
+           "hurt"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "passed",
+       "when": {
+        "eq": [
+         "$a.after_round2",
+         "passed"
+        ]
+       }
+      },
+      {
+       "to": "ride2",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "ride2",
+     "kind": "embed",
+     "embed": "urgeWave",
+     "answerAs": "again",
+     "title": "ride_again_title",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.pull",
+           "hurt"
+          ]
+         },
+         {
+          "in": [
+           "$a.safe",
+           [
+            "unsure",
+            "no"
+           ]
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "props": {
+      "checkSec": 75,
+      "maxChecks": 10,
+      "checkTitle": "check_title",
+      "riding": "riding",
+      "still_here": "still_here",
+      "fading": "fading",
+      "gone": "gone",
+      "bigger": "bigger",
+      "next": "ride_next"
+     },
+     "next": [
+      {
+       "to": "switch",
+       "when": {
+        "has": [
+         "$a.again.ids",
+         "ended_bigger"
+        ]
+       }
+      },
+      {
+       "to": "shape",
+       "when": {
+        "any": [
+         {
+          "any": [
+           {
+            "has": [
+             "$a.ride.ids",
+             "still_here"
+            ]
+           },
+           {
+            "has": [
+             "$a.ride.ids",
+             "fading"
+            ]
+           },
+           {
+            "has": [
+             "$a.ride.ids",
+             "gone"
+            ]
+           },
+           {
+            "has": [
+             "$a.ride.ids",
+             "bigger"
+            ]
+           }
+          ]
+         },
+         {
+          "any": [
+           {
+            "has": [
+             "$a.again.ids",
+             "still_here"
+            ]
+           },
+           {
+            "has": [
+             "$a.again.ids",
+             "fading"
+            ]
+           },
+           {
+            "has": [
+             "$a.again.ids",
+             "gone"
+            ]
+           },
+           {
+            "has": [
+             "$a.again.ids",
+             "bigger"
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "hurt_end",
+       "when": {
+        "eq": [
+         "$a.pull",
+         "hurt"
+        ]
+       }
+      },
+      {
+       "to": "end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "shape",
+     "kind": "embed",
+     "embed": "waveTrace",
+     "answerAs": "shape",
+     "title": "shape_title",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.pull",
+           "hurt"
+          ]
+         },
+         {
+          "in": [
+           "$a.safe",
+           [
+            "unsure",
+            "no"
+           ]
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "props": {
+      "rideField": "ride",
+      "againField": "again",
+      "downLine": "shape_down",
+      "heldLine": "shape_held",
+      "next": "shape_next"
+     },
+     "next": [
+      {
+       "to": "hurt_end",
+       "when": {
+        "eq": [
+         "$a.pull",
+         "hurt"
+        ]
+       }
+      },
+      {
+       "to": "end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "passed",
+     "kind": "handoff",
+     "complete": true,
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.pull",
+           "hurt"
+          ]
+         },
+         {
+          "in": [
+           "$a.safe",
+           [
+            "unsure",
+            "no"
+           ]
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "end_passed"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "pros_cons",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "end",
+     "kind": "handoff",
+     "complete": true,
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.pull",
+           "hurt"
+          ]
+         },
+         {
+          "in": [
+           "$a.safe",
+           [
+            "unsure",
+            "no"
+           ]
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "any": [
+         {
+          "has": [
+           "$a.ride.ids",
+           "ended_gone"
+          ]
+         },
+         {
+          "has": [
+           "$a.again.ids",
+           "ended_gone"
+          ]
+         }
+        ]
+       },
+       "key": "end_gone"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "end_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "pros_cons",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "switch",
+     "kind": "handoff",
+     "complete": true,
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.pull",
+           "hurt"
+          ]
+         },
+         {
+          "in": [
+           "$a.safe",
+           [
+            "unsure",
+            "no"
+           ]
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "noClose": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "switch_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "cool_down",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "pause",
+       "when": {
+        "not": {
+         "eq": [
+          "$a.pull",
+          "hurt"
+         ]
+        }
+       }
+      }
+     ]
+    },
+    {
+     "id": "settle",
+     "kind": "handoff",
+     "complete": true,
+     "noClose": true,
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.pull",
+           "hurt"
+          ]
+         },
+         {
+          "in": [
+           "$a.safe",
+           [
+            "unsure",
+            "no"
+           ]
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "settle_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "cool_down",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.heads_up",
+           "body"
+          ]
+         },
+         {
+          "eq": [
+           "$a.pull",
+           "hurt"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "exit": "pause",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.heads_up",
+           "hold"
+          ]
+         },
+         {
+          "not": {
+           "eq": [
+            "$a.pull",
+            "hurt"
+           ]
+          }
+         }
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "id": "hurt_end",
+     "kind": "handoff",
+     "complete": true,
+     "noClose": true,
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.pull",
+           "hurt"
+          ]
+         },
+         {
+          "in": [
+           "$a.safe",
+           [
+            "unsure",
+            "no"
+           ]
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "hurt_end_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "cool_down",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "crisis_kit",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "reach",
+     "kind": "handoff",
+     "complete": true,
+     "noClose": true,
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.pull",
+           "hurt"
+          ]
+         },
+         {
+          "in": [
+           "$a.safe",
+           [
+            "unsure",
+            "no"
+           ]
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "reach_line"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": [
+      {
+       "exit": "crisis_kit",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    }
+   ],
+   "exits": [
+    {
+     "id": "cool_down",
+     "toolId": "cool-down",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "crisis_kit",
+     "toolId": "crisis-kit",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "done",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": true
+    },
+    {
+     "id": "pause",
+     "toolId": "pause",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "pros_cons",
+     "toolId": "pros-cons",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "safety_open",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": false,
+     "safety": true
+    }
+   ],
+   "options": {
+    "pull": [
+     {
+      "value": "send",
+      "label": "Send or say something",
+      "urge": "send"
+     },
+     {
+      "value": "check",
+      "label": "Check their page, or my phone",
+      "urge": "check"
+     },
+     {
+      "value": "hurt",
+      "label": "Hurt myself",
+      "urge": "self_harm",
+      "danger": "self"
+     },
+     {
+      "value": "hit",
+      "label": "Hit, throw or slam",
+      "urge": "hit"
+     },
+     {
+      "value": "leave",
+      "label": "Leave, run or disappear",
+      "urge": "leave"
+     },
+     {
+      "value": "use",
+      "label": "Use, drink, binge or buy",
+      "urge": "use"
+     }
+    ],
+    "safe": [
+     {
+      "value": "safe",
+      "label": "Yes, I'm safe for now"
+     },
+     {
+      "value": "unsure",
+      "label": "I'm not sure",
+      "danger": "self"
+     },
+     {
+      "value": "no",
+      "label": "No",
+      "danger": "self"
+     }
+    ],
+    "heads_up": [
+     {
+      "value": "body",
+      "label": "My body first"
+     },
+     {
+      "value": "hold",
+      "label": "A way to wait first"
+     },
+     {
+      "value": "now",
+      "label": "Ride it now"
+     }
+    ],
+    "bigger": [
+     {
+      "value": "body",
+      "label": "Something for my body"
+     },
+     {
+      "value": "hold",
+      "label": "A way to wait"
+     },
+     {
+      "value": "keep",
+      "label": "Keep riding it"
+     }
+    ],
+    "swap": [
+     {
+      "value": "walk",
+      "label": "A walk, even round the room",
+      "send": true,
+      "check": true,
+      "hurt": true,
+      "hit": true,
+      "leave": true,
+      "use": true,
+      "other": true
+     },
+     {
+      "value": "wash",
+      "label": "Cold water on my hands or face",
+      "send": true,
+      "check": true,
+      "hurt": true,
+      "hit": true,
+      "leave": true,
+      "use": true,
+      "other": true
+     },
+     {
+      "value": "call",
+      "label": "Call or text someone",
+      "check": true,
+      "hurt": true,
+      "hit": true,
+      "leave": true,
+      "use": true,
+      "other": true
+     },
+     {
+      "value": "cold",
+      "label": "Hold something cold",
+      "hurt": true,
+      "hit": true,
+      "use": true
+     },
+     {
+      "value": "squeeze",
+      "label": "Squeeze a pillow or a ball",
+      "hurt": true,
+      "hit": true
+     },
+     {
+      "value": "phone",
+      "label": "Put the phone in another room",
+      "send": true,
+      "check": true
+     },
+     {
+      "value": "hands",
+      "label": "Give my hands a job",
+      "send": true,
+      "check": true,
+      "use": true,
+      "other": true
+     },
+     {
+      "value": "just_wait",
+      "label": "Five minutes, nothing else",
+      "send": true,
+      "check": true,
+      "hurt": true,
+      "hit": true,
+      "leave": true,
+      "use": true,
+      "other": true
+     }
+    ],
+    "after_round": [
+     {
+      "value": "passed",
+      "label": "Gone or fading",
+      "again": false
+     },
+     {
+      "value": "again",
+      "label": "Five more minutes",
+      "again": true
+     },
+     {
+      "value": "still",
+      "label": "Still here",
+      "again": false
+     }
+    ]
+   }
   }
  ]
 }
