@@ -71,6 +71,7 @@ EMBED_PROPS = {
         "hint": {"type": "copy"},
         "doneLabel": {"type": "copy", "optional": True},
         "next": {"type": "copy"},
+        "wayOn": {"type": "enum", "values": ["from_start"], "optional": True},
     },
     "witness": {
         "moment": {"type": "id"},

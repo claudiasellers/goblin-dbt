@@ -64,6 +64,7 @@ function TimedRing({ ms, leadIn = 0, label, running, leadLabel, onStop, onEnd, a
   const ranMs = Math.max(0, timer.elapsedMs - leadIn * 1000);
   useEffect(() => { if (liveRef) liveRef.current = on ? { fraction: Math.min(1, doseFraction), ranMs } : null; });
   const toggle = () => {
+    if (autoStart && on) return; // nothing to do: a tap doesn't stop it (the way on is below)
     if (on) { timer.stop(); onStop(Math.min(1, doseFraction), Math.max(0, timer.elapsedMs - leadIn * 1000)); }
     else timer.start();
   };
@@ -118,7 +119,7 @@ export function DoseTimer({ props, onShown, onDone }: EmbedProps) {
   return (
     <section className="space-y-5" data-testid="dose-timer" data-art={text(props, 'art') || 'none'}>
       {props.art === 'cold' && (
-        <img src={COLD_ART} alt="" aria-hidden="true" draggable={false} className="mx-auto h-28 w-auto select-none pointer-events-none" />
+        <div aria-hidden="true" className="mx-auto w-fit rounded-2xl bg-[#eef1fb] p-2"><img src={COLD_ART} alt="" draggable={false} className="h-24 w-auto select-none pointer-events-none" /></div>
       )}
       <Steps props={props} />
       <TimedRing ms={ms} leadIn={lead} label={text(props, 'start')} running={text(props, 'running')} finished={done} liveRef={liveRef}
@@ -175,8 +176,10 @@ export function BreathPacer({ props, onShown, onDone }: EmbedProps) {
         <button type="button" aria-pressed={on} disabled={done}
           onClick={() => { if (on) { timer.stop(); setEnded({ fraction: timer.fraction, ranMs: timer.elapsedMs }); } else timer.start(); }}
           className="relative w-[200px] h-[200px] rounded-full grid place-items-center select-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-accent)]">
-          <span aria-hidden="true" className="absolute inset-0 rounded-full bg-[var(--color-accent)] opacity-20"
-            style={{ transform: `scale(${reduce ? 1 : scale})`, transition: reduce ? 'none' : 'transform 100ms linear' }} />
+          <span aria-hidden="true" className="absolute inset-0 rounded-full bg-[var(--color-accent)]"
+            style={{ transform: `scale(${reduce ? 1 : scale})`, transition: reduce ? 'none' : 'transform 100ms linear',
+              // Reduced motion: no growing circle, so in and out show as a fuller or fainter fill.
+              opacity: reduce && on ? (b.phase === 'in' ? 0.35 : 0.15) : 0.2 }} />
           <span aria-live="polite" className="relative block max-w-[9rem] text-center text-lg font-medium text-[var(--color-text-primary)] text-balance">
             {done ? text(props, 'done') : on ? text(props, b.phase === 'in' ? 'inLabel' : 'outLabel') : text(props, 'start')}
           </span>
@@ -216,11 +219,12 @@ export function SqueezeRelease({ props, onShown, onDone }: EmbedProps) {
           <li key={i} className={`h-2.5 w-2.5 rounded-full ${i < doneCount ? 'bg-[var(--color-accent)]' : 'border border-[var(--color-text-tertiary)]'}`} />
         ))}
       </ol>
+      <p className="sr-only" aria-live="polite">{doneCount} of {plan.rounds}</p>
       {finished
         ? <p role="status" className="text-center text-[var(--color-text-secondary)]">{text(props, 'done')}</p>
         : (
           <div className="flex justify-center">
-            <button type="button" data-hold="" disabled={dropping} {...handlers}
+            <button type="button" data-hold="" aria-disabled={dropping || undefined} {...(dropping ? {} : handlers)}
               className="rounded-full select-none touch-none [-webkit-touch-callout:none] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-accent)]">
               <ProgressRing value={squeezing ? p : 0} size={200} stroke={5} smooth={false}>
                 <span aria-hidden="true" className="absolute inset-0 m-auto w-24 h-24 rounded-[45%] bg-[var(--color-accent)] opacity-25"
@@ -258,6 +262,7 @@ export function OrientFind({ props, onShown, onDone }: EmbedProps) {
           <li key={i} className={`h-3 w-3 rounded-full ${i < found ? 'bg-[var(--color-accent)]' : 'border border-[var(--color-text-tertiary)]'}`} />
         ))}
       </ol>
+      <p className="sr-only" aria-live="polite">{Math.min(found, count)} of {count}</p>
       {done
         ? <p role="status" className="text-center text-[var(--color-text-secondary)]">{text(props, 'done')}</p>
         : (

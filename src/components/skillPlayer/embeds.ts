@@ -104,6 +104,8 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     hint: { type: 'copy' },
     doneLabel: { type: 'copy', optional: true },
     next: { type: 'copy' },
+    /** `from_start`: the quiet way on shows before any try (a body mode with no hold to wait out, DT-01's press). */
+    wayOn: { type: 'enum', values: ['from_start'], optional: true },
   },
   witness: {
     moment: { type: 'id' },

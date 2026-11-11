@@ -20,7 +20,8 @@ import type { EmbedProps } from './embeds';
  *
  * Props (copy props arrive as text): variant, seconds, holds, growthPct, maxSeconds; label (inside the ring),
  * runningLabel (inside it while a hold runs, e.g. a timed ring's "Tap to stop"; else the label stays), hint (what a
- * screen reader hears with it), doneLabel (after the last hold), next (the way on).
+ * screen reader hears with it), doneLabel (after the last hold), next (the way on), wayOn (`from_start`: the quiet way
+ * on before any try).
  */
 export function HoldRingEmbed({ props, onShown, onDone }: EmbedProps) {
   const plan = holdPlan(props);
@@ -29,6 +30,7 @@ export function HoldRingEmbed({ props, onShown, onDone }: EmbedProps) {
   const runningLabel = typeof props.runningLabel === 'string' ? props.runningLabel : label;
   const doneLabel = typeof props.doneLabel === 'string' ? props.doneLabel : null;
   const next = String(props.next ?? '');
+  const wayOnFromStart = props.wayOn === 'from_start';
   const [t, setT] = useState<HoldTally>(EMPTY_TALLY);
   const [tried, setTried] = useState(false);
   const nextRef = useRef<HTMLButtonElement>(null);
@@ -67,7 +69,7 @@ export function HoldRingEmbed({ props, onShown, onDone }: EmbedProps) {
           {plan.variant === 'timed'
             ? <TimedRing key={t.doneCount} plan={plan} done={t.doneCount} label={label} runningLabel={runningLabel} hint={hint} onEnd={ended} />
             : <PressRing key={t.doneCount} plan={plan} done={t.doneCount} label={label} runningLabel={runningLabel} hint={hint} onEnd={ended} />}
-          {tried && (
+          {(tried || wayOnFromStart) && (
             <div className="flex justify-center">
               <button type="button" className={linkButton} onClick={finish}>{next}</button>
             </div>

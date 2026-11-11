@@ -178,7 +178,9 @@ Rules:
 3. **Outcomes live on the spine, not in `ext.run`.** *Did it help* is the close's `thenVsNow`; *did you
    act on it* is `actedOnUrge`; both are ask-fresh fields already registered. A skill that needs both
    asks the new two-part close (C3a, `urge_change`). Mid-flow checks that steer the flow (DT-01's
-   *louder · same · quieter*, DT-05's wave taps) are answers or `out`, never pre-filled.
+   *louder · same · quieter*, DT-05's wave taps) are answers or `out`, never pre-filled. A mid-flow check
+   that *is* the close carries `askFresh: 'thenVsNow'` (built in DT-01: the newest answer goes to the spine and
+   no `SessionClose` follows; `skill-runtime.md`).
 4. **One answer may be promoted to an ask-fresh field** (`askFresh` on the field), as `fitsFacts` is. A
    lane adding a promoted field adds it to `ASK_FRESH_FIELDS` and the export test in the same PR.
 5. **Chains.** The next skill's session carries this one as `hostSessionId` (as built). An **inline
@@ -265,12 +267,12 @@ lands with F2 because two lanes need it in their first batch.
 |---|---|---|---|---|---|
 | `witness` | The receive beat: echo, one witness line, skip, say it my way | `WitnessBeat.tsx`, `getWitnessLines` | Foundation | F2 | DT-04, DT-11, IE-01 direct entry, ER function lines |
 | `holdRing` | Press-and-hold or tap-start ring, slowing pulse, early release counts, growth across holds; variants `press`, `timed`, `settle` | `ProgressRing`, OA `HoldToConfirm`, Cope Ahead `Settle`, Wise mind `HoldButton`, R13 | DT | F2 | DT-01/02/04/06/07, ER-04, ER-05 settle, ER-15 |
-| `bodyCard` | One pictogram body cue with a ring: willing hands, half-smile, hand on heart, press | OA body cues, Recover compassion copy | DT | DT-B2 | DT-01/04/07, IE-06, MF-03/06 later |
-| `doseTimer` | Hands-free dose with lead-in (cold, move burst, warmth) | `CoolDown.tsx` clock and audio, `ColdReset` | DT | DT-B2 | DT-01, DT-07 |
-| `breathPacer` | Exhale-weighted pacer, dizzy/tingly stop rule | `BreathOrb`, capacity `sigh` | DT | DT-B2 | DT-01, DT-07, P2 |
-| `squeezeRelease` | Squeeze on the in-breath, drop on the out-breath ×3 | FTF Shape blob | DT | DT-B2 | DT-01 |
-| `orientFind` | Eyes-open find-N with date, time and where you are on screen | `Orient`, capacity `orient`, `FiveSenses.tsx` | DT | DT-B2 | DT-01, DT-06, MF-01 later |
-| `medicalScreen` | One sheet of body flags, kept on a yes | new | DT | DT-B2 (one-tap self-check) / safety batch (full) | DT-01, every cold/exertion/breath mode |
+| `bodyCard` | One pictogram body cue with a ring: willing hands, half-smile, hand on heart, press | OA body cues, Recover compassion copy; **built** in DT-01 part 1 (`BodyEmbeds.tsx` over `src/lib/bodyModes.ts`) | DT | DT-B2 | DT-01/04/07, IE-06, MF-03/06 later |
+| `doseTimer` | Hands-free dose with lead-in (cold, move burst, warmth) | `CoolDown.tsx` clock and audio, `ColdReset`; **built** in DT-01 part 1 (`BodyEmbeds.tsx` over `src/lib/bodyModes.ts`) | DT | DT-B2 | DT-01, DT-07 |
+| `breathPacer` | Exhale-weighted pacer, dizzy/tingly stop rule | `BreathOrb`, capacity `sigh`; **built** in DT-01 part 1 (`BodyEmbeds.tsx` over `src/lib/bodyModes.ts`) | DT | DT-B2 | DT-01, DT-07, P2 |
+| `squeezeRelease` | Squeeze on the in-breath, drop on the out-breath ×3 | FTF Shape blob; **built** in DT-01 part 1 (`BodyEmbeds.tsx` over `src/lib/bodyModes.ts`) | DT | DT-B2 | DT-01 |
+| `orientFind` | Eyes-open find-N with date, time and where you are on screen | `Orient`, capacity `orient`, `FiveSenses.tsx`; **built** in DT-01 part 1 (`BodyEmbeds.tsx` over `src/lib/bodyModes.ts`) | DT | DT-B2 | DT-01, DT-06, MF-01 later |
+| `medicalScreen` | One sheet of body flags, kept on a yes | new; DT-01 part 1 built the one-tap self-check as an **ask step**, not this embed (nothing kept) | DT | DT-B2 (one-tap self-check) / safety batch (full) | DT-01, every cold/exertion/breath mode |
 | `rebellionCard` | The rebellion on the square paper (wraps `PaperCard` unchanged, no keep), *against* the squeeze, *for* the function, then *When?* | `RebellionCard.tsx` | DT | DT-B1 | DT-11 (DT-03's kit menu card may reuse it) |
 | `waitLock` | Timestamp lock with a come-back, draft stays visible, never locks the send | `WaitLock.tsx`; **built** as an embed in DT-02 (`WaitLockEmbed.tsx`: plain wait, `clock={false}`, *I'm back* always there; `waited` · `back_early` + `durationSec`) | DT | DT-B1 | DT-02, IE composer |
 | `urgeWave` | The urge as a moving object animated by taps; axis-free trace at the close. Shares a motion engine with `waveRoom` | FTF Shape urge loop | DT (engine too) | DT-B3 | DT-05, ER-08 visual |
@@ -528,7 +530,7 @@ lanes, only the arrows in §5.4 hold anyone up.
 | Batch | Skills | Needs | Why this order |
 |---|---|---|---|
 | DT-B1 | **DT-11** Rebel without the wreckage (new; built, first PR); **DT-02** Hold to wait (replaces Pause); `waitLock`; behaviour urges + `self_harm` urge rows (C5) | F1 (DT-11 needs nothing more from the runtime, but merges and deploys after #55, whose own-words encryption C1 rule 7 needs from the first lane PR on; DT-02 needs R1, R6, R7, and `holdRing` from F2, so DT-02 lands after F2) | DT-11 is pure chips and Claudia's ask. DT-02 is the first whole-screen embed in a small flow and defines the urge vocabulary DT-05/10 use |
-| DT-B2 | **DT-10** Pros & cons (keep; inline; `prosConsReplay` into DT-02); **DT-01** First, the body (body-mode embeds, `Intervention` content, `microSteps.ts` into the graph, inline `regulate`, the Help-me-now fork as its hand-off step, the one-tap self-check if D4 says so) | F2 | DT-10 is the cleanest proof of keep. DT-01 is the heaviest and the most depended-on: half of ER, IE and WMP hand to it |
+| DT-B2 | **DT-10** Pros & cons (keep; inline; `prosConsReplay` into DT-02); **DT-01** First, the body (body-mode embeds, `Intervention` content, `microSteps.ts` into the graph, inline `regulate`, the Help-me-now fork as its hand-off step, the one-tap self-check if D4 says so). **Built:** DT-10 (#77); DT-01 part 1 (#81: the skill, five body embeds, the self-check, the in-flow close; the hosts, `Intervention` content, `microSteps.ts` and inline `regulate` are part 2) | F2 | DT-10 is the cleanest proof of keep. DT-01 is the heaviest and the most depended-on: half of ER, IE and WMP hand to it |
 | DT-B3 | **DT-05** Ride it out (`urgeWave`, slider gone, rows reactivated as drafts); **DT-06** Give your mind a job levels 0–2, the lid, returns, reopen (`lidShelf`, `cardDeck`) | DT-B2 (DT-01 as the bigger ×2 escalation), R5, R9 | Both need follow-ups and resume; DT-06 level 3 waits on ER-04 |
 | DT-B4 | **DT-04** Let it be, turning the mind, willingness (`bodyCard` in use, `turnFork`, inline `acceptance` for IE-05 and Recover) | witness lines for DT-04 signed off; `acceptance_target` kind | IE-05's full Let go and Recover's *Let it land* wait on it |
 | DT-B5 | **DT-07** Held, **DT-08** Thoughts passing through | D3, D13 | Need the runtime decision for MF practices and, for DT-07's voice, storage |

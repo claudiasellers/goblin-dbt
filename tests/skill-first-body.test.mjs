@@ -68,7 +68,8 @@ test("D4: cold only after the one-tap self-check; any flag rules it out; not sur
   assert.ok(cold.seconds <= 30 && cool.seconds <= 15, "15-30 s; a cool cloth is shorter");
   assert.match(skill.copy[cold.caution], /Never in a shower or a bath/);
   assert.match(skill.copy[cool.caution], /Stop if anything feels wrong/);
-  assert.match(skill.copy.screen_hint, /Heart trouble or fainting\. An eating disorder or very low weight\. Pregnant\. Raynaud's or a cold allergy\. Drinking or using today\./);
+  for (const flag of [/slow heart/, /heart medicine/, /Fainting/, /eating disorder/, /very low weight/, /Pregnant/, /Raynaud's/, /cold allergy/, /Drinking or using today/])
+    assert.match(skill.copy.screen_hint, flag, "the self-check names every cold contraindication (Gate 3)");
   // No path reaches cold or the cool cloth without the self-check answered none or not sure.
   for (const s of skill.steps) for (const t of s.next ?? []) {
     if (["cold", "cool"].includes(t.to)) assert.equal(s.id, "cold_near", `${s.id} → ${t.to}`);
@@ -97,7 +98,9 @@ test("the wave's swap is the long out-breath, with its stop rule; dizzy switches
   const p = M.stepOf(skill, "exhale").props;
   assert.ok(p.outSec > p.inSec, "the out-breath is longer");
   assert.match(skill.copy[p.dizzy], /Dizzy or tingly\? Stop/);
-  assert.equal(run([did("dizzy")], ctx(), swap).stepId, "squeeze", "a different modality");
+  assert.equal(run([did("dizzy")], ctx(), swap).stepId, "squeeze_still", "a different modality");
+  const still = skill.steps.find((x) => x.id === "squeeze_still");
+  for (const k of [still.props.step1, still.props.step2]) assert.doesNotMatch(skill.copy[k], /breathe (in|out)/i, "no paced breath after dizziness (Gate 3)");
   assert.equal(run([did("done")], ctx(), swap).stepId, "check2");
   // When squeeze already ran (a flag ruled out cold), dizzy goes straight to the check.
   const flagged = run([pick("state", "wave"), next, pick("screen", "some"), next, did(), next, pick("check1", "same"), next]);
@@ -238,4 +241,15 @@ test("leaving mid-dose reports how far it ran, not skipped", () => {
   assert.deepEqual(B.timedOutput(B.leftAt({ fraction: 0, ranMs: 0 }, { fraction: 0.5, ranMs: 15_000 }).fraction, 15_000), { ids: ["partly"], durationSec: 15 });
   const src = readFileSync("src/components/skillPlayer/BodyEmbeds.tsx", "utf8");
   assert.equal((src.match(/leftAt\(result, liveRef\.current\)/g) ?? []).length, 2, "DoseTimer and BodyCard both read the running dose");
+});
+
+test("Gate 3: frozen and far away lower the demand without anything passive; the urge goes on without a Done", () => {
+  const lh = skill.steps.find((x) => x.id === "lower_here");
+  assert.match(skill.copy[lh.props.cue], /Eyes open, feet on the floor/);
+  const c2 = skill.steps.find((x) => x.id === "check2_here");
+  assert.deepEqual(c2.next.map((t) => t.to), ["fork", "lower_here"]);
+  assert.equal(skill.steps.find((x) => x.id === "urge").done, undefined);
+  assert.doesNotMatch(skill.copy.medical_line, /come back/, "never reads as permission to skip care");
+  assert.ok(skill.copy.medical_line.length <= 90);
+  assert.equal(skill.steps.find((x) => x.id === "press").props.wayOn, "from_start", "the frozen path never locks (Gate 2)");
 });

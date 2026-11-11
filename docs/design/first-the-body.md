@@ -20,24 +20,24 @@ demand (*You don't have to make this go away*) with someone to talk to on the sc
 
 | Step | What the person sees | PRD DT-01 |
 |---|---|---|
-| `state` | *What's it like right now?* A wave · I want to do something · Frozen or numb · Far away · My mind won't stop · **Chest pain or fainting** | Step 1 |
-| `medical` | Chest pain or fainting: the `medical` banner (911 first; UK 999, Ireland and the EU 112, Canada 911, Australia 000, New Zealand 111), *If it's chest pain, fainting or you can't get your breath, call now. If it passes, come back here.* No close | Medical triage |
-| `urge` | I want to do something: *Your hand needs a job first. Hold to wait gives it one.* → `pause`, which asks about hurting yourself first (C6.5). No close | State → DT-02 |
-| `screen` | A wave: the one-tap self-check (D4). *Cold on your face can slow your heart. Is any of this true for you?* Heart trouble or fainting · an eating disorder or very low weight · pregnant · Raynaud's or a cold allergy · drinking or using today. Yes, one of these → squeeze · None of these · Not sure | Medical screen (part) |
+| `state` | *What's it like right now?* A wave · I want to do something · Frozen or numb · Far away · My mind won't stop · **Chest pain or feeling faint** | Step 1 |
+| `medical` | Chest pain or feeling faint: the `medical` banner (911 first; UK 999, Ireland and the EU 112, Canada 911, Australia 000, New Zealand 111), *Sit or lie down. Even if it eases, get it checked today.* No close | Medical triage |
+| `urge` | I want to do something: *First, a way to wait it out.* → `pause`, which asks about hurting yourself first (C6.5). No *Done* here, so the way on is Hold to wait. No close | State → DT-02 |
+| `screen` | A wave: the one-tap self-check (D4). *Cold on your face can slow your heart. Is any of this true for you?* Heart trouble, a slow heart or heart medicine · fainting · an eating disorder or very low weight · pregnant · Raynaud's or a cold allergy · drinking or using today. Yes, one of these → squeeze · None of these · Not sure | Medical screen (part) |
 | `cold_near` | *Is there cold water, or something cold, near you?* No → squeeze | — |
-| `cold` | *Circuit Breaker: cold on your face.* Three steps, the caution (*Never in a shower or a bath. Cold, not ice-cold.*), a 3-second lead-in, a 30-second ring (`doseTimer`). *Your heart slowed for a bit. That's what cold does.* | TIP-T |
+| `cold` | *Circuit Breaker: cold on your face.* *Wet a cloth with cold water, or wrap a cold pack in a cloth.* · *Lean forward. Hold it on your forehead, eyes and upper cheeks.* · *Breathe out slowly, or hold your breath if that's comfortable.* The caution (*Never in a shower or a bath. Cold, not ice-cold.*), a 3-second lead-in, a 30-second ring (`doseTimer`). *Cold like that can slow your heart for a bit.* No face in water | TIP-T |
 | `cool` | Not sure on the self-check: *A cool cloth, gently.* 15 seconds, with a caution line | *Not sure* rule |
 | `squeeze` → `tight` | *Squeeze, then let it drop.* Three rounds, press and hold to squeeze, the drop on the out-breath (`squeezeRelease`). Then *How does your body feel now?* Tight · Loose · Can't tell (nothing hangs on it) | TIP-P, the contrast |
 | `press` | Frozen: *Press the phone hard between your palms.* *Keep a thumb on the circle while you press. Letting go early still counts.* Three 10-second holds (`holdRing`) | Frozen first (the PRD's "press the phone between the palms") |
 | `orient` | Far away: *Eyes open. Look around you.* Today's date and time on screen, find three things (`orientFind`) | Far away first |
 | `find` | My mind won't stop: *Give your eyes a job.* Five blue things | Loop first |
 | `check1` | *Compared to when you started, it's…* Louder · About the same · Quieter · Much quieter (frozen and far away: Further away · About the same · A bit more here · More here). This **is** the session's close (`askFresh: 'thenVsNow'`) | Close |
-| swap | Not quieter: the wave gets the long out-breath (`exhale`, 4 in / 7 out, 90 s, `breathPacer`, with *Dizzy or tingly? Stop and breathe normally.*: dizzy goes to squeeze if it hasn't run); frozen gets *Wake your hands up* (`bodyCard`); far away gets *Something strong*; the loop gets *Now give your ears one* | Swap |
+| swap | Not quieter: the wave gets the long out-breath (`exhale`, 4 in / 7 out, 90 s, `breathPacer`, with *Dizzy or tingly? Stop and breathe normally.*: dizzy goes to a squeeze and drop with no paced breath, `squeeze_still`, if squeeze hasn't run); frozen gets *Wake your hands up* (`bodyCard`); far away gets *Something strong* (*Hold something cold, or smell something strong. Feet into the floor.*); the loop gets *Now give your ears one* | Swap |
 | `check2` | The same question again (it overwrites the close) | — |
-| `lower` → `someone` | Second time not quieter: *You don't have to make this go away. Let's get through the next two minutes.* A plain two-minute ring that starts on its own (a tap stops it), nothing to do. Then the crisis banner and *If you want someone with you right now, the support is here on the screen.* The kit's people are planned (DT-03) | Lower the demand |
+| `lower` → `someone` | Second time not quieter: *You don't have to make this go away. Let's get through the next two minutes.* A plain two-minute ring that starts on its own and isn't stopped by a tap. A wave or a loop: *Nothing to do. Watch the ring and breathe however you breathe.* Frozen or far away (`lower_here`): *Nothing to do. Eyes open, feet on the floor.* (nothing passive, C6.3). Then the crisis banner and *If you want someone with you right now, you can call or text one of these.* The kit's people are planned (DT-03) | Lower the demand |
 | `fork` → `end` | Quieter: *Can anything be done about this right now?* Yes → Problem Solve, DEAR MAN, Do the Opposite · No, it's how things are → Let it be (planned, DT-04) · Not right now → Give your mind a job (planned, DT-06) · I needed to get through it → *You got through it. That's the skill.* | The fork |
 
-*Talk to someone now* (`safety.open`) is on every screen, and the player's *This is too much right now* is under every
+*Talk to someone now* (`safety.open`) is on every screen but two: the medical card, whose banner is the emergency number, and the someone card, which shows the crisis banner itself. It is and the player's *This is too much right now* is under every
 screen. No band is asked (C6.2). The skill accepts a carried `band` but steers on nothing yet.
 
 ## Runtime changes (C7, this branch)
@@ -68,7 +68,7 @@ All three are documented in [`skill-runtime.md`](skill-runtime.md).
   check itself.
 - **Direction is never wrong** (C6.3). Frozen gets press and wake up; far away gets eyes-open orienting and something
   strong. Neither is offered a calming mode. The long out-breath is only ever the wave's swap, and it has a stop rule.
-- **Chest pain or fainting** is on the first screen and goes to the emergency number, never a body mode.
+- **Chest pain or feeling faint** is on the first screen and goes to the emergency number, never a body mode. Its line never reads as permission to skip care once it eases.
 - **A pull to do something** goes to Hold to wait, which asks about hurting yourself first.
 - **Nothing locks.** Every body embed's way on is a quiet link from the start and the button once it's done. Press
   uses Hold to wait's `holdRing`, whose quiet way on appears after the first try, held or let go.
@@ -85,6 +85,11 @@ All three are documented in [`skill-runtime.md`](skill-runtime.md).
 - Reps per mode and the fade (*Your usual: press*), and the two-far-away-visits referral line. The referral is an
   aggregate over sessions, so it waits on the fade's read path.
 - The rhythm pulse under the hold ring, with its optional audio twin.
+- Also part 2 (the hosts batch), from the PRD and not built here: the fork carrying the emotion and context into the
+  tool it opens; the *get through* check-back and the follow-ups (DT-04, DT-06, CORE's next-day card); hand on heart
+  as a swap; the flooded + blank short path; steady's *practise when calm*; the `dbt_crisis_survival` / `help-now`
+  concept, the `escalation_suggested_tool` fix and the `PracticeSkill` cold grade. They need the hosts or the spine
+  pieces those PRs bring.
 
 ## Departures from the PRD
 
@@ -95,8 +100,9 @@ All three are documented in [`skill-runtime.md`](skill-runtime.md).
 | `wave_numb` state | Not a separate card | Frozen or numb covers it. A clinician can split it later |
 | Medical screen once per profile | A one-tap self-check every time cold is next (D4) | Nothing is stored yet, so asking each time is the safe default |
 | *Not sure* on the screen | Warns (a cool cloth, gently), doesn't block | As the PRD says. Kept as a question for the clinician pass |
+| Medical: the emergency number, *then orient* | The number and *Sit or lie down. Even if it eases, get it checked today.* No orient offer | Orienting reads as "carry on" after a possible cardiac event; Gate 3 asked for the line instead. Clinician pass |
 | Direction per state (up for frozen) | Stored as `regulation_down` for every state | The close kind is per tool. See the runtime change above |
-| Sound | Off; no audio twin built | Sound is off by default in the PRD too |
+| Sound | The dose's end chime only (the deadline timer's); no rhythm pulse or audio twin | The PRD's pulse audio is off by default anyway |
 
 ## Clinician pass (open)
 
@@ -104,3 +110,11 @@ All three are documented in [`skill-runtime.md`](skill-runtime.md).
 - The two-minute *lower the demand* card: its length, and whether to name a person from the kit there once DT-03
   ships.
 - Splitting *Frozen or numb* into two cards.
+- From Gate 3: whether asthma belongs on the self-check; whether a cool cloth is acceptable for *not sure if
+  pregnant*; squeeze and drop as the fallback for the cardiac and pregnancy flags; a route for shaking or sobbing
+  while frozen; whether *Done* after the someone screen needs a check-back; trouble breathing on the medical chip
+  (a breathless wave can't be told from a medical one in one tap); whether deferring the two-far-away referral is
+  safe; and *Your heart can slow*: the PRD's close line, softened to *can* because the app can't know it did.
+- The run record keeps the self-check answer as `some` / `none` / `unsure` (never which flag). It's a health signal
+  on a log record; part 2's `body_flags` moves it to a profile item with consent. Until then, it says only that a flag
+  applied.

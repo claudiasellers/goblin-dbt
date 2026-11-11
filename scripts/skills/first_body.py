@@ -36,23 +36,23 @@ COPY = {
     "state_title": "What's it like right now?",
     "state_hint": "Tap the closest one.",
     # Chest pain or fainting: the emergency number, not a body mode.
-    "medical_line": "If it's chest pain, fainting or you can't get your breath, call now. If it passes, come back here.",
+    "medical_line": "Sit or lie down. Even if it eases, get it checked today.",
     # A pull to do something: the hand needs a job first (PRD: DT-02, hold first).
-    "urge_line": "Your hand needs a job first. Hold to wait gives it one.",
+    "urge_line": "First, a way to wait it out.",
     # The one-tap self-check before cold (D4; the full medical screen waits for the safety batch).
     "screen_title": "Cold on your face can slow your heart. Is any of this true for you?",
-    "screen_hint": "Heart trouble or fainting. An eating disorder or very low weight. Pregnant. Raynaud's or a cold allergy. Drinking or using today.",
+    "screen_hint": "Heart trouble, a slow heart or heart medicine. Fainting. An eating disorder or very low weight. Pregnant. Raynaud's or a cold allergy. Drinking or using today.",
     "cold_near_title": "Is there cold water, or something cold, near you?",
     # Circuit Breaker: cold on the face (TIP, temperature).
     "cold_title": "Circuit Breaker: cold on your face.",
-    "cold_step1": "Cold water in a bowl, or a cold cloth or pack.",
-    "cold_step2": "Lean forward. Cold on your forehead, eyes and upper cheeks.",
-    "cold_step3": "Hold your breath if that's okay, or breathe out slowly.",
+    "cold_step1": "Wet a cloth with cold water, or wrap a cold pack in a cloth.",
+    "cold_step2": "Lean forward. Hold it on your forehead, eyes and upper cheeks.",
+    "cold_step3": "Breathe out slowly, or hold your breath if that's comfortable.",
     "cold_caution": "Never in a shower or a bath. Cold, not ice-cold.",
     "cold_start": "Tap when it's on",
     "cold_running": "Hold it there",
     "cold_lead": "Ready in",
-    "cold_done": "Your heart slowed for a bit. That's what cold does.",
+    "cold_done": "Cold like that can slow your heart for a bit.",
     # Not sure: a cool cloth, short and gentle (PRD: *not sure* warns, it doesn't block).
     "cool_title": "A cool cloth, gently.",
     "cool_step1": "A cool cloth, not ice.",
@@ -63,6 +63,8 @@ COPY = {
     "squeeze_title": "Squeeze, then let it drop.",
     "squeeze_step1": "Breathe in and squeeze your hands, arms and shoulders.",
     "squeeze_step2": "Breathe out and let it all drop.",
+    "squeeze_still1": "Squeeze your hands, arms and shoulders.",
+    "squeeze_still2": "Then let it all drop. Breathe however you breathe.",
     "squeeze_start": "Press and hold to squeeze",
     "squeeze_label": "Squeeze",
     "drop_label": "Let it drop",
@@ -71,7 +73,7 @@ COPY = {
     "tight_hint": "Can't tell is a full answer.",
     # The long out-breath (TIP, paced breathing): the wave's swap, never the only thing on offer.
     "exhale_title": "Breathe out longer than you breathe in.",
-    "exhale_step1": "In through your nose while the circle grows.",
+    "exhale_step1": "A soft breath in through your nose while the circle grows.",
     "exhale_step2": "Out slowly while it shrinks.",
     "exhale_start": "Tap to start",
     "exhale_in": "In",
@@ -82,7 +84,7 @@ COPY = {
     "press_title": "Press the phone hard between your palms.",
     "press_label": "Press and hold",
     "press_running": "Push",
-    "press_hint": "Keep a thumb on the circle while you press. Letting go early still counts.",
+    "press_hint": "Keep a thumb on the circle while you press. Let go whenever you need to.",
     "press_done": "Three presses.",
     # Frozen's swap: wake up.
     "wake_title": "Wake your hands up.",
@@ -94,7 +96,7 @@ COPY = {
     "orient_done": "You're here.",
     # Far away's swap: something strong, outside the body (§f.1 working default).
     "strong_title": "Something strong.",
-    "strong_cue": "Hold something cold in your hand, or smell something strong, like soap. Press your feet into the floor.",
+    "strong_cue": "Hold something cold, or smell something strong. Feet into the floor.",
     # My mind won't stop: give the eyes a job (DT-06 level 0), then listen.
     "find_title": "Give your eyes a job.",
     "find_task": "Find five blue things around you. Tap for each one.",
@@ -113,9 +115,10 @@ COPY = {
     # Second time not quieter: lower the demand (PRD).
     "lower_title": "You don't have to make this go away. Let's get through the next two minutes.",
     "lower_cue": "Nothing to do. Watch the ring and breathe however you breathe.",
+    "lower_cue_here": "Nothing to do. Eyes open, feet on the floor.",
     "lower_running": "Two minutes",
     "lower_done": "You got through two minutes.",
-    "someone_line": "If you want someone with you right now, the support is here on the screen.",
+    "someone_line": "If you want someone with you right now, you can call or text one of these.",
     # The fork (PRD step 5), once it's quieter.
     "fork_title": "Can anything be done about this right now?",
     "fork_hint": "Any answer is fine.",
@@ -149,7 +152,7 @@ STATES = [
     ("frozen", "Frozen or numb", {}),
     ("far_away", "Far away", {}),
     ("loop", "My mind won't stop", {}),
-    ("medical", "Chest pain or fainting", {"danger": "medical"}),
+    ("medical", "Chest pain or feeling faint", {"danger": "medical"}),
 ]
 SCREEN = [
     ("some", "Yes, one of these"),
@@ -229,7 +232,7 @@ STEPS = [
         "id": "urge", "kind": "handoff", "complete": True, "noClose": True,
         "lines": [{"when": ALWAYS, "key": "urge_line"}],
         "offers": [{"exit": "pause", "when": ALWAYS}],
-        "done": "done", "links": [SAFETY_LINK],
+        "links": [SAFETY_LINK],
     },
     {
         # The one-tap self-check (D4) before any cold.
@@ -264,10 +267,14 @@ STEPS = [
     embed("exhale", "breathPacer", "exhale_title", {
         "seconds": 90, "inSec": 4, "outSec": 7, "step1": "exhale_step1", "step2": "exhale_step2", "start": "exhale_start",
         "inLabel": "exhale_in", "outLabel": "exhale_out", "dizzy": "exhale_dizzy", "done": "exhale_done", "next": "next"},
-        [{"when": {"all": [{"eq": [a("exhale"), "dizzy"]}, {"not": {"set": a("squeeze")}}]}, "to": "squeeze"}, *AFTER_MODE]),
+        [{"when": {"all": [{"eq": [a("exhale"), "dizzy"]}, {"not": {"set": a("squeeze")}}]}, "to": "squeeze_still"}, *AFTER_MODE]),
+    # After dizziness, squeeze and drop without pacing the breath again.
+    embed("squeeze_still", "squeezeRelease", "squeeze_title", {
+        "rounds": 3, "squeezeSec": 5, "step1": "squeeze_still1", "step2": "squeeze_still2", "start": "squeeze_start",
+        "squeezeLabel": "squeeze_label", "dropLabel": "drop_label", "done": "squeeze_done", "next": "next"}),
     embed("press", "holdRing", "press_title", {
         "variant": "press", "seconds": 10, "holds": 3, "label": "press_label", "runningLabel": "press_running",
-        "hint": "press_hint", "doneLabel": "press_done", "next": "next"}, hint="press_hint"),
+        "hint": "press_hint", "doneLabel": "press_done", "next": "next", "wayOn": "from_start"}, hint="press_hint"),
     card("wake", "wake_title", "wake", "wake_cue", 30),
     find("orient", "orient_title", "find", 3, "orient_task", "found"),
     card("strong", "strong_title", "strong", "strong_cue", 30),
@@ -279,9 +286,11 @@ STEPS = [
     check("check1_here", "check1_here", "tvn_here", "check_title_here",
           [{"when": BETTER1, "to": "fork"}, {"when": STATE("frozen"), "to": "wake"}, {"to": "strong"}]),
     check("check2", "check2", "tvn_down", "check_title", [{"when": BETTER2, "to": "fork"}, {"to": "lower"}]),
-    check("check2_here", "check2_here", "tvn_here", "check_title_here", [{"when": BETTER2, "to": "fork"}, {"to": "lower"}]),
+    check("check2_here", "check2_here", "tvn_here", "check_title_here", [{"when": BETTER2, "to": "fork"}, {"to": "lower_here"}]),
     # Second time not quieter: lower the demand. A plain ring, nothing to do, then someone to talk to on the screen.
     card("lower", "lower_title", "still", "lower_cue", 120, [{"to": "someone"}], done="lower_done", running="lower_running"),
+    # Frozen or far away: nothing passive (C6.3). Eyes open, feet down.
+    card("lower_here", "lower_title", "still", "lower_cue_here", 120, [{"to": "someone"}], done="lower_done", running="lower_running"),
     {
         "id": "someone", "kind": "handoff", "complete": True,
         "crisis": [{"variant": "crisis", "when": ALWAYS}],
@@ -321,7 +330,8 @@ EXITS = [
 
 
 def options():
-    out = [("state", v, label, props, "CrisisState") for v, label, props in STATES]
+    # Part 2 adds CrisisState nodes (PRD DT-01) and points these options at them with PRESENTS, as Problem Solve does.
+    out = [("state", v, label, props, None) for v, label, props in STATES]
     out += [("screen", v, label, {}, None) for v, label in SCREEN]
     out += [("cold_near", v, label, {}, None) for v, label in COLD_NEAR]
     out += [("tight", v, label, {}, None) for v, label in TIGHT]
