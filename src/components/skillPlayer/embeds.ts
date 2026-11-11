@@ -64,7 +64,7 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
  * (src/lib/skillRuntime/embedProps.ts) and passes nothing undeclared.
  */
 export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, EmbedPropSpec>>> = {
-  partsLine: { promptId: { type: 'id' } },
+  partsLine: { promptId: { type: 'id' }, as: { type: 'enum', values: ['line', 'heading'], optional: true } },
   partLater: {},
   holdRing: {
     variant: { type: 'enum', values: ['press', 'timed', 'settle'] },

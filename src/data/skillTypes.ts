@@ -104,6 +104,10 @@ export interface FieldDef {
   links?: Array<{ exit: string; label: string; when: Cond }>;
 }
 
+/**
+ * An embed placed in an ask step: under the field `after` names, or under the title (`'$title'`, above every field:
+ * a heading that comes from elsewhere, or a line the whole screen builds, like Cope Ahead's plan sentence).
+ */
 export interface SlotDef { after: string; embed: string; props?: Record<string, unknown>; showWhen: Cond; record: string }
 
 /**

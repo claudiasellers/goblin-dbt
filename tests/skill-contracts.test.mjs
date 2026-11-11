@@ -81,7 +81,11 @@ for (const sk of fixture.skills) {
         assert.ok(embeds.includes(st.embed), `${st.id}: ${st.embed}`);
         assert.ok(!st.fields?.length, `${st.id}: an embed step has no fields`);
       }
-      for (const sl of st.slots ?? []) assert.ok(embeds.includes(sl.embed), `${st.id}: ${sl.embed}`);
+      for (const sl of st.slots ?? []) {
+        assert.ok(embeds.includes(sl.embed), `${st.id}: ${sl.embed}`);
+        // Under the title ($title: above every field) or under one of this step's own fields.
+        assert.ok(sl.after === "$title" || (st.fields ?? []).some((f) => f.id === sl.after), `${st.id}: ${sl.embed} after ${sl.after}`);
+      }
     }
   });
 
@@ -229,6 +233,8 @@ test("embed props in the player: only what is declared, copy keys as the skill's
   assert.deepEqual(embedProps.resolveEmbedProps(undefined, { a: 1 }, copy), {});
   const player = read("src/components/skillPlayer/SkillPlayer.tsx");
   assert.equal((player.match(/props=\{embedProps\(ctx, /g) ?? []).length, 2, "slots and whole-screen embeds both get resolved props");
+  // A slot under `$title` renders between the title and the first field; every other slot under its field.
+  assert.match(player, /slotsAfter\(TITLE_SLOT\)[\s\S]*fields\.map[\s\S]*slotsAfter\(f\.id\)/);
   assert.equal((player.match(/answerIds=\{answerIds\(st\)\}/g) ?? []).length, 2);
 });
 

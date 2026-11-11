@@ -245,7 +245,9 @@ def check(skill):
         link_exits = [ln["exit"] for ln in s.get("links", [])] + [ln["exit"] for f in s.get("fields", []) for ln in f.get("links", [])]
         assert len(link_exits) == len(set(link_exits)), (w, "one quiet link per exit on a screen (LINKS is one edge per step and exit)", link_exits)
         for sl in s.get("slots", []):
-            assert sl["embed"] in EMBEDS and sl["after"] in fields, (w, sl)
+            # Under a field of this step, or under the title (`$title`: above every field).
+            assert sl["embed"] in EMBEDS and (sl["after"] == "$title" or sl["after"] in [f["id"] for f in s.get("fields", [])]), (w, sl)
+            assert s["kind"] == "ask", (w, "slots live on ask steps")
             check_embed_props(sl["embed"], sl.get("props"), copy, fields, w)
             check_cond(sl["showWhen"], fields, derived, w, accepts)
         # A line or an offer with `when: None` always holds (a hand-off's default line, an offer for every path).

@@ -36,7 +36,8 @@ EMBEDS = {
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
 # in [min, max], `enum` one of its values, `field` a field id of the skill, `id` a plain id. Undeclared props fail.
 EMBED_PROPS = {
-    "partsLine": {"promptId": {"type": "id"}},
+    # `as: heading`: the screen's question (a slot under `$title`, for a step whose question is parts copy).
+    "partsLine": {"promptId": {"type": "id"}, "as": {"type": "enum", "values": ["line", "heading"], "optional": True}},
     "partLater": {},
     "holdRing": {
         "variant": {"type": "enum", "values": ["press", "timed", "settle"]},

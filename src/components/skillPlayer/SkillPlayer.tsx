@@ -105,6 +105,8 @@ export function SkillPlayer({ skillId, mode = 'page', enterAt, hostSessionId, on
 
 const needsProfile = (toolId: string) => ((PROFILE_NEEDS as Record<string, readonly string[]>)[toolId]?.length ?? 0) > 0;
 const UUID = /^[0-9a-f-]{36}$/i;
+/** A slot's `after` that puts it under the step's title, above its fields. */
+const TITLE_SLOT = '$title';
 
 const GRID = new Set(emotions.map((e) => e.id));
 /** Tools that write nothing until the person saves (R15): exits to them are never named or linked back. */
@@ -408,26 +410,26 @@ function AskStep({ ctx, step, st, send, onExit, onShown, onPrimary, busy }: {
     );
   }
   const crisis = crisisFor(ctx, step, st);
+  const slotsAfter = (after: string) => (step.slots ?? []).filter((s) => s.after === after).map((s) => {
+    const Embed = EMBEDS[s.embed];
+    const show = holds(s.showWhen, sc);
+    return (
+      <div key={`${s.embed}:${s.record}`} className="min-h-6">
+        {Embed && show ? <Embed props={embedProps(ctx, s.embed, s.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(st)} onShown={() => onShown(s.record)} /> : null}
+      </div>
+    );
+  });
   return (<>
     {title && <Prompt>{title}</Prompt>}
     {step.hint && c[step.hint] && <Line>{c[step.hint]}</Line>}
-    {fields.map((f, i) => {
-      const slots = (step.slots ?? []).filter((s) => s.after === f.id);
-      return (
-        <div key={f.id} className="space-y-3" aria-live={i > 0 ? 'polite' : undefined}>
-          <FieldView ctx={ctx} field={f} st={st} send={send} onMore={() => setPicker(f.id)} onExit={onExit} />
-          {slots.map((s) => {
-            const Embed = EMBEDS[s.embed];
-            const show = holds(s.showWhen, sc);
-            return (
-              <div key={`${s.embed}:${s.record}`} className="min-h-6">
-                {Embed && show ? <Embed props={embedProps(ctx, s.embed, s.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(st)} onShown={() => onShown(s.record)} /> : null}
-              </div>
-            );
-          })}
-        </div>
-      );
-    })}
+    {/* `after: '$title'`: under the title, above the questions (a heading or a line the whole screen reads from). */}
+    {slotsAfter(TITLE_SLOT)}
+    {fields.map((f, i) => (
+      <div key={f.id} className="space-y-3" aria-live={i > 0 ? 'polite' : undefined}>
+        <FieldView ctx={ctx} field={f} st={st} send={send} onMore={() => setPicker(f.id)} onExit={onExit} />
+        {slotsAfter(f.id)}
+      </div>
+    ))}
     {/* Under the question, so the chip that raised it stays where it was tapped. */}
     {crisis && <div aria-live="polite"><CrisisBanner compact variant={crisis.variant} /></div>}
     {step.note && c[step.note] && <p className={secondaryText}>{c[step.note]}</p>}
