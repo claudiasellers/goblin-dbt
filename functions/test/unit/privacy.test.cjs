@@ -113,9 +113,10 @@ test('Cope Ahead on the skill runtime: the close projects ext.ca from ext.run, o
   const ext = JSON.parse(proj.params.ext);
   assert.equal(ext.run.skillId, 'cope_ahead', 'the run stays');
   assert.deepEqual([ext.ca.situationId, ext.ca.when, ext.ca.ifFrom, ext.ca.moveIds], ['conversation', 'today', 'moment', ['feet']]);
-  assert.ok(ext.ca.hardMomentOwn.startsWith('enc:v1:') && ext.run.answers[3].valueOwn.startsWith('enc:v1:'));
+  assert.equal(ext.ca.hardMomentOwn, undefined, 'ext.ca is ids only: the own words stay in the run');
+  assert.ok(ext.run.answers[3].valueOwn.startsWith('enc:v1:'));
   assert.ok(!proj.params.ext.includes('money'), 'no own words in the clear');
-  assert.equal(await C.decryptOwn(f.driver.session(), 'u1', ext.ca.hardMomentOwn), 'they bring up money');
+  assert.equal(await C.decryptOwn(f.driver.session(), 'u1', ext.run.answers[3].valueOwn), 'they bring up money');
 });
 
 test('own-words length limits apply to the plaintext (validators unchanged)', async () => {

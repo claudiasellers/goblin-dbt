@@ -478,14 +478,17 @@ the legacy-exits test ties to the switch).
   the situations they fit (`CopeMove.forSituations`, new); `ca_time_limit` and `ca_success_anchor` are held with a
   reason in `SAME_MOVE_HELD`. Nothing in DEAR MAN is renamed or deleted (parts mappings point at those ids).
 - **The record.** `ext.run`, and `ext.ca` written from it at close by the projection
-  (`functions/src/copeAhead/projection.ts`, `PROJECTIONS['cope-ahead']`, R14), own words encrypted like any ext own
-  words, so the after card, the `cope_ahead` part tag, Reflect and stats read exactly what they read before. The
+  (`functions/src/copeAhead/projection.ts`, `PROJECTIONS['cope-ahead']`, R14), so the after card, the `cope_ahead`
+  part tag, Reflect and stats read what they read before. The projection's `ext.ca` is **ids only**: the own words
+  stay in `ext.run` (encrypted), so the whole ext fits 4 KB, and the after card reads a skill visit's own words from
+  the run (`planIdsFromExt`; the hand-built page's sessions still carry theirs in `ext.ca`). The
   projection also sets the session's `urgeIds` to this visit's pull, as the page did.
 - **The plan line** is still one function: the embeds `planSentence`, `rehearsal` and `keepCard`
   (`src/components/skillPlayer/CopeAheadEmbeds.tsx`) compose it with `planLine` from the run's answers
   (`planCaFromFields`), Me from the kept ids (`planCaFromKept`).
 - **Keep.** *Keep this* keeps `cope_ahead_plan` (a `ProfileFact` in Me's My plans, own words encrypted; Me composes its
-  words with `planLine`), not an own line. Old kept plans stay in My words as they were. The anchor rule
+  words with `planLine`), not an own line. The pull is kept only when it is the plan's If (*forpull*); otherwise it
+  is this visit's ask-fresh answer and the kind's validator drops it. Old kept plans stay in My words as they were. The anchor rule
   (`anchorableLine`) is unchanged: a kept plan was never an anchor and still isn't.
 - **The after card** is scheduled by the keep step's *Yes* (R5), timed by screen 1's *When is it?*, or *Later, or not
   sure* when it wasn't answered (`followUp.whenDefault`, a runtime addition).
@@ -503,6 +506,8 @@ the legacy-exits test ties to the switch).
 - No *check the facts* step (Handout 19 step 1): Check the Facts is its own skill and hands off here with the situation.
 - Moves are up to two, picked directly; there is no *Add one more* chip (a third tap swaps out the oldest).
 - Feelings have no *Not sure* chip: the question is optional, so Next is *Not sure*.
+- Feelings picked before the situation changes stay picked (they show after the new situation's words); the page
+  cleared them.
 - Feelings are one field, `feel`, whose words follow the situation (`emotionsFrom`, a lookup through
   `feelBySituation`; own words alone or no pick: *Something else*'s words), not one field per situation.
 - *Once more*'s own-words boxes are shorter than the plan's: the twist 90 characters (was 140), a changed move 60

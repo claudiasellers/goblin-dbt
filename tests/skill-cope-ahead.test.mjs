@@ -190,7 +190,12 @@ test("keep: Keep this keeps the plan as cope_ahead_plan (the tap is the yes); No
   const k = M.keepFor(ctx(), M.stepOf(skill, "keep"), s);
   assert.equal(k.kind, "cope_ahead_plan");
   assert.deepEqual(k.value, { situationIds: ["conversation"], momentIds: ["go_blank"], pullIds: ["blank"], movesIds: ["feet", "give_minute"] });
-  assert.deepEqual(checkValue(PROFILE_KINDS.cope_ahead_plan, k.value), k.value);
+  const { pullIds, ...stored } = k.value;
+  assert.deepEqual(pullIds, ["blank"], "the client sends the pull");
+  assert.deepEqual(checkValue(PROFILE_KINDS.cope_ahead_plan, k.value), stored, "the If is the moment: this visit's pull (ask-fresh) is never kept");
+  const ifPull = { ...k.value, forpullIds: ["pull"] };
+  assert.deepEqual(checkValue(PROFILE_KINDS.cope_ahead_plan, ifPull), ifPull, "the If is the pull: it is the plan's words, kept");
+  assert.throws(() => checkValue(PROFILE_KINDS.cope_ahead_plan, { ...ifPull, pullIds: ["not_sure"] }), /Unexpected value/);
   // Me composes it with the same plan line the keep card showed.
   assert.equal(P.planLine(CA, P.planCaFromKept(k.value)).text, "If I go blank, I'll feel my feet on the floor and say “Give me a minute”.");
   assert.equal(M.keepFor(ctx(), M.stepOf(skill, "keep"), run([...TO_KEEP, pick("keepit", "no"), pick("ask", "no")])), null);
@@ -244,11 +249,11 @@ test("ext.ca from the run: the after card, the part tag and Reflect read what th
   const ca = caFromRun(rec);
   assert.deepEqual(ca, {
     situationId: "conversation", when: "tomorrow", feelIds: ["anxious", "hurt"], pullIds: ["blank"], partId: PART,
-    hardMomentOwn: "They bring up money", ifFrom: "pull", moveIds: ["feet"], moveOwn: "Hold my keys", rehearsed: 2,
+    ifFrom: "pull", moveIds: ["feet"], rehearsed: 2,
     newMomentId: "not_heard", newMoveIds: ["say_hard"], settle: "breath", kept: true, followUp: true,
   });
-  const ext = validateExt({ ca });
-  assert.ok(ext, "a valid ext.ca");
+  const ext = validateExt({ run: rec, ca });
+  assert.ok(ext, "a valid ext with the run and the projection");
   assert.deepEqual(planIdsFromExt(ext), { situationId: "conversation", hardMomentId: null, hardMomentOwn: "They bring up money", ifFrom: "pull", pullIds: ["blank"], moveIds: ["feet"], moveOwn: "Hold my keys" });
   assert.equal(partIdFromExt(ext), PART);
   assert.deepEqual(M.runEmotionIds(c, s), ["anxious", "hurt"], "the feelings are the session's emotions");
@@ -256,7 +261,7 @@ test("ext.ca from the run: the after card, the part tag and Reflect read what th
   const five = caFromRun({ ...M.runRecord(ctx(), run([own("situation", "the dentist"), next, next, pick("moment", "go_blank"), next, pick("moves", "feet"), next, done, pick("again", "no"), next])), exitId: "five_senses" });
   assert.equal(five.settle, "five_senses");
   assert.equal(five.situationId, "other");
-  assert.equal(five.situationOwn, "the dentist");
+  assert.equal(five.situationOwn, undefined, "own words stay in the run");
   assert.equal(five.ifFrom, "moment");
 });
 
@@ -279,6 +284,39 @@ test("resume after When is it?: the answer comes back, and the after card is boo
   assert.deepEqual(M.resumeRun(ctx(), M.runRecord(ctx(), booked), "keep").scheduled, {}, "resumed at the booking step itself: a fresh Next");
 });
 
+test("the stored ext, { run, ca }, fits 4 KB at its longest: every field at its cap, own words in 3-byte characters", () => {
+  const longest = (xs) => xs.reduce((a, b) => (b.length > a.length ? b : a), "");
+  const stepId = longest(skill.steps.map((st) => st.id));
+  const opts = (f) => (skill.options[f.options.list] ?? []).map((o) => o.value);
+  const answers = skill.steps.flatMap((st) => st.fields ?? []).map((f) => {
+    const values = f.options.emotions ? ["disappointed_in_myself", "disconnected_from_me"] : f.options.profile ? ["1f8c2a9e-5b1d-4c3e-9a7f-2d6b8e4c1a04"] : opts(f);
+    const own = f.own ? "愛".repeat(Math.min(f.own.max ?? skill.ownMax, skill.ownMax)) : null;
+    return { fieldId: f.id, optionIds: Array.from({ length: f.max }, (_, i) => values[i % values.length] ?? longest(values)), ...(own ? { valueOwn: own } : {}) };
+  });
+  answers.push({ fieldId: "rehearsed", optionIds: ["done"] }, { fieldId: "rehearsed2", optionIds: ["done"] }, { fieldId: "breath", optionIds: ["held"] });
+  const run = {
+    skillId: skill.id, versionId: skill.version, path: Array(48).fill(stepId), answers,
+    ctx: { situationId: "x".repeat(64), partId: "x".repeat(64) },
+    out: [{ embed: "rehearsal", stepId: "walk", optionIds: ["done"] }, { embed: "rehearsal", stepId: "redo", optionIds: ["done"] },
+      { embed: "holdRing", stepId: "hold", optionIds: ["held"], durationSec: 3600 }],
+    handoffs: [{ primitiveId: "sigh", completed: true, durationSec: 60, thenVsNow: "better", resumed: true, overridden: false }],
+    offeredExitIds: skill.exits.map((x) => x.id), exitId: "five_senses", embedsShown: ["safety_open"],
+    kept: ["cope_ahead_plan"], scheduled: ["cope_ahead_after"],
+  };
+  const ca = caFromRun(run);
+  assert.ok(ca.partId && ca.moveIds.length === 2 && ca.feelIds.length === 2, "the projection at its fullest");
+  const bytes = Buffer.byteLength(JSON.stringify({ run, ca }), "utf8");
+  assert.ok(bytes <= 4096, `worst case ${bytes} bytes`);
+  assert.ok(validateExt({ run, ca }));
+});
+
+test("the after card reads the hand-built page's own words from ext.ca, and the runtime's from ext.run", () => {
+  const old = JSON.stringify({ ca: { situationId: "conversation", hardMomentOwn: "old words", ifFrom: "moment", moveIds: ["feet"], moveOwn: "my move" } });
+  assert.deepEqual([planIdsFromExt(old).hardMomentOwn, planIdsFromExt(old).moveOwn], ["old words", "my move"]);
+  const other = JSON.stringify({ run: { skillId: "check_the_facts", answers: [{ fieldId: "moment", valueOwn: "no" }] }, ca: { situationId: "work" } });
+  assert.equal(planIdsFromExt(other).hardMomentOwn, null, "another skill's run is never read");
+});
+
 test("the embeds' plan: own words are the label past the ids; once more plays the new moment, with the changed moves only after Change", () => {
   const view = (answers) => ({
     answerIds: Object.fromEntries(Object.entries(answers).map(([k, a]) => [k, a.ids])),
@@ -294,4 +332,10 @@ test("the embeds' plan: own words are the label past the ids; once more plays th
   assert.equal(kept.text, "If the lights go out, I'll feel my feet on the floor and hold my keys.", "pass 2: the new moment is the If");
   const changed = P.planLine(CA, P.runPlanCa({ ...view({ ...A, change_move: { ids: ["change"], own: null } }), props: props2 }, 2));
   assert.equal(changed.text, "If the lights go out, I'll say “This is hard for me”.");
+});
+
+test("moves: two at most, a third tap swaps out the oldest (no Add one more chip)", () => {
+  const s = run([pick("situation", "conversation"), next, pick("pull", "hide"), next, pick("moment", "go_blank"), next,
+    pick("moves", "feet"), pick("moves", "say_hard"), pick("moves", "text_trust")]);
+  assert.deepEqual(s.answers.moves.ids, ["say_hard", "text_trust"]);
 });

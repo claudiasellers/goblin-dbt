@@ -5,8 +5,8 @@
  * *Used it, it helped* (`partIdFromExt`), Reflect and the parts stats.
  *
  * `caFromRun` is pure (the field ids are the skill's, scripts/skills/cope_ahead.py); the projection validates the
- * slice against `ext.ca`'s schema, encrypts its own words like every ext own-words value (spine/extOwn.ts) and merges
- * it into the session's stored ext, in the close's transaction. It also sets the session's `urgeIds` to the pull
+ * slice against `ext.ca`'s schema (ids only: the own words stay in `ext.run`) and merges it into the session's stored
+ * ext, in the close's transaction. It also sets the session's `urgeIds` to the pull
  * picked in this visit, as the page did (ask-fresh: this visit's answer, never reloaded), when the close sent none.
  */
 import type { ManagedTransaction } from 'neo4j-driver';
@@ -22,7 +22,11 @@ interface RunAnswer { fieldId?: unknown; optionIds?: unknown; valueOwn?: unknown
 
 const strs = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : []);
 
-/** `ext.ca` from a Cope Ahead run (plaintext own words; unanswered keys left out). */
+/**
+ * `ext.ca` from a Cope Ahead run: ids only, unanswered keys left out. The own words stay in `ext.run` (encrypted
+ * there), never copied, so `{ run, ca }` fits ext's 4 KB; the after card reads them from the run
+ * (spine/copeAheadAfter.ts `planIdsFromExt`).
+ */
 export function caFromRun(run: Record<string, unknown>): Record<string, unknown> {
   const answers = (Array.isArray(run.answers) ? run.answers : []) as RunAnswer[];
   const get = (id: string) => {
@@ -34,7 +38,6 @@ export function caFromRun(run: Record<string, unknown>): Record<string, unknown>
   if (sit) {
     const id = sit.ids[0] ?? (sit.own ? 'other' : null);
     if (id) ca.situationId = id;
-    if (sit.own) ca.situationOwn = sit.own;
   }
   const when = get('when')?.ids[0];
   if (when && (WHEN as readonly string[]).includes(when)) ca.when = when;
@@ -46,20 +49,16 @@ export function caFromRun(run: Record<string, unknown>): Record<string, unknown>
   if (part && UUID.test(part)) ca.partId = part;
   const moment = get('moment');
   if (moment?.ids[0]) ca.hardMomentId = moment.ids[0];
-  if (moment?.own) ca.hardMomentOwn = moment.own;
   const moves = get('moves');
   if (moment || moves) ca.ifFrom = get('forpull')?.ids.includes('pull') && pull.length ? 'pull' : 'moment';
   if (moves?.ids.length) ca.moveIds = moves.ids.slice(0, 2);
-  if (moves?.own) ca.moveOwn = moves.own;
   if (get('rehearsed2')) ca.rehearsed = 2;
   else if (get('rehearsed')) ca.rehearsed = 1;
   const nm = get('new_moment');
   if (nm?.ids[0]) ca.newMomentId = nm.ids[0];
-  if (nm?.own) ca.newMomentOwn = nm.own;
   if (get('change_move')?.ids[0] === 'change') {
     const nmv = get('new_moves');
     if (nmv?.ids.length) ca.newMoveIds = nmv.ids.slice(0, 2);
-    if (nmv?.own) ca.newMoveOwn = nmv.own;
   }
   const settle = get('settle')?.ids[0];
   if (run.exitId === 'five_senses') ca.settle = 'five_senses';

@@ -59,6 +59,22 @@ function caOf(ext: unknown): Record<string, unknown> | null {
   }
 }
 
+/**
+ * A skill-runtime visit's own words for a field, from `ext.run` (the projection writes `ext.ca` with ids only, so
+ * the record fits 4 KB). Null for the hand-built page's sessions, whose own words are in `ext.ca`.
+ */
+function runOwn(ext: unknown, fieldId: string): unknown {
+  if (typeof ext !== 'string' || !ext) return null;
+  try {
+    const run = (JSON.parse(ext) as { run?: { skillId?: unknown; answers?: unknown } } | null)?.run;
+    if (!run || run.skillId !== 'cope_ahead' || !Array.isArray(run.answers)) return null;
+    const a = (run.answers as Array<Record<string, unknown>>).find((x) => x && x.fieldId === fieldId);
+    return a?.valueOwn ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /** The plan's ids from the session's ext, or null when the visit stored none. */
 export function planIdsFromExt(ext: unknown): CopeAheadPlanIds | null {
   const ca = caOf(ext);
@@ -66,11 +82,11 @@ export function planIdsFromExt(ext: unknown): CopeAheadPlanIds | null {
   return {
     situationId: id(ca.situationId),
     hardMomentId: id(ca.hardMomentId),
-    hardMomentOwn: text(ca.hardMomentOwn, 140),
+    hardMomentOwn: text(ca.hardMomentOwn ?? runOwn(ext, 'moment'), 140),
     ifFrom: ca.ifFrom === 'moment' || ca.ifFrom === 'pull' ? ca.ifFrom : null,
     pullIds: ids(ca.pullIds, 4),
     moveIds: ids(ca.moveIds, 2),
-    moveOwn: text(ca.moveOwn, 90),
+    moveOwn: text(ca.moveOwn ?? runOwn(ext, 'moves'), 90),
   };
 }
 

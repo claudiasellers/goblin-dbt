@@ -114,7 +114,7 @@ export const EXT_SCHEMAS: Record<string, Record<string, Field>> = {
     newMoveIds: { t: 'ids', max: 2 },                                              // once more: Change what I'll do
     newMoveOwn: { t: 'text', max: CA_MOVE_OWN_MAX },
     settle: { t: 'one', of: ['breath', 'five_senses', 'ok'] },
-    kept: { t: 'bool' },                                                           // "Keep this" wrote an OwnLine
+    kept: { t: 'bool' },                                                           // "Keep this": an OwnLine (hand-built page) or cope_ahead_plan (skill)
     followUp: { t: 'bool' },                                                       // "Want me to ask how it went?" Yes
   },
   // The skill runtime (docs/design/skill-runtime.md): one shape for every skill the player runs, the
