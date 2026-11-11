@@ -14,11 +14,12 @@ import ending_relationships  # noqa: E402
 import hold_to_wait  # noqa: E402
 import dear_man_debrief  # noqa: E402
 import pros_cons  # noqa: E402
+import first_body  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
 SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKILL, *fast.SKILLS, nightmare_rescript.SKILL, problem_solve.SKILL,
-          ending_relationships.SKILL, hold_to_wait.SKILL, dear_man_debrief.SKILL, pros_cons.SKILL]
+          ending_relationships.SKILL, hold_to_wait.SKILL, dear_man_debrief.SKILL, pros_cons.SKILL, first_body.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -44,6 +45,13 @@ EMBEDS = {
     # for this run's pull, replayed inside Hold to wait (reports nothing; its slot's record says it showed).
     "prosConsCard": {"ids": ["read"], "measures": ["durationSec"]},
     "prosConsReplay": {},
+    # DT-01's body modes (plan C3b, DT-owned; src/components/skillPlayer/BodyEmbeds.tsx): each reports done, partly or
+    # skipped and the seconds it ran (the breath pacer also `dizzy`: its stop rule); measurements, never ratings.
+    "doseTimer": {"ids": ["done", "partly", "skipped"], "measures": ["durationSec"]},
+    "bodyCard": {"ids": ["done", "partly", "skipped"], "measures": ["durationSec"]},
+    "breathPacer": {"ids": ["done", "partly", "skipped", "dizzy"], "measures": ["durationSec"]},
+    "squeezeRelease": {"ids": ["done", "partly", "skipped"], "measures": ["durationSec", "doneCount"]},
+    "orientFind": {"ids": ["done", "partly", "skipped"], "measures": ["doneCount"]},
 }
 # What each embed takes from the skill (embeds.ts EMBED_PROPS; the contract test keeps the two equal). build.py
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
@@ -134,6 +142,70 @@ EMBED_PROPS = {
         "noProFor": {"type": "id"},
         "noteFor": {"type": "id"},
         "note": {"type": "copy"},
+    },
+    "doseTimer": {
+        "art": {"type": "enum", "values": ["cold", "none"], "optional": True},
+        "seconds": {"type": "int", "min": 5, "max": 300},
+        "leadIn": {"type": "int", "min": 0, "max": 5, "optional": True},
+        "step1": {"type": "copy", "optional": True},
+        "step2": {"type": "copy", "optional": True},
+        "step3": {"type": "copy", "optional": True},
+        "caution": {"type": "copy", "optional": True},
+        "start": {"type": "copy"},
+        "running": {"type": "copy"},
+        "lead": {"type": "copy", "optional": True},
+        "done": {"type": "copy"},
+        "next": {"type": "copy"},
+    },
+    "bodyCard": {
+        "kind": {"type": "enum", "values": ["hand_heart", "wake", "strong", "still", "press"]},
+        "cue": {"type": "copy", "optional": True},
+        "seconds": {"type": "int", "min": 5, "max": 300},
+        "step1": {"type": "copy", "optional": True},
+        "step2": {"type": "copy", "optional": True},
+        "step3": {"type": "copy", "optional": True},
+        "caution": {"type": "copy", "optional": True},
+        "start": {"type": "copy"},
+        "running": {"type": "copy"},
+        "done": {"type": "copy"},
+        "next": {"type": "copy"},
+    },
+    "breathPacer": {
+        "seconds": {"type": "int", "min": 30, "max": 300},
+        "inSec": {"type": "int", "min": 2, "max": 6},
+        "outSec": {"type": "int", "min": 3, "max": 10},
+        "step1": {"type": "copy", "optional": True},
+        "step2": {"type": "copy", "optional": True},
+        "step3": {"type": "copy", "optional": True},
+        "caution": {"type": "copy", "optional": True},
+        "start": {"type": "copy"},
+        "inLabel": {"type": "copy"},
+        "outLabel": {"type": "copy"},
+        "dizzy": {"type": "copy"},
+        "done": {"type": "copy"},
+        "next": {"type": "copy"},
+    },
+    "squeezeRelease": {
+        "rounds": {"type": "int", "min": 1, "max": 5},
+        "squeezeSec": {"type": "int", "min": 3, "max": 8},
+        "step1": {"type": "copy", "optional": True},
+        "step2": {"type": "copy", "optional": True},
+        "step3": {"type": "copy", "optional": True},
+        "caution": {"type": "copy", "optional": True},
+        "start": {"type": "copy"},
+        "squeezeLabel": {"type": "copy"},
+        "dropLabel": {"type": "copy"},
+        "done": {"type": "copy"},
+        "next": {"type": "copy"},
+    },
+    "orientFind": {
+        "variant": {"type": "enum", "values": ["find", "listen"]},
+        "count": {"type": "int", "min": 1, "max": 5},
+        "here": {"type": "copy"},
+        "task": {"type": "copy"},
+        "foundLabel": {"type": "copy"},
+        "done": {"type": "copy"},
+        "next": {"type": "copy"},
     },
 }
 # Shared tables the graph supplies to every skill (never written here).

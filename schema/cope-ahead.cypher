@@ -223,7 +223,7 @@ SET n += {kind: "tool", label: "5-4-3-2-1", line: "do 5-4-3-2-1", forPulls: ["bl
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "five_senses"})
 MERGE (t)-[:HAS_MOVE]->(m);
 MERGE (n:CopeMove {id: "cool_down"})
-SET n += {kind: "tool", label: "Circuit Breaker", line: "do Circuit Breaker", forPulls: ["fight", "chase"], general: false, appToolId: "cool-down", forMoments: [], order: 16, version: "cope-ahead-v1"};
+SET n += {kind: "tool", label: "First, the body", line: "bring my body down first", forPulls: ["fight", "chase"], general: false, appToolId: "cool-down", forMoments: [], order: 16, version: "cope-ahead-v1"};
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "cool_down"})
 MERGE (t)-[:HAS_MOVE]->(m);
 MERGE (n:CopeMove {id: "urge_surfing"})

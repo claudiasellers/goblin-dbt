@@ -153,8 +153,12 @@ test("each host mounts PartTagSlot under its saved close; the slot is the only g
     assert.doesNotMatch(src, /<PartTagRow\b/, f);
     assert.doesNotMatch(src, /tagRowGate\(/, f);
   }
-  // Cool Down's Quieter is its one better answer; FTF's quieter / much map to better / much_better.
-  assert.match(read(pageOf("cool-down")), /\{ id: 'quieter', label: 'Quieter', thenVsNow: 'better' \}/);
+  // First, the body (cool-down) asks its close in the flow: Quieter is `better`, and the player's leaving card
+  // mounts the row with that answer once the close is saved. FTF's quieter / much map to better / much_better.
+  const fb = JSON.parse(read("tests/fixtures/skills-content.json")).skills.find((s) => s.id === "first_body");
+  assert.equal(fb.options.tvn_down.find((o) => o.value === "better").label, "Quieter");
+  assert.match(read("src/components/skillPlayer/SkillPlayer.tsx"),
+    /\{inFlowClose && <PartTagSlot toolId=\{skill\.toolId\} toolSessionId=\{toolSession\.id\} thenVsNow=\{inFlowClose\.thenVsNow\} saved=\{inFlowClose\.saved\} \/>\}/);
 });
 
 test("the row: no hard-coded words, after the close is saved, fire-and-forget writes", () => {

@@ -605,8 +605,8 @@
   {
    "id": "cool_down",
    "kind": "tool",
-   "label": "Circuit Breaker",
-   "line": "do Circuit Breaker",
+   "label": "First, the body",
+   "line": "bring my body down first",
    "forPulls": [
     "fight",
     "chase"
