@@ -68,6 +68,22 @@ test("a kept person with a fresh harm answer is the safety route again, without 
   assert.equal(p.personId, kept().id);
 });
 
+test("an answer given this visit replaces the mounted list's: no stale safe answer after Things changed", () => {
+  const iso = new Date(NOW).toISOString();
+  const k = kept();
+  const harm = { personId: k.id, label: k.label, role: k.role, safe: "no", risk: "harm", route: "safety" };
+  const [after] = people.withAnswer([k], harm, iso);
+  assert.equal(after.risk, "harm");
+  assert.equal(after.safeAskedAt, iso);
+  assert.equal(people.pickedKept(after).route, "safety", "picked again: the safety route, not the old yes");
+  // A fresh answer picked unchanged keeps its date; a newly kept person goes first; nothing kept, nothing changes.
+  assert.equal(people.withAnswer([k], people.pickedKept(k), iso)[0].safeAskedAt, k.safeAskedAt);
+  const fresh = people.withAnswer([k], { personId: "new-id", label: "Jo", role: "boss", safe: "yes", risk: "none", route: "ok" }, iso);
+  assert.deepEqual(fresh.map((x) => x.id), ["new-id", k.id]);
+  assert.deepEqual(people.withAnswer([k], { ...harm, personId: null }, iso), [k]);
+  assert.match(read("src/pages/tools/DearMan.tsx"), /people=\{answeredPeople \?\? copeProfile\.slices\?\.people \?\? null\}/);
+});
+
 test("what gets kept: only someone named, only signed in; the screen's keep line names them first", () => {
   const d = { personId: null, label: "  Sam ", role: "parent" };
   const iso = "2026-11-11T12:00:00.000Z";

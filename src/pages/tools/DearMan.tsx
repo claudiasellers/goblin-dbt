@@ -40,7 +40,7 @@ import { anchorLead, copeExt, copeParts, copeReady, keptLines, showCopeAhead } f
 import { focusLost, focusStepStart } from '../../lib/focusStart';
 import { PersonPicker } from '../../components/people/PersonPicker';
 import { PersonSafetyRoute } from '../../components/people/PersonSafetyRoute';
-import { PERSON_SAFETY_ROUTE_COPY, pickerCopy, type PickedPerson } from '../../lib/people';
+import { PERSON_SAFETY_ROUTE_COPY, pickerCopy, withAnswer, type KeptPerson, type PickedPerson } from '../../lib/people';
 import { roleLabel } from '../../data/people';
 
 type Phase =
@@ -346,6 +346,8 @@ export function DearMan() {
   // ahead per part ("Who might show up in this conversation?") parts, kept lines and anchors, empty with parts off.
   const partsOn = useUserProfile().profile.partsEnabled;
   const copeProfile = useProfileContext('dear-man');
+  /** The people slice with this visit's answers folded in (src/lib/people.ts withAnswer): the slice doesn't reload. */
+  const [answeredPeople, setAnsweredPeople] = useState<KeptPerson[] | null>(null);
   /** The shipped parts content for the cope copy: null while loading, false when it couldn't load. */
   const [copeContent, setCopeContent] = useState<PartsContent | null | false>(null);
   useEffect(() => {
@@ -888,9 +890,10 @@ export function DearMan() {
 
           {/* Sub-step 0: Who it's with, and is it safe (IE-03 + D4). The older role chips stay for a graph without the copy. */}
           {sceneStep === 0 && peopleCopy && profileSettled && (
-            <PersonPicker key={pickerKey} people={copeProfile.slices?.people ?? null} signedIn={copeProfile.status !== 'signed-out' && copeProfile.status !== 'error'}
+            <PersonPicker key={pickerKey} people={answeredPeople ?? copeProfile.slices?.people ?? null} signedIn={copeProfile.status !== 'signed-out' && copeProfile.status !== 'error'}
               copy={peopleCopy}
               onDone={(p) => {
+                setAnsweredPeople(withAnswer(answeredPeople ?? copeProfile.slices?.people ?? null, p, new Date().toISOString()));
                 setPerson(p);
                 setRelationshipType(p.role);
                 if (p.route === 'safety') setPhase('person-safety');
