@@ -495,6 +495,20 @@ test("follow-up timed by an earlier answer: whenFrom's pick, else whenDefault (C
   assert.deepEqual(m.followUpFor(ctx, step, picked), { type: "resume_skill", chip: "1h" }, "answered: the pick");
 });
 
+test("build.py: one non-hand-off step books each follow-up type (resume restores bookings by type)", () => {
+  const out = execFileSync("python3", ["-c", `import sys,json,copy; sys.path.insert(0,'scripts/skills'); import build
+from content import SKILLS
+sk = copy.deepcopy(next(s for s in SKILLS if s["id"] == "cope_ahead"))
+keep = next(s for s in sk["steps"] if s["id"] == "keep")
+calm = next(s for s in sk["steps"] if s["id"] == "calm")
+calm["followUp"] = dict(keep["followUp"])
+try:
+    build.check(sk); print("passed")
+except AssertionError as e:
+    print("refused" if "one step books" in str(e) else "other: " + str(e))`], { encoding: "utf8" }).trim();
+  assert.equal(out, "refused");
+});
+
 test("emotionsFrom: a derived list of words in place of emotions; emotions when it resolves to nothing", () => {
   const ctx = { ...f2Ctx(null), skill: { ...F2, tables: { ...F2.tables, feelBy: { a: ["anxious", "hurt"] } },
     derive: [...F2.derive, { name: "feelFor", from: "$a.chip", table: "feelBy" }] } };
