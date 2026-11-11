@@ -45,8 +45,10 @@ function WayOn({ done, label, onGo }: { done: boolean; label: string; onGo: () =
 }
 
 /** A tap-to-start ring on the deadline clock: tap starts, tap again stops where it is. */
-function TimedRing({ ms, leadIn = 0, label, running, leadLabel, onStop, onEnd, autoStart = false, children }: {
+function TimedRing({ ms, leadIn = 0, label, running, leadLabel, onStop, onEnd, autoStart = false, finished = false, children }: {
   ms: number; leadIn?: number; label: string; running: string; leadLabel?: (n: number) => string; autoStart?: boolean;
+  /** The dose is done: the ring stays mounted (full, inert) so the timer's end chime isn't cut off by an unmount. */
+  finished?: boolean;
   onStop: (fraction: number, ranMs: number) => void; onEnd: () => void; children?: ReactNode;
 }) {
   const total = ms + leadIn * 1000;
@@ -64,12 +66,12 @@ function TimedRing({ ms, leadIn = 0, label, running, leadLabel, onStop, onEnd, a
   return (
     <div className="flex flex-col items-center gap-3">
       {children}
-      <button type="button" aria-pressed={on} onClick={toggle} data-dose=""
+      <button type="button" aria-pressed={on} onClick={toggle} data-dose="" disabled={finished}
         className="rounded-full select-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-accent)]">
-        <ProgressRing value={timer.state === 'done' ? 1 : lead !== null ? 0 : doseFraction} size={200} stroke={5} smooth={false}>
+        <ProgressRing value={finished || timer.state === 'done' ? 1 : lead !== null ? 0 : doseFraction} size={200} stroke={5} smooth={false}>
           <span role={lead !== null ? 'timer' : undefined} aria-live={lead !== null ? 'assertive' : undefined}
             className="block max-w-[9rem] text-center text-lg font-medium text-[var(--color-text-primary)] text-balance">
-            {lead !== null && leadLabel ? leadLabel(lead) : on ? running : label}
+            {finished ? '' : lead !== null && leadLabel ? leadLabel(lead) : on ? running : label}
           </span>
         </ProgressRing>
       </button>
@@ -114,14 +116,11 @@ export function DoseTimer({ props, onShown, onDone }: EmbedProps) {
         <img src={COLD_ART} alt="" aria-hidden="true" draggable={false} className="mx-auto h-28 w-auto select-none pointer-events-none" />
       )}
       <Steps props={props} />
-      {done
-        ? <p role="status" className="text-center text-[var(--color-text-secondary)]">{text(props, 'done')}</p>
-        : (
-          <TimedRing ms={ms} leadIn={lead} label={text(props, 'start')} running={text(props, 'running')}
-            leadLabel={leadWord ? (n) => `${leadWord} ${n}` : undefined}
-            onStop={(fraction, ranMs) => setResult({ fraction, ranMs })}
-            onEnd={() => { buzz(30); setResult({ fraction: 1, ranMs: ms }); }} />
-        )}
+      <TimedRing ms={ms} leadIn={lead} label={text(props, 'start')} running={text(props, 'running')} finished={done}
+        leadLabel={leadWord ? (n) => `${leadWord} ${n}` : undefined}
+        onStop={(fraction, ranMs) => setResult({ fraction, ranMs })}
+        onEnd={() => { buzz(30); setResult({ fraction: 1, ranMs: ms }); }} />
+      {done && <p role="status" className="text-center text-[var(--color-text-secondary)]">{text(props, 'done')}</p>}
       <WayOn done={done} label={text(props, 'next')} onGo={() => onDone?.(timedOutput(result.fraction, result.ranMs))} />
     </section>
   );
@@ -136,13 +135,10 @@ export function BodyCard({ props, onShown, onDone }: EmbedProps) {
     <section className="space-y-5" data-testid="body-card" data-kind={text(props, 'kind')}>
       {text(props, 'cue') && <p className="text-lg leading-snug text-[var(--color-text-primary)] text-balance">{text(props, 'cue')}</p>}
       <Steps props={props} />
-      {done
-        ? <p role="status" className="text-center text-[var(--color-text-secondary)]">{text(props, 'done')}</p>
-        : (
-          <TimedRing ms={ms} label={text(props, 'start')} running={text(props, 'running')} autoStart={props.kind === 'still'}
-            onStop={(fraction, ranMs) => setResult({ fraction, ranMs })}
-            onEnd={() => setResult({ fraction: 1, ranMs: ms })} />
-        )}
+      <TimedRing ms={ms} label={text(props, 'start')} running={text(props, 'running')} autoStart={props.kind === 'still'} finished={done}
+        onStop={(fraction, ranMs) => setResult({ fraction, ranMs })}
+        onEnd={() => setResult({ fraction: 1, ranMs: ms })} />
+      {done && <p role="status" className="text-center text-[var(--color-text-secondary)]">{text(props, 'done')}</p>}
       <WayOn done={done} label={text(props, 'next')} onGo={() => onDone?.(timedOutput(result.fraction, result.ranMs))} />
     </section>
   );

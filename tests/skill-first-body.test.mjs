@@ -222,3 +222,12 @@ test("press: the instruction is on screen, not only for a screen reader (embed s
   const embedStep = player.slice(player.indexOf("function EmbedStep"), player.indexOf("function StepLinks"));
   assert.match(embedStep, /step\.hint && ctx\.skill\.copy\[step\.hint\]/);
 });
+
+test("a finished dose keeps its ring mounted, so the end chime isn't cut off (the timer closes its audio on unmount)", () => {
+  const src = readFileSync("src/components/skillPlayer/BodyEmbeds.tsx", "utf8");
+  for (const name of ["DoseTimer", "BodyCard"]) {
+    const body = src.slice(src.indexOf(`export function ${name}`), src.indexOf("export function", src.indexOf(`export function ${name}`) + 10));
+    assert.match(body, /<TimedRing [^>]*finished=\{done\}/, name);
+    assert.doesNotMatch(body, /done\s*\?[^:]*:\s*\(\s*<TimedRing/, `${name}: the ring is not swapped out when done`);
+  }
+});
