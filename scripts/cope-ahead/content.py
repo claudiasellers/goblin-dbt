@@ -116,10 +116,10 @@ MOVES = [
 
 # A danger moment's plan holds only moves that keep the person safe (Gate 3, ER-B2): its own move (listed first),
 # plus these, where they fit the pull. No conversation moves (validate, keep going, no sorry, the one thing, come
-# back) when someone might hurt them, and nothing that waits it out or only puts the phone away when they might hurt
+# back, and no *step out for five minutes*, which means going back) when someone might hurt them, and nothing that waits it out or only puts the phone away when they might hurt
 # themselves. Every other move is left out for that moment.
 DANGER_SAFE_MOVES = {
-    "might_hurt": ["long_out", "feet", "cold_water", "hold_something", "step_out", "text_trust", "five_senses", "cool_down"],
+    "might_hurt": ["long_out", "feet", "cold_water", "hold_something", "text_trust", "five_senses", "cool_down"],
     "might_hurt_self": ["long_out", "feet", "cold_water", "hold_something", "give_minute", "step_out", "text_trust",
                         "pause", "five_senses", "cool_down", "urge_surfing"],
 }

@@ -90,7 +90,7 @@ test("a danger moment: CrisisBanner alongside on the moment and plan screens (ot
 
 test("a danger moment's plan holds only safe moves, for every situation and pull; I might hurt myself links to Talk to someone now", () => {
   const SAFE = {
-    might_hurt: ["leave_safe", "long_out", "feet", "cold_water", "hold_something", "step_out", "text_trust", "five_senses", "cool_down"],
+    might_hurt: ["leave_safe", "long_out", "feet", "cold_water", "hold_something", "text_trust", "five_senses", "cool_down"],
     might_hurt_self: ["reach_help", "long_out", "feet", "cold_water", "hold_something", "give_minute", "step_out", "text_trust", "pause", "five_senses", "cool_down", "urge_surfing"],
   };
   for (const sit of CA.situations) {
@@ -103,6 +103,7 @@ test("a danger moment's plan holds only safe moves, for every situation and pull
         assert.equal(moves[0], SAFE[moment][0], "its own move first");
         // The rehearsal and the keep card carry the banner too.
         for (const st of ["walk", "keep"]) assert.ok(M.crisisFor(ctx(), M.stepOf(skill, st), s), `${st} keeps the banner`);
+        assert.ok(!M.shownFields(ctx(), M.stepOf(skill, "plan"), s).some((f) => f.id === "forpull"), "the If stays the danger moment");
         const field = (st, id) => M.stepOf(skill, st).fields.find((f) => f.id === id);
         const links = [...M.fieldLinks(ctx(), field("hard", "moment"), s), ...M.fieldLinks(ctx(), field("plan", "moves"), s),
           ...M.stepLinks(ctx(), M.stepOf(skill, "walk"), s)].map((l) => l.exit.id);
@@ -196,6 +197,11 @@ test("keep: Keep this keeps the plan as cope_ahead_plan (the tap is the yes); No
   const ifPull = { ...k.value, forpullIds: ["pull"] };
   assert.deepEqual(checkValue(PROFILE_KINDS.cope_ahead_plan, ifPull), ifPull, "the If is the pull: it is the plan's words, kept");
   assert.throws(() => checkValue(PROFILE_KINDS.cope_ahead_plan, { ...ifPull, pullIds: ["not_sure"] }), /Unexpected value/);
+  const notSure = run([pick("situation", "conversation"), next, pick("pull", "not_sure"), next, pick("moment", "go_blank"), next,
+    pick("moves", "feet"), next, done, pick("again", "no"), next, pick("settle", "ok"), next, pick("keepit", "yes"), pick("ask", "no")]);
+  const kn = M.keepFor(ctx(), M.stepOf(skill, "keep"), notSure).value;
+  assert.deepEqual(kn.pullIds, ["not_sure"]);
+  assert.deepEqual(checkValue(PROFILE_KINDS.cope_ahead_plan, kn), { situationIds: ["conversation"], momentIds: ["go_blank"], movesIds: ["feet"] }, "Not sure: Keep this works, no pull stored");
   // Me composes it with the same plan line the keep card showed.
   assert.equal(P.planLine(CA, P.planCaFromKept(k.value)).text, "If I go blank, I'll feel my feet on the floor and say “Give me a minute”.");
   assert.equal(M.keepFor(ctx(), M.stepOf(skill, "keep"), run([...TO_KEEP, pick("keepit", "no"), pick("ask", "no")])), null);

@@ -153,7 +153,9 @@ STEPS = [
         ],
         "fields": [
             # The "If": the moment, or (a chip, pressed) the pull.
-            {"id": "forpull", "options": {"list": "forpull"}, "max": 1, "showWhen": PULL_PICKED},
+            # Never for a danger moment: the plan must say what it is for.
+            {"id": "forpull", "options": {"list": "forpull"}, "max": 1,
+             "showWhen": {"all": [PULL_PICKED, {"not": {"in": [a("moment"), DANGER_IDS]}}]}},
             {"id": "moves", "options": {"list": "move", "where": MOVE_WHERE}, "max": 2, "swap": True, "required": True,
              "own": {"hint": "plan_own_hint", "countsAsPick": True, "max": MOVE_OWN_MAX}, "links": [SAFETY_LINK]},
         ],

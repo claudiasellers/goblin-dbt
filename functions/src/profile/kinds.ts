@@ -88,14 +88,14 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
       ids('situationIds', 1);
       ids('momentIds', 1);
       ids('forpullIds', 1, ['pull']);
-      ids('pullIds', 1, ['fight', 'chase', 'hide', 'blank']);
+      // The pull is plan content only when it is the If (`forpullIds: ['pull']`); otherwise it is this visit's
+      // ask-fresh answer (any pull, *Not sure* included) and is dropped before it is read.
+      if (o.forpullIds !== undefined) ids('pullIds', 1, ['fight', 'chase', 'hide', 'blank']);
       ids('movesIds', 2);
       if (o.situationOwn !== undefined) out.situationOwn = str(o.situationOwn, { max: 140 });
       if (o.momentOwn !== undefined) out.momentOwn = str(o.momentOwn, { max: 140 });
       if (o.movesOwn !== undefined) out.movesOwn = str(o.movesOwn, { max: 90 });
       for (const k of Object.keys(o)) if (!/^(situation|moment|forpull|pull|moves)(Ids|Own)$/.test(k) || k === 'forpullOwn' || k === 'pullOwn') throw new ValidationError('Unexpected field');
-      // The pull is plan content only when it is the If (`forpullIds: ['pull']`); otherwise it is this visit's
-      // ask-fresh answer and is never kept.
       if (!(out.forpullIds as string[] | undefined)?.length) delete out.pullIds;
       const has = (k: string) => (Array.isArray(out[`${k}Ids`]) && (out[`${k}Ids`] as string[]).length > 0) || typeof out[`${k}Own`] === 'string';
       if (!has('moves') || (!has('moment') && !(out.forpullIds as string[] | undefined)?.length)) throw new ValidationError('Nothing to keep');

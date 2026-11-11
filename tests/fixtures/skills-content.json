@@ -3182,14 +3182,29 @@
        },
        "max": 1,
        "showWhen": {
-        "in": [
-         "$a.pull",
-         [
-          "fight",
-          "chase",
-          "hide",
-          "blank"
-         ]
+        "all": [
+         {
+          "in": [
+           "$a.pull",
+           [
+            "fight",
+            "chase",
+            "hide",
+            "blank"
+           ]
+          ]
+         },
+         {
+          "not": {
+           "in": [
+            "$a.moment",
+            [
+             "might_hurt",
+             "might_hurt_self"
+            ]
+           ]
+          }
+         }
         ]
        }
       },
@@ -4421,7 +4436,6 @@
       "forMoments": [],
       "sits": [],
       "safeIn": [
-       "might_hurt",
        "might_hurt_self"
       ]
      },
@@ -4747,7 +4761,6 @@
       "forMoments": [],
       "sits": [],
       "safeIn": [
-       "might_hurt",
        "might_hurt_self"
       ]
      },

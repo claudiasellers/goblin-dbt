@@ -499,7 +499,7 @@ the legacy-exits test ties to the switch).
 
 - A danger moment's move is listed **first but not pre-selected**, and the plan offers **only safe moves** beside it
   (`DANGER_SAFE_MOVES` in `scripts/cope-ahead/content.py`: body and orienting moves, stepping out, texting someone; no
-  conversation moves when someone might hurt them, nothing that waits it out when they might hurt themselves). With
+  conversation moves and no *step out for five minutes* (which means going back) when someone might hurt them, nothing that waits it out when they might hurt themselves), and *Plan for the pull instead* is hidden, so the plan always says what it is for. With
   every chip on the screen a safe one, the person picks the plan's words (C1: nothing pre-filled) rather than the app
   pressing one. The banner shows on the moment, plan, rehearsal and keep screens; *I might hurt myself* adds *Talk to
   someone now* (safety.open, C6.5) under the moment, the plan and the rehearsal.
