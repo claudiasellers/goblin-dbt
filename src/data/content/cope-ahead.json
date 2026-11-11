@@ -581,8 +581,8 @@
       {
         "id": "pause",
         "kind": "tool",
-        "label": "Pause",
-        "line": "open Pause",
+        "label": "Hold to wait",
+        "line": "open Hold to wait",
         "forPulls": [
           "fight",
           "chase"

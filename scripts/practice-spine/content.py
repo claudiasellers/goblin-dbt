@@ -48,10 +48,17 @@ CLOSE_FLOW = {
     },
     # Per-tool wording of a kind's question (same answer ids).
     "byTool": {
+        # Hold to wait (DT-02): the two-part close (urge_change, R7). PRD: "Did you act on it? no · partly · yes",
+        # never red or green; then the pull now.
         "pause": {
             "urge": {
-                "question": "And the urge?",
-                "choices": [{"id": "no", "label": "Held off"}, {"id": "yes", "label": "Went ahead"}, {"id": "not_yet", "label": "Still deciding"}],
+                "question": "Did you act on it?",
+                "choices": [{"id": "no", "label": "No"}, {"id": "partly", "label": "Partly"}, {"id": "yes", "label": "Yes"}],
+            },
+            "regulation_down": {
+                "dir": "down",
+                "question": "And the pull now, compared to when you started?",
+                "choices": [{"id": k, "label": DIRECTION_LABELS["down"][k]} for k in THEN_VS_NOW],
             },
         },
         # DT-11: the acted answer is on the destructive urge, not on the rebellion picked.
@@ -240,6 +247,20 @@ FOLLOW_UP_TYPES = [
         "copy": {"title": "Your new version", "body": "A read-through you asked for. A minute, eyes open."},
         "choices": [{"id": "not_today", "label": "Not today", "status": "dismissed"}],
         "notification": "Something you asked to be reminded of is ready.",
+    },
+    {
+        # Hold to wait (DT-02): ten minutes after the phone went down, or after the short path's body-first card
+        # (a carried flooded reading: the observe and proceed steps wait for this). It opens a fresh visit (the
+        # earlier one may never have closed while the phone was down); opening it is the resolution, as for
+        # resume_skill. The copy and the notification never name the urge.
+        "id": "hold_come_back", "ownerModule": "dt", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/pause?followUp={followUpId}",
+        "window": {"kind": "after", "minutes": 10},
+        "staleAfterHours": 6, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "A little later", "body": "Quieter now? Want to decide what to do with the pull?"},
+        "choices": [{"id": "not_now", "label": "Not now", "status": "dismissed"}],
+        "notification": "Something you asked to come back to is ready.",
     },
     {
         # E3 §A4.2.6: "Come back to this later" from the breakdown hand-off (A4-2 schedules it).

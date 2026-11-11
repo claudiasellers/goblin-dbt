@@ -133,7 +133,7 @@ Added by F1 (docs/design/dbt-modules-plan.md §4, 10 Nov 2026):
   `field`, `id`; any may be `optional`), mirrored in content.py. `build.py` refuses an undeclared, mistyped or
   missing prop on any embed step or slot, and a `copy` prop must name a key in the skill's copy: the player
   passes its text (`resolveEmbedProps`), so an embed never carries its own words. Embeds also get `answerIds`.
-  Shared embeds: `holdRing` (`press` · `timed` · `settle`; `src/lib/holdRing.ts`) and `witness` (the receive beat,
+  Shared embeds: `holdRing` (`press` · `timed` · `settle`; `src/lib/holdRing.ts`), `waitLock` (DT-02) and `witness` (the receive beat,
   logged against the visit's session). `dev/skills-review.html` shows every step of every skill and each embed.
 - **Crisis slots.** `crisis: [{variant: 'crisis' | 'other_person', when}]` on any step (ask, embed, hand-off)
   shows the compact `CrisisBanner` while `when` holds. An option or embed id marked `danger` needs a slot of its
@@ -141,6 +141,11 @@ Added by F1 (docs/design/dbt-modules-plan.md §4, 10 Nov 2026):
 - **Exits.** A `planned` exit (a tool not built yet) is recorded in content but never offered or linked. The
   reserved exit `safety_open` (`safety: true`, no tool, at most one per skill) opens `SafetyOpen` over the step,
   which stays mounted underneath, and records `safety_open` in `embedsShown`; it is not a way out.
+- **`safetyFirst`** (DT-02): a step's condition; when the run arrives at the step and it holds, the player opens
+  `safety.open` over it before it can be answered (once per arrival, never on a resume). `build.py` requires the
+  `safety_open` exit and a crisis slot on the step. Hold to wait's *Hurt myself* → `safe` is the first user.
+- **Urge ids** (DT-02): an option's `urge` prop names the `ActionUrge` it stands for; the player sets the session's
+  `urgeIds` (ask-fresh) from the run's picks. `build.py` checks every `urge` / `forUrges` id is an `ActionUrge`.
 - **Counting derive** (`kind: 'count'`: weighted picks summed, the table row with the largest threshold at or
   below the total) and a per-field `own.max` under the skill's `ownMax` (≤ 140).
 - **Follow-up on a hand-off** (R5, ER-B1 second PR, agreed with the plan thread). A step's `followUp`

@@ -100,7 +100,7 @@ MOVES = [
     ("phone_away", "action", "Put my phone in another room", "put my phone in another room", ["chase"], False, None, []),
     ("leave_safe", "action", "Leave and get somewhere safe", "leave and get somewhere safe", [], False, None, ["might_hurt"]),
     ("reach_help", "action", "Call or text someone who can help, now", "call or text someone who can help, now", [], False, None, ["might_hurt_self"]),
-    ("pause", "tool", "Pause", "open Pause", ["fight", "chase"], False, "pause", []),
+    ("pause", "tool", "Hold to wait", "open Hold to wait", ["fight", "chase"], False, "pause", []),
     ("five_senses", "tool", "5-4-3-2-1", "do 5-4-3-2-1", ["blank", "hide", "fight"], True, "five-senses", []),
     ("cool_down", "tool", "Circuit Breaker", "do Circuit Breaker", ["fight", "chase"], False, "cool-down", []),
     ("urge_surfing", "tool", "Urge Surfing", "use Urge Surfing", ["chase", "fight"], False, "urge-surfing", []),

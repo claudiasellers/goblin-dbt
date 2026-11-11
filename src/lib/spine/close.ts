@@ -10,7 +10,7 @@ import type { CloseQuestion, SpineContent } from '../../services/spine';
 export const TOOL_CLOSE_KIND: Record<string, { module: SpineModule; closeKind: CloseKind }> = {
   'cool-down': { module: 'dt', closeKind: 'regulation_down' },
   'five-senses': { module: 'dt', closeKind: 'orienting' },
-  'pause': { module: 'dt', closeKind: 'urge' },
+  'pause': { module: 'dt', closeKind: 'urge_change' },
   'urge-surfing': { module: 'dt', closeKind: 'urge' },
   'alternate-rebellion': { module: 'dt', closeKind: 'urge' },
   'problem-solve': { module: 'er', closeKind: 'plan' },

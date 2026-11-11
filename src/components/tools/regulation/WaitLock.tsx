@@ -28,7 +28,11 @@ function useCountdown(ms: number) {
  * with `text`, the copy button appears only when the timer ends; without it, it's a plain wait.
  * The deadline is a timestamp, so a backgrounded tab can't make it drift.
  */
-export function WaitLock({ minutes, text, c, onUnlocked }: { minutes: number; text: string | null; c: WaitLockCopy; onUnlocked?: () => void }) {
+export function WaitLock({ minutes, text, c, onUnlocked, clock = true }: {
+  minutes: number; text: string | null; c: WaitLockCopy; onUnlocked?: () => void;
+  /** false hides the mm:ss and the padlock (Hold to wait's phone-down wait never locks: the ring is the only progress). */
+  clock?: boolean;
+}) {
   const total = minutes * 60_000;
   const { left, skip } = useCountdown(total);
   const unlocked = left <= 0;
@@ -40,10 +44,10 @@ export function WaitLock({ minutes, text, c, onUnlocked }: { minutes: number; te
   const copy = async () => { if (!text) return; try { await navigator.clipboard.writeText(text); setCopied(true); } catch { setCopied(false); } };
   return (
     <div className="p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] flex flex-col items-center gap-4">
-      <ProgressRing value={1 - left / total} size={128} label={unlocked ? c.unlockedShort : `${mm}:${ss}`}>
+      <ProgressRing value={1 - left / total} size={128} label={unlocked ? c.unlockedShort : clock ? `${mm}:${ss}` : c.waiting}>
         <div className="flex flex-col items-center gap-0.5">
-          <Padlock closed={!unlocked} size={32} />
-          <span className="text-sm font-medium tabular-nums">{unlocked ? c.unlockedShort : `${mm}:${ss}`}</span>
+          {clock && <Padlock closed={!unlocked} size={32} />}
+          {(unlocked || clock) && <span className="text-sm font-medium tabular-nums">{unlocked ? c.unlockedShort : `${mm}:${ss}`}</span>}
         </div>
       </ProgressRing>
       <p className={`${secondaryText} text-center max-w-[36ch]`} aria-live="polite">
