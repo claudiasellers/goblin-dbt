@@ -10,6 +10,7 @@ export const PLAYER_TOOLS: Readonly<Record<string, string>> = {
   'er-troubleshoot': 'er_troubleshoot',
   'ending-relationships': 'ending_relationships',
   'nightmare-rescript': 'nightmare_rescript',
+  'problem-solve': 'problem_solve',
 };
 
 /** The skill a tool's page plays, or null when the tool still has its own page. */

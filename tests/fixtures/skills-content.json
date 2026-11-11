@@ -7183,6 +7183,5591 @@
      }
     ]
    }
+  },
+  {
+   "id": "problem_solve",
+   "toolId": "problem-solve",
+   "version": "ps-v1",
+   "start": "feel",
+   "accepts": [
+    "band"
+   ],
+   "ownMax": 140,
+   "emotionFields": [
+    "feel"
+   ],
+   "copy": {
+    "feel_title": "What's the feeling that's pointing at a problem?",
+    "feel_more": "Something else",
+    "ready_title": "Can you think about this fairly clearly right now, or is the feeling too loud?",
+    "not_now_line": "That makes sense. When a feeling is this loud, planning is harder. It may help to bring it down a little first, then come back to this.",
+    "not_fit_shame": "When a feeling says something is wrong with you, there's nothing there to solve. Lots of people feel this. Doing the opposite of hiding often helps more. If there's one thing you did that you want to put right, you can come back for that.",
+    "not_fit_facts": "When something isn't clear yet, it helps to get the facts straight before solving anything.",
+    "not_fit_other": "Problem Solve works from a feeling that's pointing at a problem you can work on. This one might want something else first.",
+    "ack_fear": "Your fear is pointing at something that matters to you. Let's see what you can do about it.",
+    "ack_anger": "Your anger says something that mattered got crossed. Let's work out what to do about it.",
+    "ack_disgust": "Something is crossing a line for you. Let's see what you can do about it.",
+    "ack_envy": "Envy points at something you want. That's useful to know, and you can use it.",
+    "ack_jealousy": "Something in this relationship feels under threat. Let's look at what you can do, starting from what you need.",
+    "ack_love": "The love is real, and something is in the way. Let's look at what's in the way.",
+    "ack_sadness": "You've lost something, or something didn't go the way you needed. Let's see which parts you can do something about.",
+    "ack_guilt": "Something you did doesn't sit right with your values. The move now is repair, not punishing yourself.",
+    "problem_q": "Which of these sounds closest?",
+    "ack_routed": "Something is asking a lot of you right now. Let's see what you can do about it.",
+    "own_hint": "Say it your way",
+    "piling": "It's not one thing. Everything feels like too much",
+    "safety_open": "Talk to someone now",
+    "triage_title": "When everything piles up, one thing is a foothold. Which would shift most if it moved even a little?",
+    "barrier_title": "What's in the way of doing something about it?",
+    "barrier_hint": "There's no wrong answer. It helps find the next step.",
+    "sub_title": "Can you say a bit more?",
+    "sub_title_tried": "You've been trying. That counts, even though it hasn't landed the way you needed. Can you say a bit more?",
+    "re_cant-afraid-aftermath": "The fear of what comes after is real, and you can prepare for it. Rehearsing the hard part first can make the real thing less overwhelming.",
+    "re_cant-no-energy": "That's not a flaw in you. When you're running low, even obvious steps feel impossible. Refill a little first, then come back.",
+    "re_cant-ambivalent": "That's honest. Both sides are real: the part that wants change and the part that doesn't. Let's look at what staying the same protects you from.",
+    "re_cant-keep-putting-off": "Putting it off usually protects you from something, like discomfort, failing or conflict. Let's find the smallest version of the step and see how sure you feel about that.",
+    "re_person-dont-know-what-to-say": "DEAR MAN is for exactly that. It gives you a shape for what to say, so you don't start from nothing.",
+    "re_person-scared-reaction": "Their reaction is worth taking seriously. You can prepare what to say and rehearse how you'll handle the hard part.",
+    "re_person-tried-they-dont-listen": "When something hasn't landed, it may be the approach and not the message. Changing how you say it can change whether it gets through. Or this may be where your influence over them ends.",
+    "re_person-no-right-to-speak": "That feeling is worth a look. You have needs, and saying them isn't selfish. This may be more about your self-respect than the problem itself.",
+    "re_tried-talked-to-them": "Maybe it's the approach that needs to change, not the goal. Saying your piece and saying it so it gets through are different things.",
+    "re_tried-thinking-constantly": "That's your mind working on it, and it counts. Thinking and doing are different skills. You've done the thinking. Let's try the smallest piece of doing.",
+    "re_tried-different-approaches": "That tells you something. Either it needs a different kind of strategy, or this wall won't move and the wise move is to put your energy somewhere else.",
+    "re_tried-exhausted": "Trying hard without results wears you out. You're not failing, you're running low. The most useful thing now is to refill, not push harder.",
+    "go_q": "What would help now?",
+    "go_ambiv": "Look at what it protects me from",
+    "go_ruler": "See how sure I feel",
+    "go_options": "Show me some options",
+    "go_keep": "Keep problem-solving",
+    "ambiv_title": "What does staying the same protect you from?",
+    "fo_ambiv-hard-conversation": "Hard conversations carry real risk. The question is whether not having it costs more than having it.",
+    "fo_ambiv-change-might-not-help": "If you change things and it still hurts, that would be hard. That fear is real. Staying put to avoid finding out is a choice too.",
+    "fo_ambiv-losing-something": "Change usually costs something. There may be a way to change and keep the part that matters.",
+    "fo_ambiv-admitting-need-help": "Asking for help or owning a mistake can feel like it makes you smaller. It's also a way of looking after what matters.",
+    "conf_title": "How sure are you that you could do the smallest version of this?",
+    "co_high": "So the how is there. Let's name the step.",
+    "co_medium": "Small is real. Let's find the smallest version that still counts.",
+    "co_low": "That's honest. Someone else could help with this, and a smaller piece might be in reach.",
+    "co_none": "Then the step may need to be smaller still, or something may need to change first. Not easy. Possible.",
+    "decompose_title": "Some parts of this are facts. Some are up to other people. Some are in your hands.",
+    "mine_q": "Which of these are in your hands?",
+    "others_title": "Which parts are up to someone else?",
+    "accept_line": "Most of this is facts or other people's choices. That's painful, and it isn't a failure. Here the skill is to carry it, not solve it.",
+    "solutions_title": "Which direction feels right?",
+    "solutions_title_small": "Let's start small. Which direction feels right?",
+    "solutions_title_mine": "Here's what's in your hands. Which direction feels right?",
+    "size_title": "{direction}. Pick what feels doable.",
+    "own_step_title": "What's the step you already know you want to take?",
+    "own_step_hint": "Write it your way, or start from one of these.",
+    "mysize_q": "How big is it?",
+    "commit_title": "Your next step: {step}",
+    "commit_title_own": "Your next step: {mine}",
+    "commit_line": "Any size is a real step. If it doesn't work, or the problem shifts, come back: problem-solving goes round more than once.",
+    "commit_line_rehearse": "A bigger step can help to rehearse before you take it.",
+    "commit_line_safety": "If it gets more dangerous, call now. You don't have to wait for a plan.",
+    "when_q": "Want me to ask how it went?",
+    "review_title": "How did it go? You planned: {step}",
+    "review_title_own": "How did it go? You planned: {mine}",
+    "review_next_part": "Part of it is still a step. What would help with the rest?",
+    "review_next_didnt": "That happens, and it's useful to know. What would help next time?",
+    "review_next_didnt_safety": "That happens. If you're not safe now, call. Or pick another way.",
+    "review_next_nohelp": "You did it, and it didn't help. That's worth knowing. What would help now?",
+    "review_next_nohelp_safety": "It didn't help enough. If you're not safe now, call. Or pick another way.",
+    "review_help_title": "You took the step. Did it help with the problem?",
+    "review_done_line": "You took the step and saw what it did. That's the whole loop: a problem, a step, and seeing how it went.",
+    "review_later_line": "It can wait.",
+    "review_later_q": "Want me to ask again?",
+    "rest_line": "Stopping here is a real choice. You can come back to this when you have more in the tank.",
+    "go_rest": "Stop here for now",
+    "own_direction": "My own idea",
+    "done": "Done",
+    "next": "Next",
+    "l_cope_ahead": "Rehearse it with Cope Ahead",
+    "l_dear_man": "Work out what to say with DEAR MAN",
+    "l_fast": "Keep your self-respect",
+    "l_give": "Keep it warm",
+    "l_dialectics": "Find the middle path",
+    "l_please_skill": "Look after the basics first",
+    "l_build_mastery": "Build a small win",
+    "l_finding_connection": "Find someone to lean on",
+    "l_self_validate": "Validate yourself",
+    "l_others": "This part is about them. Work out what to say with DEAR MAN",
+    "l_missing_links": "Find what got in the way"
+   },
+   "tables": {
+    "psFit": {
+     "fearful": "other",
+     "scared": "fit",
+     "anxious": "fit",
+     "insecure": "shame",
+     "weak": "shame",
+     "rejected": "shame",
+     "helpless": "fit",
+     "frightened": "fit",
+     "worried": "fit",
+     "overwhelmed": "fit",
+     "inadequate": "shame",
+     "inferior": "shame",
+     "worthless": "shame",
+     "insignificant": "shame",
+     "excluded": "shame",
+     "persecuted": "other",
+     "nervous": "fit",
+     "exposed": "shame",
+     "angry": "fit",
+     "threatened": "fit",
+     "let_down": "fit",
+     "humiliated": "shame",
+     "bitter": "fit",
+     "mad": "fit",
+     "aggressive": "fit",
+     "frustrated": "fit",
+     "distant": "fit",
+     "critical": "fit",
+     "betrayed": "fit",
+     "resentful": "fit",
+     "disrespected": "fit",
+     "ridiculed": "shame",
+     "indignant": "fit",
+     "violated": "fit",
+     "furious": "fit",
+     "jealous": "fit",
+     "provoked": "fit",
+     "hostile": "fit",
+     "infuriated": "fit",
+     "annoyed": "fit",
+     "withdrawn": "fit",
+     "skeptical": "facts",
+     "dismissive": "fit",
+     "stressed": "fit",
+     "busy": "fit",
+     "rushed": "fit",
+     "pressured": "fit",
+     "out_of_control": "fit",
+     "happy": "other",
+     "playful": "other",
+     "interested": "other",
+     "proud": "other",
+     "accepted": "other",
+     "powerful": "other",
+     "optimistic": "other",
+     "aroused": "other",
+     "cheeky": "other",
+     "joyful": "other",
+     "curious": "other",
+     "inquisitive": "other",
+     "successful": "other",
+     "confident": "other",
+     "respected": "other",
+     "valued": "other",
+     "courageous": "other",
+     "creative": "other",
+     "hopeful": "other",
+     "inspired": "other",
+     "surprised": "other",
+     "startled": "other",
+     "confused": "facts",
+     "amazed": "other",
+     "excited": "other",
+     "shocked": "fit",
+     "dismayed": "fit",
+     "disillusioned": "fit",
+     "perplexed": "facts",
+     "astonished": "other",
+     "awe": "other",
+     "eager": "other",
+     "energetic": "other",
+     "bad": "other",
+     "tired": "other",
+     "bored": "other",
+     "sleepy": "other",
+     "unfocused": "other",
+     "apathetic": "other",
+     "indifferent": "other",
+     "disgusted": "fit",
+     "disapproving": "fit",
+     "disappointed": "fit",
+     "awful": "fit",
+     "repelled": "fit",
+     "judgmental": "fit",
+     "embarrassed": "shame",
+     "appalled": "fit",
+     "revolted": "fit",
+     "nauseated": "fit",
+     "detestable": "fit",
+     "horrified": "fit",
+     "hesitant": "fit",
+     "sad": "fit",
+     "lonely": "fit",
+     "vulnerable": "fit",
+     "despair": "fit",
+     "guilty": "fit",
+     "depressed": "fit",
+     "hurt": "fit",
+     "isolated": "fit",
+     "abandoned": "fit",
+     "victimized": "fit",
+     "fragile": "fit",
+     "grief": "fit",
+     "powerless": "fit",
+     "ashamed": "shame",
+     "remorseful": "fit",
+     "empty": "fit",
+     "numb": "other",
+     "calm": "other",
+     "relaxed": "other",
+     "peaceful": "other",
+     "content": "other",
+     "trusting": "other",
+     "sensitive": "other",
+     "intimate": "other",
+     "loving": "other",
+     "thankful": "other",
+     "good": "other",
+     "chill": "other",
+     "comfortable": "other",
+     "thoughtful": "other",
+     "mellow": "other",
+     "sympathetic": "other",
+     "serene": "other",
+     "secure": "other",
+     "satisfied": "other",
+     "restful": "other",
+     "appreciative": "other",
+     "at_ease": "other",
+     "balanced": "other",
+     "grounded": "other",
+     "tender": "other",
+     "cozy": "other",
+     "humble": "other"
+    },
+    "psParent": {
+     "scared": "fear",
+     "anxious": "fear",
+     "helpless": "sadness",
+     "frightened": "fear",
+     "worried": "fear",
+     "overwhelmed": "fear",
+     "nervous": "fear",
+     "angry": "anger",
+     "threatened": "fear",
+     "let_down": "sadness",
+     "bitter": "anger",
+     "mad": "anger",
+     "aggressive": "anger",
+     "frustrated": "anger",
+     "distant": "sadness",
+     "critical": "anger",
+     "betrayed": "anger",
+     "resentful": "anger",
+     "disrespected": "anger",
+     "indignant": "anger",
+     "violated": "anger",
+     "furious": "anger",
+     "jealous": "jealousy",
+     "provoked": "anger",
+     "hostile": "anger",
+     "infuriated": "anger",
+     "annoyed": "anger",
+     "withdrawn": "sadness",
+     "dismissive": "disgust",
+     "stressed": "fear",
+     "busy": "fear",
+     "rushed": "fear",
+     "pressured": "fear",
+     "out_of_control": "fear",
+     "shocked": "fear",
+     "dismayed": "sadness",
+     "disillusioned": "sadness",
+     "disgusted": "disgust",
+     "disapproving": "disgust",
+     "disappointed": "sadness",
+     "awful": "sadness",
+     "repelled": "disgust",
+     "judgmental": "anger",
+     "appalled": "disgust",
+     "revolted": "disgust",
+     "nauseated": "disgust",
+     "detestable": "disgust",
+     "horrified": "fear",
+     "hesitant": "fear",
+     "sad": "sadness",
+     "lonely": "sadness",
+     "vulnerable": "fear",
+     "despair": "sadness",
+     "guilty": "guilt",
+     "depressed": "sadness",
+     "hurt": "sadness",
+     "isolated": "sadness",
+     "abandoned": "sadness",
+     "victimized": "anger",
+     "fragile": "fear",
+     "grief": "sadness",
+     "powerless": "sadness",
+     "remorseful": "guilt",
+     "empty": "sadness"
+    },
+    "subGo": {
+     "cant-afraid-aftermath": [
+      "keep"
+     ],
+     "cant-no-energy": [
+      "rest",
+      "keep"
+     ],
+     "cant-ambivalent": [
+      "ambiv"
+     ],
+     "cant-keep-putting-off": [
+      "ruler"
+     ],
+     "person-dont-know-what-to-say": [
+      "keep"
+     ],
+     "person-scared-reaction": [
+      "keep"
+     ],
+     "person-tried-they-dont-listen": [
+      "keep"
+     ],
+     "person-no-right-to-speak": [
+      "keep"
+     ],
+     "tried-talked-to-them": [
+      "keep"
+     ],
+     "tried-thinking-constantly": [
+      "options"
+     ],
+     "tried-different-approaches": [
+      "options"
+     ],
+     "tried-exhausted": [
+      "rest",
+      "keep"
+     ]
+    },
+    "startSmall": {
+     "tried-thinking-constantly": "yes"
+    }
+   },
+   "derive": [
+    {
+     "name": "parent",
+     "from": "$a.feel",
+     "table": "psParent"
+    },
+    {
+     "name": "fit",
+     "from": "$a.feel",
+     "table": "psFit",
+     "default": "other"
+    },
+    {
+     "name": "subGo",
+     "from": "$a.sub",
+     "table": "subGo"
+    },
+    {
+     "name": "startSmall",
+     "from": "$a.sub",
+     "table": "startSmall"
+    }
+   ],
+   "steps": [
+    {
+     "id": "feel",
+     "kind": "ask",
+     "title": "feel_title",
+     "fields": [
+      {
+       "id": "feel",
+       "options": {
+        "emotions": [
+         "anxious",
+         "worried",
+         "stressed",
+         "angry",
+         "frustrated",
+         "sad",
+         "lonely",
+         "hurt",
+         "guilty",
+         "jealous"
+        ],
+        "carriedFirst": true,
+        "moreKey": "feel_more"
+       },
+       "max": 1,
+       "required": true,
+       "emotion": true
+      }
+     ],
+     "next": [
+      {
+       "to": "not_now",
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       }
+      },
+      {
+       "to": "not_fit",
+       "when": {
+        "not": {
+         "eq": [
+          "$d.fit",
+          "fit"
+         ]
+        }
+       }
+      },
+      {
+       "to": "ready",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "ready",
+     "kind": "ask",
+     "title": "ready_title",
+     "fields": [
+      {
+       "id": "ready",
+       "options": {
+        "list": "ready"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "not_now",
+       "when": {
+        "eq": [
+         "$a.ready",
+         "too_loud"
+        ]
+       }
+      },
+      {
+       "to": "problem",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "problem",
+     "kind": "ask",
+     "title": [
+      {
+       "when": {
+        "in": [
+         "$a.feel",
+         [
+          "busy",
+          "helpless",
+          "rushed"
+         ]
+        ]
+       },
+       "key": "ack_routed"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "anger"
+        ]
+       },
+       "key": "ack_anger"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "disgust"
+        ]
+       },
+       "key": "ack_disgust"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "envy"
+        ]
+       },
+       "key": "ack_envy"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "fear"
+        ]
+       },
+       "key": "ack_fear"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "guilt"
+        ]
+       },
+       "key": "ack_guilt"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "jealousy"
+        ]
+       },
+       "key": "ack_jealousy"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "love"
+        ]
+       },
+       "key": "ack_love"
+      },
+      {
+       "key": "ack_sadness"
+      }
+     ],
+     "fields": [
+      {
+       "id": "problem",
+       "label": "problem_q",
+       "max": 1,
+       "swap": true,
+       "required": true,
+       "options": {
+        "list": "problem",
+        "where": {
+         "any": [
+          {
+           "eq": [
+            "$opt.parent",
+            "$d.parent"
+           ]
+          },
+          {
+           "eq": [
+            "$opt.all",
+            true
+           ]
+          }
+         ]
+        }
+       },
+       "own": {
+        "hint": "own_hint",
+        "countsAsPick": true,
+        "max": 80
+       },
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "any": [
+           {
+            "own": "problem"
+           },
+           {
+            "in": [
+             "$a.feel",
+             [
+              "despair",
+              "depressed",
+              "worthless",
+              "helpless",
+              "powerless"
+             ]
+            ]
+           }
+          ]
+         }
+        }
+       ]
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "eq": [
+         "$a.problem",
+         "fear-safety-threat"
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "triage",
+       "when": {
+        "eq": [
+         "$a.problem",
+         "piling"
+        ]
+       }
+      },
+      {
+       "to": "solutions",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "barrier",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "triage",
+     "kind": "ask",
+     "title": "triage_title",
+     "fields": [
+      {
+       "id": "focus",
+       "max": 1,
+       "required": true,
+       "swap": true,
+       "options": {
+        "list": "problem",
+        "where": {
+         "all": [
+          {
+           "eq": [
+            "$opt.parent",
+            "$d.parent"
+           ]
+          },
+          {
+           "not": {
+            "eq": [
+             "$opt.all",
+             true
+            ]
+           }
+          }
+         ]
+        }
+       },
+       "own": {
+        "hint": "own_hint",
+        "countsAsPick": true,
+        "max": 80
+       },
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "any": [
+           {
+            "own": "focus"
+           },
+           {
+            "in": [
+             "$a.feel",
+             [
+              "despair",
+              "depressed",
+              "worthless",
+              "helpless",
+              "powerless"
+             ]
+            ]
+           }
+          ]
+         }
+        }
+       ]
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "eq": [
+         "$a.focus",
+         "fear-safety-threat"
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "solutions",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "barrier",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "barrier",
+     "kind": "ask",
+     "title": "barrier_title",
+     "hint": "barrier_hint",
+     "fields": [
+      {
+       "id": "barrier",
+       "options": {
+        "list": "barrier"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "sub",
+       "when": {
+        "in": [
+         "$a.barrier",
+         [
+          "know-but-cant",
+          "involves-person",
+          "tried-nothing-works"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "decompose",
+       "when": {
+        "eq": [
+         "$a.barrier",
+         "outside-control"
+        ]
+       }
+      },
+      {
+       "to": "solutions",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "sub",
+     "kind": "ask",
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$a.barrier",
+         "tried-nothing-works"
+        ]
+       },
+       "key": "sub_title_tried"
+      },
+      {
+       "key": "sub_title"
+      }
+     ],
+     "fields": [
+      {
+       "id": "sub",
+       "options": {
+        "list": "sub",
+        "where": {
+         "eq": [
+          "$opt.barrier",
+          "$a.barrier"
+         ]
+        }
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "sub_reply",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "sub_reply",
+     "kind": "ask",
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$a.sub",
+         "cant-afraid-aftermath"
+        ]
+       },
+       "key": "re_cant-afraid-aftermath"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.sub",
+         "cant-no-energy"
+        ]
+       },
+       "key": "re_cant-no-energy"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.sub",
+         "cant-ambivalent"
+        ]
+       },
+       "key": "re_cant-ambivalent"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.sub",
+         "cant-keep-putting-off"
+        ]
+       },
+       "key": "re_cant-keep-putting-off"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.sub",
+         "person-dont-know-what-to-say"
+        ]
+       },
+       "key": "re_person-dont-know-what-to-say"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.sub",
+         "person-scared-reaction"
+        ]
+       },
+       "key": "re_person-scared-reaction"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.sub",
+         "person-tried-they-dont-listen"
+        ]
+       },
+       "key": "re_person-tried-they-dont-listen"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.sub",
+         "person-no-right-to-speak"
+        ]
+       },
+       "key": "re_person-no-right-to-speak"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.sub",
+         "tried-talked-to-them"
+        ]
+       },
+       "key": "re_tried-talked-to-them"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.sub",
+         "tried-thinking-constantly"
+        ]
+       },
+       "key": "re_tried-thinking-constantly"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.sub",
+         "tried-different-approaches"
+        ]
+       },
+       "key": "re_tried-different-approaches"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.sub",
+         "tried-exhausted"
+        ]
+       },
+       "key": "re_tried-exhausted"
+      },
+      {
+       "key": "go_q"
+      }
+     ],
+     "fields": [
+      {
+       "id": "go",
+       "label": "go_q",
+       "options": {
+        "list": "go",
+        "where": {
+         "has": [
+          "$d.subGo",
+          "$opt.value"
+         ]
+        }
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "build_mastery",
+         "label": "l_build_mastery",
+         "when": {
+          "in": [
+           "$a.sub",
+           [
+            "tried-exhausted"
+           ]
+          ]
+         }
+        },
+        {
+         "exit": "cope_ahead",
+         "label": "l_cope_ahead",
+         "when": {
+          "in": [
+           "$a.sub",
+           [
+            "cant-afraid-aftermath",
+            "person-scared-reaction"
+           ]
+          ]
+         }
+        },
+        {
+         "exit": "dear_man",
+         "label": "l_dear_man",
+         "when": {
+          "in": [
+           "$a.sub",
+           [
+            "person-dont-know-what-to-say",
+            "person-scared-reaction",
+            "tried-talked-to-them"
+           ]
+          ]
+         }
+        },
+        {
+         "exit": "dialectics",
+         "label": "l_dialectics",
+         "when": {
+          "in": [
+           "$a.sub",
+           [
+            "person-tried-they-dont-listen"
+           ]
+          ]
+         }
+        },
+        {
+         "exit": "fast",
+         "label": "l_fast",
+         "when": {
+          "in": [
+           "$a.sub",
+           [
+            "person-no-right-to-speak"
+           ]
+          ]
+         }
+        },
+        {
+         "exit": "give",
+         "label": "l_give",
+         "when": {
+          "in": [
+           "$a.sub",
+           [
+            "person-tried-they-dont-listen",
+            "tried-talked-to-them"
+           ]
+          ]
+         }
+        },
+        {
+         "exit": "please_skill",
+         "label": "l_please_skill",
+         "when": {
+          "in": [
+           "$a.sub",
+           [
+            "cant-no-energy",
+            "tried-exhausted"
+           ]
+          ]
+         }
+        },
+        {
+         "exit": "self_validate",
+         "label": "l_self_validate",
+         "when": {
+          "in": [
+           "$a.sub",
+           [
+            "person-no-right-to-speak"
+           ]
+          ]
+         }
+        },
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "eq": [
+           "$a.sub",
+           "tried-exhausted"
+          ]
+         }
+        }
+       ]
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "rest",
+       "when": {
+        "eq": [
+         "$a.go",
+         "rest"
+        ]
+       }
+      },
+      {
+       "to": "ambivalence",
+       "when": {
+        "eq": [
+         "$a.go",
+         "ambiv"
+        ]
+       }
+      },
+      {
+       "to": "confidence",
+       "when": {
+        "eq": [
+         "$a.go",
+         "ruler"
+        ]
+       }
+      },
+      {
+       "to": "solutions",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "ambivalence",
+     "kind": "ask",
+     "title": "ambiv_title",
+     "fields": [
+      {
+       "id": "ambiv",
+       "options": {
+        "list": "ambiv",
+        "where": {
+         "eq": [
+          "$opt.sub",
+          "$a.sub"
+         ]
+        }
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "cope_ahead",
+         "label": "l_cope_ahead",
+         "when": {
+          "in": [
+           "$a.ambiv",
+           [
+            "ambiv-hard-conversation"
+           ]
+          ]
+         }
+        },
+        {
+         "exit": "dialectics",
+         "label": "l_dialectics",
+         "when": {
+          "in": [
+           "$a.ambiv",
+           [
+            "ambiv-losing-something"
+           ]
+          ]
+         }
+        },
+        {
+         "exit": "fast",
+         "label": "l_fast",
+         "when": {
+          "in": [
+           "$a.ambiv",
+           [
+            "ambiv-admitting-need-help"
+           ]
+          ]
+         }
+        }
+       ]
+      }
+     ],
+     "slots": [
+      {
+       "after": "ambiv",
+       "embed": "partLater",
+       "props": {},
+       "showWhen": {
+        "all": [
+         {
+          "eq": [
+           "$a.sub",
+           "cant-ambivalent"
+          ]
+         },
+         {
+          "set": "$a.ambiv"
+         }
+        ]
+       },
+       "record": "ps_later"
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "ambiv_reply",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "ambiv_reply",
+     "kind": "ask",
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$a.ambiv",
+         "ambiv-hard-conversation"
+        ]
+       },
+       "key": "fo_ambiv-hard-conversation"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.ambiv",
+         "ambiv-change-might-not-help"
+        ]
+       },
+       "key": "fo_ambiv-change-might-not-help"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.ambiv",
+         "ambiv-losing-something"
+        ]
+       },
+       "key": "fo_ambiv-losing-something"
+      },
+      {
+       "key": "fo_ambiv-admitting-need-help"
+      }
+     ],
+     "fields": [],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "solutions",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "confidence",
+     "kind": "ask",
+     "title": "conf_title",
+     "fields": [
+      {
+       "id": "conf",
+       "options": {
+        "list": "conf"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "build_mastery",
+         "label": "l_build_mastery",
+         "when": {
+          "in": [
+           "$a.conf",
+           [
+            "none"
+           ]
+          ]
+         }
+        },
+        {
+         "exit": "cope_ahead",
+         "label": "l_cope_ahead",
+         "when": {
+          "in": [
+           "$a.conf",
+           [
+            "high"
+           ]
+          ]
+         }
+        },
+        {
+         "exit": "dear_man",
+         "label": "l_dear_man",
+         "when": {
+          "in": [
+           "$a.conf",
+           [
+            "low"
+           ]
+          ]
+         }
+        },
+        {
+         "exit": "finding_connection",
+         "label": "l_finding_connection",
+         "when": {
+          "in": [
+           "$a.conf",
+           [
+            "low"
+           ]
+          ]
+         }
+        },
+        {
+         "exit": "please_skill",
+         "label": "l_please_skill",
+         "when": {
+          "in": [
+           "$a.conf",
+           [
+            "none"
+           ]
+          ]
+         }
+        }
+       ]
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "conf_reply",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "conf_reply",
+     "kind": "ask",
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$a.conf",
+         "high"
+        ]
+       },
+       "key": "co_high"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.conf",
+         "medium"
+        ]
+       },
+       "key": "co_medium"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.conf",
+         "low"
+        ]
+       },
+       "key": "co_low"
+      },
+      {
+       "key": "co_none"
+      }
+     ],
+     "fields": [],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "own_step",
+       "when": {
+        "eq": [
+         "$a.conf",
+         "high"
+        ]
+       }
+      },
+      {
+       "to": "solutions",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "decompose",
+     "kind": "ask",
+     "title": "decompose_title",
+     "fields": [
+      {
+       "id": "mine",
+       "label": "mine_q",
+       "options": {
+        "list": "aspect",
+        "where": {
+         "any": [
+          {
+           "all": [
+            {
+             "set": "$a.problem"
+            },
+            {
+             "eq": [
+              "$opt.type",
+              "$a.problem"
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "set": "$a.focus"
+            },
+            {
+             "eq": [
+              "$opt.type",
+              "$a.focus"
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "not": {
+              "any": [
+               {
+                "all": [
+                 {
+                  "set": "$a.problem.ids"
+                 },
+                 {
+                  "not": {
+                   "eq": [
+                    "$a.problem",
+                    "piling"
+                   ]
+                  }
+                 }
+                ]
+               },
+               {
+                "set": "$a.focus.ids"
+               }
+              ]
+             }
+            },
+            {
+             "eq": [
+              "$opt.firstOf",
+              "$d.parent"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "max": 9,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "any": [
+           {
+            "own": "problem"
+           },
+           {
+            "own": "focus"
+           }
+          ]
+         }
+        }
+       ]
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "solutions",
+       "when": {
+        "set": "$a.mine"
+       }
+      },
+      {
+       "to": "theirs",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "theirs",
+     "kind": "ask",
+     "title": "others_title",
+     "fields": [
+      {
+       "id": "others",
+       "options": {
+        "list": "aspect",
+        "where": {
+         "any": [
+          {
+           "all": [
+            {
+             "set": "$a.problem"
+            },
+            {
+             "eq": [
+              "$opt.type",
+              "$a.problem"
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "set": "$a.focus"
+            },
+            {
+             "eq": [
+              "$opt.type",
+              "$a.focus"
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "not": {
+              "any": [
+               {
+                "all": [
+                 {
+                  "set": "$a.problem.ids"
+                 },
+                 {
+                  "not": {
+                   "eq": [
+                    "$a.problem",
+                    "piling"
+                   ]
+                  }
+                 }
+                ]
+               },
+               {
+                "set": "$a.focus.ids"
+               }
+              ]
+             }
+            },
+            {
+             "eq": [
+              "$opt.firstOf",
+              "$d.parent"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "max": 9,
+       "links": [
+        {
+         "exit": "dear_man",
+         "label": "l_others",
+         "when": {
+          "set": "$a.others"
+         }
+        }
+       ]
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "accept",
+       "when": {
+        "set": "$a.others"
+       }
+      },
+      {
+       "to": "solutions",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "solutions",
+     "kind": "ask",
+     "clears": [
+      "mystep",
+      "mysize"
+     ],
+     "title": [
+      {
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.barrier",
+           "outside-control"
+          ]
+         },
+         {
+          "set": "$a.mine"
+         }
+        ]
+       },
+       "key": "solutions_title_mine"
+      },
+      {
+       "when": {
+        "any": [
+         {
+          "set": "$d.startSmall"
+         },
+         {
+          "eq": [
+           "$a.conf",
+           "medium"
+          ]
+         },
+         {
+          "eq": [
+           "$a.barrier",
+           "outside-control"
+          ]
+         }
+        ]
+       },
+       "key": "solutions_title_small"
+      },
+      {
+       "key": "solutions_title"
+      }
+     ],
+     "fields": [
+      {
+       "id": "solutions",
+       "options": {
+        "list": "direction",
+        "where": {
+         "any": [
+          {
+           "any": [
+            {
+             "all": [
+              {
+               "set": "$a.problem"
+              },
+              {
+               "eq": [
+                "$opt.type",
+                "$a.problem"
+               ]
+              }
+             ]
+            },
+            {
+             "all": [
+              {
+               "set": "$a.focus"
+              },
+              {
+               "eq": [
+                "$opt.type",
+                "$a.focus"
+               ]
+              }
+             ]
+            },
+            {
+             "all": [
+              {
+               "not": {
+                "any": [
+                 {
+                  "all": [
+                   {
+                    "set": "$a.problem.ids"
+                   },
+                   {
+                    "not": {
+                     "eq": [
+                      "$a.problem",
+                      "piling"
+                     ]
+                    }
+                   }
+                  ]
+                 },
+                 {
+                  "set": "$a.focus.ids"
+                 }
+                ]
+               }
+              },
+              {
+               "eq": [
+                "$opt.firstOf",
+                "$d.parent"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "eq": [
+            "$opt.all",
+            true
+           ]
+          }
+         ]
+        }
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "any": [
+           {
+            "own": "problem"
+           },
+           {
+            "own": "focus"
+           }
+          ]
+         }
+        }
+       ]
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "own_step",
+       "when": {
+        "eq": [
+         "$a.solutions",
+         "own"
+        ]
+       }
+      },
+      {
+       "to": "size",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "size",
+     "kind": "ask",
+     "title": "size_title",
+     "titleSlots": {
+      "direction": {
+       "labelOf": "solutions"
+      }
+     },
+     "fields": [
+      {
+       "id": "size",
+       "options": {
+        "list": "step",
+        "where": {
+         "eq": [
+          "$opt.dir",
+          "$a.solutions"
+         ]
+        }
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "any": [
+           {
+            "own": "problem"
+           },
+           {
+            "own": "focus"
+           }
+          ]
+         }
+        }
+       ]
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "commit",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "own_step",
+     "kind": "ask",
+     "title": "own_step_title",
+     "clears": [
+      "solutions",
+      "size"
+     ],
+     "fields": [
+      {
+       "id": "mystep",
+       "options": {
+        "list": "starter"
+       },
+       "max": 1,
+       "required": true,
+       "own": {
+        "hint": "own_step_hint",
+        "countsAsPick": true,
+        "open": true,
+        "seed": true,
+        "max": 80
+       },
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "own": "mystep"
+         }
+        }
+       ]
+      },
+      {
+       "id": "mysize",
+       "label": "mysize_q",
+       "options": {
+        "list": "mysize"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "commit",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "commit",
+     "kind": "handoff",
+     "complete": true,
+     "title": [
+      {
+       "when": {
+        "own": "mystep"
+       },
+       "key": "commit_title_own"
+      },
+      {
+       "key": "commit_title"
+      }
+     ],
+     "titleSlots": {
+      "step": {
+       "labelOf": "size"
+      },
+      "mine": {
+       "labelOf": "mystep"
+      }
+     },
+     "lines": [
+      {
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       },
+       "key": "commit_line_safety"
+      },
+      {
+       "when": {
+        "any": [
+         {
+          "some": [
+           "size",
+           {
+            "in": [
+             "$opt.size",
+             [
+              "medium",
+              "bigger"
+             ]
+            ]
+           }
+          ]
+         },
+         {
+          "in": [
+           "$a.mysize",
+           [
+            "medium",
+            "bigger"
+           ]
+          ]
+         }
+        ]
+       },
+       "key": "commit_line_rehearse"
+      },
+      {
+       "when": null,
+       "key": "commit_line"
+      }
+     ],
+     "fields": [
+      {
+       "id": "when",
+       "label": "when_q",
+       "max": 1,
+       "options": {
+        "list": "when",
+        "where": {
+         "not": {
+          "all": [
+           {
+            "any": [
+             {
+              "eq": [
+               "$a.problem",
+               "fear-safety-threat"
+              ]
+             },
+             {
+              "eq": [
+               "$a.focus",
+               "fear-safety-threat"
+              ]
+             }
+            ]
+           },
+           {
+            "eq": [
+             "$opt.value",
+             "this_week"
+            ]
+           }
+          ]
+         }
+        }
+       }
+      }
+     ],
+     "followUp": {
+      "type": "ps_review",
+      "whenFrom": "when"
+     },
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "in": [
+         "$a.feel",
+         [
+          "despair",
+          "depressed",
+          "worthless",
+          "helpless",
+          "powerless"
+         ]
+        ]
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "build_mastery",
+       "when": {
+        "some": [
+         "solutions",
+         {
+          "eq": [
+           "$opt.tool",
+           "build-mastery"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "exit": "chain_analysis",
+       "when": {
+        "some": [
+         "solutions",
+         {
+          "eq": [
+           "$opt.tool",
+           "chain-analysis"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "exit": "cope_ahead",
+       "when": {
+        "some": [
+         "solutions",
+         {
+          "eq": [
+           "$opt.tool",
+           "cope-ahead"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "exit": "dear_man",
+       "when": {
+        "some": [
+         "solutions",
+         {
+          "eq": [
+           "$opt.tool",
+           "dear-man"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "exit": "dialectics",
+       "when": {
+        "some": [
+         "solutions",
+         {
+          "eq": [
+           "$opt.tool",
+           "dialectics"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "exit": "effectiveness",
+       "when": {
+        "some": [
+         "solutions",
+         {
+          "eq": [
+           "$opt.tool",
+           "effectiveness"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "exit": "fast",
+       "when": {
+        "some": [
+         "solutions",
+         {
+          "eq": [
+           "$opt.tool",
+           "fast"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "exit": "finding_connection",
+       "when": {
+        "some": [
+         "solutions",
+         {
+          "eq": [
+           "$opt.tool",
+           "finding-connection"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "exit": "give",
+       "when": {
+        "some": [
+         "solutions",
+         {
+          "eq": [
+           "$opt.tool",
+           "give"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "exit": "let_it_be",
+       "when": {
+        "some": [
+         "solutions",
+         {
+          "eq": [
+           "$opt.tool",
+           "let-it-be"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "exit": "please_skill",
+       "when": {
+        "some": [
+         "solutions",
+         {
+          "eq": [
+           "$opt.tool",
+           "please-skill"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "exit": "values_clarification",
+       "when": {
+        "some": [
+         "solutions",
+         {
+          "eq": [
+           "$opt.tool",
+           "values-clarification"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "exit": "cope_ahead",
+       "when": {
+        "all": [
+         {
+          "any": [
+           {
+            "some": [
+             "size",
+             {
+              "in": [
+               "$opt.size",
+               [
+                "medium",
+                "bigger"
+               ]
+              ]
+             }
+            ]
+           },
+           {
+            "in": [
+             "$a.mysize",
+             [
+              "medium",
+              "bigger"
+             ]
+            ]
+           }
+          ]
+         },
+         {
+          "not": {
+           "any": [
+            {
+             "eq": [
+              "$a.problem",
+              "fear-safety-threat"
+             ]
+            },
+            {
+             "eq": [
+              "$a.focus",
+              "fear-safety-threat"
+             ]
+            }
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "exit": "ending_relationships",
+       "when": {
+        "all": [
+         {
+          "some": [
+           "solutions",
+           {
+            "eq": [
+             "$opt.tool",
+             "ending-relationships"
+            ]
+           }
+          ]
+         },
+         {
+          "some": [
+           "size",
+           {
+            "eq": [
+             "$opt.size",
+             "bigger"
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "id": "review",
+     "kind": "ask",
+     "reopens": {
+      "after": "commit",
+      "again": [
+       "review_later"
+      ]
+     },
+     "clears": [
+      "how",
+      "help",
+      "then",
+      "ready",
+      "barrier",
+      "sub",
+      "go",
+      "ambiv",
+      "conf",
+      "mine",
+      "others"
+     ],
+     "title": [
+      {
+       "when": {
+        "own": "mystep"
+       },
+       "key": "review_title_own"
+      },
+      {
+       "key": "review_title"
+      }
+     ],
+     "titleSlots": {
+      "step": {
+       "labelOf": "size"
+      },
+      "mine": {
+       "labelOf": "mystep"
+      }
+     },
+     "fields": [
+      {
+       "id": "how",
+       "options": {
+        "list": "how"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "review_help",
+       "when": {
+        "eq": [
+         "$a.how",
+         "did_it"
+        ]
+       }
+      },
+      {
+       "to": "review_later",
+       "when": {
+        "eq": [
+         "$a.how",
+         "not_yet"
+        ]
+       }
+      },
+      {
+       "to": "review_next",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "review_help",
+     "kind": "ask",
+     "title": "review_help_title",
+     "fields": [
+      {
+       "id": "help",
+       "options": {
+        "list": "help"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "review_next",
+       "when": {
+        "eq": [
+         "$a.help",
+         "not_really"
+        ]
+       }
+      },
+      {
+       "to": "review_done",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "review_next",
+     "kind": "ask",
+     "title": [
+      {
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.help",
+           "not_really"
+          ]
+         },
+         {
+          "any": [
+           {
+            "eq": [
+             "$a.problem",
+             "fear-safety-threat"
+            ]
+           },
+           {
+            "eq": [
+             "$a.focus",
+             "fear-safety-threat"
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       "key": "review_next_nohelp_safety"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.help",
+         "not_really"
+        ]
+       },
+       "key": "review_next_nohelp"
+      },
+      {
+       "when": {
+        "all": [
+         {
+          "in": [
+           "$a.how",
+           [
+            "didnt",
+            "did_part"
+           ]
+          ]
+         },
+         {
+          "any": [
+           {
+            "eq": [
+             "$a.problem",
+             "fear-safety-threat"
+            ]
+           },
+           {
+            "eq": [
+             "$a.focus",
+             "fear-safety-threat"
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       "key": "review_next_didnt_safety"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.how",
+         "did_part"
+        ]
+       },
+       "key": "review_next_part"
+      },
+      {
+       "key": "review_next_didnt"
+      }
+     ],
+     "fields": [
+      {
+       "id": "then",
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "missing_links",
+         "label": "l_missing_links",
+         "when": {
+          "eq": [
+           "$a.how",
+           "didnt"
+          ]
+         }
+        }
+       ],
+       "options": {
+        "list": "then",
+        "where": {
+         "not": {
+          "all": [
+           {
+            "eq": [
+             "$a.help",
+             "not_really"
+            ]
+           },
+           {
+            "eq": [
+             "$opt.value",
+             "smaller"
+            ]
+           }
+          ]
+         }
+        }
+       }
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "size",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.then",
+           "smaller"
+          ]
+         },
+         {
+          "set": "$a.size"
+         }
+        ]
+       }
+      },
+      {
+       "to": "own_step",
+       "when": {
+        "eq": [
+         "$a.then",
+         "smaller"
+        ]
+       }
+      },
+      {
+       "to": "barrier",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.then",
+           "blocked"
+          ]
+         },
+         {
+          "not": {
+           "any": [
+            {
+             "eq": [
+              "$a.problem",
+              "fear-safety-threat"
+             ]
+            },
+            {
+             "eq": [
+              "$a.focus",
+              "fear-safety-threat"
+             ]
+            }
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "to": "solutions",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "review_done",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": null,
+       "key": "review_done_line"
+      }
+     ],
+     "done": "done",
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "in": [
+         "$a.feel",
+         [
+          "despair",
+          "depressed",
+          "worthless",
+          "helpless",
+          "powerless"
+         ]
+        ]
+       }
+      }
+     ],
+     "next": [],
+     "offers": []
+    },
+    {
+     "id": "review_later",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       },
+       "key": "commit_line_safety"
+      },
+      {
+       "when": null,
+       "key": "review_later_line"
+      }
+     ],
+     "fields": [
+      {
+       "id": "again",
+       "label": "review_later_q",
+       "max": 1,
+       "options": {
+        "list": "when",
+        "where": {
+         "not": {
+          "all": [
+           {
+            "any": [
+             {
+              "eq": [
+               "$a.problem",
+               "fear-safety-threat"
+              ]
+             },
+             {
+              "eq": [
+               "$a.focus",
+               "fear-safety-threat"
+              ]
+             }
+            ]
+           },
+           {
+            "eq": [
+             "$opt.value",
+             "this_week"
+            ]
+           }
+          ]
+         }
+        }
+       }
+      }
+     ],
+     "followUp": {
+      "type": "ps_review",
+      "whenFrom": "again"
+     },
+     "done": "done",
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "in": [
+         "$a.feel",
+         [
+          "despair",
+          "depressed",
+          "worthless",
+          "helpless",
+          "powerless"
+         ]
+        ]
+       }
+      }
+     ],
+     "next": [],
+     "offers": []
+    },
+    {
+     "id": "not_now",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": null,
+       "key": "not_now_line"
+      }
+     ],
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "in": [
+         "$a.feel",
+         [
+          "despair",
+          "depressed",
+          "worthless",
+          "helpless",
+          "powerless"
+         ]
+        ]
+       }
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": [
+      {
+       "exit": "cool_down",
+       "when": null
+      },
+      {
+       "exit": "five_senses",
+       "when": null
+      },
+      {
+       "exit": "pause",
+       "when": null
+      }
+     ]
+    },
+    {
+     "id": "not_fit",
+     "kind": "handoff",
+     "complete": true,
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "in": [
+         "$a.feel",
+         [
+          "despair",
+          "depressed",
+          "worthless",
+          "helpless",
+          "powerless"
+         ]
+        ]
+       }
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$d.fit",
+         "shame"
+        ]
+       },
+       "key": "not_fit_shame"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.fit",
+         "facts"
+        ]
+       },
+       "key": "not_fit_facts"
+      },
+      {
+       "when": null,
+       "key": "not_fit_other"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": [
+      {
+       "exit": "opposite_action",
+       "when": {
+        "eq": [
+         "$d.fit",
+         "shame"
+        ]
+       }
+      },
+      {
+       "exit": "self_validate",
+       "when": {
+        "eq": [
+         "$d.fit",
+         "shame"
+        ]
+       }
+      },
+      {
+       "exit": "check_the_facts",
+       "when": {
+        "eq": [
+         "$d.fit",
+         "facts"
+        ]
+       }
+      },
+      {
+       "exit": "body_scan",
+       "when": {
+        "eq": [
+         "$a.feel",
+         "numb"
+        ]
+       }
+      },
+      {
+       "exit": "mindfulness_emotions",
+       "when": {
+        "eq": [
+         "$d.fit",
+         "other"
+        ]
+       }
+      },
+      {
+       "exit": "find_the_feeling",
+       "when": {
+        "eq": [
+         "$d.fit",
+         "other"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "id": "accept",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": null,
+       "key": "accept_line"
+      }
+     ],
+     "done": "done",
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "in": [
+         "$a.feel",
+         [
+          "despair",
+          "depressed",
+          "worthless",
+          "helpless",
+          "powerless"
+         ]
+        ]
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "dear_man",
+       "when": {
+        "set": "$a.others"
+       }
+      },
+      {
+       "exit": "let_it_be",
+       "when": null
+      },
+      {
+       "exit": "willingness",
+       "when": null
+      },
+      {
+       "exit": "turning_the_mind",
+       "when": null
+      }
+     ]
+    },
+    {
+     "id": "rest",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": null,
+       "key": "rest_line"
+      }
+     ],
+     "done": "done",
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.problem",
+           "fear-safety-threat"
+          ]
+         },
+         {
+          "eq": [
+           "$a.focus",
+           "fear-safety-threat"
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "in": [
+         "$a.feel",
+         [
+          "despair",
+          "depressed",
+          "worthless",
+          "helpless",
+          "powerless"
+         ]
+        ]
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "please_skill",
+       "when": null
+      },
+      {
+       "exit": "five_senses",
+       "when": null
+      }
+     ]
+    }
+   ],
+   "exits": [
+    {
+     "id": "body_scan",
+     "toolId": "body-scan",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "build_mastery",
+     "toolId": "build-mastery",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "chain_analysis",
+     "toolId": "chain-analysis",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "check_the_facts",
+     "toolId": "check-the-facts",
+     "query": {},
+     "carry": [
+      "feel"
+     ],
+     "done": false
+    },
+    {
+     "id": "cool_down",
+     "toolId": "cool-down",
+     "query": {},
+     "carry": [
+      "feel"
+     ],
+     "done": false
+    },
+    {
+     "id": "cope_ahead",
+     "toolId": "cope-ahead",
+     "query": {},
+     "carry": [
+      "feel"
+     ],
+     "done": false
+    },
+    {
+     "id": "dear_man",
+     "toolId": "dear-man",
+     "query": {},
+     "carry": [
+      "feel"
+     ],
+     "done": false
+    },
+    {
+     "id": "dialectics",
+     "toolId": "dialectics",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "done",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": true
+    },
+    {
+     "id": "effectiveness",
+     "toolId": "effectiveness",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "ending_relationships",
+     "toolId": "ending-relationships",
+     "query": {},
+     "carry": [
+      "feel"
+     ],
+     "done": false
+    },
+    {
+     "id": "fast",
+     "toolId": "fast",
+     "query": {},
+     "carry": [
+      "feel"
+     ],
+     "done": false
+    },
+    {
+     "id": "find_the_feeling",
+     "toolId": "find-the-feeling",
+     "query": {},
+     "carry": [
+      "feel"
+     ],
+     "done": false
+    },
+    {
+     "id": "finding_connection",
+     "toolId": "finding-connection",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "five_senses",
+     "toolId": "five-senses",
+     "query": {},
+     "carry": [
+      "feel"
+     ],
+     "done": false
+    },
+    {
+     "id": "give",
+     "toolId": "give",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "let_it_be",
+     "toolId": "let-it-be",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "mindfulness_emotions",
+     "toolId": "mindfulness-emotions",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "missing_links",
+     "toolId": "missing-links",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "opposite_action",
+     "toolId": "opposite-action",
+     "query": {},
+     "carry": [
+      "feel"
+     ],
+     "done": false
+    },
+    {
+     "id": "pause",
+     "toolId": "pause",
+     "query": {},
+     "carry": [
+      "feel"
+     ],
+     "done": false
+    },
+    {
+     "id": "please_skill",
+     "toolId": "please-skill",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "safety_open",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": false,
+     "safety": true
+    },
+    {
+     "id": "self_validate",
+     "toolId": "self-validate",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "turning_the_mind",
+     "toolId": "turning-the-mind",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "values_clarification",
+     "toolId": "values-clarification",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "willingness",
+     "toolId": "willingness",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    }
+   ],
+   "options": {
+    "ready": [
+     {
+      "value": "can",
+      "label": "I can think about it"
+     },
+     {
+      "value": "too_loud",
+      "label": "It's too loud right now"
+     }
+    ],
+    "problem": [
+     {
+      "value": "anger-boundary-violation",
+      "label": "Someone crossed a line",
+      "parent": "anger"
+     },
+     {
+      "value": "anger-blocked-goal",
+      "label": "Something is in my way",
+      "parent": "anger"
+     },
+     {
+      "value": "anger-injustice",
+      "label": "Something unfair is happening",
+      "parent": "anger"
+     },
+     {
+      "value": "disgust-forced-proximity",
+      "label": "I'm stuck near something that feels wrong",
+      "parent": "disgust"
+     },
+     {
+      "value": "disgust-values-violation",
+      "label": "Something goes against what I believe in",
+      "parent": "disgust"
+     },
+     {
+      "value": "envy-resource-gap",
+      "label": "They have something I want",
+      "parent": "envy"
+     },
+     {
+      "value": "envy-unfair-advantage",
+      "label": "The playing field isn't level",
+      "parent": "envy"
+     },
+     {
+      "value": "fear-safety-threat",
+      "label": "My safety is at risk",
+      "parent": "fear",
+      "danger": "other"
+     },
+     {
+      "value": "fear-health-threat",
+      "label": "A health situation",
+      "parent": "fear"
+     },
+     {
+      "value": "fear-anticipatory",
+      "label": "Something bad might happen",
+      "parent": "fear"
+     },
+     {
+      "value": "guilt-clear-harm",
+      "label": "I hurt someone and I can repair it",
+      "parent": "guilt"
+     },
+     {
+      "value": "guilt-pattern",
+      "label": "I keep doing this",
+      "parent": "guilt"
+     },
+     {
+      "value": "guilt-values-conflict",
+      "label": "I was caught between two values",
+      "parent": "guilt"
+     },
+     {
+      "value": "jealousy-broken-trust",
+      "label": "Trust was actually broken",
+      "parent": "jealousy"
+     },
+     {
+      "value": "jealousy-active-threat",
+      "label": "Someone is actively threatening this relationship",
+      "parent": "jealousy"
+     },
+     {
+      "value": "love-external-barrier",
+      "label": "Something external is in the way",
+      "parent": "love"
+     },
+     {
+      "value": "love-internal-conflict",
+      "label": "Something between us isn't working",
+      "parent": "love"
+     },
+     {
+      "value": "sadness-relationship-loss",
+      "label": "I lost a relationship",
+      "parent": "sadness"
+     },
+     {
+      "value": "sadness-goal-failure",
+      "label": "Something didn't work out",
+      "parent": "sadness"
+     },
+     {
+      "value": "sadness-gradual-erosion",
+      "label": "My life got smaller",
+      "parent": "sadness"
+     },
+     {
+      "value": "piling",
+      "label": "It's not one thing. Everything feels like too much",
+      "all": true
+     }
+    ],
+    "barrier": [
+     {
+      "value": "know-but-cant",
+      "label": "I know what to do, and I can't make myself do it"
+     },
+     {
+      "value": "involves-person",
+      "label": "It involves another person and I don't know how to get through to them"
+     },
+     {
+      "value": "not-sure-what",
+      "label": "I'm not sure what the right move is"
+     },
+     {
+      "value": "outside-control",
+      "label": "This feels completely outside my control"
+     },
+     {
+      "value": "tried-nothing-works",
+      "label": "I've tried things and nothing has worked"
+     }
+    ],
+    "sub": [
+     {
+      "value": "cant-afraid-aftermath",
+      "label": "I'm afraid of what happens after",
+      "barrier": "know-but-cant"
+     },
+     {
+      "value": "cant-no-energy",
+      "label": "I don't have the energy or bandwidth right now",
+      "barrier": "know-but-cant"
+     },
+     {
+      "value": "cant-ambivalent",
+      "label": "Part of me doesn't actually want this to change",
+      "barrier": "know-but-cant"
+     },
+     {
+      "value": "cant-keep-putting-off",
+      "label": "I keep putting it off and I don't know why",
+      "barrier": "know-but-cant"
+     },
+     {
+      "value": "person-dont-know-what-to-say",
+      "label": "I don't know what to say",
+      "barrier": "involves-person"
+     },
+     {
+      "value": "person-scared-reaction",
+      "label": "I'm scared of their reaction",
+      "barrier": "involves-person"
+     },
+     {
+      "value": "person-tried-they-dont-listen",
+      "label": "I've tried and they don't listen",
+      "barrier": "involves-person"
+     },
+     {
+      "value": "person-no-right-to-speak",
+      "label": "I don't feel like I have the right to say something",
+      "barrier": "involves-person"
+     },
+     {
+      "value": "tried-talked-to-them",
+      "label": "I've talked to them about it",
+      "barrier": "tried-nothing-works"
+     },
+     {
+      "value": "tried-thinking-constantly",
+      "label": "I've been thinking about it constantly",
+      "barrier": "tried-nothing-works"
+     },
+     {
+      "value": "tried-different-approaches",
+      "label": "I've tried different approaches and hit the same wall",
+      "barrier": "tried-nothing-works"
+     },
+     {
+      "value": "tried-exhausted",
+      "label": "I don't even know anymore, I'm exhausted",
+      "barrier": "tried-nothing-works"
+     }
+    ],
+    "go": [
+     {
+      "value": "rest",
+      "label": "Stop here for now"
+     },
+     {
+      "value": "ambiv",
+      "label": "Look at what it protects me from"
+     },
+     {
+      "value": "ruler",
+      "label": "See how sure I feel"
+     },
+     {
+      "value": "options",
+      "label": "Show me some options"
+     },
+     {
+      "value": "keep",
+      "label": "Keep problem-solving"
+     }
+    ],
+    "ambiv": [
+     {
+      "value": "ambiv-hard-conversation",
+      "label": "A hard conversation I don't want to have",
+      "sub": "cant-ambivalent"
+     },
+     {
+      "value": "ambiv-change-might-not-help",
+      "label": "Finding out that the change doesn't actually help",
+      "sub": "cant-ambivalent"
+     },
+     {
+      "value": "ambiv-losing-something",
+      "label": "Losing something I still value about the current situation",
+      "sub": "cant-ambivalent"
+     },
+     {
+      "value": "ambiv-admitting-need-help",
+      "label": "Having to admit I was wrong or that I need help",
+      "sub": "cant-ambivalent"
+     }
+    ],
+    "conf": [
+     {
+      "value": "high",
+      "label": "I could do this if I decided to"
+     },
+     {
+      "value": "medium",
+      "label": "I could do a small version of this"
+     },
+     {
+      "value": "low",
+      "label": "I'd need help or support to do this"
+     },
+     {
+      "value": "none",
+      "label": "I honestly don't think I can right now"
+     }
+    ],
+    "aspect": [
+     {
+      "value": "anger-bound-da-what-happened",
+      "label": "What they did",
+      "type": "anger-boundary-violation",
+      "firstOf": "anger"
+     },
+     {
+      "value": "anger-bound-da-whether-speak",
+      "label": "Whether I say something about it",
+      "type": "anger-boundary-violation",
+      "firstOf": "anger"
+     },
+     {
+      "value": "anger-bound-da-their-response",
+      "label": "How they respond when I do",
+      "type": "anger-boundary-violation",
+      "firstOf": "anger"
+     },
+     {
+      "value": "anger-bound-da-what-i-tolerate",
+      "label": "What I'm willing to tolerate going forward",
+      "type": "anger-boundary-violation",
+      "firstOf": "anger"
+     },
+     {
+      "value": "anger-blocked-da-the-obstacle",
+      "label": "The obstacle itself",
+      "type": "anger-blocked-goal"
+     },
+     {
+      "value": "anger-blocked-da-alternate-routes",
+      "label": "Whether there's another way to get what I need",
+      "type": "anger-blocked-goal"
+     },
+     {
+      "value": "anger-blocked-da-gatekeeper",
+      "label": "The person or system blocking me",
+      "type": "anger-blocked-goal"
+     },
+     {
+      "value": "anger-blocked-da-worth-fighting",
+      "label": "Whether this fight is worth my energy",
+      "type": "anger-blocked-goal"
+     },
+     {
+      "value": "anger-injust-da-what-happened",
+      "label": "The injustice itself",
+      "type": "anger-injustice"
+     },
+     {
+      "value": "anger-injust-da-my-voice",
+      "label": "Whether I speak up or take action",
+      "type": "anger-injustice"
+     },
+     {
+      "value": "anger-injust-da-system",
+      "label": "The system or people responsible",
+      "type": "anger-injustice"
+     },
+     {
+      "value": "disgust-prox-da-the-situation",
+      "label": "That I'm in this situation",
+      "type": "disgust-forced-proximity",
+      "firstOf": "disgust"
+     },
+     {
+      "value": "disgust-prox-da-distance",
+      "label": "How much distance I can create",
+      "type": "disgust-forced-proximity",
+      "firstOf": "disgust"
+     },
+     {
+      "value": "disgust-prox-da-their-behavior",
+      "label": "The other person's behavior",
+      "type": "disgust-forced-proximity",
+      "firstOf": "disgust"
+     },
+     {
+      "value": "disgust-values-da-whats-wrong",
+      "label": "What's happening that feels wrong",
+      "type": "disgust-values-violation"
+     },
+     {
+      "value": "disgust-values-da-voice",
+      "label": "Whether I say something",
+      "type": "disgust-values-violation"
+     },
+     {
+      "value": "disgust-values-da-exit",
+      "label": "Whether I can move toward an environment that fits my values",
+      "type": "disgust-values-violation"
+     },
+     {
+      "value": "envy-gap-da-what-they-have",
+      "label": "What they have",
+      "type": "envy-resource-gap",
+      "firstOf": "envy"
+     },
+     {
+      "value": "envy-gap-da-barriers",
+      "label": "The barriers between me and getting there",
+      "type": "envy-resource-gap",
+      "firstOf": "envy"
+     },
+     {
+      "value": "envy-gap-da-what-i-have",
+      "label": "What I already have to work with",
+      "type": "envy-resource-gap",
+      "firstOf": "envy"
+     },
+     {
+      "value": "envy-unfair-da-the-inequality",
+      "label": "The structural advantage they had",
+      "type": "envy-unfair-advantage"
+     },
+     {
+      "value": "envy-unfair-da-my-path",
+      "label": "The path available to me from where I actually am",
+      "type": "envy-unfair-advantage"
+     },
+     {
+      "value": "envy-unfair-da-system-change",
+      "label": "Whether the system itself can be changed",
+      "type": "envy-unfair-advantage"
+     },
+     {
+      "value": "fear-safety-da-threat-exists",
+      "label": "The threat itself",
+      "type": "fear-safety-threat"
+     },
+     {
+      "value": "fear-safety-da-my-location",
+      "label": "Where I am and whether I stay",
+      "type": "fear-safety-threat"
+     },
+     {
+      "value": "fear-safety-da-who-knows",
+      "label": "Who knows about this and can help",
+      "type": "fear-safety-threat"
+     },
+     {
+      "value": "fear-safety-da-other-behavior",
+      "label": "What the other person does next",
+      "type": "fear-safety-threat"
+     },
+     {
+      "value": "fear-health-da-diagnosis",
+      "label": "The diagnosis or symptoms themselves",
+      "type": "fear-health-threat"
+     },
+     {
+      "value": "fear-health-da-treatment",
+      "label": "What treatment or care I pursue",
+      "type": "fear-health-threat"
+     },
+     {
+      "value": "fear-health-da-info",
+      "label": "How much I know about what's happening",
+      "type": "fear-health-threat"
+     },
+     {
+      "value": "fear-health-da-others-support",
+      "label": "Whether other people help or show up",
+      "type": "fear-health-threat"
+     },
+     {
+      "value": "fear-antic-da-whether-happens",
+      "label": "Whether the thing actually happens",
+      "type": "fear-anticipatory",
+      "firstOf": "fear"
+     },
+     {
+      "value": "fear-antic-da-preparation",
+      "label": "How prepared I am if it does",
+      "type": "fear-anticipatory",
+      "firstOf": "fear"
+     },
+     {
+      "value": "fear-antic-da-reduce-risk",
+      "label": "Steps I could take to reduce the risk",
+      "type": "fear-anticipatory",
+      "firstOf": "fear"
+     },
+     {
+      "value": "fear-antic-da-others-decisions",
+      "label": "Other people's decisions that affect the outcome",
+      "type": "fear-anticipatory",
+      "firstOf": "fear"
+     },
+     {
+      "value": "guilt-harm-da-what-i-did",
+      "label": "What I did",
+      "type": "guilt-clear-harm",
+      "firstOf": "guilt"
+     },
+     {
+      "value": "guilt-harm-da-repair",
+      "label": "Whether I apologize or make amends",
+      "type": "guilt-clear-harm",
+      "firstOf": "guilt"
+     },
+     {
+      "value": "guilt-harm-da-their-forgiveness",
+      "label": "Whether they forgive me",
+      "type": "guilt-clear-harm",
+      "firstOf": "guilt"
+     },
+     {
+      "value": "guilt-harm-da-my-behavior",
+      "label": "What I do differently going forward",
+      "type": "guilt-clear-harm",
+      "firstOf": "guilt"
+     },
+     {
+      "value": "guilt-pattern-da-the-pattern",
+      "label": "That this keeps happening",
+      "type": "guilt-pattern"
+     },
+     {
+      "value": "guilt-pattern-da-trigger",
+      "label": "What triggers it",
+      "type": "guilt-pattern"
+     },
+     {
+      "value": "guilt-pattern-da-environment",
+      "label": "The environment or conditions that make it worse",
+      "type": "guilt-pattern"
+     },
+     {
+      "value": "guilt-conflict-da-the-choice",
+      "label": "The choice I made",
+      "type": "guilt-values-conflict"
+     },
+     {
+      "value": "guilt-conflict-da-cost",
+      "label": "The cost it had on someone or something",
+      "type": "guilt-values-conflict"
+     },
+     {
+      "value": "guilt-conflict-da-mitigate",
+      "label": "Whether I can reduce the damage going forward",
+      "type": "guilt-values-conflict"
+     },
+     {
+      "value": "jealousy-trust-da-what-happened",
+      "label": "What they did",
+      "type": "jealousy-broken-trust",
+      "firstOf": "jealousy"
+     },
+     {
+      "value": "jealousy-trust-da-conversation",
+      "label": "Whether I address it directly",
+      "type": "jealousy-broken-trust",
+      "firstOf": "jealousy"
+     },
+     {
+      "value": "jealousy-trust-da-their-willingness",
+      "label": "Whether they're willing to rebuild trust",
+      "type": "jealousy-broken-trust",
+      "firstOf": "jealousy"
+     },
+     {
+      "value": "jealousy-trust-da-my-terms",
+      "label": "What I need to feel safe, and whether I stay",
+      "type": "jealousy-broken-trust",
+      "firstOf": "jealousy"
+     },
+     {
+      "value": "jealousy-threat-da-the-threat",
+      "label": "The person or situation threatening things",
+      "type": "jealousy-active-threat"
+     },
+     {
+      "value": "jealousy-threat-da-talk-partner",
+      "label": "Whether I talk to my person about it",
+      "type": "jealousy-active-threat"
+     },
+     {
+      "value": "jealousy-threat-da-invest",
+      "label": "How I invest in the relationship",
+      "type": "jealousy-active-threat"
+     },
+     {
+      "value": "love-ext-da-the-barrier",
+      "label": "The logistical barrier (distance, timing, etc.)",
+      "type": "love-external-barrier",
+      "firstOf": "love"
+     },
+     {
+      "value": "love-ext-da-creative-solutions",
+      "label": "Creative options I haven't tried",
+      "type": "love-external-barrier",
+      "firstOf": "love"
+     },
+     {
+      "value": "love-ext-da-their-willingness",
+      "label": "Their willingness to work on this together",
+      "type": "love-external-barrier",
+      "firstOf": "love"
+     },
+     {
+      "value": "love-int-da-the-pattern",
+      "label": "The dynamic between us that isn't working",
+      "type": "love-internal-conflict"
+     },
+     {
+      "value": "love-int-da-conversation",
+      "label": "Whether I bring it up directly",
+      "type": "love-internal-conflict"
+     },
+     {
+      "value": "love-int-da-their-part",
+      "label": "Whether they're willing to change their part",
+      "type": "love-internal-conflict"
+     },
+     {
+      "value": "sadness-loss-da-the-loss",
+      "label": "The person being gone",
+      "type": "sadness-relationship-loss",
+      "firstOf": "sadness"
+     },
+     {
+      "value": "sadness-loss-da-daily-gaps",
+      "label": "The gaps in my daily life this created",
+      "type": "sadness-relationship-loss",
+      "firstOf": "sadness"
+     },
+     {
+      "value": "sadness-loss-da-others-reaching",
+      "label": "Whether other people reach out",
+      "type": "sadness-relationship-loss",
+      "firstOf": "sadness"
+     },
+     {
+      "value": "sadness-loss-da-what-i-do-now",
+      "label": "How I structure my life going forward",
+      "type": "sadness-relationship-loss",
+      "firstOf": "sadness"
+     },
+     {
+      "value": "sadness-fail-da-what-happened",
+      "label": "That it didn't work out",
+      "type": "sadness-goal-failure"
+     },
+     {
+      "value": "sadness-fail-da-try-again",
+      "label": "Whether I try again or try something different",
+      "type": "sadness-goal-failure"
+     },
+     {
+      "value": "sadness-fail-da-external-factors",
+      "label": "External factors that contributed",
+      "type": "sadness-goal-failure"
+     },
+     {
+      "value": "sadness-fail-da-what-i-learned",
+      "label": "What I learned and how I use it",
+      "type": "sadness-goal-failure"
+     },
+     {
+      "value": "sadness-erosion-da-how-it-happened",
+      "label": "How life got smaller",
+      "type": "sadness-gradual-erosion"
+     },
+     {
+      "value": "sadness-erosion-da-one-thing",
+      "label": "One thing I could bring back or start",
+      "type": "sadness-gradual-erosion"
+     },
+     {
+      "value": "sadness-erosion-da-people-drifted",
+      "label": "People who drifted away",
+      "type": "sadness-gradual-erosion"
+     },
+     {
+      "value": "sadness-erosion-da-daily-structure",
+      "label": "Whether I have any structure in my days",
+      "type": "sadness-gradual-erosion"
+     }
+    ],
+    "direction": [
+     {
+      "value": "anger-boundary-assert",
+      "label": "Communicate what you need",
+      "type": "anger-boundary-violation",
+      "firstOf": "anger",
+      "tool": "dear-man"
+     },
+     {
+      "value": "anger-boundary-enforce",
+      "label": "Enforce a boundary you've already set",
+      "type": "anger-boundary-violation",
+      "firstOf": "anger",
+      "tool": "fast"
+     },
+     {
+      "value": "anger-boundary-get-support",
+      "label": "Get support from someone else",
+      "type": "anger-boundary-violation",
+      "firstOf": "anger"
+     },
+     {
+      "value": "anger-blocked-alternate",
+      "label": "Find an alternate path",
+      "type": "anger-blocked-goal"
+     },
+     {
+      "value": "anger-blocked-advocate",
+      "label": "Advocate more effectively",
+      "type": "anger-blocked-goal",
+      "tool": "dear-man"
+     },
+     {
+      "value": "anger-blocked-redirect",
+      "label": "Decide if this fight is worth it",
+      "type": "anger-blocked-goal",
+      "tool": "effectiveness"
+     },
+     {
+      "value": "anger-injustice-act",
+      "label": "Act within your power",
+      "type": "anger-injustice"
+     },
+     {
+      "value": "anger-injustice-limits",
+      "label": "Accept the limits of your influence",
+      "type": "anger-injustice",
+      "tool": "dialectics"
+     },
+     {
+      "value": "disgust-proximity-distance",
+      "label": "Create as much distance as you can",
+      "type": "disgust-forced-proximity",
+      "firstOf": "disgust"
+     },
+     {
+      "value": "disgust-proximity-boundary",
+      "label": "Set a boundary on what you'll tolerate",
+      "type": "disgust-forced-proximity",
+      "firstOf": "disgust",
+      "tool": "fast"
+     },
+     {
+      "value": "disgust-values-assert",
+      "label": "Speak up about what's wrong",
+      "type": "disgust-values-violation",
+      "tool": "dear-man"
+     },
+     {
+      "value": "disgust-values-align",
+      "label": "Move toward alignment with your values",
+      "type": "disgust-values-violation",
+      "tool": "values-clarification"
+     },
+     {
+      "value": "envy-gap-one-step",
+      "label": "Take one step toward closing the gap",
+      "type": "envy-resource-gap",
+      "firstOf": "envy",
+      "tool": "build-mastery"
+     },
+     {
+      "value": "envy-gap-underlying-need",
+      "label": "Check what you actually want",
+      "type": "envy-resource-gap",
+      "firstOf": "envy",
+      "tool": "values-clarification"
+     },
+     {
+      "value": "envy-unfair-effective",
+      "label": "Play the hand you have",
+      "type": "envy-unfair-advantage",
+      "tool": "effectiveness"
+     },
+     {
+      "value": "envy-unfair-advocate",
+      "label": "Work to change the system",
+      "type": "envy-unfair-advantage"
+     },
+     {
+      "value": "fear-safety-get-safe",
+      "label": "Get safe now",
+      "type": "fear-safety-threat"
+     },
+     {
+      "value": "fear-safety-get-help",
+      "label": "Get help",
+      "type": "fear-safety-threat"
+     },
+     {
+      "value": "fear-safety-plan-ahead",
+      "label": "Plan for next time",
+      "type": "fear-safety-threat",
+      "tool": "cope-ahead"
+     },
+     {
+      "value": "fear-health-info",
+      "label": "Get information",
+      "type": "fear-health-threat"
+     },
+     {
+      "value": "fear-health-one-step",
+      "label": "Take one medical or logistical step",
+      "type": "fear-health-threat"
+     },
+     {
+      "value": "fear-health-support",
+      "label": "Identify your support system",
+      "type": "fear-health-threat"
+     },
+     {
+      "value": "fear-anticipatory-prepare",
+      "label": "Prepare for the most likely scenario",
+      "type": "fear-anticipatory",
+      "firstOf": "fear",
+      "tool": "cope-ahead"
+     },
+     {
+      "value": "fear-anticipatory-reduce-risk",
+      "label": "Reduce the risk",
+      "type": "fear-anticipatory",
+      "firstOf": "fear"
+     },
+     {
+      "value": "fear-anticipatory-accept-uncertainty",
+      "label": "Accept the part you can't control",
+      "type": "fear-anticipatory",
+      "firstOf": "fear",
+      "tool": "let-it-be"
+     },
+     {
+      "value": "guilt-harm-apologize",
+      "label": "Apologize and take responsibility",
+      "type": "guilt-clear-harm",
+      "firstOf": "guilt",
+      "tool": "dear-man"
+     },
+     {
+      "value": "guilt-harm-make-amends",
+      "label": "Make concrete amends",
+      "type": "guilt-clear-harm",
+      "firstOf": "guilt"
+     },
+     {
+      "value": "guilt-harm-prevent",
+      "label": "Change the behavior going forward",
+      "type": "guilt-clear-harm",
+      "firstOf": "guilt",
+      "tool": "cope-ahead"
+     },
+     {
+      "value": "guilt-pattern-understand",
+      "label": "Understand what's driving the pattern",
+      "type": "guilt-pattern",
+      "tool": "chain-analysis"
+     },
+     {
+      "value": "guilt-pattern-replace",
+      "label": "Build a replacement behavior",
+      "type": "guilt-pattern",
+      "tool": "cope-ahead"
+     },
+     {
+      "value": "guilt-pattern-reduce-vulnerability",
+      "label": "Reduce what makes you susceptible",
+      "type": "guilt-pattern",
+      "tool": "please-skill"
+     },
+     {
+      "value": "guilt-conflict-mitigate",
+      "label": "Mitigate the cost of your choice",
+      "type": "guilt-values-conflict",
+      "tool": "give"
+     },
+     {
+      "value": "guilt-conflict-clarify",
+      "label": "Clarify which value takes priority",
+      "type": "guilt-values-conflict",
+      "tool": "values-clarification"
+     },
+     {
+      "value": "guilt-conflict-accept",
+      "label": "Accept the impossible choice",
+      "type": "guilt-values-conflict",
+      "tool": "let-it-be"
+     },
+     {
+      "value": "jealousy-trust-conversation",
+      "label": "Have the conversation about what happened",
+      "type": "jealousy-broken-trust",
+      "firstOf": "jealousy",
+      "tool": "dear-man"
+     },
+     {
+      "value": "jealousy-trust-terms",
+      "label": "Define what you need to feel safe",
+      "type": "jealousy-broken-trust",
+      "firstOf": "jealousy",
+      "tool": "give"
+     },
+     {
+      "value": "jealousy-trust-decide",
+      "label": "Decide if this can be repaired",
+      "type": "jealousy-broken-trust",
+      "firstOf": "jealousy",
+      "tool": "ending-relationships"
+     },
+     {
+      "value": "jealousy-threat-talk",
+      "label": "Talk to your person, not the threat",
+      "type": "jealousy-active-threat",
+      "tool": "dear-man"
+     },
+     {
+      "value": "jealousy-threat-strengthen",
+      "label": "Strengthen what you have",
+      "type": "jealousy-active-threat",
+      "tool": "give"
+     },
+     {
+      "value": "love-external-logistics",
+      "label": "Solve the logistics",
+      "type": "love-external-barrier",
+      "firstOf": "love"
+     },
+     {
+      "value": "love-external-bridge",
+      "label": "Build a bridge for the interim",
+      "type": "love-external-barrier",
+      "firstOf": "love"
+     },
+     {
+      "value": "love-internal-conversation",
+      "label": "Have the conversation you've been avoiding",
+      "type": "love-internal-conflict",
+      "tool": "dear-man"
+     },
+     {
+      "value": "love-internal-dynamic",
+      "label": "Change the dynamic, not only the event",
+      "type": "love-internal-conflict",
+      "tool": "dialectics"
+     },
+     {
+      "value": "sadness-loss-rebuild-structure",
+      "label": "Rebuild the structure that was lost",
+      "type": "sadness-relationship-loss",
+      "firstOf": "sadness"
+     },
+     {
+      "value": "sadness-loss-reach-out",
+      "label": "Reach out for connection",
+      "type": "sadness-relationship-loss",
+      "firstOf": "sadness",
+      "tool": "finding-connection"
+     },
+     {
+      "value": "sadness-loss-allow-and-move",
+      "label": "Allow the grief and take one step",
+      "type": "sadness-relationship-loss",
+      "firstOf": "sadness",
+      "tool": "dialectics"
+     },
+     {
+      "value": "sadness-failure-try-again",
+      "label": "Try again, differently",
+      "type": "sadness-goal-failure"
+     },
+     {
+      "value": "sadness-failure-redirect",
+      "label": "Redirect toward something adjacent",
+      "type": "sadness-goal-failure",
+      "tool": "values-clarification"
+     },
+     {
+      "value": "sadness-failure-grieve",
+      "label": "Grieve this version and open to alternatives",
+      "type": "sadness-goal-failure",
+      "tool": "let-it-be"
+     },
+     {
+      "value": "sadness-erosion-one-thing",
+      "label": "Recover one thing you lost",
+      "type": "sadness-gradual-erosion",
+      "tool": "build-mastery"
+     },
+     {
+      "value": "sadness-erosion-identify-barrier",
+      "label": "Name what got in the way",
+      "type": "sadness-gradual-erosion"
+     },
+     {
+      "value": "sadness-erosion-structure",
+      "label": "Add one piece of structure",
+      "type": "sadness-gradual-erosion",
+      "tool": "please-skill"
+     },
+     {
+      "value": "own",
+      "label": "My own idea",
+      "all": true
+     }
+    ],
+    "step": [
+     {
+      "value": "anger-boundary-assert:small",
+      "label": "Write down what you want to say: don't send it yet",
+      "dir": "anger-boundary-assert",
+      "size": "small"
+     },
+     {
+      "value": "anger-boundary-assert:medium",
+      "label": "Have a direct, calm conversation using the DEAR MAN framework",
+      "dir": "anger-boundary-assert",
+      "size": "medium"
+     },
+     {
+      "value": "anger-boundary-assert:bigger",
+      "label": "Set a clear consequence if the boundary is crossed again, and mean it",
+      "dir": "anger-boundary-assert",
+      "size": "bigger"
+     },
+     {
+      "value": "anger-boundary-enforce:small",
+      "label": "Name the violation calmly: \"I told you X, and Y happened again\"",
+      "dir": "anger-boundary-enforce",
+      "size": "small"
+     },
+     {
+      "value": "anger-boundary-enforce:medium",
+      "label": "Follow through on the consequence you set",
+      "dir": "anger-boundary-enforce",
+      "size": "medium"
+     },
+     {
+      "value": "anger-boundary-enforce:bigger",
+      "label": "Change the terms of the relationship to protect yourself",
+      "dir": "anger-boundary-enforce",
+      "size": "bigger"
+     },
+     {
+      "value": "anger-boundary-get-support:small",
+      "label": "Tell one person what happened",
+      "dir": "anger-boundary-get-support",
+      "size": "small"
+     },
+     {
+      "value": "anger-boundary-get-support:medium",
+      "label": "Ask someone to be present for the next conversation",
+      "dir": "anger-boundary-get-support",
+      "size": "medium"
+     },
+     {
+      "value": "anger-boundary-get-support:bigger",
+      "label": "Involve a mediator, HR, or professional if the situation warrants it",
+      "dir": "anger-boundary-get-support",
+      "size": "bigger"
+     },
+     {
+      "value": "anger-blocked-alternate:small",
+      "label": "List two other ways to get what you need",
+      "dir": "anger-blocked-alternate",
+      "size": "small"
+     },
+     {
+      "value": "anger-blocked-alternate:medium",
+      "label": "Ask someone who's navigated this before how they did it",
+      "dir": "anger-blocked-alternate",
+      "size": "medium"
+     },
+     {
+      "value": "anger-blocked-alternate:bigger",
+      "label": "Take the alternate route, even if it's slower or harder",
+      "dir": "anger-blocked-alternate",
+      "size": "bigger"
+     },
+     {
+      "value": "anger-blocked-advocate:small",
+      "label": "Identify specifically what hasn't worked and why",
+      "dir": "anger-blocked-advocate",
+      "size": "small"
+     },
+     {
+      "value": "anger-blocked-advocate:medium",
+      "label": "Reframe your request in terms of what they care about",
+      "dir": "anger-blocked-advocate",
+      "size": "medium"
+     },
+     {
+      "value": "anger-blocked-advocate:bigger",
+      "label": "Escalate: go to someone with more authority or a different lever",
+      "dir": "anger-blocked-advocate",
+      "size": "bigger"
+     },
+     {
+      "value": "anger-blocked-redirect:small",
+      "label": "Ask yourself: \"If I keep pushing, what's the realistic best outcome?\"",
+      "dir": "anger-blocked-redirect",
+      "size": "small"
+     },
+     {
+      "value": "anger-blocked-redirect:medium",
+      "label": "Put this fight on hold for one week and see how it feels",
+      "dir": "anger-blocked-redirect",
+      "size": "medium"
+     },
+     {
+      "value": "anger-blocked-redirect:bigger",
+      "label": "Let this one go and invest the energy in something you can move",
+      "dir": "anger-blocked-redirect",
+      "size": "bigger"
+     },
+     {
+      "value": "anger-injustice-act:small",
+      "label": "Name the specific part of this injustice you have any leverage on",
+      "dir": "anger-injustice-act",
+      "size": "small"
+     },
+     {
+      "value": "anger-injustice-act:medium",
+      "label": "Take one action: speak up, write, show up, support someone affected",
+      "dir": "anger-injustice-act",
+      "size": "medium"
+     },
+     {
+      "value": "anger-injustice-act:bigger",
+      "label": "Commit to sustained action: organize, advocate, build something",
+      "dir": "anger-injustice-act",
+      "size": "bigger"
+     },
+     {
+      "value": "anger-injustice-limits:small",
+      "label": "Distinguish between what you can influence and what you can witness",
+      "dir": "anger-injustice-limits",
+      "size": "small"
+     },
+     {
+      "value": "anger-injustice-limits:medium",
+      "label": "Do what you can, then let the rest be: without guilt",
+      "dir": "anger-injustice-limits",
+      "size": "medium"
+     },
+     {
+      "value": "anger-injustice-limits:bigger",
+      "label": "Find a way to live with justified anger without it consuming you",
+      "dir": "anger-injustice-limits",
+      "size": "bigger"
+     },
+     {
+      "value": "disgust-proximity-distance:small",
+      "label": "Limit the contact to what's strictly necessary: no extra",
+      "dir": "disgust-proximity-distance",
+      "size": "small"
+     },
+     {
+      "value": "disgust-proximity-distance:medium",
+      "label": "Change one thing about the arrangement to reduce exposure",
+      "dir": "disgust-proximity-distance",
+      "size": "medium"
+     },
+     {
+      "value": "disgust-proximity-distance:bigger",
+      "label": "Start working toward a structural change: new role, new living situation, new arrangement",
+      "dir": "disgust-proximity-distance",
+      "size": "bigger"
+     },
+     {
+      "value": "disgust-proximity-boundary:small",
+      "label": "Identify your hardest line: what's the thing you will not accept?",
+      "dir": "disgust-proximity-boundary",
+      "size": "small"
+     },
+     {
+      "value": "disgust-proximity-boundary:medium",
+      "label": "Communicate that line clearly to the relevant person",
+      "dir": "disgust-proximity-boundary",
+      "size": "medium"
+     },
+     {
+      "value": "disgust-proximity-boundary:bigger",
+      "label": "Enforce it: if the line is crossed, follow through on the consequence",
+      "dir": "disgust-proximity-boundary",
+      "size": "bigger"
+     },
+     {
+      "value": "disgust-values-assert:small",
+      "label": "Name it to yourself clearly: \"This is wrong because...\"",
+      "dir": "disgust-values-assert",
+      "size": "small"
+     },
+     {
+      "value": "disgust-values-assert:medium",
+      "label": "Say it to one other person: break the silence",
+      "dir": "disgust-values-assert",
+      "size": "medium"
+     },
+     {
+      "value": "disgust-values-assert:bigger",
+      "label": "Address it directly with whoever has the power to change it",
+      "dir": "disgust-values-assert",
+      "size": "bigger"
+     },
+     {
+      "value": "disgust-values-align:small",
+      "label": "Clarify: what would an environment aligned with your values look like?",
+      "dir": "disgust-values-align",
+      "size": "small"
+     },
+     {
+      "value": "disgust-values-align:medium",
+      "label": "Identify one concrete step toward that environment",
+      "dir": "disgust-values-align",
+      "size": "medium"
+     },
+     {
+      "value": "disgust-values-align:bigger",
+      "label": "Make the move: change roles, leave the group, restructure the situation",
+      "dir": "disgust-values-align",
+      "size": "bigger"
+     },
+     {
+      "value": "envy-gap-one-step:small",
+      "label": "Name the gap specifically: \"I want X and I currently have Y\"",
+      "dir": "envy-gap-one-step",
+      "size": "small"
+     },
+     {
+      "value": "envy-gap-one-step:medium",
+      "label": "Identify the most important barrier and one action to address it",
+      "dir": "envy-gap-one-step",
+      "size": "medium"
+     },
+     {
+      "value": "envy-gap-one-step:bigger",
+      "label": "Start today: apply, sign up, reach out, begin",
+      "dir": "envy-gap-one-step",
+      "size": "bigger"
+     },
+     {
+      "value": "envy-gap-underlying-need:small",
+      "label": "Ask: if I had this thing, what would actually change in my daily life?",
+      "dir": "envy-gap-underlying-need",
+      "size": "small"
+     },
+     {
+      "value": "envy-gap-underlying-need:medium",
+      "label": "Name the underlying need: security, competence, connection, freedom",
+      "dir": "envy-gap-underlying-need",
+      "size": "medium"
+     },
+     {
+      "value": "envy-gap-underlying-need:bigger",
+      "label": "Find a more direct path to the underlying need, not only the surface want",
+      "dir": "envy-gap-underlying-need",
+      "size": "bigger"
+     },
+     {
+      "value": "envy-unfair-effective:small",
+      "label": "Name what you DO have access to: resources, skills, people, time",
+      "dir": "envy-unfair-effective",
+      "size": "small"
+     },
+     {
+      "value": "envy-unfair-effective:medium",
+      "label": "Make a plan that works from your actual starting point, not theirs",
+      "dir": "envy-unfair-effective",
+      "size": "medium"
+     },
+     {
+      "value": "envy-unfair-effective:bigger",
+      "label": "Invest fully in your own path without looking sideways",
+      "dir": "envy-unfair-effective",
+      "size": "bigger"
+     },
+     {
+      "value": "envy-unfair-advocate:small",
+      "label": "Name the specific structural barrier",
+      "dir": "envy-unfair-advocate",
+      "size": "small"
+     },
+     {
+      "value": "envy-unfair-advocate:medium",
+      "label": "Find one person or organization already working on this",
+      "dir": "envy-unfair-advocate",
+      "size": "medium"
+     },
+     {
+      "value": "envy-unfair-advocate:bigger",
+      "label": "Join the effort, or start one",
+      "dir": "envy-unfair-advocate",
+      "size": "bigger"
+     },
+     {
+      "value": "fear-safety-get-safe:small",
+      "label": "Go to a different room or a public space",
+      "dir": "fear-safety-get-safe",
+      "size": "small"
+     },
+     {
+      "value": "fear-safety-get-safe:medium",
+      "label": "Leave the location and go somewhere you feel safe",
+      "dir": "fear-safety-get-safe",
+      "size": "medium"
+     },
+     {
+      "value": "fear-safety-get-safe:bigger",
+      "label": "Call someone to come get you, or call a crisis line",
+      "dir": "fear-safety-get-safe",
+      "size": "bigger"
+     },
+     {
+      "value": "fear-safety-get-help:small",
+      "label": "Text one person and tell them what's happening",
+      "dir": "fear-safety-get-help",
+      "size": "small"
+     },
+     {
+      "value": "fear-safety-get-help:medium",
+      "label": "Call someone you trust and ask for concrete help",
+      "dir": "fear-safety-get-help",
+      "size": "medium"
+     },
+     {
+      "value": "fear-safety-get-help:bigger",
+      "label": "Contact a professional resource: police, hotline, advocate",
+      "dir": "fear-safety-get-help",
+      "size": "bigger"
+     },
+     {
+      "value": "fear-safety-plan-ahead:small",
+      "label": "Identify one person you could call in an emergency",
+      "dir": "fear-safety-plan-ahead",
+      "size": "small"
+     },
+     {
+      "value": "fear-safety-plan-ahead:medium",
+      "label": "Pack a bag, set up a code word, or save key numbers",
+      "dir": "fear-safety-plan-ahead",
+      "size": "medium"
+     },
+     {
+      "value": "fear-safety-plan-ahead:bigger",
+      "label": "Create a full safety plan with a trusted person or professional",
+      "dir": "fear-safety-plan-ahead",
+      "size": "bigger"
+     },
+     {
+      "value": "fear-health-info:small",
+      "label": "Write down the three questions you most need answered",
+      "dir": "fear-health-info",
+      "size": "small"
+     },
+     {
+      "value": "fear-health-info:medium",
+      "label": "Call the doctor's office, insurance, or relevant resource",
+      "dir": "fear-health-info",
+      "size": "medium"
+     },
+     {
+      "value": "fear-health-info:bigger",
+      "label": "Schedule the appointment or test you've been putting off",
+      "dir": "fear-health-info",
+      "size": "bigger"
+     },
+     {
+      "value": "fear-health-one-step:small",
+      "label": "Refill the prescription, make the call, open the portal",
+      "dir": "fear-health-one-step",
+      "size": "small"
+     },
+     {
+      "value": "fear-health-one-step:medium",
+      "label": "Go to the appointment or follow through on the recommendation",
+      "dir": "fear-health-one-step",
+      "size": "medium"
+     },
+     {
+      "value": "fear-health-one-step:bigger",
+      "label": "Start the treatment plan or have the conversation with family about what's needed",
+      "dir": "fear-health-one-step",
+      "size": "bigger"
+     },
+     {
+      "value": "fear-health-support:small",
+      "label": "Tell one person what's going on",
+      "dir": "fear-health-support",
+      "size": "small"
+     },
+     {
+      "value": "fear-health-support:medium",
+      "label": "Ask someone specific for a specific kind of help",
+      "dir": "fear-health-support",
+      "size": "medium"
+     },
+     {
+      "value": "fear-health-support:bigger",
+      "label": "Build a support team: medical, emotional, practical",
+      "dir": "fear-health-support",
+      "size": "bigger"
+     },
+     {
+      "value": "fear-anticipatory-prepare:small",
+      "label": "Write down the most likely outcome: not worst case, most likely",
+      "dir": "fear-anticipatory-prepare",
+      "size": "small"
+     },
+     {
+      "value": "fear-anticipatory-prepare:medium",
+      "label": "Make a plan for that scenario: what would you do first?",
+      "dir": "fear-anticipatory-prepare",
+      "size": "medium"
+     },
+     {
+      "value": "fear-anticipatory-prepare:bigger",
+      "label": "Rehearse your response mentally: walk through it step by step",
+      "dir": "fear-anticipatory-prepare",
+      "size": "bigger"
+     },
+     {
+      "value": "fear-anticipatory-reduce-risk:small",
+      "label": "Identify the one thing most in your control",
+      "dir": "fear-anticipatory-reduce-risk",
+      "size": "small"
+     },
+     {
+      "value": "fear-anticipatory-reduce-risk:medium",
+      "label": "Do that thing today",
+      "dir": "fear-anticipatory-reduce-risk",
+      "size": "medium"
+     },
+     {
+      "value": "fear-anticipatory-reduce-risk:bigger",
+      "label": "Address the root vulnerability: the thing that makes this risk feel so high",
+      "dir": "fear-anticipatory-reduce-risk",
+      "size": "bigger"
+     },
+     {
+      "value": "fear-anticipatory-accept-uncertainty:small",
+      "label": "Name what's in your control and what isn't: out loud or on paper",
+      "dir": "fear-anticipatory-accept-uncertainty",
+      "size": "small"
+     },
+     {
+      "value": "fear-anticipatory-accept-uncertainty:medium",
+      "label": "Do what you can, then practice letting the rest be",
+      "dir": "fear-anticipatory-accept-uncertainty",
+      "size": "medium"
+     },
+     {
+      "value": "fear-anticipatory-accept-uncertainty:bigger",
+      "label": "Sit with the uncertainty for 10 minutes without trying to resolve it",
+      "dir": "fear-anticipatory-accept-uncertainty",
+      "size": "bigger"
+     },
+     {
+      "value": "guilt-harm-apologize:small",
+      "label": "Write out what you want to say: name the specific action and its impact",
+      "dir": "guilt-harm-apologize",
+      "size": "small"
+     },
+     {
+      "value": "guilt-harm-apologize:medium",
+      "label": "Have the conversation: \"I did X, it affected you by Y, and I'm sorry\"",
+      "dir": "guilt-harm-apologize",
+      "size": "medium"
+     },
+     {
+      "value": "guilt-harm-apologize:bigger",
+      "label": "Ask them what they need from you to repair this, and listen without defending",
+      "dir": "guilt-harm-apologize",
+      "size": "bigger"
+     },
+     {
+      "value": "guilt-harm-make-amends:small",
+      "label": "Identify one tangible thing you can do to make it right",
+      "dir": "guilt-harm-make-amends",
+      "size": "small"
+     },
+     {
+      "value": "guilt-harm-make-amends:medium",
+      "label": "Do the thing: don't only offer, follow through",
+      "dir": "guilt-harm-make-amends",
+      "size": "medium"
+     },
+     {
+      "value": "guilt-harm-make-amends:bigger",
+      "label": "Sustain the amends over time, not only a one-time gesture",
+      "dir": "guilt-harm-make-amends",
+      "size": "bigger"
+     },
+     {
+      "value": "guilt-harm-prevent:small",
+      "label": "Identify what led to the behavior: what was the trigger or pattern?",
+      "dir": "guilt-harm-prevent",
+      "size": "small"
+     },
+     {
+      "value": "guilt-harm-prevent:medium",
+      "label": "Commit to one specific alternative action for next time",
+      "dir": "guilt-harm-prevent",
+      "size": "medium"
+     },
+     {
+      "value": "guilt-harm-prevent:bigger",
+      "label": "Put a system in place: not willpower, a structural change",
+      "dir": "guilt-harm-prevent",
+      "size": "bigger"
+     },
+     {
+      "value": "guilt-pattern-understand:small",
+      "label": "Name the trigger: what's happening right before you fall into this?",
+      "dir": "guilt-pattern-understand",
+      "size": "small"
+     },
+     {
+      "value": "guilt-pattern-understand:medium",
+      "label": "Trace the chain: what set it off, the thought, the urge, what I did, what came after",
+      "dir": "guilt-pattern-understand",
+      "size": "medium"
+     },
+     {
+      "value": "guilt-pattern-understand:bigger",
+      "label": "Identify the function: what does this behavior give you or help you avoid?",
+      "dir": "guilt-pattern-understand",
+      "size": "bigger"
+     },
+     {
+      "value": "guilt-pattern-replace:small",
+      "label": "Identify one alternative action you could take at the trigger point",
+      "dir": "guilt-pattern-replace",
+      "size": "small"
+     },
+     {
+      "value": "guilt-pattern-replace:medium",
+      "label": "Practice the alternative once this week, even imperfectly",
+      "dir": "guilt-pattern-replace",
+      "size": "medium"
+     },
+     {
+      "value": "guilt-pattern-replace:bigger",
+      "label": "Make the alternative easier and the pattern harder: change the environment",
+      "dir": "guilt-pattern-replace",
+      "size": "bigger"
+     },
+     {
+      "value": "guilt-pattern-reduce-vulnerability:small",
+      "label": "Check whether I'm short on sleep, hungry, alone or overwhelmed",
+      "dir": "guilt-pattern-reduce-vulnerability",
+      "size": "small"
+     },
+     {
+      "value": "guilt-pattern-reduce-vulnerability:medium",
+      "label": "Address the most urgent vulnerability factor today",
+      "dir": "guilt-pattern-reduce-vulnerability",
+      "size": "medium"
+     },
+     {
+      "value": "guilt-pattern-reduce-vulnerability:bigger",
+      "label": "Build a routine that keeps me above the point where the pattern takes over",
+      "dir": "guilt-pattern-reduce-vulnerability",
+      "size": "bigger"
+     },
+     {
+      "value": "guilt-conflict-mitigate:small",
+      "label": "Name specifically who or what paid the cost of your decision",
+      "dir": "guilt-conflict-mitigate",
+      "size": "small"
+     },
+     {
+      "value": "guilt-conflict-mitigate:medium",
+      "label": "Acknowledge the cost directly to the person affected, without undoing your choice",
+      "dir": "guilt-conflict-mitigate",
+      "size": "medium"
+     },
+     {
+      "value": "guilt-conflict-mitigate:bigger",
+      "label": "Find a way to invest in the value that was sacrificed: going forward, not backward",
+      "dir": "guilt-conflict-mitigate",
+      "size": "bigger"
+     },
+     {
+      "value": "guilt-conflict-clarify:small",
+      "label": "Name the two values that were competing",
+      "dir": "guilt-conflict-clarify",
+      "size": "small"
+     },
+     {
+      "value": "guilt-conflict-clarify:medium",
+      "label": "For this season of your life, which one comes first? And can you accept the tradeoff?",
+      "dir": "guilt-conflict-clarify",
+      "size": "medium"
+     },
+     {
+      "value": "guilt-conflict-clarify:bigger",
+      "label": "Restructure your life to reduce how often these values collide",
+      "dir": "guilt-conflict-clarify",
+      "size": "bigger"
+     },
+     {
+      "value": "guilt-conflict-accept:small",
+      "label": "Say to yourself: \"There was no clean answer here. I chose, and it cost something.\"",
+      "dir": "guilt-conflict-accept",
+      "size": "small"
+     },
+     {
+      "value": "guilt-conflict-accept:medium",
+      "label": "Talk to someone you trust about the dilemma: not for absolution, for perspective",
+      "dir": "guilt-conflict-accept",
+      "size": "medium"
+     },
+     {
+      "value": "guilt-conflict-accept:bigger",
+      "label": "Practice self-forgiveness: \"I was in an impossible situation, and I did my best\"",
+      "dir": "guilt-conflict-accept",
+      "size": "bigger"
+     },
+     {
+      "value": "jealousy-trust-conversation:small",
+      "label": "Write down what you need to say: separate facts from interpretations",
+      "dir": "jealousy-trust-conversation",
+      "size": "small"
+     },
+     {
+      "value": "jealousy-trust-conversation:medium",
+      "label": "Have the conversation with DEAR MAN: what happened, how it hit me, what I need",
+      "dir": "jealousy-trust-conversation",
+      "size": "medium"
+     },
+     {
+      "value": "jealousy-trust-conversation:bigger",
+      "label": "Agree together what rebuilding trust looks like: specific actions, not only promises",
+      "dir": "jealousy-trust-conversation",
+      "size": "bigger"
+     },
+     {
+      "value": "jealousy-trust-terms:small",
+      "label": "Name one specific thing that would help you feel more secure",
+      "dir": "jealousy-trust-terms",
+      "size": "small"
+     },
+     {
+      "value": "jealousy-trust-terms:medium",
+      "label": "Communicate those needs clearly, without ultimatums",
+      "dir": "jealousy-trust-terms",
+      "size": "medium"
+     },
+     {
+      "value": "jealousy-trust-terms:bigger",
+      "label": "Decide together on concrete agreements, and follow up on them",
+      "dir": "jealousy-trust-terms",
+      "size": "bigger"
+     },
+     {
+      "value": "jealousy-trust-decide:small",
+      "label": "Ask yourself honestly: do I want to repair this, or am I staying out of fear?",
+      "dir": "jealousy-trust-decide",
+      "size": "small"
+     },
+     {
+      "value": "jealousy-trust-decide:medium",
+      "label": "Give it a set time, then look again at whether to keep going",
+      "dir": "jealousy-trust-decide",
+      "size": "medium"
+     },
+     {
+      "value": "jealousy-trust-decide:bigger",
+      "label": "Make the decision: stay and rebuild, or leave and grieve",
+      "dir": "jealousy-trust-decide",
+      "size": "bigger"
+     },
+     {
+      "value": "jealousy-threat-talk:small",
+      "label": "Resist the urge to confront the third party",
+      "dir": "jealousy-threat-talk",
+      "size": "small"
+     },
+     {
+      "value": "jealousy-threat-talk:medium",
+      "label": "Tell your person what you're noticing and how it makes you feel",
+      "dir": "jealousy-threat-talk",
+      "size": "medium"
+     },
+     {
+      "value": "jealousy-threat-talk:bigger",
+      "label": "Address it together as a team: \"This is affecting us. How do we handle it?\"",
+      "dir": "jealousy-threat-talk",
+      "size": "bigger"
+     },
+     {
+      "value": "jealousy-threat-strengthen:small",
+      "label": "Do one thing that invests in the relationship today",
+      "dir": "jealousy-threat-strengthen",
+      "size": "small"
+     },
+     {
+      "value": "jealousy-threat-strengthen:medium",
+      "label": "Create quality time together this week: intentional, not incidental",
+      "dir": "jealousy-threat-strengthen",
+      "size": "medium"
+     },
+     {
+      "value": "jealousy-threat-strengthen:bigger",
+      "label": "Have an honest conversation about what you both need to feel chosen",
+      "dir": "jealousy-threat-strengthen",
+      "size": "bigger"
+     },
+     {
+      "value": "love-external-logistics:small",
+      "label": "Name the specific logistical barrier: distance, money, timing, obligation",
+      "dir": "love-external-logistics",
+      "size": "small"
+     },
+     {
+      "value": "love-external-logistics:medium",
+      "label": "Brainstorm together: what are the actual options?",
+      "dir": "love-external-logistics",
+      "size": "medium"
+     },
+     {
+      "value": "love-external-logistics:bigger",
+      "label": "Pick an option and commit, even if it's imperfect or requires sacrifice",
+      "dir": "love-external-logistics",
+      "size": "bigger"
+     },
+     {
+      "value": "love-external-bridge:small",
+      "label": "Establish one consistent touchpoint: daily text, weekly call, something reliable",
+      "dir": "love-external-bridge",
+      "size": "small"
+     },
+     {
+      "value": "love-external-bridge:medium",
+      "label": "Plan the next time you'll be together and make it concrete",
+      "dir": "love-external-bridge",
+      "size": "medium"
+     },
+     {
+      "value": "love-external-bridge:bigger",
+      "label": "Set a timeline for resolving the barrier, even approximately",
+      "dir": "love-external-bridge",
+      "size": "bigger"
+     },
+     {
+      "value": "love-internal-conversation:small",
+      "label": "Name to yourself what isn't working. Be specific.",
+      "dir": "love-internal-conversation",
+      "size": "small"
+     },
+     {
+      "value": "love-internal-conversation:medium",
+      "label": "Tell them: \"I love you, and this thing between us needs to change\"",
+      "dir": "love-internal-conversation",
+      "size": "medium"
+     },
+     {
+      "value": "love-internal-conversation:bigger",
+      "label": "Use DEAR MAN to structure the conversation so it's clear and kind",
+      "dir": "love-internal-conversation",
+      "size": "bigger"
+     },
+     {
+      "value": "love-internal-dynamic:small",
+      "label": "Notice: does this conflict follow a pattern? Same roles, same escalation?",
+      "dir": "love-internal-dynamic",
+      "size": "small"
+     },
+     {
+      "value": "love-internal-dynamic:medium",
+      "label": "Name the pattern to your partner without blame: \"I notice we keep ending up here\"",
+      "dir": "love-internal-dynamic",
+      "size": "medium"
+     },
+     {
+      "value": "love-internal-dynamic:bigger",
+      "label": "Agree together to try a different approach next time, and practice it",
+      "dir": "love-internal-dynamic",
+      "size": "bigger"
+     },
+     {
+      "value": "sadness-loss-rebuild-structure:small",
+      "label": "Identify one gap in your daily life this loss created",
+      "dir": "sadness-loss-rebuild-structure",
+      "size": "small"
+     },
+     {
+      "value": "sadness-loss-rebuild-structure:medium",
+      "label": "Fill that gap with something, even temporarily, even imperfectly",
+      "dir": "sadness-loss-rebuild-structure",
+      "size": "medium"
+     },
+     {
+      "value": "sadness-loss-rebuild-structure:bigger",
+      "label": "Create a new routine that belongs to your life after this loss",
+      "dir": "sadness-loss-rebuild-structure",
+      "size": "bigger"
+     },
+     {
+      "value": "sadness-loss-reach-out:small",
+      "label": "Text one person back, or send a message you don't have to",
+      "dir": "sadness-loss-reach-out",
+      "size": "small"
+     },
+     {
+      "value": "sadness-loss-reach-out:medium",
+      "label": "Call someone and talk: not about the loss if you don't want to, talk",
+      "dir": "sadness-loss-reach-out",
+      "size": "medium"
+     },
+     {
+      "value": "sadness-loss-reach-out:bigger",
+      "label": "See someone in person, even if every part of you wants to cancel",
+      "dir": "sadness-loss-reach-out",
+      "size": "bigger"
+     },
+     {
+      "value": "sadness-loss-allow-and-move:small",
+      "label": "Give yourself 10 minutes to feel it fully, then do one small thing",
+      "dir": "sadness-loss-allow-and-move",
+      "size": "small"
+     },
+     {
+      "value": "sadness-loss-allow-and-move:medium",
+      "label": "Write a letter to them (you don't have to send it), then do something for yourself",
+      "dir": "sadness-loss-allow-and-move",
+      "size": "medium"
+     },
+     {
+      "value": "sadness-loss-allow-and-move:bigger",
+      "label": "Honor the loss in a way that matters, then change one thing about how I'm living now",
+      "dir": "sadness-loss-allow-and-move",
+      "size": "bigger"
+     },
+     {
+      "value": "sadness-failure-try-again:small",
+      "label": "Name one thing you'd change about your approach",
+      "dir": "sadness-failure-try-again",
+      "size": "small"
+     },
+     {
+      "value": "sadness-failure-try-again:medium",
+      "label": "Make a concrete plan for the second attempt",
+      "dir": "sadness-failure-try-again",
+      "size": "medium"
+     },
+     {
+      "value": "sadness-failure-try-again:bigger",
+      "label": "Start the revised attempt today: don't wait for the feeling to pass",
+      "dir": "sadness-failure-try-again",
+      "size": "bigger"
+     },
+     {
+      "value": "sadness-failure-redirect:small",
+      "label": "Ask: what was I really trying to get from this?",
+      "dir": "sadness-failure-redirect",
+      "size": "small"
+     },
+     {
+      "value": "sadness-failure-redirect:medium",
+      "label": "Identify one adjacent goal that would meet the same need",
+      "dir": "sadness-failure-redirect",
+      "size": "medium"
+     },
+     {
+      "value": "sadness-failure-redirect:bigger",
+      "label": "Commit to the new direction and let go of the original plan",
+      "dir": "sadness-failure-redirect",
+      "size": "bigger"
+     },
+     {
+      "value": "sadness-failure-grieve:small",
+      "label": "Name what you're sad about losing: be specific",
+      "dir": "sadness-failure-grieve",
+      "size": "small"
+     },
+     {
+      "value": "sadness-failure-grieve:medium",
+      "label": "Allow yourself to feel the disappointment without rushing to fix it",
+      "dir": "sadness-failure-grieve",
+      "size": "medium"
+     },
+     {
+      "value": "sadness-failure-grieve:bigger",
+      "label": "Write down what this attempt taught you, then look forward",
+      "dir": "sadness-failure-grieve",
+      "size": "bigger"
+     },
+     {
+      "value": "sadness-erosion-one-thing:small",
+      "label": "Name one activity, person, or habit you stopped doing",
+      "dir": "sadness-erosion-one-thing",
+      "size": "small"
+     },
+     {
+      "value": "sadness-erosion-one-thing:medium",
+      "label": "Do a version of that thing today, even a 5-minute version",
+      "dir": "sadness-erosion-one-thing",
+      "size": "medium"
+     },
+     {
+      "value": "sadness-erosion-one-thing:bigger",
+      "label": "Commit to doing it regularly this week",
+      "dir": "sadness-erosion-one-thing",
+      "size": "bigger"
+     },
+     {
+      "value": "sadness-erosion-identify-barrier:small",
+      "label": "Name one thing I stopped doing, and what got in the way",
+      "dir": "sadness-erosion-identify-barrier",
+      "size": "small"
+     },
+     {
+      "value": "sadness-erosion-identify-barrier:medium",
+      "label": "Is that barrier still real, or has it become a habit?",
+      "dir": "sadness-erosion-identify-barrier",
+      "size": "medium"
+     },
+     {
+      "value": "sadness-erosion-identify-barrier:bigger",
+      "label": "Remove or work around the barrier for one specific activity",
+      "dir": "sadness-erosion-identify-barrier",
+      "size": "bigger"
+     },
+     {
+      "value": "sadness-erosion-structure:small",
+      "label": "Set one consistent time for one thing: waking up, a meal, a walk",
+      "dir": "sadness-erosion-structure",
+      "size": "small"
+     },
+     {
+      "value": "sadness-erosion-structure:medium",
+      "label": "Schedule one activity with another person this week",
+      "dir": "sadness-erosion-structure",
+      "size": "medium"
+     },
+     {
+      "value": "sadness-erosion-structure:bigger",
+      "label": "Build a minimal daily routine: 3 things, same time each day",
+      "dir": "sadness-erosion-structure",
+      "size": "bigger"
+     }
+    ],
+    "starter": [
+     {
+      "value": "call",
+      "label": "Make the call"
+     },
+     {
+      "value": "message",
+      "label": "Send the message"
+     },
+     {
+      "value": "book",
+      "label": "Book it"
+     },
+     {
+      "value": "five_minutes",
+      "label": "Start it for five minutes"
+     }
+    ],
+    "mysize": [
+     {
+      "value": "small",
+      "label": "Small: in the next hour"
+     },
+     {
+      "value": "medium",
+      "label": "Medium: today or tomorrow"
+     },
+     {
+      "value": "bigger",
+      "label": "Bigger: a real change"
+     }
+    ],
+    "how": [
+     {
+      "value": "did_it",
+      "label": "I did it"
+     },
+     {
+      "value": "did_part",
+      "label": "I did part of it"
+     },
+     {
+      "value": "didnt",
+      "label": "I didn't"
+     },
+     {
+      "value": "not_yet",
+      "label": "Not yet"
+     }
+    ],
+    "help": [
+     {
+      "value": "helped",
+      "label": "It helped"
+     },
+     {
+      "value": "some",
+      "label": "Some"
+     },
+     {
+      "value": "not_really",
+      "label": "Not really"
+     }
+    ],
+    "then": [
+     {
+      "value": "smaller",
+      "label": "A smaller version of the same step"
+     },
+     {
+      "value": "other",
+      "label": "A different direction"
+     },
+     {
+      "value": "blocked",
+      "label": "Something got in the way"
+     }
+    ],
+    "when": [
+     {
+      "value": "today",
+      "label": "Tonight"
+     },
+     {
+      "value": "tomorrow",
+      "label": "Tomorrow"
+     },
+     {
+      "value": "this_week",
+      "label": "Later this week"
+     }
+    ]
+   }
   }
  ]
 }

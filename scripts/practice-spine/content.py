@@ -132,6 +132,22 @@ FOLLOW_UP_TYPES = [
         "notification": "A step you planned is ready.",
     },
     {
+        # Problem Solve on the skill runtime (ER-12, docs/design/problem-solve.md): Handout 12's evaluate step. The
+        # commit card's chips schedule it; its card reopens that visit's run at *How did it go?* (`review`, a
+        # `reopens` step, R9). Opening it is the resolution, as for resume_skill (functions/src/spine/toolSession.ts);
+        # *Not any more* dismisses it. ps_step (above) stays for the cards the hand-built page scheduled.
+        "id": "ps_review", "ownerModule": "er", "tier": "quality", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/problem-solve?run={sourceSessionId}&at=review&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"today": {"kind": "at_local", "days": 0, "time": "20:00"},
+                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
+                                             "this_week": {"kind": "at_local", "days": 4, "time": "18:00"}}},
+        "staleAfterHours": 72, "missedPath": "missing_links", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Your next step", "body": "The step you picked in Problem Solve. How did it go?"},
+        "choices": [{"id": "dismiss", "label": "Not any more", "status": "dismissed"}],
+        "notification": "A step you planned is ready.",
+    },
+    {
         # Cope Ahead (docs/design/cope-ahead.md, "Today, afterwards"): on the keep screen's "Want me to ask how
         # it went?" Yes, for the time from screen 1 (the chip is ext.ca.when). Scheduled only on the caller's
         # own cope-ahead ToolSession. Its Today card is the tool's own (cope-ahead.json's after_* lines, the

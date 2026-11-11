@@ -181,6 +181,22 @@ export interface StepDef {
    */
   noClose?: boolean;
   /**
+   * Only a reopened run starts here (R9, `?run=<id>&at=<this step>`), and only a run whose path reached `after` (the
+   * step that made the plan it asks about); any other run doesn't reopen. No step leads to it; it comes after the
+   * run's whole recorded path, every answer of that run comes back but the ask-fresh ones, and neither it nor any
+   * step after it reads an ask-fresh field. For a step that asks how it went afterwards, such as Problem Solve's
+   * *How did it go?* (Handout 12's evaluate step). `again`: steps after it that keep the plan standing (a reminder
+   * booked again), so a run they ended reopens too; the latest of `after` and `again` must come after the step's last ask.
+   */
+  reopens?: { after: string; again?: string[] };
+  /**
+   * Fields whose answers are dropped when the run arrives here by a forward move, or reopens here: the answers
+   * of a plan this step replaces, so they don't stand in for the new one. For two ways to the same thing, such as
+   * Problem Solve's guided step and own-words step (each clears the other's), and for a reopens step's own loop
+   * (its last answers are never read back as this time's).
+   */
+  clears?: string[];
+  /**
    * kind 'embed' or 'handoff': quiet links under the screen (an ask step's live on its fields). For a way out that
    * belongs on every screen, such as *Talk to someone now*, where the screen has no field to hang it on.
    */

@@ -4,7 +4,7 @@ import type { HandoffResult, ThenVsNow } from '../../data/capacityTypes';
 import { PROFILE_NEEDS, type ClientProfileConsumer } from '../../data/profileTypes';
 import { emotions, getEmotionById } from '../../data/emotions';
 import type { ExitDef, FieldDef, SkillDef, SkillsContent, StepDef } from '../../data/skillTypes';
-import { getToolById } from '../../data/tools';
+import { getToolById, tools } from '../../data/tools';
 import { useToolSession } from '../../hooks/useToolSession';
 import { useProfileContext } from '../../hooks/useProfileContext';
 import { ToolSessionProvider } from '../../contexts/ToolSessionContext';
@@ -107,6 +107,8 @@ const needsProfile = (toolId: string) => ((PROFILE_NEEDS as Record<string, reado
 const UUID = /^[0-9a-f-]{36}$/i;
 
 const GRID = new Set(emotions.map((e) => e.id));
+/** Tools that write nothing until the person saves (R15): exits to them are never named or linked back. */
+const PRIVATE_TOOLS: ReadonlySet<string> = new Set(tools.filter((t) => t.deferSession).map((t) => t.id));
 const emotionLabel = (id: string) => (getEmotionById(id)?.name ?? id.replace(/_/g, ' ')).toLowerCase();
 
 /**
@@ -146,7 +148,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
   const profile = useProfileContext(skill.toolId as ClientProfileConsumer, { enabled: needsProfile(skill.toolId) });
   const slices = profile.slices as Record<string, unknown> | null;
   const ctx = useMemo<RunContext>(() => ({
-    skill, shared: { parentOf: content.parentOf, fitsWhen: content.fitsWhen }, carried, gridIds: GRID, emotionLabel, ctxIn,
+    skill, shared: { parentOf: content.parentOf, fitsWhen: content.fitsWhen }, carried, gridIds: GRID, emotionLabel, ctxIn, privateTools: PRIVATE_TOOLS,
     embedOutputs: EMBED_OUTPUTS, profile: slices,
   }), [skill, content, carried, ctxIn, slices]);
   const [safetyOpen, setSafetyOpen] = useState(false);
@@ -167,13 +169,14 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
   // out), so those picks aren't read as options it no longer offers and dropped.
   const profileSettled = !needsProfile(skill.toolId) || profile.status !== 'loading';
   const resumed = useRef(false);
+  const reopenedRef = useRef(false);
   useEffect(() => {
     if (!resumeFrom || !profileSettled || resumed.current) return;
     resumed.current = true;
     getSkillRun(resumeFrom.run, skill.toolId)
       .then((rec) => {
         const r = resumeRun(ctx, rec, resumeFrom.at, { keepFresh: !!resumeKeepsFresh });
-        if (r) setSt(r);
+        if (r) { reopenedRef.current = !!stepOf(skill, r.stepId).reopens; setSt(r); }
         else setCtxIn((c) => ctxAfterResume(c, false));
       })
       // Nothing to reopen: a fresh run, and a whole first visit (the link's enterAt was for the run it named).
@@ -207,7 +210,9 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
   useEffect(() => {
     toolSession.setStep(st.stepId);
     toolSession.setExt({ run: runRecord(ctx, st) });
-    toolSession.setEmotionIds(runEmotionIds(ctx, st));
+    // A run reopened at a `reopens` step (a review afterwards) is a new visit about the same plan: the feeling
+    // was the first visit's, so it isn't counted again here.
+    toolSession.setEmotionIds(reopenedRef.current ? [] : runEmotionIds(ctx, st));
     const fresh = askFresh(ctx, st);
     toolSession.setFitsFacts((fresh.fitsFacts as Parameters<typeof toolSession.setFitsFacts>[0]) ?? null);
     if (stepOf(skill, st.stepId).complete) toolSession.markComplete();
@@ -216,7 +221,11 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
   /** Go: after the close question (answered or skipped), or at once when there is none to ask. */
   const go = useCallback((exit: ExitDef) => {
     if (exit.done || !exit.toolId) return;
-    const to = toolSession.linkTo(exit.toolId, { checkinEmotions: carriedOf(exit, st) });
+    // Into a tool that writes nothing until the person saves (R15), the visit carries no host session: once it
+    // saves, nothing there may point back at this run, as nothing here names it (runRecord, `private`).
+    const to = PRIVATE_TOOLS.has(exit.toolId)
+      ? { pathname: `/tool/${exit.toolId}`, state: { checkinEmotions: carriedOf(exit, st) } }
+      : toolSession.linkTo(exit.toolId, { checkinEmotions: carriedOf(exit, st) });
     const q = new URLSearchParams(exit.query).toString();
     navigate({ pathname: to.pathname, search: q ? `?${q}` : '' }, { state: to.state });
   }, [toolSession, navigate, st]);
@@ -552,10 +561,14 @@ function HandoffCard({ ctx, step, st, send, onExit, busy }: {
     .filter((x): x is ExitDef => !!x && (!!x.safety || (!!x.toolId && !!getToolById(x.toolId))));
   const done = step.done ? ctx.skill.exits.find((x) => x.id === step.done) : undefined;
   const crisis = crisisFor(ctx, step, st);
+  // A hand-off's title (Problem Solve's *Your next step: …*) heads the card, as an ask step's does.
+  const title = copyText(ctx, step.title, st, titleSlots(ctx, step, st));
   return (<>
     {crisis && <CrisisBanner compact variant={crisis.variant} />}
+    {title && <Prompt>{title}</Prompt>}
     <section className="space-y-4 p-5 rounded-2xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]" data-testid="skill-handoff">
-      {line && <Prompt serif>{line}</Prompt>}
+      {/* Under a title the line is read after it, not focused or announced as a second heading. */}
+      {line && (title ? <Line serif>{line}</Line> : <Prompt serif>{line}</Prompt>)}
       {chips.map((f) => (
         // Held while the reminder saves, so the chip shown is the one that was scheduled.
         <fieldset key={f.id} data-testid="handoff-reminder" disabled={busy} className="m-0 p-0 border-0 min-w-0">

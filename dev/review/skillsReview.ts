@@ -7,7 +7,8 @@
 import type { SkillDef } from '../../src/data/skillTypes';
 
 /**
- * Every step's first path from the start (breadth-first over `next`, conditions ignored). A re-entry step
+ * Every step's first path from the start (breadth-first over `next`, conditions ignored). A `reopens` step, which only
+ * a reopened run starts on, comes after its `after` step's path, and the steps after it from there. A re-entry step
  * (`resumeAt`, opened by a check-in off the run's path) that no transition reaches follows the deepest step that
  * schedules a follow-up: the run the check-in came back to.
  */
@@ -25,6 +26,10 @@ export function stepPaths(skill: SkillDef): Record<string, string[]> {
     }
   };
   walk([skill.start]);
+  for (const st of skill.steps.filter((s) => s.reopens && !paths[s.id] && paths[s.reopens.after])) {
+    paths[st.id] = [...paths[st.reopens!.after], st.id];
+    walk([st.id]);
+  }
   for (const at of skill.resumeAt ?? []) {
     if (paths[at]) continue;
     const from = skill.steps.filter((s) => s.followUp && paths[s.id])
