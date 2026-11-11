@@ -1,7 +1,7 @@
 {
   "source": {
     "file": "graph-content-only-2026-11-11.json",
-    "exportedAt": "2026-11-11T19:47:17.338Z"
+    "exportedAt": "2026-11-11T20:09:43.946Z"
   },
   "content": {
     "version": "skills-v1",
@@ -2815,104 +2815,104 @@
         "ownMax": 140,
         "emotionFields": [],
         "copy": {
-          "feel_title": "Before we look back, how are you feeling right now?",
-          "feel_hint": "Pick up to three.",
-          "cool_down": "Settle my body first",
-          "talk_now": "Talk to someone now",
-          "happened_title": "Did the conversation happen?",
-          "outcome_title": "How did it turn out?",
+          "again_label": "Want me to ask again?",
           "between_title": "Is it still okay between you?",
-          "proud_title": "Are you proud of how you handled it?",
-          "proud_hint": "However it turned out.",
-          "went_well_title": "You got what you asked for.",
-          "went_well_title_proud": "You got what you asked for, and you're proud of how you did it.",
-          "more_title": "Want to look at what worked, so you can do it again?",
-          "factor_title_partly": "Part of it landed. What got in the way most?",
+          "body_title": "What was happening in your body, right before or during it?",
+          "cool_down": "Settle my body first",
+          "cope_title": "What could you try when that moment comes again?",
+          "decided_not_line": "Deciding not to have it is a real answer. You know your situation best.",
+          "done": "Done",
+          "factor_hint": "One is enough. These happen to most people.",
           "factor_title_no": "It didn't go your way this time. What got in the way most?",
           "factor_title_no_answer": "No answer can be hard to sit with. Looking back, what got in the way most?",
-          "factor_hint": "One is enough. These happen to most people.",
-          "waiting_title": "No answer can be hard to sit with.",
-          "waiting_more": "Want to look at how it went, or leave it for now?",
-          "again_label": "Want me to ask again?",
-          "moment_title": "Was there a moment where things shifted?",
-          "pick_any": "Pick any that fit.",
-          "response_title": "What did you do in that moment?",
-          "body_title": "What was happening in your body, right before or during it?",
-          "thought_title": "What thoughts showed up?",
-          "thought_own": "Something else",
-          "underneath_title": "Underneath that, what was the deeper feeling?",
-          "reflect_hint": "Does that land?",
-          "cope_title": "What could you try when that moment comes again?",
-          "plan_title": "Your moment plan",
-          "plan_next": "Next",
-          "next": "Next",
-          "done": "Done",
-          "not_yet_line": "It's still ahead. When you want, you can get ready for it, or leave it for now.",
-          "waiting_line": "When you hear back, you can look at it here again.",
-          "later_line": "That was a lot. We can look at the rest later.",
-          "unsafe_line": "Your safety comes first. The people below can help, any time, and you don't have to be sure.",
-          "decided_not_line": "Deciding not to have it is a real answer. You know your situation best.",
-          "good_line_proud": "You asked, and you're proud of how you did it. That's the skill working.",
-          "good_line_shaky": "You got what you asked for, and things feel unsettled between you. Both can be true at once.",
+          "factor_title_partly": "Part of it landed. What got in the way most?",
+          "feel_hint": "Pick up to three.",
+          "feel_title": "Before we look back, how are you feeling right now?",
+          "fix_belief": "Worries like that can be checked. Looking at the facts can loosen their grip.",
+          "fix_cant_give": "Some needs can't be met by this person. That doesn't make the need wrong. There may be other places to meet it.",
+          "fix_feelings": "Feelings rising fast is common in hard talks. A plan for that moment, and a check on how you're doing before you start, can help.",
+          "fix_no_words": "When the words go, a line ready ahead of time is easier to find. Saying it out loud first helps it stick.",
+          "fix_not_willing": "Asking skilfully doesn't decide their answer. You did your part.",
+          "fix_power": "When they hold more of the power, a smaller ask or another route can be wiser. If it's the relationship itself, that's worth looking at too.",
+          "fix_quick_win": "Ending it fast can cost what you came for. Keeping your self-respect in view can help you hold on a little longer.",
+          "fix_unclear": "Next time, pick the one thing that matters most before you start. A plan can help you find it.",
           "good_line": "You asked for what you needed. That counts.",
           "good_line_not_proud": "You got what you asked for. If how you did it doesn't sit right, keeping your self-respect can be part of the plan next time.",
-          "fix_no_words": "When the words go, a line ready ahead of time is easier to find. Saying it out loud first helps it stick.",
-          "fix_unclear": "Next time, pick the one thing that matters most before you start. A plan can help you find it.",
-          "fix_feelings": "Feelings rising fast is common in hard talks. A plan for that moment, and a check on how you're doing before you start, can help.",
-          "fix_belief": "Worries like that can be checked. Looking at the facts can loosen their grip.",
-          "fix_quick_win": "Ending it fast can cost what you came for. Keeping your self-respect in view can help you hold on a little longer.",
-          "fix_power": "When they hold more of the power, a smaller ask or another route can be wiser. If it's the relationship itself, that's worth looking at too.",
-          "fix_cant_give": "Some needs can't be met by this person. That doesn't make the need wrong. There may be other places to meet it.",
-          "fix_not_willing": "Asking skilfully doesn't decide their answer. You did your part.",
-          "picker_personWhoDebrief": "Who was the conversation with?",
-          "picker_personNew": "Someone new",
-          "picker_personNameLabel": "What do you call them?",
-          "picker_personNameHint": "A nickname is fine. No real names needed.",
-          "picker_personRoleLabel": "Who are they to you?",
-          "picker_personKeepLine": "The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.",
-          "picker_personNoNameLine": "Without a name, nothing about them is kept.",
-          "picker_personSignedOutLine": "This stays on this screen only.",
-          "picker_personGoOn": "Go on",
+          "good_line_proud": "You asked, and you're proud of how you did it. That's the skill working.",
+          "good_line_shaky": "You got what you asked for, and things feel unsettled between you. Both can be true at once.",
+          "happened_title": "Did the conversation happen?",
+          "later_line": "That was a lot. We can look at the rest later.",
+          "moment_title": "Was there a moment where things shifted?",
+          "more_title": "Want to look at what worked, so you can do it again?",
+          "next": "Next",
+          "not_yet_line": "It's still ahead. When you want, you can get ready for it, or leave it for now.",
+          "outcome_title": "How did it turn out?",
+          "pick_any": "Pick any that fit.",
           "picker_personChanged": "Things changed with someone?",
           "picker_personChangedHint": "Pick who it is, and you'll be asked about them again.",
-          "picker_safeQuestion": "Is it safe to bring hard things up with {who}?",
-          "picker_safeYes": "Yes, mostly",
-          "picker_safeNo": "No",
-          "picker_safeUnsure": "Not sure",
-          "picker_riskQuestion": "Is it more that they might hurt or control you, or that it tends to go badly?",
-          "picker_riskHarm": "They might hurt or control me",
+          "picker_personGoOn": "Go on",
+          "picker_personKeepLine": "The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.",
+          "picker_personNameHint": "A nickname is fine. No real names needed.",
+          "picker_personNameLabel": "What do you call them?",
+          "picker_personNew": "Someone new",
+          "picker_personNoNameLine": "Without a name, nothing about them is kept.",
+          "picker_personRoleLabel": "Who are they to you?",
+          "picker_personSignedOutLine": "This stays on this screen only.",
+          "picker_personWhoDebrief": "Who was the conversation with?",
           "picker_riskBadly": "It tends to go badly",
+          "picker_riskHarm": "They might hurt or control me",
+          "picker_riskQuestion": "Is it more that they might hurt or control you, or that it tends to go badly?",
           "picker_riskUnsaid": "I'd rather not say",
-          "picker_safetyRouteDebriefHeading": "With {who}, your safety comes first. Looking back can wait.",
-          "picker_safetyRouteBody": "The people below can help you think it through, any time, and you don't have to be sure.",
-          "picker_safetyRouteEnding": "Thinking about ending the relationship",
+          "picker_safeNo": "No",
+          "picker_safeQuestion": "Is it safe to bring hard things up with {who}?",
+          "picker_safeUnsure": "Not sure",
+          "picker_safeYes": "Yes, mostly",
           "picker_safetyRouteBack": "This is about someone else",
+          "picker_safetyRouteBody": "The people below can help you think it through, any time, and you don't have to be sure.",
+          "picker_safetyRouteDebriefHeading": "With {who}, your safety comes first. Looking back can wait.",
+          "picker_safetyRouteEnding": "Thinking about ending the relationship",
+          "plan_next": "Next",
+          "plan_title": "Your moment plan",
+          "proud_hint": "However it turned out.",
+          "proud_title": "Are you proud of how you handled it?",
+          "reflect_hint": "Does that land?",
+          "reflect_ref_apologized_agreed": "Saying sorry and agreeing when you don't mean it makes the discomfort stop for now. The need doesn't go away. It goes quiet.",
+          "reflect_ref_apologized_quiet": "Saying sorry and then going quiet can be something people learn when asking felt risky. Your voice is still there.",
+          "reflect_ref_crying_cried": "Tears in a hard talk usually mean it matters to you. The skill is keeping going through them, or saying 'I need a minute' without dropping what you need.",
+          "reflect_ref_crying_froze": "Tears and freezing can come when there's too much to hold at once. Next time you can give yourself permission to pause.",
+          "reflect_ref_default": "Whatever happened in that moment, you did the best you could with what you had. Let's find something you can reach for next time.",
           "reflect_ref_defensive_froze": "When someone gets defensive, freezing is common. The skill isn't never freezing. It's having a plan for when you do.",
           "reflect_ref_defensive_loud": "When they got defensive, you matched their intensity. That happens to most people. The aim is to notice the surge a moment before it takes over.",
           "reflect_ref_defensive_quiet": "Going quiet when someone gets defensive can be a way to protect yourself. The question is whether the quiet helped you, or only kept the peace.",
-          "reflect_ref_crying_froze": "Tears and freezing can come when there's too much to hold at once. Next time you can give yourself permission to pause.",
-          "reflect_ref_crying_cried": "Tears in a hard talk usually mean it matters to you. The skill is keeping going through them, or saying 'I need a minute' without dropping what you need.",
-          "reflect_ref_apologized_agreed": "Saying sorry and agreeing when you don't mean it makes the discomfort stop for now. The need doesn't go away. It goes quiet.",
-          "reflect_ref_apologized_quiet": "Saying sorry and then going quiet can be something people learn when asking felt risky. Your voice is still there.",
-          "reflect_ref_nowords_froze": "When feelings flood in, words are hard to reach. It's not that you had nothing to say. A few lines ready ahead of time can help.",
-          "reflect_ref_nowords_changed": "Changing the subject when the words wouldn't come was a way out of the moment. One rehearsed sentence can be there for you next time.",
+          "reflect_ref_escalated_left": "Leaving when things escalate can be a skill. One sentence can turn it into a break: 'I need to pause. I want to come back to this.'",
+          "reflect_ref_escalated_loud": "When it escalated and you got louder, you were trying to be heard. Volume usually makes it harder for the other person to hear you.",
           "reflect_ref_gavein_agreed": "Giving in to keep the peace makes sense when conflict feels risky. Peace paid for with your needs costs a lot. A plan for next time can help you hold on a little longer, when it's safe to.",
           "reflect_ref_gavein_left": "Leaving can be a wise move, especially before saying something you'd regret. If you want to come back to it, a plan for that can help.",
-          "reflect_ref_escalated_loud": "When it escalated and you got louder, you were trying to be heard. Volume usually makes it harder for the other person to hear you.",
-          "reflect_ref_escalated_left": "Leaving when things escalate can be a skill. One sentence can turn it into a break: 'I need to pause. I want to come back to this.'",
+          "reflect_ref_nowords_changed": "Changing the subject when the words wouldn't come was a way out of the moment. One rehearsed sentence can be there for you next time.",
+          "reflect_ref_nowords_froze": "When feelings flood in, words are hard to reach. It's not that you had nothing to say. A few lines ready ahead of time can help.",
           "reflect_ref_okay_stayed": "You stayed on course, so something worked. Was it something you said, something you didn't say, or something you did with your body?",
-          "reflect_ref_default": "Whatever happened in that moment, you did the best you could with what you had. Let's find something you can reach for next time.",
-          "rehearse_ca_pause_phrase": "Choose one sentence for when you feel the moment coming, like 'I want to keep talking about this. I need a second.' Say it out loud three times now. Notice how it feels to say. Or come back to it later.",
+          "rehearse_ca_apology_check": "When you feel the urge to say sorry, pause and ask: 'Did I do something wrong, or am I uncomfortable?' If it's discomfort, try 'I know this is hard' instead of 'I'm sorry'. Practise the swap now. Or come back to it later.",
           "rehearse_ca_body_anchor": "When you notice the signal: feet on the floor, hands on your thighs, one slow breath. It buys you a couple of seconds to think. Try it now: feet, hands, breath. Or come back to it later.",
           "rehearse_ca_broken_record": "Pick your one key sentence, the thing you need to say. When the talk starts spinning, come back to it. Same words, calm voice: 'What I need is…' Say it three times now, a little softer each time. Or come back to it later.",
           "rehearse_ca_name_the_dynamic": "When things heat up, name the pattern instead of the content: 'I notice we're both getting louder. I don't want that. Can we slow down?' Say it out loud now. Or come back to it later.",
+          "rehearse_ca_pause_phrase": "Choose one sentence for when you feel the moment coming, like 'I want to keep talking about this. I need a second.' Say it out loud three times now. Notice how it feels to say. Or come back to it later.",
           "rehearse_ca_planned_exit": "Choose your exit line now: 'I care about this too much to keep going while we're both this upset. Can we come back to it at [a time]?' Naming a time makes it a pause, not an escape. Say it out loud. Or come back to it later.",
-          "rehearse_ca_validate_first": "Before you say what you need, name what they might be feeling: 'I can see this is hard for you too.' One line like that can lower their guard. Say it now. Or come back to it later.",
+          "rehearse_ca_success_anchor": "You stayed on course. Before it fades, describe what you did with your body, your voice, and where you put your attention. Write it down. That's your playbook for next time. Or come back to it later.",
           "rehearse_ca_tears_plan": "Give yourself permission ahead of time: 'If I cry, that's okay. I'll keep talking.' You could tell them: 'I might get emotional. It doesn't mean I want to stop.' Say that now and notice what comes up. Or come back to it later.",
-          "rehearse_ca_apology_check": "When you feel the urge to say sorry, pause and ask: 'Did I do something wrong, or am I uncomfortable?' If it's discomfort, try 'I know this is hard' instead of 'I'm sorry'. Practise the swap now. Or come back to it later.",
-          "rehearse_ca_write_it_down": "Write down the two or three things you want to say. It's not a script. It's something to glance at if the words go. Do it now, on your phone or on paper. Or come back to it later.",
           "rehearse_ca_time_limit": "Before you start, say: 'I'd like to talk about this for 15 minutes, then check how we're both doing.' A time limit makes a hard talk feel more doable, and gives you a natural place to stop. Or come back to it later.",
-          "rehearse_ca_success_anchor": "You stayed on course. Before it fades, describe what you did with your body, your voice, and where you put your attention. Write it down. That's your playbook for next time. Or come back to it later."
+          "rehearse_ca_validate_first": "Before you say what you need, name what they might be feeling: 'I can see this is hard for you too.' One line like that can lower their guard. Say it now. Or come back to it later.",
+          "rehearse_ca_write_it_down": "Write down the two or three things you want to say. It's not a script. It's something to glance at if the words go. Do it now, on your phone or on paper. Or come back to it later.",
+          "response_title": "What did you do in that moment?",
+          "talk_now": "Talk to someone now",
+          "thought_own": "Something else",
+          "thought_title": "What thoughts showed up?",
+          "underneath_title": "Underneath that, what was the deeper feeling?",
+          "unsafe_line": "Your safety comes first. The people below can help, any time, and you don't have to be sure.",
+          "waiting_line": "When you hear back, you can look at it here again.",
+          "waiting_more": "Want to look at how it went, or leave it for now?",
+          "waiting_title": "No answer can be hard to sit with.",
+          "went_well_title": "You got what you asked for.",
+          "went_well_title_proud": "You got what you asked for, and you're proud of how you did it."
         },
         "tables": {},
         "derive": [],
@@ -2920,17 +2920,9 @@
           {
             "id": "feel",
             "kind": "ask",
-            "title": "feel_title",
-            "hint": "feel_hint",
             "fields": [
               {
                 "id": "feel",
-                "options": {
-                  "list": "feel"
-                },
-                "max": 3,
-                "swap": true,
-                "required": true,
                 "links": [
                   {
                     "exit": "cool_down",
@@ -2972,9 +2964,17 @@
                       ]
                     }
                   }
-                ]
+                ],
+                "max": 3,
+                "options": {
+                  "list": "feel"
+                },
+                "required": true,
+                "swap": true
               }
             ],
+            "hint": "feel_hint",
+            "title": "feel_title",
             "next": [
               {
                 "to": "happened",
@@ -2986,17 +2986,17 @@
           {
             "id": "happened",
             "kind": "ask",
-            "title": "happened_title",
             "fields": [
               {
                 "id": "happened",
+                "max": 1,
                 "options": {
                   "list": "happened"
                 },
-                "max": 1,
                 "required": true
               }
             ],
+            "title": "happened_title",
             "next": [
               {
                 "to": "not_yet",
@@ -3026,17 +3026,17 @@
           {
             "id": "outcome",
             "kind": "ask",
-            "title": "outcome_title",
             "fields": [
               {
                 "id": "outcome",
+                "max": 1,
                 "options": {
                   "list": "outcome"
                 },
-                "max": 1,
                 "required": true
               }
             ],
+            "title": "outcome_title",
             "next": [
               {
                 "to": "between",
@@ -3048,17 +3048,6 @@
           {
             "id": "between",
             "kind": "ask",
-            "title": "between_title",
-            "fields": [
-              {
-                "id": "between",
-                "options": {
-                  "list": "between"
-                },
-                "max": 1,
-                "required": true
-              }
-            ],
             "crisis": [
               {
                 "variant": "other_person",
@@ -3070,6 +3059,17 @@
                 }
               }
             ],
+            "fields": [
+              {
+                "id": "between",
+                "max": 1,
+                "options": {
+                  "list": "between"
+                },
+                "required": true
+              }
+            ],
+            "title": "between_title",
             "next": [
               {
                 "to": "unsafe",
@@ -3090,18 +3090,18 @@
           {
             "id": "proud",
             "kind": "ask",
-            "title": "proud_title",
-            "hint": "proud_hint",
             "fields": [
               {
                 "id": "proud",
+                "max": 1,
                 "options": {
                   "list": "proud"
                 },
-                "max": 1,
                 "required": true
               }
             ],
+            "hint": "proud_hint",
+            "title": "proud_title",
             "next": [
               {
                 "to": "later",
@@ -3153,18 +3153,18 @@
           {
             "id": "waiting",
             "kind": "ask",
-            "title": "waiting_title",
             "fields": [
               {
                 "id": "wait",
                 "label": "waiting_more",
+                "max": 1,
                 "options": {
                   "list": "wait"
                 },
-                "max": 1,
                 "required": true
               }
             ],
+            "title": "waiting_title",
             "next": [
               {
                 "to": "moment",
@@ -3185,6 +3185,17 @@
           {
             "id": "went_well",
             "kind": "ask",
+            "fields": [
+              {
+                "id": "more",
+                "label": "more_title",
+                "max": 1,
+                "options": {
+                  "list": "more"
+                },
+                "required": true
+              }
+            ],
             "title": [
               {
                 "key": "went_well_title_proud",
@@ -3197,17 +3208,6 @@
               },
               {
                 "key": "went_well_title"
-              }
-            ],
-            "fields": [
-              {
-                "id": "more",
-                "label": "more_title",
-                "options": {
-                  "list": "more"
-                },
-                "max": 1,
-                "required": true
               }
             ],
             "next": [
@@ -3233,6 +3233,17 @@
             "clears": [
               "factor"
             ],
+            "fields": [
+              {
+                "id": "factor",
+                "max": 1,
+                "options": {
+                  "list": "factor"
+                },
+                "required": true
+              }
+            ],
+            "hint": "factor_hint",
             "title": [
               {
                 "key": "factor_title_partly",
@@ -3256,17 +3267,6 @@
                 "key": "factor_title_no"
               }
             ],
-            "hint": "factor_hint",
-            "fields": [
-              {
-                "id": "factor",
-                "options": {
-                  "list": "factor"
-                },
-                "max": 1,
-                "required": true
-              }
-            ],
             "next": [
               {
                 "to": "moment",
@@ -3287,19 +3287,19 @@
           {
             "id": "moment",
             "kind": "ask",
-            "title": "moment_title",
-            "hint": "pick_any",
             "fields": [
               {
                 "id": "moment",
+                "max": 3,
                 "options": {
                   "list": "moment"
                 },
-                "max": 3,
-                "swap": true,
-                "required": true
+                "required": true,
+                "swap": true
               }
             ],
+            "hint": "pick_any",
+            "title": "moment_title",
             "next": [
               {
                 "to": "response",
@@ -3311,19 +3311,19 @@
           {
             "id": "response",
             "kind": "ask",
-            "title": "response_title",
-            "hint": "pick_any",
             "fields": [
               {
                 "id": "response",
+                "max": 3,
                 "options": {
                   "list": "response"
                 },
-                "max": 3,
-                "swap": true,
-                "required": true
+                "required": true,
+                "swap": true
               }
             ],
+            "hint": "pick_any",
+            "title": "response_title",
             "next": [
               {
                 "to": "body",
@@ -3335,19 +3335,19 @@
           {
             "id": "body",
             "kind": "ask",
-            "title": "body_title",
-            "hint": "pick_any",
             "fields": [
               {
                 "id": "body",
+                "max": 3,
                 "options": {
                   "list": "body"
                 },
-                "max": 3,
-                "swap": true,
-                "required": true
+                "required": true,
+                "swap": true
               }
             ],
+            "hint": "pick_any",
+            "title": "body_title",
             "next": [
               {
                 "to": "thought",
@@ -3359,22 +3359,9 @@
           {
             "id": "thought",
             "kind": "ask",
-            "title": "thought_title",
-            "hint": "pick_any",
             "fields": [
               {
                 "id": "thought",
-                "options": {
-                  "list": "thought"
-                },
-                "max": 3,
-                "swap": true,
-                "required": true,
-                "own": {
-                  "hint": "thought_own",
-                  "countsAsPick": true,
-                  "max": 90
-                },
                 "links": [
                   {
                     "exit": "safety_open",
@@ -3386,9 +3373,22 @@
                       ]
                     }
                   }
-                ]
+                ],
+                "max": 3,
+                "options": {
+                  "list": "thought"
+                },
+                "own": {
+                  "countsAsPick": true,
+                  "hint": "thought_own",
+                  "max": 90
+                },
+                "required": true,
+                "swap": true
               }
             ],
+            "hint": "pick_any",
+            "title": "thought_title",
             "next": [
               {
                 "to": "underneath",
@@ -3400,19 +3400,19 @@
           {
             "id": "underneath",
             "kind": "ask",
-            "title": "underneath_title",
-            "hint": "pick_any",
             "fields": [
               {
                 "id": "underneath",
+                "max": 2,
                 "options": {
                   "list": "underneath"
                 },
-                "max": 2,
-                "swap": true,
-                "required": true
+                "required": true,
+                "swap": true
               }
             ],
+            "hint": "pick_any",
+            "title": "underneath_title",
             "next": [
               {
                 "to": "who",
@@ -3424,8 +3424,8 @@
           {
             "id": "who",
             "kind": "embed",
-            "embed": "debriefWho",
             "answerAs": "who",
+            "embed": "debriefWho",
             "props": {},
             "next": [
               {
@@ -3438,6 +3438,17 @@
           {
             "id": "reflect",
             "kind": "ask",
+            "fields": [
+              {
+                "id": "landed",
+                "max": 1,
+                "options": {
+                  "list": "landed"
+                },
+                "required": true
+              }
+            ],
+            "hint": "reflect_hint",
             "title": [
               {
                 "key": "reflect_ref_defensive_froze",
@@ -3709,17 +3720,6 @@
                 "key": "reflect_ref_default"
               }
             ],
-            "hint": "reflect_hint",
-            "fields": [
-              {
-                "id": "landed",
-                "options": {
-                  "list": "landed"
-                },
-                "max": 1,
-                "required": true
-              }
-            ],
             "next": [
               {
                 "to": "cope",
@@ -3731,10 +3731,10 @@
           {
             "id": "cope",
             "kind": "ask",
-            "title": "cope_title",
             "fields": [
               {
                 "id": "cope",
+                "max": 1,
                 "options": {
                   "list": "cope",
                   "where": {
@@ -3876,10 +3876,10 @@
                     ]
                   }
                 },
-                "max": 1,
                 "required": true
               }
             ],
+            "title": "cope_title",
             "next": [
               {
                 "to": "rehearse",
@@ -3891,6 +3891,8 @@
           {
             "id": "rehearse",
             "kind": "ask",
+            "fields": [],
+            "primary": "next",
             "title": [
               {
                 "key": "rehearse_ca_pause_phrase",
@@ -3992,8 +3994,6 @@
                 }
               }
             ],
-            "primary": "next",
-            "fields": [],
             "next": [
               {
                 "to": "plan",
@@ -4005,16 +4005,16 @@
           {
             "id": "plan",
             "kind": "embed",
-            "embed": "boundaryLine",
-            "title": "plan_title",
             "answerAs": "plan_copied",
+            "embed": "boundaryLine",
             "props": {
               "field": "body",
               "field2": "thought",
               "field3": "cope",
-              "shape": "list",
-              "next": "plan_next"
+              "next": "plan_next",
+              "shape": "list"
             },
+            "title": "plan_title",
             "next": [
               {
                 "to": "factor",
@@ -4039,12 +4039,7 @@
             "id": "not_yet",
             "kind": "handoff",
             "complete": true,
-            "lines": [
-              {
-                "when": null,
-                "key": "not_yet_line"
-              }
-            ],
+            "done": "done",
             "fields": [
               {
                 "id": "again",
@@ -4059,7 +4054,12 @@
               "type": "ask_outcome",
               "whenFrom": "again"
             },
-            "done": "done",
+            "lines": [
+              {
+                "key": "not_yet_line",
+                "when": null
+              }
+            ],
             "next": [],
             "offers": [
               {
@@ -4080,12 +4080,7 @@
             "id": "no_answer",
             "kind": "handoff",
             "complete": true,
-            "lines": [
-              {
-                "when": null,
-                "key": "waiting_line"
-              }
-            ],
+            "done": "done",
             "fields": [
               {
                 "id": "again",
@@ -4100,7 +4095,12 @@
               "type": "ask_outcome",
               "whenFrom": "again"
             },
-            "done": "done",
+            "lines": [
+              {
+                "key": "waiting_line",
+                "when": null
+              }
+            ],
             "next": [],
             "offers": []
           },
@@ -4108,12 +4108,7 @@
             "id": "later",
             "kind": "handoff",
             "complete": true,
-            "lines": [
-              {
-                "when": null,
-                "key": "later_line"
-              }
-            ],
+            "done": "done",
             "fields": [
               {
                 "id": "again",
@@ -4128,7 +4123,12 @@
               "type": "ask_outcome",
               "whenFrom": "again"
             },
-            "done": "done",
+            "lines": [
+              {
+                "key": "later_line",
+                "when": null
+              }
+            ],
             "next": [],
             "offers": [
               {
@@ -4141,7 +4141,6 @@
             "id": "unsafe",
             "kind": "handoff",
             "complete": true,
-            "noClose": true,
             "crisis": [
               {
                 "variant": "other_person",
@@ -4150,13 +4149,14 @@
                 }
               }
             ],
+            "done": "done",
             "lines": [
               {
-                "when": null,
-                "key": "unsafe_line"
+                "key": "unsafe_line",
+                "when": null
               }
             ],
-            "done": "done",
+            "noClose": true,
             "next": [],
             "offers": [
               {
@@ -4173,13 +4173,13 @@
             "id": "decided_not",
             "kind": "handoff",
             "complete": true,
+            "done": "done",
             "lines": [
               {
-                "when": null,
-                "key": "decided_not_line"
+                "key": "decided_not_line",
+                "when": null
               }
             ],
-            "done": "done",
             "next": [],
             "offers": []
           },
@@ -4187,8 +4187,10 @@
             "id": "good",
             "kind": "handoff",
             "complete": true,
+            "done": "done",
             "lines": [
               {
+                "key": "good_line_shaky",
                 "when": {
                   "in": [
                     "$a.between",
@@ -4197,19 +4199,19 @@
                       "no"
                     ]
                   ]
-                },
-                "key": "good_line_shaky"
+                }
               },
               {
+                "key": "good_line_proud",
                 "when": {
                   "eq": [
                     "$a.proud",
                     "yes"
                   ]
-                },
-                "key": "good_line_proud"
+                }
               },
               {
+                "key": "good_line_not_proud",
                 "when": {
                   "all": [
                     {
@@ -4225,15 +4227,13 @@
                       ]
                     }
                   ]
-                },
-                "key": "good_line_not_proud"
+                }
               },
               {
-                "when": null,
-                "key": "good_line"
+                "key": "good_line",
+                "when": null
               }
             ],
-            "done": "done",
             "next": [],
             "offers": [
               {
@@ -4273,81 +4273,81 @@
             "id": "fix",
             "kind": "handoff",
             "complete": true,
+            "done": "done",
             "lines": [
               {
+                "key": "fix_no_words",
                 "when": {
                   "eq": [
                     "$a.factor",
                     "no_words"
                   ]
-                },
-                "key": "fix_no_words"
+                }
               },
               {
+                "key": "fix_unclear",
                 "when": {
                   "eq": [
                     "$a.factor",
                     "unclear"
                   ]
-                },
-                "key": "fix_unclear"
+                }
               },
               {
+                "key": "fix_feelings",
                 "when": {
                   "eq": [
                     "$a.factor",
                     "feelings"
                   ]
-                },
-                "key": "fix_feelings"
+                }
               },
               {
+                "key": "fix_belief",
                 "when": {
                   "eq": [
                     "$a.factor",
                     "belief"
                   ]
-                },
-                "key": "fix_belief"
+                }
               },
               {
+                "key": "fix_quick_win",
                 "when": {
                   "eq": [
                     "$a.factor",
                     "quick_win"
                   ]
-                },
-                "key": "fix_quick_win"
+                }
               },
               {
+                "key": "fix_power",
                 "when": {
                   "eq": [
                     "$a.factor",
                     "power"
                   ]
-                },
-                "key": "fix_power"
+                }
               },
               {
+                "key": "fix_cant_give",
                 "when": {
                   "eq": [
                     "$a.factor",
                     "cant_give"
                   ]
-                },
-                "key": "fix_cant_give"
+                }
               },
               {
+                "key": "fix_not_willing",
                 "when": {
                   "eq": [
                     "$a.factor",
                     "not_willing"
                   ]
-                },
-                "key": "fix_not_willing"
+                }
               }
             ],
-            "done": "done",
             "next": [],
             "offers": [
               {
@@ -4920,92 +4920,92 @@
             {
               "value": "ca_pause_phrase",
               "label": "Have a pause line ready",
-              "universal": true,
-              "responses": []
+              "responses": [],
+              "universal": true
             },
             {
               "value": "ca_body_anchor",
               "label": "Settle your body first",
-              "universal": true,
-              "responses": []
+              "responses": [],
+              "universal": true
             },
             {
               "value": "ca_broken_record",
               "label": "Come back to your one line",
-              "universal": false,
               "responses": [
                 "mr_changed_subject",
                 "mr_went_quiet"
-              ]
+              ],
+              "universal": false
             },
             {
               "value": "ca_name_the_dynamic",
               "label": "Name what's happening",
-              "universal": false,
               "responses": [
                 "mr_got_loud",
                 "mr_left"
-              ]
+              ],
+              "universal": false
             },
             {
               "value": "ca_planned_exit",
               "label": "Plan your exit line",
-              "universal": false,
               "responses": [
                 "mr_left",
                 "mr_froze"
-              ]
+              ],
+              "universal": false
             },
             {
               "value": "ca_validate_first",
               "label": "Start by naming their side",
-              "universal": false,
               "responses": [
                 "mr_agreed",
                 "mr_froze"
-              ]
+              ],
+              "universal": false
             },
             {
               "value": "ca_tears_plan",
               "label": "Make a plan for tears",
-              "universal": false,
               "responses": [
                 "mr_cried"
-              ]
+              ],
+              "universal": false
             },
             {
               "value": "ca_apology_check",
               "label": "Check before saying sorry",
-              "universal": false,
               "responses": [
                 "mr_agreed"
-              ]
+              ],
+              "universal": false
             },
             {
               "value": "ca_write_it_down",
               "label": "Write your key points down",
-              "universal": false,
               "responses": [
                 "mr_froze",
                 "mr_went_quiet"
-              ]
+              ],
+              "universal": false
             },
             {
               "value": "ca_time_limit",
               "label": "Set a time limit",
-              "universal": false,
               "responses": [
                 "mr_got_loud",
                 "mr_cried"
-              ]
+              ],
+              "universal": false
             },
             {
               "value": "ca_success_anchor",
               "label": "Remember what worked this time",
-              "universal": false,
               "responses": [
                 "mr_stayed_course"
-              ]
+              ],
+              "universal": false
             }
           ]
         }
