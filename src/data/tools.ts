@@ -79,6 +79,19 @@ export const tools: Tool[] = [
     emoji: '🎸',
     bare: true,
   },
+  {
+    // DT-10 on the skill runtime (docs/design/pros-cons.md): made while steady, for one pull that keeps coming back;
+    // kept in Me, Hold to wait shows it when the same pull comes up.
+    id: 'pros-cons',
+    name: 'Pros & cons card',
+    tagline: 'Your reasons, ready for a harder moment',
+    description: 'For a pull that keeps coming back: your reasons not to, what doing it gives you, and what holding off costs and gives, on one card you can keep.',
+    whenToUse: 'When things are calm enough to think it through, before the next time it pulls.',
+    module: 'distress-tolerance',
+    dbtBasis: 'Pros and cons (DT Handout 5)',
+    emoji: '⚖️',
+    bare: true,
+  },
   // Emotion Regulation
   {
     id: 'opposite-action',
@@ -268,6 +281,7 @@ export const allIntents: Intent[] = [
   { id: 'ground', label: 'Ground myself', toolId: 'five-senses', emoji: '👁️' },
   { id: 'urge', label: 'Ride out an urge', toolId: 'urge-surfing', emoji: '🌊' },
   { id: 'blow-it-up', label: 'I want to blow it all up', toolId: 'alternate-rebellion', emoji: '🎸' },
+  { id: 'reasons', label: 'Make a card for a pull that keeps coming back', toolId: 'pros-cons', emoji: '⚖️' },
   { id: 'shift', label: 'Shift a feeling that isn\'t helping', toolId: 'opposite-action', emoji: '🔄' },
   { id: 'problem', label: 'Work through a problem', toolId: 'problem-solve', emoji: '🛠️' },
   { id: 'ask', label: 'Ask someone for what I need', toolId: 'dear-man', emoji: '🗣️' },

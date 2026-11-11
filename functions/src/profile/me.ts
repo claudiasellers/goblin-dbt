@@ -199,6 +199,11 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
     if (meta.kind === 'quiet_hours' && value) summary = `${value.start}–${value.end}`;
     // A rewritten nightmare: its ending when the person wrote it; picked endings are ids (the title says enough).
     if (meta.kind === 'nightmare_script' && value && typeof value.endingOwn === 'string') summary = value.endingOwn;
+    // A pros & cons card: the pull in their words when they wrote it, else their first reason in their words.
+    if (meta.kind === 'pros_cons' && value) {
+      const own = [value.pullOwn, value.longOwn, value.keepsOwn].find((x) => typeof x === 'string' && x.trim());
+      if (typeof own === 'string') summary = own;
+    }
     // A person (IE-03): the name they gave, never the safety answer (Me is not where that's asked or shown).
     if (meta.kind === 'person' && value) {
       summary = typeof value.label === 'string' ? value.label : '';

@@ -63,6 +63,13 @@ COPY = {
     # Screen 5: P, proceed mindfully (PRD step 5).
     "proceed_title": "What matters most right now?",
     "move_q": "One next move",
+    # The person's kept pros & cons card for this pull (DT-10's replay), when there is one.
+    "replay_title": "Your card, from a steadier moment",
+    "replay_reasons": "My reasons not to",
+    "replay_pro": "And yes, it pulls because",
+    "replay_fallback": "It does something for me in the moment.",
+    # Leave can be how someone gets safe (Gate 3, DT-10): said above a leave card's reasons.
+    "replay_leave_note": "If you need to get away to be safe, that's not what this card is for.",
     # The end card.
     "next_line": "You gave the pull some room. What you do next is yours.",
     "next_later": "Saving it for later is a choice. The message will still be there when you're steadier.",
@@ -233,6 +240,13 @@ STEPS = [
             {"id": "move", "label": "move_q", "options": {"list": "move", "where": MOVE_WHERE}, "max": 1,
              "links": [SAFETY_LINK]},
         ],
+        # DT-10's replay (PRD step 5: "the replay card plays here if one exists for this urge"): the card the person
+        # kept for this pull, between what matters and the move; nothing shows (and nothing is recorded) without one.
+        "slots": [{"after": "goal", "embed": "prosConsReplay", "showWhen": {"set": a("pull")}, "record": "pros_cons_replay",
+                   "props": {"pullField": "pull", "fromSkill": "pros_cons", "title": "replay_title",
+                             "reasonsLabel": "replay_reasons", "proLabel": "replay_pro", "fallback": "replay_fallback",
+                             # A hurt card shows its reasons only: no payoff named in the hot moment (C6.7).
+                             "noProFor": "hurt", "noteFor": "leave", "note": "replay_leave_note"}}],
         "next": [{"when": HURT, "to": "hurt_end"}, {"to": "next"}],
     },
     {

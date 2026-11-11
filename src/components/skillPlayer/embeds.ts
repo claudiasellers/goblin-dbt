@@ -4,6 +4,7 @@ import { BoundaryLine } from './BoundaryLine';
 import { HoldRingEmbed } from './HoldRingEmbed';
 import { PartsLine } from './PartsLine';
 import { PartLaterEmbed } from './PartLaterEmbed';
+import { ProsConsCard, ProsConsReplay } from './ProsConsCard';
 import { WitnessEmbed } from './WitnessEmbed';
 import { RebellionCard } from './RebellionCard';
 import { RescriptCard } from './RescriptCard';
@@ -30,6 +31,11 @@ export interface EmbedProps {
   picked?: Readonly<Record<string, readonly string[]>>;
   /** The same answers as ids (an emotion field's grid ids, for an embed that asks the server about them). */
   answerIds?: Readonly<Record<string, readonly string[]>>;
+  /**
+   * The tool's profile slices (PROFILE_NEEDS, the same `$p.*` the conditions read), or null while loading or signed
+   * out. For an embed that shows something the person kept (Hold to wait's pros & cons replay); read-only.
+   */
+  profile?: Readonly<Record<string, unknown>> | null;
   onShown: () => void;
   onDone?: (output: EmbedOutput) => void;
   /**
@@ -48,6 +54,8 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   boundaryLine: BoundaryLine,
   rescriptCard: RescriptCard,
   waitLock: WaitLockEmbed,
+  prosConsCard: ProsConsCard,
+  prosConsReplay: ProsConsReplay,
 };
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
@@ -59,6 +67,8 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   boundaryLine: { ids: ['copied'] },
   rescriptCard: { ids: ['read', 'stopped'], measures: ['durationSec'] },
   waitLock: { ids: ['waited', 'back_early'], measures: ['durationSec'] },
+  prosConsCard: { ids: ['read'], measures: ['durationSec'] },
+  prosConsReplay: {},
 };
 
 /**
@@ -131,5 +141,25 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     done: { type: 'copy' },
     doneShort: { type: 'copy' },
     next: { type: 'copy' },
+  },
+  prosConsCard: {
+    reasonsField: { type: 'field' },
+    moreField: { type: 'field' },
+    proField: { type: 'field' },
+    reasonsLabel: { type: 'copy' },
+    proLabel: { type: 'copy' },
+    fallback: { type: 'copy' },
+    next: { type: 'copy' },
+  },
+  prosConsReplay: {
+    pullField: { type: 'field' },
+    fromSkill: { type: 'id' },
+    title: { type: 'copy' },
+    reasonsLabel: { type: 'copy' },
+    proLabel: { type: 'copy' },
+    fallback: { type: 'copy' },
+    noProFor: { type: 'id' },
+    noteFor: { type: 'id' },
+    note: { type: 'copy' },
   },
 };

@@ -87,8 +87,8 @@ page's `ext.dt.stepsDone` stays readable for old sessions (plan C7).
   a short `waitingShort` word inside the ring, also its accessible name); output `waited` · `back_early` with `durationSec`.
 - **Behaviour urges** (C5): `ActionUrge` `send`, `check`, `hit`, `leave`, `use`, `self_harm` (`kind: behaviour`,
   `module: dt`; `self_harm` `lifeThreatening`), in `schema/opposite-action-data.cypher` with no
-  `HAS_ACTION_URGE`, so Do the Opposite never lists them. Parts coverage: all six `HELD` for now; the proposed
-  moves (check → chase, hit → hit back, leave → hide) wait for parts sign-off.
+  `HAS_ACTION_URGE`, so Do the Opposite never lists them. Parts coverage (Claudia, 11 Nov): check → chase, hit →
+  hit back, leave → hide (`EXPRESSES`, signed off); send, use and self_harm stay `HELD`.
 
 ## Departures from the PRD, and what waits
 
@@ -99,11 +99,11 @@ page's `ext.dt.stepsDone` stays readable for old sessions (plan C7).
 | A next-morning check after *Yes* | Not built; the close's *Yes* is recorded | Needs CORE-04's look-back; a reminder after a lapse needs its own clinical review |
 | The person's own hold line | Not built | A keep kind; after the clinician pass |
 | MF-01's body card on Observe | Plain chips | MF-01 isn't built |
-| DT-10's pros & cons replay for a frequent urge | Not built | DT-10 is DT-B2 (`prosConsReplay`) |
+| DT-10's pros & cons replay for a frequent urge | **Built** (DT-10): the card kept for this pull shows on the proceed step (`prosConsReplay`, recorded `pros_cons_replay`); nothing shows without one | [`pros-cons.md`](pros-cons.md) |
 | Inline entry from hosts (`enterAt`, `$ctx.urgeId`) | Not yet | The hosts (OA, Recover's *Don't send yet*, FTF, IE composer) wire it when they move to the runtime |
 | *Yes*: *Thanks for telling me. That's useful, not a failure.* · *No*: *Held.* after the close | Not shown (*Noted.*) | The close question is the spine's; a per-answer line needs a close-copy extension. Worth it for *Yes* first |
 | Behaviour urges' DBT parents | None | They're behaviours, not emotions |
-| Binge and buy as their own chips and urges (C5) | One *Use, drink, binge or buy* chip, urge `use` | Kept to six chips on one screen; splitting is open for Claudia (C5 lists them separately; D14 only parks DT-09) |
+| Binge and buy as their own chips and urges (C5) | One *Use, drink, binge or buy* chip, urge `use` | Kept to six chips on one screen; Claudia, 11 Nov: one chip until DT-09 (C5 lists them separately; D14 parks DT-09) |
 | MF-04's optional wise-mind check on Proceed | Not built | A link to Wise mind fits after the clinician pass; Wise mind has no inline entry yet |
 | Three steps back for the same person → The Ask leads | Not built | Needs IE-03 and a per-person read |
 | Witness lines per urge family (`StopFlow`) | One witness line | The witness corpus has no per-urge rows yet |

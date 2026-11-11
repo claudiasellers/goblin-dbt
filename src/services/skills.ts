@@ -6,11 +6,17 @@
 import type { SkillsContent } from '../data/skillTypes';
 
 let cached: Promise<SkillsContent> | null = null;
+let loaded: SkillsContent | null = null;
+
+/** The content if it has already loaded (the player loads it before any step renders), else null. */
+export function peekSkillsContent(): SkillsContent | null {
+  return loaded;
+}
 
 /** Fetched as its own chunk the first time it is needed, kept for the page's life; a failed fetch can be retried. */
 export function getSkillsContent(): Promise<SkillsContent> {
   if (!cached) {
-    cached = import('../data/content/skills.json').then((m) => m.default.content as unknown as SkillsContent).catch((e) => {
+    cached = import('../data/content/skills.json').then((m) => (loaded = m.default.content as unknown as SkillsContent)).catch((e) => {
       cached = null;
       throw e;
     });

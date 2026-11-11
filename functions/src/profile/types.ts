@@ -14,7 +14,7 @@ export const SLICE_IDS = [
   'name', 'quietHours', 'patterns', 'ownLines', 'savedLines',
   'people', 'bodyFlags', 'values', 'goals', 'copeAheadPlans', 'boundaryLines', 'practicePrefs',
   'fadeLevels', 'ownWords', 'thingsILike', 'crisisKit', 'safetyPlan', 'country',
-  'parts', 'partDetail', 'partAnchors', 'den',
+  'parts', 'partDetail', 'partAnchors', 'den', 'prosCons',
 ] as const;
 export type SliceId = (typeof SLICE_IDS)[number];
 
@@ -115,6 +115,15 @@ export interface ProfileSlices {
     links: Array<{ id: string; kind: 'covers_for' | 'two_pulls'; aId: string; bId: string; bothWantId: string | null }>;
     snapshots: Array<{ id: string; takenAt: string }>;
   };
+  /**
+   * Kept pros & cons cards (DT-10, kind `pros_cons`), active only, newest first: ids and the person's own words as
+   * written (decrypted for them). Hold to wait replays the one for the pull picked in the visit.
+   */
+  prosCons: Array<{
+    id: string; pullIds: string[]; pullOwn: string | null; longIds: string[]; longOwn: string | null;
+    givesIds: string[]; givesOwn: string | null; costIds: string[]; costOwn: string | null;
+    keepsIds: string[]; keepsOwn: string | null; meta: ProfileItemMeta;
+  }>;
 }
 
 /**
@@ -137,7 +146,7 @@ export const PROFILE_NEEDS = {
   // close): every tool whose close asks then-vs-now or about the urge (src/lib/partTag.ts TAG_ROW_TOOLS)
   // reads `parts`.
   'five-senses': ['parts'],
-  'pause': ['parts'],
+  'pause': ['parts', 'prosCons'],              // prosCons: the kept card for the pull (DT-10's replay, on proceed)
   'urge-surfing': ['parts'],
   'alternate-rebellion': ['parts'],          // the tag row on its urge close (DT-11, Held off)
   'check-the-facts': ['parts'],              // the tag row on its close (docs/design/check-the-facts.md, screen 3)
