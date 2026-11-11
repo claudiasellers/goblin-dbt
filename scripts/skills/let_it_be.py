@@ -12,8 +12,8 @@ docs/design/let-it-be.md lists what this batch defers (the turning-the-mind card
 target, the inline entries for FAST's Let go and Recover) and where it departs from the PRD.
 
 Safety (plan C6):
-- **Never acceptance of ongoing harm.** A person- or harm-related thing asks once: *Is this still happening to you?*
-  Yes or sometimes opens the `other_person` crisis slot for the rest of the run, says *Accepting that it happened isn't
+- **Never acceptance of ongoing harm.** A person- or harm-related thing asks once: *Is anyone still hurting you, or could this happen to you again?*
+  Anything but no opens the `other_person` crisis slot for the rest of the run, says *Accepting that it happened isn't
   accepting you have to stay in it*, offers Ending a relationship that's hurting you (careful frame), and goes on only
   for what already happened.
 - **Never the first thing for something changeable.** From the Tools list, the first question is whether it's been
@@ -36,7 +36,7 @@ OWN_MAX = 120  # what's to accept, or a statement, in their words
 
 COPY = {
     # From the Tools list (PRD risks: premature acceptance of something changeable).
-    "checked_title": "Have you checked whether any of this can change?",
+    "checked_title": "Some things can change and some can't. Have you looked at which this is?",
     "checked_hint": "Letting it be is for the part that can't change right now.",
     "check_first_title": "It can help to sort what might change from what can't, first.",
     "check_first_hint": "Problem Solve does that sorting. You can come back here after.",
@@ -50,29 +50,30 @@ COPY = {
     "what_hint": "Pick the closest, or say it your way.",
     "what_own": "Say it my way",
     # The danger check (PRD step 2), once, for person- or harm-related things.
-    "still_title": "Is this still happening to you?",
+    "still_title": "Is anyone still hurting you, or could this happen to you again?",
     "still_hint": "Letting it be is never about staying somewhere you're being hurt.",
     "still_line_title": "Accepting that it happened isn't accepting you have to stay in it.",
-    "still_line_hint": "If you're not safe, the support is on this screen. Ending a relationship that's hurting you can help you think it through.",
+    "still_line_hint": "If you're not safe, the support is on this screen. If it's someone close to you, Ending a relationship that's hurting you can help you think it through.",
+    "still_stop_line": "Stopping here is okay. The support stays here for you.",
     "still_ending": "Ending a relationship that's hurting you",
     # Step 3: notice the fight, willing or willful, what letting it be seems to threaten.
     "fight_title": "How does the fight with it show up?",
-    "fight_hint": "Pick any that fit.",
+    "fight_hint": "Pick up to four.",
     "willing_title": "Right now, are you willing to let it be, or digging in against it?",
     "willing_hint": "Digging in makes sense. It's how we protect what matters.",
     "threat_title": "What feels like it would happen if you let this be?",
     "threat_hint": "Pick the closest.",
-    "threat_they_win": "Letting it be isn't saying they were right. It's choosing where your energy goes.",
-    "threat_my_fault": "Accepting that it happened isn't accepting the blame. Causes aren't the same as fault.",
-    "threat_never_change": "Accepting what's true now leaves room for what can still change.",
-    "threat_alone": "You can let this be and still reach for people. Letting it be isn't letting go of everyone.",
-    "threat_lose_myself": "Letting it be doesn't take away what you care about. That stays yours.",
+    "threat_they_win": "That makes sense. Letting it be isn't saying they were right. It's choosing where your energy goes.",
+    "threat_my_fault": "That fear makes sense. Accepting that it happened isn't taking the blame. Causes aren't the same as fault.",
+    "threat_never_change": "That fear makes sense. Accepting what's true now leaves room for what can still change.",
+    "threat_alone": "Of course that's scary. You can let this be and still reach for people.",
+    "threat_lose_myself": "That makes sense. Letting it be doesn't take away what you care about. That stays yours.",
     "threat_other": "That fear makes sense. Letting it be is something you do, and you can do it a little at a time.",
     "threat_line_hint": "Accepting isn't approving. It isn't giving up on what can change.",
     # Step 4: the body (willing hands, DT Handout 14).
     "hands_title": "Willing hands. Let your body practise letting it be.",
     "hands_step1": "Sit or stand, arms loose by your sides or in your lap.",
-    "hands_step2": "Turn your palms up. Let your fingers relax.",
+    "hands_step2": "Turn your palms up, or rest them however feels safe. Let your fingers relax.",
     "hands_step3": "Breathe however you breathe. Let your hands stay open.",
     # Half-smile offered, never required (PRD open question 1; masking histories).
     "hands_caution": "If it feels right, let your face soften too. You don't have to smile.",
@@ -81,10 +82,13 @@ COPY = {
     "hands_done": "That's it. Your hands did it.",
     # Step 5: one acceptance statement.
     "statement_title": "Pick the words that fit, or write your own.",
-    "statement_hint": "One is enough.",
+    "statement_hint": "Accepting isn't approving. It isn't giving up on what can change. One line is enough.",
     "statement_own": "In my words",
     "card_title": "Read it once, slowly.",
     "card_next": "Next",
+    "card_copy": "Copy",
+    "card_copied": "Copied",
+    "card_selected": "The line is selected, ready to copy.",
     # Step 6: let grief in.
     "grief_title": "If sadness comes, it's allowed. It isn't going backwards.",
     "grief_hint": "Letting it be can make room for the sad part.",
@@ -106,7 +110,8 @@ COPY = {
     "end_boundary": "One line to hold your ground, for the next time.",
     "end_small": "Pick one small thing that matters to you, and do it today.",
     "end_body": "Look after your body tonight: rest, water, being gentle with yourself.",
-    "end_nothing": "Nothing right now is okay. Letting it be was the thing.",
+    "end_nothing": "Doing nothing more today is okay. Letting it be was enough.",
+    "end_louder": "The fight's loud right now. That happens with hard things. You can come back to this anytime.",
     "end_line": "You let it be, for now. You can come back to this whenever the fight starts again.",
     "safety_open": "Talk to someone now",
     "next": "Next",
@@ -122,7 +127,7 @@ ALWAYS = {"all": []}
 FLOODED = {"eq": ["$ctx.band", "flooded"]}
 STIRRED = {"eq": ["$ctx.band", "stirred"]}
 SHORT = {"any": [STIRRED, {"eq": [a("heads_up"), "anyway"]}]}  # the PRD's ★ path
-STILL = {"in": [a("still"), ["yes", "sometimes"]]}
+STILL = {"in": [a("still"), ["yes", "sometimes", "unsure"]]}  # anything uncertain is the safety branch
 SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
 CRISIS = [{"variant": "other_person", "when": STILL}]
 
@@ -148,11 +153,12 @@ HEADS_UP = [
     ("anyway", "Try it now"),
 ]
 STILL_OPTS = [
-    ("no", "No, it's in the past", {}),
+    ("no", "No, I'm safe from it now", {}),
     ("yes", "Yes", {"danger": "other"}),
     ("sometimes", "Sometimes", {"danger": "other"}),
+    ("unsure", "I'm not sure", {"danger": "other"}),
 ]
-STILL_GO = [("go_on", "Go on, for what's already happened")]
+STILL_GO = [("go_on", "Go on, for what's already happened"), ("stop", "Stop here for now")]
 # PRD step 3: non-acceptance signs (NonAcceptanceSign).
 FIGHT = [
     ("replay", "Replaying it"),
@@ -184,8 +190,11 @@ STATEMENTS = [
     ("causes", "It has causes, even ones I hate.", EVERY),
     ("next", "I can't change it. I can change what I do next.", EVERY),
     ("cant_undo", "It happened. I can't make it not have happened.", ["happened"]),
-    ("who_they_are", "They are who they are right now. I can't make them change.", ["wont_change"]),
-    ("need_real", "I may not get this from them. My need is still real.", ["wont_give"]),
+    ("who_they_are", "They are who they are right now. I can't make them change.", ["wont_change"], "person"),
+    ("need_real", "I may not get this from them. My need is still real.", ["wont_give"], "person"),
+    # Still happening: never a line that reads as accepting more of it (Gate 3).
+    ("wasnt_okay", "It happened, and it wasn't okay.", [], "still"),
+    ("not_more", "Accepting what happened isn't agreeing to more of it.", [], "still"),
     ("it_mattered", "It hurts because it mattered.", ["lost"]),
     ("limit_now", "This is a limit I'm living with right now.", ["limit"]),
     ("unfair_true", "It isn't fair, and it's still what happened.", ["unfair"]),
@@ -212,6 +221,11 @@ TVN = [("worse", "Louder"), ("same", "About the same"), ("better", "Quieter"), (
 PER_CAT = {"any": [
     *[{"all": [{"eq": [a("what"), c]}, {"eq": [f"$opt.{c}", True]}]} for c in CATS],
     {"all": [OWN_WHAT, {"eq": ["$opt.own", True]}]},
+]}
+# Category-matched, minus the person lines while it's still happening; plus the still lines then.
+STATEMENT_WHERE = {"any": [
+    {"all": [STILL, {"eq": ["$opt.still", True]}]},
+    {"all": [PER_CAT, {"not": {"all": [STILL, {"eq": ["$opt.person", True]}]}}]},
 ]}
 THREAT_LINES = [{"when": {"eq": [a("threat"), v]}, "key": f"threat_{v}"} for v, _ in THREAT]
 
@@ -253,7 +267,7 @@ STEPS = [
     # Still happening: the line, the support on the screen (the crisis slot), Ending in its careful frame, and the
     # way on for what's already happened only.
     ask("still_line", "still_line_title", "still_line_hint", "still_go", "still_go",
-        [{"when": SHORT, "to": "hands"}, {"to": "fight"}],
+        [{"when": {"eq": [a("still_go"), "stop"]}, "to": "still_stop"}, {"when": SHORT, "to": "hands"}, {"to": "fight"}],
         links=[{"exit": "ending", "label": "still_ending", "when": ALWAYS}]),
     ask("fight", "fight_title", "fight_hint", "fight", "fight", [{"to": "willing"}], max_=4),
     ask("willing", "willing_title", "willing_hint", "willing", "willing",
@@ -264,11 +278,12 @@ STEPS = [
     ask("threat_line", THREAT_LINES, "threat_line_hint", "landed", "landed", [{"to": "hands"}], required=False),
     card("hands", "hands_title", "willing", 45, "hands", [{"to": "statement"}]),
     ask("statement", "statement_title", "statement_hint", "statement", "statement", [{"to": "statement_card"}],
-        own="statement_own", where=PER_CAT),
+        own="statement_own", where=STATEMENT_WHERE),
     {
         # The statement on paper, read once (copyable: it's theirs to keep).
         "id": "statement_card", "kind": "embed", "embed": "boundaryLine", "title": "card_title", "crisis": CRISIS,
-        "links": [SAFETY_LINK], "props": {"field": "statement", "shape": "line", "next": "card_next"},
+        "links": [SAFETY_LINK], "props": {"field": "statement", "shape": "line", "next": "card_next",
+                                        "copyLabel": "card_copy", "copiedLabel": "card_copied", "selectedLabel": "card_selected"},
         "next": AFTER_STATEMENT,
     },
     ask("grief", "grief_title", "grief_hint", "grief", "grief",
@@ -280,10 +295,12 @@ STEPS = [
     {
         "id": "end", "kind": "handoff", "complete": True, "crisis": CRISIS,
         "lines": [
+            {"when": {"eq": [a("close"), "worse"]}, "key": "end_louder"},
             *[{"when": {"eq": [a("hands_still"), v]}, "key": f"end_{v}"} for v, _ in HANDS_STILL],
             {"when": ALWAYS, "key": "end_line"},
         ],
         "offers": [
+            {"exit": "cool_down", "when": {"eq": [a("close"), "worse"]}},
             {"exit": "recover", "when": {"eq": [a("hands_still"), "need"]}},
             {"exit": "fast", "when": {"eq": [a("hands_still"), "boundary"]}},
             {"exit": "good_things", "when": {"eq": [a("hands_still"), "small"]}},
@@ -296,6 +313,13 @@ STEPS = [
         "id": "too_much", "kind": "handoff", "complete": True, "noClose": True, "crisis": CRISIS,
         "lines": [{"when": ALWAYS, "key": "too_much_line"}],
         "offers": [{"exit": "cool_down", "when": ALWAYS}, {"exit": "soothe", "when": ALWAYS}],
+        "done": "done", "links": [SAFETY_LINK],
+    },
+    {
+        # Still happening, and they stop here: the support stays, no close.
+        "id": "still_stop", "kind": "handoff", "complete": True, "noClose": True, "crisis": CRISIS,
+        "lines": [{"when": ALWAYS, "key": "still_stop_line"}],
+        "offers": [{"exit": "ending", "when": ALWAYS}],
         "done": "done", "links": [SAFETY_LINK],
     },
     {
@@ -333,7 +357,8 @@ def options():
     out += [("willing", v, label, {}, None) for v, label in WILLING]
     out += [("threat", v, label, {}, "WillfulnessThreat") for v, label in THREAT]
     out += [("landed", v, label, {}, None) for v, label in LANDED]
-    out += [("statement", v, label, {c: True for c in cats}, "AcceptanceStatement") for v, label, cats in STATEMENTS]
+    out += [("statement", v, label, {**{c: True for c in cats}, **{f: True for f in flag}}, "AcceptanceStatement")
+            for v, label, cats, *flag in STATEMENTS]
     out += [("grief", v, label, {}, None) for v, label in GRIEF]
     out += [("hands_still", v, label, {}, "StillInMyHands") for v, label in HANDS_STILL]
     out += [("tvn", v, label, {}, None) for v, label in TVN]

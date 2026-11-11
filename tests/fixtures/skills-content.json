@@ -11900,7 +11900,7 @@
    "ownMax": 120,
    "emotionFields": [],
    "copy": {
-    "checked_title": "Have you checked whether any of this can change?",
+    "checked_title": "Some things can change and some can't. Have you looked at which this is?",
     "checked_hint": "Letting it be is for the part that can't change right now.",
     "check_first_title": "It can help to sort what might change from what can't, first.",
     "check_first_hint": "Problem Solve does that sorting. You can come back here after.",
@@ -11911,37 +11911,41 @@
     "what_title": "It makes sense you're fighting this. It matters to you. What is it you can't change?",
     "what_hint": "Pick the closest, or say it your way.",
     "what_own": "Say it my way",
-    "still_title": "Is this still happening to you?",
+    "still_title": "Is anyone still hurting you, or could this happen to you again?",
     "still_hint": "Letting it be is never about staying somewhere you're being hurt.",
     "still_line_title": "Accepting that it happened isn't accepting you have to stay in it.",
-    "still_line_hint": "If you're not safe, the support is on this screen. Ending a relationship that's hurting you can help you think it through.",
+    "still_line_hint": "If you're not safe, the support is on this screen. If it's someone close to you, Ending a relationship that's hurting you can help you think it through.",
+    "still_stop_line": "Stopping here is okay. The support stays here for you.",
     "still_ending": "Ending a relationship that's hurting you",
     "fight_title": "How does the fight with it show up?",
-    "fight_hint": "Pick any that fit.",
+    "fight_hint": "Pick up to four.",
     "willing_title": "Right now, are you willing to let it be, or digging in against it?",
     "willing_hint": "Digging in makes sense. It's how we protect what matters.",
     "threat_title": "What feels like it would happen if you let this be?",
     "threat_hint": "Pick the closest.",
-    "threat_they_win": "Letting it be isn't saying they were right. It's choosing where your energy goes.",
-    "threat_my_fault": "Accepting that it happened isn't accepting the blame. Causes aren't the same as fault.",
-    "threat_never_change": "Accepting what's true now leaves room for what can still change.",
-    "threat_alone": "You can let this be and still reach for people. Letting it be isn't letting go of everyone.",
-    "threat_lose_myself": "Letting it be doesn't take away what you care about. That stays yours.",
+    "threat_they_win": "That makes sense. Letting it be isn't saying they were right. It's choosing where your energy goes.",
+    "threat_my_fault": "That fear makes sense. Accepting that it happened isn't taking the blame. Causes aren't the same as fault.",
+    "threat_never_change": "That fear makes sense. Accepting what's true now leaves room for what can still change.",
+    "threat_alone": "Of course that's scary. You can let this be and still reach for people.",
+    "threat_lose_myself": "That makes sense. Letting it be doesn't take away what you care about. That stays yours.",
     "threat_other": "That fear makes sense. Letting it be is something you do, and you can do it a little at a time.",
     "threat_line_hint": "Accepting isn't approving. It isn't giving up on what can change.",
     "hands_title": "Willing hands. Let your body practise letting it be.",
     "hands_step1": "Sit or stand, arms loose by your sides or in your lap.",
-    "hands_step2": "Turn your palms up. Let your fingers relax.",
+    "hands_step2": "Turn your palms up, or rest them however feels safe. Let your fingers relax.",
     "hands_step3": "Breathe however you breathe. Let your hands stay open.",
     "hands_caution": "If it feels right, let your face soften too. You don't have to smile.",
     "hands_start": "Start",
     "hands_running": "Hands open",
     "hands_done": "That's it. Your hands did it.",
     "statement_title": "Pick the words that fit, or write your own.",
-    "statement_hint": "One is enough.",
+    "statement_hint": "Accepting isn't approving. It isn't giving up on what can change. One line is enough.",
     "statement_own": "In my words",
     "card_title": "Read it once, slowly.",
     "card_next": "Next",
+    "card_copy": "Copy",
+    "card_copied": "Copied",
+    "card_selected": "The line is selected, ready to copy.",
     "grief_title": "If sadness comes, it's allowed. It isn't going backwards.",
     "grief_hint": "Letting it be can make room for the sad part.",
     "heart_title": "Hand on your heart.",
@@ -11959,7 +11963,8 @@
     "end_boundary": "One line to hold your ground, for the next time.",
     "end_small": "Pick one small thing that matters to you, and do it today.",
     "end_body": "Look after your body tonight: rest, water, being gentle with yourself.",
-    "end_nothing": "Nothing right now is okay. Letting it be was the thing.",
+    "end_nothing": "Doing nothing more today is okay. Letting it be was enough.",
+    "end_louder": "The fight's loud right now. That happens with hard things. You can come back to this anytime.",
     "end_line": "You let it be, for now. You can come back to this whenever the fight starts again.",
     "safety_open": "Talk to someone now",
     "next": "Next",
@@ -11980,7 +11985,8 @@
          "$a.still",
          [
           "yes",
-          "sometimes"
+          "sometimes",
+          "unsure"
          ]
         ]
        }
@@ -12044,7 +12050,8 @@
          "$a.still",
          [
           "yes",
-          "sometimes"
+          "sometimes",
+          "unsure"
          ]
         ]
        }
@@ -12106,7 +12113,8 @@
          "$a.still",
          [
           "yes",
-          "sometimes"
+          "sometimes",
+          "unsure"
          ]
         ]
        }
@@ -12161,7 +12169,8 @@
          "$a.still",
          [
           "yes",
-          "sometimes"
+          "sometimes",
+          "unsure"
          ]
         ]
        }
@@ -12263,7 +12272,8 @@
          "$a.still",
          [
           "yes",
-          "sometimes"
+          "sometimes",
+          "unsure"
          ]
         ]
        }
@@ -12297,7 +12307,8 @@
          "$a.still",
          [
           "yes",
-          "sometimes"
+          "sometimes",
+          "unsure"
          ]
         ]
        }
@@ -12340,7 +12351,8 @@
          "$a.still",
          [
           "yes",
-          "sometimes"
+          "sometimes",
+          "unsure"
          ]
         ]
        }
@@ -12374,6 +12386,15 @@
      ],
      "hint": "still_line_hint",
      "next": [
+      {
+       "to": "still_stop",
+       "when": {
+        "eq": [
+         "$a.still_go",
+         "stop"
+        ]
+       }
+      },
       {
        "to": "hands",
        "when": {
@@ -12412,7 +12433,8 @@
          "$a.still",
          [
           "yes",
-          "sometimes"
+          "sometimes",
+          "unsure"
          ]
         ]
        }
@@ -12458,7 +12480,8 @@
          "$a.still",
          [
           "yes",
-          "sometimes"
+          "sometimes",
+          "unsure"
          ]
         ]
        }
@@ -12513,7 +12536,8 @@
          "$a.still",
          [
           "yes",
-          "sometimes"
+          "sometimes",
+          "unsure"
          ]
         ]
        }
@@ -12614,7 +12638,8 @@
          "$a.still",
          [
           "yes",
-          "sometimes"
+          "sometimes",
+          "unsure"
          ]
         ]
        }
@@ -12661,7 +12686,8 @@
          "$a.still",
          [
           "yes",
-          "sometimes"
+          "sometimes",
+          "unsure"
          ]
         ]
        }
@@ -12708,7 +12734,8 @@
          "$a.still",
          [
           "yes",
-          "sometimes"
+          "sometimes",
+          "unsure"
          ]
         ]
        }
@@ -12724,14 +12751,18 @@
           {
            "all": [
             {
-             "eq": [
-              "$a.what",
-              "happened"
+             "in": [
+              "$a.still",
+              [
+               "yes",
+               "sometimes",
+               "unsure"
+              ]
              ]
             },
             {
              "eq": [
-              "$opt.happened",
+              "$opt.still",
               true
              ]
             }
@@ -12740,105 +12771,151 @@
           {
            "all": [
             {
-             "eq": [
-              "$a.what",
-              "wont_change"
+             "any": [
+              {
+               "all": [
+                {
+                 "eq": [
+                  "$a.what",
+                  "happened"
+                 ]
+                },
+                {
+                 "eq": [
+                  "$opt.happened",
+                  true
+                 ]
+                }
+               ]
+              },
+              {
+               "all": [
+                {
+                 "eq": [
+                  "$a.what",
+                  "wont_change"
+                 ]
+                },
+                {
+                 "eq": [
+                  "$opt.wont_change",
+                  true
+                 ]
+                }
+               ]
+              },
+              {
+               "all": [
+                {
+                 "eq": [
+                  "$a.what",
+                  "wont_give"
+                 ]
+                },
+                {
+                 "eq": [
+                  "$opt.wont_give",
+                  true
+                 ]
+                }
+               ]
+              },
+              {
+               "all": [
+                {
+                 "eq": [
+                  "$a.what",
+                  "lost"
+                 ]
+                },
+                {
+                 "eq": [
+                  "$opt.lost",
+                  true
+                 ]
+                }
+               ]
+              },
+              {
+               "all": [
+                {
+                 "eq": [
+                  "$a.what",
+                  "limit"
+                 ]
+                },
+                {
+                 "eq": [
+                  "$opt.limit",
+                  true
+                 ]
+                }
+               ]
+              },
+              {
+               "all": [
+                {
+                 "eq": [
+                  "$a.what",
+                  "unfair"
+                 ]
+                },
+                {
+                 "eq": [
+                  "$opt.unfair",
+                  true
+                 ]
+                }
+               ]
+              },
+              {
+               "all": [
+                {
+                 "not": {
+                  "in": [
+                   "$a.what",
+                   [
+                    "happened",
+                    "wont_change",
+                    "wont_give",
+                    "lost",
+                    "limit",
+                    "unfair"
+                   ]
+                  ]
+                 }
+                },
+                {
+                 "eq": [
+                  "$opt.own",
+                  true
+                 ]
+                }
+               ]
+              }
              ]
             },
-            {
-             "eq": [
-              "$opt.wont_change",
-              true
-             ]
-            }
-           ]
-          },
-          {
-           "all": [
-            {
-             "eq": [
-              "$a.what",
-              "wont_give"
-             ]
-            },
-            {
-             "eq": [
-              "$opt.wont_give",
-              true
-             ]
-            }
-           ]
-          },
-          {
-           "all": [
-            {
-             "eq": [
-              "$a.what",
-              "lost"
-             ]
-            },
-            {
-             "eq": [
-              "$opt.lost",
-              true
-             ]
-            }
-           ]
-          },
-          {
-           "all": [
-            {
-             "eq": [
-              "$a.what",
-              "limit"
-             ]
-            },
-            {
-             "eq": [
-              "$opt.limit",
-              true
-             ]
-            }
-           ]
-          },
-          {
-           "all": [
-            {
-             "eq": [
-              "$a.what",
-              "unfair"
-             ]
-            },
-            {
-             "eq": [
-              "$opt.unfair",
-              true
-             ]
-            }
-           ]
-          },
-          {
-           "all": [
             {
              "not": {
-              "in": [
-               "$a.what",
-               [
-                "happened",
-                "wont_change",
-                "wont_give",
-                "lost",
-                "limit",
-                "unfair"
-               ]
+              "all": [
+               {
+                "in": [
+                 "$a.still",
+                 [
+                  "yes",
+                  "sometimes",
+                  "unsure"
+                 ]
+                ]
+               },
+               {
+                "eq": [
+                 "$opt.person",
+                 true
+                ]
+               }
               ]
              }
-            },
-            {
-             "eq": [
-              "$opt.own",
-              true
-             ]
             }
            ]
           }
@@ -12884,7 +12961,8 @@
          "$a.still",
          [
           "yes",
-          "sometimes"
+          "sometimes",
+          "unsure"
          ]
         ]
        }
@@ -12902,7 +12980,10 @@
      "props": {
       "field": "statement",
       "shape": "line",
-      "next": "card_next"
+      "next": "card_next",
+      "copyLabel": "card_copy",
+      "copiedLabel": "card_copied",
+      "selectedLabel": "card_selected"
      },
      "next": [
       {
@@ -12943,7 +13024,8 @@
          "$a.still",
          [
           "yes",
-          "sometimes"
+          "sometimes",
+          "unsure"
          ]
         ]
        }
@@ -13008,7 +13090,8 @@
          "$a.still",
          [
           "yes",
-          "sometimes"
+          "sometimes",
+          "unsure"
          ]
         ]
        }
@@ -13054,7 +13137,8 @@
          "$a.still",
          [
           "yes",
-          "sometimes"
+          "sometimes",
+          "unsure"
          ]
         ]
        }
@@ -13100,7 +13184,8 @@
          "$a.still",
          [
           "yes",
-          "sometimes"
+          "sometimes",
+          "unsure"
          ]
         ]
        }
@@ -13146,13 +13231,23 @@
          "$a.still",
          [
           "yes",
-          "sometimes"
+          "sometimes",
+          "unsure"
          ]
         ]
        }
       }
      ],
      "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.close",
+         "worse"
+        ]
+       },
+       "key": "end_louder"
+      },
       {
        "when": {
         "eq": [
@@ -13218,6 +13313,15 @@
      "next": [],
      "offers": [
       {
+       "exit": "cool_down",
+       "when": {
+        "eq": [
+         "$a.close",
+         "worse"
+        ]
+       }
+      },
+      {
        "exit": "recover",
        "when": {
         "eq": [
@@ -13268,7 +13372,8 @@
          "$a.still",
          [
           "yes",
-          "sometimes"
+          "sometimes",
+          "unsure"
          ]
         ]
        }
@@ -13309,6 +13414,54 @@
      ]
     },
     {
+     "id": "still_stop",
+     "kind": "handoff",
+     "complete": true,
+     "noClose": true,
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "in": [
+         "$a.still",
+         [
+          "yes",
+          "sometimes",
+          "unsure"
+         ]
+        ]
+       }
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "still_stop_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "ending",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
      "id": "settle",
      "kind": "handoff",
      "complete": true,
@@ -13321,7 +13474,8 @@
          "$a.still",
          [
           "yes",
-          "sometimes"
+          "sometimes",
+          "unsure"
          ]
         ]
        }
@@ -13490,7 +13644,7 @@
     "still": [
      {
       "value": "no",
-      "label": "No, it's in the past"
+      "label": "No, I'm safe from it now"
      },
      {
       "value": "yes",
@@ -13501,12 +13655,21 @@
       "value": "sometimes",
       "label": "Sometimes",
       "danger": "other"
+     },
+     {
+      "value": "unsure",
+      "label": "I'm not sure",
+      "danger": "other"
      }
     ],
     "still_go": [
      {
       "value": "go_on",
       "label": "Go on, for what's already happened"
+     },
+     {
+      "value": "stop",
+      "label": "Stop here for now"
      }
     ],
     "fight": [
@@ -13631,12 +13794,24 @@
      {
       "value": "who_they_are",
       "label": "They are who they are right now. I can't make them change.",
-      "wont_change": true
+      "wont_change": true,
+      "person": true
      },
      {
       "value": "need_real",
       "label": "I may not get this from them. My need is still real.",
-      "wont_give": true
+      "wont_give": true,
+      "person": true
+     },
+     {
+      "value": "wasnt_okay",
+      "label": "It happened, and it wasn't okay.",
+      "still": true
+     },
+     {
+      "value": "not_more",
+      "label": "Accepting what happened isn't agreeing to more of it.",
+      "still": true
      },
      {
       "value": "it_mattered",

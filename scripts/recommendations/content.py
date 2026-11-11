@@ -294,7 +294,7 @@ WORD_RULES = [
     {"key": "watchful", "pattern": "chronic_vigilance", "tool": "wise-mind", "priority": WORD_NEXT, "words": WATCHFUL_WORDS,
      "why": "Planned: Wise Mind as the alternative for suspicion and judgement."},
     {"key": "helpless", "pattern": "chronic_vigilance", "tool": "problem-solve", "priority": WORD_LEAD, "words": ["helpless"],
-     "why": "Radical Acceptance (planned), then Problem Solve in micro-steps; Problem Solve leads until then."},
+     "why": "Let it be (built, row off until signed off), then Problem Solve in micro-steps; Problem Solve leads until then."},
     {"key": "helpless", "pattern": "chronic_vigilance", "tool": "let-it-be", "priority": 0.4, "words": ["helpless"],
      "why": "Let it be (radical acceptance) leads for helplessness."},
     # --- Social threat ---
@@ -329,7 +329,7 @@ WORD_RULES = [
      "why": "Do the Opposite (unhiding) as the alternative for shame."},
     # --- Low drive ---
     {"key": "fragile", "pattern": "reward_drive_low", "tool": "problem-solve", "priority": WORD_LEAD, "words": ["vulnerable", "fragile", "powerless"],
-     "why": "Radical Acceptance (planned), then Problem Solve in micro-steps; Problem Solve until then."},
+     "why": "Let it be (built, row off until signed off), then Problem Solve in micro-steps; Problem Solve until then."},
     {"key": "fragile", "pattern": "reward_drive_low", "tool": "let-it-be", "priority": 0.4, "words": ["vulnerable", "fragile", "powerless"],
      "why": "Let it be (radical acceptance) leads."},
     {"key": "connection", "pattern": "reward_drive_low", "tool": "give", "priority": 0.85, "words": ["lonely", "isolated"],

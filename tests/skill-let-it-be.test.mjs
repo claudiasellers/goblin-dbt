@@ -60,7 +60,7 @@ test("never acceptance of ongoing harm: person and harm things ask once; yes or 
   assert.equal(run([...START, own("what", "my job"), next]).stepId, "still", "own words ask too");
   for (const what of ["lost", "limit"]) assert.equal(run([...START, pick("what", what), next]).stepId, "fight", what);
   const s = run([...START, pick("what", "wont_change"), next]);
-  for (const a of ["yes", "sometimes"]) {
+  for (const a of ["yes", "sometimes", "unsure"]) {
     const r = run([pick("still", a), next], ctx(), s);
     assert.equal(r.stepId, "still_line");
     assert.equal(M.crisisFor(ctx(), M.stepOf(skill, "still_line"), r)?.variant, "other_person");
@@ -74,6 +74,23 @@ test("never acceptance of ongoing harm: person and harm things ask once; yes or 
     assert.equal(M.crisisFor(ctx(), M.stepOf(skill, "fight"), on)?.variant, "other_person", "the support stays");
   }
   assert.equal(run([pick("still", "no"), next], ctx(), s).stepId, "fight");
+  // Stop here: the support stays, Ending offered, no close.
+  const stop = run([pick("still", "yes"), next, pick("still_go", "stop"), next], ctx(), s);
+  assert.equal(stop.stepId, "still_stop");
+  assert.ok(M.stepOf(skill, "still_stop").noClose);
+  assert.equal(M.crisisFor(ctx(), M.stepOf(skill, "still_stop"), stop)?.variant, "other_person");
+  assert.deepEqual(offers(stop), ["ending"]);
+});
+
+test("still happening: no statement reads as accepting more of it; the still lines are offered instead", () => {
+  const to = (still) => run([...START, pick("what", "wont_change"), next, pick("still", still), next,
+    ...(still === "no" ? [] : [pick("still_go", "go_on"), next]), pick("fight", "replay"), next, pick("willing", "willing"), next, did()]);
+  const past = ids(to("no"), "statement");
+  assert.ok(past.includes("who_they_are") && !past.includes("wasnt_okay") && !past.includes("not_more"));
+  const now = ids(to("yes"), "statement");
+  assert.ok(!now.includes("who_they_are") && !now.includes("need_real"), "no person line while it's still happening");
+  assert.ok(now.includes("wasnt_okay") && now.includes("not_more") && now.includes("what_happened"));
+  assert.match(skill.copy.statement_hint, /^Accepting isn't approving\./, "every path hears it, not only digging in");
 });
 
 test("willing or digging in: digging in asks what letting it be threatens, and each threat gets its own line", () => {
@@ -107,6 +124,8 @@ test("willing hands, then one statement (category-matched, or their own) on pape
   const paper = run([pick("statement", "it_mattered"), next], ctx(), st);
   assert.equal(paper.stepId, "statement_card");
   assert.equal(M.stepOf(skill, "statement_card").embed, "boundaryLine");
+  const cp = M.stepOf(skill, "statement_card").props;
+  for (const k of ["copyLabel", "copiedLabel", "selectedLabel", "next"]) assert.ok(skill.copy[cp[k]], `the card's ${k} is copy`);
   assert.equal(run([own("statement", "It's over, and I'm still here."), next], ctx(), st).stepId, "statement_card");
   assert.equal(run([did("copied")], ctx(), paper).stepId, "grief");
 });
@@ -133,8 +152,11 @@ test("what's still in my hands routes; the close on the fight, then the end card
   assert.deepEqual(offers(at("need")), ["recover"]);
   assert.deepEqual(offers(at("boundary")), ["fast"]);
   assert.deepEqual(offers(at("small")), [], "ER-04 is planned");
-  assert.equal(M.handoffLine(ctx(), M.stepOf(skill, "end"), at("nothing")), "Nothing right now is okay. Letting it be was the thing.");
+  assert.equal(M.handoffLine(ctx(), M.stepOf(skill, "end"), at("nothing")), "Doing nothing more today is okay. Letting it be was enough.");
   assert.deepEqual(M.askFresh(ctx(), at("need")), { thenVsNow: "better" });
+  const louder = run([pick("hands_still", "need"), next, pick("close", "worse"), next], ctx(), hs);
+  assert.equal(M.handoffLine(ctx(), M.stepOf(skill, "end"), louder), skill.copy.end_louder, "no success claim after Louder");
+  assert.deepEqual(offers(louder), ["cool_down", "recover"]);
 });
 
 test("stirred: the short path (no fight, no grief); flooded: the body first, or try it now", () => {
