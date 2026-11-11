@@ -203,23 +203,26 @@ STEPS = [
         "next": [{"to": "keep"}],
     },
     {
-        # The plan on the paper; *Keep this* is the yes (R4); *Yes* asks how it went, at screen 1's when (R5).
+        # The plan on the paper; *Keep this* is the one primary and the yes (R4), *Not now* a quiet way on.
         "id": "keep", "kind": "ask", "title": "keep_title", "crisis": CRISIS,
         "slots": [{"after": "$title", "embed": "keepCard", "props": {**PLAN_FIELDS, "partField": "part"}, "showWhen": ALWAYS, "record": "plan_card"}],
-        "fields": [
-            {"id": "keepit", "options": {"list": "keepit"}, "max": 1, "required": True},
-            {"id": "ask", "label": "ask_after_q", "options": {"list": "ask"}, "max": 1, "required": True},
-        ],
         "keep": {"kind": "cope_ahead_plan", "many": True, "from": ["situation", "moment", "forpull", "pull", "moves"],
-                 "when": {"eq": [a("keepit"), "yes"]}},
-        # Screen 1's *When is it?* times it; not answered, *Later, or not sure* (as the hand-built page did).
+                 "done": "done_kept"},
+        "primary": "keep_yes", "secondary": "keep_no",
+        "next": [{"to": "ask"}],
+    },
+    {
+        # Then, kept or not: *Want me to ask how it went?* (R5), at screen 1's when (*Later, or not sure* if unanswered,
+        # as the hand-built page did). The keep's confirmation shows above it.
+        "id": "ask", "kind": "ask", "title": "ask_after_q", "crisis": CRISIS,
+        "fields": [{"id": "ask", "options": {"list": "ask"}, "max": 1, "required": True}],
         "followUp": {"type": "cope_ahead_after", "whenFrom": "when", "whenDefault": "later", "when": {"eq": [a("ask"), "yes"]}},
-        "primary": "next",
+        "primary": "done",
         "next": [{"to": "end"}],
     },
     {
         "id": "end", "kind": "handoff", "complete": True,
-        "lines": [{"when": {"eq": [a("keepit"), "yes"]}, "key": "done_kept"}, {"when": ALWAYS, "key": "done_line"}],
+        "lines": [{"when": ALWAYS, "key": "done_line"}],
         "offers": [], "done": "done",
     },
 ]
@@ -256,7 +259,6 @@ def options():
     out += [("change_move", "keep", CA.COPY["rehearse_keep_move"], {}, None),
             ("change_move", "change", CA.COPY["rehearse_change_move"], {}, None)]
     out += [("settle", "breath", CA.COPY["settle_breath"], {}, None), ("settle", "ok", CA.COPY["settle_ok"], {}, None)]
-    out += [("keepit", "yes", CA.COPY["keep_yes"], {}, None), ("keepit", "no", CA.COPY["keep_no"], {}, None)]
     out += [("ask", "yes", CA.COPY["ask_after_yes"], {}, None), ("ask", "no", CA.COPY["ask_after_no"], {}, None)]
     return out
 

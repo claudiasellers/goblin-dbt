@@ -186,9 +186,14 @@ test("settle is a choice (never skipped silently), marks the visit complete; 5-4
 
 const TO_KEEP = [...PLANNED, done, pick("again", "no"), next, pick("settle", "ok"), next];
 
-test("keep: Keep this keeps the plan as cope_ahead_plan (the tap is the yes); Not now keeps nothing; the value passes its kind", () => {
-  const s = run([...TO_KEEP, pick("keepit", "yes"), pick("ask", "no")]);
-  const k = M.keepFor(ctx(), M.stepOf(skill, "keep"), s);
+test("keep: Keep this keeps the plan as cope_ahead_plan (the one primary is the yes); Not now is the quiet way on; the value passes its kind", () => {
+  const s = run(TO_KEEP);
+  assert.equal(s.stepId, "keep");
+  const keepStep = M.stepOf(skill, "keep");
+  assert.deepEqual([keepStep.primary, keepStep.secondary, keepStep.fields ?? []], ["keep_yes", "keep_no", []], "no chips: Keep this, then Not now quietly");
+  assert.equal(keepStep.keep.done, "done_kept", "a kept plan says where it went, on the next screen");
+  assert.equal(run([next], ctx(), s).stepId, "ask", "kept or not, the ask comes next");
+  const k = M.keepFor(ctx(), keepStep, s);
   assert.equal(k.kind, "cope_ahead_plan");
   assert.deepEqual(k.value, { situationIds: ["conversation"], momentIds: ["go_blank"], pullIds: ["blank"], movesIds: ["feet", "give_minute"] });
   const { pullIds, ...stored } = k.value;
@@ -198,30 +203,29 @@ test("keep: Keep this keeps the plan as cope_ahead_plan (the tap is the yes); No
   assert.deepEqual(checkValue(PROFILE_KINDS.cope_ahead_plan, ifPull), ifPull, "the If is the pull: it is the plan's words, kept");
   assert.throws(() => checkValue(PROFILE_KINDS.cope_ahead_plan, { ...ifPull, pullIds: ["not_sure"] }), /Unexpected value/);
   const notSure = run([pick("situation", "conversation"), next, pick("pull", "not_sure"), next, pick("moment", "go_blank"), next,
-    pick("moves", "feet"), next, done, pick("again", "no"), next, pick("settle", "ok"), next, pick("keepit", "yes"), pick("ask", "no")]);
+    pick("moves", "feet"), next, done, pick("again", "no"), next, pick("settle", "ok"), next]);
   const kn = M.keepFor(ctx(), M.stepOf(skill, "keep"), notSure).value;
   assert.deepEqual(kn.pullIds, ["not_sure"]);
   assert.deepEqual(checkValue(PROFILE_KINDS.cope_ahead_plan, kn), { situationIds: ["conversation"], momentIds: ["go_blank"], movesIds: ["feet"] }, "Not sure: Keep this works, no pull stored");
   // Me composes it with the same plan line the keep card showed.
   assert.equal(P.planLine(CA, P.planCaFromKept(k.value)).text, "If I go blank, I'll feel my feet on the floor and say “Give me a minute”.");
-  assert.equal(M.keepFor(ctx(), M.stepOf(skill, "keep"), run([...TO_KEEP, pick("keepit", "no"), pick("ask", "no")])), null);
   assert.throws(() => checkValue(PROFILE_KINDS.cope_ahead_plan, { situationIds: ["conversation"] }), /Nothing to keep/);
   assert.throws(() => checkValue(PROFILE_KINDS.cope_ahead_plan, { movesIds: ["feet"], momentIds: ["go_blank"], pullOwn: "x" }), /Unexpected field/);
   assert.deepEqual(PROFILE_KINDS.cope_ahead_plan.ownFields, ["situationOwn", "momentOwn", "movesOwn"]);
 });
 
 test("Want me to ask how it went? Yes schedules cope_ahead_after at screen 1's when; not answered, Later or not sure; No, nothing", () => {
-  const step = M.stepOf(skill, "keep");
-  assert.deepEqual(M.followUpFor(ctx(), step, run([...TO_KEEP, pick("keepit", "no"), pick("ask", "yes")])), { type: "cope_ahead_after", chip: "tomorrow" });
+  const step = M.stepOf(skill, "ask");
+  assert.deepEqual(M.followUpFor(ctx(), step, run([...TO_KEEP, next, pick("ask", "yes")])), { type: "cope_ahead_after", chip: "tomorrow" });
   const noWhen = run([pick("situation", "conversation"), next, next, pick("moment", "go_blank"), next, pick("moves", "feet"), next, done,
-    pick("again", "no"), next, pick("settle", "ok"), next, pick("keepit", "no"), pick("ask", "yes")]);
+    pick("again", "no"), next, pick("settle", "ok"), next, next, pick("ask", "yes")]);
   assert.deepEqual(M.followUpFor(ctx(), step, noWhen), { type: "cope_ahead_after", chip: "later" });
-  assert.equal(M.followUpFor(ctx(), step, run([...TO_KEEP, pick("keepit", "no"), pick("ask", "no")])), null);
+  assert.equal(M.followUpFor(ctx(), step, run([...TO_KEEP, next, pick("ask", "no")])), null);
   const type = spine.followUpTypes.find((t) => t.id === "cope_ahead_after");
   for (const w of CA.when) assert.ok(type.window.chips[w.id], `${w.id} is a chip of the after card's window`);
-  const end = run([next], ctx(), run([...TO_KEEP, pick("keepit", "yes"), pick("ask", "no")]));
+  const end = run([next], ctx(), run([...TO_KEEP, next, pick("ask", "no")]));
   assert.equal(end.stepId, "end");
-  assert.equal(M.handoffLine(ctx(), M.stepOf(skill, "end"), end), skill.copy.done_kept);
+  assert.equal(M.handoffLine(ctx(), M.stepOf(skill, "end"), end), skill.copy.done_line);
 });
 
 test("parts on, with a kept part: who might show up, the link's part first and never pressed; parts off, no step", () => {
@@ -248,8 +252,8 @@ test("ext.ca from the run: the after card, the part tag and Reflect read what th
     pick("pull", "blank"), next, pick("part", PART), next, own("moment", "They bring up money"), next, pick("forpull", "pull"), pick("moves", "feet"),
     own("moves", "Hold my keys"), next, done, pick("again", "yes"), next, pick("new_moment", "not_heard"), pick("change_move", "change"),
     pick("new_moves", "say_hard"), next, done, pick("settle", "breath"), next, { type: "embedDone", output: { ids: ["held"], durationSec: 18 } },
-    pick("keepit", "yes"), pick("ask", "yes"), { type: "kept", stepId: "keep", kind: "cope_ahead_plan", id: PART },
-    { type: "scheduled", stepId: "keep", followUpType: "cope_ahead_after", id: PART }], c);
+    { type: "kept", stepId: "keep", kind: "cope_ahead_plan", id: PART }, next, pick("ask", "yes"),
+    { type: "scheduled", stepId: "ask", followUpType: "cope_ahead_after", id: PART }], c);
   const rec = M.runRecord(c, s);
   assert.ok(validateExt({ run: rec }), "the run record is a valid ext.run");
   const ca = caFromRun(rec);
@@ -275,19 +279,20 @@ test("resume after When is it?: the answer comes back, and the after card is boo
   const toKeep = [pick("situation", "conversation"), pick("when", "tomorrow"), next, next, pick("moment", "go_blank"), next,
     pick("moves", "feet"), next, done, pick("again", "no"), next, pick("settle", "ok"), next];
   const s = run(toKeep);
-  assert.equal(s.stepId, "keep");
-  const back = M.resumeRun(ctx(), M.runRecord(ctx(), s), "keep");
+  const atAsk = run([next], ctx(), s);
+  assert.equal(atAsk.stepId, "ask");
+  const back = M.resumeRun(ctx(), M.runRecord(ctx(), atAsk), "ask");
   assert.deepEqual(back.answers.when, { ids: ["tomorrow"], own: null }, "screen 1's answer, read back (not a reminder chip)");
-  const yes = run([pick("keepit", "yes"), pick("ask", "yes")], ctx(), back);
-  assert.deepEqual(M.followUpFor(ctx(), M.stepOf(skill, "keep"), yes), { type: "cope_ahead_after", chip: "tomorrow" });
-  assert.equal(M.followUpFor(ctx(), M.stepOf(skill, "keep"), run([pick("keepit", "yes"), pick("ask", "no")], ctx(), back)), null, "only on Yes");
-  // Booked, then resumed past it: the keep step stays booked, so going back to it books nothing more.
-  const booked = run([pick("keepit", "yes"), pick("ask", "yes"), { type: "scheduled", stepId: "keep", followUpType: "cope_ahead_after", id: "f1" }, next], ctx(), s);
+  const askStep = M.stepOf(skill, "ask");
+  assert.deepEqual(M.followUpFor(ctx(), askStep, run([pick("ask", "yes")], ctx(), back)), { type: "cope_ahead_after", chip: "tomorrow" });
+  assert.equal(M.followUpFor(ctx(), askStep, run([pick("ask", "no")], ctx(), back)), null, "only on Yes");
+  // Booked, then resumed past it: the ask step stays booked, so going back to it books nothing more.
+  const booked = run([pick("ask", "yes"), { type: "scheduled", stepId: "ask", followUpType: "cope_ahead_after", id: "f1" }, next], ctx(), atAsk);
   const later = M.resumeRun(ctx(), M.runRecord(ctx(), booked), "end");
   assert.equal(later.stepId, "end");
-  assert.ok(later.scheduled.keep, "already booked");
-  assert.equal(M.followUpFor(ctx(), M.stepOf(skill, "keep"), { ...later, answers: { ...later.answers, ask: { ids: ["yes"], own: null } } }), null);
-  assert.deepEqual(M.resumeRun(ctx(), M.runRecord(ctx(), booked), "keep").scheduled, {}, "resumed at the booking step itself: a fresh Next");
+  assert.ok(later.scheduled.ask, "already booked");
+  assert.equal(M.followUpFor(ctx(), askStep, { ...later, answers: { ...later.answers, ask: { ids: ["yes"], own: null } } }), null);
+  assert.deepEqual(M.resumeRun(ctx(), M.runRecord(ctx(), booked), "ask").scheduled, {}, "resumed at the booking step itself: a fresh Next");
 });
 
 test("the stored ext, { run, ca }, fits 4 KB at its longest: every field at its cap, own words in 3-byte characters", () => {

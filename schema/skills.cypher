@@ -5841,15 +5841,20 @@ MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:hold"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 10};
 MERGE (n:SkillStep {id: "cope_ahead:keep"})
-SET n += {skillId: "cope_ahead", step: "keep", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt\"]}}, {\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt_self\"]}}], \"fields\": [{\"id\": \"keepit\", \"max\": 1, \"options\": {\"list\": \"keepit\"}, \"required\": true}, {\"id\": \"ask\", \"label\": \"ask_after_q\", \"max\": 1, \"options\": {\"list\": \"ask\"}, \"required\": true}], \"followUp\": {\"type\": \"cope_ahead_after\", \"when\": {\"eq\": [\"$a.ask\", \"yes\"]}, \"whenDefault\": \"later\", \"whenFrom\": \"when\"}, \"keep\": {\"from\": [\"situation\", \"moment\", \"forpull\", \"pull\", \"moves\"], \"kind\": \"cope_ahead_plan\", \"many\": true, \"when\": {\"eq\": [\"$a.keepit\", \"yes\"]}}, \"primary\": \"next\", \"slots\": [{\"after\": \"$title\", \"embed\": \"keepCard\", \"props\": {\"forpullField\": \"forpull\", \"momentField\": \"moment\", \"movesField\": \"moves\", \"partField\": \"part\", \"pullField\": \"pull\"}, \"record\": \"plan_card\", \"showWhen\": {\"all\": []}}], \"title\": \"keep_title\"}";
+SET n += {skillId: "cope_ahead", step: "keep", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt\"]}}, {\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt_self\"]}}], \"keep\": {\"done\": \"done_kept\", \"from\": [\"situation\", \"moment\", \"forpull\", \"pull\", \"moves\"], \"kind\": \"cope_ahead_plan\", \"many\": true}, \"primary\": \"keep_yes\", \"secondary\": \"keep_no\", \"slots\": [{\"after\": \"$title\", \"embed\": \"keepCard\", \"props\": {\"forpullField\": \"forpull\", \"momentField\": \"moment\", \"movesField\": \"moves\", \"partField\": \"part\", \"pullField\": \"pull\"}, \"record\": \"plan_card\", \"showWhen\": {\"all\": []}}], \"title\": \"keep_title\"}";
 MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:keep"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 11};
-MERGE (n:SkillStep {id: "cope_ahead:end"})
-SET n += {skillId: "cope_ahead", step: "end", kind: "handoff", version: "ca-skill-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"done_kept\", \"when\": {\"eq\": [\"$a.keepit\", \"yes\"]}}, {\"key\": \"done_line\", \"when\": {\"all\": []}}]}";
-MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:end"})
+MERGE (n:SkillStep {id: "cope_ahead:ask"})
+SET n += {skillId: "cope_ahead", step: "ask", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt\"]}}, {\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt_self\"]}}], \"fields\": [{\"id\": \"ask\", \"max\": 1, \"options\": {\"list\": \"ask\"}, \"required\": true}], \"followUp\": {\"type\": \"cope_ahead_after\", \"when\": {\"eq\": [\"$a.ask\", \"yes\"]}, \"whenDefault\": \"later\", \"whenFrom\": \"when\"}, \"primary\": \"done\", \"title\": \"ask_after_q\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:ask"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 12};
+MERGE (n:SkillStep {id: "cope_ahead:end"})
+SET n += {skillId: "cope_ahead", step: "end", kind: "handoff", version: "ca-skill-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"done_line\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 13};
 MERGE (x:SkillExit {id: "cope_ahead:five_senses"})
 SET x += {skillId: "cope_ahead", exit: "five_senses", toolId: "five-senses", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
 MATCH (s:Skill {id: "cope_ahead"}), (x:SkillExit {id: "cope_ahead:five_senses"})
@@ -5921,7 +5926,10 @@ SET r += {order: 0, field: "settle", label: "settle_five"}, r.whenJson = "{\"all
 MATCH (a:SkillStep {id: "cope_ahead:hold"}), (b:SkillStep {id: "cope_ahead:keep"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
-MATCH (a:SkillStep {id: "cope_ahead:keep"}), (b:SkillStep {id: "cope_ahead:end"})
+MATCH (a:SkillStep {id: "cope_ahead:keep"}), (b:SkillStep {id: "cope_ahead:ask"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "cope_ahead:ask"}), (b:SkillStep {id: "cope_ahead:end"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
 MERGE (o:SkillOption {id: "cope_ahead:situation:conversation"})
@@ -6677,26 +6685,16 @@ SET o:SkillOption, o += {skillId: "cope_ahead", list: "settle", value: "ok", lab
 MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:settle:ok"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "settle", order: 110};
-MERGE (o:SkillOption {id: "cope_ahead:keepit:yes"})
-SET o:SkillOption, o += {skillId: "cope_ahead", list: "keepit", value: "yes", label: "Keep this", version: "ca-skill-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:keepit:yes"})
-MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "keepit", order: 111};
-MERGE (o:SkillOption {id: "cope_ahead:keepit:no"})
-SET o:SkillOption, o += {skillId: "cope_ahead", list: "keepit", value: "no", label: "Not now", version: "ca-skill-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:keepit:no"})
-MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "keepit", order: 112};
 MERGE (o:SkillOption {id: "cope_ahead:ask:yes"})
 SET o:SkillOption, o += {skillId: "cope_ahead", list: "ask", value: "yes", label: "Yes", version: "ca-skill-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:ask:yes"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "ask", order: 113};
+SET r += {list: "ask", order: 111};
 MERGE (o:SkillOption {id: "cope_ahead:ask:no"})
 SET o:SkillOption, o += {skillId: "cope_ahead", list: "ask", value: "no", label: "No thanks", version: "ca-skill-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:ask:no"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "ask", order: 114};
+SET r += {list: "ask", order: 112};
 
 // --- hold_to_wait (hw-v1) ---
 MERGE (s:Skill {id: "hold_to_wait"})

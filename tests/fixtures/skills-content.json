@@ -3763,25 +3763,6 @@
        "record": "plan_card"
       }
      ],
-     "fields": [
-      {
-       "id": "keepit",
-       "options": {
-        "list": "keepit"
-       },
-       "max": 1,
-       "required": true
-      },
-      {
-       "id": "ask",
-       "label": "ask_after_q",
-       "options": {
-        "list": "ask"
-       },
-       "max": 1,
-       "required": true
-      }
-     ],
      "keep": {
       "kind": "cope_ahead_plan",
       "many": true,
@@ -3792,13 +3773,52 @@
        "pull",
        "moves"
       ],
-      "when": {
-       "eq": [
-        "$a.keepit",
-        "yes"
-       ]
-      }
+      "done": "done_kept"
      },
+     "primary": "keep_yes",
+     "secondary": "keep_no",
+     "next": [
+      {
+       "to": "ask",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "ask",
+     "kind": "ask",
+     "title": "ask_after_q",
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "eq": [
+         "$a.moment",
+         "might_hurt"
+        ]
+       }
+      },
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.moment",
+         "might_hurt_self"
+        ]
+       }
+      }
+     ],
+     "fields": [
+      {
+       "id": "ask",
+       "options": {
+        "list": "ask"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
      "followUp": {
       "type": "cope_ahead_after",
       "whenFrom": "when",
@@ -3810,7 +3830,7 @@
        ]
       }
      },
-     "primary": "next",
+     "primary": "done",
      "next": [
       {
        "to": "end",
@@ -3824,15 +3844,6 @@
      "kind": "handoff",
      "complete": true,
      "lines": [
-      {
-       "when": {
-        "eq": [
-         "$a.keepit",
-         "yes"
-        ]
-       },
-       "key": "done_kept"
-      },
       {
        "when": {
         "all": []
@@ -4978,16 +4989,6 @@
      {
       "value": "ok",
       "label": "I'm OK"
-     }
-    ],
-    "keepit": [
-     {
-      "value": "yes",
-      "label": "Keep this"
-     },
-     {
-      "value": "no",
-      "label": "Not now"
      }
     ],
     "ask": [

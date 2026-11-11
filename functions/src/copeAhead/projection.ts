@@ -63,8 +63,9 @@ export function caFromRun(run: Record<string, unknown>): Record<string, unknown>
   const settle = get('settle')?.ids[0];
   if (run.exitId === 'five_senses') ca.settle = 'five_senses';
   else if (settle === 'breath' || settle === 'ok') ca.settle = settle;
-  // The keep step's taps: what the runtime kept (R4) and scheduled (R5), once the person answered them.
-  if (get('keepit')) ca.kept = strs(run.kept).includes('cope_ahead_plan');
+  // The keep step (*Keep this* or *Not now*, then on to the ask) and the ask: what the runtime kept (R4) and
+  // scheduled (R5), once the person got past them.
+  if (strs(run.path).includes('ask')) ca.kept = strs(run.kept).includes('cope_ahead_plan');
   if (get('ask')) ca.followUp = strs(run.scheduled).includes('cope_ahead_after');
   return ca;
 }

@@ -520,6 +520,6 @@ the legacy-exits test ties to the switch).
   heading (`partsLine` `as: heading`, a slot under `$title`).
 - A visit is complete at settle (as before); a rep is logged for a completed visit only, so a rehearsed visit left
   before settle no longer counts as practised.
-- The keep step asks both questions on one screen and ends on a short card (*Your plan is in Me, under My plans.*).
+- The keep is two screens: the paper card with *Keep this* as its one button and *Not now* quiet under it, then *Want me to ask how it went?* with *Your plan is in Me, under My plans.* above it once kept (the page showed both on one screen, the ask after the keep).
 - Not built here: the inline if-then (`copeAheadIfThen`, R8). Its first host (IE-02 Rehearse it, IE-08) isn't built;
   an inline run gives back on its first hand-off, so the shape is decided with a real host, as the ER-B1 mini-card was.
