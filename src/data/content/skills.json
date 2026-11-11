@@ -10253,13 +10253,13 @@
             },
             {
               "value": "jealousy-trust-conversation:medium",
-              "label": "Have the conversation using DEAR MAN: describe what happened, express the impact, ask for what you need",
+              "label": "Have the conversation with DEAR MAN: what happened, how it hit me, what I need",
               "dir": "jealousy-trust-conversation",
               "size": "medium"
             },
             {
               "value": "jealousy-trust-conversation:bigger",
-              "label": "Define together what rebuilding trust would look like: specific actions, not only promises",
+              "label": "Agree together what rebuilding trust looks like: specific actions, not only promises",
               "dir": "jealousy-trust-conversation",
               "size": "bigger"
             },
@@ -10457,7 +10457,7 @@
             },
             {
               "value": "sadness-loss-allow-and-move:bigger",
-              "label": "Honor the loss in a way that matters to you, then commit to one change in how you're living now",
+              "label": "Honor the loss in a way that matters, then change one thing about how I'm living now",
               "dir": "sadness-loss-allow-and-move",
               "size": "bigger"
             },

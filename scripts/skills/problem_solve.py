@@ -139,6 +139,9 @@ LABELS = {
     "guilt-pattern-understand:medium": "Trace the chain: what set it off, the thought, the urge, what I did, what came after",
     "guilt-pattern-reduce-vulnerability:small": "Check whether I'm short on sleep, hungry, alone or overwhelmed",
     "guilt-pattern-reduce-vulnerability:bigger": "Build a routine that keeps me above the point where the pattern takes over",
+    "jealousy-trust-conversation:medium": "Have the conversation with DEAR MAN: what happened, how it hit me, what I need",
+    "jealousy-trust-conversation:bigger": "Agree together what rebuilding trust looks like: specific actions, not only promises",
+    "sadness-loss-allow-and-move:bigger": "Honor the loss in a way that matters, then change one thing about how I'm living now",
     "love-internal-conversation:medium": "Tell them: \"I love you, and this thing between us needs to change\"",
 }
 

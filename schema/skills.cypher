@@ -4798,12 +4798,12 @@ MATCH (s:Skill {id: "problem_solve"}), (o:SkillOption {id: "problem_solve:step:j
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "step", order: 278};
 MERGE (o:SkillOption {id: "problem_solve:step:jealousy-trust-conversation:medium"})
-SET o:SkillOption, o += {skillId: "problem_solve", list: "step", value: "jealousy-trust-conversation:medium", label: "Have the conversation using DEAR MAN: describe what happened, express the impact, ask for what you need", version: "ps-v1"}, o.propsJson = "{\"dir\": \"jealousy-trust-conversation\", \"size\": \"medium\"}";
+SET o:SkillOption, o += {skillId: "problem_solve", list: "step", value: "jealousy-trust-conversation:medium", label: "Have the conversation with DEAR MAN: what happened, how it hit me, what I need", version: "ps-v1"}, o.propsJson = "{\"dir\": \"jealousy-trust-conversation\", \"size\": \"medium\"}";
 MATCH (s:Skill {id: "problem_solve"}), (o:SkillOption {id: "problem_solve:step:jealousy-trust-conversation:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "step", order: 279};
 MERGE (o:SkillOption {id: "problem_solve:step:jealousy-trust-conversation:bigger"})
-SET o:SkillOption, o += {skillId: "problem_solve", list: "step", value: "jealousy-trust-conversation:bigger", label: "Define together what rebuilding trust would look like: specific actions, not only promises", version: "ps-v1"}, o.propsJson = "{\"dir\": \"jealousy-trust-conversation\", \"size\": \"bigger\"}";
+SET o:SkillOption, o += {skillId: "problem_solve", list: "step", value: "jealousy-trust-conversation:bigger", label: "Agree together what rebuilding trust looks like: specific actions, not only promises", version: "ps-v1"}, o.propsJson = "{\"dir\": \"jealousy-trust-conversation\", \"size\": \"bigger\"}";
 MATCH (s:Skill {id: "problem_solve"}), (o:SkillOption {id: "problem_solve:step:jealousy-trust-conversation:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "step", order: 280};
@@ -4968,7 +4968,7 @@ MATCH (s:Skill {id: "problem_solve"}), (o:SkillOption {id: "problem_solve:step:s
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "step", order: 312};
 MERGE (o:SkillOption {id: "problem_solve:step:sadness-loss-allow-and-move:bigger"})
-SET o:SkillOption, o += {skillId: "problem_solve", list: "step", value: "sadness-loss-allow-and-move:bigger", label: "Honor the loss in a way that matters to you, then commit to one change in how you're living now", version: "ps-v1"}, o.propsJson = "{\"dir\": \"sadness-loss-allow-and-move\", \"size\": \"bigger\"}";
+SET o:SkillOption, o += {skillId: "problem_solve", list: "step", value: "sadness-loss-allow-and-move:bigger", label: "Honor the loss in a way that matters, then change one thing about how I'm living now", version: "ps-v1"}, o.propsJson = "{\"dir\": \"sadness-loss-allow-and-move\", \"size\": \"bigger\"}";
 MATCH (s:Skill {id: "problem_solve"}), (o:SkillOption {id: "problem_solve:step:sadness-loss-allow-and-move:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "step", order: 313};
