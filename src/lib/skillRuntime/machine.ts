@@ -393,7 +393,7 @@ export function runNext(ctx: RunContext, s: RunState, e: RunEvent): RunState {
       const to = stepOf(ctx.skill, t.to);
       const arrived = to.clears?.length ? { ...after, answers: normalize(ctx, without(after.answers, to.clears)) } : after;
       return {
-        ...arrived, stepId: to.id, path: [...arrived.path, to.id].slice(0, PATH_MAX),
+        ...arrived, stepId: to.id, path: [...arrived.path, to.id].slice(-PATH_MAX),
         offered: to.kind === 'handoff' ? offersFor(ctx, to, arrived) : arrived.offered,
       };
     }
@@ -401,7 +401,7 @@ export function runNext(ctx: RunContext, s: RunState, e: RunEvent): RunState {
       const i = s.path.lastIndexOf(s.stepId);
       const prev = i > 0 ? s.path[i - 1] : null;
       if (!prev || prev === s.stepId) return s;
-      return { ...s, stepId: prev, path: [...s.path, prev].slice(0, PATH_MAX), offered: [] };
+      return { ...s, stepId: prev, path: [...s.path, prev].slice(-PATH_MAX), offered: [] };
     }
     case 'exit':
       return ctx.skill.exits.some((x) => x.id === e.exitId && !x.planned && !x.safety) ? { ...s, exitId: e.exitId } : s;
@@ -471,17 +471,25 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { ke
   // A run reopened a second time has the step on its path already (its last review, then a new plan): it still comes
   // after the whole path, so the new plan's answers come back, and the step's `clears` drop its last loop's answers.
   const reopensAt = at ? ctx.skill.steps.find((st) => st.id === at && st.reopens) : undefined;
-  if (reopensAt && !path.includes(reopensAt.reopens!.after)) return null;
+  // The latest loop decides: the plan must stand after the last time the step was asked, made again at `after` or
+  // kept by one of the `again` steps (a reminder booked again on *Not yet*). A run whose last review led to a revised
+  // plan that was left half-made has nothing to ask about, so it doesn't reopen.
+  const standsAt = reopensAt ? Math.max(...[reopensAt.reopens!.after, ...(reopensAt.reopens!.again ?? [])].map((x) => path.lastIndexOf(x))) : -1;
+  if (reopensAt && standsAt <= path.lastIndexOf(reopensAt.id)) return null;
   const reopened = !!reopensAt;
   let stepId = reopensAt?.id ?? (at && path.includes(at) ? at : path[path.length - 1]);
   if (!stepId) return null;
   const fresh = new Set(keepFresh ? [] : allFields(ctx.skill).filter((f) => f.askFresh).map((f) => f.id));
   const asksFresh = path.findIndex((id) => (stepOf(ctx.skill, id).fields ?? []).some((f) => fresh.has(f.id)));
   if (!reopened && asksFresh >= 0 && asksFresh < path.lastIndexOf(stepId)) stepId = path[asksFresh];
-  const upTo = reopened ? path : path.slice(0, path.lastIndexOf(stepId) + 1);
+  // Reopened: the path up to where the plan was last made, so earlier review loops (whose answers the step clears)
+  // don't pile up, and the newest steps are the ones kept.
+  const upTo = reopened ? path.slice(0, Math.max(path.lastIndexOf(reopensAt!.reopens!.after), 0) + 1) : path.slice(0, path.lastIndexOf(stepId) + 1);
   // Only the answers of the steps up to the one reopened: a step after it will be asked again, and an answer
   // read back there would be a pre-fill (a reminder chip picked last time would schedule again unasked).
-  const onPath = new Set(upTo.flatMap((id) => {
+  // Reopened, every step's answers come back: the record keeps the newest PATH_MAX steps only, so a long run's first
+  // steps (the feeling, the problem) may be off the path its answers still describe.
+  const onPath = new Set((reopened ? ctx.skill.steps.map((st) => st.id) : upTo).flatMap((id) => {
     const st = stepOf(ctx.skill, id);
     return [...(st.fields ?? []).map((f) => f.id), ...(st.answerAs ? [st.answerAs] : [])];
   }));
@@ -528,7 +536,10 @@ export function titleSlots(ctx: RunContext, step: StepDef, s: Pick<RunState, 'an
   const out: Record<string, string> = {};
   for (const [name, src] of Object.entries(step.titleSlots ?? {})) {
     const f = fieldOf(ctx.skill, src.labelOf);
-    const v = s.answers[src.labelOf]?.ids[0];
+    const a = s.answers[src.labelOf];
+    // The person's own words, when the field has them, are what they said (a starter they changed included).
+    if (f && a?.own?.trim()) { out[name] = a.own.trim(); continue; }
+    const v = a?.ids[0];
     if (!f || !v) continue;
     out[name] = f.options.emotions ? ctx.emotionLabel(v) : (ctx.skill.options[f.options.list ?? '']?.find((o) => o.value === v)?.label ?? v);
   }

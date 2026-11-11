@@ -532,6 +532,22 @@ test("reopens: only a run that reached `after` reopens there, after the whole pa
   const again = { ...rec, path: [...rec.path, "how", "end"], answers: [...rec.answers, { fieldId: "went", optionIds: ["better"] }] };
   assert.deepEqual(m.resumeRun(ctx, again, "how").path, [...again.path, "how"], "a second reopen keeps the later steps");
   assert.deepEqual(m.resumeRun(ctx, again, "how").answers.went, { ids: ["better"], own: null }, "without clears, the last answer comes back");
+  // The latest loop decides: a revised plan left before `after` again doesn't reopen.
+  assert.equal(m.resumeRun(ctx, { ...again, path: [...rec.path, "how", "check"] }, "how"), null, "a half-made revised plan: no reopen");
+  // A step after it that keeps the plan standing (`again`, a reminder booked again) reopens too.
+  const A = { ...R, steps: R.steps.map((x) => (x.id === "how" ? { ...x, reopens: { after: "end", again: ["check"] } } : x)) };
+  assert.equal(m.resumeRun({ ...ctx, skill: A }, { ...again, path: [...rec.path, "how", "check"] }, "how")?.stepId, "how", "kept by an again step");
+  assert.deepEqual(m.resumeRun({ ...ctx, skill: A }, { ...again, path: [...rec.path, "how", "check"] }, "how").path, [...rec.path, "how"], "from where the plan was made: the old loop doesn't pile up");
+  // The path keeps its newest steps: a run past PATH_MAX still records the latest `after`, and reopens on it.
+  let long = { ...m.initialRun(R), answers: { line: { ids: ["l2"], own: null } } };
+  for (let i = 0; i < 30; i++) long = m.runNext(ctx, m.runNext(ctx, long, { type: "next" }), { type: "back" });
+  for (const _ of [1, 2, 3]) long = m.runNext(ctx, long, { type: "next" });
+  assert.equal(long.stepId, "end");
+  assert.equal(long.path.length, 48, "capped");
+  assert.equal(long.path.at(-1), "end", "the newest step is kept, not dropped");
+  const lr = m.resumeRun(ctx, m.runRecord(ctx, long), "how");
+  assert.equal(lr?.stepId, "how", "reopens on the latest `after`");
+  assert.deepEqual(lr.answers.line, { ids: ["l2"], own: null }, "answers of steps off the capped path still come back");
   const C = { ...R, steps: R.steps.map((x) => (x.id === "how" ? { ...x, clears: ["went"] } : x)) };
   assert.equal(m.resumeRun({ ...ctx, skill: C }, again, "how").answers.went, undefined, "a reopens step's clears drop its last loop's answers");
   for (const sk of fixture.skills) {

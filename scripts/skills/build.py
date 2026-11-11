@@ -299,7 +299,8 @@ def check(skill):
             # R9: only a reopened run starts here, after the whole recorded path of a run that reached `after`. Nothing
             # leads to it, and it isn't the start, so a first visit never reaches it.
             ro = s["reopens"]
-            assert isinstance(ro, dict) and set(ro) == {"after"}, (w, "reopens is {after: <step>}", ro)
+            assert isinstance(ro, dict) and "after" in ro and set(ro) <= {"after", "again"}, (w, "reopens is {after: <step>, again?: [<step>]}", ro)
+            assert all(x in steps for x in ro.get("again", [])), (w, "reopens again names steps of the skill", ro)
             assert ro["after"] in steps and ro["after"] != s["id"], (w, "reopens after a step of the skill, not itself", ro)
             assert s["id"] != skill["start"], (w, "a reopens step is never the start")
             into = [x["id"] for x in skill["steps"] if any(t["to"] == s["id"] for t in x.get("next", []))]

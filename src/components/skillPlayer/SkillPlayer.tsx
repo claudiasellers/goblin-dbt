@@ -531,8 +531,11 @@ function HandoffCard({ ctx, step, st, send, onExit, busy }: {
     .filter((x): x is ExitDef => !!x && (!!x.safety || (!!x.toolId && !!getToolById(x.toolId))));
   const done = step.done ? ctx.skill.exits.find((x) => x.id === step.done) : undefined;
   const crisis = crisisFor(ctx, step, st);
+  // A hand-off's title (Problem Solve's *Your next step: …*) heads the card, as an ask step's does.
+  const title = copyText(ctx, step.title, st, titleSlots(ctx, step, st));
   return (<>
     {crisis && <CrisisBanner compact variant={crisis.variant} />}
+    {title && <Prompt>{title}</Prompt>}
     <section className="space-y-4 p-5 rounded-2xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]" data-testid="skill-handoff">
       {line && <Prompt serif>{line}</Prompt>}
       {chips.map((f) => (
