@@ -267,6 +267,9 @@ test("after: the pull back is expected; going back isn't failure; I don't feel s
 
 test("listed for everyone under Interpersonal Effectiveness; deferred session; no close question; no routing rows", () => {
   assert.match(tools, /id: 'ending-relationships'[\s\S]*?deferSession: true/);
+  const entry = tools.slice(tools.indexOf("id: 'ending-relationships'"), tools.indexOf("// Mindfulness"));
+  assert.match(entry, /module: 'interpersonal-effectiveness'/);
+  assert.doesNotMatch(entry, /listed:/, "listed for everyone (Claudia, 11 Nov)");
   assert.equal(shipped.skills.some((s) => s.id === "ending_relationships" && s.quickExit === true && s.persist?.after === "safety"), true,
     "the runtime switches ship in skills.json");
   const rf = readFileSync("schema/recommended-for.cypher", "utf8");

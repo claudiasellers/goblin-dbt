@@ -55,10 +55,10 @@ test("listed only with parts on and its copy shipped (the gate ToolPage opens it
   assert.ok(!T.listedTools().some((t) => t.id === "meet-a-part"));
   assert.ok(T.getToolsByModule("mindfulness", { parts: true }).some((t) => t.id === "meet-a-part"), "parts on and ready: listed");
   assert.deepEqual(T.listedTools({ parts: true }).map((t) => t.id), T.tools.filter((t) => t.listed !== false).map((t) => t.id), "nothing else is held back (Two pulls and Ending are link-only)");
-  assert.deepEqual(T.listedTools().map((t) => t.id), T.tools.filter((t) => !["meet-a-part", "two-pulls", "ending-relationships"].includes(t.id)).map((t) => t.id));
+  assert.deepEqual(T.listedTools().map((t) => t.id), T.tools.filter((t) => !["meet-a-part", "two-pulls"].includes(t.id)).map((t) => t.id));
   assert.ok(!T.intents.some((i) => i.toolId === "meet-a-part"));
   // Ending a relationship: by link only until the DV review (IE-08, D14).
-  assert.deepEqual(T.tools.filter((t) => t.listed !== undefined).map((t) => t.id), ["ending-relationships", "meet-a-part", "two-pulls"]);
+  assert.deepEqual(T.tools.filter((t) => t.listed !== undefined).map((t) => t.id), ["meet-a-part", "two-pulls"]);
   assert.equal(T.getToolById("two-pulls").listed, false, "Two pulls: by link only, never listed");
   // Lists read only listed tools: Tools.tsx through getToolsByModule, with `parts` from Meet a part's own gate.
   const tools = read("src/pages/Tools.tsx");

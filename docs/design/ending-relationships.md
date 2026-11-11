@@ -8,7 +8,7 @@ copy in the project files). Linehan, *DBT Skills Training Handouts and Worksheet
 
 Claudia unparked it on 10 Nov ("build them now"), on the existing safety pieces (`CrisisBanner`, its
 `other_person` variant), with all three gate reviews (their fixes are in). The PRD's open question, a blocking review of the safety branch
-by a DV specialist (plan D14), is still open, so it is unlisted for now: see *Before it's listed* below.
+by a DV specialist (plan D14), is still open. Claudia listed it anyway on 11 Nov, with that review to follow: see *Listing and the clinical review* below.
 
 ## The flow
 
@@ -159,12 +159,13 @@ back for this tool (`getSkillRun` `RESUME_DAYS_FOR`), since `ending_again` can b
 | Region lines beyond the US | The app is US-only |
 | A hotline chat link in `CrisisBanner` | The banner's numbers are the one place they live; adding chat is a banner change for its own review |
 
-## Before it's listed
+## Listing and the clinical review
 
 The PRD recommends a DV specialist review the safety branch before launch (D14), and Gates 1 and 3 both flagged
-listing it before that. So it ships **unlisted** (`listed: false` in `src/data/tools.ts`): it opens from Problem
-Solve's *Decide if this can be repaired* and Rebel's *someone I'm scared of* only, and isn't on the Tools page. To
-list it under Interpersonal Effectiveness, drop that line.
+listing it before that. Claudia's call (11 Nov): list it now under Interpersonal Effectiveness, and have a clinician
+review and tweak the copy and the safety branch after, so the module set is built and connected first. It also opens
+from Problem Solve's *Decide if this can be repaired* and Rebel's *someone I'm scared of*. The review is still owed;
+its changes are content edits in `scripts/skills/ending_relationships.py`.
 
 ## Tests
 
