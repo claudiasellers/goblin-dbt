@@ -96,7 +96,7 @@ for (const sk of fixture.skills) {
   test(`${sk.id}: picking anything that can carry danger shows a crisis slot of its variant on its step (C6.4)`, () => {
     // Not just "a slot exists": with that pick made, the step's slot holds. Embed ids an embed marks danger too.
     const ctx = { skill: sk, shared: fixture, carried: [], gridIds: new Set(), emotionLabel: (x) => x, ctxIn: {}, embedOutputs: EMBEDS_PY };
-    const want = (d) => (d === "other" ? "other_person" : "crisis");
+    const want = (d) => ({ other: "other_person", medical: "medical" })[d] ?? "crisis";
     for (const st of sk.steps) {
       for (const f of st.fields ?? []) {
         for (const o of sk.options[f.options.list] ?? []) {

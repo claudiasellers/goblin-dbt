@@ -9,7 +9,7 @@ import { closeKindFor, durationSec } from '../lib/spine/close';
 import { useToday } from '../hooks/useToday';
 import { profileCache } from '../lib/profileCache';
 import { PROFILE_WRITING_CLOSES } from '../lib/skillRuntime/playerTools';
-import type { CapacityReading } from '../data/capacityTypes';
+import type { CapacityReading, ThenVsNow } from '../data/capacityTypes';
 
 /**
  * One ToolSession per tool visit (PR-S3; mounted by ToolPage with `key={location.key}`).
@@ -70,6 +70,7 @@ export function ToolSessionProvider({ toolId, inside, deferStart = false, childr
   const bandAtStart = useRef<CapacityReading | null>(null);
   const wiseMindAnswer = useRef<string | null>(null);
   const fitsFacts = useRef<'fits' | 'partly' | 'doesnt_fit' | 'unsure' | null>(null);
+  const thenVsNow = useRef<ThenVsNow | null>(null);
   const closed = useRef(false);
   const mounted = useRef(false);
   const bare = useRef(false);
@@ -118,7 +119,7 @@ export function ToolSessionProvider({ toolId, inside, deferStart = false, childr
           practiced: practiced.current,
           durationSec: durationSec(startedAt.current, Date.now()),
           ...(Object.keys(mergedExt).length ? { ext: mergedExt } : {}),
-          ...(input.thenVsNow ? { thenVsNow: input.thenVsNow } : {}),
+          ...((input.thenVsNow ?? thenVsNow.current) ? { thenVsNow: input.thenVsNow ?? thenVsNow.current ?? undefined } : {}),
           ...(input.actedOnUrge ? { actedOnUrge: input.actedOnUrge } : {}),
           ...((input.bandAtStart ?? bandAtStart.current) ? { bandAtStart: input.bandAtStart ?? bandAtStart.current ?? undefined } : {}),
           ...(input.bandAtEnd ? { bandAtEnd: input.bandAtEnd } : {}),
@@ -165,6 +166,7 @@ export function ToolSessionProvider({ toolId, inside, deferStart = false, childr
       setBandAtStart: (r) => { bandAtStart.current = r; },
       setWiseMindAnswer: (a) => { wiseMindAnswer.current = a; },
       setFitsFacts: (v) => { fitsFacts.current = v; },
+      setThenVsNow: (v) => { thenVsNow.current = v; },
       begin: () => { begun.current = true; start(); },
       setBare: (b) => { bare.current = b; },
       close,
