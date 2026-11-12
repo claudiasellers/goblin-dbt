@@ -86,6 +86,9 @@ export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
     WITH p ORDER BY p.confirmedAt DESC, p.id LIMIT 60
     RETURN p {.id, .kind, .area, .status, .source, .valueJson,
               confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p`,
+  // The same rows; the resolver keeps only the catalogue id a good thing done was kept as.
+  thingsILikePicks: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'thing_i_like', status: 'active'})
+    RETURN p {.id, .valueJson} AS p`,
 };
 
 /** A kept thing's picked ids, named by Good things' own options (graph content: `SkillOption`, never a copy). */
@@ -257,8 +260,9 @@ const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
       const p = rec.get('p') as Record<string, unknown>;
       try { return [{ p, v: JSON.parse(String(p.valueJson)) as Record<string, unknown> }]; } catch { return []; }
     });
-    // Own words first (what the person called it), then the good thing they did, then the kind of thing it was.
-    const optionIds = (v: Record<string, unknown>) => (['pick', 'kind'] as const).flatMap((f) => strings(v[`${f}Ids`]).slice(0, 1).map((id) => THING_OPTION[f] + id));
+    // Own words first (what the person called it), then the good thing they did. A thing found and kept only as a
+    // chip ("A colour") is no good thing to do today: it stays in Me, out of the pick list.
+    const optionIds = (v: Record<string, unknown>) => strings(v.pickIds).slice(0, 1).map((id) => THING_OPTION.pick + id);
     const ids = [...new Set(rows.flatMap(({ v }) => optionIds(v)))];
     const labels = new Map<string, string>();
     if (ids.length) for (const rec of (await tx.run(THING_LABELS, { ids })).records) labels.set(String(rec.get('id')), String(rec.get('label')));
@@ -269,6 +273,14 @@ const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
       if (label) out.push({ id: String(p.id), label, meta: metaFrom(p, now) });
     }
     return out;
+  },
+  thingsILikePicks: async (tx, uid) => {
+    const r = await tx.run(SLICE_QUERIES.thingsILikePicks!, { uid });
+    const ids = new Set<string>();
+    for (const rec of r.records) {
+      try { for (const id of strings((JSON.parse(String((rec.get('p') as Record<string, unknown>).valueJson)) as Record<string, unknown>).pickIds).slice(0, 1)) ids.add(id); } catch { /* unreadable: skip */ }
+    }
+    return [...ids].map((id) => ({ id }));
   },
   prosCons: async (tx, uid, now) => {
     const r = await tx.run(SLICE_QUERIES.prosCons!, { uid });

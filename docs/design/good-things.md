@@ -23,13 +23,13 @@ kept in a list of things I like, a visible, growing "me that likes things", buil
 
 | Step | What the person sees | PRD ER-04 |
 |---|---|---|
-| `start` | *Where do you want to start?* (*A minute is enough.*) Find one okay thing around me · Pick one good thing for today. From a pleasant check-in (`?frame=savour`): *Something's good right now. Want to stay with it a moment?* with *Stay with this good moment* first | Entry points; every level reachable from day one |
+| `start` | *Where do you want to start?* (*A minute is enough.*) Find one okay thing around me · Pick one good thing for today. From a pleasant check-in (`?frame=savour`, the result having just asked): *Stay with this good moment* first | Entry points; every level reachable from day one |
 | `heads_up` | A carried flooded reading: *Your body's loud right now.* (*Good things land better once it settles a little.*) Look after the next few minutes first → `settle` (First, the body) · Try it anyway | Not for flooded |
-| `find` | *Look around.* *Find one thing that's even a little okay: a colour you like, something soft, a sound, a window.* `orientFind`, one find | Level 0 |
-| `stay` | *Stay with it for a few seconds.* (from a good moment: *Stay with what's good for a few seconds.*) A 15 s timed `holdRing`, *Notice one thing you like about it. Let it be as big as it is; it doesn't have to last.*, no breath instruction | Level 0: "three breaths", no breath instruction |
-| `name` | *What was it?* (from a good moment, first: A moment, or how I felt) A colour · Something soft or comfortable · A sound · A taste or smell · A view · A person · An animal, or a few words; *Keep it in Things I like?* Keep it · Not this time | Level 0: keep it, a short chip label |
-| `name_end` | Kept: *It's in Things I like. A list like that grows slowly, one thing at a time.* Else: *You found one. Noticing it is the practice.* | Built slowly |
-| `energy` | *How much have you got right now?* Hardly any · A little · Some | Level 1: energy needed |
+| `find` | *Look around.* *Find one thing that's even a little okay: a colour you like, something soft, a sound, a window. Cold water or something sour counts too.* `orientFind`, one find | Level 0 |
+| `stay` | *Stay with it for a few seconds. Notice one thing you like about it.* (from a good moment: *Stay with what's good for a few seconds.* …) A 15 s timed `holdRing`, hint *Let it be as big as it is; it doesn't have to last.*, no breath instruction | Level 0: "three breaths", no breath instruction |
+| `name` | *What was it?* (from a good moment, first: A moment, or how I felt) A colour · Something soft or comfortable · A sound · A taste or smell · A view · A person · An animal, or a few words; *Add it to Things I like?* Keep it · Not this time | Level 0: keep it, a short chip label |
+| `name_end` | *Found one.* Kept: *It's in Things I like. A list like that grows slowly, one thing at a time.* Else: *You found one. Noticing it is the practice.* | Built slowly |
+| `energy` | *How much energy have you got right now?* Hardly any · A little · Some | Level 1: energy needed |
 | `pick` | *Pick one good thing.* (*If nothing sounds good, that's part of feeling low. Pick the one that sounds least bad.*) The person's own things I like first, then the catalogue for that energy, or own words | Level 1; anhedonia: validation first; own directory first (fade) |
 | `when` | *When will you do it?* Now · This afternoon · This evening · Tomorrow; *Want me to ask how it went?* Yes books `good_thing` at that time (now: an hour on) | Level 1: now · later (time chip) → FollowUp |
 | `set` | *Your good thing: {pick}.* *Doing it counts, whether or not you enjoy it.* | Reps, not feelings |
@@ -41,23 +41,23 @@ reopens the run at `back` (R9 `reopens`, only on a run that reached `when`):
 
 | Step | What the person sees |
 |---|---|
-| `back` | *Did it happen? {pick}* Yes · Partly · Not today |
+| `back` | *Earlier you picked: {pick}.* *Did it happen?* Yes · Partly · Not today |
 | `after` | *Compared to before, how are you?* Lighter · About the same · Heavier; *Was your mind mostly here, or somewhere else?* Mostly here · Partly · Somewhere else (optional) |
-| `keep_more` | Lighter, and a listed pick that isn't already in Things I like (never own words, until CORE can check them): *Add it to things you like?* (*Things that helped once are worth finding again.*) |
-| `after_end` | *You did it.* Then the first that fits: *It's in Things I like.* · Heavier: *That happens sometimes. It isn't a sign you did it wrong.* with First, the body and Running low · *If 'it won't last' or 'I don't deserve this' shows up next time, notice it and come back to what you're doing. That's part of the skill.* (H16, being unmindful of worries) · *Something lifted. That's worth noticing.* · *Enjoying it comes later. Doing it is the rep.* (the PRD's line for *didn't enjoy it*) |
-| `not_today` | *That's okay. A smaller one tomorrow still counts.* and Running low (the body may be part of it) |
+| `keep_more` | Lighter, and a listed pick that isn't already in Things I like (never own words, until CORE can check them): *Add it to Things I like?* (*Things that helped once are worth finding again.*) |
+| `after_end` | *You gave it a go.* Then the first that fits: *It's in Things I like.* · Heavier: *That happens sometimes. It isn't a sign you did it wrong.* with First, the body and Running low · *If 'it won't last' or 'I don't deserve this' shows up next time, notice it and come back to what you're doing. That's part of the skill.* (H16, being unmindful of worries) · *Something lifted. That's worth noticing.* · *Enjoying it comes later. Doing it is the rep.* (the PRD's line for *didn't enjoy it*) |
+| `not_today` | *That's okay. A smaller one tomorrow still counts. If energy's been low for a while, Running low looks at sleep, food and the body.* and Running low |
 
 *Talk to someone now* is on every screen.
 
 ### The catalogue
 
-Paraphrasing H16's range, no verbatim list. Each carries the least energy it takes; *Hardly any* shows the first six,
-*A little* adds seven, *Some* adds four.
+Paraphrasing H16's range, no verbatim list. Each carries the least energy it takes; *Hardly any* shows the first five,
+*A little* adds eight, *Some* adds four.
 
 | Energy | Good things |
 |---|---|
-| Hardly any | a song you like; a window or a patch of sun; a photo of a place or a day you liked; one clip that's made you laugh before; a smell you like; ten minutes reading about something you're curious about |
-| A little | a warm shower or bath; an animal; a message to someone you like; five minutes outside; draw, doodle, write or make something; a few pages of something you enjoy; a plant or a garden |
+| Hardly any | a song you like; a window or a patch of sun; a photo of a place or a day you liked; one clip that's made you laugh before; a smell you like |
+| A little | a warm shower or bath; an animal; a message to someone you like; five minutes outside; make something for ten minutes; a few pages of something you enjoy; a plant or a garden; ten minutes reading about something you're curious about |
 | Some | a short walk somewhere you like; dance to one song; call or see someone you're easy with; somewhere you like being (a park, a library, a bench) |
 
 No food, drink, shopping or scrolling (the PRD keeps impulsive pleasures out), no gratitude push, no streaks. Photos are a place or a day, never people (they can sting in grief); the screen items are bounded (one clip, ten minutes); no place that costs money.
@@ -66,9 +66,12 @@ No food, drink, shopping or scrolling (the PRD keeps impulsive pleasures out), n
 
 - **`thing_i_like`** (`ProfileFact`, many (60), My words, own words encrypted; `functions/src/profile/kinds.ts`): kept
   on *Keep it* (`kindIds` / `kindOwn`) or *Add it* (`pickIds` / `pickOwn`), linked `KEPT_FROM` the visit. The
-  **`thingsILike`** slice (`PROFILE_NEEDS['good-things']`) returns each active one with its label: the person's own
-  words, else the option's label read from the graph (`SkillOption good_things:activity:<id>` /
-  `good_things:kind:<id>`, never a copy). Me lists it under My words, named the same way, with *Set aside*.
+  **`thingsILike`** slice (`PROFILE_NEEDS['good-things']`) returns each active one that's a thing to do with its label:
+  the person's own words, else the good thing's label read from the graph (`SkillOption good_things:activity:<id>`,
+  never a copy). A thing kept only as a chip (*A colour*) isn't one: it stays in Me, out of the pick list.
+  **`thingsILikePicks`** is the catalogue ids kept that way, so the catalogue drops its copy and *Add it* isn't
+  offered twice. Me lists every one under My words, named the same way (chips by `good_things:kind:<id>`), with
+  *Set aside*.
 - **`ext.run`** (plan D2): the visit's answers, kept ids and booked follow-up; a kept thing picked again is its id, never
   its label (its label can be decrypted own words). No `SkillPractice` rep of its own.
 - **`good_thing`** (`scripts/practice-spine/content.py`): chips `hour` (60 min), `afternoon` (16:00), `evening` (20:00),
@@ -101,6 +104,12 @@ skill's `profile_unnamed` copy, never its id or a raw `{slot}` (agreed with the 
 | Level 0 only while the last three check-ins are Low drive or Shut down; numb prompts favour strong sensory input | One find prompt for everyone | Needs a read of past check-ins | ER-B4 part 2 |
 | `micro-win` migrated into the graph as a level-0 variant | The low-energy result keeps its micro-win guided activity | The result screen's activity is CORE's (guided activities) | CORE |
 | Own additions matching CORE target behaviours get a gentle note | Not built; meanwhile an own-words pick is never offered for Things I like on *Lighter* | CORE-04's target behaviours don't exist yet | CORE |
+| Level 1 only from `steady`; level 0 for `stirred` | Every band but flooded gets both | The band is optional on a carried reading; a stirred person can still pick level 0 first | ER-B4 part 2 |
+| The low-energy result (`conservation_freeze`) as an entry point | Not routed; Low drive's flat words are | Shut down's cell already carries two signed-off cards | ER-B4 part 2 |
+| `ADDRESSES` edges to apathy, boredom and the rest | None; the routing word rule names the words | ER-06's emotion links | ER-06 |
+| A `PositiveExperience` → `SkillPractice` rep | No rep (see Saved) | Reps wait for part 2's counts | ER-B4 part 2 |
+| `ThingILike.source` / `firstAt` / `lastAt` | A `ProfileFact` with `source` and `confirmedAt` only | Times done and last done are part 2's mirror | ER-B4 part 2 |
+| Three shown, *show others* | The whole list for that energy (up to 17) | Needs a *show more* in the runtime's chip field | ER-B4 part 2 |
 | MF-07 *Keep it*, MF-02's practice home, ER-09's values step, DT-06 level 3 as entry points | Not built | Those hosts aren't built | MF / ER-B4 (ER-09) / DT-06 part 2 |
 
 ## Safety

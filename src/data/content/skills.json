@@ -15739,18 +15739,18 @@
         "emotionFields": [],
         "copy": {
           "start_title": "Where do you want to start?",
-          "start_title_savour": "Something's good right now. Want to stay with it a moment?",
+          "start_title_savour": "Where do you want to start?",
           "start_hint": "A minute is enough.",
           "heads_up_title": "Your body's loud right now.",
           "heads_up_hint": "Good things land better once it settles a little.",
           "settle_line": "This will keep. Look after the next few minutes first.",
           "find_title": "Look around.",
           "here": "You're here, and it's",
-          "find_task": "Find one thing that's even a little okay: a colour you like, something soft, a sound, a window.",
+          "find_task": "Find one thing that's even a little okay: a colour you like, something soft, a sound, a window. Cold water or something sour counts too.",
           "find_found": "Found one",
           "find_done": "That's the one.",
-          "stay_title": "Stay with it for a few seconds.",
-          "stay_title_savour": "Stay with what's good for a few seconds.",
+          "stay_title": "Stay with it for a few seconds. Notice one thing you like about it.",
+          "stay_title_savour": "Stay with what's good for a few seconds. Notice one thing you like about it.",
           "stay_label": "Start",
           "stay_running": "Staying with it",
           "stay_hint": "Let your eyes rest on it, or keep it in mind. Notice one thing you like about it. Let it be as big as it is; it doesn't have to last.",
@@ -15758,10 +15758,10 @@
           "name_title": "What was it?",
           "name_hint": "Pick the closest, or name it in a few words.",
           "name_own": "Name it",
-          "keepit_label": "Keep it in Things I like?",
+          "keepit_label": "Add it to Things I like?",
           "name_end_kept": "It's in Things I like. A list like that grows slowly, one thing at a time.",
           "name_end": "You found one. Noticing it is the practice.",
-          "energy_title": "How much have you got right now?",
+          "energy_title": "How much energy have you got right now?",
           "energy_hint": "Any answer works. There's something for each.",
           "pick_title": "Pick one good thing.",
           "pick_hint": "If nothing sounds good, that's part of feeling low. Pick the one that sounds least bad.",
@@ -15771,12 +15771,14 @@
           "set_title": "Your good thing: {pick}.",
           "set_remind": "I'll ask how it went. Doing it counts, whether or not you enjoy it.",
           "set_line": "Doing it counts, whether or not you enjoy it.",
-          "back_title": "Did it happen? {pick}",
+          "back_title": "Earlier you picked: {pick}.",
+          "happened_label": "Did it happen?",
           "after_title": "Compared to before, how are you?",
           "mind_label": "Was your mind mostly here, or somewhere else?",
-          "keep_more_title": "Add it to things you like?",
+          "keep_more_title": "Add it to Things I like?",
           "keep_more_hint": "Things that helped once are worth finding again.",
-          "after_end_title": "You did it.",
+          "after_end_title": "You gave it a go.",
+          "name_end_title": "Found one.",
           "after_kept": "It's in Things I like.",
           "after_lighter": "Something lifted. That's worth noticing.",
           "after_flat": "Enjoying it comes later. Doing it is the rep.",
@@ -15784,6 +15786,7 @@
           "after_heavier": "That happens sometimes. It isn't a sign you did it wrong.",
           "no_title": "That's okay.",
           "no_line": "A smaller one tomorrow still counts.",
+          "no_low": "If energy's been low for a while, Running low looks at sleep, food and the body.",
           "keep_primary": "Next",
           "safety_open": "Talk to someone now",
           "next": "Next",
@@ -16087,7 +16090,16 @@
                   "hint": "name_own",
                   "countsAsPick": true,
                   "max": 40
+                }
+              },
+              {
+                "id": "keepit",
+                "options": {
+                  "list": "keepit"
                 },
+                "max": 1,
+                "required": true,
+                "label": "keepit_label",
                 "links": [
                   {
                     "exit": "safety_open",
@@ -16097,15 +16109,6 @@
                     }
                   }
                 ]
-              },
-              {
-                "id": "keepit",
-                "options": {
-                  "list": "keepit"
-                },
-                "max": 1,
-                "required": true,
-                "label": "keepit_label"
               }
             ],
             "keep": {
@@ -16135,7 +16138,7 @@
             "id": "name_end",
             "kind": "handoff",
             "complete": true,
-            "title": null,
+            "title": "name_end_title",
             "lines": [
               {
                 "when": {
@@ -16208,63 +16211,75 @@
                 "options": {
                   "list": "activity",
                   "where": {
-                    "any": [
+                    "all": [
                       {
-                        "all": [
+                        "any": [
                           {
-                            "eq": [
-                              "$a.energy",
-                              "none"
+                            "all": [
+                              {
+                                "eq": [
+                                  "$a.energy",
+                                  "none"
+                                ]
+                              },
+                              {
+                                "in": [
+                                  "$opt.energy",
+                                  [
+                                    "none"
+                                  ]
+                                ]
+                              }
                             ]
                           },
                           {
-                            "in": [
-                              "$opt.energy",
-                              [
-                                "none"
-                              ]
+                            "all": [
+                              {
+                                "eq": [
+                                  "$a.energy",
+                                  "little"
+                                ]
+                              },
+                              {
+                                "in": [
+                                  "$opt.energy",
+                                  [
+                                    "none",
+                                    "little"
+                                  ]
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "all": [
+                              {
+                                "eq": [
+                                  "$a.energy",
+                                  "some"
+                                ]
+                              },
+                              {
+                                "in": [
+                                  "$opt.energy",
+                                  [
+                                    "none",
+                                    "little",
+                                    "some"
+                                  ]
+                                ]
+                              }
                             ]
                           }
                         ]
                       },
                       {
-                        "all": [
-                          {
-                            "eq": [
-                              "$a.energy",
-                              "little"
-                            ]
-                          },
-                          {
-                            "in": [
-                              "$opt.energy",
-                              [
-                                "none",
-                                "little"
-                              ]
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        "all": [
-                          {
-                            "eq": [
-                              "$a.energy",
-                              "some"
-                            ]
-                          },
-                          {
-                            "in": [
-                              "$opt.energy",
-                              [
-                                "none",
-                                "little",
-                                "some"
-                              ]
-                            ]
-                          }
-                        ]
+                        "not": {
+                          "has": [
+                            "$p.thingsILikePicks.ids",
+                            "$opt.value"
+                          ]
+                        }
                       }
                     ]
                   },
@@ -16308,7 +16323,16 @@
                   "list": "when"
                 },
                 "max": 1,
-                "required": true,
+                "required": true
+              },
+              {
+                "id": "remind",
+                "options": {
+                  "list": "remind"
+                },
+                "max": 1,
+                "required": false,
+                "label": "remind_label",
                 "links": [
                   {
                     "exit": "safety_open",
@@ -16318,15 +16342,6 @@
                     }
                   }
                 ]
-              },
-              {
-                "id": "remind",
-                "options": {
-                  "list": "remind"
-                },
-                "max": 1,
-                "required": false,
-                "label": "remind_label"
               }
             ],
             "followUp": {
@@ -16399,6 +16414,7 @@
                 },
                 "max": 1,
                 "required": true,
+                "label": "happened_label",
                 "links": [
                   {
                     "exit": "safety_open",
@@ -16452,7 +16468,16 @@
                   "list": "compared"
                 },
                 "max": 1,
-                "required": true,
+                "required": true
+              },
+              {
+                "id": "mind",
+                "options": {
+                  "list": "mind"
+                },
+                "max": 1,
+                "required": false,
+                "label": "mind_label",
                 "links": [
                   {
                     "exit": "safety_open",
@@ -16462,15 +16487,6 @@
                     }
                   }
                 ]
-              },
-              {
-                "id": "mind",
-                "options": {
-                  "list": "mind"
-                },
-                "max": 1,
-                "required": false,
-                "label": "mind_label"
               }
             ],
             "next": [
@@ -16489,9 +16505,19 @@
                     },
                     {
                       "not": {
-                        "has": [
-                          "$p.thingsILike.ids",
-                          "$a.pick"
+                        "any": [
+                          {
+                            "has": [
+                              "$p.thingsILike.ids",
+                              "$a.pick"
+                            ]
+                          },
+                          {
+                            "has": [
+                              "$p.thingsILikePicks.ids",
+                              "$a.pick"
+                            ]
+                          }
                         ]
                       }
                     }
@@ -16644,6 +16670,12 @@
                   "all": []
                 },
                 "key": "no_line"
+              },
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "no_low"
               }
             ],
             "done": "done",
@@ -16813,7 +16845,7 @@
             {
               "value": "curious",
               "label": "Read about something you're curious about, for ten minutes",
-              "energy": "none"
+              "energy": "little"
             },
             {
               "value": "warm",
@@ -16837,7 +16869,7 @@
             },
             {
               "value": "make",
-              "label": "Draw, doodle, write or make something for ten minutes",
+              "label": "Make something for ten minutes",
               "energy": "little"
             },
             {

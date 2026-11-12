@@ -17461,7 +17461,7 @@ SET r += {list: "happened", order: 36};
 
 // --- good_things (gt-v1) ---
 MERGE (s:Skill {id: "good_things"})
-SET s += {toolId: "good-things", version: "gt-v1", contentVersion: "skills-v1", start: "start", ownMax: 40, emotionFields: [], accepts: ["band", "frame"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"after_end_title\": \"You did it.\", \"after_flat\": \"Enjoying it comes later. Doing it is the rep.\", \"after_heavier\": \"That happens sometimes. It isn't a sign you did it wrong.\", \"after_kept\": \"It's in Things I like.\", \"after_lighter\": \"Something lifted. That's worth noticing.\", \"after_mind\": \"If 'it won't last' or 'I don't deserve this' shows up next time, notice it and come back to what you're doing. That's part of the skill.\", \"after_title\": \"Compared to before, how are you?\", \"back_title\": \"Did it happen? {pick}\", \"done\": \"Done\", \"energy_hint\": \"Any answer works. There's something for each.\", \"energy_title\": \"How much have you got right now?\", \"find_done\": \"That's the one.\", \"find_found\": \"Found one\", \"find_task\": \"Find one thing that's even a little okay: a colour you like, something soft, a sound, a window.\", \"find_title\": \"Look around.\", \"heads_up_hint\": \"Good things land better once it settles a little.\", \"heads_up_title\": \"Your body's loud right now.\", \"here\": \"You're here, and it's\", \"keep_more_hint\": \"Things that helped once are worth finding again.\", \"keep_more_title\": \"Add it to things you like?\", \"keep_primary\": \"Next\", \"keepit_label\": \"Keep it in Things I like?\", \"mind_label\": \"Was your mind mostly here, or somewhere else?\", \"name_end\": \"You found one. Noticing it is the practice.\", \"name_end_kept\": \"It's in Things I like. A list like that grows slowly, one thing at a time.\", \"name_hint\": \"Pick the closest, or name it in a few words.\", \"name_own\": \"Name it\", \"name_title\": \"What was it?\", \"next\": \"Next\", \"no_line\": \"A smaller one tomorrow still counts.\", \"no_title\": \"That's okay.\", \"pick_hint\": \"If nothing sounds good, that's part of feeling low. Pick the one that sounds least bad.\", \"pick_own\": \"Something else\", \"pick_title\": \"Pick one good thing.\", \"profile_unnamed\": \"something you like\", \"remind_label\": \"Want me to ask how it went?\", \"safety_open\": \"Talk to someone now\", \"set_line\": \"Doing it counts, whether or not you enjoy it.\", \"set_remind\": \"I'll ask how it went. Doing it counts, whether or not you enjoy it.\", \"set_title\": \"Your good thing: {pick}.\", \"settle_line\": \"This will keep. Look after the next few minutes first.\", \"start_hint\": \"A minute is enough.\", \"start_title\": \"Where do you want to start?\", \"start_title_savour\": \"Something's good right now. Want to stay with it a moment?\", \"stay_done\": \"You noticed it. That counts.\", \"stay_hint\": \"Let your eyes rest on it, or keep it in mind. Notice one thing you like about it. Let it be as big as it is; it doesn't have to last.\", \"stay_label\": \"Start\", \"stay_running\": \"Staying with it\", \"stay_title\": \"Stay with it for a few seconds.\", \"stay_title_savour\": \"Stay with what's good for a few seconds.\", \"when_title\": \"When will you do it?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "good-things", version: "gt-v1", contentVersion: "skills-v1", start: "start", ownMax: 40, emotionFields: [], accepts: ["band", "frame"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"after_end_title\": \"You gave it a go.\", \"after_flat\": \"Enjoying it comes later. Doing it is the rep.\", \"after_heavier\": \"That happens sometimes. It isn't a sign you did it wrong.\", \"after_kept\": \"It's in Things I like.\", \"after_lighter\": \"Something lifted. That's worth noticing.\", \"after_mind\": \"If 'it won't last' or 'I don't deserve this' shows up next time, notice it and come back to what you're doing. That's part of the skill.\", \"after_title\": \"Compared to before, how are you?\", \"back_title\": \"Earlier you picked: {pick}.\", \"done\": \"Done\", \"energy_hint\": \"Any answer works. There's something for each.\", \"energy_title\": \"How much energy have you got right now?\", \"find_done\": \"That's the one.\", \"find_found\": \"Found one\", \"find_task\": \"Find one thing that's even a little okay: a colour you like, something soft, a sound, a window. Cold water or something sour counts too.\", \"find_title\": \"Look around.\", \"happened_label\": \"Did it happen?\", \"heads_up_hint\": \"Good things land better once it settles a little.\", \"heads_up_title\": \"Your body's loud right now.\", \"here\": \"You're here, and it's\", \"keep_more_hint\": \"Things that helped once are worth finding again.\", \"keep_more_title\": \"Add it to Things I like?\", \"keep_primary\": \"Next\", \"keepit_label\": \"Add it to Things I like?\", \"mind_label\": \"Was your mind mostly here, or somewhere else?\", \"name_end\": \"You found one. Noticing it is the practice.\", \"name_end_kept\": \"It's in Things I like. A list like that grows slowly, one thing at a time.\", \"name_end_title\": \"Found one.\", \"name_hint\": \"Pick the closest, or name it in a few words.\", \"name_own\": \"Name it\", \"name_title\": \"What was it?\", \"next\": \"Next\", \"no_line\": \"A smaller one tomorrow still counts.\", \"no_low\": \"If energy's been low for a while, Running low looks at sleep, food and the body.\", \"no_title\": \"That's okay.\", \"pick_hint\": \"If nothing sounds good, that's part of feeling low. Pick the one that sounds least bad.\", \"pick_own\": \"Something else\", \"pick_title\": \"Pick one good thing.\", \"profile_unnamed\": \"something you like\", \"remind_label\": \"Want me to ask how it went?\", \"safety_open\": \"Talk to someone now\", \"set_line\": \"Doing it counts, whether or not you enjoy it.\", \"set_remind\": \"I'll ask how it went. Doing it counts, whether or not you enjoy it.\", \"set_title\": \"Your good thing: {pick}.\", \"settle_line\": \"This will keep. Look after the next few minutes first.\", \"start_hint\": \"A minute is enough.\", \"start_title\": \"Where do you want to start?\", \"start_title_savour\": \"Where do you want to start?\", \"stay_done\": \"You noticed it. That counts.\", \"stay_hint\": \"Let your eyes rest on it, or keep it in mind. Notice one thing you like about it. Let it be as big as it is; it doesn't have to last.\", \"stay_label\": \"Start\", \"stay_running\": \"Staying with it\", \"stay_title\": \"Stay with it for a few seconds. Notice one thing you like about it.\", \"stay_title_savour\": \"Stay with what's good for a few seconds. Notice one thing you like about it.\", \"when_title\": \"When will you do it?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "dbt_accumulate_positives"}), (s:Skill {id: "good_things"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "good_things"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
@@ -17492,12 +17492,12 @@ MATCH (s:Skill {id: "good_things"}), (n:SkillStep {id: "good_things:stay"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 4};
 MERGE (n:SkillStep {id: "good_things:name"})
-SET n += {skillId: "good_things", step: "name", kind: "ask", version: "gt-v1"}, n.specJson = "{\"fields\": [{\"id\": \"kind\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"kind\", \"where\": {\"any\": [{\"not\": {\"eq\": [\"$opt.savour\", true]}}, {\"eq\": [\"$a.start\", \"savour\"]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"name_own\", \"max\": 40}, \"required\": true}, {\"id\": \"keepit\", \"label\": \"keepit_label\", \"max\": 1, \"options\": {\"list\": \"keepit\"}, \"required\": true}], \"hint\": \"name_hint\", \"keep\": {\"from\": [\"kind\"], \"kind\": \"thing_i_like\", \"many\": true, \"when\": {\"eq\": [\"$a.keepit\", \"keep\"]}}, \"primary\": \"keep_primary\", \"title\": \"name_title\"}";
+SET n += {skillId: "good_things", step: "name", kind: "ask", version: "gt-v1"}, n.specJson = "{\"fields\": [{\"id\": \"kind\", \"max\": 1, \"options\": {\"list\": \"kind\", \"where\": {\"any\": [{\"not\": {\"eq\": [\"$opt.savour\", true]}}, {\"eq\": [\"$a.start\", \"savour\"]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"name_own\", \"max\": 40}, \"required\": true}, {\"id\": \"keepit\", \"label\": \"keepit_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"keepit\"}, \"required\": true}], \"hint\": \"name_hint\", \"keep\": {\"from\": [\"kind\"], \"kind\": \"thing_i_like\", \"many\": true, \"when\": {\"eq\": [\"$a.keepit\", \"keep\"]}}, \"primary\": \"keep_primary\", \"title\": \"name_title\"}";
 MATCH (s:Skill {id: "good_things"}), (n:SkillStep {id: "good_things:name"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 5};
 MERGE (n:SkillStep {id: "good_things:name_end"})
-SET n += {skillId: "good_things", step: "name_end", kind: "handoff", version: "gt-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"name_end_kept\", \"when\": {\"eq\": [\"$a.keepit\", \"keep\"]}}, {\"key\": \"name_end\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"title\": null}";
+SET n += {skillId: "good_things", step: "name_end", kind: "handoff", version: "gt-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"name_end_kept\", \"when\": {\"eq\": [\"$a.keepit\", \"keep\"]}}, {\"key\": \"name_end\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"title\": \"name_end_title\"}";
 MATCH (s:Skill {id: "good_things"}), (n:SkillStep {id: "good_things:name_end"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 6};
@@ -17507,12 +17507,12 @@ MATCH (s:Skill {id: "good_things"}), (n:SkillStep {id: "good_things:energy"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 7};
 MERGE (n:SkillStep {id: "good_things:pick"})
-SET n += {skillId: "good_things", step: "pick", kind: "ask", version: "gt-v1"}, n.specJson = "{\"fields\": [{\"id\": \"pick\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"activity\", \"profile\": \"thingsILike\", \"where\": {\"any\": [{\"all\": [{\"eq\": [\"$a.energy\", \"none\"]}, {\"in\": [\"$opt.energy\", [\"none\"]]}]}, {\"all\": [{\"eq\": [\"$a.energy\", \"little\"]}, {\"in\": [\"$opt.energy\", [\"none\", \"little\"]]}]}, {\"all\": [{\"eq\": [\"$a.energy\", \"some\"]}, {\"in\": [\"$opt.energy\", [\"none\", \"little\", \"some\"]]}]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"pick_own\", \"max\": 40}, \"required\": true}], \"hint\": \"pick_hint\", \"title\": \"pick_title\"}";
+SET n += {skillId: "good_things", step: "pick", kind: "ask", version: "gt-v1"}, n.specJson = "{\"fields\": [{\"id\": \"pick\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"activity\", \"profile\": \"thingsILike\", \"where\": {\"all\": [{\"any\": [{\"all\": [{\"eq\": [\"$a.energy\", \"none\"]}, {\"in\": [\"$opt.energy\", [\"none\"]]}]}, {\"all\": [{\"eq\": [\"$a.energy\", \"little\"]}, {\"in\": [\"$opt.energy\", [\"none\", \"little\"]]}]}, {\"all\": [{\"eq\": [\"$a.energy\", \"some\"]}, {\"in\": [\"$opt.energy\", [\"none\", \"little\", \"some\"]]}]}]}, {\"not\": {\"has\": [\"$p.thingsILikePicks.ids\", \"$opt.value\"]}}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"pick_own\", \"max\": 40}, \"required\": true}], \"hint\": \"pick_hint\", \"title\": \"pick_title\"}";
 MATCH (s:Skill {id: "good_things"}), (n:SkillStep {id: "good_things:pick"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 8};
 MERGE (n:SkillStep {id: "good_things:when"})
-SET n += {skillId: "good_things", step: "when", kind: "ask", version: "gt-v1"}, n.specJson = "{\"fields\": [{\"id\": \"when\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"when\"}, \"required\": true}, {\"id\": \"remind\", \"label\": \"remind_label\", \"max\": 1, \"options\": {\"list\": \"remind\"}, \"required\": false}], \"followUp\": {\"type\": \"good_thing\", \"when\": {\"eq\": [\"$a.remind\", \"yes\"]}, \"whenFrom\": \"when\"}, \"title\": \"when_title\"}";
+SET n += {skillId: "good_things", step: "when", kind: "ask", version: "gt-v1"}, n.specJson = "{\"fields\": [{\"id\": \"when\", \"max\": 1, \"options\": {\"list\": \"when\"}, \"required\": true}, {\"id\": \"remind\", \"label\": \"remind_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"remind\"}, \"required\": false}], \"followUp\": {\"type\": \"good_thing\", \"when\": {\"eq\": [\"$a.remind\", \"yes\"]}, \"whenFrom\": \"when\"}, \"title\": \"when_title\"}";
 MATCH (s:Skill {id: "good_things"}), (n:SkillStep {id: "good_things:when"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 9};
@@ -17522,12 +17522,12 @@ MATCH (s:Skill {id: "good_things"}), (n:SkillStep {id: "good_things:set"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 10};
 MERGE (n:SkillStep {id: "good_things:back"})
-SET n += {skillId: "good_things", step: "back", kind: "ask", version: "gt-v1"}, n.specJson = "{\"clears\": [\"happened\", \"compared\", \"mind\", \"keep_more\"], \"fields\": [{\"id\": \"happened\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"happened\"}, \"required\": true}], \"reopens\": {\"after\": \"when\"}, \"title\": \"back_title\", \"titleSlots\": {\"pick\": {\"labelOf\": \"pick\"}}}";
+SET n += {skillId: "good_things", step: "back", kind: "ask", version: "gt-v1"}, n.specJson = "{\"clears\": [\"happened\", \"compared\", \"mind\", \"keep_more\"], \"fields\": [{\"id\": \"happened\", \"label\": \"happened_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"happened\"}, \"required\": true}], \"reopens\": {\"after\": \"when\"}, \"title\": \"back_title\", \"titleSlots\": {\"pick\": {\"labelOf\": \"pick\"}}}";
 MATCH (s:Skill {id: "good_things"}), (n:SkillStep {id: "good_things:back"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 11};
 MERGE (n:SkillStep {id: "good_things:after"})
-SET n += {skillId: "good_things", step: "after", kind: "ask", version: "gt-v1"}, n.specJson = "{\"fields\": [{\"id\": \"compared\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"compared\"}, \"required\": true}, {\"id\": \"mind\", \"label\": \"mind_label\", \"max\": 1, \"options\": {\"list\": \"mind\"}, \"required\": false}], \"title\": \"after_title\"}";
+SET n += {skillId: "good_things", step: "after", kind: "ask", version: "gt-v1"}, n.specJson = "{\"fields\": [{\"id\": \"compared\", \"max\": 1, \"options\": {\"list\": \"compared\"}, \"required\": true}, {\"id\": \"mind\", \"label\": \"mind_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"mind\"}, \"required\": false}], \"title\": \"after_title\"}";
 MATCH (s:Skill {id: "good_things"}), (n:SkillStep {id: "good_things:after"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 12};
@@ -17542,7 +17542,7 @@ MATCH (s:Skill {id: "good_things"}), (n:SkillStep {id: "good_things:after_end"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 14};
 MERGE (n:SkillStep {id: "good_things:not_today"})
-SET n += {skillId: "good_things", step: "not_today", kind: "handoff", version: "gt-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"no_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"no_title\"}";
+SET n += {skillId: "good_things", step: "not_today", kind: "handoff", version: "gt-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"no_line\", \"when\": {\"all\": []}}, {\"key\": \"no_low\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"no_title\"}";
 MATCH (s:Skill {id: "good_things"}), (n:SkillStep {id: "good_things:not_today"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 15};
@@ -17619,7 +17619,7 @@ MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "good_things:name"}), (x:SkillExit {id: "good_things:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 0, field: "kind", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+SET r += {order: 0, field: "keepit", label: "safety_open"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "good_things:name_end"}), (x:SkillExit {id: "good_things:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
@@ -17640,7 +17640,7 @@ MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "good_things:when"}), (x:SkillExit {id: "good_things:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 0, field: "when", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+SET r += {order: 0, field: "remind", label: "safety_open"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "good_things:set"}), (x:SkillExit {id: "good_things:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
@@ -17655,13 +17655,13 @@ MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "happened", label: "safety_open"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "good_things:after"}), (b:SkillStep {id: "good_things:keep_more"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "{\"all\": [{\"eq\": [\"$a.compared\", \"lighter\"]}, {\"set\": \"$a.pick.ids\"}, {\"not\": {\"has\": [\"$p.thingsILike.ids\", \"$a.pick\"]}}]}";
+SET r += {order: 0}, r.whenJson = "{\"all\": [{\"eq\": [\"$a.compared\", \"lighter\"]}, {\"set\": \"$a.pick.ids\"}, {\"not\": {\"any\": [{\"has\": [\"$p.thingsILike.ids\", \"$a.pick\"]}, {\"has\": [\"$p.thingsILikePicks.ids\", \"$a.pick\"]}]}}]}";
 MATCH (a:SkillStep {id: "good_things:after"}), (b:SkillStep {id: "good_things:after_end"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 1}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "good_things:after"}), (x:SkillExit {id: "good_things:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 0, field: "compared", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+SET r += {order: 0, field: "mind", label: "safety_open"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "good_things:keep_more"}), (b:SkillStep {id: "good_things:after_end"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
@@ -17799,7 +17799,7 @@ MATCH (s:Skill {id: "good_things"}), (o:SkillOption {id: "good_things:activity:s
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "activity", order: 22};
 MERGE (o:SkillOption {id: "good_things:activity:curious"})
-SET o:SkillOption, o += {skillId: "good_things", list: "activity", value: "curious", label: "Read about something you're curious about, for ten minutes", version: "gt-v1"}, o.propsJson = "{\"energy\": \"none\"}";
+SET o:SkillOption, o += {skillId: "good_things", list: "activity", value: "curious", label: "Read about something you're curious about, for ten minutes", version: "gt-v1"}, o.propsJson = "{\"energy\": \"little\"}";
 MATCH (s:Skill {id: "good_things"}), (o:SkillOption {id: "good_things:activity:curious"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "activity", order: 23};
@@ -17824,7 +17824,7 @@ MATCH (s:Skill {id: "good_things"}), (o:SkillOption {id: "good_things:activity:o
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "activity", order: 27};
 MERGE (o:SkillOption {id: "good_things:activity:make"})
-SET o:SkillOption, o += {skillId: "good_things", list: "activity", value: "make", label: "Draw, doodle, write or make something for ten minutes", version: "gt-v1"}, o.propsJson = "{\"energy\": \"little\"}";
+SET o:SkillOption, o += {skillId: "good_things", list: "activity", value: "make", label: "Make something for ten minutes", version: "gt-v1"}, o.propsJson = "{\"energy\": \"little\"}";
 MATCH (s:Skill {id: "good_things"}), (o:SkillOption {id: "good_things:activity:make"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "activity", order: 28};

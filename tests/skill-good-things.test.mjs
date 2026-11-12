@@ -49,7 +49,7 @@ test("where to start: find one okay thing or one good thing; the good moment onl
   assert.equal(title(s), "Where do you want to start?");
   const sv = ctx({ frame: "savour" });
   assert.deepEqual(values(s, "start", sv), ["savour", "find", "one"]);
-  assert.equal(title(s, sv), "Something's good right now. Want to stay with it a moment?");
+  assert.equal(title(s, sv), "Where do you want to start?");
   assert.equal(run([pick("start", "savour"), next], sv).stepId, "stay", "the good moment goes straight to staying with it");
   const svName = run([done("held")], sv, run([pick("start", "savour"), next], sv));
   assert.equal(values(svName, "kind", sv)[0], "moment", "a good moment can be a moment, or how I felt");
@@ -142,7 +142,7 @@ test("back: did it happen? names the pick; lighter offers Things I like; flat ge
   assert.deepEqual(M.stepOf(skill, "back").reopens, { after: "when" });
   const r = M.resumeRun(ctx(), M.runRecord(ctx(), booked()), "back");
   assert.equal(r?.stepId, "back");
-  assert.equal(title(r), "Did it happen? Step outside for five minutes");
+  assert.equal(title(r), "Earlier you picked: Step outside for five minutes.");
   assert.equal(M.resumeRun(ctx(), M.runRecord(ctx(), run([pick("start", "one"), next, pick("energy", "little"), next])), "back"), null, "a run that never reached when doesn't reopen");
   const after = run([pick("happened", "yes"), next], ctx(), r);
   assert.equal(after.stepId, "after");
@@ -180,14 +180,26 @@ test("a kept thing picked again: named by what the person kept, display only; ne
   assert.ok(JSON.stringify(rec).includes(KEPT_ID), "the record keeps the id");
   assert.ok(!JSON.stringify(rec).includes("The blue mug"), "never the label (it can be decrypted own words)");
   const r = M.resumeRun(c, rec, "back");
-  assert.equal(title(r, c), "Did it happen? The blue mug");
+  assert.equal(title(r, c), "Earlier you picked: The blue mug.");
   const lighter = run([pick("happened", "yes"), next, pick("compared", "lighter"), next], c, r);
   assert.equal(lighter.stepId, "after_end", "already in Things I like: not offered again");
   // Set aside since the visit: the slice no longer has it, and the title never shows the id or a raw {pick}.
   const gone = ctx({}, { thingsILike: [] });
   const rg = M.resumeRun(gone, rec, "back");
-  assert.equal(title(rg, gone), "Did it happen? something you like");
+  assert.equal(title(rg, gone), "Earlier you picked: something you like.");
   assert.equal(run([pick("happened", "yes"), next, pick("compared", "lighter"), next], gone, rg).stepId, "after_end", "nothing to keep");
+});
+
+test("a catalogue thing kept before shows once, as the person's own, and is never offered for keeping again", () => {
+  const prof = { thingsILike: [{ id: KEPT_ID, label: "Step outside for five minutes", meta: {} }], thingsILikePicks: [{ id: "outside" }] };
+  const c = ctx({}, prof);
+  const p = run([pick("start", "one"), next, pick("energy", "little"), next], c);
+  const vals = values(p, "pick", c);
+  assert.equal(vals[0], KEPT_ID);
+  assert.ok(!vals.includes("outside"), "no second copy in the catalogue");
+  assert.ok(vals.includes("warm"));
+  // A slice item kept only as a chip ("A colour") is not a thing to do: the slice offers pick-sourced or own words only.
+  assert.match(readFileSync("functions/src/profile/slices.ts", "utf8"), /strings\(v\.pickIds\)\.slice\(0, 1\)\.map\(\(id\) => THING_OPTION\.pick \+ id\)/);
 });
 
 test("thing_i_like: a profile kind in My words, own words encrypted, the thingsILike slice for good-things", async () => {
@@ -203,7 +215,7 @@ test("thing_i_like: a profile kind in My words, own words encrypted, the thingsI
   assert.throws(() => k.validate({ kindIds: ["colour"], label: "x" }), /Unexpected field/);
   assert.throws(() => k.validate({ kindOwn: "x".repeat(41) }));
   for (const p of ["functions/src/profile/types.ts", "src/data/profileTypes.ts"]) {
-    assert.match(readFileSync(p, "utf8"), /'good-things': \['thingsILike'\]/, p);
+    assert.match(readFileSync(p, "utf8"), /'good-things': \['thingsILike', 'thingsILikePicks'\]/, p);
   }
   // Every catalogue and chip id the slice names is a SkillOption the graph holds.
   const cy = readFileSync("schema/skills.cypher", "utf8");

@@ -13,7 +13,7 @@ export const PROFILE_AREAS: readonly ProfileAreaId[] = ['about_me', 'my_people',
 export const SLICE_IDS = [
   'name', 'quietHours', 'patterns', 'ownLines', 'savedLines',
   'people', 'bodyFlags', 'values', 'goals', 'copeAheadPlans', 'boundaryLines', 'practicePrefs',
-  'fadeLevels', 'ownWords', 'thingsILike', 'crisisKit', 'safetyPlan', 'country',
+  'fadeLevels', 'ownWords', 'thingsILike', 'thingsILikePicks', 'crisisKit', 'safetyPlan', 'country',
   'parts', 'partDetail', 'partAnchors', 'den', 'prosCons',
 ] as const;
 export type SliceId = (typeof SLICE_IDS)[number];
@@ -75,6 +75,8 @@ export interface ProfileSlices {
    * words, else the chip or catalogue option's label from the graph). Good things offers them first on its pick step.
    */
   thingsILike: Array<{ id: string; label: string; meta: ProfileItemMeta }>;
+  /** The catalogue ids of the things kept from a good thing done (`pickIds`): Good things drops their catalogue copy. */
+  thingsILikePicks: Array<{ id: string }>;
   crisisKit: null;
   safetyPlan: null;
   country: null;
@@ -164,7 +166,7 @@ export const PROFILE_NEEDS = {
   'check-the-facts': ['parts'],              // the tag row on its close (docs/design/check-the-facts.md, screen 3)
   'fast': ['parts'],                         // the tag row on its close (docs/design/fast.md)
   'say-no': ['people'],                      // the picker (IE-03), before the skill (docs/design/say-no.md)
-  'good-things': ['thingsILike'],             // its pick step: the person's own things first (docs/design/good-things.md)
+  'good-things': ['thingsILike', 'thingsILikePicks'],             // its pick step: the person's own things first (docs/design/good-things.md)
   // Wise mind's step back (parts on only): the person's parts in the room, with their names, shapes,
   // tender and safety flags. Empty while parts are off, so the tool shows its two-minds form.
   'wise-mind': ['parts'],

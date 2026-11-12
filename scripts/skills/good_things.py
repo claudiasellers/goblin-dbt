@@ -8,7 +8,7 @@ attention graduates into positive attention, then into doing and planning good t
 in a directory of things I like, built slowly.
 
   start      where to start: *Find one okay thing around me* (level 0) or *Pick one good thing for today*
-             (level 1). From a pleasant check-in (`?frame=savour`, the positive-state result's *Keep this one?*)
+             (level 1). From a pleasant check-in (`?frame=savour`, the positive-state result's *Keep this one*)
              the first choice is *Stay with this good moment*.
   heads_up   a carried flooded reading: good things land better once the body settles (PRD: not for flooded).
              First, the body, or try anyway.
@@ -52,7 +52,7 @@ OWN_MAX = 40  # a thing I like, a good thing to do: a few words
 
 COPY = {
     "start_title": "Where do you want to start?",
-    "start_title_savour": "Something's good right now. Want to stay with it a moment?",
+    "start_title_savour": "Where do you want to start?",
     "start_hint": "A minute is enough.",
     # A carried flooded reading (PRD: not for flooded; that's DT's distraction).
     "heads_up_title": "Your body's loud right now.",
@@ -61,12 +61,12 @@ COPY = {
     # Level 0 (PRD: find one okay thing, eyes open).
     "find_title": "Look around.",
     "here": "You're here, and it's",
-    "find_task": "Find one thing that's even a little okay: a colour you like, something soft, a sound, a window.",
+    "find_task": "Find one thing that's even a little okay: a colour you like, something soft, a sound, a window. Cold water or something sour counts too.",
     "find_found": "Found one",
     "find_done": "That's the one.",
     # The savour (PRD: "Stay with it for three breaths", a 15 s hold, no breath instruction).
-    "stay_title": "Stay with it for a few seconds.",
-    "stay_title_savour": "Stay with what's good for a few seconds.",
+    "stay_title": "Stay with it for a few seconds. Notice one thing you like about it.",
+    "stay_title_savour": "Stay with what's good for a few seconds. Notice one thing you like about it.",
     "stay_label": "Start",
     "stay_running": "Staying with it",
     "stay_hint": "Let your eyes rest on it, or keep it in mind. Notice one thing you like about it. Let it be as big as it is; it doesn't have to last.",
@@ -74,11 +74,11 @@ COPY = {
     "name_title": "What was it?",
     "name_hint": "Pick the closest, or name it in a few words.",
     "name_own": "Name it",
-    "keepit_label": "Keep it in Things I like?",
+    "keepit_label": "Add it to Things I like?",
     "name_end_kept": "It's in Things I like. A list like that grows slowly, one thing at a time.",
     "name_end": "You found one. Noticing it is the practice.",
     # Level 1 (PRD: one good thing today).
-    "energy_title": "How much have you got right now?",
+    "energy_title": "How much energy have you got right now?",
     "energy_hint": "Any answer works. There's something for each.",
     "pick_title": "Pick one good thing.",
     # The anhedonia line (PRD risks: validation first; no "be grateful").
@@ -90,12 +90,14 @@ COPY = {
     "set_remind": "I'll ask how it went. Doing it counts, whether or not you enjoy it.",
     "set_line": "Doing it counts, whether or not you enjoy it.",
     # The good_thing card reopens the run here.
-    "back_title": "Did it happen? {pick}",
+    "back_title": "Earlier you picked: {pick}.",
+    "happened_label": "Did it happen?",
     "after_title": "Compared to before, how are you?",
     "mind_label": "Was your mind mostly here, or somewhere else?",
-    "keep_more_title": "Add it to things you like?",
+    "keep_more_title": "Add it to Things I like?",
     "keep_more_hint": "Things that helped once are worth finding again.",
-    "after_end_title": "You did it.",
+    "after_end_title": "You gave it a go.",
+    "name_end_title": "Found one.",
     "after_kept": "It's in Things I like.",
     "after_lighter": "Something lifted. That's worth noticing.",
     # PRD: *Didn't enjoy it* is data, with this line (reps, not feelings).
@@ -106,6 +108,7 @@ COPY = {
     "after_heavier": "That happens sometimes. It isn't a sign you did it wrong.",
     "no_title": "That's okay.",
     "no_line": "A smaller one tomorrow still counts.",
+    "no_low": "If energy's been low for a while, Running low looks at sleep, food and the body.",
     "keep_primary": "Next",
     "safety_open": "Talk to someone now",
     "next": "Next",
@@ -126,8 +129,10 @@ SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
 KEPT = {"eq": [a("keepit"), "keep"]}
 LIGHTER = {"eq": [a("compared"), "lighter"]}
 HEAVIER = {"eq": [a("compared"), "heavier"]}
-# A pick from Things I like is already kept: never offered again.
-FROM_KEPT = {"has": ["$p.thingsILike.ids", a("pick")]}
+# A pick from Things I like, or a catalogue thing kept before, is already kept: never offered again.
+FROM_KEPT = {"any": [{"has": ["$p.thingsILike.ids", a("pick")]}, {"has": ["$p.thingsILikePicks.ids", a("pick")]}]}
+# A catalogue thing already kept shows once, as the person's own (first), not again in the catalogue.
+NOT_KEPT = {"not": {"has": ["$p.thingsILikePicks.ids", "$opt.value"]}}
 KEPT_MORE = {"eq": [a("keep_more"), "keep"]}
 
 # Where to start. `savour` only from a pleasant check-in (`frames`), first.
@@ -158,12 +163,12 @@ ACTIVITIES = [
     ("photos", "Look at a photo of a place or a day you liked", "none"),
     ("laugh", "Watch one clip that's made you laugh before", "none"),
     ("scent", "Smell something you like: soap, coffee, a candle", "none"),
-    ("curious", "Read about something you're curious about, for ten minutes", "none"),
+    ("curious", "Read about something you're curious about, for ten minutes", "little"),
     ("warm", "A warm shower or bath", "little"),
     ("animal", "Spend a few minutes with an animal", "little"),
     ("message", "Send a message to someone you like", "little"),
     ("outside", "Step outside for five minutes", "little"),
-    ("make", "Draw, doodle, write or make something for ten minutes", "little"),
+    ("make", "Make something for ten minutes", "little"),
     ("read", "Read a few pages of something you enjoy", "little"),
     ("plant", "Water a plant, or stand in a garden", "little"),
     ("walk", "A short walk somewhere you like", "some"),
@@ -184,8 +189,8 @@ KEEP_MORE = [("keep", "Add it"), ("not_now", "Not this time")]
 
 
 def ask(sid, title, hint, fields, nxt, **extra):
-    # *Talk to someone now* on every screen: an ask step's links live on its first field.
-    fields = [{**fields[0], "links": [SAFETY_LINK]}, *fields[1:]]
+    # *Talk to someone now* on every screen: an ask step's links live on a field, the last, so they sit below the form.
+    fields = [*fields[:-1], {**fields[-1], "links": [SAFETY_LINK]}]
     s = {"id": sid, "kind": "ask", "title": title, "fields": fields, "next": nxt, **extra}
     if hint:
         s["hint"] = hint
@@ -238,11 +243,11 @@ STEPS = [
          field("keepit", "keepit", label="keepit_label")],
         [{"to": "name_end"}],
         keep={"kind": "thing_i_like", "many": True, "when": KEPT, "from": ["kind"]}, primary="keep_primary"),
-    handoff("name_end", None, [{"when": KEPT, "key": "name_end_kept"}, {"when": ALWAYS, "key": "name_end"}], []),
+    handoff("name_end", "name_end_title", [{"when": KEPT, "key": "name_end_kept"}, {"when": ALWAYS, "key": "name_end"}], []),
     # --- Level 1: one good thing today ---
     ask("energy", "energy_title", "energy_hint", [field("energy", "energy")], [{"to": "pick"}]),
     ask("pick", "pick_title", "pick_hint",
-        [field("pick", "activity", own="pick_own", where=FITS_ENERGY, profile="thingsILike")], [{"to": "when"}]),
+        [field("pick", "activity", own="pick_own", where={"all": [FITS_ENERGY, NOT_KEPT]}, profile="thingsILike")], [{"to": "when"}]),
     ask("when", "when_title", None,
         [field("when", "when"), field("remind", "remind", required=False, label="remind_label")],
         [{"to": "set"}],
@@ -250,7 +255,7 @@ STEPS = [
     handoff("set", "set_title", [{"when": {"eq": [a("remind"), "yes"]}, "key": "set_remind"}, {"when": ALWAYS, "key": "set_line"}],
             [], titleSlots={"pick": {"labelOf": "pick"}}),
     # --- The good_thing card reopens the run here (R9), on a run that reached `when` ---
-    ask("back", "back_title", None, [field("happened", "happened")],
+    ask("back", "back_title", None, [field("happened", "happened", label="happened_label")],
         [{"when": {"eq": [a("happened"), "no"]}, "to": "not_today"}, {"to": "after"}],
         reopens={"after": "when"}, clears=["happened", "compared", "mind", "keep_more"],
         titleSlots={"pick": {"labelOf": "pick"}}),
@@ -267,7 +272,7 @@ STEPS = [
         {"when": LIGHTER, "key": "after_lighter"},
         {"when": ALWAYS, "key": "after_flat"},
     ], [{"exit": "cool_down", "when": HEAVIER}, {"exit": "please_skill", "when": HEAVIER}], no_close=True),
-    handoff("not_today", "no_title", [{"when": ALWAYS, "key": "no_line"}], [{"exit": "please_skill", "when": ALWAYS}],
+    handoff("not_today", "no_title", [{"when": ALWAYS, "key": "no_line"}, {"when": ALWAYS, "key": "no_low"}], [{"exit": "please_skill", "when": ALWAYS}],
             no_close=True),
 ]
 
