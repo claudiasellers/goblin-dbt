@@ -1,6 +1,7 @@
 import type { ManagedTransaction } from 'neo4j-driver';
 import { projectCopeAhead } from '../copeAhead/projection';
 import { projectDearManDebrief } from '../dearMan/debriefProjection';
+import { projectDearManOne } from '../dearMan/oneProjection';
 import { projectSayNo } from '../sayNo/projection';
 
 /**
@@ -22,11 +23,18 @@ export interface ProjectionInput {
 
 export type Projection = (tx: ManagedTransaction, input: ProjectionInput) => Promise<void>;
 
+/** DEAR MAN's skills: each projection acts on its own skill's run only and leaves the other's alone. */
+export async function projectDearMan(tx: ManagedTransaction, input: ProjectionInput): Promise<void> {
+  await projectDearManDebrief(tx, input);
+  await projectDearManOne(tx, input);
+}
+
 export const PROJECTIONS: Readonly<Record<string, Projection>> = {
   // Cope Ahead (ER-B2): `ext.ca` for the after card, the part tag, Reflect and stats; the pull as urgeIds.
   'cope-ahead': projectCopeAhead,
   // DEAR MAN's debrief (IE-B2): the legacy DearManSession {type: 'debrief'}, the Interaction and the refusal counts.
-  'dear-man': projectDearManDebrief,
+  // One message (IE-B3): the DearManSession {type: 'prep', mode: 'one_message'} the debrief reads.
+  'dear-man': projectDearMan,
   // Say no (IE-B3): the Interaction {kind: 'no'} once they've said how it went; a re-ask of the safety question.
   'say-no': projectSayNo,
 };

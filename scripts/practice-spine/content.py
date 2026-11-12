@@ -384,6 +384,22 @@ FOLLOW_UP_TYPES += [
         "notification": "Ready to look back?",
     },
     {
+        # One message (IE-01 Mode A, IE-B3; docs/design/one-message.md): *Save it and remind me* on the cooling screen.
+        # Its card reopens that visit's run at *Still want to send it?* (`back`, a `reopens` step, R9); opening it is the
+        # resolution (OPEN_RESOLVES). Session-bound: only a DEAR MAN visit schedules one. Tech safety (PRD): the copy
+        # never names the person or says what the message is.
+        "id": "ask_delayed", "ownerModule": "ie", "tier": "quality", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/dear-man?mode=one&run={sourceSessionId}&at=back&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"hour": {"kind": "after", "minutes": 60},
+                                             "today": {"kind": "at_local", "days": 0, "time": "19:00"},
+                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "10:00"}}},
+        "staleAfterHours": 48, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Something you saved", "body": "Still there when you're ready."},
+        "choices": [{"id": "dismiss", "label": "No need", "status": "dismissed"}],
+        "notification": "Something you saved",
+    },
+    {
         # Say no (IE-04, IE-B3; docs/design/say-no.md): the sent card's "Want me to ask how it went?" chips. Its card
         # reopens that visit's run at *Did you say no?* (`said`, a `reopens` step, R9); opening it is the resolution
         # (OPEN_RESOLVES). Session-bound: only a Say no visit schedules one. The copy names no one and says nothing

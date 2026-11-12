@@ -16,7 +16,7 @@ export type Cond =
   | { not: Cond };
 
 /** Context keys a skill may accept from the page that opens it (`SkillDef.accepts`, refs `$ctx.<key>`). */
-export type CtxKey = 'urgeId' | 'personId' | 'frame' | 'enterAt' | 'situationId' | 'partId' | 'band' | 'returnTo';
+export type CtxKey = 'urgeId' | 'personId' | 'frame' | 'enterAt' | 'situationId' | 'partId' | 'band' | 'returnTo' | 'emotionId' | 'refused';
 
 /** Profile slices a field can list as options (R3): each item has an id and something to call it. */
 export type ProfileOptionSlice = 'parts' | 'ownLines' | 'savedLines' | 'people' | 'values' | 'goals'
@@ -145,7 +145,7 @@ export interface EmbedOutput {
 /**
  * One prop an embed takes from the skill (embeds.ts EMBED_PROPS, mirrored in content.py EMBED_PROPS; build.py
  * checks every step against it): `copy` names a key in the skill's copy (the player passes its text), `int` a
- * whole number in [min, max], `enum` one of `values`, `field` a field id of the skill, `id` a plain id (another
+ * whole number in [min, max], `enum` one of `values`, `field` a field id of the skill, `fields` a list of them, `id` a plain id (another
  * module's content id). `optional` props may be left out.
  */
 export type EmbedPropSpec =
@@ -153,6 +153,7 @@ export type EmbedPropSpec =
   | { type: 'int'; min: number; max: number; optional?: boolean }
   | { type: 'enum'; values: readonly string[]; optional?: boolean }
   | { type: 'field'; optional?: boolean }
+  | { type: 'fields'; optional?: boolean }
   | { type: 'id'; optional?: boolean };
 
 /**
