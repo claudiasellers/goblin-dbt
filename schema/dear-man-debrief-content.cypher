@@ -559,7 +559,7 @@ MERGE (tp)-[:SUGGESTS_FACTOR]->(tf);
 MERGE (tf:TroubleshootFactor {id: 'belief'})
 SET tf.label = 'A worry or belief stopped me',
     tf.handout = 'worries',
-    tf.opens = ['check-the-facts', 'dear-man'],
+    tf.opens = ['check-the-facts', 'thoughts-passing', 'dear-man'],
     tf.sortOrder = 4;
 
 MATCH (tf:TroubleshootFactor {id: 'belief'}), (tc:TherapyConcept {id: 'dbt_dear_man'})

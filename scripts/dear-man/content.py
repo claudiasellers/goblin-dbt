@@ -431,7 +431,7 @@ TROUBLESHOOT_FACTORS = [
     {"id": "no_words", "label": "I couldn't find the words", "handout": "skill", "opens": ["rehearse", "cope-ahead", "dear-man"], "suggestedBy": ["tp_no_words"], "sortOrder": 1},
     {"id": "unclear", "label": "I wasn't sure what I wanted from it", "handout": "indecision", "opens": ["dear-man"], "suggestedBy": [], "sortOrder": 2},
     {"id": "feelings", "label": "My feelings took over", "handout": "emotions", "opens": ["cope-ahead", "dear-man"], "suggestedBy": ["tp_crying_shutdown", "tp_escalated", "tp_defensive"], "sortOrder": 3},
-    {"id": "belief", "label": "A worry or belief stopped me", "handout": "worries", "opens": ["check-the-facts", "dear-man"], "suggestedBy": ["tp_apologized", "tp_gave_in"], "sortOrder": 4},
+    {"id": "belief", "label": "A worry or belief stopped me", "handout": "worries", "opens": ["check-the-facts", "thoughts-passing", "dear-man"], "suggestedBy": ["tp_apologized", "tp_gave_in"], "sortOrder": 4},
     {"id": "quick_win", "label": "I settled for ending it quickly", "handout": "short_term_goals", "opens": ["fast", "dear-man"], "suggestedBy": ["tp_gave_in"], "sortOrder": 5},
     {"id": "power", "label": "They had more power in this", "handout": "environment", "opens": ["fast", "ending-relationships", "let-it-be"], "suggestedBy": [], "sortOrder": 6},
     {"id": "cant_give", "label": "What I wanted isn't something they can give", "handout": "environment", "opens": ["fast", "finding-connection"], "suggestedBy": [], "sortOrder": 7},

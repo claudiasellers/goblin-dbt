@@ -198,6 +198,11 @@ CONCEPT_TAGS["let-it-be"] = {"concept": "dbt_radical_acceptance", "side": "accep
 # keeps it off every blank result, primary or alongside), by the body and senses (`body`). One word row, live with the
 # module (connected by default, 12 Nov 2026): cold shame on replay, beside Recover.
 CONCEPT_TAGS["soothe"] = {"concept": "dbt_self_soothe", "side": "acceptance", "skillKind": "body", "direction": "down"}
+# Thoughts passing through (DT-08): watching a thought go by; tagged so a row is one line. No row yet: every fitting
+# word (self-worth, worried, judgmental) already shows two signed-off cards (12 Nov 2026). A row must add
+# CONTRAINDICATED_FOR the vigilance + rumination and dissociation + rumination co-occurrences (their
+# contraindicatedTools list mindfulness_of_thoughts, schema/pattern-co-occurrence.cypher).
+CONCEPT_TAGS["thoughts-passing"] = {"concept": "dbt_mindfulness_current_thoughts", "side": "acceptance", "skillKind": "hold", "direction": "neutral"}
 BUILT_NOT_SIGNED_OFF = {
 }
 # Ride it out (urge-surfing), Let it be and Give your mind a job are live (Claudia, 12 Nov 2026: default to connected).

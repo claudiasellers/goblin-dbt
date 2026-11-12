@@ -1464,6 +1464,18 @@ SET self_soothe += {
 };
 
 
+// DT Handout 15 (PRD DT-08): mindfulness of current thoughts, observing a thought as a thought; Thoughts passing
+// through (docs/design/thoughts-passing.md).
+MERGE (current_thoughts:TherapyConcept {id: "dbt_mindfulness_current_thoughts"})
+SET current_thoughts += {
+  name: "Mindfulness of Current Thoughts",
+  description: "Observing a thought as a thought, an event that comes and goes, not a fact or a command",
+  modality: "DBT",
+  module: "Distress Tolerance",
+  skill_type: "reality_acceptance"
+};
+
+
 // ============================================================
 // MINDFULNESS AS CROSS-MODALITY CONCEPT
 // ============================================================

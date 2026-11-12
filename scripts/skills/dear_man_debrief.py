@@ -382,6 +382,7 @@ STEPS = [
             {"exit": "rehearse", "when": is_("factor", "no_words")},
             {"exit": "cope_ahead", "when": {"in": [a("factor"), ["no_words", "feelings"]]}},
             {"exit": "check_the_facts", "when": is_("factor", "belief")},
+            {"exit": "thoughts", "when": is_("factor", "belief")},                # DT-08: the worry as a thought
             {"exit": "fast", "when": {"in": [a("factor"), ["quick_win", "power", "not_willing"]]}},
             {"exit": "ending_relationships", "when": is_("factor", "power")},
             {"exit": "let_it_be", "when": is_("factor", "power")},
@@ -395,6 +396,7 @@ STEPS = [
 
 EXITS = [
     {"id": "cool_down", "toolId": "cool-down"},
+    {"id": "thoughts", "toolId": "thoughts-passing"},                     # DT-08 Thoughts passing through
     {"id": "dear_man", "toolId": "dear-man"},
     {"id": "cope_ahead", "toolId": "cope-ahead", "query": {"situationId": "conversation"}},
     {"id": "rehearse", "toolId": "rehearse", "planned": True},
