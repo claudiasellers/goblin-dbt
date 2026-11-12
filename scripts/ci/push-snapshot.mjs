@@ -6,9 +6,12 @@
  *
  * The snapshot commit C sits on top of the commit this run checked out. If main is still that commit, C
  * is pushed as it is. Otherwise C's src/data/content changes are applied to main's tip as a new commit
- * (generated files only: C's version of each file C changed wins, every other path is main's), without
- * touching the working tree, which stays at what this run built, tested and deploys. Retries on a
- * rejected push, re-reading main each time.
+ * (generated files only), without touching the working tree, which stays at what this run built, tested
+ * and deploys. A file C changed takes C's version only where main still has it as this run checked it out:
+ * where a newer merge changed it, main's version stays, because that merge carries newer graph content
+ * and its own deploy loads the graph and snapshots it (12 Nov: the catch-up deploy's older skills.json
+ * overwrote #110's, and main's tests failed until the next load). Every other path is main's. Retries on
+ * a rejected push, re-reading main each time.
  *
  * CLI (in deploy.yml): node scripts/ci/push-snapshot.mjs <commit> [--remote origin] [--branch main]
  */
@@ -26,12 +29,14 @@ function gitIn(cwd, env = {}) {
 
 /**
  * The commit to push so main gets C's content files on top of `tip`: C itself when C's parent is the tip,
- * null when the tip already has every one of those files as C has them, else a new commit on the tip.
+ * null when there is nothing to change on the tip (it already has C's files, or newer merges changed every
+ * one of them), else a new commit on the tip. `kept` lists the files left as main has them.
  */
-export function snapshotOnto({ cwd = process.cwd(), commit, tip }) {
+export function snapshotOnto({ cwd = process.cwd(), commit, tip, kept = [] }) {
   const git = gitIn(cwd);
   const c = git('rev-parse', `${commit}^{commit}`);
   if (git('rev-parse', `${c}^`) === tip) return c;
+  const blob = (rev, path) => git('ls-tree', rev, '--', path); // "<mode> blob <sha>\t<path>", empty when absent
 
   const changed = git('diff', '--name-only', '--no-renames', `${c}^`, c).split('\n').filter(Boolean);
   const outside = changed.filter((p) => !p.startsWith(CONTENT_DIR));
@@ -42,7 +47,8 @@ export function snapshotOnto({ cwd = process.cwd(), commit, tip }) {
     const idx = gitIn(cwd, { GIT_INDEX_FILE: join(dir, 'index') });
     idx('read-tree', tip);
     for (const path of changed) {
-      const entry = git('ls-tree', c, '--', path); // "<mode> blob <sha>\t<path>", empty when C deleted it
+      if (blob(tip, path) !== blob(`${c}^`, path)) { kept.push(path); continue; } // a newer merge changed it
+      const entry = blob(c, path);
       if (entry) {
         const [mode, , sha] = entry.split(/\s+/);
         idx('update-index', '--add', '--cacheinfo', `${mode},${sha},${path}`);
@@ -64,9 +70,11 @@ export function pushSnapshot({ cwd = process.cwd(), commit, remote = 'origin', b
   for (let i = 1; i <= attempts; i++) {
     git('fetch', '-q', remote, branch);
     const tip = git('rev-parse', 'FETCH_HEAD');
-    const push = snapshotOnto({ cwd, commit, tip });
+    const kept = [];
+    const push = snapshotOnto({ cwd, commit, tip, kept });
+    if (kept.length) log.log(`Left as ${branch} has them (a newer merge changed them; its deploy refreshes them): ${kept.join(', ')}`);
     if (push === null) {
-      log.log(`${branch} (${tip.slice(0, 7)}) already has these content files; nothing to push.`);
+      log.log(`${branch} (${tip.slice(0, 7)}) needs none of these content files; nothing to push.`);
       return null;
     }
     try {

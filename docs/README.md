@@ -126,7 +126,7 @@ Waves follow the index: 1 safety floor and platform, 2 validation and the transf
 | 55 | ER-13 | Sleep reset | spec only | |
 | 56 | MF-06 | Kind wishes (loving-kindness) | spec only | |
 | 57 | DT-09 | When it's a habit (addiction skills) | spec only | |
-| 58 | IE-09 | Find your people | spec only | |
+| 58 | IE-09 | Find your people | built (part 1) | One small step towards people with a guess before and a check after ([design/find-your-people.md](design/find-your-people.md)) |
 | 59 | MF-07 | Take a moment apart | spec only | |
 | 60 | WMP-08 | Validate them | spec only | |
 | 61 | CORE-12 | Outcomes, fade and graduation | spec only | Reflect shows what helped; no outcomes or fade |

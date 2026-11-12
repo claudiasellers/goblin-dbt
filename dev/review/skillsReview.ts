@@ -53,6 +53,7 @@ const SEEDS: Record<string, Record<string, string[]>> = {
   good_things: { start: ['one'], energy: ['little'], pick: ['outside'], when: ['evening'], remind: ['yes'], kind: ['colour'], keepit: ['keep'], happened: ['yes'], compared: ['lighter'], mind: ['here'] },
   values: { start: ['step'], mine: ['honesty', 'friendship', 'calm', 'fun', 'learning'], kept: ['friendship', 'honesty'], focus: ['friendship'], focus_kept: ['friendship'], step: ['friendship_1'], when: ['few_days'], remind: ['yes'], happened: ['yes'] },
   build_mastery: { area: ['caring'], rung: ['caring_2'], when: ['tomorrow'], remind: ['yes'], happened: ['done'], ican: ['yes'], then: ['up'], again: ['smaller'] },
+  finding_connection: { area: ['friend'], step: ['friend_thought'], predict: ['badly'], liking: ['not_much'], when: ['tomorrow'], remind: ['yes'], happened: ['did'], went: ['well'], liked: ['some'], again: ['new_time'] },
 };
 
 /** The first option a field offers: a seed, an emotion id, or its list's first value (tables and profile options: none). */

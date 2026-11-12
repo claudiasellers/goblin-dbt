@@ -54,6 +54,9 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   // *Did it happen?*, after the step (a then-vs-now would ask about a sort, which isn't a state change).
   'values-clarification': { module: 'er', closeKind: 'none' },
   'build-mastery': { module: 'er', closeKind: 'none' },
+  // Find your people (IE-09, docs/design/find-your-people.md): no close question; the outcome is the
+  // `reach_out_outcome` card's *Did you do it?* and *How did it go?*, after the step, against the prediction.
+  'finding-connection': { module: 'ie', closeKind: 'none' },
   // These ask their own questions inside their flows; the spine adds none (PR-S4 wraps them).
   'opposite-action': { module: 'er', closeKind: 'regulation_down' },
   'dear-man': { module: 'ie', closeKind: 'none' },

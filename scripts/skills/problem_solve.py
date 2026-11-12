@@ -129,7 +129,7 @@ COPY = {
     "l_dialectics": "Find the middle path",
     "l_please_skill": "Look after the basics first",
     "l_build_mastery": "Build a small win",
-    "l_finding_connection": "Find someone to lean on",
+    "l_finding_connection": "Take one small step towards people",
     "l_self_validate": "Validate yourself",
     "l_others": "This part is about them. Work out what to say with DEAR MAN",
     "l_missing_links": "Find what got in the way",
@@ -265,7 +265,8 @@ START_SMALL = {r["id"]: "yes" for rows in PS["subs"].values() for r in rows if r
 
 # --- Exits: every tool the content names. Unbuilt ones are planned: written, never offered or linked. ---
 BUILT = {"cool-down", "five-senses", "pause", "cope-ahead", "dear-man", "fast", "opposite-action", "check-the-facts",
-         "find-the-feeling", "ending-relationships", "let-it-be", "please-skill", "give", "values-clarification", "build-mastery"}
+         "find-the-feeling", "ending-relationships", "let-it-be", "please-skill", "give", "values-clarification", "build-mastery",
+         "finding-connection"}
 
 
 def exit_id(tool):

@@ -30,7 +30,7 @@ test("both skills are the one fast tool; nothing in either is a planned exit off
     assert.equal(s.toolId, "fast");
   }
   assert.deepEqual(review.exits.filter((x) => x.planned).map((x) => x.toolId), ["rehearse"]);
-  assert.deepEqual(letGo.exits.filter((x) => x.planned).map((x) => x.toolId).sort(), ["finding-connection"]);
+  assert.deepEqual(letGo.exits.filter((x) => x.planned).map((x) => x.toolId).sort(), [], "Find your people is built (IE-09)");
 });
 
 test("A: a sorry for a real wrong is kept to one; the card shows the instead line; Check the Facts is offered", () => {
@@ -95,7 +95,7 @@ test("Let go: a line, the card, then elsewhere with Recover; I don't need to say
   const first = letGo.options.line[0].value;
   const s = run(letGo, [pick("line", first), next, copied]);
   assert.deepEqual(s.path, ["line", "card", "elsewhere"]);
-  assert.deepEqual(s.offered, ["let_it_be", "recover"], "Let it be is built (DT-04); Finding connection is planned");
+  assert.deepEqual(s.offered, ["let_it_be", "recover", "finding_connection"], "Let it be (DT-04) and Find your people (IE-09) are built");
   assert.equal(M.handoffLine(ctx(letGo), M.stepOf(letGo, "elsewhere"), s), letGo.copy.elsewhere_line);
   const heard = run(letGo, [pick("line", first), next, copied], { frame: "let_go" });
   assert.equal(heard.stepId, "room", "after a host's no: the acknowledgement and Let it be here");
@@ -121,7 +121,7 @@ test("Let go after a host's no (IE-B4): *make some room for it here* runs Let it
   assert.equal(M.handoffLine(ctx(letGo, c), M.stepOf(letGo, "room"), at), letGo.copy.elsewhere_line_none);
   const later = run(letGo, [pick("line", "none"), next, pick("room", "later"), next], c);
   assert.equal(later.stepId, "after");
-  assert.deepEqual(later.offered, ["recover"], "Recover; Finding connection is planned");
+  assert.deepEqual(later.offered, ["recover", "finding_connection"], "Recover, then Find your people (IE-09)");
   const accept = M.stepOf(letGo, "accept");
   assert.deepEqual([accept.embed, accept.props.skill, accept.props.enterAt], ["inlineSkill", "let_it_be", "what"]);
   const here = [pick("line", "none"), next, pick("room", "here"), next];

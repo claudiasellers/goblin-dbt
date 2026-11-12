@@ -24,7 +24,7 @@ Claudia unparked it on 10 Nov ("build them now"), on the existing safety pieces 
 | `channel` → `open_line` → `decision_line` → `practical` | A message · A call · In person (*a message is fine, and often the wisest way*; after *It harms me* the question adds *If you're worried how they'll react, a message is often safer than in person*); one opening line; the decision said plainly (lines filtered to the decision); logistics only, optional. Own words everywhere | `card` |
 | `card` | The `boundaryLine` card with the three picks as one paragraph, Copy, never locked | `checkin` |
 | `checkin` → `when` | *Do you want a check-in after you've told them?* (opt-in), then *When are you thinking of doing it?* Today · This week · Not sure yet (it sets the check-in's day) | `ahead`: Cope Ahead (`first=conversation`), Rehearse (planned) |
-| `after` | Re-entered by the check-in (`resumeAt`): Holding steady · Pulled back toward them · I went back · I haven't done it yet · I don't feel safe · I'm in a really bad place; *Another check-in?* week · month; a quiet *I might hurt myself* link (`safety_open`) | `after_next` (Do the Opposite and Let it be on a pull; Find your people planned), `after_unsafe` (other-person resources, nothing from this check-in saved) or `after_low` (the crisis slot and `safety_open`) |
+| `after` | Re-entered by the check-in (`resumeAt`): Holding steady · Pulled back toward them · I went back · I haven't done it yet · I don't feel safe · I'm in a really bad place; *Another check-in?* week · month; a quiet *I might hurt myself* link (`safety_open`) | `after_next` (Do the Opposite and Let it be on a pull; Find your people, built 12 Nov), `after_unsafe` (other-person resources, nothing from this check-in saved) or `after_low` (the crisis slot and `safety_open`) |
 
 No close question (`closeKind: 'none'`): a rating after deciding about a relationship isn't evidence of anything,
 and a quiet end keeps the visit quiet. No routing rows, by design (PRD: "No intent row"; the note sits in
@@ -155,7 +155,7 @@ back for this tool (`getSkillRun` `RESUME_DAYS_FOR`), since `ending_again` can b
 | Rehearse it | IE-02 (planned exit) |
 | GIVE's *ending kindly* lines | IE-06 (planned exit); one kind opening line stands in |
 | Size it (IE-07) on the channel | IE-07 isn't built |
-| Let-go grief lines, *meet it elsewhere* | WMP / IE-09 (Find your people is a planned exit; Let it be is built) |
+| Let-go grief lines, *meet it elsewhere* | WMP / IE-09 (Find your people and Let it be are built) |
 | ER's `love-check` urge | ER to add; Do the Opposite's existing love urges serve now |
 | An `EndingSession` label | Not needed: the run is `ext.run` when saved (plan D2) |
 | Region lines beyond the US | The app is US-only |

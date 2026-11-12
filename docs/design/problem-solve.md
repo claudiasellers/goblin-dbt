@@ -146,7 +146,7 @@ holds.
   old page linked to all three, dead.
 - **Every dead link is a planned exit**: give, dialectics, PLEASE, build mastery, finding connection, effectiveness,
   chain analysis, values clarification, self-validation, body scan, the wave. All are recorded and never shown, so
-  they light up when their tool ships. Ending a relationship (IE-08) lit up on 11 Nov: for *Decide if this can be repaired* (broken trust)
+  they light up when their tool ships (Find your people lit up on 12 Nov, *Find someone to lean on*). Ending a relationship (IE-08) lit up on 11 Nov: for *Decide if this can be repaired* (broken trust)
   the commit card offers it only on the bigger step (*Make the decision: stay and rebuild, or leave and grieve*),
   behind Cope Ahead; the smaller steps still weigh repair, and a button to end it would answer that for them.
   Ending asks about safety first, and nothing in this run's record names it (`private`).

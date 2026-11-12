@@ -126,6 +126,7 @@ SIGNED_OFF = {
     "rf_reactive_aggression_words_grievance_fast": "2026-11-12",
     "rf_acute_alarm_words_demand_say-no": "2026-11-12",
     "rf_rumination_loop_words_repair_give": "2026-11-12",
+    "rf_reward_drive_low_words_cut-off_finding-connection": "2026-11-12",
 }
 BANDS = ["steady", "stirred", "flooded"]
 
@@ -229,6 +230,12 @@ CONCEPT_TAGS["please-skill"] = {"concept": "dbt_please", "side": "both", "skillK
 # okay, then something good), so it sits beside Running low (`body`) on a plain Low drive result. Direction up: never
 # on a flooded result (its row is DEFAULT_BANDS only), and fine on a blank one (blank drops only `down`).
 CONCEPT_TAGS["good-things"] = {"concept": "dbt_accumulate_positives", "side": "change", "skillKind": "redirect", "direction": "up"}
+# Find your people (IE-09, appToolId 'finding-connection' on the new concept dbt_building_relationships,
+# docs/design/find-your-people.md): reaching towards people, one small step. Relational, change-side, direction up (an
+# activating step: never on a flooded result, its row is DEFAULT_BANDS only; fine on a blank one). One word row, live
+# with the module (connected by default, 12 Nov 2026): *lonely* / *isolated* on Low drive lead with it, Running low
+# beside it. These are the words Keep it warm's note above set aside for "reaching out to people".
+CONCEPT_TAGS["finding-connection"] = {"concept": "dbt_building_relationships", "side": "change", "skillKind": "relational", "direction": "up"}
 BUILT_NOT_SIGNED_OFF = {
 }
 # Ride it out (urge-surfing), Let it be and Give your mind a job are live (Claudia, 12 Nov 2026: default to connected).
@@ -411,6 +418,8 @@ WORD_RULES = [
      "why": "Let it be (radical acceptance) after gentle movement for despair, grief and emptiness; not for numbness, which needs the body first (12 Nov 2026: was a pattern row for all of Shut down)."},
     {"key": "fragile", "pattern": "reward_drive_low", "tool": "let-it-be", "priority": 0.4, "words": ["vulnerable", "fragile", "powerless"],
      "why": "Let it be (radical acceptance) leads."},
+    {"key": "cut-off", "pattern": "reward_drive_low", "tool": "finding-connection", "priority": WORD_LEAD, "words": ["lonely", "isolated"],
+     "why": "Cut off from people (vocabulary: reach towards them): Find your people (IE-09) leads with one small step, the smallest only on a stirred reading, and Running low (the pattern's own lead) stays beside it. A word that names the missing people asks for people first."},
     {"key": "flat", "pattern": "reward_drive_low", "tool": "good-things", "priority": 1.5, "words": ["bored", "apathetic", "indifferent"],
      "why": "Nothing sounds good (ER PRD ER-04): one small good thing, picked for the energy there is, as the second card after Running low; Do the Opposite stays for the rest of Low drive (12 Nov 2026, default to connected)."},
 ]
