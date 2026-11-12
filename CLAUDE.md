@@ -152,7 +152,7 @@ Tools are defined in `src/data/tools.ts`. Each tool has:
 
 - `id` (kebab-case, e.g., `"opposite-action"`)
 - `name`, `emoji`, `tagline`, `description`
-- `category` (one of: `"distress-tolerance"`, `"emotion-regulation"`, `"mindfulness"`, `"interpersonal"`)
+- `module` (one of `src/data/modules.ts`: `"distress-tolerance"`, `"emotion-regulation"`, `"interpersonal-effectiveness"`, `"mindfulness"`): the Tools page groups by it. Every skill on the runtime must open a tool listed under its module, and a DBT `TherapyConcept` with an `appToolId` must carry the same `module` (`"Distress Tolerance"`, …) in the schema; `tests/tool-modules.test.mjs` (over `scripts/tools/concept_modules.py`) fails otherwise
 - `basis` (optional, e.g., `"DBT Handout 11"`)
 
 Interactive tool components live in `src/pages/tools/` and are registered in the `toolComponents` map in `ToolPage.tsx`. The `ToolPage` component handles the routing: it looks up the tool by ID from the URL, checks `toolComponents` for an interactive component, and renders either the interactive version or a static info page.

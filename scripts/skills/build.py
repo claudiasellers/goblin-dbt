@@ -157,6 +157,8 @@ def check(skill):
     lists = {o[0] for o in skill["options"]}
     tables = set(skill["tables"]) | set(GRAPH_TABLES)
     tools = tool_ids()
+    # Its tool must be in src/data/tools.ts, which gives it its DBT module on the Tools page (tests/tool-modules.test.mjs).
+    assert skill["toolId"] in tools, (sid, "the skill's tool isn't in src/data/tools.ts, so it has no module", skill["toolId"])
     assert skill["start"] in steps, sid
     assert len(steps) == len(skill["steps"]), (sid, "step ids are unique")
     for o in skill["options"]:
