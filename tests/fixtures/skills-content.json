@@ -6579,6 +6579,15 @@
        }
       },
       {
+       "exit": "thoughts",
+       "when": {
+        "eq": [
+         "$a.factor",
+         "belief"
+        ]
+       }
+      },
+      {
        "exit": "fast",
        "when": {
         "in": [
@@ -6756,6 +6765,13 @@
      "carry": [],
      "done": false,
      "safety": true
+    },
+    {
+     "id": "thoughts",
+     "toolId": "thoughts-passing",
+     "query": {},
+     "carry": [],
+     "done": false
     }
    ],
    "options": {
@@ -18369,6 +18385,24 @@
          "body"
         ]
        }
+      },
+      {
+       "exit": "thoughts",
+       "when": {
+        "all": [
+         {
+          "set": "$a.threat"
+         },
+         {
+          "not": {
+           "eq": [
+            "$a.close",
+            "worse"
+           ]
+          }
+         }
+        ]
+       }
       }
      ]
     },
@@ -18595,6 +18629,13 @@
     {
      "id": "soothe",
      "toolId": "soothe",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "thoughts",
+     "toolId": "thoughts-passing",
      "query": {},
      "carry": [],
      "done": false
@@ -37821,6 +37862,947 @@
      {
       "value": "no",
       "label": "No"
+     }
+    ]
+   }
+  },
+  {
+   "id": "thoughts_passing",
+   "toolId": "thoughts-passing",
+   "version": "tp-v1",
+   "start": "catch",
+   "accepts": [
+    "band"
+   ],
+   "ownMax": 60,
+   "emotionFields": [],
+   "copy": {
+    "catch_title": "What's the thought?",
+    "catch_hint": "Pick the closest, or put it in a few words.",
+    "catch_own": "In my own words",
+    "heads_up_title": "Your body's loud right now.",
+    "heads_up_hint": "Thoughts are easier to watch once your body settles. You can still try.",
+    "settle_line": "The thought will keep, and it's easier to watch from steadier ground.",
+    "file_title": "What kind of thought is it?",
+    "file_hint": "Naming the kind can give a little distance.",
+    "replay_line": "A memory that feels like it's happening now needs grounding first, not watching. If it happens a lot, someone trained in trauma can help.",
+    "not_mine_line": "Thoughts that don't feel like your own are worth talking through with a doctor, or your care team if you have one. For now, something steady around you can help.",
+    "harm_line": "That's a heavy thought to carry. Someone to talk to comes first.",
+    "move_title": "Pick one way to hold it a little further off.",
+    "move_hint": "Nothing to argue with. Only a little distance.",
+    "having_title": "Here's the thought. In a moment, say it to yourself with a few words in front.",
+    "having_next": "Next",
+    "frame_title": "Say the thought to yourself, with a few words in front.",
+    "frame_step1": "Say “I'm having the thought that”, then the thought.",
+    "frame_step2": "Once more: “I notice I'm having the thought that”, then the thought.",
+    "frame_step3": "Notice any change in how close it feels.",
+    "slow_title": "Slow it right down.",
+    "slow_step1": "Say the thought in your head, one word at a time.",
+    "slow_step2": "Leave a long gap between the words.",
+    "slow_step3": "Notice it's made of words.",
+    "leaf_title": "Set it on a leaf.",
+    "leaf_step1": "Picture a stream with leaves floating past.",
+    "leaf_step2": "Put the thought on a leaf. Let it float at its own pace.",
+    "leaf_step3": "If it stays or comes back, that's okay. Put it on the next leaf.",
+    "screen_title": "Watch it on a screen.",
+    "screen_step1": "Picture the thought as words on a screen across the room.",
+    "screen_step2": "Let them sit there, like subtitles.",
+    "screen_step3": "Let them stay or scroll off, in their own time.",
+    "start": "Start",
+    "running_frame": "Saying it",
+    "running_slow": "Slowly",
+    "running_leaf": "Floating",
+    "running_screen": "Watching",
+    "move_done": "That's it.",
+    "room_title": "Back to the room.",
+    "here": "You're here, and it's",
+    "found": "Found one",
+    "find_done": "That's it.",
+    "room_task": "Find three things you can see.",
+    "close_title": "How is the thought now?",
+    "louder_line": "Watching a thought can make it louder for a bit. That happens.",
+    "end_same": "It's still loud, and you noticed it as a thought. That's the skill, even when it doesn't shift.",
+    "end_same_facts": "It's still loud, and you noticed it as a thought. That's the skill. If you want to look at what it rests on, checking the facts can help.",
+    "end_further": "You held it as a thought, something passing through. You can do this again, anywhere.",
+    "safety_open": "Talk to someone now",
+    "next": "Next",
+    "done": "Done"
+   },
+   "tables": {},
+   "derive": [],
+   "steps": [
+    {
+     "id": "catch",
+     "kind": "ask",
+     "title": "catch_title",
+     "fields": [
+      {
+       "id": "catch",
+       "options": {
+        "list": "catch"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "own": {
+        "hint": "catch_own",
+        "countsAsPick": true
+       }
+      }
+     ],
+     "hint": "catch_hint",
+     "next": [
+      {
+       "to": "heads_up",
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       }
+      },
+      {
+       "to": "file",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "heads_up",
+     "kind": "ask",
+     "title": "heads_up_title",
+     "fields": [
+      {
+       "id": "heads_up",
+       "options": {
+        "list": "heads_up"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "heads_up_hint",
+     "next": [
+      {
+       "to": "settle",
+       "when": {
+        "eq": [
+         "$a.heads_up",
+         "body"
+        ]
+       }
+      },
+      {
+       "to": "file",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "settle",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "settle_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "next": [],
+     "offers": [
+      {
+       "exit": "cool_down",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "file",
+     "kind": "ask",
+     "title": "file_title",
+     "fields": [
+      {
+       "id": "file",
+       "options": {
+        "list": "file"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "file_hint",
+     "next": [
+      {
+       "to": "harm",
+       "when": {
+        "eq": [
+         "$a.file",
+         "harm"
+        ]
+       }
+      },
+      {
+       "to": "replay",
+       "when": {
+        "eq": [
+         "$a.file",
+         "replay"
+        ]
+       }
+      },
+      {
+       "to": "not_mine",
+       "when": {
+        "eq": [
+         "$a.file",
+         "not_mine"
+        ]
+       }
+      },
+      {
+       "to": "move",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "replay",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "replay_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "next": [],
+     "offers": [
+      {
+       "exit": "five_senses",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "not_mine",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "not_mine_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "next": [],
+     "offers": [
+      {
+       "exit": "five_senses",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "harm",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "harm_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "move",
+     "kind": "ask",
+     "title": "move_title",
+     "fields": [
+      {
+       "id": "move",
+       "options": {
+        "list": "move"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "move_hint",
+     "next": [
+      {
+       "to": "slow",
+       "when": {
+        "eq": [
+         "$a.move",
+         "slow"
+        ]
+       }
+      },
+      {
+       "to": "leaf",
+       "when": {
+        "eq": [
+         "$a.move",
+         "leaf"
+        ]
+       }
+      },
+      {
+       "to": "screen",
+       "when": {
+        "eq": [
+         "$a.move",
+         "screen"
+        ]
+       }
+      },
+      {
+       "to": "having",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "having",
+     "kind": "embed",
+     "embed": "boundaryLine",
+     "answerAs": "having",
+     "title": "having_title",
+     "props": {
+      "field": "catch",
+      "shape": "list",
+      "next": "having_next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "frame",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "frame",
+     "kind": "embed",
+     "embed": "doseTimer",
+     "answerAs": "frame",
+     "title": "frame_title",
+     "props": {
+      "seconds": 20,
+      "step1": "frame_step1",
+      "step2": "frame_step2",
+      "step3": "frame_step3",
+      "start": "start",
+      "running": "running_frame",
+      "done": "move_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "room",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "slow",
+     "kind": "embed",
+     "embed": "doseTimer",
+     "answerAs": "slow",
+     "title": "slow_title",
+     "props": {
+      "seconds": 30,
+      "step1": "slow_step1",
+      "step2": "slow_step2",
+      "step3": "slow_step3",
+      "start": "start",
+      "running": "running_slow",
+      "done": "move_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "room",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "leaf",
+     "kind": "embed",
+     "embed": "doseTimer",
+     "answerAs": "leaf",
+     "title": "leaf_title",
+     "props": {
+      "seconds": 45,
+      "step1": "leaf_step1",
+      "step2": "leaf_step2",
+      "step3": "leaf_step3",
+      "start": "start",
+      "running": "running_leaf",
+      "done": "move_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "room",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "screen",
+     "kind": "embed",
+     "embed": "doseTimer",
+     "answerAs": "screen",
+     "title": "screen_title",
+     "props": {
+      "seconds": 45,
+      "step1": "screen_step1",
+      "step2": "screen_step2",
+      "step3": "screen_step3",
+      "start": "start",
+      "running": "running_screen",
+      "done": "move_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "room",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "room",
+     "kind": "embed",
+     "embed": "orientFind",
+     "answerAs": "room",
+     "title": "room_title",
+     "props": {
+      "variant": "find",
+      "count": 3,
+      "here": "here",
+      "task": "room_task",
+      "foundLabel": "found",
+      "done": "find_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "close",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "close",
+     "kind": "ask",
+     "title": "close_title",
+     "fields": [
+      {
+       "id": "close",
+       "options": {
+        "list": "tvn"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "askFresh": "thenVsNow"
+      }
+     ],
+     "next": [
+      {
+       "to": "louder",
+       "when": {
+        "eq": [
+         "$a.close",
+         "worse"
+        ]
+       }
+      },
+      {
+       "to": "end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "louder",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "louder_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "cool_down",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "end",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.close",
+           "same"
+          ]
+         },
+         {
+          "in": [
+           "$a.file",
+           [
+            "judgement",
+            "prediction",
+            "about_them",
+            "about_me",
+            "ought"
+           ]
+          ]
+         }
+        ]
+       },
+       "key": "end_same_facts"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.close",
+         "same"
+        ]
+       },
+       "key": "end_same"
+      },
+      {
+       "when": {
+        "in": [
+         "$a.close",
+         [
+          "better",
+          "much_better"
+         ]
+        ]
+       },
+       "key": "end_further"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "check_the_facts",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.close",
+           "same"
+          ]
+         },
+         {
+          "in": [
+           "$a.file",
+           [
+            "judgement",
+            "prediction",
+            "about_them",
+            "about_me",
+            "ought"
+           ]
+          ]
+         }
+        ]
+       }
+      }
+     ]
+    }
+   ],
+   "exits": [
+    {
+     "id": "check_the_facts",
+     "toolId": "check-the-facts",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "cool_down",
+     "toolId": "cool-down",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "done",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": true
+    },
+    {
+     "id": "five_senses",
+     "toolId": "five-senses",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "safety_open",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": false,
+     "safety": true
+    }
+   ],
+   "options": {
+    "catch": [
+     {
+      "value": "thought_too_much",
+      "label": "I'm being too much"
+     },
+     {
+      "value": "thought_my_fault",
+      "label": "This is probably my fault"
+     },
+     {
+      "value": "thought_cant_handle",
+      "label": "I can't handle this"
+     },
+     {
+      "value": "thought_wrong",
+      "label": "What if I'm wrong?"
+     },
+     {
+      "value": "thought_will_leave",
+      "label": "They're going to leave"
+     },
+     {
+      "value": "hate_me",
+      "label": "They hate me"
+     },
+     {
+      "value": "have_to",
+      "label": "I have to do something right now"
+     },
+     {
+      "value": "mess_up",
+      "label": "I'm going to mess this up"
+     },
+     {
+      "value": "never_change",
+      "label": "Nothing will ever change"
+     }
+    ],
+    "heads_up": [
+     {
+      "value": "body",
+      "label": "My body first"
+     },
+     {
+      "value": "try",
+      "label": "Try it anyway"
+     }
+    ],
+    "file": [
+     {
+      "value": "judgement",
+      "label": "A judgement"
+     },
+     {
+      "value": "prediction",
+      "label": "A prediction"
+     },
+     {
+      "value": "ought",
+      "label": "An 'ought to' or a 'have to'"
+     },
+     {
+      "value": "about_me",
+      "label": "About me"
+     },
+     {
+      "value": "about_them",
+      "label": "About them"
+     },
+     {
+      "value": "memory",
+      "label": "A memory"
+     },
+     {
+      "value": "replay",
+      "label": "A memory that feels like it's happening now"
+     },
+     {
+      "value": "not_mine",
+      "label": "It doesn't feel like my own thought"
+     },
+     {
+      "value": "harm",
+      "label": "About hurting myself or not being here"
+     }
+    ],
+    "move": [
+     {
+      "value": "having",
+      "label": "Put words in front of it"
+     },
+     {
+      "value": "slow",
+      "label": "Slow it down"
+     },
+     {
+      "value": "leaf",
+      "label": "Set it on a leaf"
+     },
+     {
+      "value": "screen",
+      "label": "Watch it on a screen"
+     }
+    ],
+    "tvn": [
+     {
+      "value": "worse",
+      "label": "Louder"
+     },
+     {
+      "value": "same",
+      "label": "About as loud"
+     },
+     {
+      "value": "better",
+      "label": "A bit further away"
+     },
+     {
+      "value": "much_better",
+      "label": "Much further away"
      }
     ]
    }

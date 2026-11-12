@@ -155,6 +155,7 @@ export const PROFILE_NEEDS = {
   'let-it-be': ['parts'],                    // the tag row on its in-flow close (docs/design/let-it-be.md)
   'mind-job': ['parts'],                     // the tag row on its in-flow close (docs/design/mind-job.md)
   'soothe': ['parts'],                       // the tag row on its in-flow close (docs/design/held.md)
+  'thoughts-passing': ['parts'],             // the tag row on its in-flow close (docs/design/thoughts-passing.md)
   'alternate-rebellion': ['parts'],          // the tag row on its urge close (DT-11, Held off)
   'check-the-facts': ['parts'],              // the tag row on its close (docs/design/check-the-facts.md, screen 3)
   'fast': ['parts'],                         // the tag row on its close (docs/design/fast.md)

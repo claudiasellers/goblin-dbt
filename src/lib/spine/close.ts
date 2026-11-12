@@ -15,6 +15,7 @@ export const TOOL_CLOSE_KIND: Record<string, { module: SpineModule; closeKind: C
   'let-it-be': { module: 'dt', closeKind: 'regulation_down' },
   'mind-job': { module: 'dt', closeKind: 'regulation_down' },
   'soothe': { module: 'dt', closeKind: 'regulation_down' },
+  'thoughts-passing': { module: 'dt', closeKind: 'regulation_down' },
   'pros-cons': { module: 'dt', closeKind: 'none' },
   'alternate-rebellion': { module: 'dt', closeKind: 'urge' },
   'problem-solve': { module: 'er', closeKind: 'plan' },
