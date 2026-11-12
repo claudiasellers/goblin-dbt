@@ -13471,12 +13471,6 @@ MATCH (s:Skill {id: "dear_man_prep"}), (x:SkillExit {id: "dear_man_prep:cope_ahe
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_prep:cope_ahead"}), (t:TherapyConcept {appToolId: "cope-ahead"})
 MERGE (x)-[:OPENS]->(t);
-MERGE (x:SkillExit {id: "dear_man_prep:notice_them"})
-SET x += {skillId: "dear_man_prep", exit: "notice_them", toolId: "mindfulness-of-others", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"person\": \"$ctx.personId\", \"situationId\": \"notice\"}", x.label = null;
-MATCH (s:Skill {id: "dear_man_prep"}), (x:SkillExit {id: "dear_man_prep:notice_them"})
-MERGE (s)-[:HAS_EXIT]->(x);
-MATCH (x:SkillExit {id: "dear_man_prep:notice_them"}), (t:TherapyConcept {appToolId: "mindfulness-of-others"})
-MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_prep:ending_careful"})
 SET x += {skillId: "dear_man_prep", exit: "ending_careful", toolId: "ending-relationships", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"careful\"}", x.label = null;
 MATCH (s:Skill {id: "dear_man_prep"}), (x:SkillExit {id: "dear_man_prep:ending_careful"})
@@ -13584,9 +13578,6 @@ SET r += {order: 0}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "dear_man_prep:when"}), (x:SkillExit {id: "dear_man_prep:cope_ahead"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": null}]";
-MATCH (a:SkillStep {id: "dear_man_prep:when"}), (x:SkillExit {id: "dear_man_prep:notice_them"})
-MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": null}]";
 MERGE (o:SkillOption {id: "dear_man_prep:situation:ask"})
 SET o:SkillOption, o += {skillId: "dear_man_prep", list: "situation", value: "ask", label: "I need to ask for something", version: "dm-prep-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "dear_man_prep"}), (o:SkillOption {id: "dear_man_prep:situation:ask"})

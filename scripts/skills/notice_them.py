@@ -12,7 +12,7 @@ isn't safe). *Someone new* with no name is the PRD's *someone I'll see today*.
 Steps:
   way          what would help with them? (one tap): notice them next time (observe) · look again at something that
                happened (describe) · do one thing with them fully (participate). `?situationId=` puts one first
-               (DEAR MAN's prep: notice; the debrief after *they got defensive*: look again). A carried flooded
+               (the debrief after *they got defensive*, and *I couldn't*: look again). A carried flooded
                reading doesn't get *look again* (PRD: never while flooded; Recover owns the acute path).
   notice       observe: one thing to notice next time, with curiosity (their face, what they care about right now,
                how they're doing, …). Curiosity, not checking on them (the hypervigilance guard).
@@ -38,7 +38,7 @@ Steps:
 Departures (docs/design/notice-them.md lists them): the columns are two picks, not a pile sort of the episode's chips
 dealt one at a time (no episode record to deal from); no THINK line (the PRD's open question; adult app); no MF
 runtime cap of one a day and no fade (MF's runtime doesn't exist yet); no `OthersPractice` / `NotKnowingOption` nodes
-(the skill's options); the *their side* step in DEAR MAN's prep is an offer at its end, not a step inside it.
+(the skill's options); no *their side* in DEAR MAN's prep (one more exit takes its worst-case record past ext's 4 KB).
 
 Safety (plan C6): *Talk to someone now* on every screen.
 
@@ -332,7 +332,7 @@ def options():
 SKILL = {
     "id": ID, "toolId": TOOL_ID, "concept": CONCEPT, "version": VERSION, "start": "way", "ownMax": OWN_MAX,
     # personId: the person picked on the page (or `none`); band: a host's or the carried reading (flooded: no looking
-    # again); situationId: which way in comes first (DEAR MAN's prep: notice; the debrief: look_again).
+    # again); situationId: which way in comes first (the debrief: look_again).
     "accepts": ["personId", "band", "situationId"],
     "copy": COPY, "tables": {}, "derive": [], "steps": STEPS, "exits": EXITS, "options": options(),
     "emotionFields": [],

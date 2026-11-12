@@ -21,7 +21,7 @@ The person says *I was sure they meant it*, or *I don't really listen, I'm plann
 
 It runs at three moments:
 - as a calm-time practice;
-- before a conversation (DEAR MAN's prep);
+- before a conversation (*Notice them next time*);
 - the day after a misunderstanding (DEAR MAN's debrief). It never runs while flooded.
 
 ## Who first
@@ -34,7 +34,7 @@ The page asks *Who's it about?* with the person picker, then D4's safety questio
 
 | Step | What the person sees | PRD IE-10 |
 |---|---|---|
-| `way` | *What would help with them?* (*Curiosity, not checking on them.*) Notice them next time I'm with them · Look again at something that happened · Do one thing with them fully. `?situationId=` puts one option first: the prep puts *notice* first, the debrief and *I couldn't* put *look_again* first. A carried flooded reading sees only *notice* and *fully*, with *Looking again at what happened works better once your body settles* and a *Settle my body first* link | Observe / describe / participate; never while flooded |
+| `way` | *What would help with them?* (*Curiosity, not checking on them.*) Notice them next time I'm with them · Look again at something that happened · Do one thing with them fully. `?situationId=` puts one option first: the debrief and *I couldn't* put *look_again* first. A carried flooded reading sees only *notice* and *fully*, with *Looking again at what happened works better once your body settles* and a *Settle my body first* link | Observe / describe / participate; never while flooded |
 | `notice` | *Next time you're with them, notice one thing with curiosity.* (*Not checking whether they're upset. Noticing them, the way you'd notice weather.*) Their face · What they care about right now · How they're doing · Something they're good at · Something I hadn't noticed before | 1. Observe, off-phone; the hypervigilance guard |
 | `fully` | *Pick one thing to do with them fully.* (*No phone, and go with it. If your mind drifts, come back to them.*) A meal · A walk · A conversation · Watching something together · Something they like doing, or own words | 3. Participate |
 | `when` | *When will you see them?* Later today · Tomorrow · In a few days · Sometime this week. *Want me to ask how it went?* Yes books `notice_back` | → FollowUp |
@@ -81,7 +81,6 @@ One word row is live (12 Nov 2026):
 ## Entry points
 
 - The Tools list and the intent *I was sure they meant it*.
-- DEAR MAN's prep: Notice them is offered on its last screen with `situationId=notice` and the person. This is the PRD's *their side*.
 - DEAR MAN's debrief: when the turning point was *They got defensive*, the end card (`good` or `fix`) offers it with `situationId=look_again` and the person.
 - The check-in result for critical / dismissive (Routing above).
 
@@ -94,7 +93,7 @@ One word row is live (12 Nov 2026):
 | THINK line (adolescent add-on) | Not built: the PRD's open question, and this is the adult app | If an adolescent mode comes |
 | MF runtime: capped at one a day; fade guided → cue → off-phone; MF-02 rotation | Not built: MF's practice runtime doesn't exist yet (D3: the skill runtime is MF's runtime, and this skill runs on it) | MF batches |
 | `OthersPractice`, `NotKnowingOption`, `ThinkLine` nodes `IMPLEMENTS` the concept | The skill's options (graph content through `skills.cypher`) | When a second surface needs them |
-| IE-01 Mode B's optional *their side* step | An offer at the end of DEAR MAN's prep, not a step inside the plan | If the prep grows optional steps |
+| IE-01 Mode B's optional *their side* step | Not wired: one more exit takes the prep's worst-case record past ext's 4 KB (`tests/skill-contracts.test.mjs`). The Tools intent and *Notice them next time* cover the moment before a conversation | When the prep's record shrinks or ext's budget grows |
 | Recover v2's *worth a second look* zone | Not wired: Recover v2 isn't built | WMP |
 | Metrics: within-person change in *sure they meant it* answers in Recover | Not wired | Insights |
 

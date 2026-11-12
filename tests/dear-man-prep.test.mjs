@@ -182,7 +182,7 @@ test("skill: *I'm scared of what they'd do* stops the plan: the other-person res
 
 test("skill: *Rehearse it* is Cope Ahead for a conversation, carrying the part picked in who (an id read from the run, never a name)", () => {
   const ca = skill.exits.find((x) => x.id === "cope_ahead");
-  assert.deepEqual(step("when").offers.map((o) => o.exit), ["cope_ahead", "notice_them"], "and Notice them, the PRD's *their side* (IE-10)");
+  assert.deepEqual(step("when").offers.map((o) => o.exit), ["cope_ahead"]);
   const withPart = { answers: { part: { ids: ["3f2c9a0e-1b2c-4d5e-8f90-123456789abc"], own: null } } };
   assert.deepEqual(M.exitQuery(ctx(), ca, withPart), { situationId: "conversation", partId: "3f2c9a0e-1b2c-4d5e-8f90-123456789abc" });
   assert.deepEqual(M.exitQuery(ctx(), ca, { answers: {} }), { situationId: "conversation" }, "no part: the key is left out");

@@ -12239,10 +12239,6 @@
       {
        "exit": "cope_ahead",
        "when": null
-      },
-      {
-       "exit": "notice_them",
-       "when": null
       }
      ]
     }
@@ -12295,16 +12291,6 @@
      "toolId": "fast",
      "query": {
       "frame": "let_go"
-     },
-     "carry": [],
-     "done": false
-    },
-    {
-     "id": "notice_them",
-     "toolId": "mindfulness-of-others",
-     "query": {
-      "situationId": "notice",
-      "person": "$ctx.personId"
      },
      "carry": [],
      "done": false

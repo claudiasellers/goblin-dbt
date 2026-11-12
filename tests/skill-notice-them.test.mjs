@@ -187,11 +187,9 @@ test("Talk to someone now on every screen", () => {
   }
 });
 
-test("the entry points: DEAR MAN's prep (notice, their side) and the debrief after *they got defensive* (look again)", () => {
+test("the entry points: the debrief after *they got defensive* (look again, with the person); not the prep (its 4 KB budget)", () => {
   const prep = content.skills.find((s) => s.id === "dear_man_prep");
-  const pe = prep.exits.find((e) => e.id === "notice_them");
-  assert.deepEqual([pe.toolId, pe.query], ["mindfulness-of-others", { situationId: "notice", person: "$ctx.personId" }]);
-  assert.ok(prep.steps.find((s) => s.id === "when").offers.some((o) => o.exit === "notice_them"));
+  assert.ok(!prep.exits.some((e) => e.toolId === "mindfulness-of-others"), "one more exit takes the prep's worst case past 4 KB");
   const deb = content.skills.find((s) => s.id === "dear_man_debrief");
   assert.deepEqual(deb.exits.find((e) => e.id === "notice_them").query, { situationId: "look_again", person: "$ctx.personId" });
   for (const id of ["good", "fix"]) {
