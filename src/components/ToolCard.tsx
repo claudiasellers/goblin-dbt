@@ -35,7 +35,7 @@ export function ToolCard({ tool, state, mode }: ToolCardProps) {
             {mode ? mode.name : label(tool)}
           </h3>
           {official && (
-            <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5">{mode ? label(tool) : `In the app: ${tool.name}`}</p>
+            <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5">{mode ? label(tool) : <>In the app: {tool.name}</>}</p>
           )}
           <p className="text-sm text-[var(--color-text-secondary)] mt-1">
             {mode?.tagline ?? tool.tagline}
