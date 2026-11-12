@@ -2740,7 +2740,9 @@
     "anxious",
     "nervous"
    ],
-   "beside": [],
+   "beside": [
+    "check-the-facts"
+   ],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"

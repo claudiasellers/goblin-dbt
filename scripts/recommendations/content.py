@@ -282,7 +282,10 @@ WATCHFUL_WORDS = ["persecuted", "critical", "skeptical", "dismissive", "jealous"
 # with the priority the review gave them, so they take their place the day the module ships.
 # A word rule may name the leads it was reviewed to sit `beside` (app tool ids): when one of them is the first card,
 # the row fills the second card even where the swap rule (a different skill kind, never two change skills) would
-# drop it (12 Nov 2026, connected by default). Every other row keeps the rule; the hard filters apply to all.
+# drop it (12 Nov 2026, connected by default): both checks, kind and change + change, are skipped. Only on a
+# plain result: a blank result or a co-occurring pattern keeps the rule (and so its orienting backup). A tool's
+# pairs are the union over its rows that fired, so a better-ranked row of the same tool doesn't hide them.
+# Every other row keeps the rule; the hard filters apply to all; build.py checks the ids.
 WORD_RULES = [
     # --- Alarm ---
     {"key": "overwhelm", "pattern": "acute_alarm", "tool": "pause", "priority": WORD_LEAD, "words": ["overwhelmed", "out_of_control"],
@@ -304,7 +307,7 @@ WORD_RULES = [
     # --- On guard ---
     {"key": "anticipatory", "pattern": "chronic_vigilance", "tool": "opposite-action", "priority": WORD_LEAD, "words": ["anxious", "nervous"],
      "why": "Anticipatory anxiety needs rehearsal and evaluation: Cope Ahead, then Check the Facts (both planned); Do the Opposite (approach, fits-the-facts step) until then."},
-    {"key": "anticipatory", "pattern": "chronic_vigilance", "tool": "cope-ahead", "priority": 0.4, "words": ["anxious", "nervous"],
+    {"key": "anticipatory", "pattern": "chronic_vigilance", "tool": "cope-ahead", "priority": 0.4, "words": ["anxious", "nervous"], "beside": ["check-the-facts"],
      "why": "Planned: Cope Ahead leads for anticipatory anxiety."},
     {"key": "anticipatory", "pattern": "chronic_vigilance", "tool": "check-the-facts", "priority": 0.45, "words": ["anxious", "nervous"], "beside": ["cope-ahead"],
      "why": "Planned: Check the Facts as the alternative."},

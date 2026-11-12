@@ -12,8 +12,10 @@
  *     addresses (today's signal, now a tie-break), then app tool id (deterministic)
  *   → primary: the first without `requiresPrior`
  *   → swap: the first remaining with a different skillKind and not change + change (diversity), except
- *     a row reviewed to sit `beside` the first card's tool (12 Nov 2026: the review's "Say no beside
- *     Problem Solve"); a `requiresPrior` row may only fill this slot, marked `after_primary`
+ *     a tool with a row reviewed to sit `beside` the first card's tool (12 Nov 2026: the review's "Say no
+ *     beside Problem Solve"), which skips both checks, and only when the result is neither blank nor has a
+ *     co-occurring pattern (those keep the orienting backup); a `requiresPrior` row may only fill this slot,
+ *     marked `after_primary`
  *   → fallback: RoutingPolicy.fallbackConceptId (5-4-3-2-1) when nothing survives
  *   → applyMiddlePath (WMP-04 v0): labels only; `receiveFirst` = the first card is a change skill.
  * Nothing clinical is decided here: every row, tag and gate is graph content (content.py).
@@ -139,6 +141,16 @@ export function selectRecommendations(ctx: SelectInput): SelectOutput {
 
   // One card per tool: the best-ranked row wins.
   const seen = new Set<string>();
+  // A tool's reviewed pairs: the union of `beside` over every row of it that survived, so a better-ranked
+  // row without `beside` doesn't hide the pairing.
+  const besideByTool = new Map<string, Set<string>>();
+  for (const c of candidates) {
+    const set = besideByTool.get(c.concept.appToolId) ?? new Set<string>();
+    for (const t of c.row.beside ?? []) set.add(t);
+    besideByTool.set(c.concept.appToolId, set);
+  }
+  // Pairs only on a plain result: blank or a co-occurring pattern keeps the orienting backup (Gate 2, 12 Nov).
+  const pairsAllowed = !ctx.blank && !ctx.secondary;
   const ranked = candidates.filter((c) => (seen.has(c.concept.appToolId) ? false : (seen.add(c.concept.appToolId), true)));
 
   const picks: RoutingPick[] = [];
@@ -149,7 +161,7 @@ export function selectRecommendations(ctx: SelectInput): SelectOutput {
       for (const c of ranked) {
         if (c === first) continue;
         const bothChange = c.side === 'change' && first.side === 'change';
-        const reviewedPair = (c.row.beside ?? []).includes(first.concept.appToolId);
+        const reviewedPair = pairsAllowed && (besideByTool.get(c.concept.appToolId)?.has(first.concept.appToolId) ?? false);
         if (!reviewedPair && (c.concept.skillKind === first.concept.skillKind || bothChange)) { reject(c, 'diversity'); continue; }
         picks.push(pick(c, 'swap', c.row.requiresPrior ? 'after_primary' : undefined));
         break;

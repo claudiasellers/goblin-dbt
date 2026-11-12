@@ -316,4 +316,14 @@ test("a row reviewed to sit beside the lead fills the second card past the swap 
   }
   const sel = await cell("acute_alarm", "stirred", { words: ["frustrated"] });
   assert.ok(sel.picks.filter((p) => p.side === "change").length <= 1, "no word row fired: never two change skills");
+  // Both ways round: a second word that puts Check the Facts first still pairs it with Cope Ahead.
+  assert.deepEqual(pickIds(await cell("chronic_vigilance", "stirred", { words: ["anxious", "worried"] })).sort(), ["check-the-facts", "cope-ahead"]);
+  // A pair only on a plain result: blank or a co-occurring pattern keeps the rule and its orienting backup (Gate 2).
+  for (const opts of [{ secondary: "dissociation_overmodulation" }, { blank: true }]) {
+    const alarm = await cell("acute_alarm", "stirred", { words: ["pressured"], ...opts });
+    assert.ok(!pickIds(alarm).includes("say-no"), JSON.stringify(opts));
+    assert.equal(alarm.filtered.find((f) => f.toolId === "say-no")?.reason, "diversity", JSON.stringify(opts));
+    assert.ok(!pickIds(await cell("chronic_vigilance", "stirred", { words: ["anxious"], secondary: "rumination_loop", ...opts })).includes("check-the-facts") ||
+      !pickIds(await cell("chronic_vigilance", "stirred", { words: ["anxious"], secondary: "rumination_loop", ...opts })).includes("cope-ahead"), JSON.stringify(opts));
+  }
 });

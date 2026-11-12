@@ -54,6 +54,11 @@ def check(rows):
         else:
             assert not r["words"], f"{r['id']}: words only go with a words gate"
         assert r["requiresPrior"] in (None, "up_regulation"), r["id"]
+        if r["beside"]:
+            assert r["emotionGate"] == "words", f"{r['id']}: only a reviewed word rule sits beside a lead"
+            bad = [t for t in r["beside"] if t not in C.CONCEPT_TAGS or t == r["tool"]]
+            assert not bad, f"{r['id']}: beside names unknown tools or itself: {bad}"
+            assert "flooded" not in r["bands"], f"{r['id']}: no pairs when flooded"
         assert r["side"] in (None, *SIDES), r["id"]
         if C.BLANK_PATTERNS.get(r["pattern"]):
             assert r["direction"] != "down", f"{r['id']}: blank patterns are never calmed"
