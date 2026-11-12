@@ -17,12 +17,11 @@ const waitsForFrame = (x) => {
   return !!target && typeof x.query?.frame === "string" && !target.accepts.includes("frame");
 };
 const CTX_KEYS = new Set(["urgeId", "personId", "frame", "enterAt", "situationId", "partId", "band", "returnTo", "emotionId", "refused", "feelingId"]);
-const EXT_MAX_BYTES = 4096;
 /** Tools whose page is PersonFirstSkill (the picker, then the skill): they read `?person=` themselves. */
 const PERSON_FIRST_TOOLS = new Set(["dear-man", "say-no", "give", "mindfulness-of-others"]);
 
 const m = await importTs("src/lib/skillRuntime/machine.ts");
-const { validateExt, EXT_SCHEMAS, RUN_OWN_MAX } = await importTs("functions/src/spine/extSchemas.ts");
+const { validateExt, EXT_SCHEMAS, RUN_OWN_MAX, EXT_MAX_BYTES } = await importTs("functions/src/spine/extSchemas.ts");
 const conditions = await importTs("src/lib/skillRuntime/conditions.ts");
 const holdRing = await importTs("src/lib/holdRing.ts");
 const embedProps = await importTs("src/lib/skillRuntime/embedProps.ts");
@@ -149,16 +148,19 @@ for (const sk of fixture.skills) {
     assert.match(read("src/lib/spine/close.ts"), decl);
   });
 
-  test(`${sk.id}: its longest possible record fits ext's 4 KB and passes the server's schema`, () => {
+  test(`${sk.id}: its longest possible record fits ext's byte cap and passes the server's schema`, () => {
     // Worst case: the path at its cap with the longest step id; every field at its max picks of its longest
     // option values, with own words at the cap in 3-byte characters; every exit offered; every embed shown.
     const longest = (xs) => xs.reduce((a, b) => (b.length > a.length ? b : a), "");
     const stepId = longest(sk.steps.map((s) => s.id));
-    const answers = fields(sk).map((f) => {
+    // A per-pick field (R16) is recorded once per pick, three at most, each with its pick.
+    const perPick = new Set(sk.steps.filter((st) => st.each).flatMap((st) => (st.fields ?? []).map((f) => f.id)));
+    const answers = fields(sk).flatMap((f) => {
       const values = f.options.emotions ? ["disappointed_in_myself"] : (sk.options[f.options.list] ?? []).map((o) => o.value);
       const pick = Array.from({ length: Math.min(f.max, 12) }, () => longest(values) || "x");
       const own = f.own ? "愛".repeat(Math.min(f.own.max ?? sk.ownMax, sk.ownMax)) : null;
-      return { fieldId: f.id, optionIds: pick, ...(own ? { valueOwn: own } : {}) };
+      const one = { fieldId: f.id, optionIds: pick, ...(own ? { valueOwn: own } : {}) };
+      return perPick.has(f.id) ? [0, 1, 2].map((i) => ({ ...one, pick: String(i) })) : [one];
     });
     // Every recorded context key at the id cap, and each embed step's report at what its embed declares.
     const id64 = "x".repeat(64);
@@ -174,7 +176,7 @@ for (const sk of fixture.skills) {
       };
     });
     const run = {
-      skillId: sk.id, versionId: sk.version, path: Array(48).fill(stepId), answers: answers.slice(0, 32),
+      skillId: sk.id, versionId: sk.version, path: Array(48).fill(stepId), answers: answers.slice(0, 40),
       ctx: ctxRec, ...(out.length ? { out } : {}),
       offeredExitIds: sk.exits.slice(0, 8).map((x) => x.id), exitId: longest(sk.exits.map((x) => x.id)),
       embedsShown: ["safety_open"],

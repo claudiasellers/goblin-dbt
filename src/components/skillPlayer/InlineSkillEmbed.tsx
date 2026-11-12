@@ -13,7 +13,9 @@ import type { EmbedProps } from './embeds';
  * `left` when the person went back early), then each `inline.flags` id that held (`unsafe`), and the host's
  * transitions branch on them.
  *
- * Output: `finished`, `left`, `stopped`, `body`, `unsafe`.
+ * Output: `finished`, `left`, `stopped`, `body`, `unsafe`, and the sub-skill's own `inline.outcomes` (the step's
+ * `outcomes` prop, written by build.py). Context in: the step's `ctx` prop (Do the Opposite hands Check the Facts the
+ * feeling it's on), with which the sub-skill's `inline.seed` / `enterWhen` decide where it starts.
  */
 export function InlineSkillEmbed({ props, onShown, onDone, covered }: EmbedProps) {
   const toolSession = useToolSession();
@@ -26,10 +28,12 @@ export function InlineSkillEmbed({ props, onShown, onDone, covered }: EmbedProps
   }, [onShown]);
   const skillId = typeof props.skill === 'string' ? props.skill : '';
   const enterAt = typeof props.enterAt === 'string' ? props.enterAt : undefined;
+  // The host's `ctx` prop, already read in the host's run (SkillPlayer's embedProps): the sub-run's context in.
+  const runCtx = props.ctx && typeof props.ctx === 'object' ? props.ctx as Record<string, string> : undefined;
   if (!skillId || !toolSession.id) return null;
   return (
     <div data-testid="inline-skill" data-inline-skill={skillId}>
-      <SkillPlayer skillId={skillId} mode="inline" enterAt={enterAt} hostSessionId={toolSession.id} covered={covered}
+      <SkillPlayer skillId={skillId} mode="inline" enterAt={enterAt} ctx={runCtx} hostSessionId={toolSession.id} covered={covered}
         onReturn={(r) => onDone?.({ ids: r.ids })} />
     </div>
   );

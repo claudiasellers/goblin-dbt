@@ -80,7 +80,7 @@ function caOf(ext: unknown): Record<string, unknown> | null {
 
 /**
  * A skill-runtime visit's own words for a field, from `ext.run` (the projection writes `ext.ca` with ids only, so
- * the record fits 4 KB). Null for the hand-built page's sessions, whose own words are in `ext.ca`.
+ * the record fits 6 KB). Null for the hand-built page's sessions, whose own words are in `ext.ca`.
  */
 function runOwn(ext: unknown, fieldId: string): unknown {
   if (typeof ext !== 'string' || !ext) return null;

@@ -132,6 +132,12 @@ def check_embed_props(name, props, copy, fields, w):
             assert v in fields, (w, f"{name}.{k} is a field of the skill", v)
         elif t == "fields":
             assert isinstance(v, list) and v and len(set(v)) == len(v) and all(x in fields for x in v), (w, f"{name}.{k} lists fields of the skill", v)
+        elif t == "ids":
+            assert isinstance(v, list) and all(isinstance(x, str) and ID.match(x) for x in v), (w, f"{name}.{k} lists ids", v)
+        elif t == "ctx":
+            # Context key → a ref in this run; the sub-skill's `accepts` and the refs are checked with the host (R8 below).
+            assert isinstance(v, dict) and v and set(v) <= CTX_KEYS, (w, f"{name}.{k} maps context keys", v)
+            assert all(isinstance(r, str) and (r == "$each" or re.match(r"^\$(a|d|ctx)\.[A-Za-z_][A-Za-z0-9_]*$", r)) for r in v.values()), (w, f"{name}.{k} maps to refs", v)
         else:
             assert isinstance(v, str) and ID.match(v), (w, f"{name}.{k} is an id", v)
 
@@ -413,13 +419,29 @@ def check(skill):
             values = {x[1] for x in skill["options"] if f and x[0] == f["options"].get("list")}
             assert f and values and values <= THEN_VS_NOW, (sid, "the change check's options are then-vs-now answers", values)
         outs = set(EMBEDS["inlineSkill"]["ids"])
+        own = inl.get("outcomes") or []
+        # A skill's own outcomes never reuse a fixed id, and each is something the run can give (an end or a flag).
+        assert len(set(own)) == len(own) and not set(own) & outs, (sid, "inline outcomes are new ids", own)
+        assert all(ID.match(x) for x in own), (sid, "inline outcomes are ids", own)
         handoffs = {s["id"] for s in skill["steps"] if s["kind"] == "handoff"}
         for st_id, out in (inl.get("ends") or {}).items():
             assert st_id in handoffs, (sid, "inline ends name hand-off steps", st_id)
-            assert out in outs - {"left", "unsafe"}, (sid, "inline ends give an outcome id", out)
+            assert out in (outs - {"left", "unsafe"}) | set(own), (sid, "inline ends give an outcome id", out)
         for fl in inl.get("flags") or []:
-            assert fl["id"] in outs - {"finished", "left"}, (sid, "inline flags are output ids", fl)
+            assert fl["id"] in (outs - {"finished", "left"}) | set(own), (sid, "inline flags are output ids", fl)
             check_cond(fl["when"], fields, derived, sid, accepts)
+        given = set((inl.get("ends") or {}).values()) | {fl["id"] for fl in inl.get("flags") or []}
+        assert set(own) <= given, (sid, "every inline outcome is given by an end or a flag", set(own) - given)
+        if own:
+            assert "unsafe" in given, (sid, "a skill with its own outcomes says when it's unsafe (hosts branch on it first)")
+        for f_id, ref in (inl.get("seed") or {}).items():
+            assert f_id in fields, (sid, "inline seeds a field of the skill", f_id)
+            assert isinstance(ref, str) and ref.startswith("$ctx.") and ref[5:] in accepts, (sid, "inline seeds from context the skill accepts", ref)
+        for st_id, cond in (inl.get("enterWhen") or {}).items():
+            assert st_id in inl["enterAt"], (sid, "inline enterWhen is for one of its entries", st_id)
+            check_cond(cond, fields, derived, sid, accepts)
+        if inl.get("seed") or inl.get("enterWhen"):
+            assert set(inl["enterAt"]) <= set(inl.get("enterWhen") or {}), (sid, "a seeded entry says when it holds (else the start, never an empty screen)")
     per = skill.get("persist")
     if per:
         # R15: the session waits until the run leaves `after`, then writes nothing while `nothingWhen` holds.
@@ -493,14 +515,50 @@ def check_each(skill):
                 assert x not in per, (sid, s["id"], "a reopens step's after / again isn't per-pick")
     if skill.get("persist"):
         assert skill["persist"]["after"] not in per, (sid, "persist.after isn't per-pick")
-    # The record's answers: every per-pick field once per pick (three at most) plus the rest, under its 32-answer cap.
+    # The record's answers: every per-pick field once per pick (three at most) plus the rest, under its 40-answer cap (raised from 32 for the inline check, ER-B5).
     n_per = len({f["id"] for s in skill["steps"] if s.get("each") for f in s.get("fields", [])} | {s["answerAs"] for s in skill["steps"] if s.get("each") and s.get("answerAs")})
     n_once = len({f["id"] for s in skill["steps"] if not s.get("each") for f in s.get("fields", [])} | {s["answerAs"] for s in skill["steps"] if not s.get("each") and s.get("answerAs")})
-    assert 3 * n_per + n_once <= 32, (sid, "the longest record's answers fit the 32-answer cap", 3 * n_per + n_once)
+    assert 3 * n_per + n_once <= 40, (sid, "the longest record's answers fit the 40-answer cap", 3 * n_per + n_once)
     # The record's embed reports (`out`, one per whole-screen embed step, per pick on a per-pick one) under its cap of 8.
     e_per = sum(1 for s in skill["steps"] if s.get("each") and s["kind"] == "embed")
     e_once = sum(1 for s in skill["steps"] if not s.get("each") and s["kind"] == "embed")
     assert 3 * e_per + e_once <= 8, (sid, "the longest record's embed reports fit the cap of 8", 3 * e_per + e_once)
+
+
+# ext's byte cap (functions/src/spine/extSchemas.ts EXT_MAX_BYTES), read from the server so the two can't drift.
+EXT_MAX_BYTES = int(re.search(r"export const EXT_MAX_BYTES = (\d+);", open(os.path.join(ROOT, "functions/src/spine/extSchemas.ts"), encoding="utf8").read()).group(1))
+
+
+def worst_record_bytes(skill):
+    """The longest record's `ext.run` in bytes, the way tests/skill-contracts.test.mjs builds it (ER-B5): the path at
+    its cap, every field at its max picks of its longest value (three times, with its pick, on a per-pick step), own
+    words at the cap in 3-byte characters, 40 answers at most, every embed's report, every exit offered."""
+    longest = lambda xs: max(xs, key=len) if xs else "x"  # noqa: E731
+    per = {f["id"] for s in skill["steps"] if s.get("each") for f in s.get("fields", [])}
+    answers = []
+    for s in skill["steps"]:
+        for f in s.get("fields", []):
+            vals = ["disappointed_in_myself"] if f["options"].get("emotions") else [o[1] for o in skill["options"] if o[0] == f["options"].get("list")]
+            one = {"fieldId": f["id"], "optionIds": [longest(vals)] * min(f.get("max", 1), 12)}
+            if f.get("own"):
+                one["valueOwn"] = "愛" * min(f["own"].get("max", skill["ownMax"]), skill["ownMax"])
+            answers += [{**one, "pick": str(i)} for i in range(3)] if f["id"] in per else [one]
+    out = []
+    for s in [s for s in skill["steps"] if s["kind"] == "embed"][:8]:
+        d = EMBEDS.get(s["embed"], {})
+        r = {"embed": s["embed"], "stepId": s["id"]}
+        if d.get("ids"):
+            r["optionIds"] = [longest(d["ids"])] * 12
+        if d.get("ownText"):
+            r["valueOwn"] = "愛" * skill["ownMax"]
+        r.update({k: 3600 if k == "durationSec" else 100 for k in d.get("measures", [])})
+        out.append(r)
+    run = {"skillId": skill["id"], "versionId": skill["version"], "path": [longest([s["id"] for s in skill["steps"]])] * 48,
+           "answers": answers[:40], "ctx": {k: "x" * 64 for k in ("urgeId", "personId", "frame", "enterAt", "situationId", "partId")},
+           "out": out, "offeredExitIds": [e["id"] for e in skill["exits"]][:8], "exitId": longest([e["id"] for e in skill["exits"]]),
+           "embedsShown": ["safety_open"],
+           "handoffs": [{"primitiveId": "sigh", "completed": True, "durationSec": 60, "thenVsNow": "better", "resumed": True, "overridden": False}]}
+    return len(json.dumps({"run": run}, ensure_ascii=False, separators=(",", ":")).encode("utf8"))
 
 
 # Every ActionUrge id the graph has (Do the Opposite's and DT's behaviour urges): an option's `urge` names one.
@@ -508,17 +566,46 @@ ACTION_URGES = set(re.findall(r'\{id: "([a-z0-9_-]+)", label:', open(os.path.joi
 
 for sk in SKILLS:
     check(sk)
+    # Next to the answer count: the longest record fits ext's byte cap, or the close is refused after the whole skill.
+    assert worst_record_bytes(sk) <= EXT_MAX_BYTES, (sk["id"], "the longest record fits ext's byte cap", worst_record_bytes(sk), EXT_MAX_BYTES)
 
 # R8: an inline host's `inlineSkill` names a skill that declares `inline`, at one of its entries, under another tool.
-_by_id = {sk["id"]: sk for sk in SKILLS}
-for sk in SKILLS:
-    for st in sk["steps"]:
-        if st.get("embed") == "inlineSkill":
-            sub = _by_id.get(st["props"]["skill"])
-            w = (sk["id"], st["id"])
-            assert sub and sub.get("inline"), (w, "inlineSkill names a skill that runs inline", st["props"])
-            assert sub["id"] != sk["id"], (w, "a skill never runs itself inline")
-            assert st["props"].get("enterAt", sub["start"]) in sub["inline"]["enterAt"] + [sub["start"]], (w, "inlineSkill enters where the skill lets it", st["props"])
+def check_inline_hosts(skills):
+    """R8 hosts: an `inlineSkill` names a skill that runs inline, at one of its entries, with context it accepts; its
+    own outcomes go on the step; a host that branches on them branches on `unsafe` first (ER-B5)."""
+    _by_id = {sk["id"]: sk for sk in skills}
+    for sk in skills:
+        for st in sk["steps"]:
+            if st.get("embed") == "inlineSkill":
+                sub = _by_id.get(st["props"]["skill"])
+                w = (sk["id"], st["id"])
+                assert sub and sub.get("inline"), (w, "inlineSkill names a skill that runs inline", st["props"])
+                assert sub["id"] != sk["id"], (w, "a skill never runs itself inline")
+                assert st["props"].get("enterAt", sub["start"]) in sub["inline"]["enterAt"] + [sub["start"]], (w, "inlineSkill enters where the skill lets it", st["props"])
+                # Context in: keys the sub-skill accepts, refs this run has.
+                host_fields = {f["id"] for s in sk["steps"] for f in s.get("fields", [])} | {s["answerAs"] for s in sk["steps"] if s.get("answerAs")}
+                host_derived = {d["name"] for d in sk.get("derive", [])}
+                for k, r in (st["props"].get("ctx") or {}).items():
+                    assert k in sub.get("accepts", []), (w, "inline context the sub-skill accepts", k)
+                    assert (r == "$each" and st.get("each")) or (r.startswith("$a.") and r[3:] in host_fields) \
+                        or (r.startswith("$d.") and r[3:] in host_derived) or (r.startswith("$ctx.") and r[5:] in sk.get("accepts", [])), (w, "inline context from this run", k, r)
+                # The sub-skill's own outcomes go on the step for the machine (written here, never by hand).
+                own = sub["inline"].get("outcomes") or []
+                assert st["props"].get("outcomes", list(own)) == list(own), (w, "an inlineSkill step's outcomes come from its sub-skill")
+                if own:
+                    st["props"]["outcomes"] = list(own)
+                # A host that branches on the sub-skill's own outcomes branches on `unsafe` first: a run can end on a verdict
+                # and still carry the danger flag, and the danger card wins.
+                ids_ref = f"$a.{st['answerAs']}.ids"
+                branches = [{x[1] for x in re.findall(r'\["(\$a\.[A-Za-z_]+\.ids)", "([a-z_]+)"\]', json.dumps(t.get("when"))) if x[0] == ids_ref}
+                            for t in st.get("next", [])]
+                if any(b & set(own) for b in branches):
+                    assert branches and "unsafe" in branches[0], (w, "a host that branches on the sub-skill's outcomes branches on unsafe first")
+                for b in branches:
+                    assert b <= set(EMBEDS["inlineSkill"]["ids"]) | set(own), (w, "a host branches only on ids its sub-skill can give", b)
+
+
+check_inline_hosts(SKILLS)
 
 
 def spec_of(step):

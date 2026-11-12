@@ -84,6 +84,7 @@ One word row is live (12 Nov 2026):
 ## Entry points
 
 - The Tools list and the intent *I was sure they meant it*.
+- DEAR MAN's prep: the end card offers *Notice them next time, with curiosity* (`situationId=notice` and the person), the PRD's optional *their side* as an offer, not a step inside the plan.
 - DEAR MAN's debrief: when the turning point was *They got defensive*, and not *It escalated quickly* or *I gave in to keep the peace*, and *between you* isn't *no* or *I don't feel safe*, the end card (`good` or `fix`) offers it with `situationId=look_again` and the person.
 - The check-in result for critical / dismissive (Routing above).
 
@@ -97,7 +98,6 @@ One word row is live (12 Nov 2026):
 | THINK line (adolescent add-on) | Not built: the PRD's open question, and this is the adult app | If an adolescent mode comes |
 | MF runtime: capped at one a day; fade guided → cue → off-phone; MF-02 rotation | Not built: MF's practice runtime doesn't exist yet (D3: the skill runtime is MF's runtime, and this skill runs on it) | MF batches |
 | `OthersPractice`, `NotKnowingOption`, `ThinkLine` nodes `IMPLEMENTS` the concept | The skill's options (graph content through `skills.cypher`) | When a second surface needs them |
-| IE-01 Mode B's optional *their side* step | Not wired: one more exit takes the prep's worst-case record past ext's 4 KB (4108 B; `tests/skill-contracts.test.mjs`). The Tools intent and *Notice them next time* cover the moment before a conversation | IE-B5's Rehearse it PR makes room in the prep's record and wires it (`module-edges.json` tracks it) |
 | Recover v2's *worth a second look* zone | Not wired: Recover v2 isn't built | WMP |
 | Metrics: within-person change in *sure they meant it* answers in Recover | Not wired | Insights |
 | Metric: how often the debrief's *they got defensive* is followed by a *what might be going on* pick | Not measurable yet: the Notice them visit doesn't record which debrief opened it | Insights (a `hostSessionId` in the exit's context) |

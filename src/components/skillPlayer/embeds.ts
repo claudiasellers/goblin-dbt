@@ -419,7 +419,13 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     next: { type: 'copy' },
   },
   // R8: another skill run inline; `skill` names it (it must declare `inline`), `enterAt` one of its `inline.enterAt`.
-  inlineSkill: { skill: { type: 'id' }, enterAt: { type: 'id', optional: true } },
+  inlineSkill: {
+    skill: { type: 'id' }, enterAt: { type: 'id', optional: true },
+    /** Context key → a ref in the host's run: the sub-run's context in. */
+    ctx: { type: 'ctx', optional: true },
+    /** The sub-skill's `inline.outcomes`, written by build.py (never by hand). */
+    outcomes: { type: 'ids', optional: true },
+  },
 
   lidShelf: {
     /** The field whose pick is the container: `jar` · `tin` · `box` (its id; anything else draws a jar). */

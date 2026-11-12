@@ -41,7 +41,7 @@ Steps:
 Departures (docs/design/notice-them.md lists them): the columns are two picks, not a pile sort of the episode's chips
 dealt one at a time (no episode record to deal from); no THINK line (the PRD's open question; adult app); no MF
 runtime cap of one a day and no fade (MF's runtime doesn't exist yet); no `OthersPractice` / `NotKnowingOption` nodes
-(the skill's options); no *their side* in DEAR MAN's prep (one more exit takes its worst-case record past ext's 4 KB).
+(the skill's options). DEAR MAN's prep offers it on its end card (the PRD's *their side*, `situationId=notice`).
 
 Safety (plan C6): *Talk to someone now* on every screen.
 

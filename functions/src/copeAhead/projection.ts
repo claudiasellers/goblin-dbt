@@ -24,7 +24,7 @@ const strs = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is st
 
 /**
  * `ext.ca` from a Cope Ahead run: ids only, unanswered keys left out. The own words stay in `ext.run` (encrypted
- * there), never copied, so `{ run, ca }` fits ext's 4 KB; the after card reads them from the run
+ * there), never copied, so `{ run, ca }` fits ext's 6 KB; the after card reads them from the run
  * (spine/copeAheadAfter.ts `planIdsFromExt`).
  */
 export function caFromRun(run: Record<string, unknown>): Record<string, unknown> {

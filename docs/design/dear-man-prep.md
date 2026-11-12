@@ -43,10 +43,11 @@ card       the pocket card: Say it · Stay steady · If they push (one PaperCard
    │                                (flooded: Settle my body first, a link)
 when       *When is the conversation?* today · tomorrow · this week · not sure (ask_outcome: the card opens the debrief)
            offer: Rehearse it → Cope Ahead (situationId=conversation, partId = the part picked in who)
+           offer: Notice them next time, with curiosity → Notice them (IE-10, the PRD's *their side*; situationId=notice)
 ```
 
 Exits: `debrief` (the first screen's link), `let_go` (FAST, `frame=let_go`), `cool_down` (flooded), `cope_ahead`
-(*Rehearse it*, its `partId` read from the run as the exit is taken: `$a.part`, a runtime addition), `ending_careful`
+(*Rehearse it*, its `partId` read from the run as the exit is taken: `$a.part`, a runtime addition), `notice_them` (*their side*, with the person), `ending_careful`
 and `safety_open` (scared), `done`. The visit names the feelings picked as emotion words (`emotionFields: express`, each
 chip's `emotion` prop), as the old page did with the chips' labels.
 

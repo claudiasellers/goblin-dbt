@@ -157,7 +157,10 @@ EMBED_PROPS = {
     "batteryRead": {"fields": {"type": "fields"}, "low": {"type": "field"}, "names": {"type": "copy"},
                     "line": {"type": "copy", "optional": True}, "next": {"type": "copy"}},
     # R8: another skill run inline; `skill` names it (it must declare `inline`), `enterAt` one of its `inline.enterAt`.
-    "inlineSkill": {"skill": {"type": "id"}, "enterAt": {"type": "id", "optional": True}},
+    # `ctx`: context key → a ref in the host's run (the sub-run's context in); `outcomes`: the sub-skill's
+    # `inline.outcomes`, written by build.py, never by hand.
+    "inlineSkill": {"skill": {"type": "id"}, "enterAt": {"type": "id", "optional": True},
+                    "ctx": {"type": "ctx", "optional": True}, "outcomes": {"type": "ids", "optional": True}},
     "holdRing": {
         "variant": {"type": "enum", "values": ["press", "timed", "settle"]},
         "seconds": {"type": "int", "min": 1, "max": 900},
