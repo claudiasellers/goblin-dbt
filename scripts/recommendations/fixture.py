@@ -24,7 +24,7 @@ TOOL_EDGES = ('ADDRESSES', 'REDUCES', 'TARGETS')
 PATTERN_FIELDS = ('userFacingLabel', 'description', 'evidenceGrade', 'safetyConstraints', 'clinicalNotes')
 CONCEPT_FIELDS = ('appToolId', 'name', 'description', 'whenToUse', 'dbtBasis', 'side', 'skillKind', 'direction')
 CO_FIELDS = ('clinicalLabel', 'combinedUserFacingLabel', 'primaryPatternId', 'frequency', 'sequencingNote')
-RF_FIELDS = ('bands', 'priority', 'direction', 'side', 'requiresPrior', 'emotionGate', 'words', 'tier', 'surface', 'active',
+RF_FIELDS = ('bands', 'priority', 'direction', 'side', 'requiresPrior', 'emotionGate', 'words', 'beside', 'tier', 'surface', 'active',
              'version', 'reviewStatus', 'rationale')
 
 

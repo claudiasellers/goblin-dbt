@@ -144,6 +144,8 @@ export interface RoutingRow {
   emotionGate: 'addresses' | 'none_named' | 'words' | null;
   /** The words a `words` gate fires on (grid ids as sent); empty otherwise. */
   words: string[];
+  /** Leads (app tool ids) this row was reviewed to sit beside: it fills the swap past the diversity rule (12 Nov 2026). */
+  beside: string[];
   active: boolean;
 }
 
