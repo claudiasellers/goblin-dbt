@@ -150,10 +150,20 @@ already have something going on with. Both rows were dropped from `scripts/recom
 
 ## Not yet
 
+Each with where it lands. The two-refusals rule is the count alone (the person's own answers in the debrief), not the
+PRD's `risk: 'invalidating'` and the count: the refusals are the evidence, and the risk answer is about safety. It shows
+the practical-asks line and offers Let go beside the ask; it doesn't hide the brought or repair paths.
+
 - The inline layer inside DEAR MAN's prep, Say no's opener and Ending (PRD: four rows in under 30 s). The standalone
-  *before an ask* path is the same four rows.
+  *before an ask* path is the same four rows (IE-B5).
 - Check the Facts' inline mini-card for the guilt check (ER-B5); a link until then.
-- WMP's `forOther` witness corpus: the validation lines ship in the skill (D16) until it exists.
+- WMP's `forOther` witness corpus: the validation lines ship in the skill (D16) until it exists (the WMP batch).
 - Fade (lines that led to *still okay* become "lines that work with {label}"; Validate opens empty after three reps),
   the reps `validated_other` / `break_returned`, the weekly *one GIVE rep*, three nos → GIVE from Say no, People's
-  *repair with {label}*, IE-02 rehearsal (planned exit).
+  *repair with {label}*, IE-02 rehearsal (planned exit) (IE-B5).
+- The stirred branch's Angry part when the urge is to fire back (parts are gated; with the parts batch).
+- IE-01's situation list gaining *repair* and *keep it warm* entries in DEAR MAN's prep (IE-B5).
+- Do the Opposite's guilt-that-fits → the repair here (ER-B5, with Check the Facts' mini-card).
+- The PRD's `ADDRESSES` edges (anger, irritation, guilt, jealousy) on `dbt_give` (with the next routing review).
+- Own words on the no-sorry line, *yours to say* and the break line: the run's worst case sits near ext's 4 KB, so
+  these wait on the ext budget (IE-B5).

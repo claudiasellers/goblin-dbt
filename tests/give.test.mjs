@@ -210,7 +210,7 @@ test("skill: stirred hears its own side held first; voice: no exclamation marks,
   for (const list of Object.values(skill.options)) for (const o of list) assert.doesNotMatch(o.label, /!|\bshould\b|\bjust\b/i, o.value);
 });
 
-test("page: who it's with first; the safety route's heading; two refused asks to be heard narrow it to practical asks", () => {
+test("page: who it's with first; the safety route's heading; two refused asks to be heard say GIVE is for practical asks with them, with Let go beside the ask", () => {
   assert.match(read("src/pages/tools/Give.tsx"), /<PersonFirstSkill skillId="give" toolId="give" questionKey="personWhoGive" headingKey="safetyRouteGiveHeading" ctxFor=\{giveCtx\} \/>/);
   assert.match(skill.copy.picker_safetyRouteGiveHeading, /Keeping it warm isn't your job with \{who\}/);
   const kept = (n) => [{ id: "p1", refusalsValidation: n }];

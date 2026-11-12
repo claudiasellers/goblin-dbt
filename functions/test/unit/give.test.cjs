@@ -85,7 +85,7 @@ test('the reopened visit: one Interaction, WITH the person the first visit named
 
 test('a reopened visit that carries its person reads no source run; the safety route is never linked', async () => {
   const tx = fakeTx();
-  await G.projectGive(tx, input(run([ans('repaired', 'not_ready')], { personId: PERSON })));
+  await G.projectGive(tx, input(run([ans('repaired', 'wait')], { personId: PERSON })));
   assert.equal(tx.calls.some((c) => c.query === G.SOURCE_RUN_QUERY), false);
   assert.equal(writes(tx)[0].params.kind, 'repair');
   const unsafe = fakeTx((q) => (q === D.PERSON_RISK_QUERY ? [{ v: JSON.stringify({ risk: 'harm' }) }] : undefined));
@@ -119,7 +119,7 @@ test('the rep: either afterwards answered yes is off the phone, anything else no
   assert.deepEqual(S.runRep(ext([ans('repaired', 'yes')]), 'give'), { repSource: 'followup_offphone' });
   assert.deepEqual(S.runRep(ext([ans('back', 'yes')]), 'give'), { repSource: 'followup_offphone' });
   assert.deepEqual(S.runRep(ext([ans('back', 'not_yet')]), 'give'), { noRep: true });
-  assert.deepEqual(S.runRep(ext([ans('repaired', 'not_ready')]), 'give'), { noRep: true });
+  assert.deepEqual(S.runRep(ext([ans('repaired', 'wait')]), 'give'), { noRep: true });
   assert.equal(S.runRep(ext([ans('situation', 'brought')]), 'give'), null);
   assert.equal(S.runRep(ext([ans('back', 'yes')]), 'say-no'), null, "only Keep it warm's own tool");
 });
