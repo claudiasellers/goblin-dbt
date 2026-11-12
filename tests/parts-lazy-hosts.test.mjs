@@ -64,11 +64,11 @@ test("each one comes through lazy(), in its own Suspense", () => {
   assert.match(read("src/components/spine/SessionClose.tsx"), /import \{ PartTagSlot \} from '\.\/PartTagSlot';/);
 });
 
-test("Meet a part, Two pulls, Wise mind, Cope Ahead, Check the Facts, Rebel without the wreckage, It isn't working and Keep your self-respect are the lazy tools; the parts gates stay eager and fetch the content on demand", () => {
+test("Meet a part, Two pulls, Wise mind, Cope Ahead, Check the Facts, Rebel without the wreckage, It isn't working, Keep your self-respect and Say no are the lazy tools; the parts gates stay eager and fetch the content on demand", () => {
   const page = read("src/pages/ToolPage.tsx");
   const tools = importsOf(page).filter((s) => s.startsWith("./tools/")).map((s) => s.slice("./tools/".length)).sort();
   assert.deepEqual(tools, ["CoolDown", "DearMan", "FindTheFeeling", "FiveSenses", "InvalidationRecovery", "OppositeAction", "Pause", "ProblemSolve", "UrgeSurfing"]);
-  assert.equal((page.match(/\blazy\(/g) ?? []).length, 6, "six lazy tools");
+  assert.equal((page.match(/\blazy\(/g) ?? []).length, 7, "seven lazy tools");
   // Check the Facts (not a parts surface): played by the skill player (playerTools.ts), its own chunk, for everyone.
   assert.match(page, /const LazySkillPlayer = lazy\(\(\) => import\('\.\.\/components\/skillPlayer\/SkillPlayer'\)/);
   assert.match(read("src/lib/skillRuntime/playerTools.ts"), /'check-the-facts': 'check_the_facts',/);
@@ -77,6 +77,9 @@ test("Meet a part, Two pulls, Wise mind, Cope Ahead, Check the Facts, Rebel with
   // Keep your self-respect (FAST, not a parts surface): its own chunk, which picks one of its two skills.
   assert.match(page, /const LazyFast = lazy\(\(\) => import\('\.\/tools\/Fast'\)/);
   assert.match(page, /'fast': Fast,/);
+  // Say no (not a parts surface): its own chunk, who's asking first, then the skill.
+  assert.match(page, /const LazySayNo = lazy\(\(\) => import\('\.\/tools\/SayNo'\)/);
+  assert.match(page, /'say-no': SayNo,/);
   // Cope Ahead (not a parts surface): its own chunk, for everyone.
   assert.match(page, /const loadCopeAhead = \(\) => import\('\.\/tools\/CopeAhead'\);/);
   assert.match(page, /'cope-ahead': CopeAhead,/);

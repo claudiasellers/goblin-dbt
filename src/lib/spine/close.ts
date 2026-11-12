@@ -26,6 +26,7 @@ export const TOOL_CLOSE_KIND: Record<string, { module: SpineModule; closeKind: C
   'dear-man': { module: 'ie', closeKind: 'none' },
   'fast': { module: 'ie', closeKind: 'regulation_down' },
   'ending-relationships': { module: 'ie', closeKind: 'none' },
+  'say-no': { module: 'ie', closeKind: 'none' },
   'recovering-from-invalidation': { module: 'wmp', closeKind: 'none' },
   'meet-a-part': { module: 'mf', closeKind: 'orienting' },
   'two-pulls': { module: 'mf', closeKind: 'orienting' },

@@ -143,6 +143,21 @@ SET r += {why: "Give up on something that matters.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "envy-give-up"}), (b:ProtectiveMove {id: "put_it_off"})
 MERGE (a)-[r:EXPRESSES]->(b)
 SET r += {why: "Give up on your own goals.", reviewStatus: "approved"};
+MATCH (a:ActionUrge {id: "text-again"}), (b:ProtectiveMove {id: "chase"})
+MERGE (a)-[r:EXPRESSES]->(b)
+SET r += {why: "Text them again: chasing contact.", reviewStatus: "approved"};
+MATCH (a:ActionUrge {id: "check-profile"}), (b:ProtectiveMove {id: "chase"})
+MERGE (a)-[r:EXPRESSES]->(b)
+SET r += {why: "Check their profile: chasing certainty.", reviewStatus: "approved"};
+MATCH (a:ActionUrge {id: "pull-away"}), (b:ProtectiveMove {id: "hide"})
+MERGE (a)-[r:EXPRESSES]->(b)
+SET r += {why: "Pull away from them: getting out of reach.", reviewStatus: "approved"};
+MATCH (a:ActionUrge {id: "fire-back"}), (b:ProtectiveMove {id: "hit_back"})
+MERGE (a)-[r:EXPRESSES]->(b)
+SET r += {why: "Fire back.", reviewStatus: "approved"};
+MATCH (a:ActionUrge {id: "go-quiet"}), (b:ProtectiveMove {id: "hide"})
+MERGE (a)-[r:EXPRESSES]->(b)
+SET r += {why: "Go quiet on them: hiding behind silence, as Shut someone out.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "check"}), (b:ProtectiveMove {id: "chase"})
 MERGE (a)-[r:EXPRESSES]->(b)
 SET r += {why: "Check their page, or my phone: chasing certainty.", reviewStatus: "approved"};

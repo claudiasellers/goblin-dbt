@@ -57,7 +57,7 @@ run (R9); opening either resolves it (`OPEN_RESOLVES`).
 ## Routing
 
 The three planned `accepts` rows (strain words on Alarm; annoyed as the alternative; disgust and hesitation on
-replay) are `mind-job` rows now, live since 12 Nov 2026 (Claudia: default to connected); strain words get it first,
+replay) are `mind-job` rows now, live since 12 Nov 2026 (Claudia: default to connected); strain words get it first (not *pressured*, where Say no sits beside Problem Solve),
 Problem Solve after. It is `CONTRAINDICATED_FOR` dissociation, primary or alongside, like Do the Opposite. The concept keeps the
 review's `side: acceptance`; its `skillKind` is `redirect` (it was `hold`), so it can sit beside Pause or Let it be as
 a different kind of swap. `schema/app-tool-ids.cypher` gives `dbt_accepts` its `appToolId`.

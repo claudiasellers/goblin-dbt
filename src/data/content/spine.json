@@ -1,7 +1,7 @@
 {
   "source": {
     "file": "graph-content-only-2026-11-12.json",
-    "exportedAt": "2026-11-12T02:12:19.911Z"
+    "exportedAt": "2026-11-12T05:50:13.604Z"
   },
   "content": {
     "version": "spine-v1",
@@ -152,6 +152,52 @@
       "skip": "Skip"
     },
     "followUpTypes": [
+      {
+        "id": "ask_delayed",
+        "ownerModule": "ie",
+        "tier": "quality",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/dear-man?mode=one&run={sourceSessionId}&at=back&followUp={followUpId}",
+        "staleAfterHours": 48,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "Still there when you're ready.",
+          "title": "Something you saved"
+        },
+        "choices": [
+          {
+            "id": "dismiss",
+            "label": "No need",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "chips": {
+            "hour": {
+              "kind": "after",
+              "minutes": 60
+            },
+            "today": {
+              "days": 0,
+              "kind": "at_local",
+              "time": "19:00"
+            },
+            "tomorrow": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "10:00"
+            }
+          },
+          "kind": "chip"
+        },
+        "notification": "Something you saved"
+      },
       {
         "id": "ask_outcome",
         "ownerModule": "ie",
@@ -626,6 +672,53 @@
           "kind": "chip"
         },
         "notification": "Something you asked to be reminded of is ready."
+      },
+      {
+        "id": "no_outcome",
+        "ownerModule": "ie",
+        "tier": "quality",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/say-no?run={sourceSessionId}&at=said&followUp={followUpId}",
+        "staleAfterHours": 120,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "A few taps, when you're ready.",
+          "title": "How did it go?"
+        },
+        "choices": [
+          {
+            "id": "dismiss",
+            "label": "No need",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "chips": {
+            "this_week": {
+              "days": 4,
+              "kind": "at_local",
+              "time": "19:00"
+            },
+            "today": {
+              "days": 0,
+              "kind": "at_local",
+              "time": "20:00"
+            },
+            "tomorrow": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "19:00"
+            }
+          },
+          "kind": "chip"
+        },
+        "notification": "How did it go?"
       },
       {
         "id": "oa_plan",

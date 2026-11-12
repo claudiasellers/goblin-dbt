@@ -116,6 +116,12 @@ SIGNED_OFF = {
     "rf_reward_drive_low_words_fragile_problem-solve": "2026-10-05",
     # Rebel without the wreckage (DT-11), Pause's swap on provoked / indignant: signed off 10 Nov (Claudia).
     "rf_reactive_aggression_words_rebel_alternate-rebellion": "2026-11-10",
+    # Connected by default (Claudia, 12 Nov: "why are we leaving things disconnected and hedging by default at ALL?"):
+    # FAST's two word rows and Say no's row go live with the module.
+    "rf_social_threat_shame_words_self-respect_fast": "2026-11-12",
+    "rf_social_threat_shame_words_ask-for-it_dear-man": "2026-11-12",
+    "rf_reactive_aggression_words_grievance_fast": "2026-11-12",
+    "rf_acute_alarm_words_demand_say-no": "2026-11-12",
 }
 BANDS = ["steady", "stirred", "flooded"]
 
@@ -136,7 +142,9 @@ CONCEPT_TAGS = {
 # Tools whose rows are authored but switched off (content kill switch per row).
 INACTIVE_TOOLS: dict = {}
 # Tools that must have no rows at all yet.
-NO_ROWS = {"dear-man": "IE-01's 'is it safe with them?' question ships with the safety batch (R9, D-02)"}
+# Tools that may never have a row, with the reason. DEAR MAN left this list on 12 Nov 2026: its "is it safe with
+# them?" question shipped with IE-B2 (the picker opens every prep, docs/design/people.md), so it has its word row.
+NO_ROWS: dict[str, str] = {}
 
 # Planned tools (Oct 2026 review): the routing names them now; each concept is in the graph but has no
 # app module yet, so its rows are written switched off (and the routing slice skips concepts without an
@@ -162,6 +170,8 @@ CONCEPT_TAGS["alternate-rebellion"] = {"concept": "dbt_alternate_rebellion", "si
 # rejects it every time (as Rebel's `hold` did). skillKind `values` (the review asks what you stand for, F-A-S-T);
 # side `both` (the review, then Let go when nothing can be done).
 CONCEPT_TAGS["fast"] = {"concept": "dbt_fast", "side": "both", "skillKind": "values", "direction": "neutral"}
+# Say no (IE-04, appToolId 'say-no', docs/design/say-no.md): one word row, live with the module (connected by default).
+CONCEPT_TAGS["say-no"] = {"concept": "dbt_saying_no", "side": "change", "skillKind": "relational", "direction": "neutral"}
 
 # It isn't working (ER-14, appToolId 'er-troubleshoot', docs/design/er-troubleshoot.md) has no RECOMMENDED_FOR rows
 # by design: it answers "I did a skill and it didn't help", which no check-in state names. Its entries are skill
@@ -283,14 +293,22 @@ WATCHFUL_WORDS = ["persecuted", "critical", "skeptical", "dismissive", "jealous"
 # Per-word rules (Oct 2026 review): when one of the words is picked, this tool ranks above the pattern's
 # own rows. Each row's `why` is the review's reasoning. Planned tools (PLANNED) are written switched off
 # with the priority the review gave them, so they take their place the day the module ships.
+# A word rule may name the leads it was reviewed to sit `beside` (app tool ids): when one of them is the first card,
+# the row fills the second card even where the swap rule (a different skill kind, never two change skills) would
+# drop it (12 Nov 2026, connected by default): both checks, kind and change + change, are skipped. Only on a
+# plain result: a blank result or a co-occurring pattern keeps the rule (and so its orienting backup). A tool's
+# pairs are the union over its rows that fired, so a better-ranked row of the same tool doesn't hide them.
+# Every other row keeps the rule; the hard filters apply to all; build.py checks the ids.
 WORD_RULES = [
     # --- Alarm ---
     {"key": "overwhelm", "pattern": "acute_alarm", "tool": "pause", "priority": WORD_LEAD, "words": ["overwhelmed", "out_of_control"],
      "why": "Capacity saturation needs a behavioural halt: Pause (STOP), then Cool Down (TIPP). Overwhelmed stays on Alarm, not Flooded: one everyday word doesn't raise the crisis banner."},
     {"key": "stress", "pattern": "acute_alarm", "tool": "problem-solve", "priority": WORD_LEAD, "words": STRESS_WORDS,
      "why": "Bridge high agitation: distraction (Give your mind a job) leads, then Problem Solve."},
-    {"key": "stress", "pattern": "acute_alarm", "tool": "mind-job", "priority": 0.4, "words": STRESS_WORDS,
-     "why": "Give your mind a job (ACCEPTS, distract) leads for strain words."},
+    {"key": "stress", "pattern": "acute_alarm", "tool": "mind-job", "priority": 0.4, "words": [w for w in STRESS_WORDS if w != "pressured"],
+     "why": "Give your mind a job (ACCEPTS, distract) leads for strain words; not pressured, where Say no sits beside Problem Solve (a demand to answer, not to distract from)."},
+    {"key": "demand", "pattern": "acute_alarm", "tool": "say-no", "priority": WORD_NEXT, "words": ["pressured"], "beside": ["problem-solve"],
+     "why": "Pressure from someone's demands: Say no (IE-04) beside Problem Solve, so the person can turn the ask down instead of absorbing it."},
     {"key": "annoyed", "pattern": "acute_alarm", "tool": "opposite-action", "priority": WORD_LEAD, "words": ["annoyed"],
      "why": "Check the Facts on low-grade anger (planned); Do the Opposite's fits-the-facts step until then."},
     {"key": "annoyed", "pattern": "acute_alarm", "tool": "check-the-facts", "priority": 0.4, "words": ["annoyed"],
@@ -302,9 +320,9 @@ WORD_RULES = [
     # --- On guard ---
     {"key": "anticipatory", "pattern": "chronic_vigilance", "tool": "opposite-action", "priority": WORD_LEAD, "words": ["anxious", "nervous"],
      "why": "Anticipatory anxiety needs rehearsal and evaluation: Cope Ahead, then Check the Facts (both planned); Do the Opposite (approach, fits-the-facts step) until then."},
-    {"key": "anticipatory", "pattern": "chronic_vigilance", "tool": "cope-ahead", "priority": 0.4, "words": ["anxious", "nervous"],
+    {"key": "anticipatory", "pattern": "chronic_vigilance", "tool": "cope-ahead", "priority": 0.4, "words": ["anxious", "nervous"], "beside": ["check-the-facts"],
      "why": "Planned: Cope Ahead leads for anticipatory anxiety."},
-    {"key": "anticipatory", "pattern": "chronic_vigilance", "tool": "check-the-facts", "priority": 0.45, "words": ["anxious", "nervous"],
+    {"key": "anticipatory", "pattern": "chronic_vigilance", "tool": "check-the-facts", "priority": 0.45, "words": ["anxious", "nervous"], "beside": ["cope-ahead"],
      "why": "Planned: Check the Facts as the alternative."},
     {"key": "worry", "pattern": "chronic_vigilance", "tool": "opposite-action", "priority": WORD_LEAD, "words": ["worried"] + WATCHFUL_WORDS,
      "why": "Check the Facts first (planned); Do the Opposite's fits-the-facts step until then."},
@@ -325,6 +343,8 @@ WORD_RULES = [
      "why": "Planned: Check the Facts beside Do the Opposite (unhiding) for shame about the self."},
     {"key": "let-down", "pattern": "social_threat_shame", "tool": "give", "priority": 1.5, "words": ["let_down"],
      "why": "Planned: GIVE (keep the relationship) as the alternative to Recover."},
+    {"key": "ask-for-it", "pattern": "social_threat_shame", "tool": "dear-man", "priority": 1.5, "words": ["let_down", "excluded"], "beside": ["recovering-from-invalidation"],
+     "why": "DEAR MAN (ask for what you need) as the alternative to Recover after a let-down or being left out: the person's own ask, after the picker and the safety question (IE-01, D4). Not rejected or humiliated: a wound to recover from first."},
     {"key": "self-respect", "pattern": "social_threat_shame", "tool": "fast", "priority": 1.5, "words": ["betrayed", "disrespected"],
      "why": "FAST (keep self-respect) as the alternative to Recover. Not violated (Claudia, 10 Nov, IE-B1): the review opens on what the person did, which reads as self-blame after a violation."},
     # --- Ready to fight ---
@@ -392,7 +412,7 @@ def rows():
             "id": id_, "tool": tool, "pattern": pattern, "bands": bands, "priority": priority,
             "direction": spec.get("direction", CONCEPT_TAGS[tool]["direction"]), "requiresPrior": spec.get("requiresPrior"),
             "side": spec.get("side"), "emotionGate": gate, "words": words or [], "active": tool not in INACTIVE_TOOLS,
-            "why": why,
+            "beside": spec.get("beside", []), "why": why,
         })
 
     for pattern, cells in TABLE.items():
@@ -413,7 +433,7 @@ def rows():
             add(f"rf_{pattern}_{g['gate']}_{g['tool']}", g["tool"], pattern, g["bands"], g["priority"], g["why"], gate=g["gate"])
     for w in WORD_RULES:
         add(f"rf_{w['pattern']}_words_{w['key']}_{w['tool']}", w["tool"], w["pattern"], DEFAULT_BANDS, w["priority"], w["why"],
-            gate="words", words=w["words"], spec={k: w[k] for k in ("requiresPrior",) if k in w})
+            gate="words", words=w["words"], spec={"beside": w.get("beside", []), **{k: w[k] for k in ("requiresPrior",) if k in w}})
     for pr in PLANNED_ROWS:
         add(f"rf_{pr['pattern']}_planned_{pr['tool']}", pr["tool"], pr["pattern"], DEFAULT_BANDS, pr["priority"], pr["why"])
     for r in out:

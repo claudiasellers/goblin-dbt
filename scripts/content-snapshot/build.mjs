@@ -33,6 +33,8 @@
  *                          cut to the fields screens read (an allowlist, partsAllowlist.mjs)
  *   tool-names.json        each app tool's official skill name: TherapyConcept.name by appToolId (the admin
  *                          "Official DBT names" switch on the Tools page; no Cloud Function serves it)
+ *   opposite-action-picker.json  getOppositeActionContent's word → DBT parent rows and each parent's
+ *                          label, acknowledgment and urges, for every word (Do the Opposite's doors)
  * Each builder mirrors the Cypher in the Cloud Function it replaces (named on the function).
  */
 import { readFileSync, writeFileSync, readdirSync, mkdirSync, statSync } from 'node:fs';
@@ -565,6 +567,43 @@ export function buildToolNames(g) {
   return { tools };
 }
 
+/**
+ * The Opposite Action picker: which DBT parent each word works on, and each parent's label,
+ * acknowledgment and urges (labels only, by `order`). The same rows getOppositeActionContent
+ * (functions/src/oppositeAction/index.ts) reads, for every word at once, so the doors, the
+ * "start with the urge" list and the square can be drawn before any call. The guided steps
+ * (fits-the-facts, opposite steps, body cues) still come from the function.
+ */
+export function buildOppositeActionPicker(g) {
+  const parentOf = new Map();
+  for (const r of g.rels('HAS_REGULATION_CONTENT', 'Emotion', 'EmotionRegulationContent')) parentOf.set(r.a, r.b);
+  const urgesOf = new Map();
+  for (const r of g.rels('HAS_ACTION_URGE', 'EmotionRegulationContent', 'ActionUrge')) pushTo(urgesOf, r.a, r.b);
+
+  const words = {};
+  const wordsOf = new Map();
+  for (const e of g.nodes('Emotion').sort((a, b) => asc(a.props.id, b.props.id))) {
+    const c = parentOf.get(e);
+    if (e.props.oppositeActionApplicable === undefined && !c) continue;
+    const applicable = e.props.oppositeActionApplicable === true;
+    words[e.props.id] = { applicable, parent: c?.props.dbtParent ?? null, alternativeSkill: e.props.oaAlternativeSkill ?? null };
+    if (applicable && c) pushTo(wordsOf, c, e.props.id);
+  }
+  const parents = g.nodes('EmotionRegulationContent')
+    .sort((a, b) => asc(a.props.dbtParent, b.props.dbtParent))
+    .map((c) => ({
+      id: c.props.dbtParent,
+      label: c.props.label ?? c.props.dbtParent,
+      acknowledgment: c.props.acknowledgment ?? '',
+      urges: (urgesOf.get(c) ?? [])
+        .sort((a, b) => asc(a.props.order, b.props.order) || asc(a.props.id, b.props.id))
+        .map((u) => ({ id: u.props.id, label: u.props.label })),
+      wordIds: wordsOf.get(c) ?? [],
+    }));
+  if (!parents.some((p) => p.wordIds.length && p.urges.length)) throw new Error('Opposite Action picker content is empty');
+  return { parents, words };
+}
+
 /** Files a graph may not have content for yet: missing from an export, the committed file is kept. */
 export const KEPT_WHEN_MISSING = ['wise-mind.json', 'cope-ahead.json', 'skills.json'];
 
@@ -587,6 +626,7 @@ export function buildSnapshots(exp) {
     'spine.json': buildSpine(g),
     'parts.json': buildParts(g),
     'tool-names.json': buildToolNames(g),
+    'opposite-action-picker.json': buildOppositeActionPicker(g),
     ...(wiseMind ? { 'wise-mind.json': wiseMind } : {}),
     ...(copeAhead ? { 'cope-ahead.json': copeAhead } : {}),
     ...(skills ? { 'skills.json': skills } : {}),

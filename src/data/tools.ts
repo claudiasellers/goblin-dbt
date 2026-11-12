@@ -125,6 +125,8 @@ export const tools: Tool[] = [
     module: 'emotion-regulation',
     dbtBasis: 'Opposite Action',
     emoji: '🔄',
+    // The doors ask their own question first; the tagline and "When to use" box pushed them off a phone's first screen.
+    bare: true,
   },
   {
     id: 'find-the-feeling',
@@ -229,6 +231,18 @@ export const tools: Tool[] = [
     bare: true,
   },
   {
+    // On the skill runtime (docs/design/say-no.md): who's asking first, then the skill.
+    id: 'say-no',
+    name: 'Say no',
+    tagline: 'Size it, word it, and have a line ready for when they push',
+    description: 'Name what they\'re asking and what you\'re worried happens if you refuse. Size how firm to be, put the no together (one reason at most, no extra sorry), and copy it. Afterwards, look at whether it held.',
+    whenToUse: 'When someone wants something you don\'t want to give, or you said yes and want to take it back.',
+    module: 'interpersonal-effectiveness',
+    dbtBasis: 'DBT IE Handouts 5 and 8 (DEAR MAN for saying no, how firm to be)',
+    emoji: '🙅',
+    bare: true,
+  },
+  {
     // On the skill runtime (docs/design/ending-relationships.md). Safety first: nothing is saved before the
     // safety answer, and nothing at all in the safety branch unless the person saves it.
     id: 'ending-relationships',
@@ -290,6 +304,8 @@ export interface Intent {
   label: string;
   toolId: string;
   emoji: string;
+  /** A mode of the tool the intent opens (`mode=one`: DEAR MAN's One message). */
+  query?: string;
 }
 
 /**
@@ -310,8 +326,10 @@ export const allIntents: Intent[] = [
   { id: 'shift', label: 'Shift a feeling that isn\'t helping', toolId: 'opposite-action', emoji: '🔄' },
   { id: 'problem', label: 'Work through a problem', toolId: 'problem-solve', emoji: '🛠️' },
   { id: 'ask', label: 'Ask someone for what I need', toolId: 'dear-man', emoji: '🗣️' },
+  { id: 'one_message', label: 'Send someone one clear message', toolId: 'dear-man', query: 'mode=one', emoji: '✉️' },
   { id: 'dreading', label: 'Something\'s coming up that I\'m dreading', toolId: 'cope-ahead', emoji: '🧭' },
   { id: 'torn', label: 'I\'m torn about what to do', toolId: 'wise-mind', emoji: '🪨' },
+  { id: 'say-no', label: 'Say no to someone', toolId: 'say-no', emoji: '🙅' },
   { id: 'overreacting', label: 'I can\'t tell if I\'m overreacting', toolId: 'check-the-facts', emoji: '🔍' },
   { id: 'not-working', label: 'My skills aren\'t working', toolId: 'er-troubleshoot', emoji: '🧩' },
   { id: 'nightmares', label: 'The same nightmare keeps coming back', toolId: 'nightmare-rescript', emoji: '🌙' },

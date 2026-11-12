@@ -50,10 +50,10 @@ test("rows are drafts until signed off; the policy can only be enabled once ever
   }
 });
 
-test("no DEAR MAN rows, Pause active; planned tools are written switched off; built tools live (default to connected, 12 Nov 2026)", () => {
+test("DEAR MAN's one word row, Pause active; planned tools are written switched off; built tools live (default to connected, 12 Nov 2026)", () => {
   const planned = ["dbt_give", "dbt_please"];
   for (const r of rows) {
-    assert.notEqual(r.conceptId, "dbt_dear_man", r.id);
+    if (r.conceptId === "dbt_dear_man") assert.deepEqual([r.id, r.active, r.reviewStatus, r.words], ["rf_social_threat_shame_words_ask-for-it_dear-man", true, "approved", ["let_down", "excluded"]], "DEAR MAN's one word row, live (12 Nov)");
     const off = planned.includes(r.conceptId);
     assert.equal(r.active, !off, r.id);
   }
@@ -79,13 +79,17 @@ test("no DEAR MAN rows, Pause active; planned tools are written switched off; bu
   assert.equal(graph.concepts.dbt_alternate_rebellion.appToolId, "alternate-rebellion");
   const ar = rows.filter((r) => r.conceptId === "dbt_alternate_rebellion");
   assert.deepEqual(ar.map((r) => [r.id, r.active, r.reviewStatus]), [["rf_reactive_aggression_words_rebel_alternate-rebellion", true, "approved"]]);
-  // Keep your self-respect (docs/design/fast.md, IE-B1) the same way: built on the skill runtime, its two word rows off and drafts.
+  // Keep your self-respect (docs/design/fast.md, IE-B1): built on the skill runtime, its two word rows live (connected by default, 12 Nov).
   // Never on violated or victimized (Claudia, 10 Nov 2026): the review opens on what the person did.
   assert.equal(graph.concepts.dbt_fast.appToolId, "fast");
   const fast = rows.filter((r) => r.conceptId === "dbt_fast");
   assert.equal(fast.length, 2);
   assert.ok(fast.every((r) => !(r.words ?? []).some((w) => w === "violated" || w === "victimized")), "FAST never on violated or victimized");
   assert.ok(fast.every((r) => r.active === true && r.reviewStatus === "approved"), "FAST rows live (12 Nov: default to connected)");
+  // Say no (docs/design/say-no.md, IE-04): one word row, live with the module.
+  assert.equal(graph.concepts.dbt_saying_no.appToolId, "say-no");
+  const no = rows.filter((r) => r.conceptId === "dbt_saying_no");
+  assert.deepEqual(no.map((r) => [r.id, r.active, r.reviewStatus, r.words]), [["rf_acute_alarm_words_demand_say-no", true, "approved", ["pressured"]]]);
   // Let it be (docs/design/let-it-be.md, DT-04; D6 renamed radical-acceptance): built, its three rows live.
   assert.equal(graph.concepts.dbt_radical_acceptance.appToolId, "let-it-be");
   const lb = rows.filter((r) => r.conceptId === "dbt_radical_acceptance");
@@ -104,7 +108,7 @@ test("tags (WMP-04 v0 side, skillKind, direction) on the 13 app-tool concepts; D
     "dear-man": ["change", "relational", "neutral"], "recovering-from-invalidation": ["both", "relational", "neutral"],
     "wise-mind": ["both", "naming", "neutral"], "cope-ahead": ["change", "change", "neutral"],
     "check-the-facts": ["change", "change", "neutral"], "alternate-rebellion": ["acceptance", "redirect", "neutral"], fast: ["both", "values", "neutral"],
-    "let-it-be": ["acceptance", "hold", "neutral"], "mind-job": ["acceptance", "redirect", "neutral"],
+    "say-no": ["change", "relational", "neutral"], "let-it-be": ["acceptance", "hold", "neutral"], "mind-job": ["acceptance", "redirect", "neutral"],
   });
   for (const id of Object.keys(tags)) assert.ok(toolIds.includes(id), id);
 });

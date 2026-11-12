@@ -5192,6 +5192,26 @@
     "moveId": "put_it_off",
     "reviewStatus": "approved"
    },
+   "text-again": {
+    "moveId": "chase",
+    "reviewStatus": "approved"
+   },
+   "check-profile": {
+    "moveId": "chase",
+    "reviewStatus": "approved"
+   },
+   "pull-away": {
+    "moveId": "hide",
+    "reviewStatus": "approved"
+   },
+   "fire-back": {
+    "moveId": "hit_back",
+    "reviewStatus": "approved"
+   },
+   "go-quiet": {
+    "moveId": "hide",
+    "reviewStatus": "approved"
+   },
    "check": {
     "moveId": "chase",
     "reviewStatus": "approved"

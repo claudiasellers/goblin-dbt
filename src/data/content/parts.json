@@ -1,7 +1,7 @@
 {
   "source": {
     "file": "graph-content-only-2026-11-12.json",
-    "exportedAt": "2026-11-12T02:12:19.911Z"
+    "exportedAt": "2026-11-12T05:50:13.604Z"
   },
   "content": {
     "version": "parts-v1",
@@ -3406,6 +3406,7 @@
         "anger-lash": "hit_back",
         "anger-stonewall": "hide",
         "check": "chase",
+        "check-profile": "chase",
         "disgust-judge": "hit_back",
         "disgust-leave": "hide",
         "envy-compare": "turn_on_myself",
@@ -3414,6 +3415,8 @@
         "fear-avoid": "put_it_off",
         "fear-cancel": "hide",
         "fear-escape": "hide",
+        "fire-back": "hit_back",
+        "go-quiet": "hide",
         "guilt-apologize": "keep_the_peace",
         "guilt-avoid": "hide",
         "guilt-punish": "turn_on_myself",
@@ -3425,12 +3428,14 @@
         "love-proximity": "chase",
         "love-reach-out": "chase",
         "love-stalk": "chase",
+        "pull-away": "hide",
         "sad-give-up": "put_it_off",
         "sad-isolate": "hide",
         "shame-avoid-people": "hide",
         "shame-hide": "hide",
         "shame-secret": "hide",
-        "shame-shrink": "take_less_room"
+        "shame-shrink": "take_less_room",
+        "text-again": "chase"
       },
       "BarrierSubResponse": {
         "cant-afraid-aftermath": "put_it_off",
