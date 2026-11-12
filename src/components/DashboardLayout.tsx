@@ -6,6 +6,9 @@ import { useUserProfile } from '../contexts/UserProfileContext';
 import { OppositeActionFollowUpProvider } from '../contexts/OppositeActionFollowUpContext';
 import { TodayProvider } from '../contexts/TodayContext';
 import { TodayButton } from './today/TodayButton';
+import { useEffect } from 'react';
+import { preloadSafetyContent } from '../services/safety';
+import { HELP_AND_SAFETY_LABEL } from '../lib/safetyRoute';
 
 /**
  * App shell: sidebar + header + scrolling main column.
@@ -21,6 +24,8 @@ export function DashboardLayout() {
   const resolving = phase === 'resolving';
   const { profile } = useUserProfile();
   const { pathname } = useLocation();
+  // The route's content, loaded once the shell is up, so Help & safety opens offline later in the visit.
+  useEffect(() => { preloadSafetyContent(); }, []);
 
   const isExercise = pathname.startsWith('/tool/');
   const isToolsDirectory = pathname === '/tools';
@@ -75,6 +80,13 @@ export function DashboardLayout() {
               </div>
             )}
             <div className="flex items-center gap-3">
+              {/* Help & safety on every screen, signed in or out (CORE-01). */}
+              {pathname !== '/safety' && (
+                <Link to="/safety" data-testid="help-and-safety"
+                  className="inline-flex items-center min-h-11 px-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] underline-offset-4 hover:underline transition-colors">
+                  {HELP_AND_SAFETY_LABEL}
+                </Link>
+              )}
               {user && !focusedLayout && <TodayButton />}
               {phase === 'signed_out' && (
                 <Link

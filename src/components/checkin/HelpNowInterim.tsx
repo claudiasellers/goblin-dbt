@@ -6,6 +6,7 @@ import { getToolById } from '../../data/tools';
 import { useOfficialNames } from '../../hooks/useOfficialNames';
 import { recordToolSession } from '../../services/spine';
 import { newId } from '../../lib/spine/ids';
+import { HELP_NOW_SAY_HREF, SAY_LABEL } from '../../lib/safetyRoute';
 import { HELP_NOW_MICRO_STEP_SET, HELP_NOW_QUERY, HELP_NOW_TOOL_IDS, helpNowLinkState } from '../../lib/spine/helpNow';
 
 /**
@@ -71,6 +72,11 @@ export function HelpNowInterim({ onDone }: { onDone: () => void }) {
           );
         })}
       </div>
+      {/* CORE-01: the safety route is one tap from Help me now, never behind the body step */}
+      <Link to={HELP_NOW_SAY_HREF} onClick={() => record('exited_early')} data-testid="help-now-say"
+        className="mt-6 min-h-11 inline-flex items-center text-sm text-[var(--color-text-secondary)] underline underline-offset-2 hover:text-[var(--color-text-primary)]">
+        {SAY_LABEL}
+      </Link>
     </div>
   );
 }

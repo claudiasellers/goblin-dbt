@@ -37,7 +37,8 @@ def check():
     assert set(FLAGS) <= {"crisis_suicidal", "crisis_self_harm", "clinical_referral_shutdown",
                           "clinical_referral_psychosis", "clinical_referral_severe_dissociation"}
     assert set(VERIFIED) <= set(line_ids), "VERIFIED names a line that isn't there"
-    if POLICY["enabled"]:
+    assert POLICY["enabled"] is False, "`enabled` is the pre-PR-2 servers' field; the switch is routeOn"
+    if POLICY["routeOn"]:
         assert REVIEW_STATUS != "draft" or APPROVED_TO_SHIP, "the switch is on while the copy is a draft"
     text = json.dumps(FLOW, ensure_ascii=False)
     assert "!" not in text, "no exclamation marks"
@@ -106,6 +107,6 @@ for lid, country, name, kind, phone, sms, body, chat, hours, langs, source in LI
     A(f"MATCH (l:CrisisLine {{id: {q(lid)}}}), (c:Country {{id: {q(country)}}})\nMERGE (l)-[:COVERS]->(c);")
 
 A("\n// --- The switch ---")
-A(f"MERGE (p:SafetyPolicy {{id: {q(POLICY['id'])}}})\nSET p.enabled = {'true' if POLICY['enabled'] else 'false'}, p.version = {q(POLICY['version'])};")
+A(f"MERGE (p:SafetyPolicy {{id: {q(POLICY['id'])}}})\nSET p.enabled = false, p.routeOn = {'true' if POLICY['routeOn'] else 'false'}, p.version = {q(POLICY['version'])};")
 if __name__ == "__main__":
     print("\n".join(L))
