@@ -97,6 +97,9 @@ export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
   // The same rows; the resolver keeps only the catalogue id a good thing done was kept as.
   thingsILikePicks: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'thing_i_like', status: 'active'})
     RETURN p {.id, .valueJson} AS p`,
+  // Build mastery (ER-11): the ladder steps already on the I can list, so a done step isn't offered for keeping twice.
+  iCanRungs: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'i_can', status: 'active'})
+    RETURN p {.id, .valueJson} AS p`,
 };
 
 /** A kept thing's picked ids, named by Good things' own options (graph content: `SkillOption`, never a copy). */
@@ -309,6 +312,14 @@ const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
     const ids = new Set<string>();
     for (const rec of r.records) {
       try { for (const id of strings((JSON.parse(String((rec.get('p') as Record<string, unknown>).valueJson)) as Record<string, unknown>).pickIds).slice(0, 1)) ids.add(id); } catch { /* unreadable: skip */ }
+    }
+    return [...ids].map((id) => ({ id }));
+  },
+  iCanRungs: async (tx, uid) => {
+    const r = await tx.run(SLICE_QUERIES.iCanRungs!, { uid });
+    const ids = new Set<string>();
+    for (const rec of r.records) {
+      try { for (const id of strings((JSON.parse(String((rec.get('p') as Record<string, unknown>).valueJson)) as Record<string, unknown>).rungIds).slice(0, 1)) ids.add(id); } catch { /* unreadable: skip */ }
     }
     return [...ids].map((id) => ({ id }));
   },

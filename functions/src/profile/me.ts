@@ -182,7 +182,7 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
   let decrypt: ((v: unknown) => string | null) | null = null;
   // Items named from the graph after the loop: a thing I like or an I can step (the first label that resolves), values (every kept
   // one, then their own words, joined).
-  const unnamedThings: Array<{ ids: string[]; item: MeItem; all?: boolean; own?: string }> = [];
+  const unnamedThings: Array<{ ids: string[]; item: MeItem; all?: boolean; own?: string; forArea?: string }> = [];
   for (const r of itemsRes.records) {
     if (r.get('label') === 'Part' && !partsOn) continue;   // the query gates it too
     const p = r.get('p') as Record<string, unknown>;
@@ -222,8 +222,11 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
       }
     }
     // An I can step (ER-11): what they called it; a ladder step is named from the graph after the loop.
+    // A step for an area in their own words carries the area: "Spend five minutes on it (the garden)".
+    let forArea: string | undefined;
     if (meta.kind === 'i_can' && value) {
-      if (typeof value.rungOwn === 'string' && value.rungOwn.trim()) summary = value.rungOwn;
+      forArea = typeof value.areaOwn === 'string' && value.areaOwn.trim() ? value.areaOwn.trim() : undefined;
+      if (typeof value.rungOwn === 'string' && value.rungOwn.trim()) summary = forArea ? `${value.rungOwn.trim()} (${forArea})` : value.rungOwn;
       else {
         const ids = (Array.isArray(value.rungIds) ? (value.rungIds as unknown[]) : []).filter((x): x is string => typeof x === 'string').slice(0, 1);
         if (ids.length) thingIds = ids.map((id) => RUNG_OPTION + id);
@@ -260,7 +263,7 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
       ...(p.toolId !== undefined ? { toolId: (p.toolId as string | null) ?? null } : {}),
       ...(part ? { part } : {}),
     };
-    if (thingIds) unnamedThings.push({ ids: thingIds, item });
+    if (thingIds) unnamedThings.push({ ids: thingIds, item, ...(forArea ? { forArea } : {}) });
     if (valueIds) unnamedThings.push({ ids: valueIds.ids, item, all: true, ...(valueIds.own ? { own: valueIds.own } : {}) });
     (byArea.get(meta.area) ?? byArea.set(meta.area, []).get(meta.area)!).push(item);
   }
@@ -272,6 +275,7 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
       t.item.summary = t.all
         ? [...t.ids.map((id) => labels.get(id)).filter((x): x is string => !!x), ...(t.own ? [t.own] : [])].join(' · ')
         : t.ids.map((id) => labels.get(id)).find((x) => !!x) ?? '';
+      if (t.forArea && t.item.summary) t.item.summary = `${t.item.summary} (${t.forArea})`;
     }
   }
   const { name } = await readProfileSlices(tx, uid, 'find-the-feeling', now);

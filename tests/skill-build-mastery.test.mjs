@@ -10,7 +10,7 @@ import { importTs } from "./lib/importTs.mjs";
 const M = await importTs("src/lib/skillRuntime/machine.ts");
 const content = JSON.parse(readFileSync("tests/fixtures/skills-content.json", "utf8"));
 const skill = content.skills.find((s) => s.id === "build_mastery");
-const ctx = (ctxIn = {}) => ({ skill, shared: content, carried: [], gridIds: new Set(), emotionLabel: (x) => x, ctxIn, embedOutputs: {}, profile: null });
+const ctx = (ctxIn = {}, profile = null) => ({ skill, shared: content, carried: [], gridIds: new Set(), emotionLabel: (x) => x, ctxIn, embedOutputs: {}, profile });
 const pick = (fieldId, value) => ({ type: "pick", fieldId, value });
 const own = (fieldId, text) => ({ type: "own", fieldId, text });
 const next = { type: "next" };
@@ -50,11 +50,19 @@ test("an area, then that area's three rungs, easier to harder; own words always"
   assert.deepEqual(skill.options.rung.filter((o) => o.area === "admin").map((o) => o.label), ["Open one letter", "Reply to one email", "Sort one pile"], "the PRD's admin ladder");
   assert.match(skill.copy.rung_hint, /Smaller is still mastery/);
   for (const area of values(s, "area")) assert.deepEqual(skill.options.rung.filter((o) => o.area === area).map((o) => o.rung), [1, 2, 3], area);
-  // An area in their own words: three general rungs, or their own step.
-  const typed = run([own("area", "My garden"), next]);
+  // An area in their own words: three general rungs, or their own step; the area is named on the card so "it" keeps
+  // its meaning.
+  const typed = run([own("area", "the garden"), next]);
   assert.deepEqual(values(typed, "rung"), ["own_1", "own_2", "own_3"]);
-  const set = run([own("rung", "Pull the weeds by the door"), next, pick("when", "today"), next], ctx(), typed);
-  assert.equal(title(set), "Your step: Pull the weeds by the door.");
+  const set = run([pick("rung", "own_1"), next, pick("when", "today"), pick("remind", "yes"), next], ctx(), typed);
+  assert.equal(title(set), "Your step for the garden: Spend five minutes on it.");
+  assert.equal(title(reopen(set)), "Earlier you picked: Spend five minutes on it, for the garden.");
+  // Competence, not fitness; caring only for someone safe; time-boxed tops (clinical gate).
+  const labels = (area) => skill.options.rung.filter((o) => o.area === area).map((o) => o.label).join(" | ");
+  assert.doesNotMatch(labels("body"), /walk|active|exercise|run/i);
+  assert.match(labels("caring"), /someone safe/);
+  assert.doesNotMatch(labels("home") + labels("making"), /whole|something new/);
+  assert.equal(skill.options.area.find((o) => o.value === "caring").label, "Caring for someone or something");
 });
 
 test("when, and the card: done beats done well; ask me books mastery_step", () => {
@@ -92,17 +100,21 @@ test("done or partly: the I can list on a yes, then the next one up (never past 
   assert.equal(done.stepId, "back_done");
   assert.equal(title(done), "You did it.");
   assert.equal(title(run([pick("happened", "partly"), next], ctx(), r)), "Part of it counts.");
-  assert.deepEqual(values(done, "then"), ["up", "same", "rest"]);
+  assert.deepEqual(values(done, "then"), ["same", "up", "rest"], "no rush to go up: the same again first");
+  // Partly: the same or a smaller one, never up.
+  assert.deepEqual(values(run([pick("happened", "partly"), next], ctx(), r), "then"), ["same", "smaller", "rest"]);
   const step = M.stepOf(skill, "back_done");
   const yes = run([pick("ican", "yes"), pick("then", "rest")], ctx(), done);
-  assert.deepEqual((({ kind, value }) => ({ kind, value }))(M.keepFor(ctx(), step, yes)), { kind: "i_can", value: { rungIds: ["admin_2"] } });
+  assert.deepEqual((({ kind, value }) => ({ kind, value }))(M.keepFor(ctx(), step, yes)), { kind: "i_can", value: { areaIds: ["admin"], rungIds: ["admin_2"] } });
   assert.equal(M.keepFor(ctx(), step, run([pick("ican", "no"), pick("then", "rest")], ctx(), done)), null, "kept only on a yes");
   const end = run([next], ctx(), yes);
   assert.equal(end.stepId, "back_end");
-  assert.match(line(end), /I can list in Me/);
+  assert.match(line(end), /I can\u201d list in Me/);
+  assert.match(line(run([pick("ican", "no"), pick("then", "rest"), next], ctx(), done)), /^That's done for now/);
   // Up: back to the ladder, last time's rung cleared, so the person picks afresh.
   const up = run([pick("ican", "no"), pick("then", "up"), next], ctx(), done);
   assert.equal(up.stepId, "rung");
+  assert.equal(title(up), "Pick the next one up.");
   assert.equal(up.answers.rung, undefined);
   assert.deepEqual(values(up, "rung"), ["admin_1", "admin_2", "admin_3"]);
   const again = run([pick("rung", "admin_3"), next, pick("when", "tomorrow"), pick("remind", "yes")], ctx(), up);
@@ -114,6 +126,19 @@ test("done or partly: the I can list on a yes, then the next one up (never past 
   // From the top rung there's no next one up.
   const top = run([pick("happened", "done"), next], ctx(), reopen(booked("admin_3")));
   assert.deepEqual(values(top, "then"), ["same", "rest"]);
+  // A ladder step already on the I can list isn't offered for keeping again (the list never reads as a count).
+  const ic = ctx({}, { iCanRungs: [{ id: "admin_2" }] });
+  const again2 = run([pick("happened", "done"), next], ic, reopen(booked("admin_2", ic), ic));
+  const ican = M.stepOf(skill, "back_done").fields.find((f) => f.id === "ican");
+  assert.deepEqual(ican.showWhen, { not: { has: ["$p.iCanRungs.ids", "$a.rung"] } });
+  assert.equal(M.keepFor(ic, M.stepOf(skill, "back_done"), run([pick("then", "rest")], ic, again2)), null);
+  for (const p of ["functions/src/profile/types.ts", "src/data/profileTypes.ts"]) {
+    assert.match(readFileSync(p, "utf8"), /'build-mastery': \['iCanRungs'\]/, p);
+  }
+  // Up with a carried flooded reading: the heads-up first, as on a first visit.
+  const fc = ctx({ band: "flooded" });
+  const fl = run([pick("happened", "done"), next, pick("then", "up"), next], fc, reopen(booked("admin_2")));
+  assert.equal(fl.stepId, "heads_up");
 });
 
 test("not yet: a real answer; a smaller one (never below the bottom), the same again, or not now", () => {
@@ -122,15 +147,22 @@ test("not yet: a real answer; a smaller one (never below the bottom), the same a
   assert.equal(no.stepId, "back_not");
   assert.equal(title(no), "Not yet is a real answer.");
   assert.match(skill.copy.not_hint, /Smaller is still mastery/);
-  assert.deepEqual(values(no, "again"), ["smaller", "same", "not_now"]);
-  assert.deepEqual(offers(no), []);
-  assert.equal(run([pick("again", "smaller"), next], ctx(), no).stepId, "rung");
+  assert.deepEqual(values(no, "again"), ["smaller", "same", "stuck", "not_now"]);
+  assert.match(skill.copy.not_hint, /Neither is a failing/);
+  const smaller = run([pick("again", "smaller"), next], ctx(), no);
+  assert.equal(smaller.stepId, "rung");
+  assert.equal(title(smaller), "Pick a smaller one.");
+  // Something keeps getting in the way: Problem Solve (the stand-in for "not yet twice" until part 2).
+  const stuck = run([pick("again", "stuck"), next], ctx(), no);
+  assert.equal(stuck.stepId, "back_stuck");
+  assert.deepEqual(offers(stuck), ["problem_solve"]);
   assert.equal(run([pick("again", "same"), next], ctx(), no).stepId, "when");
   const later = run([pick("again", "not_now"), next], ctx(), no);
   assert.equal(later.stepId, "back_end");
   assert.match(line(later), /^It'll keep/);
   const bottom = run([pick("happened", "not_yet"), next], ctx(), reopen(booked("admin_1")));
-  assert.deepEqual(values(bottom, "again"), ["same", "not_now"]);
+  assert.deepEqual(values(bottom, "again"), ["smaller_own", "same", "stuck", "not_now"], "at the bottom: smaller in their own words");
+  assert.equal(run([pick("again", "smaller_own"), next], ctx(), bottom).stepId, "rung");
   // No streaks, counts or scores anywhere in the copy.
   assert.doesNotMatch(JSON.stringify(skill.copy), /streak|score|\d+ (times|days) in a row|failed/i);
 });
@@ -152,8 +184,9 @@ test("i_can: a profile kind about me, many, own words encrypted, named in Me fro
   const k = PROFILE_KINDS.i_can;
   assert.equal(k.area, "about_me");
   assert.equal(k.many, true);
-  assert.equal(k.slice, null);
-  assert.deepEqual(k.ownFields, ["rungOwn"]);
+  assert.equal(k.slice, "iCanRungs");
+  assert.deepEqual(k.ownFields, ["areaOwn", "rungOwn"]);
+  assert.deepEqual(k.validate({ areaOwn: "the garden", rungIds: ["own_1"] }), { areaOwn: "the garden", rungIds: ["own_1"] });
   assert.deepEqual(k.validate({ rungIds: ["admin_1"] }), { rungIds: ["admin_1"] });
   assert.deepEqual(k.validate({ rungOwn: "Pull the weeds" }), { rungOwn: "Pull the weeds" });
   assert.throws(() => k.validate({}), /Nothing to keep/);

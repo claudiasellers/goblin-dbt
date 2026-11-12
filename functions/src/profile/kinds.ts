@@ -173,16 +173,20 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
   },
   // Build mastery (ER-11, docs/design/build-mastery.md): one step the person did (done or partly), kept on the done
   // card's *Yes, add it* to their I can list. The runtime's keep (R4: `rungIds`, the ladder's option id, or `rungOwn`).
-  // No slice: Me names it (own words, else the option's label from the graph).
+  // Me names it (own words, else the option's label from the graph); the `iCanRungs` slice keeps a ladder step from
+  // being kept twice.
   i_can: {
-    kind: 'i_can', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'about_me', slice: null,
-    owner: 'ER', many: true, maxItems: 100, editor: null, ownFields: ['rungOwn'],
+    kind: 'i_can', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'about_me', slice: 'iCanRungs',
+    owner: 'ER', many: true, maxItems: 100, editor: null, ownFields: ['areaOwn', 'rungOwn'],
     validate: (v) => {
       const o = obj(v);
       const out: Record<string, unknown> = {};
-      if (o.rungIds !== undefined) out.rungIds = strArray(o.rungIds, { max: 1, item: (x) => str(x, { max: 40, pattern: OPTION_ID }) });
-      if (o.rungOwn !== undefined) out.rungOwn = str(o.rungOwn, { max: 60 });
-      for (const k of Object.keys(o)) if (k !== 'rungIds' && k !== 'rungOwn') throw new ValidationError('Unexpected field');
+      // The area comes along (an id, or the person's words), so a general step still says what it was for.
+      for (const f of ['area', 'rung'] as const) {
+        if (o[`${f}Ids`] !== undefined) out[`${f}Ids`] = strArray(o[`${f}Ids`], { max: 1, item: (x) => str(x, { max: 40, pattern: OPTION_ID }) });
+        if (o[`${f}Own`] !== undefined) out[`${f}Own`] = str(o[`${f}Own`], { max: 60 });
+      }
+      for (const k of Object.keys(o)) if (!/^(area|rung)(Ids|Own)$/.test(k)) throw new ValidationError('Unexpected field');
       const has = ((out.rungIds as string[] | undefined)?.length ?? 0) > 0 || (typeof out.rungOwn === 'string' && out.rungOwn.trim() !== '');
       if (!has) throw new ValidationError('Nothing to keep');
       return out;

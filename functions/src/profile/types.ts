@@ -13,7 +13,7 @@ export const PROFILE_AREAS: readonly ProfileAreaId[] = ['about_me', 'my_people',
 export const SLICE_IDS = [
   'name', 'quietHours', 'patterns', 'ownLines', 'savedLines',
   'people', 'bodyFlags', 'values', 'goals', 'copeAheadPlans', 'boundaryLines', 'practicePrefs',
-  'fadeLevels', 'ownWords', 'thingsILike', 'thingsILikePicks', 'crisisKit', 'safetyPlan', 'country',
+  'fadeLevels', 'ownWords', 'thingsILike', 'thingsILikePicks', 'iCanRungs', 'crisisKit', 'safetyPlan', 'country',
   'parts', 'partDetail', 'partAnchors', 'den', 'prosCons',
 ] as const;
 export type SliceId = (typeof SLICE_IDS)[number];
@@ -78,6 +78,8 @@ export interface ProfileSlices {
   thingsILike: Array<{ id: string; label: string; meta: ProfileItemMeta }>;
   /** The catalogue ids of the things kept from a good thing done (`pickIds`): Good things drops their catalogue copy. */
   thingsILikePicks: Array<{ id: string }>;
+  /** The ladder ids already on the I can list (ER-11, kind `i_can`, `rungIds`): Build mastery doesn't offer them twice. */
+  iCanRungs: Array<{ id: string }>;
   /**
    * The kept crisis kit (DT-03, kind `crisis_kit`, one per person), active only, or null: per section the option ids
    * and the person's own words as written (decrypted for them). The kit plays it one card at a time.
@@ -177,6 +179,7 @@ export const PROFILE_NEEDS = {
   'fast': ['parts'],                         // the tag row on its close (docs/design/fast.md)
   'say-no': ['people'],                      // the picker (IE-03), before the skill (docs/design/say-no.md)
   'good-things': ['thingsILike', 'thingsILikePicks'],             // its pick step: the person's own things first (docs/design/good-things.md)
+  'build-mastery': ['iCanRungs'],             // the done card: a step already on the I can list isn't offered again (docs/design/build-mastery.md)
   'give': ['people'],                        // the picker (IE-03), before the skill (docs/design/give.md)
   'values-clarification': ['values'],         // the start screen (*Your values are here*) and a step for one kept before (docs/design/values.md)
   // Wise mind's step back (parts on only): the person's parts in the room, with their names, shapes,

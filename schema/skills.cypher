@@ -20267,7 +20267,7 @@ SET r += {list: "again", order: 113};
 
 // --- build_mastery (bm-v1) ---
 MERGE (s:Skill {id: "build_mastery"})
-SET s += {toolId: "build-mastery", version: "bm-v1", contentVersion: "skills-v1", start: "start", ownMax: 60, emotionFields: [], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"area_label\": \"Which part of life?\", \"area_own\": \"Something else\", \"back_title\": \"Earlier you picked: {rung}.\", \"done\": \"Done\", \"done_hint\": \"That's evidence you can do hard things.\", \"done_title\": \"You did it.\", \"end_kept\": \"It's on your I can list in Me.\", \"end_line\": \"It'll keep. Come back to it any time.\", \"happened_label\": \"How did it go?\", \"heads_up_hint\": \"This works better once it settles a little.\", \"heads_up_title\": \"Your body's loud right now.\", \"ican_label\": \"Add it to your I can list?\", \"keep_primary\": \"Next\", \"next\": \"Next\", \"not_hint\": \"Smaller is still mastery.\", \"not_title\": \"Not yet is a real answer.\", \"partly_title\": \"Part of it counts.\", \"remind_label\": \"Want me to ask how it went?\", \"rung_hint\": \"They go from easier to harder. Smaller is still mastery.\", \"rung_own\": \"My own step\", \"rung_title\": \"Pick one that's a stretch you can manage today.\", \"safety_open\": \"Talk to someone now\", \"set_line\": \"Done beats done well. Doing part of it counts.\", \"set_remind\": \"I'll ask how it went. Doing part of it counts.\", \"set_title\": \"Your step: {rung}.\", \"settle_line\": \"This will keep. Look after the next few minutes first.\", \"start_hint\": \"Something small enough to finish. Done beats done well.\", \"start_title\": \"Get one thing done.\", \"then_label\": \"What next?\", \"when_title\": \"When could you do it?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "build-mastery", version: "bm-v1", contentVersion: "skills-v1", start: "start", ownMax: 60, emotionFields: [], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"area_label\": \"Which part of life?\", \"area_own\": \"Something else\", \"back_title\": \"Earlier you picked: {rung}.\", \"back_title_own\": \"Earlier you picked: {rung}, for {area}.\", \"done\": \"Done\", \"done_hint\": \"That counts. It's evidence you can do things that feel hard.\", \"done_title\": \"You did it.\", \"end_done\": \"That's done for now. Come back any time for another.\", \"end_kept\": \"It's on your “I can” list in Me.\", \"end_line\": \"It'll keep. Come back to it any time.\", \"happened_label\": \"How did it go?\", \"heads_up_hint\": \"This works better once it settles a little.\", \"heads_up_title\": \"Your body's loud right now.\", \"ican_label\": \"Keep this on your “I can” list in Me?\", \"keep_primary\": \"Next\", \"next\": \"Next\", \"not_hint\": \"Smaller is still mastery. If it keeps not happening, the step may be too big or life too full right now. Neither is a failing.\", \"not_title\": \"Not yet is a real answer.\", \"note_admin\": \"If something could bring bad news, pick a time with someone around.\", \"note_body\": \"Go by what your body can do today.\", \"note_caring\": \"If caring is already wearing you out, another area may suit today better. If someone there hurts you, this isn't the step.\", \"partly_title\": \"Part of it counts.\", \"remind_label\": \"Want me to ask how it went?\", \"rung_down_title\": \"Pick a smaller one.\", \"rung_hint\": \"They go from easier to harder. Go by what you can do today. Smaller is still mastery.\", \"rung_own\": \"My own step\", \"rung_title\": \"Pick one that's a stretch you can manage today.\", \"rung_up_title\": \"Pick the next one up.\", \"safety_open\": \"Talk to someone now\", \"set_line\": \"Done beats done well. Doing part of it counts.\", \"set_remind\": \"I'll ask how it went. Done beats done well.\", \"set_title\": \"Your step: {rung}.\", \"set_title_own\": \"Your step for {area}: {rung}.\", \"settle_line\": \"This will keep. First, the body.\", \"start_hint\": \"Something small enough to finish. Done beats done well.\", \"start_title\": \"Get one thing done.\", \"stuck_line\": \"Problem Solve can help find a way round it, or a smaller way in.\", \"stuck_title\": \"Something keeps getting in the way.\", \"then_label\": \"What next? No rush.\", \"when_title\": \"When could you do it?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "dbt_build_mastery"}), (s:Skill {id: "build_mastery"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "build_mastery"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
@@ -20288,7 +20288,7 @@ MATCH (s:Skill {id: "build_mastery"}), (n:SkillStep {id: "build_mastery:settle"}
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 2};
 MERGE (n:SkillStep {id: "build_mastery:rung"})
-SET n += {skillId: "build_mastery", step: "rung", kind: "ask", version: "bm-v1"}, n.specJson = "{\"clears\": [\"rung\", \"when\", \"remind\"], \"fields\": [{\"id\": \"rung\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"rung\", \"where\": {\"any\": [{\"eq\": [\"$opt.area\", \"$a.area\"]}, {\"all\": [{\"eq\": [\"$opt.area\", \"own\"]}, {\"not\": {\"set\": \"$a.area.ids\"}}]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"rung_own\", \"max\": 60}, \"required\": true}], \"hint\": \"rung_hint\", \"title\": \"rung_title\"}";
+SET n += {skillId: "build_mastery", step: "rung", kind: "ask", version: "bm-v1"}, n.specJson = "{\"clears\": [\"rung\", \"when\", \"remind\"], \"fields\": [{\"id\": \"note_body\", \"label\": \"note_body\", \"max\": 1, \"options\": {\"list\": \"rung\", \"where\": {\"any\": []}}, \"required\": false, \"showWhen\": {\"eq\": [\"$a.area\", \"body\"]}}, {\"id\": \"note_caring\", \"label\": \"note_caring\", \"max\": 1, \"options\": {\"list\": \"rung\", \"where\": {\"any\": []}}, \"required\": false, \"showWhen\": {\"eq\": [\"$a.area\", \"caring\"]}}, {\"id\": \"note_admin\", \"label\": \"note_admin\", \"max\": 1, \"options\": {\"list\": \"rung\", \"where\": {\"any\": []}}, \"required\": false, \"showWhen\": {\"eq\": [\"$a.area\", \"admin\"]}}, {\"id\": \"rung\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"rung\", \"where\": {\"any\": [{\"eq\": [\"$opt.area\", \"$a.area\"]}, {\"all\": [{\"eq\": [\"$opt.area\", \"own\"]}, {\"not\": {\"set\": \"$a.area.ids\"}}]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"rung_own\", \"max\": 60}, \"required\": true}], \"hint\": \"rung_hint\", \"title\": [{\"key\": \"rung_up_title\", \"when\": {\"eq\": [\"$a.then\", \"up\"]}}, {\"key\": \"rung_down_title\", \"when\": {\"any\": [{\"eq\": [\"$a.then\", \"smaller\"]}, {\"eq\": [\"$a.again\", \"smaller\"]}]}}, {\"key\": \"rung_title\"}]}";
 MATCH (s:Skill {id: "build_mastery"}), (n:SkillStep {id: "build_mastery:rung"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 3};
@@ -20298,35 +20298,46 @@ MATCH (s:Skill {id: "build_mastery"}), (n:SkillStep {id: "build_mastery:when"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 4};
 MERGE (n:SkillStep {id: "build_mastery:set"})
-SET n += {skillId: "build_mastery", step: "set", kind: "handoff", version: "bm-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"set_remind\", \"when\": {\"eq\": [\"$a.remind\", \"yes\"]}}, {\"key\": \"set_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"title\": \"set_title\", \"titleSlots\": {\"rung\": {\"labelOf\": \"rung\"}}}";
+SET n += {skillId: "build_mastery", step: "set", kind: "handoff", version: "bm-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"set_remind\", \"when\": {\"eq\": [\"$a.remind\", \"yes\"]}}, {\"key\": \"set_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"title\": [{\"key\": \"set_title_own\", \"when\": {\"not\": {\"set\": \"$a.area.ids\"}}}, {\"key\": \"set_title\"}], \"titleSlots\": {\"area\": {\"labelOf\": \"area\"}, \"rung\": {\"labelOf\": \"rung\"}}}";
 MATCH (s:Skill {id: "build_mastery"}), (n:SkillStep {id: "build_mastery:set"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 5};
 MERGE (n:SkillStep {id: "build_mastery:back"})
-SET n += {skillId: "build_mastery", step: "back", kind: "ask", version: "bm-v1"}, n.specJson = "{\"clears\": [\"happened\", \"ican\", \"then\", \"again\"], \"fields\": [{\"id\": \"happened\", \"label\": \"happened_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"happened\"}, \"required\": true}], \"reopens\": {\"after\": \"when\"}, \"title\": \"back_title\", \"titleSlots\": {\"rung\": {\"labelOf\": \"rung\"}}}";
+SET n += {skillId: "build_mastery", step: "back", kind: "ask", version: "bm-v1"}, n.specJson = "{\"clears\": [\"happened\", \"ican\", \"then\", \"again\"], \"fields\": [{\"id\": \"happened\", \"label\": \"happened_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"happened\"}, \"required\": true}], \"reopens\": {\"after\": \"when\"}, \"title\": [{\"key\": \"back_title_own\", \"when\": {\"not\": {\"set\": \"$a.area.ids\"}}}, {\"key\": \"back_title\"}], \"titleSlots\": {\"area\": {\"labelOf\": \"area\"}, \"rung\": {\"labelOf\": \"rung\"}}}";
 MATCH (s:Skill {id: "build_mastery"}), (n:SkillStep {id: "build_mastery:back"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 6};
 MERGE (n:SkillStep {id: "build_mastery:back_done"})
-SET n += {skillId: "build_mastery", step: "back_done", kind: "ask", version: "bm-v1"}, n.specJson = "{\"fields\": [{\"id\": \"ican\", \"label\": \"ican_label\", \"max\": 1, \"options\": {\"list\": \"ican\"}, \"required\": true}, {\"id\": \"then\", \"label\": \"then_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"then\", \"where\": {\"not\": {\"all\": [{\"eq\": [\"$opt.up\", true]}, {\"some\": [\"rung\", {\"eq\": [\"$opt.rung\", 3]}]}]}}}, \"required\": true}], \"hint\": \"done_hint\", \"keep\": {\"from\": [\"rung\"], \"kind\": \"i_can\", \"many\": true, \"when\": {\"eq\": [\"$a.ican\", \"yes\"]}}, \"primary\": \"keep_primary\", \"title\": [{\"key\": \"partly_title\", \"when\": {\"eq\": [\"$a.happened\", \"partly\"]}}, {\"key\": \"done_title\"}]}";
+SET n += {skillId: "build_mastery", step: "back_done", kind: "ask", version: "bm-v1"}, n.specJson = "{\"fields\": [{\"id\": \"ican\", \"label\": \"ican_label\", \"max\": 1, \"options\": {\"list\": \"ican\"}, \"required\": false, \"showWhen\": {\"not\": {\"has\": [\"$p.iCanRungs.ids\", \"$a.rung\"]}}}, {\"id\": \"then\", \"label\": \"then_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"then\", \"where\": {\"all\": [{\"not\": {\"all\": [{\"eq\": [\"$opt.up\", true]}, {\"any\": [{\"some\": [\"rung\", {\"eq\": [\"$opt.rung\", 3]}]}, {\"eq\": [\"$a.happened\", \"partly\"]}]}]}}, {\"not\": {\"all\": [{\"eq\": [\"$opt.down\", true]}, {\"any\": [{\"some\": [\"rung\", {\"eq\": [\"$opt.rung\", 1]}]}, {\"eq\": [\"$a.happened\", \"done\"]}]}]}}]}}, \"required\": true}], \"hint\": \"done_hint\", \"keep\": {\"from\": [\"area\", \"rung\"], \"kind\": \"i_can\", \"many\": true, \"when\": {\"eq\": [\"$a.ican\", \"yes\"]}}, \"primary\": \"keep_primary\", \"title\": [{\"key\": \"partly_title\", \"when\": {\"eq\": [\"$a.happened\", \"partly\"]}}, {\"key\": \"done_title\"}]}";
 MATCH (s:Skill {id: "build_mastery"}), (n:SkillStep {id: "build_mastery:back_done"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 7};
 MERGE (n:SkillStep {id: "build_mastery:back_not"})
-SET n += {skillId: "build_mastery", step: "back_not", kind: "ask", version: "bm-v1"}, n.specJson = "{\"fields\": [{\"id\": \"again\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"again\", \"where\": {\"not\": {\"all\": [{\"eq\": [\"$opt.down\", true]}, {\"some\": [\"rung\", {\"eq\": [\"$opt.rung\", 1]}]}]}}}, \"required\": true}], \"hint\": \"not_hint\", \"title\": \"not_title\"}";
+SET n += {skillId: "build_mastery", step: "back_not", kind: "ask", version: "bm-v1"}, n.specJson = "{\"fields\": [{\"id\": \"again\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"again\", \"where\": {\"all\": [{\"not\": {\"all\": [{\"eq\": [\"$opt.down\", true]}, {\"some\": [\"rung\", {\"eq\": [\"$opt.rung\", 1]}]}]}}, {\"not\": {\"all\": [{\"eq\": [\"$opt.bottom\", true]}, {\"not\": {\"some\": [\"rung\", {\"eq\": [\"$opt.rung\", 1]}]}}]}}]}}, \"required\": true}], \"hint\": \"not_hint\", \"title\": \"not_title\"}";
 MATCH (s:Skill {id: "build_mastery"}), (n:SkillStep {id: "build_mastery:back_not"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 8};
-MERGE (n:SkillStep {id: "build_mastery:back_end"})
-SET n += {skillId: "build_mastery", step: "back_end", kind: "handoff", version: "bm-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"end_kept\", \"when\": {\"eq\": [\"$a.ican\", \"yes\"]}}, {\"key\": \"end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": null}";
-MATCH (s:Skill {id: "build_mastery"}), (n:SkillStep {id: "build_mastery:back_end"})
+MERGE (n:SkillStep {id: "build_mastery:back_stuck"})
+SET n += {skillId: "build_mastery", step: "back_stuck", kind: "handoff", version: "bm-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"stuck_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"stuck_title\"}";
+MATCH (s:Skill {id: "build_mastery"}), (n:SkillStep {id: "build_mastery:back_stuck"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 9};
+MERGE (n:SkillStep {id: "build_mastery:back_end"})
+SET n += {skillId: "build_mastery", step: "back_end", kind: "handoff", version: "bm-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"end_kept\", \"when\": {\"eq\": [\"$a.ican\", \"yes\"]}}, {\"key\": \"end_done\", \"when\": {\"any\": [{\"eq\": [\"$a.happened\", \"done\"]}, {\"eq\": [\"$a.happened\", \"partly\"]}]}}, {\"key\": \"end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": null}";
+MATCH (s:Skill {id: "build_mastery"}), (n:SkillStep {id: "build_mastery:back_end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 10};
 MERGE (x:SkillExit {id: "build_mastery:cool_down"})
 SET x += {skillId: "build_mastery", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "build_mastery"}), (x:SkillExit {id: "build_mastery:cool_down"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "build_mastery:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "build_mastery:problem_solve"})
+SET x += {skillId: "build_mastery", exit: "problem_solve", toolId: "problem-solve", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "build_mastery"}), (x:SkillExit {id: "build_mastery:problem_solve"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "build_mastery:problem_solve"}), (t:TherapyConcept {appToolId: "problem-solve"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "build_mastery:safety_open"})
 SET x += {skillId: "build_mastery", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
@@ -20384,30 +20395,45 @@ SET r += {order: 1}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "build_mastery:back"}), (x:SkillExit {id: "build_mastery:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "happened", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "build_mastery:back_done"}), (b:SkillStep {id: "build_mastery:heads_up"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"all\": [{\"any\": [{\"eq\": [\"$a.then\", \"up\"]}, {\"eq\": [\"$a.then\", \"smaller\"]}]}, {\"eq\": [\"$ctx.band\", \"flooded\"]}]}";
 MATCH (a:SkillStep {id: "build_mastery:back_done"}), (b:SkillStep {id: "build_mastery:rung"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.then\", \"up\"]}";
+SET r += {order: 1}, r.whenJson = "{\"all\": [{\"any\": [{\"eq\": [\"$a.then\", \"up\"]}, {\"eq\": [\"$a.then\", \"smaller\"]}]}]}";
 MATCH (a:SkillStep {id: "build_mastery:back_done"}), (b:SkillStep {id: "build_mastery:when"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.then\", \"same\"]}";
+SET r += {order: 2}, r.whenJson = "{\"eq\": [\"$a.then\", \"same\"]}";
 MATCH (a:SkillStep {id: "build_mastery:back_done"}), (b:SkillStep {id: "build_mastery:back_end"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 2}, r.whenJson = "null";
+SET r += {order: 3}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "build_mastery:back_done"}), (x:SkillExit {id: "build_mastery:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "then", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "build_mastery:back_not"}), (b:SkillStep {id: "build_mastery:heads_up"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"all\": [{\"any\": [{\"eq\": [\"$a.again\", \"smaller\"]}, {\"eq\": [\"$a.again\", \"smaller_own\"]}]}, {\"eq\": [\"$ctx.band\", \"flooded\"]}]}";
 MATCH (a:SkillStep {id: "build_mastery:back_not"}), (b:SkillStep {id: "build_mastery:rung"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.again\", \"smaller\"]}";
+SET r += {order: 1}, r.whenJson = "{\"all\": [{\"any\": [{\"eq\": [\"$a.again\", \"smaller\"]}, {\"eq\": [\"$a.again\", \"smaller_own\"]}]}]}";
 MATCH (a:SkillStep {id: "build_mastery:back_not"}), (b:SkillStep {id: "build_mastery:when"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.again\", \"same\"]}";
+SET r += {order: 2}, r.whenJson = "{\"eq\": [\"$a.again\", \"same\"]}";
+MATCH (a:SkillStep {id: "build_mastery:back_not"}), (b:SkillStep {id: "build_mastery:back_stuck"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 3}, r.whenJson = "{\"eq\": [\"$a.again\", \"stuck\"]}";
 MATCH (a:SkillStep {id: "build_mastery:back_not"}), (b:SkillStep {id: "build_mastery:back_end"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 2}, r.whenJson = "null";
+SET r += {order: 4}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "build_mastery:back_not"}), (x:SkillExit {id: "build_mastery:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "again", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "build_mastery:back_stuck"}), (x:SkillExit {id: "build_mastery:problem_solve"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "build_mastery:back_stuck"}), (x:SkillExit {id: "build_mastery:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "build_mastery:back_end"}), (x:SkillExit {id: "build_mastery:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
@@ -20437,7 +20463,7 @@ MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:area:w
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "area", order: 4};
 MERGE (o:SkillOption {id: "build_mastery:area:caring"})
-SET o:SkillOption, o += {skillId: "build_mastery", list: "area", value: "caring", label: "Caring for someone", version: "bm-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "build_mastery", list: "area", value: "caring", label: "Caring for someone or something", version: "bm-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:area:caring"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "area", order: 5};
@@ -20457,17 +20483,17 @@ MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:heads_
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "heads_up", order: 8};
 MERGE (o:SkillOption {id: "build_mastery:rung:body_1"})
-SET o:SkillOption, o += {skillId: "build_mastery", list: "rung", value: "body_1", label: "Stretch for two minutes", version: "bm-v1"}, o.propsJson = "{\"area\": \"body\", \"rung\": 1}";
+SET o:SkillOption, o += {skillId: "build_mastery", list: "rung", value: "body_1", label: "Stretch or move gently for two minutes", version: "bm-v1"}, o.propsJson = "{\"area\": \"body\", \"rung\": 1}";
 MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:rung:body_1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "rung", order: 9};
 MERGE (o:SkillOption {id: "build_mastery:rung:body_2"})
-SET o:SkillOption, o += {skillId: "build_mastery", list: "rung", value: "body_2", label: "Walk around the block", version: "bm-v1"}, o.propsJson = "{\"area\": \"body\", \"rung\": 2}";
+SET o:SkillOption, o += {skillId: "build_mastery", list: "rung", value: "body_2", label: "Have a shower or get properly dressed", version: "bm-v1"}, o.propsJson = "{\"area\": \"body\", \"rung\": 2}";
 MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:rung:body_2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "rung", order: 10};
 MERGE (o:SkillOption {id: "build_mastery:rung:body_3"})
-SET o:SkillOption, o += {skillId: "build_mastery", list: "rung", value: "body_3", label: "Do twenty minutes of something active", version: "bm-v1"}, o.propsJson = "{\"area\": \"body\", \"rung\": 3}";
+SET o:SkillOption, o += {skillId: "build_mastery", list: "rung", value: "body_3", label: "Move in a way that suits my body for ten minutes", version: "bm-v1"}, o.propsJson = "{\"area\": \"body\", \"rung\": 3}";
 MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:rung:body_3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "rung", order: 11};
@@ -20482,7 +20508,7 @@ MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:rung:h
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "rung", order: 13};
 MERGE (o:SkillOption {id: "build_mastery:rung:home_3"})
-SET o:SkillOption, o += {skillId: "build_mastery", list: "rung", value: "home_3", label: "Tidy one whole room", version: "bm-v1"}, o.propsJson = "{\"area\": \"home\", \"rung\": 3}";
+SET o:SkillOption, o += {skillId: "build_mastery", list: "rung", value: "home_3", label: "Tidy one room for twenty minutes", version: "bm-v1"}, o.propsJson = "{\"area\": \"home\", \"rung\": 3}";
 MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:rung:home_3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "rung", order: 14};
@@ -20497,7 +20523,7 @@ MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:rung:m
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "rung", order: 16};
 MERGE (o:SkillOption {id: "build_mastery:rung:making_3"})
-SET o:SkillOption, o += {skillId: "build_mastery", list: "rung", value: "making_3", label: "Make something new from start to end", version: "bm-v1"}, o.propsJson = "{\"area\": \"making\", \"rung\": 3}";
+SET o:SkillOption, o += {skillId: "build_mastery", list: "rung", value: "making_3", label: "Make one small thing from start to end", version: "bm-v1"}, o.propsJson = "{\"area\": \"making\", \"rung\": 3}";
 MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:rung:making_3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "rung", order: 17};
@@ -20532,17 +20558,17 @@ MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:rung:w
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "rung", order: 23};
 MERGE (o:SkillOption {id: "build_mastery:rung:caring_1"})
-SET o:SkillOption, o += {skillId: "build_mastery", list: "rung", value: "caring_1", label: "Send one kind message", version: "bm-v1"}, o.propsJson = "{\"area\": \"caring\", \"rung\": 1}";
+SET o:SkillOption, o += {skillId: "build_mastery", list: "rung", value: "caring_1", label: "Do one small caring thing (a plant, a pet, a person)", version: "bm-v1"}, o.propsJson = "{\"area\": \"caring\", \"rung\": 1}";
 MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:rung:caring_1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "rung", order: 24};
 MERGE (o:SkillOption {id: "build_mastery:rung:caring_2"})
-SET o:SkillOption, o += {skillId: "build_mastery", list: "rung", value: "caring_2", label: "Do one small thing for someone I look after", version: "bm-v1"}, o.propsJson = "{\"area\": \"caring\", \"rung\": 2}";
+SET o:SkillOption, o += {skillId: "build_mastery", list: "rung", value: "caring_2", label: "Send one kind message to someone safe", version: "bm-v1"}, o.propsJson = "{\"area\": \"caring\", \"rung\": 2}";
 MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:rung:caring_2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "rung", order: 25};
 MERGE (o:SkillOption {id: "build_mastery:rung:caring_3"})
-SET o:SkillOption, o += {skillId: "build_mastery", list: "rung", value: "caring_3", label: "Plan one thing with or for someone", version: "bm-v1"}, o.propsJson = "{\"area\": \"caring\", \"rung\": 3}";
+SET o:SkillOption, o += {skillId: "build_mastery", list: "rung", value: "caring_3", label: "Plan one thing with someone safe", version: "bm-v1"}, o.propsJson = "{\"area\": \"caring\", \"rung\": 3}";
 MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:rung:caring_3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "rung", order: 26};
@@ -20626,33 +20652,48 @@ SET o:SkillOption, o += {skillId: "build_mastery", list: "ican", value: "no", la
 MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:ican:no"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "ican", order: 42};
-MERGE (o:SkillOption {id: "build_mastery:then:up"})
-SET o:SkillOption, o += {skillId: "build_mastery", list: "then", value: "up", label: "Try the next one up", version: "bm-v1"}, o.propsJson = "{\"up\": true}";
-MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:then:up"})
-MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "then", order: 43};
 MERGE (o:SkillOption {id: "build_mastery:then:same"})
 SET o:SkillOption, o += {skillId: "build_mastery", list: "then", value: "same", label: "The same one again", version: "bm-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:then:same"})
 MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "then", order: 43};
+MERGE (o:SkillOption {id: "build_mastery:then:up"})
+SET o:SkillOption, o += {skillId: "build_mastery", list: "then", value: "up", label: "Try the next one up", version: "bm-v1"}, o.propsJson = "{\"up\": true}";
+MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:then:up"})
+MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "then", order: 44};
+MERGE (o:SkillOption {id: "build_mastery:then:smaller"})
+SET o:SkillOption, o += {skillId: "build_mastery", list: "then", value: "smaller", label: "Try a smaller one", version: "bm-v1"}, o.propsJson = "{\"down\": true}";
+MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:then:smaller"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "then", order: 45};
 MERGE (o:SkillOption {id: "build_mastery:then:rest"})
 SET o:SkillOption, o += {skillId: "build_mastery", list: "then", value: "rest", label: "That's enough for now", version: "bm-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:then:rest"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "then", order: 45};
+SET r += {list: "then", order: 46};
 MERGE (o:SkillOption {id: "build_mastery:again:smaller"})
 SET o:SkillOption, o += {skillId: "build_mastery", list: "again", value: "smaller", label: "Pick a smaller one", version: "bm-v1"}, o.propsJson = "{\"down\": true}";
 MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:again:smaller"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "again", order: 46};
+SET r += {list: "again", order: 47};
+MERGE (o:SkillOption {id: "build_mastery:again:smaller_own"})
+SET o:SkillOption, o += {skillId: "build_mastery", list: "again", value: "smaller_own", label: "Make it smaller my own way", version: "bm-v1"}, o.propsJson = "{\"bottom\": true}";
+MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:again:smaller_own"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "again", order: 48};
 MERGE (o:SkillOption {id: "build_mastery:again:same"})
 SET o:SkillOption, o += {skillId: "build_mastery", list: "again", value: "same", label: "Try the same one again", version: "bm-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:again:same"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "again", order: 47};
+SET r += {list: "again", order: 49};
+MERGE (o:SkillOption {id: "build_mastery:again:stuck"})
+SET o:SkillOption, o += {skillId: "build_mastery", list: "again", value: "stuck", label: "Something keeps getting in the way", version: "bm-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:again:stuck"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "again", order: 50};
 MERGE (o:SkillOption {id: "build_mastery:again:not_now"})
 SET o:SkillOption, o += {skillId: "build_mastery", list: "again", value: "not_now", label: "Not now", version: "bm-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "build_mastery"}), (o:SkillOption {id: "build_mastery:again:not_now"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "again", order: 48};
+SET r += {list: "again", order: 51};

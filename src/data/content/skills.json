@@ -1463,26 +1463,36 @@
           "area_own": "Something else",
           "heads_up_title": "Your body's loud right now.",
           "heads_up_hint": "This works better once it settles a little.",
-          "settle_line": "This will keep. Look after the next few minutes first.",
+          "settle_line": "This will keep. First, the body.",
           "rung_title": "Pick one that's a stretch you can manage today.",
-          "rung_hint": "They go from easier to harder. Smaller is still mastery.",
+          "rung_up_title": "Pick the next one up.",
+          "rung_down_title": "Pick a smaller one.",
+          "rung_hint": "They go from easier to harder. Go by what you can do today. Smaller is still mastery.",
+          "note_body": "Go by what your body can do today.",
+          "note_caring": "If caring is already wearing you out, another area may suit today better. If someone there hurts you, this isn't the step.",
+          "note_admin": "If something could bring bad news, pick a time with someone around.",
           "rung_own": "My own step",
           "when_title": "When could you do it?",
           "remind_label": "Want me to ask how it went?",
           "set_title": "Your step: {rung}.",
+          "set_title_own": "Your step for {area}: {rung}.",
           "set_line": "Done beats done well. Doing part of it counts.",
-          "set_remind": "I'll ask how it went. Doing part of it counts.",
+          "set_remind": "I'll ask how it went. Done beats done well.",
           "back_title": "Earlier you picked: {rung}.",
+          "back_title_own": "Earlier you picked: {rung}, for {area}.",
           "happened_label": "How did it go?",
           "done_title": "You did it.",
           "partly_title": "Part of it counts.",
-          "done_hint": "That's evidence you can do hard things.",
-          "ican_label": "Add it to your I can list?",
-          "then_label": "What next?",
+          "done_hint": "That counts. It's evidence you can do things that feel hard.",
+          "ican_label": "Keep this on your “I can” list in Me?",
+          "then_label": "What next? No rush.",
           "not_title": "Not yet is a real answer.",
-          "not_hint": "Smaller is still mastery.",
+          "not_hint": "Smaller is still mastery. If it keeps not happening, the step may be too big or life too full right now. Neither is a failing.",
+          "stuck_title": "Something keeps getting in the way.",
+          "stuck_line": "Problem Solve can help find a way round it, or a smaller way in.",
           "keep_primary": "Next",
-          "end_kept": "It's on your I can list in Me.",
+          "end_kept": "It's on your “I can” list in Me.",
+          "end_done": "That's done for now. Come back any time for another.",
           "end_line": "It'll keep. Come back to it any time.",
           "safety_open": "Talk to someone now",
           "next": "Next",
@@ -1616,8 +1626,94 @@
           {
             "id": "rung",
             "kind": "ask",
-            "title": "rung_title",
+            "title": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.then",
+                    "up"
+                  ]
+                },
+                "key": "rung_up_title"
+              },
+              {
+                "when": {
+                  "any": [
+                    {
+                      "eq": [
+                        "$a.then",
+                        "smaller"
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$a.again",
+                        "smaller"
+                      ]
+                    }
+                  ]
+                },
+                "key": "rung_down_title"
+              },
+              {
+                "key": "rung_title"
+              }
+            ],
             "fields": [
+              {
+                "id": "note_body",
+                "options": {
+                  "list": "rung",
+                  "where": {
+                    "any": []
+                  }
+                },
+                "max": 1,
+                "required": false,
+                "label": "note_body",
+                "showWhen": {
+                  "eq": [
+                    "$a.area",
+                    "body"
+                  ]
+                }
+              },
+              {
+                "id": "note_caring",
+                "options": {
+                  "list": "rung",
+                  "where": {
+                    "any": []
+                  }
+                },
+                "max": 1,
+                "required": false,
+                "label": "note_caring",
+                "showWhen": {
+                  "eq": [
+                    "$a.area",
+                    "caring"
+                  ]
+                }
+              },
+              {
+                "id": "note_admin",
+                "options": {
+                  "list": "rung",
+                  "where": {
+                    "any": []
+                  }
+                },
+                "max": 1,
+                "required": false,
+                "label": "note_admin",
+                "showWhen": {
+                  "eq": [
+                    "$a.area",
+                    "admin"
+                  ]
+                }
+              },
               {
                 "id": "rung",
                 "options": {
@@ -1738,7 +1834,19 @@
             "id": "set",
             "kind": "handoff",
             "complete": true,
-            "title": "set_title",
+            "title": [
+              {
+                "when": {
+                  "not": {
+                    "set": "$a.area.ids"
+                  }
+                },
+                "key": "set_title_own"
+              },
+              {
+                "key": "set_title"
+              }
+            ],
             "lines": [
               {
                 "when": {
@@ -1769,6 +1877,9 @@
             "titleSlots": {
               "rung": {
                 "labelOf": "rung"
+              },
+              "area": {
+                "labelOf": "area"
               }
             },
             "next": [],
@@ -1777,7 +1888,19 @@
           {
             "id": "back",
             "kind": "ask",
-            "title": "back_title",
+            "title": [
+              {
+                "when": {
+                  "not": {
+                    "set": "$a.area.ids"
+                  }
+                },
+                "key": "back_title_own"
+              },
+              {
+                "key": "back_title"
+              }
+            ],
             "fields": [
               {
                 "id": "happened",
@@ -1810,6 +1933,9 @@
             "titleSlots": {
               "rung": {
                 "labelOf": "rung"
+              },
+              "area": {
+                "labelOf": "area"
               }
             },
             "next": [
@@ -1863,35 +1989,90 @@
                   "list": "ican"
                 },
                 "max": 1,
-                "required": true,
-                "label": "ican_label"
+                "required": false,
+                "label": "ican_label",
+                "showWhen": {
+                  "not": {
+                    "has": [
+                      "$p.iCanRungs.ids",
+                      "$a.rung"
+                    ]
+                  }
+                }
               },
               {
                 "id": "then",
                 "options": {
                   "list": "then",
                   "where": {
-                    "not": {
-                      "all": [
-                        {
-                          "eq": [
-                            "$opt.up",
-                            true
-                          ]
-                        },
-                        {
-                          "some": [
-                            "rung",
+                    "all": [
+                      {
+                        "not": {
+                          "all": [
                             {
                               "eq": [
-                                "$opt.rung",
-                                3
+                                "$opt.up",
+                                true
+                              ]
+                            },
+                            {
+                              "any": [
+                                {
+                                  "some": [
+                                    "rung",
+                                    {
+                                      "eq": [
+                                        "$opt.rung",
+                                        3
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "eq": [
+                                    "$a.happened",
+                                    "partly"
+                                  ]
+                                }
                               ]
                             }
                           ]
                         }
-                      ]
-                    }
+                      },
+                      {
+                        "not": {
+                          "all": [
+                            {
+                              "eq": [
+                                "$opt.down",
+                                true
+                              ]
+                            },
+                            {
+                              "any": [
+                                {
+                                  "some": [
+                                    "rung",
+                                    {
+                                      "eq": [
+                                        "$opt.rung",
+                                        1
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "eq": [
+                                    "$a.happened",
+                                    "done"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    ]
                   }
                 },
                 "max": 1,
@@ -1918,6 +2099,7 @@
                 ]
               },
               "from": [
+                "area",
                 "rung"
               ]
             },
@@ -1925,11 +2107,54 @@
             "hint": "done_hint",
             "next": [
               {
+                "to": "heads_up",
+                "when": {
+                  "all": [
+                    {
+                      "any": [
+                        {
+                          "eq": [
+                            "$a.then",
+                            "up"
+                          ]
+                        },
+                        {
+                          "eq": [
+                            "$a.then",
+                            "smaller"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$ctx.band",
+                        "flooded"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
                 "to": "rung",
                 "when": {
-                  "eq": [
-                    "$a.then",
-                    "up"
+                  "all": [
+                    {
+                      "any": [
+                        {
+                          "eq": [
+                            "$a.then",
+                            "up"
+                          ]
+                        },
+                        {
+                          "eq": [
+                            "$a.then",
+                            "smaller"
+                          ]
+                        }
+                      ]
+                    }
                   ]
                 }
               },
@@ -1959,27 +2184,56 @@
                 "options": {
                   "list": "again",
                   "where": {
-                    "not": {
-                      "all": [
-                        {
-                          "eq": [
-                            "$opt.down",
-                            true
-                          ]
-                        },
-                        {
-                          "some": [
-                            "rung",
+                    "all": [
+                      {
+                        "not": {
+                          "all": [
                             {
                               "eq": [
-                                "$opt.rung",
-                                1
+                                "$opt.down",
+                                true
+                              ]
+                            },
+                            {
+                              "some": [
+                                "rung",
+                                {
+                                  "eq": [
+                                    "$opt.rung",
+                                    1
+                                  ]
+                                }
                               ]
                             }
                           ]
                         }
-                      ]
-                    }
+                      },
+                      {
+                        "not": {
+                          "all": [
+                            {
+                              "eq": [
+                                "$opt.bottom",
+                                true
+                              ]
+                            },
+                            {
+                              "not": {
+                                "some": [
+                                  "rung",
+                                  {
+                                    "eq": [
+                                      "$opt.rung",
+                                      1
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
                   }
                 },
                 "max": 1,
@@ -1998,11 +2252,54 @@
             "hint": "not_hint",
             "next": [
               {
+                "to": "heads_up",
+                "when": {
+                  "all": [
+                    {
+                      "any": [
+                        {
+                          "eq": [
+                            "$a.again",
+                            "smaller"
+                          ]
+                        },
+                        {
+                          "eq": [
+                            "$a.again",
+                            "smaller_own"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$ctx.band",
+                        "flooded"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
                 "to": "rung",
                 "when": {
-                  "eq": [
-                    "$a.again",
-                    "smaller"
+                  "all": [
+                    {
+                      "any": [
+                        {
+                          "eq": [
+                            "$a.again",
+                            "smaller"
+                          ]
+                        },
+                        {
+                          "eq": [
+                            "$a.again",
+                            "smaller_own"
+                          ]
+                        }
+                      ]
+                    }
                   ]
                 }
               },
@@ -2016,11 +2313,54 @@
                 }
               },
               {
+                "to": "back_stuck",
+                "when": {
+                  "eq": [
+                    "$a.again",
+                    "stuck"
+                  ]
+                }
+              },
+              {
                 "to": "back_end",
                 "when": null
               }
             ],
             "offers": []
+          },
+          {
+            "id": "back_stuck",
+            "kind": "handoff",
+            "complete": true,
+            "title": "stuck_title",
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "stuck_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
+            "next": [],
+            "offers": [
+              {
+                "exit": "problem_solve",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
           },
           {
             "id": "back_end",
@@ -2036,6 +2376,25 @@
                   ]
                 },
                 "key": "end_kept"
+              },
+              {
+                "when": {
+                  "any": [
+                    {
+                      "eq": [
+                        "$a.happened",
+                        "done"
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$a.happened",
+                        "partly"
+                      ]
+                    }
+                  ]
+                },
+                "key": "end_done"
               },
               {
                 "when": {
@@ -2075,6 +2434,13 @@
             "done": true
           },
           {
+            "id": "problem_solve",
+            "toolId": "problem-solve",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
             "id": "safety_open",
             "toolId": null,
             "query": {},
@@ -2107,7 +2473,7 @@
             },
             {
               "value": "caring",
-              "label": "Caring for someone"
+              "label": "Caring for someone or something"
             },
             {
               "value": "admin",
@@ -2127,19 +2493,19 @@
           "rung": [
             {
               "value": "body_1",
-              "label": "Stretch for two minutes",
+              "label": "Stretch or move gently for two minutes",
               "area": "body",
               "rung": 1
             },
             {
               "value": "body_2",
-              "label": "Walk around the block",
+              "label": "Have a shower or get properly dressed",
               "area": "body",
               "rung": 2
             },
             {
               "value": "body_3",
-              "label": "Do twenty minutes of something active",
+              "label": "Move in a way that suits my body for ten minutes",
               "area": "body",
               "rung": 3
             },
@@ -2157,7 +2523,7 @@
             },
             {
               "value": "home_3",
-              "label": "Tidy one whole room",
+              "label": "Tidy one room for twenty minutes",
               "area": "home",
               "rung": 3
             },
@@ -2175,7 +2541,7 @@
             },
             {
               "value": "making_3",
-              "label": "Make something new from start to end",
+              "label": "Make one small thing from start to end",
               "area": "making",
               "rung": 3
             },
@@ -2217,19 +2583,19 @@
             },
             {
               "value": "caring_1",
-              "label": "Send one kind message",
+              "label": "Do one small caring thing (a plant, a pet, a person)",
               "area": "caring",
               "rung": 1
             },
             {
               "value": "caring_2",
-              "label": "Do one small thing for someone I look after",
+              "label": "Send one kind message to someone safe",
               "area": "caring",
               "rung": 2
             },
             {
               "value": "caring_3",
-              "label": "Plan one thing with or for someone",
+              "label": "Plan one thing with someone safe",
               "area": "caring",
               "rung": 3
             },
@@ -2320,13 +2686,18 @@
           ],
           "then": [
             {
+              "value": "same",
+              "label": "The same one again"
+            },
+            {
               "value": "up",
               "label": "Try the next one up",
               "up": true
             },
             {
-              "value": "same",
-              "label": "The same one again"
+              "value": "smaller",
+              "label": "Try a smaller one",
+              "down": true
             },
             {
               "value": "rest",
@@ -2340,8 +2711,17 @@
               "down": true
             },
             {
+              "value": "smaller_own",
+              "label": "Make it smaller my own way",
+              "bottom": true
+            },
+            {
               "value": "same",
               "label": "Try the same one again"
+            },
+            {
+              "value": "stuck",
+              "label": "Something keeps getting in the way"
             },
             {
               "value": "not_now",
