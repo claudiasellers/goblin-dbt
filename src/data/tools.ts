@@ -308,6 +308,18 @@ export const tools: Tool[] = [
     emoji: '🪜',
     bare: true,
   },
+  {
+    // ER-10 on the skill runtime (docs/design/emotion-guide.md): the feeling card and its family ladder.
+    id: 'emotion-guide',
+    name: 'Know This Feeling',
+    tagline: 'What a feeling is for, and a closer word for it',
+    description: 'Pick a feeling to see what it\'s for, what often sets it off, where it shows up in the body and the pull it can bring. Then find the word in its family that\'s closest.',
+    whenToUse: 'When you\'ve named a feeling and want to understand it, or the word you have feels too big or too vague.',
+    module: 'emotion-regulation',
+    dbtBasis: 'DBT ER Handouts 3–6 (what emotions do, the model of emotions, describing emotions)',
+    emoji: '🔎',
+    bare: true,
+  },
   // Interpersonal Effectiveness
   {
     id: 'dear-man',
@@ -478,6 +490,7 @@ export const allIntents: Intent[] = [
   { id: 'find-good', label: 'Find something good', toolId: 'good-things', emoji: '🌼' },
   { id: 'what-matters', label: 'Work out what matters to me', toolId: 'values-clarification', emoji: '🧭' },
   { id: 'one-thing', label: 'Get one thing done', toolId: 'build-mastery', emoji: '🪜' },
+  { id: 'know-feeling', label: 'Get to know a feeling', toolId: 'emotion-guide', emoji: '🔎' },
   { id: 'nightmares', label: 'The same nightmare keeps coming back', toolId: 'nightmare-rescript', emoji: '🌙' },
 ];
 

@@ -1,0 +1,103 @@
+# Know this feeling (ER-10)
+
+DBT Emotion Regulation Handouts 3–6: what emotions do, the model of emotions, ways to describe them. Tool
+`emotion-guide` ("Know This Feeling"), concept `dbt_model_of_emotions` (module Emotion Regulation), skill
+`emotion_guide` on the skill runtime. Listed under Emotion Regulation for everyone, with the Tools intent *Get to
+know a feeling*.
+
+Part 1 (this document, built 12 Nov 2026) is the feeling card and the ladder. Parts 2–4 are below under *Not yet*.
+
+## What it is for
+
+Affect labelling is the app's first job: the person names a feeling, and a closer word takes some of the edge
+off. The check-in and Find the feeling get someone to a word. This tool makes the word a known thing: what the
+feeling is for, what often sets it off, where it often shows up in the body, and the pull it can bring. Then one
+tap trains differentiation: *Which of these is closest?*, the family's words from milder to stronger.
+
+The card is recognition, never criteria. Nothing asks the person to match a list, nothing scores them, and the
+pull is framed as something that comes with the feeling, not something to do (*A pull comes with the feeling. You
+don't have to act on it.*).
+
+## The flow (`scripts/skills/emotion_guide.py`)
+
+1. **feel**: *Which feeling do you want to know better?* One word. A chip per family (the family's most common
+   word: scared, angry, sad, ashamed, guilty, disgusted, jealous, loving, happy), carried words first (never
+   pre-picked), any grid word under *More words*. A word with no guide (calm, surprised, tired, numb…) goes to
+   **none**.
+2. **heads_up** (a carried flooded reading only): *Your body's loud right now.* *Look after the next few minutes
+   first* → First, the body; *Show me anyway* → the card. A heads-up, never a lock, as Build mastery.
+3. **card**: the `feelingCard` embed, titled *Feeling {word}*. Its family (*Part of the fear family.*), what it's
+   for, what often sets it off, where it often shows up (up to three signed-off body places, as *Chest · tight*),
+   the pull it can bring (up to three of the parent's emotion urges). Each part shows only when the graph has it;
+   with no row at all (content drift) the card shows only *Next*.
+4. **ladder**: *Which of these is closest?* The family's ladder. Not required: *Close is enough, and none of them
+   is an answer too.* Skipped for a family with one word (jealousy, envy).
+5. **end**: *You named it: {closest}.* (or *You know this feeling a little better now.*), *Putting a closer word to a
+   feeling can take some of the edge off.* Then by family: for the nine DBT parents with fit statements, Check the
+   Facts (*does it fit what happened?*) and Do the Opposite, each carrying the word; for happiness, Good things in
+   its `savour` frame (*stay with it a little longer*).
+6. **none**: *There isn't a card for feeling {word} yet.* → Find the feeling, carrying the word.
+
+*Talk to someone now* on every ask and hand-off screen. Close kind `none` (knowing a feeling isn't a state change
+to rate), no keep, no follow-up, no routing rows by design. `emotionFields`: `feel` and `closest`, so both are the
+visit's emotions.
+
+## Content (`scripts/emotion-guide/content.py` → `schema/emotion-guide.cypher`)
+
+One `FeelingGuide` per family: the nine DBT parents and happiness. Each has its label, one function line (H3,
+paraphrased, flat, no *should*), three prompting events (H6, paraphrased), the ladder, and the `BodyMap` whose
+places it shows. `build.py` checks: ten guides; every ladder is the family's own grid words, none twice, never a
+single word; every body map is signed off; every held urge is one of the parent's; the happiness words are grid
+words with no DBT parent. The function lines and prompts are voice-linted as flow copy.
+
+Edges:
+
+- `(:FeelingGuide)-[:GUIDES]->(:EmotionRegulationContent)` for the nine parents: the card's urges are that parent's
+  `HAS_ACTION_URGE` urges, and its words are the parent's words through `HAS_REGULATION_CONTENT`.
+- `(:FeelingGuide)-[:FELT_LIKE]->(:BodyMap)`: the places are computed from the `FELT_AS` rows of the emotions the map
+  `GROUPS`, live rows only, with `placesFromFelt` (the body mirror's own computation). Jealousy uses the fear map;
+  envy has none and shows no body section.
+- `(:Emotion)-[:IN_GUIDE]->(:FeelingGuide {id: 'happiness'})` for happy, joyful, playful, proud, optimistic, hopeful,
+  content, satisfied, excited and eager.
+
+**Held:** guilt's *punish myself* urge is never listed on the card (`urgesHeld`): it sits next to self-harm, and Do
+the Opposite meets it with `safety.open` first. The DT behaviour urges (send, check, hit, leave, use, self_harm) are
+never on the card either: only `kind: 'emotion'` urges reach it.
+
+## The runtime additions (approved on the plan thread)
+
+- Two shared tables, `feelingOf` and `feelingGuideOf` ([`skill-runtime.md`](skill-runtime.md)), served by
+  `getSkillContent` and shipped in `skills.json` by the snapshot build, both through
+  `functions/src/skills/feelingOf.ts`.
+- A derive may take one `field` of a `feelingOf` row (the ladder), and `emotionsFrom` may name it.
+- An embed prop of type `row`: the player resolves the ref and hands the embed the table's row
+  (`sharedRow` in `machine.ts`). The card reads its row this way; nothing emotion-level is copied into the skill.
+
+## Departures from the PRD
+
+- **Happiness is not a tenth `EmotionRegulationContent`.** The PRD added it as a parent. That would grow every loop
+  over parents: Do the Opposite's doors (`opposite-action-picker.json`), `parentOf`, Problem Solve, Insights and the
+  witness corpus. The guide is its own label instead, and happiness words reach it by `IN_GUIDE`. A test pins the
+  doors at nine and keeps happiness out of `parentOf` and `fitsWhen`.
+- **The card is a tool of its own for now**, opened from the Tools list. Hosts showing it after naming (check-in,
+  Find the feeling) come with part 3.
+- **The ladder is milder to stronger as written**, not sorted by the square's energy axis (nervous sits above
+  worried there; the order is the content's reviewed judgement).
+
+## Not yet
+
+- Part 2, *Walk the wave*: the `episodeStrip` embed (prompting event → interpretation → body → urge → action →
+  after-effects), embedded by CORE-08.
+- Part 3, words everywhere: `FOUND_WORD` from more hosts, own words first, the card after naming in the check-in and
+  Find the feeling.
+- Part 4, the myth cards (H2): It isn't working's *belief* check links here with `frame=myths`, written as a planned
+  exit until then.
+
+## Tests
+
+`tests/skill-emotion-guide.test.mjs`: freshness, load order and constraint, the voice lint, the pins (body places
+equal the body map's live places; urges equal the picker's minus the held one, no behaviour urge; the doors stay
+nine and happiness stays out of the parent tables; ladders), the wiring, and the flow (worried → its card, row and
+ladder → Check the Facts and Do the Opposite; proud → Good things; jealous skips the ladder; calm → Find the
+feeling; a carried word first; flooded → the heads-up; the safety link on every screen). The shipped `feelingOf`
+equals the fixture in `tests/skill-runtime.test.mjs`.

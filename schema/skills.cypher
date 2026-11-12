@@ -1543,7 +1543,7 @@ MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "er_troubleshoot:five_senses"}), (t:TherapyConcept {appToolId: "five-senses"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "er_troubleshoot:emotion_guide"})
-SET x += {skillId: "er_troubleshoot", exit: "emotion_guide", toolId: "emotion-guide", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
+SET x += {skillId: "er_troubleshoot", exit: "emotion_guide", toolId: "emotion-guide", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{\"frame\": \"myths\"}", x.label = null;
 MATCH (s:Skill {id: "er_troubleshoot"}), (x:SkillExit {id: "er_troubleshoot:emotion_guide"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "er_troubleshoot:emotion_guide"}), (t:TherapyConcept {appToolId: "emotion-guide"})
@@ -21270,3 +21270,151 @@ SET o:SkillOption, o += {skillId: "finding_connection", list: "again", value: "l
 MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:again:leave"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "again", order: 56};
+
+// --- emotion_guide (eg-v1) ---
+MERGE (s:Skill {id: "emotion_guide"})
+SET s += {toolId: "emotion-guide", version: "eg-v1", contentVersion: "skills-v1", start: "feel", ownMax: 60, emotionFields: ["feel", "closest"], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"body_label\": \"Where it often shows up\", \"card_title\": \"Feeling {feeling}\", \"done\": \"Done\", \"end_fits\": \"If you want to look at whether it fits what happened, Check the Facts goes through it.\", \"end_happy\": \"Good things can help you stay with it a little longer.\", \"end_line\": \"Putting a closer word to a feeling can take some of the edge off.\", \"end_title\": \"You know this feeling a little better now.\", \"end_title_picked\": \"You named it: {closest}.\", \"family_line\": \"Part of the {family} family.\", \"feel_hint\": \"Pick the word that's closest. It doesn't have to be exact.\", \"feel_more\": \"More words\", \"feel_title\": \"Which feeling do you want to know better?\", \"for_label\": \"What it's for\", \"heads_up_hint\": \"Getting to know a feeling works better once it settles a little.\", \"heads_up_title\": \"Your body's loud right now.\", \"ladder_hint\": \"They go from milder to stronger. Close is enough, and none of them is an answer too.\", \"ladder_title\": \"Which of these is closest?\", \"next\": \"Next\", \"none_line\": \"Find the feeling can help put more words to it.\", \"none_title\": \"There isn't a card for feeling {feeling} yet.\", \"prompts_label\": \"What often sets it off\", \"safety_open\": \"Talk to someone now\", \"settle_line\": \"This will keep. First, the body.\", \"urge_note\": \"A pull comes with the feeling. You don't have to act on it.\", \"urges_label\": \"The pull it can bring\"}", s.tablesJson = "{}", s.deriveJson = "[{\"from\": \"$a.feel\", \"name\": \"guide\", \"table\": \"feelingGuideOf\"}, {\"field\": \"ladder\", \"from\": \"$d.guide\", \"name\": \"ladder\", \"table\": \"feelingOf\"}, {\"from\": \"$a.feel\", \"name\": \"parent\", \"table\": \"parentOf\"}, {\"from\": \"$d.parent\", \"keep\": \"key\", \"name\": \"fitsParent\", \"table\": \"fitsWhen\"}]";
+MATCH (t:TherapyConcept {id: "dbt_model_of_emotions"}), (s:Skill {id: "emotion_guide"})
+MERGE (t)-[:HAS_SKILL]->(s);
+MATCH (:SkillStep {skillId: "emotion_guide"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
+MATCH (:Skill {id: "emotion_guide"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
+MERGE (n:SkillStep {id: "emotion_guide:feel"})
+SET n += {skillId: "emotion_guide", step: "feel", kind: "ask", version: "eg-v1"}, n.specJson = "{\"fields\": [{\"emotion\": true, \"id\": \"feel\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"carriedFirst\": true, \"emotions\": [\"scared\", \"angry\", \"sad\", \"ashamed\", \"guilty\", \"disgusted\", \"jealous\", \"loving\", \"happy\"], \"moreKey\": \"feel_more\"}, \"required\": true}], \"hint\": \"feel_hint\", \"title\": \"feel_title\"}";
+MATCH (s:Skill {id: "emotion_guide"}), (n:SkillStep {id: "emotion_guide:feel"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 0};
+MERGE (n:SkillStep {id: "emotion_guide:heads_up"})
+SET n += {skillId: "emotion_guide", step: "heads_up", kind: "ask", version: "eg-v1"}, n.specJson = "{\"fields\": [{\"id\": \"heads_up\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"heads_up\"}, \"required\": true}], \"hint\": \"heads_up_hint\", \"title\": \"heads_up_title\"}";
+MATCH (s:Skill {id: "emotion_guide"}), (n:SkillStep {id: "emotion_guide:heads_up"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 1};
+MERGE (n:SkillStep {id: "emotion_guide:settle"})
+SET n += {skillId: "emotion_guide", step: "settle", kind: "handoff", version: "eg-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"settle_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"heads_up_title\"}";
+MATCH (s:Skill {id: "emotion_guide"}), (n:SkillStep {id: "emotion_guide:settle"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 2};
+MERGE (n:SkillStep {id: "emotion_guide:card"})
+SET n += {skillId: "emotion_guide", step: "card", kind: "embed", version: "eg-v1"}, n.specJson = "{\"answerAs\": \"card\", \"embed\": \"feelingCard\", \"props\": {\"bodyLabel\": \"body_label\", \"familyLine\": \"family_line\", \"forLabel\": \"for_label\", \"guide\": \"$d.guide\", \"next\": \"next\", \"promptsLabel\": \"prompts_label\", \"urgeNote\": \"urge_note\", \"urgesLabel\": \"urges_label\"}, \"title\": \"card_title\", \"titleSlots\": {\"feeling\": {\"labelOf\": \"feel\"}}}";
+MATCH (s:Skill {id: "emotion_guide"}), (n:SkillStep {id: "emotion_guide:card"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 3};
+MERGE (n:SkillStep {id: "emotion_guide:ladder"})
+SET n += {skillId: "emotion_guide", step: "ladder", kind: "ask", version: "eg-v1"}, n.specJson = "{\"fields\": [{\"emotion\": true, \"id\": \"closest\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"emotions\": [\"scared\", \"angry\", \"sad\", \"ashamed\", \"guilty\", \"disgusted\", \"jealous\", \"loving\", \"happy\"], \"emotionsFrom\": \"$d.ladder\"}, \"required\": false}], \"hint\": \"ladder_hint\", \"title\": \"ladder_title\"}";
+MATCH (s:Skill {id: "emotion_guide"}), (n:SkillStep {id: "emotion_guide:ladder"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 4};
+MERGE (n:SkillStep {id: "emotion_guide:end"})
+SET n += {skillId: "emotion_guide", step: "end", kind: "handoff", version: "eg-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"end_line\", \"when\": {\"all\": []}}, {\"key\": \"end_fits\", \"when\": {\"set\": \"$d.fitsParent\"}}, {\"key\": \"end_happy\", \"when\": {\"eq\": [\"$d.guide\", \"happiness\"]}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": [{\"key\": \"end_title_picked\", \"when\": {\"set\": \"$a.closest\"}}, {\"key\": \"end_title\"}], \"titleSlots\": {\"closest\": {\"labelOf\": \"closest\"}}}";
+MATCH (s:Skill {id: "emotion_guide"}), (n:SkillStep {id: "emotion_guide:end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 5};
+MERGE (n:SkillStep {id: "emotion_guide:none"})
+SET n += {skillId: "emotion_guide", step: "none", kind: "handoff", version: "eg-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"none_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"none_title\", \"titleSlots\": {\"feeling\": {\"labelOf\": \"feel\"}}}";
+MATCH (s:Skill {id: "emotion_guide"}), (n:SkillStep {id: "emotion_guide:none"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 6};
+MERGE (x:SkillExit {id: "emotion_guide:check_the_facts"})
+SET x += {skillId: "emotion_guide", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "emotion_guide"}), (x:SkillExit {id: "emotion_guide:check_the_facts"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "emotion_guide:check_the_facts"}), (t:TherapyConcept {appToolId: "check-the-facts"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "emotion_guide:opposite_action"})
+SET x += {skillId: "emotion_guide", exit: "opposite_action", toolId: "opposite-action", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "emotion_guide"}), (x:SkillExit {id: "emotion_guide:opposite_action"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "emotion_guide:opposite_action"}), (t:TherapyConcept {appToolId: "opposite-action"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "emotion_guide:good_things"})
+SET x += {skillId: "emotion_guide", exit: "good_things", toolId: "good-things", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"savour\"}", x.label = null;
+MATCH (s:Skill {id: "emotion_guide"}), (x:SkillExit {id: "emotion_guide:good_things"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "emotion_guide:good_things"}), (t:TherapyConcept {appToolId: "good-things"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "emotion_guide:find_the_feeling"})
+SET x += {skillId: "emotion_guide", exit: "find_the_feeling", toolId: "find-the-feeling", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "emotion_guide"}), (x:SkillExit {id: "emotion_guide:find_the_feeling"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "emotion_guide:find_the_feeling"}), (t:TherapyConcept {appToolId: "find-the-feeling"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "emotion_guide:cool_down"})
+SET x += {skillId: "emotion_guide", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "emotion_guide"}), (x:SkillExit {id: "emotion_guide:cool_down"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "emotion_guide:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "emotion_guide:safety_open"})
+SET x += {skillId: "emotion_guide", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "emotion_guide"}), (x:SkillExit {id: "emotion_guide:safety_open"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MERGE (x:SkillExit {id: "emotion_guide:done"})
+SET x += {skillId: "emotion_guide", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "emotion_guide"}), (x:SkillExit {id: "emotion_guide:done"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (a:SkillStep {id: "emotion_guide:feel"}), (b:SkillStep {id: "emotion_guide:none"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"not\": {\"set\": \"$d.guide\"}}";
+MATCH (a:SkillStep {id: "emotion_guide:feel"}), (b:SkillStep {id: "emotion_guide:heads_up"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
+MATCH (a:SkillStep {id: "emotion_guide:feel"}), (b:SkillStep {id: "emotion_guide:card"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "emotion_guide:feel"}), (x:SkillExit {id: "emotion_guide:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "feel", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "emotion_guide:heads_up"}), (b:SkillStep {id: "emotion_guide:settle"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.heads_up\", \"settle\"]}";
+MATCH (a:SkillStep {id: "emotion_guide:heads_up"}), (b:SkillStep {id: "emotion_guide:card"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "emotion_guide:heads_up"}), (x:SkillExit {id: "emotion_guide:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "heads_up", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "emotion_guide:settle"}), (x:SkillExit {id: "emotion_guide:cool_down"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "emotion_guide:settle"}), (x:SkillExit {id: "emotion_guide:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "emotion_guide:card"}), (b:SkillStep {id: "emotion_guide:ladder"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"set\": \"$d.ladder\"}";
+MATCH (a:SkillStep {id: "emotion_guide:card"}), (b:SkillStep {id: "emotion_guide:end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "emotion_guide:ladder"}), (b:SkillStep {id: "emotion_guide:end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "emotion_guide:ladder"}), (x:SkillExit {id: "emotion_guide:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "closest", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "emotion_guide:end"}), (x:SkillExit {id: "emotion_guide:check_the_facts"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"set\": \"$d.fitsParent\"}}]";
+MATCH (a:SkillStep {id: "emotion_guide:end"}), (x:SkillExit {id: "emotion_guide:opposite_action"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"set\": \"$d.fitsParent\"}}]";
+MATCH (a:SkillStep {id: "emotion_guide:end"}), (x:SkillExit {id: "emotion_guide:good_things"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"eq\": [\"$d.guide\", \"happiness\"]}}]";
+MATCH (a:SkillStep {id: "emotion_guide:end"}), (x:SkillExit {id: "emotion_guide:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "emotion_guide:none"}), (x:SkillExit {id: "emotion_guide:find_the_feeling"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "emotion_guide:none"}), (x:SkillExit {id: "emotion_guide:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MERGE (o:SkillOption {id: "emotion_guide:heads_up:settle"})
+SET o:SkillOption, o += {skillId: "emotion_guide", list: "heads_up", value: "settle", label: "Look after the next few minutes first", version: "eg-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "emotion_guide"}), (o:SkillOption {id: "emotion_guide:heads_up:settle"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up", order: 0};
+MERGE (o:SkillOption {id: "emotion_guide:heads_up:try"})
+SET o:SkillOption, o += {skillId: "emotion_guide", list: "heads_up", value: "try", label: "Show me anyway", version: "eg-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "emotion_guide"}), (o:SkillOption {id: "emotion_guide:heads_up:try"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up", order: 1};
