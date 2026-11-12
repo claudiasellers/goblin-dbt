@@ -1,7 +1,7 @@
 {
   "source": {
     "file": "graph-content-only-2026-11-12.json",
-    "exportedAt": "2026-11-12T07:45:36.176Z"
+    "exportedAt": "2026-11-12T17:13:16.882Z"
   },
   "content": {
     "version": "skills-v1",
@@ -33699,56 +33699,56 @@
         "ownMax": 60,
         "emotionFields": [],
         "copy": {
-          "catch_title": "What's the thought?",
           "catch_hint": "Pick the closest, or put it in a few words.",
           "catch_own": "In my own words",
-          "heads_up_title": "Your body's loud right now.",
-          "heads_up_hint": "Thoughts are easier to watch once your body settles. You can still try.",
-          "settle_line": "The thought will keep, and it's easier to watch from steadier ground.",
-          "file_title": "What kind of thought is it?",
+          "catch_title": "What's the thought?",
+          "close_title": "How is the thought now?",
+          "done": "Done",
+          "end_further": "You held it as a thought, something passing through. You can do this again, anywhere.",
+          "end_same": "It's still loud, and you noticed it as a thought. That's the skill, even when it doesn't shift.",
+          "end_same_facts": "It's still loud, and you noticed it as a thought. That's the skill. If you want to look at what it rests on, checking the facts can help.",
           "file_hint": "Naming the kind can give a little distance.",
-          "replay_line": "A memory that feels like it's happening now needs grounding first, not watching. If it happens a lot, someone trained in trauma can help.",
-          "not_mine_line": "Thoughts that don't feel like your own are worth talking through with a doctor, or your care team if you have one. For now, something steady around you can help.",
-          "harm_line": "That's a heavy thought to carry. Someone to talk to comes first.",
-          "move_title": "Pick one way to hold it a little further off.",
-          "move_hint": "Nothing to argue with. Only a little distance.",
-          "having_title": "Here's the thought. In a moment, say it to yourself with a few words in front.",
-          "having_next": "Next",
-          "frame_title": "Say the thought to yourself, with a few words in front.",
+          "file_title": "What kind of thought is it?",
+          "find_done": "That's it.",
+          "found": "Found one",
           "frame_step1": "Say “I'm having the thought that”, then the thought.",
           "frame_step2": "Once more: “I notice I'm having the thought that”, then the thought.",
           "frame_step3": "Notice any change in how close it feels.",
-          "slow_title": "Slow it right down.",
-          "slow_step1": "Say the thought in your head, one word at a time.",
-          "slow_step2": "Leave a long gap between the words.",
-          "slow_step3": "Notice it's made of words.",
-          "leaf_title": "Set it on a leaf.",
+          "frame_title": "Say the thought to yourself, with a few words in front.",
+          "harm_line": "That's a heavy thought to carry. Someone to talk to comes first.",
+          "having_next": "Next",
+          "having_title": "Here's the thought. In a moment, say it to yourself with a few words in front.",
+          "heads_up_hint": "Thoughts are easier to watch once your body settles. You can still try.",
+          "heads_up_title": "Your body's loud right now.",
+          "here": "You're here, and it's",
           "leaf_step1": "Picture a stream with leaves floating past.",
           "leaf_step2": "Put the thought on a leaf. Let it float at its own pace.",
           "leaf_step3": "If it stays or comes back, that's okay. Put it on the next leaf.",
-          "screen_title": "Watch it on a screen.",
+          "leaf_title": "Set it on a leaf.",
+          "louder_line": "Watching a thought can make it louder for a bit. That happens.",
+          "move_done": "That's it.",
+          "move_hint": "Nothing to argue with. Only a little distance.",
+          "move_title": "Pick one way to hold it a little further off.",
+          "next": "Next",
+          "not_mine_line": "Thoughts that don't feel like your own are worth talking through with a doctor, or your care team if you have one. For now, something steady around you can help.",
+          "replay_line": "A memory that feels like it's happening now needs grounding first, not watching. If it happens a lot, someone trained in trauma can help.",
+          "room_task": "Find three things you can see.",
+          "room_title": "Back to the room.",
+          "running_frame": "Saying it",
+          "running_leaf": "Floating",
+          "running_screen": "Watching",
+          "running_slow": "Slowly",
+          "safety_open": "Talk to someone now",
           "screen_step1": "Picture the thought as words on a screen across the room.",
           "screen_step2": "Let them sit there, like subtitles.",
           "screen_step3": "Let them stay or scroll off, in their own time.",
-          "start": "Start",
-          "running_frame": "Saying it",
-          "running_slow": "Slowly",
-          "running_leaf": "Floating",
-          "running_screen": "Watching",
-          "move_done": "That's it.",
-          "room_title": "Back to the room.",
-          "here": "You're here, and it's",
-          "found": "Found one",
-          "find_done": "That's it.",
-          "room_task": "Find three things you can see.",
-          "close_title": "How is the thought now?",
-          "louder_line": "Watching a thought can make it louder for a bit. That happens.",
-          "end_same": "It's still loud, and you noticed it as a thought. That's the skill, even when it doesn't shift.",
-          "end_same_facts": "It's still loud, and you noticed it as a thought. That's the skill. If you want to look at what it rests on, checking the facts can help.",
-          "end_further": "You held it as a thought, something passing through. You can do this again, anywhere.",
-          "safety_open": "Talk to someone now",
-          "next": "Next",
-          "done": "Done"
+          "screen_title": "Watch it on a screen.",
+          "settle_line": "The thought will keep, and it's easier to watch from steadier ground.",
+          "slow_step1": "Say the thought in your head, one word at a time.",
+          "slow_step2": "Leave a long gap between the words.",
+          "slow_step3": "Notice it's made of words.",
+          "slow_title": "Slow it right down.",
+          "start": "Start"
         },
         "tables": {},
         "derive": [],
@@ -33756,15 +33756,9 @@
           {
             "id": "catch",
             "kind": "ask",
-            "title": "catch_title",
             "fields": [
               {
                 "id": "catch",
-                "options": {
-                  "list": "catch"
-                },
-                "max": 1,
-                "required": true,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -33774,13 +33768,19 @@
                     }
                   }
                 ],
+                "max": 1,
+                "options": {
+                  "list": "catch"
+                },
                 "own": {
-                  "hint": "catch_own",
-                  "countsAsPick": true
-                }
+                  "countsAsPick": true,
+                  "hint": "catch_own"
+                },
+                "required": true
               }
             ],
             "hint": "catch_hint",
+            "title": "catch_title",
             "next": [
               {
                 "to": "heads_up",
@@ -33801,15 +33801,9 @@
           {
             "id": "heads_up",
             "kind": "ask",
-            "title": "heads_up_title",
             "fields": [
               {
                 "id": "heads_up",
-                "options": {
-                  "list": "heads_up"
-                },
-                "max": 1,
-                "required": true,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -33818,10 +33812,16 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "list": "heads_up"
+                },
+                "required": true
               }
             ],
             "hint": "heads_up_hint",
+            "title": "heads_up_title",
             "next": [
               {
                 "to": "settle",
@@ -33843,15 +33843,15 @@
             "id": "settle",
             "kind": "handoff",
             "complete": true,
+            "done": "done",
             "lines": [
               {
+                "key": "settle_line",
                 "when": {
                   "all": []
-                },
-                "key": "settle_line"
+                }
               }
             ],
-            "done": "done",
             "links": [
               {
                 "exit": "safety_open",
@@ -33875,15 +33875,9 @@
           {
             "id": "file",
             "kind": "ask",
-            "title": "file_title",
             "fields": [
               {
                 "id": "file",
-                "options": {
-                  "list": "file"
-                },
-                "max": 1,
-                "required": true,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -33892,10 +33886,16 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "list": "file"
+                },
+                "required": true
               }
             ],
             "hint": "file_hint",
+            "title": "file_title",
             "next": [
               {
                 "to": "harm",
@@ -33935,15 +33935,15 @@
             "id": "replay",
             "kind": "handoff",
             "complete": true,
+            "done": "done",
             "lines": [
               {
+                "key": "replay_line",
                 "when": {
                   "all": []
-                },
-                "key": "replay_line"
+                }
               }
             ],
-            "done": "done",
             "links": [
               {
                 "exit": "safety_open",
@@ -33974,15 +33974,15 @@
             "id": "not_mine",
             "kind": "handoff",
             "complete": true,
+            "done": "done",
             "lines": [
               {
+                "key": "not_mine_line",
                 "when": {
                   "all": []
-                },
-                "key": "not_mine_line"
+                }
               }
             ],
-            "done": "done",
             "links": [
               {
                 "exit": "safety_open",
@@ -34013,15 +34013,23 @@
             "id": "harm",
             "kind": "handoff",
             "complete": true,
-            "lines": [
+            "crisis": [
               {
+                "variant": "crisis",
                 "when": {
                   "all": []
-                },
-                "key": "harm_line"
+                }
               }
             ],
             "done": "done",
+            "lines": [
+              {
+                "key": "harm_line",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
             "links": [
               {
                 "exit": "safety_open",
@@ -34032,14 +34040,6 @@
               }
             ],
             "noClose": true,
-            "crisis": [
-              {
-                "variant": "crisis",
-                "when": {
-                  "all": []
-                }
-              }
-            ],
             "next": [],
             "offers": [
               {
@@ -34053,15 +34053,9 @@
           {
             "id": "move",
             "kind": "ask",
-            "title": "move_title",
             "fields": [
               {
                 "id": "move",
-                "options": {
-                  "list": "move"
-                },
-                "max": 1,
-                "required": true,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -34070,10 +34064,16 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "list": "move"
+                },
+                "required": true
               }
             ],
             "hint": "move_hint",
+            "title": "move_title",
             "next": [
               {
                 "to": "slow",
@@ -34112,14 +34112,8 @@
           {
             "id": "having",
             "kind": "embed",
-            "embed": "boundaryLine",
             "answerAs": "having",
-            "title": "having_title",
-            "props": {
-              "field": "catch",
-              "shape": "list",
-              "next": "having_next"
-            },
+            "embed": "boundaryLine",
             "links": [
               {
                 "exit": "safety_open",
@@ -34129,6 +34123,12 @@
                 }
               }
             ],
+            "props": {
+              "field": "catch",
+              "next": "having_next",
+              "shape": "list"
+            },
+            "title": "having_title",
             "next": [
               {
                 "to": "frame",
@@ -34140,19 +34140,8 @@
           {
             "id": "frame",
             "kind": "embed",
-            "embed": "doseTimer",
             "answerAs": "frame",
-            "title": "frame_title",
-            "props": {
-              "seconds": 20,
-              "step1": "frame_step1",
-              "step2": "frame_step2",
-              "step3": "frame_step3",
-              "start": "start",
-              "running": "running_frame",
-              "done": "move_done",
-              "next": "next"
-            },
+            "embed": "doseTimer",
             "links": [
               {
                 "exit": "safety_open",
@@ -34162,6 +34151,17 @@
                 }
               }
             ],
+            "props": {
+              "done": "move_done",
+              "next": "next",
+              "running": "running_frame",
+              "seconds": 20,
+              "start": "start",
+              "step1": "frame_step1",
+              "step2": "frame_step2",
+              "step3": "frame_step3"
+            },
+            "title": "frame_title",
             "next": [
               {
                 "to": "room",
@@ -34173,19 +34173,8 @@
           {
             "id": "slow",
             "kind": "embed",
-            "embed": "doseTimer",
             "answerAs": "slow",
-            "title": "slow_title",
-            "props": {
-              "seconds": 30,
-              "step1": "slow_step1",
-              "step2": "slow_step2",
-              "step3": "slow_step3",
-              "start": "start",
-              "running": "running_slow",
-              "done": "move_done",
-              "next": "next"
-            },
+            "embed": "doseTimer",
             "links": [
               {
                 "exit": "safety_open",
@@ -34195,6 +34184,17 @@
                 }
               }
             ],
+            "props": {
+              "done": "move_done",
+              "next": "next",
+              "running": "running_slow",
+              "seconds": 30,
+              "start": "start",
+              "step1": "slow_step1",
+              "step2": "slow_step2",
+              "step3": "slow_step3"
+            },
+            "title": "slow_title",
             "next": [
               {
                 "to": "room",
@@ -34206,19 +34206,8 @@
           {
             "id": "leaf",
             "kind": "embed",
-            "embed": "doseTimer",
             "answerAs": "leaf",
-            "title": "leaf_title",
-            "props": {
-              "seconds": 45,
-              "step1": "leaf_step1",
-              "step2": "leaf_step2",
-              "step3": "leaf_step3",
-              "start": "start",
-              "running": "running_leaf",
-              "done": "move_done",
-              "next": "next"
-            },
+            "embed": "doseTimer",
             "links": [
               {
                 "exit": "safety_open",
@@ -34228,6 +34217,17 @@
                 }
               }
             ],
+            "props": {
+              "done": "move_done",
+              "next": "next",
+              "running": "running_leaf",
+              "seconds": 45,
+              "start": "start",
+              "step1": "leaf_step1",
+              "step2": "leaf_step2",
+              "step3": "leaf_step3"
+            },
+            "title": "leaf_title",
             "next": [
               {
                 "to": "room",
@@ -34239,19 +34239,8 @@
           {
             "id": "screen",
             "kind": "embed",
-            "embed": "doseTimer",
             "answerAs": "screen",
-            "title": "screen_title",
-            "props": {
-              "seconds": 45,
-              "step1": "screen_step1",
-              "step2": "screen_step2",
-              "step3": "screen_step3",
-              "start": "start",
-              "running": "running_screen",
-              "done": "move_done",
-              "next": "next"
-            },
+            "embed": "doseTimer",
             "links": [
               {
                 "exit": "safety_open",
@@ -34261,6 +34250,17 @@
                 }
               }
             ],
+            "props": {
+              "done": "move_done",
+              "next": "next",
+              "running": "running_screen",
+              "seconds": 45,
+              "start": "start",
+              "step1": "screen_step1",
+              "step2": "screen_step2",
+              "step3": "screen_step3"
+            },
+            "title": "screen_title",
             "next": [
               {
                 "to": "room",
@@ -34272,18 +34272,8 @@
           {
             "id": "room",
             "kind": "embed",
-            "embed": "orientFind",
             "answerAs": "room",
-            "title": "room_title",
-            "props": {
-              "variant": "find",
-              "count": 3,
-              "here": "here",
-              "task": "room_task",
-              "foundLabel": "found",
-              "done": "find_done",
-              "next": "next"
-            },
+            "embed": "orientFind",
             "links": [
               {
                 "exit": "safety_open",
@@ -34293,6 +34283,16 @@
                 }
               }
             ],
+            "props": {
+              "count": 3,
+              "done": "find_done",
+              "foundLabel": "found",
+              "here": "here",
+              "next": "next",
+              "task": "room_task",
+              "variant": "find"
+            },
+            "title": "room_title",
             "next": [
               {
                 "to": "close",
@@ -34304,15 +34304,10 @@
           {
             "id": "close",
             "kind": "ask",
-            "title": "close_title",
             "fields": [
               {
+                "askFresh": "thenVsNow",
                 "id": "close",
-                "options": {
-                  "list": "tvn"
-                },
-                "max": 1,
-                "required": true,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -34322,9 +34317,14 @@
                     }
                   }
                 ],
-                "askFresh": "thenVsNow"
+                "max": 1,
+                "options": {
+                  "list": "tvn"
+                },
+                "required": true
               }
             ],
+            "title": "close_title",
             "next": [
               {
                 "to": "louder",
@@ -34346,15 +34346,15 @@
             "id": "louder",
             "kind": "handoff",
             "complete": true,
+            "done": "done",
             "lines": [
               {
+                "key": "louder_line",
                 "when": {
                   "all": []
-                },
-                "key": "louder_line"
+                }
               }
             ],
-            "done": "done",
             "links": [
               {
                 "exit": "safety_open",
@@ -34378,8 +34378,10 @@
             "id": "end",
             "kind": "handoff",
             "complete": true,
+            "done": "done",
             "lines": [
               {
+                "key": "end_same_facts",
                 "when": {
                   "all": [
                     {
@@ -34401,19 +34403,19 @@
                       ]
                     }
                   ]
-                },
-                "key": "end_same_facts"
+                }
               },
               {
+                "key": "end_same",
                 "when": {
                   "eq": [
                     "$a.close",
                     "same"
                   ]
-                },
-                "key": "end_same"
+                }
               },
               {
+                "key": "end_further",
                 "when": {
                   "in": [
                     "$a.close",
@@ -34422,11 +34424,9 @@
                       "much_better"
                     ]
                   ]
-                },
-                "key": "end_further"
+                }
               }
             ],
-            "done": "done",
             "links": [
               {
                 "exit": "safety_open",
