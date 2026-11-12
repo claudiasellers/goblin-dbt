@@ -51,7 +51,7 @@ test("rows are drafts until signed off; the policy can only be enabled once ever
 });
 
 test("DEAR MAN's one word row, Pause active; planned tools are written switched off; built tools live (default to connected, 12 Nov 2026)", () => {
-  const planned = ["dbt_give", "dbt_please"];
+  const planned = ["dbt_please"];
   for (const r of rows) {
     if (r.conceptId === "dbt_dear_man") assert.deepEqual([r.id, r.active, r.reviewStatus, r.words], ["rf_social_threat_shame_words_ask-for-it_dear-man", true, "approved", ["let_down", "excluded"]], "DEAR MAN's one word row, live (12 Nov)");
     const off = planned.includes(r.conceptId);
@@ -67,6 +67,9 @@ test("DEAR MAN's one word row, Pause active; planned tools are written switched 
   assert.equal(graph.concepts.dbt_wise_mind.appToolId, "wise-mind");
   const wise = rows.filter((r) => r.conceptId === "dbt_wise_mind");
   assert.deepEqual(wise.map((r) => [r.id, r.active, r.reviewStatus]), [["rf_chronic_vigilance_words_watchful_wise-mind", true, "approved"]]);
+  // Keep it warm (IE-06): built, tagged, no row; the review's two planned rows were dropped (docs/design/give.md).
+  assert.equal(graph.concepts.dbt_give.appToolId, "give");
+  assert.deepEqual(rows.filter((r) => r.conceptId === "dbt_give"), []);
   // Cope Ahead and Check the Facts: built and live (Claudia, 12 Nov: default to connected), every row approved.
   assert.equal(graph.concepts.dbt_cope_ahead.appToolId, "cope-ahead");
   const cope = rows.filter((r) => r.conceptId === "dbt_cope_ahead");
@@ -110,6 +113,7 @@ test("tags (WMP-04 v0 side, skillKind, direction) on the 13 app-tool concepts; D
     "check-the-facts": ["change", "change", "neutral"], "alternate-rebellion": ["acceptance", "redirect", "neutral"], fast: ["both", "values", "neutral"],
     "say-no": ["change", "relational", "neutral"], "let-it-be": ["acceptance", "hold", "neutral"], "mind-job": ["acceptance", "redirect", "neutral"],
     soothe: ["acceptance", "body", "down"], "thoughts-passing": ["acceptance", "hold", "neutral"],
+    give: ["change", "relational", "neutral"],
   });
   for (const id of Object.keys(tags)) assert.ok(toolIds.includes(id), id);
 });

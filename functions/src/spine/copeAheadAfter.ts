@@ -36,6 +36,9 @@ export const FOLLOW_UP_SESSION_TOOL: Readonly<Record<string, string>> = {
   ask_delayed: 'dear-man',
   // Do the Opposite's plan for later (ER-B3): only from a Do the Opposite visit.
   oa_try: 'opposite-action',
+  // Keep it warm's break and return, and its repair's "How did it go?" (IE-B4, docs/design/give.md).
+  break_return: 'give',
+  repair_outcome: 'give',
 };
 
 /** The plan's ids, as the after card needs them. Own words are the visit's (its Today card may show them). */

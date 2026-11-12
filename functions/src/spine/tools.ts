@@ -48,6 +48,8 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   // after deciding to end a relationship isn't evidence of anything, and a quiet leave keeps the visit unseen.
   'ending-relationships': { module: 'ie', closeKind: 'none' },
   'say-no': { module: 'ie', closeKind: 'none' },
+  // Keep it warm (docs/design/give.md): no close question. How warm a repair felt is asked as its own outcome.
+  'give': { module: 'ie', closeKind: 'none' },
   'recovering-from-invalidation': { module: 'wmp', closeKind: 'none' },
   // Meet a part (docs/design/parts.md): "Further away … More here". Not in src/data/tools.ts yet.
   'meet-a-part': { module: 'mf', closeKind: 'orienting' },

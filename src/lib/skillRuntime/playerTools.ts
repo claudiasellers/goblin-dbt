@@ -32,6 +32,7 @@ export const PAGE_SKILLS: Readonly<Record<string, readonly string[]>> = {
   'fast': ['fast_review', 'fast_let_go'],
   'dear-man': ['dear_man_debrief', 'dear_man_one', 'dear_man_prep'],
   'say-no': ['say_no'],
+  'give': ['give'],
 };
 
 /**
@@ -40,7 +41,7 @@ export const PAGE_SKILLS: Readonly<Record<string, readonly string[]>> = {
  * sets the person's refusal counts and `safetyRecheckAt`. The profile cache is cleared once such a close lands, so
  * the next prep reads them fresh.
  */
-export const PROFILE_WRITING_CLOSES: ReadonlySet<string> = new Set(['dear-man', 'say-no']);
+export const PROFILE_WRITING_CLOSES: ReadonlySet<string> = new Set(['dear-man', 'say-no', 'give']);
 
 /**
  * Links the old page still answers after its port (C8.4: the old page stays in the tree, unrouted, except for these):

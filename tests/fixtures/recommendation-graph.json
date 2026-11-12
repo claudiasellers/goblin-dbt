@@ -448,6 +448,17 @@
     "perplexed"
    ]
   },
+  "dbt_give": {
+   "appToolId": "give",
+   "name": "GIVE",
+   "description": "Gentle, Interested, Validate, Easy manner",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": "change",
+   "skillKind": "relational",
+   "direction": "neutral",
+   "addresses": []
+  },
   "dbt_mindfulness_current_thoughts": {
    "appToolId": "thoughts-passing",
    "name": "Mindfulness of Current Thoughts",
@@ -3543,33 +3554,6 @@
    "rationale": "Planned: Running low (PLEASE: address the body's vulnerability) leads Low drive, Do the Opposite after it."
   },
   {
-   "id": "rf_reward_drive_low_words_connection_give",
-   "conceptId": "dbt_give",
-   "patternId": "reward_drive_low",
-   "bands": [
-    "steady",
-    "stirred"
-   ],
-   "priority": 0.85,
-   "direction": "neutral",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": "words",
-   "words": [
-    "lonely",
-    "isolated"
-   ],
-   "beside": [],
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": false,
-   "version": "rf-v2",
-   "reviewStatus": "draft",
-   "rationale": "Planned: GIVE (reaching towards people) leads for loneliness once built, Running low after it; Do the Opposite until then."
-  },
-  {
    "id": "rf_reward_drive_low_words_fragile_let-it-be",
    "conceptId": "dbt_radical_acceptance",
    "patternId": "reward_drive_low",
@@ -4152,32 +4136,6 @@
    "version": "rf-v2",
    "reviewStatus": "approved",
    "rationale": "Hot shame: Cool Down (TIPP cold water triggers the dive reflex, slowing the heart and narrowing peripheral blood vessels), then Recover. Humiliated is a wound word, so Recover still leads it (R7)."
-  },
-  {
-   "id": "rf_social_threat_shame_words_let-down_give",
-   "conceptId": "dbt_give",
-   "patternId": "social_threat_shame",
-   "bands": [
-    "steady",
-    "stirred"
-   ],
-   "priority": 1.5,
-   "direction": "neutral",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": "words",
-   "words": [
-    "let_down"
-   ],
-   "beside": [],
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": false,
-   "version": "rf-v2",
-   "reviewStatus": "draft",
-   "rationale": "Planned: GIVE (keep the relationship) as the alternative to Recover."
   },
   {
    "id": "rf_social_threat_shame_words_self-respect_fast",

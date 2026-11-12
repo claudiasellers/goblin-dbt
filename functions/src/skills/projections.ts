@@ -5,6 +5,7 @@ import { projectDearManOne } from '../dearMan/oneProjection';
 import { projectDearManPrep } from '../dearMan/prepProjection';
 import { projectSayNo } from '../sayNo/projection';
 import { projectOppositeAction } from '../oppositeAction/projection';
+import { projectGive } from '../give/projection';
 
 /**
  * The projection hook (docs/design/dbt-modules-plan.md C3a R14, C8.2): for a tool that moved onto the skill
@@ -43,13 +44,15 @@ export const PROJECTIONS: Readonly<Record<string, Projection>> = {
   // Do the Opposite (ER-B3): one OppositeActionSession v3 per feeling that reached its step, for the parts stats and
   // trails; a reopened visit (oa_try) moves them on to practiced or missed.
   'opposite-action': projectOppositeAction,
+  // Keep it warm (IE-B4): the Interaction {kind: 'repair' | 'break_return'} once its card's visit says how it went.
+  'give': projectGive,
 };
 
 /**
  * Skills whose rep is the person's own report of something done off the phone (PR-S4, D-09): the close logs it as
  * `followup_offphone` (self-reported), as DEAR MAN's hand-built debrief did. Only when the run says it happened.
  */
-export const OFF_PHONE_SKILLS: Readonly<Record<string, { toolId: string; happenedField: string; yes: string; unansweredKeepsOwn?: boolean }>> = {
+export const OFF_PHONE_SKILLS: Readonly<Record<string, { toolId: string; happenedField: string | readonly string[]; yes: string; unansweredKeepsOwn?: boolean }>> = {
   dear_man_debrief: { toolId: 'dear-man', happenedField: 'happened', yes: 'yes' },
   // Say no's afterwards (the no_outcome card reopens the run at *Did you say no?*): said is the rep. The first visit,
   // which never asks it, keeps the close's own rep (`unansweredKeepsOwn`).
@@ -57,6 +60,9 @@ export const OFF_PHONE_SKILLS: Readonly<Record<string, { toolId: string; happene
   // Do the Opposite's later visit (the oa_try card reopens the run at *Did you get to try it?*): tried is the rep, and
   // a plan not tried logs none (the hand-built page's `oaSkillIds('missed')`). The first visit keeps the close's own.
   opposite_action: { toolId: 'opposite-action', happenedField: 'tried', yes: 'yes', unansweredKeepsOwn: true },
+  // Keep it warm's afterwards: *Did you get to say it?* (repair) or *Did you go back?* (break and return), whichever the
+  // card's visit asked. A first visit asks neither and keeps the close's own rep.
+  give: { toolId: 'give', happenedField: ['repaired', 'back'], yes: 'yes', unansweredKeepsOwn: true },
 };
 
 /** The rep a run's close logs: off the phone (it happened), none (it didn't), or the close's own (null). */
@@ -69,7 +75,8 @@ export function runRep(ext: string | null, toolId: string): { repSource: 'follow
   const rule = typeof r.skillId === 'string' && Object.prototype.hasOwnProperty.call(OFF_PHONE_SKILLS, r.skillId) ? OFF_PHONE_SKILLS[r.skillId] : null;
   if (!rule || rule.toolId !== toolId) return null;
   const answers = Array.isArray(r.answers) ? r.answers as Array<{ fieldId?: unknown; optionIds?: unknown }> : [];
-  const a = answers.find((x) => x && x.fieldId === rule.happenedField);
+  const fields: readonly string[] = typeof rule.happenedField === 'string' ? [rule.happenedField] : rule.happenedField;
+  const a = answers.find((x) => x && typeof x.fieldId === 'string' && fields.includes(x.fieldId));
   if (!a && rule.unansweredKeepsOwn) return null;
   const ids = a && Array.isArray(a.optionIds) ? a.optionIds : [];
   return ids.includes(rule.yes) ? { repSource: 'followup_offphone' } : { noRep: true };
