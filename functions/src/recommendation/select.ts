@@ -11,8 +11,9 @@
  *   → rank: priority, then the user's words the concept addresses, then the pattern's emotions it
  *     addresses (today's signal, now a tie-break), then app tool id (deterministic)
  *   → primary: the first without `requiresPrior`
- *   → swap: the first remaining with a different skillKind and not change + change (diversity);
- *     a `requiresPrior` row may only fill this slot, marked `after_primary`
+ *   → swap: the first remaining with a different skillKind and not change + change (diversity), except
+ *     a row reviewed to sit `beside` the first card's tool (12 Nov 2026: the review's "Say no beside
+ *     Problem Solve"); a `requiresPrior` row may only fill this slot, marked `after_primary`
  *   → fallback: RoutingPolicy.fallbackConceptId (5-4-3-2-1) when nothing survives
  *   → applyMiddlePath (WMP-04 v0): labels only; `receiveFirst` = the first card is a change skill.
  * Nothing clinical is decided here: every row, tag and gate is graph content (content.py).
@@ -148,7 +149,8 @@ export function selectRecommendations(ctx: SelectInput): SelectOutput {
       for (const c of ranked) {
         if (c === first) continue;
         const bothChange = c.side === 'change' && first.side === 'change';
-        if (c.concept.skillKind === first.concept.skillKind || bothChange) { reject(c, 'diversity'); continue; }
+        const reviewedPair = (c.row.beside ?? []).includes(first.concept.appToolId);
+        if (!reviewedPair && (c.concept.skillKind === first.concept.skillKind || bothChange)) { reject(c, 'diversity'); continue; }
         picks.push(pick(c, 'swap', c.row.requiresPrior ? 'after_primary' : undefined));
         break;
       }

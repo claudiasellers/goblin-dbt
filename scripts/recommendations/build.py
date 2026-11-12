@@ -138,13 +138,13 @@ def main():
     for pattern, rs in by_pattern.items():
         items = [{"id": r["id"], "c": concept[r["tool"]], "p": r["pattern"], "bands": r["bands"], "prio": r["priority"],
                   "dir": r["direction"], "req": r["requiresPrior"], "side": r["side"], "gate": r["emotionGate"], "words": r["words"],
-                  "active": r["active"], "review": r["reviewStatus"], "why": r["why"]} for r in rs]
+                  "beside": r["beside"], "active": r["active"], "review": r["reviewStatus"], "why": r["why"]} for r in rs]
         A(f"// {pattern}")
         A("UNWIND [\n  " + ",\n  ".join(lit(i) for i in items) + "\n] AS row\n"
           "MATCH (tc:TherapyConcept {id: row.c}), (p:ActivationPattern {id: row.p})\n"
           "MERGE (tc)-[r:RECOMMENDED_FOR {id: row.id}]->(p)\n"
           "SET r.bands = row.bands, r.priority = row.prio, r.direction = row.dir, r.requiresPrior = row.req,\n"
-          f"    r.side = row.side, r.emotionGate = row.gate, r.words = row.words, r.tier = \"quality_of_life\", r.surface = [\"checkin_result\"],\n"
+          f"    r.side = row.side, r.emotionGate = row.gate, r.words = row.words, r.beside = row.beside, r.tier = \"quality_of_life\", r.surface = [\"checkin_result\"],\n"
           f"    r.active = row.active, r.version = {q(C.VERSION)}, r.reviewStatus = row.review, r.rationale = row.why;")
 
     A("\n// --- 4b. Contraindications (CONTRAINDICATED_FOR: the primary or the co-occurring pattern) ---")

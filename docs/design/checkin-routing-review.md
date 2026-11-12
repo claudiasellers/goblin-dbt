@@ -167,3 +167,14 @@ planned rows stay drafts until their tool ships. Switched off, the check-in rout
 
 To revisit a row later: take its id out of `SIGNED_OFF` and change it (or switch the policy off while
 you do; `build.py` won't build an enabled policy with an active draft), rebuild, reload `recommended-for`.
+
+## Addendum, 12 Nov 2026: reviewed pairs fill the second card
+
+Some rows this review wrote as "beside X" never showed: the swap rule (a different skill kind, never two change
+skills) dropped them. Say no on *pressured* beside Problem Solve (both change) and Check the Facts on *anxious* /
+*nervous* beside Cope Ahead (both change) are two. A word rule can now name the leads it sits `beside`
+(`scripts/recommendations/content.py`, `RECOMMENDED_FOR.beside`); when one of them is the first card, `select.ts` lets
+that row fill the swap past the rule. Every other row keeps the rule, so a fallback row written "until X ships" never
+becomes a second change card, and the hard filters (Flooded → body / orient only, blank, contraindications) apply to
+every row. FAST got there another way (#90: its own skill kind, `values`). DEAR MAN beside Recover follows with One
+message.
