@@ -10,6 +10,7 @@ import { completeSafetyCheckin, getSafetyContent, saveSafetyCheck, scheduleSafet
 import { PlanPeopleRow, PoisonLines, SafetyPeople } from './SafetyPeople';
 import { SafetyPlanUse } from './SafetyPlanUse';
 import { useSafetyPlan } from '../../hooks/useSafetyPlan';
+import { useToday } from '../../hooks/useToday';
 import type { SafetyPlan } from '../../lib/safetyPlan';
 import { useSafetyCountry } from '../../hooks/useSafetyCountry';
 
@@ -69,6 +70,7 @@ export function SafetyRoute({ entry, source, sourceSessionId, followUpId, onDone
   // CORE-02: the person's plan (account or device). Its people sit under the lines on every screen, and *Open your
   // plan* plays it in place; with none, the quick plan (three lines, the plan's draft).
   const { plan } = useSafetyPlan();
+  const today = useToday();
   const [visit, setVisit] = useState(() => ({ id: newId(), source }));
   const heading = useRef<HTMLHeadingElement>(null);
   const finished = useRef(false);
@@ -232,7 +234,8 @@ export function SafetyRoute({ entry, source, sourceSessionId, followUpId, onDone
         <Choices choices={f.morning.choices} onPick={(id) => {
           const prev = readJson<{ answer: string; at: number }>(MORNING_KEY);
           writeJson(MORNING_KEY, { answer: id, at: Date.now(), prevHard: twiceHard(prev, Date.now()) });
-          if (followUpId && signedIn) void completeSafetyCheckin(followUpId).catch(() => { /* card stays; it goes stale */ });
+          // Answered: off Today for this visit too once the server has it (kept on Today if the save fails).
+          if (followUpId && signedIn) void completeSafetyCheckin(followUpId).then(() => today.drop(followUpId)).catch(() => { /* card stays; it goes stale */ });
           send({ type: 'morning', id: id as 'okay' | 'hard' | 'not_safe' });
         }} />
       </>);

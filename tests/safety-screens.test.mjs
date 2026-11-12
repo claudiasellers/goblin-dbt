@@ -148,3 +148,15 @@ test("only a client that can show the route gets it; any other keeps the old cri
   assert.match(read("functions/src/recommendation/queries.ts"), /if \(!uid \|\| !\(await safetyPolicyEnabled\(tx\)\)\) return null;/);
   assert.match(read("src/pages/CheckIn.tsx"), /safetyRoute: true,/);
 });
+
+test("Back from the morning offer undoes the exit, so nothing closes the visit while the person is still on it", () => {
+  const base = { id: "x", source: "checkin", country: null };
+  for (const lead of [[{ type: "answer", id: "passing" }, { type: "carry_on" }], [{ type: "answer", id: "passing" }, { type: "leave" }, { type: "exit", id: "stop" }]]) {
+    const s = play("checkin", [...lead, { type: "back" }]);
+    assert.notEqual(s.screen, "checkin");
+    assert.equal(s.exit, null);
+    assert.equal(R.recordFor(s, base).exit, null);
+  }
+  // The answered morning card leaves Today once the server has it.
+  assert.match(read("src/components/safety/SafetyRoute.tsx"), /completeSafetyCheckin\(followUpId\)\.then\(\(\) => today\.drop\(followUpId\)\)/);
+});

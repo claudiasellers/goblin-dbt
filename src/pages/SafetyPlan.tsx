@@ -5,6 +5,7 @@ import type { SafetyContent } from '../data/safetyTypes';
 import { useBand } from '../hooks/useBand';
 import { useSafetyCountry } from '../hooks/useSafetyCountry';
 import { useSafetyPlan } from '../hooks/useSafetyPlan';
+import { useToday } from '../hooks/useToday';
 import { QUICK_PLAN_KEY } from '../lib/safetyRoute';
 import { buildNeedsHeadsUp, emptyPlan, planFromQuick } from '../lib/safetyPlan';
 import { completeFollowUp, getSafetyContent } from '../services/safety';
@@ -34,6 +35,7 @@ export function SafetyPlan() {
   const [content, setContent] = useState<SafetyContent | null>(null);
   const [countryId, setCountry] = useSafetyCountry(content);
   const { status, plan, kitCards, save } = useSafetyPlan();
+  const today = useToday();
   const review = params.get('review');
   const use = params.get('use') === '1';
   const [flooded] = useState(() => buildNeedsHeadsUp(band.current()?.value));
@@ -55,11 +57,11 @@ export function SafetyPlan() {
         <p className="m-0 text-[var(--color-text-secondary)]">{c.review.line}</p>
         {plan && <PlanCard content={content} country={country} plan={plan} kitCards={kitCards} />}
         <button type="button" className={primary} onClick={() => {
-          if (user) void completeFollowUp(review).catch(() => { /* the card goes stale */ });
+          if (user) void completeFollowUp(review).then(() => today.drop(review)).catch(() => { /* the card goes stale */ });
           leave();
         }}>{c.review.keep}</button>
         <button type="button" className={quiet} onClick={() => {
-          if (user) void completeFollowUp(review).catch(() => { /* the card goes stale */ });
+          if (user) void completeFollowUp(review).then(() => today.drop(review)).catch(() => { /* the card goes stale */ });
           setParams({});
         }}>{c.review.change}</button>
       </div>
