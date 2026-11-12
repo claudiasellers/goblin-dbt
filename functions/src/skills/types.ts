@@ -164,6 +164,8 @@ export type EmbedPropSpec =
 export interface EmbedOutputSchema {
   ids?: readonly string[];
   ownText?: boolean;
+  /** Its ids are grid word ids (RunContext.gridIds), at most this many, in the order reported (Do the Opposite's doors). */
+  emotions?: number;
   measures?: ReadonlyArray<'durationSec' | 'doneCount' | 'earlyCount'>;
   danger?: Readonly<Record<string, 'self' | 'other' | 'medical'>>;
 }

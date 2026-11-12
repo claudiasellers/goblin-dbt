@@ -527,7 +527,9 @@ export function runNext(ctx: RunContext, s: RunState, e: RunEvent): RunState {
       const o = e.output;
       const decl = ctx.embedOutputs?.[step.embed] ?? {};
       const allowed = new Set(decl.ids ?? []);
-      const ids = (o.ids ?? []).filter((v) => typeof v === 'string' && ID.test(v) && allowed.has(v)).slice(0, 12);
+      const isGrid = (v: string) => (decl.emotions ?? 0) > 0 && ctx.gridIds.has(v);
+      const ids = [...new Set((o.ids ?? []).filter((v) => typeof v === 'string' && ID.test(v) && (allowed.has(v) || isGrid(v))))]
+        .slice(0, decl.emotions && !allowed.size ? decl.emotions : 12);
       const own = decl.ownText && typeof o.own === 'string' && o.own.trim() ? o.own.trim().slice(0, ctx.skill.ownMax) : null;
       const measures = new Set(decl.measures ?? []);
       const n = (k: 'durationSec' | 'doneCount' | 'earlyCount', max: number) => {
@@ -728,7 +730,8 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { ke
   const recAnswers: Answers = {};
   for (const a of Array.isArray(r.answers) ? r.answers as Array<Record<string, unknown>> : []) {
     const fieldId = a.fieldId;
-    if (typeof fieldId !== 'string' || !fieldOf(ctx.skill, fieldId)) continue;
+    // A field, or a whole-screen embed's answer (`answerAs`: Do the Opposite's doors, the field its feelings repeat over).
+    if (typeof fieldId !== 'string' || !(fieldOf(ctx.skill, fieldId) || ctx.skill.steps.some((st) => st.answerAs === fieldId))) continue;
     const pk = typeof a.pick === 'string' && ID.test(a.pick) && per.has(fieldId) ? a.pick : null;
     if (per.has(fieldId) && !pk) continue;
     const ids = Array.isArray(a.optionIds) ? (a.optionIds as unknown[]).filter((x): x is string => typeof x === 'string' && ID.test(x)) : [];
@@ -942,6 +945,11 @@ export function runUrgeIds(ctx: RunContext, s: Pick<RunState, 'answers'>): strin
     }
   }
   return out;
+}
+
+/** This visit's urges: the run's, less those a reopened run read back from its first visit (`readBack`). */
+export function visitUrgeIds(ctx: RunContext, s: Pick<RunState, 'answers'>, readBack: readonly string[]): string[] {
+  return runUrgeIds(ctx, s).filter((u) => !readBack.includes(u));
 }
 
 /** Whether safety.open opens over this step as the run arrives at it (`safetyFirst`, plan C6.5). */

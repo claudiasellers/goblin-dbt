@@ -19,7 +19,7 @@ import {
   answersOf, askFresh, canGoOn, carried as carriedOf, carryOnOthers, labelOfValue, offersFor, contextIn, copyText, crisisFor, ctxAfterResume, seededFrom, stepLinks, emotionChoices, fieldLinks, fieldList, followUpFor,
   handoffLine, initialRun, inlineResult, keepFor, opensSafety, optionGroups, ownMaxOf, persistence, pickedLabels, resumeRun, runEmotionIds, runNext, runRecord,
   runUrgeIds,
-  scope, shownFields, stepOf, titleSlots,
+  scope, shownFields, stepOf, titleSlots, visitUrgeIds,
   type Answer, type RunContext, type RunEvent, type RunState,
 } from '../../lib/skillRuntime/machine';
 import { holds } from '../../lib/skillRuntime/conditions';
@@ -186,13 +186,19 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
   const profileSettled = !needsProfile(skill.toolId) || profile.status !== 'loading';
   const resumed = useRef(false);
   const reopenedRef = useRef(false);
+  /** On a reopened run, the urges the first visit recorded (read back with it): not this visit's. */
+  const reopenUrges = useRef<string[]>([]);
   useEffect(() => {
     if (!resumeFrom || !profileSettled || resumed.current) return;
     resumed.current = true;
     (resumeRecord !== undefined ? Promise.resolve(resumeRecord) : getSkillRun(resumeFrom.run, skill.toolId))
       .then((rec) => {
         const r = resumeRun(ctx, rec, resumeFrom.at, { keepFresh: !!resumeKeepsFresh });
-        if (r) { reopenedRef.current = !!stepOf(skill, r.stepId).reopens; setSt(r); }
+        if (r) {
+          reopenedRef.current = !!stepOf(skill, r.stepId).reopens;
+          reopenUrges.current = reopenedRef.current ? runUrgeIds(ctx, r) : [];
+          setSt(r);
+        }
         else setCtxIn((c) => ctxAfterResume(c, false));
       })
       // Nothing to reopen: a fresh run, and a whole first visit (the link's enterAt was for the run it named).
@@ -233,10 +239,11 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
   useEffect(() => {
     toolSession.setStep(st.stepId);
     toolSession.setExt({ run: runRecord(ctx, st) });
-    // A run reopened at a `reopens` step (a review afterwards) is a new visit about the same plan: the feeling
-    // was the first visit's, so it isn't counted again here.
+    // A run reopened at a `reopens` step (a review afterwards) is a new visit about the same plan: the feeling and
+    // the urges read back with it were the first visit's, so they aren't counted again here (an urge picked on the
+    // review itself is this visit's).
     toolSession.setEmotionIds(reopenedRef.current ? [] : runEmotionIds(ctx, st));
-    toolSession.setUrgeIds(runUrgeIds(ctx, st));
+    toolSession.setUrgeIds(visitUrgeIds(ctx, st, reopenUrges.current));
     const fresh = askFresh(ctx, st);
     toolSession.setFitsFacts((fresh.fitsFacts as Parameters<typeof toolSession.setFitsFacts>[0]) ?? null);
     toolSession.setThenVsNow((fresh.thenVsNow as ThenVsNow | undefined) ?? null);
@@ -527,7 +534,9 @@ function EmbedStep({ ctx, step, st, send, onShown, onExit, covered }: {
   // A whole-screen embed done for real (a hold held, a wait waited, a card read: anything but `skipped`) is
   // practice, so a visit left before its last card still counts as a rep.
   const done = (output: EmbedOutput) => {
-    if (output.ids.length && !output.ids.includes('skipped')) toolSession.markPracticed();
+    // Words picked (an `emotions` embed: Do the Opposite's doors) are a choice, not practice.
+    const picksWords = !!EMBED_OUTPUTS[step.embed ?? '']?.emotions;
+    if (!picksWords && output.ids.length && !output.ids.includes('skipped')) toolSession.markPracticed();
     send({ type: 'embedDone', output });
   };
   if (!Embed) return null;

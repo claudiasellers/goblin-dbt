@@ -255,6 +255,15 @@ Added by ER-B3 (`docs/design/opposite-action-v3.md`, *Runtime pieces*; agreed wi
   the body's check → swap, Ride it out's renewed round) is still a forward move. A resumed run has no trail and reads
   one from its path (`backTrail`), where such a loop reads as a step back. Pinned on every skill by seeded walks
   (`tests/skill-runtime-back.test.mjs`).
+- **An embed that reports words** (`EmbedOutputSchema.emotions: n`): its ids are grid word ids; the machine keeps only
+  words on the grid (`gridIds`), deduped, at most `n`, as the step's `answerAs` (Do the Opposite's `doorPicker`, the
+  field its feelings repeat over). Its done is a choice, not practice (no `markPracticed`). Resume reads an `answerAs`
+  answer back like a field's (before, only fields came back, so a reopened run lost the doors' words and every per-pick
+  answer). The real check is the projection's, against the graph.
+- **A reopened visit's urges** are only the ones picked on that visit (`visitUrgeIds`: the run's, less those read back
+  with it), as its emotion ids are none; the first visit counted them.
+- **Old links after a port** (`legacyLink` in `playerTools.ts`): a link the hand-built page still answers (Do the
+  Opposite's `?followUp=` without `run`), removed with the page's route 7 days after the port deploys.
 
 ### The attempt record (what a router reads)
 
