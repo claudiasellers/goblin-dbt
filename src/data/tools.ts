@@ -137,6 +137,19 @@ export const tools: Tool[] = [
     emoji: '⚖️',
     bare: true,
   },
+  {
+    // DT-09 on the skill runtime (docs/design/habit-plan.md): dialectical abstinence for one behaviour, with a lapse
+    // plan; the habit_renew card checks in when the stretch ends.
+    id: 'habit-plan',
+    name: 'When it\'s a habit',
+    tagline: 'All in, with a plan for a slip',
+    description: 'For something you keep going back to: commit for a stretch you can keep, make it harder to get to, pick what you\'ll turn to when a craving comes, and plan what you\'ll do if you slip.',
+    whenToUse: 'When things are calm enough to plan, for drinking, using, bingeing, gambling, spending, scrolling or anything else you keep doing.',
+    module: 'distress-tolerance',
+    dbtBasis: 'Dialectical abstinence (DT Handouts 16–21)',
+    emoji: '🌉',
+    bare: true,
+  },
   // Emotion Regulation
   {
     id: 'opposite-action',
@@ -347,6 +360,7 @@ export const allIntents: Intent[] = [
   { id: 'thoughts-passing', label: 'A thought feels like a fact', toolId: 'thoughts-passing', emoji: '🍂' },
   { id: 'blow-it-up', label: 'I want to blow it all up', toolId: 'alternate-rebellion', emoji: '🎸' },
   { id: 'reasons', label: 'Make a card for a pull that keeps coming back', toolId: 'pros-cons', emoji: '⚖️' },
+  { id: 'habit-plan', label: 'Something I keep doing', toolId: 'habit-plan', emoji: '🌉' },
   { id: 'shift', label: 'Shift a feeling that isn\'t helping', toolId: 'opposite-action', emoji: '🔄' },
   { id: 'problem', label: 'Work through a problem', toolId: 'problem-solve', emoji: '🛠️' },
   { id: 'ask', label: 'Ask someone for what I need', toolId: 'dear-man', emoji: '🗣️' },

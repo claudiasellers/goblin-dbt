@@ -36,6 +36,8 @@ export const FOLLOW_UP_SESSION_TOOL: Readonly<Record<string, string>> = {
   ask_delayed: 'dear-man',
   // Do the Opposite's plan for later (ER-B3): only from a Do the Opposite visit.
   oa_try: 'opposite-action',
+  // When it's a habit's renewal (DT-09, docs/design/habit-plan.md): only from a habit-plan visit (it reopens that run).
+  habit_renew: 'habit-plan',
 };
 
 /** The plan's ids, as the after card needs them. Own words are the visit's (its Today card may show them). */

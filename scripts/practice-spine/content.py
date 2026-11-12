@@ -329,6 +329,23 @@ FOLLOW_UP_TYPES = [
         "notification": "Something you put on the shelf is ready to open.",
     },
     {
+        # When it's a habit (DT-09, docs/design/habit-plan.md): the stretch the person committed to has ended. The chips
+        # are the stretch itself (the next hour, the rest of today, three days, a week). The card reopens that visit at
+        # `renew` (R9 `reopens`: kept to it → the next stretch; slipped → the lapse plan they wrote, then recommit).
+        # Opening it is the resolution. It never names the behaviour (Today can be seen by others).
+        "id": "habit_renew", "ownerModule": "dt", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/habit-plan?run={sourceSessionId}&at=renew&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"hour": {"kind": "after", "minutes": 60},
+                                             "tonight": {"kind": "at_local", "days": 0, "time": "21:00"},
+                                             "few_days": {"kind": "at_local", "days": 3, "time": "18:00"},
+                                             "this_week": {"kind": "at_local", "days": 7, "time": "18:00"}}},
+        "staleAfterHours": 48, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Your stretch is up", "body": "How did it go? Whatever happened, there's a next step."},
+        "choices": [{"id": "not_now", "label": "Not now", "status": "dismissed"}],
+        "notification": "A stretch you committed to is up.",
+    },
+    {
         # E3 §A4.2.6: "Come back to this later" from the breakdown hand-off (A4-2 schedules it).
         "id": "resume_skill", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
         "deepLinkTemplate": "/tool/{sourceToolId}?resume={sourceSessionId}&followUp={followUpId}",

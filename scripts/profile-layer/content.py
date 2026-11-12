@@ -43,6 +43,9 @@ KINDS = [
     # Pros & cons card (DT-10): a card the person kept for one pull. Never stale: theirs until they set it aside.
     ("pros_cons", "my_plans", "A pros & cons card", None,
      "", "Set aside. Hold to wait won't show it until you bring it back."),
+    # When it's a habit (DT-09): a plan the person kept for one behaviour. Never stale: theirs until they set it aside.
+    ("abstinence_plan", "my_plans", "A habit plan", None,
+     "", "Set aside. It stays out of the way until you bring it back."),
     # People (IE-03): someone the person named in DEAR MAN's picker. Never stale here: the safety question has its
     # own re-ask (90 days, or *Things changed*), asked in the flow, never as a Me "still true?".
     ("person", "my_people", "Someone in my life", None,

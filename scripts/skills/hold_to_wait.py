@@ -258,6 +258,8 @@ STEPS = [
             # The kit (planned, not shown until built) for hurt myself; Give your mind a job (DT-06) for checking.
             {"exit": "crisis_kit", "when": {"eq": [a("pull"), "use"]}},
             {"exit": "mind_job", "when": {"eq": [a("pull"), "check"]}},
+            # A pull that keeps coming back as a habit: a plan made in calm (DT-09).
+            {"exit": "habit_plan", "when": {"in": [a("pull"), ["use", "check"]]}},
         ],
         "done": "done", "links": [SAFETY_LINK],
     },
@@ -301,6 +303,7 @@ EXITS = [
     {"id": "crisis_kit", "toolId": "crisis-kit", "planned": True},      # DT-03 My crisis kit (safety batch)
     {"id": "held", "toolId": "soothe", "query": {"frame": "hurt"}},      # DT-07 Held (hand on heart; its banner stays)
     {"id": "mind_job", "toolId": "mind-job"},          # DT-06 Give your mind a job: park it, look once
+    {"id": "habit_plan", "toolId": "habit-plan"},                       # DT-09 When it's a habit (use, check)
     {"id": "safety_open", "toolId": None, "safety": True},              # safety.open (R6)
     {"id": "done", "done": True},
 ]

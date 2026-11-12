@@ -184,8 +184,8 @@ test("the end card: the move's own line or the plain one, its tool as the one of
   const s2 = end("send", "later");
   assert.deepEqual(M.offersFor(ctx(), card, s2), []);
   assert.match(M.handoffLine(ctx(), card, s2), /Saving it for later is a choice/);
-  assert.deepEqual(M.offersFor(ctx(), card, end("check", "phone_room")), ["mind_job"], "Give your mind a job (DT-06, built)");
-  assert.deepEqual(M.offersFor(ctx(), card, end("use", "ride")), ["urge_surfing"]);
+  assert.deepEqual(M.offersFor(ctx(), card, end("check", "phone_room")), ["mind_job", "habit_plan"], "Give your mind a job (DT-06, built); a habit plan (DT-09)");
+  assert.deepEqual(M.offersFor(ctx(), card, end("use", "ride")), ["urge_surfing", "habit_plan"], "use: a habit plan made in calm (DT-09)");
   assert.deepEqual(M.offersFor(ctx(), card, end("leave", "boundary")), ["fast"]);
   assert.deepEqual(M.offersFor(ctx(), card, end("hit", "rebel")), ["alternate_rebellion"]);
   const planned = new Set(skill.exits.filter((x) => x.planned).map((x) => x.id));

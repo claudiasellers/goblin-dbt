@@ -1476,6 +1476,18 @@ SET current_thoughts += {
 };
 
 
+// DT Handouts 16–21 (PRD DT-09): dialectical abstinence, the DBT-SUD skills; When it's a habit
+// (docs/design/habit-plan.md).
+MERGE (dialectical_abstinence:TherapyConcept {id: "dbt_dialectical_abstinence"})
+SET dialectical_abstinence += {
+  name: "Dialectical Abstinence",
+  description: "Full commitment to not doing a behaviour, for a stretch you can keep, together with a plan for a slip so one slip doesn't become giving up",
+  modality: "DBT",
+  module: "Distress Tolerance",
+  skill_type: "crisis_survival"
+};
+
+
 // ============================================================
 // MINDFULNESS AS CROSS-MODALITY CONCEPT
 // ============================================================
