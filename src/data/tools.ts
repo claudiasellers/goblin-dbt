@@ -23,6 +23,20 @@ export interface Tool {
    * it, or never does (its `persist`). Ending a relationship: its safety branch saves nothing unless chosen.
    */
   deferSession?: boolean;
+  /**
+   * More cards for the same tool in its module's list on the Tools page, each opening one of its modes by query
+   * (My crisis kit's *Make it*; Claudia, 12 Nov: both under Distress Tolerance). Same module, same tool id.
+   */
+  moreCards?: ToolModeCard[];
+}
+
+export interface ToolModeCard {
+  key: string;
+  name: string;
+  tagline: string;
+  emoji: string;
+  /** The query the card opens the tool with, e.g. `frame=build`. */
+  query: string;
 }
 
 export const tools: Tool[] = [
@@ -162,6 +176,7 @@ export const tools: Tool[] = [
     dbtBasis: 'Crisis survival skills (DT Handouts 6–9a)',
     emoji: '🧰',
     bare: true,
+    moreCards: [{ key: 'build', name: 'Make my crisis kit', tagline: 'On a calmer day, so it\'s ready for a hard night', emoji: '🧰', query: 'frame=build' }],
   },
   // Emotion Regulation
   {
