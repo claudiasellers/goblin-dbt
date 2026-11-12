@@ -13617,53 +13617,54 @@
    "version": "held-v1",
    "start": "pick",
    "accepts": [
-    "band"
+    "band",
+    "frame"
    ],
-   "ownMax": 90,
+   "ownMax": 72,
    "emotionFields": [],
    "copy": {
-    "pick_title": "How would you like to be looked after for a minute?",
+    "pick_title": "This deserves some care. How would you like to be looked after for a minute?",
     "pick_hint": "Pick one. You can stop whenever you like.",
     "deserve_title": "You don't have to deserve it.",
     "deserve_hint": "Try thirty seconds, as an experiment.",
     "deserve_card_title": "Thirty seconds.",
-    "deserve_step1": "Rest a hand on your chest, or hold something warm.",
+    "deserve_step1": "A hand on your chest, or something warm.",
     "deserve_step2": "Nothing to feel or get right.",
-    "deserve_step3": "Notice what it's like to be looked after for a moment.",
+    "deserve_step3": "Notice being looked after, for a moment.",
     "not_today_line": "That's okay. It's here for another time.",
     "where_title": "Where would your hands like to rest?",
     "where_hint": "If touch doesn't feel right, hold something instead.",
     "hold_title": "Stay here for a minute.",
-    "chest_step1": "Rest one hand on your chest, over your heart.",
-    "chest_step2": "Feel the warmth of your hand coming through.",
+    "chest_step1": "One hand on your chest, over your heart.",
+    "chest_step2": "Notice any warmth from your hand.",
     "chest_step3": "Let your breath move under it, slowly.",
     "mug_step1": "Wrap both hands around the mug.",
-    "mug_step2": "Feel the warmth in your palms.",
+    "mug_step2": "Notice the warmth in your palms.",
     "mug_step3": "Let your shoulders drop a little.",
     "soft_step1": "Hold it close, wherever feels right.",
     "soft_step2": "Notice how soft it is under your fingers.",
     "soft_step3": "Let it take some of the weight.",
     "thighs_step1": "Rest both hands flat on your thighs.",
-    "thighs_step2": "Feel the weight and warmth of your hands.",
+    "thighs_step2": "Notice the weight of your hands.",
     "thighs_step3": "Let your breath slow down under them.",
     "start": "Start",
-    "running": "Held",
+    "running": "Holding",
     "hold_done": "That's a minute.",
     "warm_title": "What's warm nearby?",
     "warm_hint": "Warm, not hot.",
     "warm_card_title": "Let the warmth in for a minute.",
-    "warm_step1": "Bring it close: in your hands, round your shoulders, on your skin.",
+    "warm_step1": "Bring it close, wherever it feels good.",
     "warm_step2": "Notice where the warmth reaches.",
-    "warm_step3": "Let a little more of it in with each breath out.",
+    "warm_step3": "Let more warmth in on each breath out.",
     "warm_running": "Warming",
     "way_title": "What would help more right now?",
-    "way_hint": "Some days you need settling. Some days you need waking up a bit.",
+    "way_hint": "Some days settling helps. Some days waking up a bit helps.",
     "sense_title": "Pick one thing.",
     "sense_hint": "Whatever's close to hand.",
     "sense_own": "Something else that's kind to me",
     "sense_card_title": "Give it a minute of your attention.",
-    "sense_step1": "Give it your full attention, as if it's the only thing here.",
-    "sense_step2": "Notice one small thing about it you hadn't noticed.",
+    "sense_step1": "Give it all your attention.",
+    "sense_step2": "Notice one small new thing about it.",
     "sense_step3": "When your mind wanders, come back to it.",
     "sense_running": "With it",
     "words_title": "What would you like to hear?",
@@ -13675,22 +13676,22 @@
     "words_copied": "Copied",
     "words_selected": "The words are selected, ready to copy.",
     "land_title": "Let it land.",
-    "land_step1": "Rest a hand on your chest, or wherever feels okay.",
+    "land_step1": "A hand on your chest, or something warm.",
     "land_step2": "Say the words to yourself once more, slowly.",
     "land_step3": "Let them stay a while.",
     "close_title": "How is it now?",
     "stirred_title": "That happens. Kindness can stir things up.",
-    "stirred_hint": "Something lighter?",
-    "light_title": "Only your hand and your breath.",
-    "light_step1": "Keep one hand where it's comfortable.",
-    "light_step2": "Breathe out a little longer than you breathe in.",
+    "stirred_hint": "Any of these is fine.",
+    "light_title": "Only your breath.",
+    "light_step1": "Let your hands rest wherever they like.",
+    "light_step2": "Breathe out longer than you breathe in.",
     "light_step3": "Stop whenever you like.",
     "light_running": "Breathing",
     "light_done": "That's it.",
     "again_title": "And now?",
     "lighter_line": "Kindness can be hard to take in right now. That's common, and it can change.",
     "talk_line": "Talking it through with someone can help: a friend, or someone who's trained to listen.",
-    "press_line": "Pressing gives your body something solid to push against.",
+    "press_line": "First, the body has ways to press, cool down or move.",
     "stop_line": "You stopped when it got to be too much. That's looking after yourself too.",
     "reach_title": "Is there someone you could call or text?",
     "reach_hint": "Only if you'd like to.",
@@ -13747,6 +13748,17 @@
       }
      ],
      "hint": "pick_hint",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
+       }
+      }
+     ],
      "next": [
       {
        "to": "warm",
@@ -13815,6 +13827,17 @@
       }
      ],
      "hint": "deserve_hint",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
+       }
+      }
+     ],
      "next": [
       {
        "to": "not_today",
@@ -13858,6 +13881,17 @@
        }
       }
      ],
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
+       }
+      }
+     ],
      "next": [
       {
        "to": "close",
@@ -13889,6 +13923,17 @@
       }
      ],
      "noClose": true,
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
+       }
+      }
+     ],
      "next": [],
      "offers": []
     },
@@ -13900,7 +13945,25 @@
       {
        "id": "where",
        "options": {
-        "list": "where"
+        "list": "where",
+        "where": {
+         "any": [
+          {
+           "not": {
+            "eq": [
+             "$ctx.band",
+             "flooded"
+            ]
+           }
+          },
+          {
+           "eq": [
+            "$opt.calm",
+            true
+           ]
+          }
+         ]
+        }
        },
        "max": 1,
        "required": true,
@@ -13916,6 +13979,17 @@
       }
      ],
      "hint": "where_hint",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
+       }
+      }
+     ],
      "next": [
       {
        "to": "hold_mug",
@@ -13977,6 +14051,17 @@
        }
       }
      ],
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
+       }
+      }
+     ],
      "next": [
       {
        "to": "close",
@@ -14008,6 +14093,17 @@
        "label": "safety_open",
        "when": {
         "all": []
+       }
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
        }
       }
      ],
@@ -14045,6 +14141,17 @@
        }
       }
      ],
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
+       }
+      }
+     ],
      "next": [
       {
        "to": "close",
@@ -14079,6 +14186,17 @@
        }
       }
      ],
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
+       }
+      }
+     ],
      "next": [
       {
        "to": "close",
@@ -14095,7 +14213,25 @@
       {
        "id": "warm",
        "options": {
-        "list": "warm"
+        "list": "warm",
+        "where": {
+         "any": [
+          {
+           "not": {
+            "eq": [
+             "$ctx.band",
+             "flooded"
+            ]
+           }
+          },
+          {
+           "eq": [
+            "$opt.calm",
+            true
+           ]
+          }
+         ]
+        }
        },
        "max": 1,
        "required": true,
@@ -14111,6 +14247,17 @@
       }
      ],
      "hint": "warm_hint",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
+       }
+      }
+     ],
      "next": [
       {
        "to": "warm_hold",
@@ -14141,6 +14288,17 @@
        "label": "safety_open",
        "when": {
         "all": []
+       }
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
        }
       }
      ],
@@ -14176,6 +14334,17 @@
       }
      ],
      "hint": "way_hint",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
+       }
+      }
+     ],
      "next": [
       {
        "to": "sense_pick",
@@ -14218,6 +14387,17 @@
       }
      ],
      "hint": "sense_hint",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
+       }
+      }
+     ],
      "next": [
       {
        "to": "sense_hold",
@@ -14248,6 +14428,17 @@
        "label": "safety_open",
        "when": {
         "all": []
+       }
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
        }
       }
      ],
@@ -14287,6 +14478,17 @@
       }
      ],
      "hint": "words_hint",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
+       }
+      }
+     ],
      "next": [
       {
        "to": "words_card",
@@ -14315,6 +14517,17 @@
        "label": "safety_open",
        "when": {
         "all": []
+       }
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
        }
       }
      ],
@@ -14352,6 +14565,17 @@
        }
       }
      ],
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
+       }
+      }
+     ],
      "next": [
       {
        "to": "close",
@@ -14384,6 +14608,17 @@
        "askFresh": "thenVsNow"
       }
      ],
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
+       }
+      }
+     ],
      "next": [
       {
        "to": "stirred",
@@ -14409,7 +14644,25 @@
       {
        "id": "stirred",
        "options": {
-        "list": "stirred"
+        "list": "stirred",
+        "where": {
+         "any": [
+          {
+           "not": {
+            "eq": [
+             "$ctx.frame",
+             "hurt"
+            ]
+           }
+          },
+          {
+           "eq": [
+            "$opt.afterHurt",
+            true
+           ]
+          }
+         ]
+        }
        },
        "max": 1,
        "required": true,
@@ -14425,6 +14678,17 @@
       }
      ],
      "hint": "stirred_hint",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
+       }
+      }
+     ],
      "next": [
       {
        "to": "light",
@@ -14436,7 +14700,61 @@
        }
       },
       {
+       "to": "light_deserve",
+       "when": {
+        "eq": [
+         "$a.stirred",
+         "deserve"
+        ]
+       }
+      },
+      {
        "to": "stirred_end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "light_deserve",
+     "kind": "embed",
+     "embed": "bodyCard",
+     "answerAs": "light_deserve",
+     "title": "deserve_title",
+     "props": {
+      "seconds": 30,
+      "step1": "light_step1",
+      "step2": "light_step2",
+      "step3": "light_step3",
+      "start": "start",
+      "running": "light_running",
+      "done": "light_done",
+      "next": "next",
+      "kind": "hand_heart"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "again",
        "when": null
       }
      ],
@@ -14465,6 +14783,17 @@
        "label": "safety_open",
        "when": {
         "all": []
+       }
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
        }
       }
      ],
@@ -14497,6 +14826,17 @@
          }
         }
        ]
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
+       }
       }
      ],
      "next": [
@@ -14544,10 +14884,27 @@
        }
       }
      ],
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
+       }
+      }
+     ],
      "next": [],
      "offers": [
       {
        "exit": "cool_down",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "safety_open",
        "when": {
         "all": []
        }
@@ -14594,6 +14951,17 @@
        }
       }
      ],
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
+       }
+      }
+     ],
      "next": [],
      "offers": [
       {
@@ -14603,6 +14971,12 @@
          "$a.stirred",
          "press"
         ]
+       }
+      },
+      {
+       "exit": "safety_open",
+       "when": {
+        "all": []
        }
       }
      ]
@@ -14618,7 +14992,7 @@
         "list": "reach"
        },
        "max": 1,
-       "required": false,
+       "required": true,
        "links": [
         {
          "exit": "safety_open",
@@ -14631,6 +15005,17 @@
       }
      ],
      "hint": "reach_hint",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
+       }
+      }
+     ],
      "next": [
       {
        "to": "end",
@@ -14712,6 +15097,17 @@
        }
       }
      ],
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "hurt"
+        ]
+       }
+      }
+     ],
      "next": [],
      "offers": []
     }
@@ -14769,7 +15165,7 @@
     "deserve": [
      {
       "value": "try",
-      "label": "Try thirty seconds"
+      "label": "Try it"
      },
      {
       "value": "not_today",
@@ -14780,12 +15176,14 @@
      {
       "value": "chest",
       "label": "On my chest, over my heart",
-      "touch": true
+      "touch": true,
+      "calm": true
      },
      {
       "value": "mug",
       "label": "Around a warm mug",
-      "touch": false
+      "touch": false,
+      "calm": true
      },
      {
       "value": "soft",
@@ -14803,13 +15201,15 @@
       "value": "drink",
       "label": "A warm drink",
       "sense": "touch",
-      "direction": "calm"
+      "direction": "calm",
+      "calm": true
      },
      {
       "value": "blanket",
       "label": "A blanket or a jumper",
       "sense": "touch",
-      "direction": "calm"
+      "direction": "calm",
+      "calm": true
      },
      {
       "value": "water",
@@ -14907,7 +15307,7 @@
      },
      {
       "value": "care",
-      "label": "I deserve care, even now."
+      "label": "Care is allowed, even now."
      },
      {
       "value": "alone",
@@ -14921,11 +15321,11 @@
     "tvn": [
      {
       "value": "much_better",
-      "label": "Much warmer"
+      "label": "Much easier"
      },
      {
       "value": "better",
-      "label": "A bit warmer"
+      "label": "A bit easier"
      },
      {
       "value": "same",
@@ -14939,15 +15339,28 @@
     "stirred": [
      {
       "value": "light",
-      "label": "Only my hand and my breath"
+      "label": "Only my breath",
+      "afterHurt": false
+     },
+     {
+      "value": "deserve",
+      "label": "It feels like I don't deserve it",
+      "afterHurt": false
      },
      {
       "value": "press",
-      "label": "Press something instead"
+      "label": "Something for my body instead",
+      "afterHurt": true
+     },
+     {
+      "value": "talk",
+      "label": "Someone to talk to now",
+      "afterHurt": true
      },
      {
       "value": "stop",
-      "label": "Stop here"
+      "label": "Stop here",
+      "afterHurt": true
      }
     ],
     "again": [
@@ -16200,7 +16613,9 @@
     {
      "id": "held",
      "toolId": "soothe",
-     "query": {},
+     "query": {
+      "frame": "hurt"
+     },
      "carry": [],
      "done": false
     },

@@ -45,10 +45,12 @@ test("the skill: tool soothe, named Held, its close asked in the flow, played by
   assert.equal(M.stepOf(skill, "close").fields[0].askFresh, "thenVsNow");
 });
 
-test("pick how to be held; a carried flooded reading keeps it to the hand, warmth and the chip", () => {
+test("pick how to be held; a carried flooded reading keeps it to the hand, warmth and the chip, two choices after", () => {
   assert.deepEqual(ids(M.initialRun(skill), "pick"), ["heart", "warm", "sense", "words", "deserve"]);
   assert.deepEqual(ids(M.initialRun(skill), "pick", FLOODED), ["heart", "warm", "deserve"], "PRD: hand on heart or warmth only");
   assert.equal(run([pick("pick", "heart"), next]).stepId, "where");
+  assert.deepEqual(ids(run([pick("pick", "heart"), next], FLOODED), "where", FLOODED), ["chest", "mug"], "one of them touch-free");
+  assert.deepEqual(ids(run([pick("pick", "warm"), next], FLOODED), "warm", FLOODED), ["drink", "blanket"]);
   assert.equal(run([pick("pick", "warm"), next]).stepId, "warm");
   assert.equal(run([pick("pick", "sense"), next]).stepId, "way");
   assert.equal(run([pick("pick", "words"), next]).stepId, "words");
@@ -116,11 +118,12 @@ test("I don't deserve this: you don't have to deserve it, thirty seconds as an e
 test("the close in the flow: warmer or the same goes outward; the end says so, and never counts it against them", () => {
   const c = run(HEART);
   assert.deepEqual(ids(c, "close"), ["much_better", "better", "same", "worse"]);
+  assert.deepEqual(skill.options.tvn.map((o) => o.label), ["Much easier", "A bit easier", "About the same", "Stirred up"], "fits the waking-up path too");
   const warmer = run([pick("close", "better"), next], ctx(), c);
   assert.equal(warmer.stepId, "reach");
   assert.deepEqual(M.askFresh(ctx(), warmer), { thenVsNow: "better" });
   assert.equal(line(run([pick("reach", "not_now"), next], ctx(), warmer)), skill.copy.end_warmer);
-  const same = run([pick("close", "same"), next, next], ctx(), c);
+  const same = run([pick("close", "same"), next, pick("reach", "not_now"), next], ctx(), c);
   assert.equal(same.stepId, "end");
   assert.equal(line(same), skill.copy.end_same);
   assert.ok(!M.stepOf(skill, "end").noClose, "the answered-close path: the parts tag row can follow");
@@ -137,16 +140,23 @@ test("stirred up (backdraft): lighter, press something, or stop; stirred up twic
   assert.equal(again.stepId, "again");
   const twice = run([pick("again", "still"), next], ctx(), again);
   assert.equal(twice.stepId, "lighter");
-  assert.deepEqual(offers(twice), ["cool_down"]);
   assert.match(M.stepOf(skill, "lighter").lines.map((l) => skill.copy[l.key]).join(" "), /Talking it through with someone/);
   const eased = run([pick("again", "easier"), next, pick("reach", "yes"), next], ctx(), again);
   assert.equal(eased.stepId, "end");
   assert.equal(line(eased), skill.copy.end_easier);
+  assert.deepEqual(offers(twice), ["cool_down", "safety_open"], "someone to talk to, on the card itself");
+  assert.deepEqual(ids(st, "stirred"), ["light", "deserve", "press", "talk", "stop"]);
   const press = run([pick("stirred", "press"), next], ctx(), st);
   assert.equal(press.stepId, "stirred_end");
-  assert.deepEqual(offers(press), ["cool_down"]);
+  assert.deepEqual(offers(press), ["cool_down", "safety_open"]);
+  assert.deepEqual(offers(run([pick("stirred", "talk"), next], ctx(), st)), ["safety_open"]);
   const stop = run([pick("stirred", "stop"), next], ctx(), st);
-  assert.deepEqual(offers(stop), []);
+  assert.deepEqual(offers(stop), ["safety_open"]);
+  // The thought itself, as backdraft: you don't have to deserve it, then the lighter hold.
+  const dz = run([pick("stirred", "deserve"), next], ctx(), st);
+  assert.equal(dz.stepId, "light_deserve");
+  assert.equal(M.stepOf(skill, "light_deserve").title, "deserve_title");
+  assert.equal(run([held], ctx(), dz).stepId, "again");
   assert.equal(line(stop), skill.copy.stop_line);
   for (const id of ["lighter", "stirred_end"]) assert.ok(!M.stepOf(skill, id).noClose, `${id}: after the in-flow close`);
 });
@@ -154,8 +164,8 @@ test("stirred up (backdraft): lighter, press something, or stop; stirred up twic
 test("outward: always offered, never pushed (skipping goes on)", () => {
   const r = run([...HEART, pick("close", "much_better"), next]);
   assert.equal(r.stepId, "reach");
-  assert.equal(M.stepOf(skill, "reach").fields[0].required, false);
-  assert.equal(run([next], ctx(), r).stepId, "end");
+  assert.deepEqual(ids(r, "reach"), ["yes", "not_now"], "not right now is a real answer");
+  assert.equal(run([pick("reach", "not_now"), next], ctx(), r).stepId, "end");
   const yes = run([pick("reach", "yes"), next], ctx(), r);
   assert.match(M.stepOf(skill, "end").lines.map((l) => l.key).join(" "), /end_reach/);
   assert.deepEqual(offers(yes), []);
@@ -167,6 +177,18 @@ test("every screen has a quiet way to someone; nothing asks the person to close 
     assert.ok(links.some((l) => l.exit === "safety_open"), st.id);
   }
   assert.doesNotMatch(Object.values(skill.copy).join(" "), /close your eyes|\bshould\b|!/i);
+});
+
+test("opened from Hold to wait's Hurt myself: the crisis banner on every screen, and no lighter hold after stirred up", () => {
+  const HURT = ctx({ frame: "hurt" });
+  for (const st of skill.steps) {
+    assert.equal(M.crisisFor(HURT, st, M.initialRun(skill))?.variant, "crisis", st.id);
+    assert.equal(M.crisisFor(ctx(), st, M.initialRun(skill)), null, `${st.id}: not otherwise`);
+  }
+  const st = run([...HEART, pick("close", "worse"), next], HURT);
+  assert.deepEqual(ids(st, "stirred", HURT), ["press", "talk", "stop"]);
+  const htw = content.skills.find((s) => s.id === "hold_to_wait");
+  assert.deepEqual(htw.exits.find((x) => x.id === "held").query, { frame: "hurt" });
 });
 
 test("the hosts that hand on to Held: Hold to wait's hand on the heart and Let it be's grief", () => {

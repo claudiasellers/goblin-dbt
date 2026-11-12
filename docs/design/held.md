@@ -19,36 +19,42 @@ care"); the person's own hand, words and things take over from the app's, and th
 
 | Step | What the person sees | PRD DT-07 |
 |---|---|---|
-| `pick` | *How would you like to be looked after for a minute?* A hand on my heart · Something warm · Something for one of my senses · Kind words · I don't deserve this. A carried flooded reading shows only the hand, warmth and the chip (T8) | Step 1; capacity: flooded |
-| `deserve` → `try` | *You don't have to deserve it. Try thirty seconds, as an experiment.* Try thirty seconds (a 30 s `hand_heart` card, then the close) · Not today → `not_today` (*That's okay. It's here for another time.*, no close) | Step 2's chip |
-| `where` → `hold_<where>` | *Where would your hands like to rest?* (*If touch doesn't feel right, hold something instead.*) On my chest, over my heart · Around a warm mug · Holding something soft · Flat on my thighs. Each its own 60 s card (`bodyCard` kind `hand_heart`) with its own three lines | Hand on heart, touch-free ways first-class |
-| `warm` → `warm_hold` | *What's warm nearby?* (*Warm, not hot.*) A warm drink · A blanket or a jumper · Warm water over my hands · A warm spot: sun, a radiator, a pet. Then 60 s (`doseTimer`) | Warmth |
+| `pick` | *This deserves some care. How would you like to be looked after for a minute?* (the witness line folded into the question, as Let it be does) A hand on my heart · Something warm · Something for one of my senses · Kind words · I don't deserve this. A carried flooded reading shows only the hand, warmth and the chip | Step 1; capacity: flooded |
+| `deserve` → `try` | *You don't have to deserve it. Try thirty seconds, as an experiment.* Try it (a 30 s `hand_heart` card, then the close) · Not today → `not_today` (*That's okay. It's here for another time.*, no close) | Step 2's chip |
+| `where` → `hold_<where>` | *Where would your hands like to rest?* (*If touch doesn't feel right, hold something instead.*) On my chest, over my heart · Around a warm mug · Holding something soft · Flat on my thighs. Each its own 60 s card (`bodyCard` kind `hand_heart`) with its own three lines, which ask the person to notice, never tell them what they'll feel. Flooded: the chest or the mug only | Hand on heart, touch-free ways first-class |
+| `warm` → `warm_hold` | *What's warm nearby?* (*Warm, not hot.*) A warm drink · A blanket or a jumper · Warm water over my hands · A warm spot: sun, a radiator, a pet (flooded: the drink or the blanket). Then 60 s (`doseTimer`) | Warmth |
 | `way` → `sense_pick` → `sense_hold` | *What would help more right now?* Settling · Waking up a bit, then one thing for one sense in that direction (settling: something beautiful, a slow song, a smell I like, a slow warm sip, something soft; waking: far out of a window, an upbeat song, mint or citrus or coffee, something sour or a cold drink, cold water on the wrists), or own words. Then 60 s | A sense; blank's *activating* soothing |
-| `words` → `words_card` → `land` | *What would you like to hear?* Five borrowed lines (*This is hard, and I'm doing what I can.* …) or their own (90 characters), read once on paper (`boundaryLine`, copyable), then 60 s with a hand on the heart while they land | A voice, in text (D13) |
-| `close` | *How is it now?* Much warmer · A bit warmer · About the same · Stirred up (the session's close, `askFresh: 'thenVsNow'`, `regulation_down`) | Step 3 |
-| `stirred` | *That happens. Kindness can stir things up.* Only my hand and my breath (`light`, 30 s, then `again`) · Press something instead → `stirred_end` with First, the body · Stop here → `stirred_end` (*You stopped when it got to be too much. That's looking after yourself too.*). Both end cards add *Talking it through with someone can help* | Backdraft |
-| `again` | *And now?* A bit easier → `reach` · Still stirred up → `lighter` (*Kindness can be hard to take in right now. That's common, and it can change.* + the talk line, First, the body offered) | Two backdrafts in a row |
-| `reach` → `end` | *Is there someone you could call or text?* (*Only if you'd like to.*, optional) Yes → *Even a short message counts.* · Not right now. The end card names what happened (warmer, the same, eased) | Step 4, outward |
+| `words` → `words_card` → `land` | *What would you like to hear?* Five borrowed lines (*This is hard, and I'm doing what I can.* …) or their own (72 characters), read once on paper (`boundaryLine`, copyable), then 60 s with a hand on the heart while they land | A voice, in text (D13) |
+| `close` | *How is it now?* Much easier · A bit easier · About the same · Stirred up (easier, not warmer, so it fits the waking-up path too) (the session's close, `askFresh: 'thenVsNow'`, `regulation_down`) | Step 3 |
+| `stirred` | *That happens. Kindness can stir things up.* Only my breath (`light`, 30 s, hands wherever they like, then `again`) · It feels like I don't deserve it (`light_deserve`: the same lighter hold under *You don't have to deserve it.*) · Something for my body instead → `stirred_end` with First, the body · Someone to talk to now → `stirred_end` with the safety screen · Stop here → `stirred_end` (*You stopped when it got to be too much. That's looking after yourself too.*). Every backdraft end card adds *Talking it through with someone can help* and offers the safety screen as a button | Backdraft |
+| `again` | *And now?* A bit easier → `reach` · Still stirred up → `lighter` (*Kindness can be hard to take in right now. That's common, and it can change.* + the talk line; First, the body and the safety screen offered) | Two backdrafts in a row |
+| `reach` → `end` | *Is there someone you could call or text?* (*Only if you'd like to.*) Yes → *Even a short message counts.* · Not right now (a real answer, so Next waits for one of the two). The end card names what happened (warmer, the same, eased) | Step 4, outward |
 
 *Talk to someone now* is on every screen. Nothing asks the person to close their eyes.
+
+**Opened from Hold to wait's *Hurt myself*** (its *A hand on my heart* move, `?frame=hurt`): the crisis banner shows on
+every screen (plan C6.5: a DT hold runs alongside resources, never instead of them), and *Stirred up* offers only
+the body, someone to talk to or stop, with no lighter hold first.
 
 ## The links that now open it
 
 Hold to wait's *Hurt myself* path has a new move, *A hand on my heart* (PRD DT-02 step 5: my kit · hand on heart ·
-call or text someone), whose end card offers Held; the crisis banner stays on that card. Let it be's grief step,
+call or text someone), whose end card offers Held in its `hurt` frame, so the crisis banner stays on every Held screen. Let it be's grief step,
 when it's too much, offers Held beside First, the body. Both exits were planned until now.
 
 ## What it records
 
 `ToolSession.ext.run` (every answer and the path; each hold's `done` / `partly` / `skipped` with seconds held) and
-the spine's `thenVsNow`, direction down. Own words (a soother, kind words) are capped at 90 characters and encrypted
+the spine's `thenVsNow`, direction down. Own words (a soother, kind words) are capped at 72 characters (the record's worst case must fit 4 KB) and encrypted
 at close like every `ext` text field. Nothing is kept to the profile in part 1.
 
 ## Routing
 
-No `RECOMMENDED_FOR` rows, following the PRD: its entry points are the hosts above, DT-01's swap, the kit and the
-Tools intent, never a check-in card. `skill_type: self_soothing` is on the concept for when a row is wanted (likely
-candidates: the low-energy shame and loneliness words, beside Recover or Do the Opposite).
+No `RECOMMENDED_FOR` rows: the PRD names no check-in entry (its entry points are the hosts above, DT-01's swap, the
+kit and the Tools intent), so there's nowhere it puts a row. Whether it should have one is Claudia's call. The likely
+candidates (the low-energy shame and loneliness words) sit on blank patterns, so a row needs the concept's
+`direction` / `side` / `skillKind` tags first, so the blank "nothing down" filter and C6.3 still hold (Held is mostly
+calming; its waking-up path is the exception).
 
 ## Deferred (DT-07 part 2)
 
@@ -61,6 +67,8 @@ candidates: the low-energy shame and loneliness words, beside Recover or Do the 
 - **The soothe list** kept as kit cards (DT-03's *soothe* section) and offered back here.
 - DT-01's swap (`soothe?mode=hand`), the kit cards, MF-06's backdraft close, ER's night mode and Recover's
   self-compassion step as hosts; an `enterAt` to open straight at the hand.
+- The WMP witness embed in place of the folded-in witness line (as Let it be defers it).
+- The fade: the diary card's *soothed yourself without the app?*; IE-06 as a host.
 - Backdraft counted across visits (part 1 counts within one visit), the calm-day follow-up after a night use, the
   `soothe` / `body_scan` reps, the PRD's graph content as its own nodes (`SootheOption` with touch-aversion
   alternatives, `HeldFlow`; the options carry the `SootheOption` label now), `affective_touch`'s grade and
@@ -70,6 +78,11 @@ candidates: the low-energy shame and loneliness words, beside Recover or Do the 
 
 | PRD | Built | Why |
 |---|---|---|
+| Witness line, then *Pick how you'd like to be held* | One title: *This deserves some care. How would you like to be looked after for a minute?* | No witness embed on the runtime yet; Let it be folds its line in the same way |
+| Close: *warmer · same · stirred up* | *Much easier · A bit easier · About the same · Stirred up* | The spine's in-flow close is exactly four (worse / same / better / much better); *easier* fits the waking-up path too |
+| Backdraft: the hand and the breath, or DT-01 press | Also *It feels like I don't deserve it*, *Someone to talk to now* and *Stop here* | Backdraft often shows up as that thought; the safety screen and stopping are always first-class |
+| *Stirred up*, then easier after the lighter hold | The session's `thenVsNow` stays *worse* | `again` isn't the close; Reflect counts the visit as worse, which matches the backdraft-rate metric |
+| Flooded: hand on heart or warmth only | Three choices on the first screen (the hand, warmth, *I don't deserve this*), then two | The chip is an escape hatch, not a tool, and it matters most for shame; T8's two after it |
 | 60–120 s hold | 60 s everywhere (30 s for the experiment and the lighter hold) | One length per card; the PRD's flooded 60 fits everyone, and the timer can be stopped |
 | A voice (memo) | Kind words in text, read once, then a hand on the heart | D13 |
 | Let the goblin hold it (Held hands) | Not offered | Part 2 (PRD open question 1) |

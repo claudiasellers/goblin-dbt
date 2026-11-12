@@ -299,7 +299,7 @@ EXITS = [
     {"id": "urge_surfing", "toolId": "urge-surfing"},                   # DT-05 Ride it out
     {"id": "alternate_rebellion", "toolId": "alternate-rebellion"},     # DT-11 (the *blow it up* chip)
     {"id": "crisis_kit", "toolId": "crisis-kit", "planned": True},      # DT-03 My crisis kit (safety batch)
-    {"id": "held", "toolId": "soothe"},                                  # DT-07 Held (hand on heart)
+    {"id": "held", "toolId": "soothe", "query": {"frame": "hurt"}},      # DT-07 Held (hand on heart; its banner stays)
     {"id": "mind_job", "toolId": "mind-job"},          # DT-06 Give your mind a job: park it, look once
     {"id": "safety_open", "toolId": None, "safety": True},              # safety.open (R6)
     {"id": "done", "done": True},
