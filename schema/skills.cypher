@@ -10805,7 +10805,7 @@ SET r += {list: "proud", order: 63};
 
 // --- opposite_action (oa-skill-v1) ---
 MERGE (s:Skill {id: "opposite_action"})
-SET s += {toolId: "opposite-action", version: "oa-skill-v1", contentVersion: "skills-v1", start: "door", ownMax: 90, emotionFields: ["feel"], accepts: ["urgeId", "band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"ack_anger\": \"Anger is mobilizing you to fight back or push against something that feels wrong. When the situation doesn't call for a fight, that energy needs somewhere else to go.\", \"ack_disgust\": \"Disgust is pushing you to reject and distance yourself. When the reaction is stronger than the situation warrants, leaning in — even a little — can change the feeling.\", \"ack_envy\": \"Envy is narrowing your focus to what someone else has and what you lack. Shifting toward what you have — and what you can build — opens it back up.\", \"ack_fear\": \"Fear is trying to keep you safe by pulling you away from the threat. When the threat isn't real, avoidance keeps the fear alive.\", \"ack_guilt\": \"Guilt is urging you to make amends or punish yourself. When you didn't actually violate your values, the self-punishment is suffering without purpose.\", \"ack_jealousy\": \"Jealousy is tightening your grip — urging you to monitor, control, and hold on tighter. Loosening that grip is what actually builds the trust you're craving.\", \"ack_love\": \"Love is pulling you toward connection. When someone is unavailable, harmful, or gone, each contact resets the clock. Distance is how this attachment fades.\", \"ack_sadness\": \"Sadness is pulling you inward, away from the world. When the withdrawal becomes the thing keeping you stuck, small movements outward can shift everything.\", \"ack_shame\": \"Shame is telling you to hide — that if people saw the real you, they'd reject you. When shame is lying about your worth, hiding feeds it. Visibility starves it.\", \"actual_label\": \"What actually happened?\", \"after_body_title\": \"The pull to {urge}, compared with before?\", \"after_title\": \"What happened?\", \"back_title\": \"Did you get to try it?\", \"boundary\": \"There's a boundary I need to keep\", \"boundary_line\": \"Holding your ground can be the effective thing. These can help you do it well.\", \"boundary_title\": \"Keeping a boundary is a different skill\", \"calm_hint\": \"Press and hold while you breathe out\", \"calm_label\": \"Hold\", \"calm_running\": \"Breathe out, slowly\", \"calm_title\": \"First, let your body settle a little\", \"carry_on\": \"Carry on with {others}\", \"check_link\": \"Check the facts properly\", \"clar_line\": \"The facts are worth a closer look before you act either way.\", \"clar_not_fit\": \"The feeling doesn't fit the facts, and acting on it still seems helpful. It may be serving a different goal.\", \"clar_title\": \"It may be serving a different goal\", \"cue_hint\": \"Pick one to try now\", \"cue_title\": \"Let your body go first\", \"danger\": \"There's danger\", \"danger_line\": \"Doing the opposite isn't for a situation that could hurt you. Support is here, on this screen.\", \"danger_title\": \"Your safety comes first\", \"done\": \"Done\", \"due_label\": \"Roughly when?\", \"end_line\": \"Done for now.\", \"fits_title\": \"Does {each} fit the facts?\", \"goal_title\": \"What do you want this moment to help you do?\", \"help_title_any\": \"If you follow this urge, will it help?\", \"help_title_boundary\": \"If you follow this urge, will it help you protect a boundary?\", \"help_title_connection\": \"If you follow this urge, will it help you stay connected?\", \"help_title_progress\": \"If you follow this urge, will it help you make progress?\", \"help_title_repair\": \"If you follow this urge, will it help you repair harm?\", \"help_title_self_respect\": \"If you follow this urge, will it help you act with self-respect?\", \"hold_hint\": \"Press and hold while you do it\", \"hold_label\": \"Hold\", \"hold_running\": \"Stay with it\", \"hold_title\": \"{cue}\", \"keep_line\": \"Want help acting on it well?\", \"keep_title\": \"Some feelings are worth keeping\", \"miss_line\": \"A plan that didn't happen tells you something about the moment. You can make another one any time.\", \"miss_strong\": \"When the urge is that strong, waiting it out comes first.\", \"miss_title\": \"That's useful to know\", \"next\": \"Next\", \"plan_line\": \"It'll be on Today when it's time, to ask how it went.\", \"plan_line_none\": \"Try it when the moment comes.\", \"plan_title\": \"It's planned\", \"pred_title\": \"If you do it, what do you expect?\", \"prob_excessive\": \"It fits, and it's bigger than the situation. Bring it down first, then work on the situation.\", \"prob_line\": \"Then the situation is the thing to work on.\", \"prob_title\": \"The feeling fits, and so does acting on it\", \"read_down\": \"The pull is weaker than before.\", \"read_gap\": \"You expected it to go badly. It didn't.\", \"read_later\": \"You did something different from what the urge wanted.\", \"read_part\": \"You tried part of it. That counts.\", \"read_react_gap\": \"You expected them to react badly. They didn't.\", \"read_same\": \"The pull is still there. It often takes a few goes.\", \"read_title\": \"You did the opposite\", \"read_unclear\": \"It's not clear yet what it did. You still did something different.\", \"read_worse_gap\": \"You expected to feel worse. You didn't.\", \"repr_line\": \"Owning it and making it right is the skill here.\", \"repr_title\": \"When guilt or shame fits, repair is the opposite of hiding\", \"safe\": \"Yes, it's safe to try\", \"safety_label\": \"Is it safe to try something different?\", \"safety_open\": \"Talk to someone now\", \"size_own\": \"My own step\", \"size_title\": \"Pick a step for {each}\", \"tried\": \"I tried it\", \"try_hint\": \"Take your time. This screen will wait.\", \"try_title\": \"Try it now, then come back\", \"tvn_label\": \"The pull, compared with before?\", \"unsure\": \"I'm not sure what's safe\", \"unsure_line\": \"You don't have to act on the urge or against it right now.\", \"unsure_title\": \"When safety is unclear, slow down first\", \"urge_own\": \"In my own words\", \"urge_q\": \"What is it pushing you to do?\", \"want_no\": \"No, I want to keep it\", \"want_not_sure\": \"Not sure\", \"want_title\": \"Do you want to turn {each} down?\", \"want_yes\": \"Yes, turn it down\", \"when_title\": \"When will you try it?\"}", s.tablesJson = "{}", s.deriveJson = "[{\"from\": \"$each\", \"name\": \"parent\", \"table\": \"parentOf\"}, {\"from\": \"$d.parent\", \"keep\": \"key\", \"name\": \"fitsParent\", \"table\": \"fitsWhen\"}]";
+SET s += {toolId: "opposite-action", version: "oa-skill-v1", contentVersion: "skills-v1", start: "door", ownMax: 90, emotionFields: ["feel"], accepts: ["urgeId", "band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"ack_anger\": \"Anger is mobilizing you to fight back or push against something that feels wrong.\", \"ack_disgust\": \"Disgust is pushing you to reject and distance yourself.\", \"ack_envy\": \"Envy is narrowing your focus to what someone else has and what you lack.\", \"ack_fear\": \"Fear is trying to keep you safe by pulling you away from the threat.\", \"ack_guilt\": \"Guilt is urging you to make amends or punish yourself.\", \"ack_jealousy\": \"Jealousy is tightening your grip — urging you to monitor, control, and hold on tighter.\", \"ack_love\": \"Love is pulling you toward connection.\", \"ack_sadness\": \"Sadness is pulling you inward, away from the world.\", \"ack_shame\": \"Shame is telling you to hide — that if people saw the real you, they'd reject you.\", \"actual_label\": \"What actually happened?\", \"after_body_title\": \"After that, the pull is…\", \"after_title\": \"What happened?\", \"back_title\": \"Did you get to try it?\", \"boundary\": \"There's a boundary I need to keep\", \"boundary_line\": \"Holding your ground can be the effective thing. These can help you do it well.\", \"boundary_title\": \"Keeping a boundary is a different skill\", \"calm_hint\": \"Press and hold while you breathe out\", \"calm_label\": \"Hold\", \"calm_running\": \"Breathe out, slowly\", \"calm_title\": \"First, let your body settle a little\", \"carry_on\": \"Carry on with the next feeling\", \"check_link\": \"Check the facts properly\", \"clar_line\": \"The facts are worth a closer look before you act either way.\", \"clar_not_fit\": \"The feeling doesn't fit the facts, and acting on it still seems helpful. It may be serving a different goal.\", \"clar_title\": \"It may be serving a different goal\", \"cue_hint\": \"Pick one to try now, or go on without one\", \"cue_title\": \"Let your body go first\", \"danger\": \"There's danger\", \"danger_line\": \"Doing the opposite isn't for a situation that could hurt you. Support is here, on this screen.\", \"danger_title\": \"Your safety comes first\", \"done\": \"Done\", \"due_label\": \"Roughly when?\", \"end_line\": \"Done for now.\", \"fits_title\": \"Does this feeling fit the facts?\", \"fits_title_anger\": \"Does the anger fit the facts?\", \"fits_title_disgust\": \"Does the disgust fit the facts?\", \"fits_title_envy\": \"Does the envy fit the facts?\", \"fits_title_fear\": \"Does the fear fit the facts?\", \"fits_title_guilt\": \"Does the guilt fit the facts?\", \"fits_title_jealousy\": \"Does the jealousy fit the facts?\", \"fits_title_love\": \"Does the love fit the facts?\", \"fits_title_sadness\": \"Does the sadness fit the facts?\", \"fits_title_shame\": \"Does the shame fit the facts?\", \"goal_title\": \"What do you want this moment to help you do?\", \"help_title_any\": \"If you follow this urge, will it help?\", \"help_title_boundary\": \"If you follow this urge, will it help you protect a boundary?\", \"help_title_connection\": \"If you follow this urge, will it help you stay connected?\", \"help_title_progress\": \"If you follow this urge, will it help you make progress?\", \"help_title_repair\": \"If you follow this urge, will it help you repair harm?\", \"help_title_self_respect\": \"If you follow this urge, will it help you act with self-respect?\", \"hold_hint\": \"Press and hold while you do it\", \"hold_label\": \"Hold\", \"hold_running\": \"Stay with it\", \"hold_title\": \"{cue}\", \"keep_line\": \"Want help acting on it well?\", \"keep_title\": \"Some feelings are worth keeping\", \"miss_line\": \"A plan that didn't happen tells you something about the moment. You can make another one any time.\", \"miss_strong\": \"When the urge is that strong, waiting it out comes first.\", \"miss_title\": \"That's useful to know\", \"next\": \"Next\", \"pick_of\": \"{n} of {count}\", \"plan_line\": \"It'll be on Today when it's time, to ask how it went.\", \"plan_line_none\": \"Try it when the moment comes.\", \"plan_title\": \"It's planned\", \"pred_title\": \"If you do it, what do you expect?\", \"prob_excessive\": \"It fits, and it's bigger than the situation. Bring it down first, then work on the situation.\", \"prob_line\": \"Then the situation is the thing to work on.\", \"prob_title\": \"The feeling fits, and so does acting on it\", \"pun_line\": \"You don't have to act on it. If something needs making right, there are kinder ways to do it.\", \"pun_title\": \"The pull to punish yourself deserves care\", \"read_down\": \"The pull is weaker than before.\", \"read_gap\": \"You expected it to go badly. It didn't.\", \"read_later\": \"You did something different from what the urge wanted.\", \"read_part\": \"You tried part of it. That counts.\", \"read_react_gap\": \"You expected them to react badly. They didn't.\", \"read_same\": \"The pull is still there. It often takes a few goes.\", \"read_title\": \"You did the opposite\", \"read_unclear\": \"It's not clear yet what it did. You still did something different.\", \"read_worse_gap\": \"You expected to feel worse. You didn't.\", \"repr_line\": \"Owning it and making it right is the skill here.\", \"repr_title\": \"When guilt or shame fits, repair is the opposite of hiding\", \"safe\": \"Yes, it's safe to try\", \"safety_label\": \"Is it safe to try something different?\", \"safety_open\": \"Talk to someone now\", \"size_own\": \"My own step\", \"size_title\": \"Pick a step for this feeling\", \"size_title_anger\": \"Pick a step for the anger\", \"size_title_disgust\": \"Pick a step for the disgust\", \"size_title_envy\": \"Pick a step for the envy\", \"size_title_fear\": \"Pick a step for the fear\", \"size_title_guilt\": \"Pick a step for the guilt\", \"size_title_jealousy\": \"Pick a step for the jealousy\", \"size_title_love\": \"Pick a step for the love\", \"size_title_sadness\": \"Pick a step for the sadness\", \"size_title_shame\": \"Pick a step for the shame\", \"tried\": \"I tried it\", \"try_hint\": \"Take your time. This screen will wait.\", \"try_title\": \"Try it now, then come back\", \"tvn_label\": \"The pull, compared with before?\", \"unsure\": \"I'm not sure what's safe\", \"unsure_line\": \"You don't have to act on the urge or against it right now.\", \"unsure_title\": \"When safety is unclear, slow down first\", \"urge_own\": \"In my own words\", \"urge_q\": \"What is it pushing you to do?\", \"want_no\": \"No, I want to keep it\", \"want_not_sure\": \"Not sure\", \"want_title\": \"Do you want to turn this feeling down?\", \"want_title_anger\": \"Do you want to turn the anger down?\", \"want_title_disgust\": \"Do you want to turn the disgust down?\", \"want_title_envy\": \"Do you want to turn the envy down?\", \"want_title_fear\": \"Do you want to turn the fear down?\", \"want_title_guilt\": \"Do you want to turn the guilt down?\", \"want_title_jealousy\": \"Do you want to turn the jealousy down?\", \"want_title_love\": \"Do you want to turn the love down?\", \"want_title_sadness\": \"Do you want to turn the sadness down?\", \"want_title_shame\": \"Do you want to turn the shame down?\", \"want_yes\": \"Yes, turn it down\", \"when_title\": \"When will you try it?\"}", s.tablesJson = "{}", s.deriveJson = "[{\"from\": \"$each\", \"name\": \"parent\", \"table\": \"parentOf\"}, {\"from\": \"$d.parent\", \"keep\": \"key\", \"name\": \"fitsParent\", \"table\": \"fitsWhen\"}]";
 MATCH (t:TherapyConcept {id: "dbt_opposite_action"}), (s:Skill {id: "opposite_action"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "opposite_action"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
@@ -10821,135 +10821,160 @@ MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:calm
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 1};
 MERGE (n:SkillStep {id: "opposite_action:goal"})
-SET n += {skillId: "opposite_action", step: "goal", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"in\": [\"$a.safety\", [\"danger\", \"unsure\"]]}}], \"fields\": [{\"id\": \"goal\", \"max\": 1, \"options\": {\"list\": \"goal\"}, \"required\": true}, {\"id\": \"safety\", \"label\": \"safety_label\", \"max\": 1, \"options\": {\"list\": \"safety\"}, \"required\": true}], \"title\": \"goal_title\"}";
+SET n += {skillId: "opposite_action", step: "goal", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"fields\": [{\"id\": \"goal\", \"max\": 1, \"options\": {\"list\": \"goal\"}, \"required\": true}], \"title\": \"goal_title\"}";
 MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:goal"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 2};
-MERGE (n:SkillStep {id: "opposite_action:dang"})
-SET n += {skillId: "opposite_action", step: "dang", kind: "handoff", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"in\": [\"$a.safety\", [\"danger\", \"unsure\"]]}}], \"done\": \"done\", \"lines\": [{\"key\": \"danger_line\", \"when\": {\"all\": []}}], \"title\": \"danger_title\"}";
-MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:dang"})
+MERGE (n:SkillStep {id: "opposite_action:safe"})
+SET n += {skillId: "opposite_action", step: "safe", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"in\": [\"$a.safety\", [\"danger\", \"unsure\"]]}}], \"fields\": [{\"id\": \"safety\", \"max\": 1, \"options\": {\"list\": \"safety\"}, \"required\": true}], \"title\": \"safety_label\"}";
+MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:safe"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 3};
-MERGE (n:SkillStep {id: "opposite_action:bnd"})
-SET n += {skillId: "opposite_action", step: "bnd", kind: "handoff", version: "oa-skill-v1"}, n.specJson = "{\"done\": \"done\", \"lines\": [{\"key\": \"boundary_line\", \"when\": {\"all\": []}}], \"title\": \"boundary_title\"}";
-MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:bnd"})
+MERGE (n:SkillStep {id: "opposite_action:dang"})
+SET n += {skillId: "opposite_action", step: "dang", kind: "handoff", version: "oa-skill-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"in\": [\"$a.safety\", [\"danger\", \"unsure\"]]}}], \"done\": \"done\", \"lines\": [{\"key\": \"danger_line\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"danger_title\"}";
+MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:dang"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 4};
-MERGE (n:SkillStep {id: "opposite_action:uns"})
-SET n += {skillId: "opposite_action", step: "uns", kind: "handoff", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"in\": [\"$a.safety\", [\"danger\", \"unsure\"]]}}], \"done\": \"done\", \"lines\": [{\"key\": \"unsure_line\", \"when\": {\"all\": []}}], \"title\": \"unsure_title\"}";
-MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:uns"})
+MERGE (n:SkillStep {id: "opposite_action:bnd"})
+SET n += {skillId: "opposite_action", step: "bnd", kind: "handoff", version: "oa-skill-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"boundary_line\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"boundary_title\"}";
+MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:bnd"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 5};
+MERGE (n:SkillStep {id: "opposite_action:uns"})
+SET n += {skillId: "opposite_action", step: "uns", kind: "handoff", version: "oa-skill-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"in\": [\"$a.safety\", [\"danger\", \"unsure\"]]}}], \"done\": \"done\", \"lines\": [{\"key\": \"unsure_line\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"unsure_title\"}";
+MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:uns"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 6};
 MERGE (n:SkillStep {id: "opposite_action:vald"})
 SET n += {skillId: "opposite_action", step: "vald", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.urge\", \"guilt-punish\"]}}], \"each\": \"feel\", \"fields\": [{\"id\": \"urge\", \"label\": \"urge_q\", \"max\": 1, \"options\": {\"firstFrom\": \"$ctx.urgeId\", \"list\": \"urge\", \"where\": {\"has\": [\"$opt.parents\", \"$d.parent\"]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"urge_own\", \"max\": 90}, \"required\": true}], \"title\": [{\"key\": \"ack_anger\", \"when\": {\"eq\": [\"$d.parent\", \"anger\"]}}, {\"key\": \"ack_disgust\", \"when\": {\"eq\": [\"$d.parent\", \"disgust\"]}}, {\"key\": \"ack_envy\", \"when\": {\"eq\": [\"$d.parent\", \"envy\"]}}, {\"key\": \"ack_fear\", \"when\": {\"eq\": [\"$d.parent\", \"fear\"]}}, {\"key\": \"ack_guilt\", \"when\": {\"eq\": [\"$d.parent\", \"guilt\"]}}, {\"key\": \"ack_jealousy\", \"when\": {\"eq\": [\"$d.parent\", \"jealousy\"]}}, {\"key\": \"ack_love\", \"when\": {\"eq\": [\"$d.parent\", \"love\"]}}, {\"key\": \"ack_sadness\", \"when\": {\"eq\": [\"$d.parent\", \"sadness\"]}}, {\"key\": \"ack_shame\", \"when\": {\"eq\": [\"$d.parent\", \"shame\"]}}, {\"key\": \"urge_q\"}]}";
 MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:vald"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 6};
+SET r += {order: 7};
 MERGE (n:SkillStep {id: "opposite_action:want"})
-SET n += {skillId: "opposite_action", step: "want", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.urge\", \"guilt-punish\"]}}], \"each\": \"feel\", \"fields\": [{\"id\": \"want\", \"max\": 1, \"options\": {\"list\": \"want\"}, \"required\": true}], \"safetyFirst\": {\"eq\": [\"$a.urge\", \"guilt-punish\"]}, \"title\": \"want_title\"}";
+SET n += {skillId: "opposite_action", step: "want", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.urge\", \"guilt-punish\"]}}], \"each\": \"feel\", \"fields\": [{\"id\": \"want\", \"max\": 1, \"options\": {\"list\": \"want\"}, \"required\": true}], \"safetyFirst\": {\"eq\": [\"$a.urge\", \"guilt-punish\"]}, \"title\": [{\"key\": \"want_title_anger\", \"when\": {\"eq\": [\"$d.parent\", \"anger\"]}}, {\"key\": \"want_title_disgust\", \"when\": {\"eq\": [\"$d.parent\", \"disgust\"]}}, {\"key\": \"want_title_envy\", \"when\": {\"eq\": [\"$d.parent\", \"envy\"]}}, {\"key\": \"want_title_fear\", \"when\": {\"eq\": [\"$d.parent\", \"fear\"]}}, {\"key\": \"want_title_guilt\", \"when\": {\"eq\": [\"$d.parent\", \"guilt\"]}}, {\"key\": \"want_title_jealousy\", \"when\": {\"eq\": [\"$d.parent\", \"jealousy\"]}}, {\"key\": \"want_title_love\", \"when\": {\"eq\": [\"$d.parent\", \"love\"]}}, {\"key\": \"want_title_sadness\", \"when\": {\"eq\": [\"$d.parent\", \"sadness\"]}}, {\"key\": \"want_title_shame\", \"when\": {\"eq\": [\"$d.parent\", \"shame\"]}}, {\"key\": \"want_title\"}]}";
 MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:want"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 7};
+SET r += {order: 8};
 MERGE (n:SkillStep {id: "opposite_action:keep"})
 SET n += {skillId: "opposite_action", step: "keep", kind: "handoff", version: "oa-skill-v1"}, n.specJson = "{\"carryOn\": \"pred\", \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.urge\", \"guilt-punish\"]}}], \"done\": \"done\", \"each\": \"feel\", \"lines\": [{\"key\": \"keep_line\", \"when\": {\"all\": []}}], \"title\": \"keep_title\"}";
 MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:keep"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 8};
+SET r += {order: 9};
 MERGE (n:SkillStep {id: "opposite_action:fits"})
-SET n += {skillId: "opposite_action", step: "fits", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.urge\", \"guilt-punish\"]}}], \"each\": \"feel\", \"fields\": [{\"id\": \"fits\", \"links\": [{\"exit\": \"check_the_facts\", \"label\": \"check_link\", \"when\": {\"all\": []}}], \"list\": {\"key\": \"$d.fitsParent\", \"table\": \"fitsWhen\"}, \"max\": 1, \"options\": {\"list\": \"fits\"}, \"required\": true}], \"title\": \"fits_title\"}";
+SET n += {skillId: "opposite_action", step: "fits", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.urge\", \"guilt-punish\"]}}], \"each\": \"feel\", \"fields\": [{\"id\": \"fits\", \"links\": [{\"exit\": \"check_the_facts\", \"label\": \"check_link\", \"when\": {\"all\": []}}], \"list\": {\"key\": \"$d.fitsParent\", \"table\": \"fitsWhen\"}, \"max\": 1, \"options\": {\"list\": \"fits\"}, \"required\": true}], \"title\": [{\"key\": \"fits_title_anger\", \"when\": {\"eq\": [\"$d.parent\", \"anger\"]}}, {\"key\": \"fits_title_disgust\", \"when\": {\"eq\": [\"$d.parent\", \"disgust\"]}}, {\"key\": \"fits_title_envy\", \"when\": {\"eq\": [\"$d.parent\", \"envy\"]}}, {\"key\": \"fits_title_fear\", \"when\": {\"eq\": [\"$d.parent\", \"fear\"]}}, {\"key\": \"fits_title_guilt\", \"when\": {\"eq\": [\"$d.parent\", \"guilt\"]}}, {\"key\": \"fits_title_jealousy\", \"when\": {\"eq\": [\"$d.parent\", \"jealousy\"]}}, {\"key\": \"fits_title_love\", \"when\": {\"eq\": [\"$d.parent\", \"love\"]}}, {\"key\": \"fits_title_sadness\", \"when\": {\"eq\": [\"$d.parent\", \"sadness\"]}}, {\"key\": \"fits_title_shame\", \"when\": {\"eq\": [\"$d.parent\", \"shame\"]}}, {\"key\": \"fits_title\"}]}";
 MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:fits"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 9};
+SET r += {order: 10};
 MERGE (n:SkillStep {id: "opposite_action:help"})
 SET n += {skillId: "opposite_action", step: "help", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.urge\", \"guilt-punish\"]}}], \"each\": \"feel\", \"fields\": [{\"id\": \"help\", \"max\": 1, \"options\": {\"list\": \"help\"}, \"required\": true}], \"title\": [{\"key\": \"help_title_connection\", \"when\": {\"eq\": [\"$a.goal\", \"connection\"]}}, {\"key\": \"help_title_boundary\", \"when\": {\"eq\": [\"$a.goal\", \"boundary\"]}}, {\"key\": \"help_title_progress\", \"when\": {\"eq\": [\"$a.goal\", \"progress\"]}}, {\"key\": \"help_title_repair\", \"when\": {\"eq\": [\"$a.goal\", \"repair\"]}}, {\"key\": \"help_title_self_respect\", \"when\": {\"eq\": [\"$a.goal\", \"self_respect\"]}}, {\"key\": \"help_title_any\"}]}";
 MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:help"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 10};
+SET r += {order: 11};
 MERGE (n:SkillStep {id: "opposite_action:clar"})
 SET n += {skillId: "opposite_action", step: "clar", kind: "handoff", version: "oa-skill-v1"}, n.specJson = "{\"carryOn\": \"pred\", \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.urge\", \"guilt-punish\"]}}], \"done\": \"done\", \"each\": \"feel\", \"lines\": [{\"key\": \"clar_not_fit\", \"when\": {\"all\": [{\"eq\": [\"$a.fits\", \"not_fit\"]}, {\"eq\": [\"$a.help\", \"helpful\"]}]}}, {\"key\": \"clar_line\", \"when\": {\"not\": {\"all\": [{\"eq\": [\"$a.fits\", \"not_fit\"]}, {\"eq\": [\"$a.help\", \"helpful\"]}]}}}], \"title\": \"clar_title\"}";
 MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:clar"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 11};
+SET r += {order: 12};
 MERGE (n:SkillStep {id: "opposite_action:prob"})
 SET n += {skillId: "opposite_action", step: "prob", kind: "handoff", version: "oa-skill-v1"}, n.specJson = "{\"carryOn\": \"pred\", \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.urge\", \"guilt-punish\"]}}], \"done\": \"done\", \"each\": \"feel\", \"lines\": [{\"key\": \"prob_excessive\", \"when\": {\"eq\": [\"$a.fits\", \"excessive\"]}}, {\"key\": \"prob_line\", \"when\": {\"not\": {\"eq\": [\"$a.fits\", \"excessive\"]}}}], \"title\": \"prob_title\"}";
 MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:prob"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 12};
+SET r += {order: 13};
+MERGE (n:SkillStep {id: "opposite_action:pun"})
+SET n += {skillId: "opposite_action", step: "pun", kind: "handoff", version: "oa-skill-v1"}, n.specJson = "{\"carryOn\": \"pred\", \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.urge\", \"guilt-punish\"]}}], \"done\": \"done\", \"each\": \"feel\", \"lines\": [{\"key\": \"pun_line\", \"when\": {\"all\": []}}], \"title\": \"pun_title\"}";
+MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:pun"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 14};
 MERGE (n:SkillStep {id: "opposite_action:repr"})
 SET n += {skillId: "opposite_action", step: "repr", kind: "handoff", version: "oa-skill-v1"}, n.specJson = "{\"carryOn\": \"pred\", \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.urge\", \"guilt-punish\"]}}], \"done\": \"done\", \"each\": \"feel\", \"lines\": [{\"key\": \"repr_line\", \"when\": {\"all\": []}}], \"title\": \"repr_title\"}";
 MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:repr"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 13};
+SET r += {order: 15};
 MERGE (n:SkillStep {id: "opposite_action:cue"})
-SET n += {skillId: "opposite_action", step: "cue", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.urge\", \"guilt-punish\"]}}], \"each\": \"feel\", \"fields\": [{\"id\": \"cue\", \"max\": 1, \"options\": {\"list\": \"cue\", \"where\": {\"any\": [{\"has\": [\"$opt.urges\", \"$a.urge\"]}, {\"all\": [{\"has\": [\"$opt.parents\", \"$d.parent\"]}, {\"not\": {\"in\": [\"$a.urge\", [\"fear-freeze\", \"sad-bed\"]]}}]}]}}, \"required\": true}], \"hint\": \"cue_hint\", \"title\": \"cue_title\"}";
+SET n += {skillId: "opposite_action", step: "cue", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.urge\", \"guilt-punish\"]}}], \"each\": \"feel\", \"fields\": [{\"id\": \"cue\", \"max\": 1, \"options\": {\"list\": \"cue\", \"where\": {\"any\": [{\"has\": [\"$opt.urges\", \"$a.urge\"]}, {\"all\": [{\"has\": [\"$opt.parents\", \"$d.parent\"]}, {\"not\": {\"in\": [\"$a.urge\", [\"fear-freeze\", \"sad-bed\"]]}}]}]}}}], \"hint\": \"cue_hint\", \"title\": \"cue_title\"}";
 MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:cue"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 14};
+SET r += {order: 16};
 MERGE (n:SkillStep {id: "opposite_action:hold"})
 SET n += {skillId: "opposite_action", step: "hold", kind: "embed", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.urge\", \"guilt-punish\"]}}], \"each\": \"feel\", \"embed\": \"holdRing\", \"props\": {\"hint\": \"hold_hint\", \"label\": \"hold_label\", \"next\": \"next\", \"runningLabel\": \"hold_running\", \"seconds\": 3, \"variant\": \"press\"}, \"title\": \"hold_title\", \"titleSlots\": {\"cue\": {\"labelOf\": \"cue\"}}}";
 MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:hold"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 15};
+SET r += {order: 17};
 MERGE (n:SkillStep {id: "opposite_action:aftb"})
-SET n += {skillId: "opposite_action", step: "aftb", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.urge\", \"guilt-punish\"]}}], \"each\": \"feel\", \"fields\": [{\"askFresh\": \"thenVsNow\", \"id\": \"tvnb\", \"max\": 1, \"options\": {\"list\": \"tvn\"}, \"required\": true}], \"title\": \"after_body_title\", \"titleSlots\": {\"urge\": {\"labelOf\": \"urge\"}}}";
+SET n += {skillId: "opposite_action", step: "aftb", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.urge\", \"guilt-punish\"]}}], \"each\": \"feel\", \"fields\": [{\"askFresh\": \"thenVsNow\", \"id\": \"tvnb\", \"max\": 1, \"options\": {\"list\": \"tvn\"}, \"required\": true}], \"title\": \"after_body_title\"}";
 MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:aftb"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 16};
+SET r += {order: 18};
 MERGE (n:SkillStep {id: "opposite_action:size"})
-SET n += {skillId: "opposite_action", step: "size", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.urge\", \"guilt-punish\"]}}], \"each\": \"feel\", \"fields\": [{\"id\": \"size\", \"max\": 1, \"options\": {\"list\": \"size\", \"where\": {\"any\": [{\"all\": [{\"in\": [\"$a.urge\", [\"anger-criticize\", \"anger-destroy\", \"anger-lash\", \"anger-stonewall\", \"check-profile\", \"disgust-judge\", \"disgust-leave\", \"disgust-push\", \"envy-compare\", \"envy-give-up\", \"envy-tear-down\", \"fear-avoid\", \"fear-cancel\", \"fear-escape\", \"fear-freeze\", \"fire-back\", \"go-quiet\", \"guilt-apologize\", \"guilt-avoid\", \"guilt-punish\", \"jealousy-check\", \"jealousy-cling\", \"jealousy-interrogate\", \"love-idealize\", \"love-proximity\", \"love-reach-out\", \"love-stalk\", \"pull-away\", \"sad-bed\", \"sad-give-up\", \"sad-isolate\", \"sad-scroll\", \"shame-avoid-people\", \"shame-hide\", \"shame-secret\", \"shame-shrink\", \"text-again\"]]}, {\"eq\": [\"$opt.urgeFor\", \"$a.urge\"]}]}, {\"all\": [{\"not\": {\"in\": [\"$a.urge\", [\"anger-criticize\", \"anger-destroy\", \"anger-lash\", \"anger-stonewall\", \"check-profile\", \"disgust-judge\", \"disgust-leave\", \"disgust-push\", \"envy-compare\", \"envy-give-up\", \"envy-tear-down\", \"fear-avoid\", \"fear-cancel\", \"fear-escape\", \"fear-freeze\", \"fire-back\", \"go-quiet\", \"guilt-apologize\", \"guilt-avoid\", \"guilt-punish\", \"jealousy-check\", \"jealousy-cling\", \"jealousy-interrogate\", \"love-idealize\", \"love-proximity\", \"love-reach-out\", \"love-stalk\", \"pull-away\", \"sad-bed\", \"sad-give-up\", \"sad-isolate\", \"sad-scroll\", \"shame-avoid-people\", \"shame-hide\", \"shame-secret\", \"shame-shrink\", \"text-again\"]]}}, {\"eq\": [\"$opt.parent\", \"$d.parent\"]}]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"size_own\", \"max\": 90}, \"required\": true}], \"title\": \"size_title\"}";
+SET n += {skillId: "opposite_action", step: "size", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.urge\", \"guilt-punish\"]}}], \"each\": \"feel\", \"fields\": [{\"id\": \"size\", \"max\": 1, \"options\": {\"list\": \"size\", \"where\": {\"any\": [{\"all\": [{\"in\": [\"$a.urge\", [\"anger-criticize\", \"anger-destroy\", \"anger-lash\", \"anger-stonewall\", \"check-profile\", \"disgust-judge\", \"disgust-leave\", \"disgust-push\", \"envy-compare\", \"envy-give-up\", \"envy-tear-down\", \"fear-avoid\", \"fear-cancel\", \"fear-escape\", \"fear-freeze\", \"fire-back\", \"go-quiet\", \"guilt-apologize\", \"guilt-avoid\", \"guilt-punish\", \"jealousy-check\", \"jealousy-cling\", \"jealousy-interrogate\", \"love-idealize\", \"love-proximity\", \"love-reach-out\", \"love-stalk\", \"pull-away\", \"sad-bed\", \"sad-give-up\", \"sad-isolate\", \"sad-scroll\", \"shame-avoid-people\", \"shame-hide\", \"shame-secret\", \"shame-shrink\", \"text-again\"]]}, {\"eq\": [\"$opt.urgeFor\", \"$a.urge\"]}]}, {\"all\": [{\"not\": {\"in\": [\"$a.urge\", [\"anger-criticize\", \"anger-destroy\", \"anger-lash\", \"anger-stonewall\", \"check-profile\", \"disgust-judge\", \"disgust-leave\", \"disgust-push\", \"envy-compare\", \"envy-give-up\", \"envy-tear-down\", \"fear-avoid\", \"fear-cancel\", \"fear-escape\", \"fear-freeze\", \"fire-back\", \"go-quiet\", \"guilt-apologize\", \"guilt-avoid\", \"guilt-punish\", \"jealousy-check\", \"jealousy-cling\", \"jealousy-interrogate\", \"love-idealize\", \"love-proximity\", \"love-reach-out\", \"love-stalk\", \"pull-away\", \"sad-bed\", \"sad-give-up\", \"sad-isolate\", \"sad-scroll\", \"shame-avoid-people\", \"shame-hide\", \"shame-secret\", \"shame-shrink\", \"text-again\"]]}}, {\"eq\": [\"$opt.parent\", \"$d.parent\"]}]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"size_own\", \"max\": 90}, \"required\": true}], \"title\": [{\"key\": \"size_title_anger\", \"when\": {\"eq\": [\"$d.parent\", \"anger\"]}}, {\"key\": \"size_title_disgust\", \"when\": {\"eq\": [\"$d.parent\", \"disgust\"]}}, {\"key\": \"size_title_envy\", \"when\": {\"eq\": [\"$d.parent\", \"envy\"]}}, {\"key\": \"size_title_fear\", \"when\": {\"eq\": [\"$d.parent\", \"fear\"]}}, {\"key\": \"size_title_guilt\", \"when\": {\"eq\": [\"$d.parent\", \"guilt\"]}}, {\"key\": \"size_title_jealousy\", \"when\": {\"eq\": [\"$d.parent\", \"jealousy\"]}}, {\"key\": \"size_title_love\", \"when\": {\"eq\": [\"$d.parent\", \"love\"]}}, {\"key\": \"size_title_sadness\", \"when\": {\"eq\": [\"$d.parent\", \"sadness\"]}}, {\"key\": \"size_title_shame\", \"when\": {\"eq\": [\"$d.parent\", \"shame\"]}}, {\"key\": \"size_title\"}]}";
 MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:size"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 17};
+SET r += {order: 19};
 MERGE (n:SkillStep {id: "opposite_action:pred"})
 SET n += {skillId: "opposite_action", step: "pred", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"fields\": [{\"id\": \"predict\", \"max\": 1, \"options\": {\"list\": \"predict\"}}], \"title\": \"pred_title\"}";
 MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:pred"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 18};
+SET r += {order: 20};
 MERGE (n:SkillStep {id: "opposite_action:when"})
-SET n += {skillId: "opposite_action", step: "when", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"fields\": [{\"id\": \"when\", \"max\": 1, \"options\": {\"list\": \"when\"}, \"required\": true}, {\"id\": \"due\", \"label\": \"due_label\", \"max\": 1, \"options\": {\"list\": \"due\"}, \"showWhen\": {\"all\": [{\"set\": \"$a.when\"}, {\"not\": {\"eq\": [\"$a.when\", \"now\"]}}]}}], \"followUp\": {\"type\": \"oa_try\", \"when\": {\"all\": [{\"not\": {\"eq\": [\"$a.when\", \"now\"]}}, {\"set\": \"$a.due\"}]}, \"whenFrom\": \"due\"}, \"title\": \"when_title\"}";
+SET n += {skillId: "opposite_action", step: "when", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"fields\": [{\"id\": \"when\", \"max\": 1, \"options\": {\"list\": \"when\"}, \"required\": true}, {\"id\": \"due\", \"label\": \"due_label\", \"max\": 1, \"options\": {\"list\": \"due\"}, \"showWhen\": {\"all\": [{\"set\": \"$a.when\"}, {\"not\": {\"eq\": [\"$a.when\", \"now\"]}}]}}], \"followUp\": {\"type\": \"oa_try\", \"when\": {\"all\": [{\"not\": {\"eq\": [\"$a.when\", \"now\"]}}, {\"set\": \"$a.due\"}]}, \"whenFrom\": \"due\"}, \"slots\": [{\"after\": \"$title\", \"embed\": \"oaSteps\", \"record\": \"steps\", \"showWhen\": {\"all\": []}}], \"title\": \"when_title\"}";
 MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:when"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 19};
+SET r += {order: 21};
 MERGE (n:SkillStep {id: "opposite_action:try"})
-SET n += {skillId: "opposite_action", step: "try", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"hint\": \"try_hint\", \"primary\": \"tried\", \"title\": \"try_title\"}";
+SET n += {skillId: "opposite_action", step: "try", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"hint\": \"try_hint\", \"primary\": \"tried\", \"slots\": [{\"after\": \"$title\", \"embed\": \"oaSteps\", \"record\": \"steps\", \"showWhen\": {\"all\": []}}], \"title\": \"try_title\"}";
 MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:try"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 20};
+SET r += {order: 22};
 MERGE (n:SkillStep {id: "opposite_action:aftr"})
-SET n += {skillId: "opposite_action", step: "aftr", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.outcome\", \"unsafe\"]}}], \"fields\": [{\"id\": \"outcome\", \"max\": 1, \"options\": {\"list\": \"outcome\"}, \"required\": true}, {\"id\": \"actual\", \"label\": \"actual_label\", \"max\": 1, \"options\": {\"list\": \"actual\"}}, {\"askFresh\": \"thenVsNow\", \"id\": \"tvna\", \"label\": \"tvn_label\", \"max\": 1, \"options\": {\"list\": \"tvn\"}, \"required\": true}], \"title\": \"after_title\"}";
+SET n += {skillId: "opposite_action", step: "aftr", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.outcome\", \"unsafe\"]}}], \"fields\": [{\"id\": \"outcome\", \"max\": 1, \"options\": {\"list\": \"outcome\"}, \"required\": true}], \"title\": \"after_title\"}";
 MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:aftr"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 21};
+SET r += {order: 23};
+MERGE (n:SkillStep {id: "opposite_action:act"})
+SET n += {skillId: "opposite_action", step: "act", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.outcome\", \"unsafe\"]}}], \"fields\": [{\"id\": \"actual\", \"max\": 1, \"options\": {\"list\": \"actual\"}}], \"title\": \"actual_label\"}";
+MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:act"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 24};
+MERGE (n:SkillStep {id: "opposite_action:tvna"})
+SET n += {skillId: "opposite_action", step: "tvna", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.outcome\", \"unsafe\"]}}], \"fields\": [{\"askFresh\": \"thenVsNow\", \"id\": \"tvna\", \"max\": 1, \"options\": {\"list\": \"tvn\"}, \"required\": true}], \"title\": \"tvn_label\"}";
+MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:tvna"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 25};
 MERGE (n:SkillStep {id: "opposite_action:read"})
-SET n += {skillId: "opposite_action", step: "read", kind: "handoff", version: "oa-skill-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.outcome\", \"unsafe\"]}}], \"done\": \"done\", \"lines\": [{\"key\": \"read_gap\", \"when\": {\"all\": [{\"eq\": [\"$a.predict\", \"badly\"]}, {\"not\": {\"eq\": [\"$a.actual\", \"badly\"]}}, {\"set\": \"$a.actual\"}]}}, {\"key\": \"read_worse_gap\", \"when\": {\"all\": [{\"eq\": [\"$a.predict\", \"worse\"]}, {\"not\": {\"eq\": [\"$a.actual\", \"worse\"]}}, {\"set\": \"$a.actual\"}]}}, {\"key\": \"read_react_gap\", \"when\": {\"all\": [{\"eq\": [\"$a.predict\", \"react\"]}, {\"not\": {\"eq\": [\"$a.actual\", \"react\"]}}, {\"set\": \"$a.actual\"}]}}, {\"key\": \"read_part\", \"when\": {\"eq\": [\"$a.outcome\", \"partial\"]}}, {\"key\": \"read_unclear\", \"when\": {\"eq\": [\"$a.outcome\", \"unclear\"]}}, {\"key\": \"read_down\", \"when\": {\"in\": [\"$a.tvna\", [\"better\", \"much_better\"]]}}, {\"key\": \"read_same\", \"when\": {\"in\": [\"$a.tvna\", [\"same\", \"worse\"]]}}], \"title\": \"read_title\"}";
+SET n += {skillId: "opposite_action", step: "read", kind: "handoff", version: "oa-skill-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.outcome\", \"unsafe\"]}}], \"done\": \"done\", \"lines\": [{\"key\": \"read_gap\", \"when\": {\"all\": [{\"eq\": [\"$a.predict\", \"badly\"]}, {\"in\": [\"$a.actual\", [\"nothing\", \"better\"]]}]}}, {\"key\": \"read_worse_gap\", \"when\": {\"all\": [{\"eq\": [\"$a.predict\", \"worse\"]}, {\"in\": [\"$a.actual\", [\"nothing\", \"better\"]]}]}}, {\"key\": \"read_react_gap\", \"when\": {\"all\": [{\"eq\": [\"$a.predict\", \"react\"]}, {\"in\": [\"$a.actual\", [\"nothing\", \"better\"]]}]}}, {\"key\": \"read_part\", \"when\": {\"eq\": [\"$a.outcome\", \"partial\"]}}, {\"key\": \"read_unclear\", \"when\": {\"eq\": [\"$a.outcome\", \"unclear\"]}}, {\"key\": \"read_down\", \"when\": {\"in\": [\"$a.tvna\", [\"better\", \"much_better\"]]}}, {\"key\": \"read_same\", \"when\": {\"in\": [\"$a.tvna\", [\"same\", \"worse\"]]}}], \"title\": \"read_title\"}";
 MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:read"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 22};
+SET r += {order: 26};
 MERGE (n:SkillStep {id: "opposite_action:plan"})
 SET n += {skillId: "opposite_action", step: "plan", kind: "handoff", version: "oa-skill-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"plan_line\", \"when\": {\"set\": \"$a.due\"}}, {\"key\": \"plan_line_none\"}], \"title\": \"plan_title\"}";
 MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:plan"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 23};
+SET r += {order: 27};
 MERGE (n:SkillStep {id: "opposite_action:back"})
-SET n += {skillId: "opposite_action", step: "back", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"clears\": [\"tried\", \"outcome\", \"actual\"], \"fields\": [{\"id\": \"tried\", \"max\": 1, \"options\": {\"list\": \"tried\"}, \"required\": true}], \"reopens\": {\"after\": \"when\"}, \"title\": \"back_title\"}";
+SET n += {skillId: "opposite_action", step: "back", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"clears\": [\"tried\", \"outcome\", \"actual\"], \"fields\": [{\"id\": \"tried\", \"max\": 1, \"options\": {\"list\": \"tried\"}, \"required\": true}], \"reopens\": {\"after\": \"when\"}, \"slots\": [{\"after\": \"$title\", \"embed\": \"oaSteps\", \"record\": \"steps\", \"showWhen\": {\"all\": []}}], \"title\": \"back_title\"}";
 MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:back"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 24};
+SET r += {order: 28};
 MERGE (n:SkillStep {id: "opposite_action:aft2"})
-SET n += {skillId: "opposite_action", step: "aft2", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.outcome\", \"unsafe\"]}}], \"fields\": [{\"id\": \"outcome\", \"max\": 1, \"options\": {\"list\": \"outcome\"}, \"required\": true}, {\"id\": \"actual\", \"label\": \"actual_label\", \"max\": 1, \"options\": {\"list\": \"actual\"}}], \"title\": \"after_title\"}";
+SET n += {skillId: "opposite_action", step: "aft2", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.outcome\", \"unsafe\"]}}], \"fields\": [{\"id\": \"outcome\", \"max\": 1, \"options\": {\"list\": \"outcome\"}, \"required\": true}], \"title\": \"after_title\"}";
 MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:aft2"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 25};
+SET r += {order: 29};
+MERGE (n:SkillStep {id: "opposite_action:act2"})
+SET n += {skillId: "opposite_action", step: "act2", kind: "ask", version: "oa-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.outcome\", \"unsafe\"]}}], \"fields\": [{\"id\": \"actual\", \"max\": 1, \"options\": {\"list\": \"actual\"}}], \"title\": \"actual_label\"}";
+MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:act2"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 30};
 MERGE (n:SkillStep {id: "opposite_action:read2"})
-SET n += {skillId: "opposite_action", step: "read2", kind: "handoff", version: "oa-skill-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.outcome\", \"unsafe\"]}}], \"done\": \"done\", \"lines\": [{\"key\": \"read_gap\", \"when\": {\"all\": [{\"eq\": [\"$a.predict\", \"badly\"]}, {\"not\": {\"eq\": [\"$a.actual\", \"badly\"]}}, {\"set\": \"$a.actual\"}]}}, {\"key\": \"read_worse_gap\", \"when\": {\"all\": [{\"eq\": [\"$a.predict\", \"worse\"]}, {\"not\": {\"eq\": [\"$a.actual\", \"worse\"]}}, {\"set\": \"$a.actual\"}]}}, {\"key\": \"read_react_gap\", \"when\": {\"all\": [{\"eq\": [\"$a.predict\", \"react\"]}, {\"not\": {\"eq\": [\"$a.actual\", \"react\"]}}, {\"set\": \"$a.actual\"}]}}, {\"key\": \"read_part\", \"when\": {\"eq\": [\"$a.outcome\", \"partial\"]}}, {\"key\": \"read_unclear\", \"when\": {\"eq\": [\"$a.outcome\", \"unclear\"]}}, {\"key\": \"read_later\"}], \"noClose\": true, \"title\": \"read_title\"}";
+SET n += {skillId: "opposite_action", step: "read2", kind: "handoff", version: "oa-skill-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.outcome\", \"unsafe\"]}}], \"done\": \"done\", \"lines\": [{\"key\": \"read_gap\", \"when\": {\"all\": [{\"eq\": [\"$a.predict\", \"badly\"]}, {\"in\": [\"$a.actual\", [\"nothing\", \"better\"]]}]}}, {\"key\": \"read_worse_gap\", \"when\": {\"all\": [{\"eq\": [\"$a.predict\", \"worse\"]}, {\"in\": [\"$a.actual\", [\"nothing\", \"better\"]]}]}}, {\"key\": \"read_react_gap\", \"when\": {\"all\": [{\"eq\": [\"$a.predict\", \"react\"]}, {\"in\": [\"$a.actual\", [\"nothing\", \"better\"]]}]}}, {\"key\": \"read_part\", \"when\": {\"eq\": [\"$a.outcome\", \"partial\"]}}, {\"key\": \"read_unclear\", \"when\": {\"eq\": [\"$a.outcome\", \"unclear\"]}}, {\"key\": \"read_later\"}], \"noClose\": true, \"title\": \"read_title\"}";
 MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:read2"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 26};
+SET r += {order: 31};
 MERGE (n:SkillStep {id: "opposite_action:miss"})
 SET n += {skillId: "opposite_action", step: "miss", kind: "handoff", version: "oa-skill-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"miss_strong\", \"when\": {\"eq\": [\"$a.tried\", \"too_strong\"]}}, {\"key\": \"miss_line\"}], \"noClose\": true, \"title\": \"miss_title\"}";
 MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:miss"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 27};
+SET r += {order: 32};
 MERGE (x:SkillExit {id: "opposite_action:check_the_facts"})
 SET x += {skillId: "opposite_action", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
 MATCH (s:Skill {id: "opposite_action"}), (x:SkillExit {id: "opposite_action:check_the_facts"})
@@ -11021,16 +11046,19 @@ SET r += {order: 1}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "opposite_action:calm"}), (b:SkillStep {id: "opposite_action:goal"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
-MATCH (a:SkillStep {id: "opposite_action:goal"}), (b:SkillStep {id: "opposite_action:dang"})
+MATCH (a:SkillStep {id: "opposite_action:goal"}), (b:SkillStep {id: "opposite_action:safe"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "opposite_action:safe"}), (b:SkillStep {id: "opposite_action:dang"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.safety\", \"danger\"]}";
-MATCH (a:SkillStep {id: "opposite_action:goal"}), (b:SkillStep {id: "opposite_action:bnd"})
+MATCH (a:SkillStep {id: "opposite_action:safe"}), (b:SkillStep {id: "opposite_action:bnd"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.safety\", \"boundary\"]}";
-MATCH (a:SkillStep {id: "opposite_action:goal"}), (b:SkillStep {id: "opposite_action:uns"})
+MATCH (a:SkillStep {id: "opposite_action:safe"}), (b:SkillStep {id: "opposite_action:uns"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 2}, r.whenJson = "{\"eq\": [\"$a.safety\", \"unsure\"]}";
-MATCH (a:SkillStep {id: "opposite_action:goal"}), (b:SkillStep {id: "opposite_action:vald"})
+MATCH (a:SkillStep {id: "opposite_action:safe"}), (b:SkillStep {id: "opposite_action:vald"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 3}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "opposite_action:dang"}), (x:SkillExit {id: "opposite_action:ending"})
@@ -11057,12 +11085,15 @@ SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
 MATCH (a:SkillStep {id: "opposite_action:vald"}), (b:SkillStep {id: "opposite_action:want"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "opposite_action:want"}), (b:SkillStep {id: "opposite_action:pun"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"all\": [{\"eq\": [\"$a.urge\", \"guilt-punish\"]}, {\"eq\": [\"$a.want\", \"no\"]}]}";
 MATCH (a:SkillStep {id: "opposite_action:want"}), (b:SkillStep {id: "opposite_action:keep"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.want\", \"no\"]}";
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.want\", \"no\"]}";
 MATCH (a:SkillStep {id: "opposite_action:want"}), (b:SkillStep {id: "opposite_action:fits"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "null";
+SET r += {order: 2}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "opposite_action:keep"}), (x:SkillExit {id: "opposite_action:problem_solve"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
@@ -11081,15 +11112,18 @@ SET r += {order: 0, field: "fits", label: "check_link"}, r.whenJson = "{\"all\":
 MATCH (a:SkillStep {id: "opposite_action:help"}), (b:SkillStep {id: "opposite_action:repr"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"all\": [{\"in\": [\"$d.parent\", [\"guilt\", \"shame\"]]}, {\"eq\": [\"$a.fits\", \"fits\"]}, {\"eq\": [\"$a.goal\", \"repair\"]}]}";
+MATCH (a:SkillStep {id: "opposite_action:help"}), (b:SkillStep {id: "opposite_action:pun"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"all\": [{\"eq\": [\"$a.urge\", \"guilt-punish\"]}, {\"any\": [{\"all\": [{\"eq\": [\"$a.fits\", \"excessive\"]}, {\"eq\": [\"$a.help\", \"helpful\"]}]}, {\"all\": [{\"eq\": [\"$a.fits\", \"fits\"]}, {\"eq\": [\"$a.help\", \"helpful\"]}]}]}]}";
 MATCH (a:SkillStep {id: "opposite_action:help"}), (b:SkillStep {id: "opposite_action:prob"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "{\"any\": [{\"all\": [{\"eq\": [\"$a.fits\", \"excessive\"]}, {\"eq\": [\"$a.help\", \"helpful\"]}]}, {\"all\": [{\"eq\": [\"$a.fits\", \"fits\"]}, {\"eq\": [\"$a.help\", \"helpful\"]}]}]}";
+SET r += {order: 2}, r.whenJson = "{\"any\": [{\"all\": [{\"eq\": [\"$a.fits\", \"excessive\"]}, {\"eq\": [\"$a.help\", \"helpful\"]}]}, {\"all\": [{\"eq\": [\"$a.fits\", \"fits\"]}, {\"eq\": [\"$a.help\", \"helpful\"]}]}]}";
 MATCH (a:SkillStep {id: "opposite_action:help"}), (b:SkillStep {id: "opposite_action:cue"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 2}, r.whenJson = "{\"any\": [{\"all\": [{\"eq\": [\"$a.fits\", \"excessive\"]}, {\"eq\": [\"$a.help\", \"unhelpful\"]}]}, {\"all\": [{\"eq\": [\"$a.fits\", \"fits\"]}, {\"eq\": [\"$a.help\", \"unhelpful\"]}]}, {\"all\": [{\"eq\": [\"$a.fits\", \"not_fit\"]}, {\"eq\": [\"$a.help\", \"unhelpful\"]}]}]}";
+SET r += {order: 3}, r.whenJson = "{\"any\": [{\"all\": [{\"eq\": [\"$a.fits\", \"excessive\"]}, {\"eq\": [\"$a.help\", \"unhelpful\"]}]}, {\"all\": [{\"eq\": [\"$a.fits\", \"fits\"]}, {\"eq\": [\"$a.help\", \"unhelpful\"]}]}, {\"all\": [{\"eq\": [\"$a.fits\", \"not_fit\"]}, {\"eq\": [\"$a.help\", \"unhelpful\"]}]}]}";
 MATCH (a:SkillStep {id: "opposite_action:help"}), (b:SkillStep {id: "opposite_action:clar"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 3}, r.whenJson = "null";
+SET r += {order: 4}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "opposite_action:clar"}), (x:SkillExit {id: "opposite_action:check_the_facts"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
@@ -11099,12 +11133,21 @@ SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"eq\": [\"$a.fits
 MATCH (a:SkillStep {id: "opposite_action:prob"}), (x:SkillExit {id: "opposite_action:problem_solve"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "opposite_action:pun"}), (x:SkillExit {id: "opposite_action:problem_solve"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "opposite_action:pun"}), (x:SkillExit {id: "opposite_action:ride"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
 MATCH (a:SkillStep {id: "opposite_action:repr"}), (x:SkillExit {id: "opposite_action:problem_solve"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
 MATCH (a:SkillStep {id: "opposite_action:cue"}), (b:SkillStep {id: "opposite_action:hold"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "null";
+SET r += {order: 0}, r.whenJson = "{\"set\": \"$a.cue\"}";
+MATCH (a:SkillStep {id: "opposite_action:cue"}), (b:SkillStep {id: "opposite_action:size"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "opposite_action:hold"}), (b:SkillStep {id: "opposite_action:aftb"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
@@ -11126,7 +11169,13 @@ SET r += {order: 1}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "opposite_action:try"}), (b:SkillStep {id: "opposite_action:aftr"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
-MATCH (a:SkillStep {id: "opposite_action:aftr"}), (b:SkillStep {id: "opposite_action:read"})
+MATCH (a:SkillStep {id: "opposite_action:aftr"}), (b:SkillStep {id: "opposite_action:act"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "opposite_action:act"}), (b:SkillStep {id: "opposite_action:tvna"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "opposite_action:tvna"}), (b:SkillStep {id: "opposite_action:read"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "opposite_action:read"}), (x:SkillExit {id: "opposite_action:pause"})
@@ -11141,7 +11190,10 @@ SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.tried\", \"yes\"]}";
 MATCH (a:SkillStep {id: "opposite_action:back"}), (b:SkillStep {id: "opposite_action:miss"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 1}, r.whenJson = "null";
-MATCH (a:SkillStep {id: "opposite_action:aft2"}), (b:SkillStep {id: "opposite_action:read2"})
+MATCH (a:SkillStep {id: "opposite_action:aft2"}), (b:SkillStep {id: "opposite_action:act2"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "opposite_action:act2"}), (b:SkillStep {id: "opposite_action:read2"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "opposite_action:read2"}), (x:SkillExit {id: "opposite_action:pause"})
@@ -11690,914 +11742,914 @@ MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:tv
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "tvn", order: 92};
 MERGE (o:SkillOption {id: "opposite_action:size:anger-lash:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-lash:small", label: "Pause and count to 10 before responding", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"anger-lash\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-lash:small", label: "A small start: Pause and count to 10 before responding", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"anger-lash\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:anger-lash:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 93};
 MATCH (o:SkillOption {id: "opposite_action:size:anger-lash:small"}), (c:ActionUrge {id: "anger-lash"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:anger-lash:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-lash:medium", label: "Write down what you want to say, then set it aside for an hour", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"anger-lash\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-lash:medium", label: "A little further: Write down what you want to say, then set it aside for an hour", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"anger-lash\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:anger-lash:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 94};
 MATCH (o:SkillOption {id: "opposite_action:size:anger-lash:medium"}), (c:ActionUrge {id: "anger-lash"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:anger-lash:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-lash:bigger", label: "Say something kind to the person instead", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"anger-lash\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-lash:bigger", label: "Fuller practice: Say something kind to the person instead", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"anger-lash\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:anger-lash:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 95};
 MATCH (o:SkillOption {id: "opposite_action:size:anger-lash:bigger"}), (c:ActionUrge {id: "anger-lash"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:anger-stonewall:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-stonewall:small", label: "Don't block or unfriend yet. Pause", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"anger-stonewall\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-stonewall:small", label: "A small start: Don't block or unfriend yet. Pause", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"anger-stonewall\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:anger-stonewall:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 96};
 MATCH (o:SkillOption {id: "opposite_action:size:anger-stonewall:small"}), (c:ActionUrge {id: "anger-stonewall"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:anger-stonewall:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-stonewall:medium", label: "Send a brief, neutral message acknowledging them", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"anger-stonewall\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-stonewall:medium", label: "A little further: Send a brief, neutral message acknowledging them", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"anger-stonewall\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:anger-stonewall:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 97};
 MATCH (o:SkillOption {id: "opposite_action:size:anger-stonewall:medium"}), (c:ActionUrge {id: "anger-stonewall"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:anger-stonewall:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-stonewall:bigger", label: "Have an honest, gentle conversation about what happened", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"anger-stonewall\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-stonewall:bigger", label: "Fuller practice: Have an honest, gentle conversation about what happened", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"anger-stonewall\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:anger-stonewall:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 98};
 MATCH (o:SkillOption {id: "opposite_action:size:anger-stonewall:bigger"}), (c:ActionUrge {id: "anger-stonewall"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:anger-destroy:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-destroy:small", label: "Squeeze ice in your hands for 30 seconds", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"anger-destroy\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-destroy:small", label: "A small start: Squeeze a cushion or a stress ball hard for 30 seconds", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"anger-destroy\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:anger-destroy:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 99};
 MATCH (o:SkillOption {id: "opposite_action:size:anger-destroy:small"}), (c:ActionUrge {id: "anger-destroy"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:anger-destroy:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-destroy:medium", label: "Do 30 jumping jacks or a brisk walk around the block", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"anger-destroy\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-destroy:medium", label: "A little further: Do 30 jumping jacks or a brisk walk around the block", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"anger-destroy\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:anger-destroy:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 100};
 MATCH (o:SkillOption {id: "opposite_action:size:anger-destroy:medium"}), (c:ActionUrge {id: "anger-destroy"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:anger-destroy:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-destroy:bigger", label: "Channel the energy into cleaning, building, or creating something", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"anger-destroy\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-destroy:bigger", label: "Fuller practice: Channel the energy into cleaning, building, or creating something", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"anger-destroy\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:anger-destroy:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 101};
 MATCH (o:SkillOption {id: "opposite_action:size:anger-destroy:bigger"}), (c:ActionUrge {id: "anger-destroy"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:anger-criticize:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-criticize:small", label: "Pause and name one thing they might be going through", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"anger-criticize\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-criticize:small", label: "A small start: Pause and name one thing they might be going through", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"anger-criticize\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:anger-criticize:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 102};
 MATCH (o:SkillOption {id: "opposite_action:size:anger-criticize:small"}), (c:ActionUrge {id: "anger-criticize"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:anger-criticize:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-criticize:medium", label: "Ask a genuine question about their perspective", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"anger-criticize\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-criticize:medium", label: "A little further: Ask a genuine question about their perspective", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"anger-criticize\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:anger-criticize:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 103};
 MATCH (o:SkillOption {id: "opposite_action:size:anger-criticize:medium"}), (c:ActionUrge {id: "anger-criticize"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:anger-criticize:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-criticize:bigger", label: "Offer an honest compliment or acknowledgment", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"anger-criticize\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "anger-criticize:bigger", label: "Fuller practice: Offer an honest compliment or acknowledgment", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"anger-criticize\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:anger-criticize:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 104};
 MATCH (o:SkillOption {id: "opposite_action:size:anger-criticize:bigger"}), (c:ActionUrge {id: "anger-criticize"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:fire-back:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fire-back:small", label: "Wait ten breaths before you answer", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"fire-back\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fire-back:small", label: "A small start: Wait ten breaths before you answer", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"fire-back\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:fire-back:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 105};
 MATCH (o:SkillOption {id: "opposite_action:size:fire-back:small"}), (c:ActionUrge {id: "fire-back"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:fire-back:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fire-back:medium", label: "Step away until you can answer gently", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"fire-back\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fire-back:medium", label: "A little further: Step away until you can answer gently", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"fire-back\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:fire-back:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 106};
 MATCH (o:SkillOption {id: "opposite_action:size:fire-back:medium"}), (c:ActionUrge {id: "fire-back"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:fire-back:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fire-back:bigger", label: "Say one fair or kind thing about their side first", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"fire-back\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fire-back:bigger", label: "Fuller practice: Say one fair or kind thing about their side first", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"fire-back\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:fire-back:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 107};
 MATCH (o:SkillOption {id: "opposite_action:size:fire-back:bigger"}), (c:ActionUrge {id: "fire-back"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:anger:small"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "anger:small", label: "Pause for 10 seconds before doing anything", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"anger\", \"size\": \"small\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "anger:small", label: "A small start: Pause for 10 seconds before doing anything", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"anger\", \"size\": \"small\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:anger:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 108};
 MERGE (o:SkillOption {id: "opposite_action:size:anger:medium"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "anger:medium", label: "Try to see the situation from the other person's perspective", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"anger\", \"size\": \"medium\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "anger:medium", label: "A little further: Try to see the situation from the other person's perspective", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"anger\", \"size\": \"medium\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:anger:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 109};
 MERGE (o:SkillOption {id: "opposite_action:size:anger:bigger"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "anger:bigger", label: "Do something genuinely kind for the person you're angry at", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"anger\", \"size\": \"bigger\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "anger:bigger", label: "Fuller practice: Do something genuinely kind for the person you're angry at", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"anger\", \"size\": \"bigger\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:anger:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 110};
 MERGE (o:SkillOption {id: "opposite_action:size:disgust-push:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "disgust-push:small", label: "Stay present for 2 more minutes", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"disgust-push\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "disgust-push:small", label: "A small start: Stay present for 2 more minutes", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"disgust-push\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:disgust-push:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 111};
 MATCH (o:SkillOption {id: "opposite_action:size:disgust-push:small"}), (c:ActionUrge {id: "disgust-push"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:disgust-push:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "disgust-push:medium", label: "Find one small thing to appreciate about the situation", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"disgust-push\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "disgust-push:medium", label: "A little further: Find one small thing to appreciate about the situation", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"disgust-push\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:disgust-push:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 112};
 MATCH (o:SkillOption {id: "opposite_action:size:disgust-push:medium"}), (c:ActionUrge {id: "disgust-push"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:disgust-push:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "disgust-push:bigger", label: "Engage fully without the disgust filter", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"disgust-push\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "disgust-push:bigger", label: "Fuller practice: Engage fully without the disgust filter", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"disgust-push\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:disgust-push:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 113};
 MATCH (o:SkillOption {id: "opposite_action:size:disgust-push:bigger"}), (c:ActionUrge {id: "disgust-push"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:disgust-leave:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "disgust-leave:small", label: "Stay, and shift your attention to something neutral", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"disgust-leave\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "disgust-leave:small", label: "A small start: Stay, and shift your attention to something neutral", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"disgust-leave\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:disgust-leave:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 114};
 MATCH (o:SkillOption {id: "opposite_action:size:disgust-leave:small"}), (c:ActionUrge {id: "disgust-leave"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:disgust-leave:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "disgust-leave:medium", label: "Stay and participate, even minimally", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"disgust-leave\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "disgust-leave:medium", label: "A little further: Stay and participate, even minimally", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"disgust-leave\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:disgust-leave:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 115};
 MATCH (o:SkillOption {id: "opposite_action:size:disgust-leave:medium"}), (c:ActionUrge {id: "disgust-leave"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:disgust-leave:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "disgust-leave:bigger", label: "Stay and engage as if the disgust isn't there", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"disgust-leave\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "disgust-leave:bigger", label: "Fuller practice: Stay and engage as if the disgust isn't there", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"disgust-leave\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:disgust-leave:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 116};
 MATCH (o:SkillOption {id: "opposite_action:size:disgust-leave:bigger"}), (c:ActionUrge {id: "disgust-leave"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:disgust-judge:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "disgust-judge:small", label: "Notice the judgment and label it as a judgment, not a fact", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"disgust-judge\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "disgust-judge:small", label: "A small start: Notice the judgment and label it as a judgment, not a fact", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"disgust-judge\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:disgust-judge:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 117};
 MATCH (o:SkillOption {id: "opposite_action:size:disgust-judge:small"}), (c:ActionUrge {id: "disgust-judge"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:disgust-judge:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "disgust-judge:medium", label: "Consider one reason this makes sense from their perspective", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"disgust-judge\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "disgust-judge:medium", label: "A little further: Consider one reason this makes sense from their perspective", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"disgust-judge\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:disgust-judge:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 118};
 MATCH (o:SkillOption {id: "opposite_action:size:disgust-judge:medium"}), (c:ActionUrge {id: "disgust-judge"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:disgust-judge:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "disgust-judge:bigger", label: "Actively practice empathy — imagine their full experience", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"disgust-judge\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "disgust-judge:bigger", label: "Fuller practice: Actively practice empathy — imagine their full experience", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"disgust-judge\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:disgust-judge:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 119};
 MATCH (o:SkillOption {id: "opposite_action:size:disgust-judge:bigger"}), (c:ActionUrge {id: "disgust-judge"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:disgust:small"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "disgust:small", label: "Stay present for 2 more minutes", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"disgust\", \"size\": \"small\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "disgust:small", label: "A small start: Stay present for 2 more minutes", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"disgust\", \"size\": \"small\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:disgust:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 120};
 MERGE (o:SkillOption {id: "opposite_action:size:disgust:medium"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "disgust:medium", label: "Find one thing to appreciate about the situation", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"disgust\", \"size\": \"medium\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "disgust:medium", label: "A little further: Find one thing to appreciate about the situation", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"disgust\", \"size\": \"medium\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:disgust:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 121};
 MERGE (o:SkillOption {id: "opposite_action:size:disgust:bigger"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "disgust:bigger", label: "Engage fully, as if the disgust weren't there", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"disgust\", \"size\": \"bigger\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "disgust:bigger", label: "Fuller practice: Engage fully, as if the disgust weren't there", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"disgust\", \"size\": \"bigger\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:disgust:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 122};
 MERGE (o:SkillOption {id: "opposite_action:size:envy-tear-down:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "envy-tear-down:small", label: "Catch the thought and label it as envy, not truth", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"envy-tear-down\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "envy-tear-down:small", label: "A small start: Catch the thought and label it as envy, not truth", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"envy-tear-down\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:envy-tear-down:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 123};
 MATCH (o:SkillOption {id: "opposite_action:size:envy-tear-down:small"}), (c:ActionUrge {id: "envy-tear-down"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:envy-tear-down:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "envy-tear-down:medium", label: "Say one genuinely kind thing about them", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"envy-tear-down\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "envy-tear-down:medium", label: "A little further: Say one genuinely kind thing about them", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"envy-tear-down\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:envy-tear-down:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 124};
 MATCH (o:SkillOption {id: "opposite_action:size:envy-tear-down:medium"}), (c:ActionUrge {id: "envy-tear-down"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:envy-tear-down:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "envy-tear-down:bigger", label: "Celebrate their success as if it were your own", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"envy-tear-down\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "envy-tear-down:bigger", label: "Fuller practice: Celebrate their success as if it were your own", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"envy-tear-down\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:envy-tear-down:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 125};
 MATCH (o:SkillOption {id: "opposite_action:size:envy-tear-down:bigger"}), (c:ActionUrge {id: "envy-tear-down"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:envy-compare:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "envy-compare:small", label: "Notice the comparison and redirect your attention", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"envy-compare\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "envy-compare:small", label: "A small start: Notice the comparison and redirect your attention", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"envy-compare\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:envy-compare:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 126};
 MATCH (o:SkillOption {id: "opposite_action:size:envy-compare:small"}), (c:ActionUrge {id: "envy-compare"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:envy-compare:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "envy-compare:medium", label: "List 3 things you have that you're genuinely grateful for", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"envy-compare\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "envy-compare:medium", label: "A little further: List 3 things you have that you're genuinely grateful for", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"envy-compare\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:envy-compare:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 127};
 MATCH (o:SkillOption {id: "opposite_action:size:envy-compare:medium"}), (c:ActionUrge {id: "envy-compare"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:envy-compare:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "envy-compare:bigger", label: "Use the envy as information — what does it tell you about what YOU want? Take one step toward that", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"envy-compare\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "envy-compare:bigger", label: "Fuller practice: Use the envy as information — what does it tell you about what YOU want? Take one step toward that", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"envy-compare\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:envy-compare:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 128};
 MATCH (o:SkillOption {id: "opposite_action:size:envy-compare:bigger"}), (c:ActionUrge {id: "envy-compare"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:envy-give-up:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "envy-give-up:small", label: "Name one small thing you've accomplished recently", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"envy-give-up\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "envy-give-up:small", label: "A small start: Name one small thing you've accomplished recently", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"envy-give-up\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:envy-give-up:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 129};
 MATCH (o:SkillOption {id: "opposite_action:size:envy-give-up:small"}), (c:ActionUrge {id: "envy-give-up"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:envy-give-up:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "envy-give-up:medium", label: "Take one tiny step toward something you want", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"envy-give-up\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "envy-give-up:medium", label: "A little further: Take one tiny step toward something you want", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"envy-give-up\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:envy-give-up:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 130};
 MATCH (o:SkillOption {id: "opposite_action:size:envy-give-up:medium"}), (c:ActionUrge {id: "envy-give-up"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:envy-give-up:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "envy-give-up:bigger", label: "Make a plan for getting what envy is pointing you toward", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"envy-give-up\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "envy-give-up:bigger", label: "Fuller practice: Make a plan for getting what envy is pointing you toward", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"envy-give-up\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:envy-give-up:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 131};
 MATCH (o:SkillOption {id: "opposite_action:size:envy-give-up:bigger"}), (c:ActionUrge {id: "envy-give-up"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:envy:small"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "envy:small", label: "Catch the comparison and name it as envy", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"envy\", \"size\": \"small\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "envy:small", label: "A small start: Catch the comparison and name it as envy", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"envy\", \"size\": \"small\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:envy:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 132};
 MERGE (o:SkillOption {id: "opposite_action:size:envy:medium"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "envy:medium", label: "List 3 things you're grateful for right now", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"envy\", \"size\": \"medium\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "envy:medium", label: "A little further: List 3 things you're grateful for right now", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"envy\", \"size\": \"medium\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:envy:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 133};
 MERGE (o:SkillOption {id: "opposite_action:size:envy:bigger"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "envy:bigger", label: "Celebrate their success genuinely, then take one step toward your own goals", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"envy\", \"size\": \"bigger\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "envy:bigger", label: "Fuller practice: Celebrate their success genuinely, then take one step toward your own goals", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"envy\", \"size\": \"bigger\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:envy:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 134};
 MERGE (o:SkillOption {id: "opposite_action:size:fear-avoid:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-avoid:small", label: "Stay in the room 2 more minutes", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"fear-avoid\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-avoid:small", label: "A small start: Stay in the room 2 more minutes", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"fear-avoid\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:fear-avoid:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 135};
 MATCH (o:SkillOption {id: "opposite_action:size:fear-avoid:small"}), (c:ActionUrge {id: "fear-avoid"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:fear-avoid:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-avoid:medium", label: "Approach the thing for 10 minutes, then reassess", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"fear-avoid\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-avoid:medium", label: "A little further: Approach the thing for 10 minutes, then reassess", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"fear-avoid\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:fear-avoid:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 136};
 MATCH (o:SkillOption {id: "opposite_action:size:fear-avoid:medium"}), (c:ActionUrge {id: "fear-avoid"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:fear-avoid:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-avoid:bigger", label: "Do the thing you've been avoiding, start to finish", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"fear-avoid\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-avoid:bigger", label: "Fuller practice: Do the thing you've been avoiding, start to finish", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"fear-avoid\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:fear-avoid:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 137};
 MATCH (o:SkillOption {id: "opposite_action:size:fear-avoid:bigger"}), (c:ActionUrge {id: "fear-avoid"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:fear-escape:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-escape:small", label: "Plant your feet and take 3 slow breaths", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"fear-escape\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-escape:small", label: "A small start: Plant your feet and take 3 slow breaths", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"fear-escape\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:fear-escape:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 138};
 MATCH (o:SkillOption {id: "opposite_action:size:fear-escape:small"}), (c:ActionUrge {id: "fear-escape"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:fear-escape:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-escape:medium", label: "Stay until the fear drops one notch", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"fear-escape\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-escape:medium", label: "A little further: Stay until the fear drops one notch", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"fear-escape\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:fear-escape:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 139};
 MATCH (o:SkillOption {id: "opposite_action:size:fear-escape:medium"}), (c:ActionUrge {id: "fear-escape"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:fear-escape:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-escape:bigger", label: "Stay until the fear passes on its own", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"fear-escape\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-escape:bigger", label: "Fuller practice: Stay a while, and let the fear rise and settle", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"fear-escape\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:fear-escape:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 140};
 MATCH (o:SkillOption {id: "opposite_action:size:fear-escape:bigger"}), (c:ActionUrge {id: "fear-escape"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:fear-cancel:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-cancel:small", label: "Don't cancel yet — wait 30 minutes and decide then", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"fear-cancel\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-cancel:small", label: "A small start: Don't cancel yet — wait 30 minutes and decide then", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"fear-cancel\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:fear-cancel:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 141};
 MATCH (o:SkillOption {id: "opposite_action:size:fear-cancel:small"}), (c:ActionUrge {id: "fear-cancel"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:fear-cancel:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-cancel:medium", label: "Go, and give yourself permission to leave early", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"fear-cancel\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-cancel:medium", label: "A little further: Go, and give yourself permission to leave early", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"fear-cancel\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:fear-cancel:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 142};
 MATCH (o:SkillOption {id: "opposite_action:size:fear-cancel:medium"}), (c:ActionUrge {id: "fear-cancel"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:fear-cancel:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-cancel:bigger", label: "Go and stay the whole time", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"fear-cancel\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-cancel:bigger", label: "Fuller practice: Go and stay the whole time", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"fear-cancel\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:fear-cancel:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 143};
 MATCH (o:SkillOption {id: "opposite_action:size:fear-cancel:bigger"}), (c:ActionUrge {id: "fear-cancel"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:fear-freeze:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-freeze:small", label: "Move one part of your body — stand up, stretch", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"fear-freeze\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-freeze:small", label: "A small start: Move one part of your body — stand up, stretch", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"fear-freeze\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:fear-freeze:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 144};
 MATCH (o:SkillOption {id: "opposite_action:size:fear-freeze:small"}), (c:ActionUrge {id: "fear-freeze"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:fear-freeze:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-freeze:medium", label: "Take one small action related to what you're avoiding", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"fear-freeze\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-freeze:medium", label: "A little further: Take one small action related to what you're avoiding", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"fear-freeze\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:fear-freeze:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 145};
 MATCH (o:SkillOption {id: "opposite_action:size:fear-freeze:medium"}), (c:ActionUrge {id: "fear-freeze"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:fear-freeze:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-freeze:bigger", label: "Start the task fully, even imperfectly", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"fear-freeze\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "fear-freeze:bigger", label: "Fuller practice: Start the task fully, even imperfectly", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"fear-freeze\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:fear-freeze:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 146};
 MATCH (o:SkillOption {id: "opposite_action:size:fear-freeze:bigger"}), (c:ActionUrge {id: "fear-freeze"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:fear:small"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "fear:small", label: "Stay with the discomfort a little longer — even 2 minutes", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"fear\", \"size\": \"small\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "fear:small", label: "A small start: Stay with the discomfort a little longer — even 2 minutes", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"fear\", \"size\": \"small\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:fear:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 147};
 MERGE (o:SkillOption {id: "opposite_action:size:fear:medium"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "fear:medium", label: "Take one step toward what you're avoiding", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"fear\", \"size\": \"medium\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "fear:medium", label: "A little further: Take one step toward what you're avoiding", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"fear\", \"size\": \"medium\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:fear:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 148};
 MERGE (o:SkillOption {id: "opposite_action:size:fear:bigger"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "fear:bigger", label: "Engage fully with the safe activity you chose while keeping appropriate boundaries", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"fear\", \"size\": \"bigger\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "fear:bigger", label: "Fuller practice: Engage fully with the safe activity you chose while keeping appropriate boundaries", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"fear\", \"size\": \"bigger\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:fear:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 149};
 MERGE (o:SkillOption {id: "opposite_action:size:guilt-apologize:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "guilt-apologize:small", label: "Notice the urge to apologize and don't act on it", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"guilt-apologize\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "guilt-apologize:small", label: "A small start: Notice the urge to apologize and don't act on it", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"guilt-apologize\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:guilt-apologize:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 150};
 MATCH (o:SkillOption {id: "opposite_action:size:guilt-apologize:small"}), (c:ActionUrge {id: "guilt-apologize"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:guilt-apologize:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "guilt-apologize:medium", label: "If you've already apologized once, let that be enough", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"guilt-apologize\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "guilt-apologize:medium", label: "A little further: If you've already apologized once, let that be enough", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"guilt-apologize\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:guilt-apologize:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 151};
 MATCH (o:SkillOption {id: "opposite_action:size:guilt-apologize:medium"}), (c:ActionUrge {id: "guilt-apologize"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:guilt-apologize:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "guilt-apologize:bigger", label: "Act freely, without hedging or seeking reassurance", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"guilt-apologize\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "guilt-apologize:bigger", label: "Fuller practice: Act freely, without hedging or seeking reassurance", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"guilt-apologize\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:guilt-apologize:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 152};
 MATCH (o:SkillOption {id: "opposite_action:size:guilt-apologize:bigger"}), (c:ActionUrge {id: "guilt-apologize"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:guilt-punish:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "guilt-punish:small", label: "Notice the self-punishment urge and name it out loud", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"guilt-punish\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "guilt-punish:small", label: "A small start: Notice the self-punishment urge and name it out loud", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"guilt-punish\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:guilt-punish:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 153};
 MATCH (o:SkillOption {id: "opposite_action:size:guilt-punish:small"}), (c:ActionUrge {id: "guilt-punish"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:guilt-punish:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "guilt-punish:medium", label: "Do something neutral — a walk, a glass of water", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"guilt-punish\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "guilt-punish:medium", label: "A little further: Do something neutral — a walk, a glass of water", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"guilt-punish\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:guilt-punish:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 154};
 MATCH (o:SkillOption {id: "opposite_action:size:guilt-punish:medium"}), (c:ActionUrge {id: "guilt-punish"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:guilt-punish:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "guilt-punish:bigger", label: "Do something kind for yourself — the direct opposite of punishment", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"guilt-punish\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "guilt-punish:bigger", label: "Fuller practice: Do something kind for yourself — the direct opposite of punishment", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"guilt-punish\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:guilt-punish:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 155};
 MATCH (o:SkillOption {id: "opposite_action:size:guilt-punish:bigger"}), (c:ActionUrge {id: "guilt-punish"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:guilt-avoid:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "guilt-avoid:small", label: "Don't change your route or routine to avoid them", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"guilt-avoid\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "guilt-avoid:small", label: "A small start: Don't change your route or routine to avoid them", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"guilt-avoid\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:guilt-avoid:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 156};
 MATCH (o:SkillOption {id: "opposite_action:size:guilt-avoid:small"}), (c:ActionUrge {id: "guilt-avoid"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:guilt-avoid:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "guilt-avoid:medium", label: "Make brief, normal contact — a wave, a hello", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"guilt-avoid\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "guilt-avoid:medium", label: "A little further: Make brief, normal contact — a wave, a hello", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"guilt-avoid\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:guilt-avoid:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 157};
 MATCH (o:SkillOption {id: "opposite_action:size:guilt-avoid:medium"}), (c:ActionUrge {id: "guilt-avoid"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:guilt-avoid:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "guilt-avoid:bigger", label: "Engage with them normally, without excessive guilt or apology", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"guilt-avoid\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "guilt-avoid:bigger", label: "Fuller practice: Engage with them normally, without excessive guilt or apology", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"guilt-avoid\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:guilt-avoid:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 158};
 MATCH (o:SkillOption {id: "opposite_action:size:guilt-avoid:bigger"}), (c:ActionUrge {id: "guilt-avoid"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:guilt:small"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "guilt:small", label: "Notice the self-punishment urge and don't act on it", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"guilt\", \"size\": \"small\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "guilt:small", label: "A small start: Notice the self-punishment urge and don't act on it", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"guilt\", \"size\": \"small\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:guilt:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 159};
 MERGE (o:SkillOption {id: "opposite_action:size:guilt:medium"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "guilt:medium", label: "Do something neutral instead of punishing yourself", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"guilt\", \"size\": \"medium\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "guilt:medium", label: "A little further: Do something neutral instead of punishing yourself", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"guilt\", \"size\": \"medium\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:guilt:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 160};
 MERGE (o:SkillOption {id: "opposite_action:size:guilt:bigger"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "guilt:bigger", label: "Act freely, as if you did nothing wrong — because you didn't", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"guilt\", \"size\": \"bigger\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "guilt:bigger", label: "Fuller practice: Go about your day openly, without hiding or making yourself small", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"guilt\", \"size\": \"bigger\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:guilt:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 161};
 MERGE (o:SkillOption {id: "opposite_action:size:jealousy-check:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "jealousy-check:small", label: "Put your phone down for 10 minutes", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"jealousy-check\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "jealousy-check:small", label: "A small start: Put your phone down for 10 minutes", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"jealousy-check\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:jealousy-check:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 162};
 MATCH (o:SkillOption {id: "opposite_action:size:jealousy-check:small"}), (c:ActionUrge {id: "jealousy-check"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:jealousy-check:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "jealousy-check:medium", label: "Delete the checking app from your home screen for today", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"jealousy-check\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "jealousy-check:medium", label: "A little further: Delete the checking app from your home screen for today", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"jealousy-check\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:jealousy-check:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 163};
 MATCH (o:SkillOption {id: "opposite_action:size:jealousy-check:medium"}), (c:ActionUrge {id: "jealousy-check"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:jealousy-check:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "jealousy-check:bigger", label: "Go a full day without checking", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"jealousy-check\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "jealousy-check:bigger", label: "Fuller practice: Go a full day without checking", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"jealousy-check\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:jealousy-check:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 164};
 MATCH (o:SkillOption {id: "opposite_action:size:jealousy-check:bigger"}), (c:ActionUrge {id: "jealousy-check"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:jealousy-interrogate:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "jealousy-interrogate:small", label: "Ask once, then accept the answer", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"jealousy-interrogate\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "jealousy-interrogate:small", label: "A small start: Ask once, then accept the answer", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"jealousy-interrogate\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:jealousy-interrogate:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 165};
 MATCH (o:SkillOption {id: "opposite_action:size:jealousy-interrogate:small"}), (c:ActionUrge {id: "jealousy-interrogate"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:jealousy-interrogate:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "jealousy-interrogate:medium", label: "Notice the urge to ask again and do something else instead", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"jealousy-interrogate\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "jealousy-interrogate:medium", label: "A little further: Notice the urge to ask again and do something else instead", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"jealousy-interrogate\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:jealousy-interrogate:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 166};
 MATCH (o:SkillOption {id: "opposite_action:size:jealousy-interrogate:medium"}), (c:ActionUrge {id: "jealousy-interrogate"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:jealousy-interrogate:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "jealousy-interrogate:bigger", label: "Say 'have fun' and genuinely mean it", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"jealousy-interrogate\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "jealousy-interrogate:bigger", label: "Fuller practice: Say 'have fun' and genuinely mean it", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"jealousy-interrogate\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:jealousy-interrogate:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 167};
 MATCH (o:SkillOption {id: "opposite_action:size:jealousy-interrogate:bigger"}), (c:ActionUrge {id: "jealousy-interrogate"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:jealousy-cling:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "jealousy-cling:small", label: "Give them 30 minutes of uninterrupted space", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"jealousy-cling\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "jealousy-cling:small", label: "A small start: Give them 30 minutes of uninterrupted space", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"jealousy-cling\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:jealousy-cling:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 168};
 MATCH (o:SkillOption {id: "opposite_action:size:jealousy-cling:small"}), (c:ActionUrge {id: "jealousy-cling"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:jealousy-cling:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "jealousy-cling:medium", label: "Make plans with someone else", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"jealousy-cling\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "jealousy-cling:medium", label: "A little further: Make plans with someone else", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"jealousy-cling\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:jealousy-cling:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 169};
 MATCH (o:SkillOption {id: "opposite_action:size:jealousy-cling:medium"}), (c:ActionUrge {id: "jealousy-cling"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:jealousy-cling:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "jealousy-cling:bigger", label: "Encourage them to spend time with others and enjoy yourself meanwhile", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"jealousy-cling\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "jealousy-cling:bigger", label: "Fuller practice: Encourage them to spend time with others and enjoy yourself meanwhile", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"jealousy-cling\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:jealousy-cling:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 170};
 MATCH (o:SkillOption {id: "opposite_action:size:jealousy-cling:bigger"}), (c:ActionUrge {id: "jealousy-cling"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:check-profile:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "check-profile:small", label: "Wait ten minutes before you look", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"check-profile\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "check-profile:small", label: "A small start: Wait ten minutes before you look", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"check-profile\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:check-profile:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 171};
 MATCH (o:SkillOption {id: "opposite_action:size:check-profile:small"}), (c:ActionUrge {id: "check-profile"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:check-profile:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "check-profile:medium", label: "Mute them for today", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"check-profile\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "check-profile:medium", label: "A little further: Mute them for today", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"check-profile\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:check-profile:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 172};
 MATCH (o:SkillOption {id: "opposite_action:size:check-profile:medium"}), (c:ActionUrge {id: "check-profile"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:check-profile:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "check-profile:bigger", label: "Take the app off your home screen for the week", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"check-profile\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "check-profile:bigger", label: "Fuller practice: Take the app off your home screen for the week", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"check-profile\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:check-profile:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 173};
 MATCH (o:SkillOption {id: "opposite_action:size:check-profile:bigger"}), (c:ActionUrge {id: "check-profile"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:jealousy:small"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "jealousy:small", label: "Put your phone down for 10 minutes", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"jealousy\", \"size\": \"small\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "jealousy:small", label: "A small start: Put your phone down for 10 minutes", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"jealousy\", \"size\": \"small\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:jealousy:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 174};
 MERGE (o:SkillOption {id: "opposite_action:size:jealousy:medium"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "jealousy:medium", label: "Ask once, then accept the answer", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"jealousy\", \"size\": \"medium\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "jealousy:medium", label: "A little further: Ask once, then accept the answer", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"jealousy\", \"size\": \"medium\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:jealousy:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 175};
 MERGE (o:SkillOption {id: "opposite_action:size:jealousy:bigger"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "jealousy:bigger", label: "Give them genuine freedom and space — and mean it", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"jealousy\", \"size\": \"bigger\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "jealousy:bigger", label: "Fuller practice: Give them genuine freedom and space — and mean it", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"jealousy\", \"size\": \"bigger\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:jealousy:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 176};
 MERGE (o:SkillOption {id: "opposite_action:size:love-reach-out:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-reach-out:small", label: "Write the message and don't send it. Wait 1 hour", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"love-reach-out\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-reach-out:small", label: "A small start: Write the message and don't send it. Wait 1 hour", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"love-reach-out\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:love-reach-out:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 177};
 MATCH (o:SkillOption {id: "opposite_action:size:love-reach-out:small"}), (c:ActionUrge {id: "love-reach-out"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:love-reach-out:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-reach-out:medium", label: "Put your phone in another room for an hour", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"love-reach-out\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-reach-out:medium", label: "A little further: Put your phone in another room for an hour", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"love-reach-out\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:love-reach-out:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 178};
 MATCH (o:SkillOption {id: "opposite_action:size:love-reach-out:medium"}), (c:ActionUrge {id: "love-reach-out"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:love-reach-out:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-reach-out:bigger", label: "Delete the draft, close the app, do something that demands your full attention", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"love-reach-out\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-reach-out:bigger", label: "Fuller practice: Delete the draft, close the app, do something that demands your full attention", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"love-reach-out\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:love-reach-out:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 179};
 MATCH (o:SkillOption {id: "opposite_action:size:love-reach-out:bigger"}), (c:ActionUrge {id: "love-reach-out"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:love-stalk:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-stalk:small", label: "Notice the urge and set a 10-minute timer before deciding", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"love-stalk\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-stalk:small", label: "A small start: Notice the urge and set a 10-minute timer before deciding", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"love-stalk\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:love-stalk:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 180};
 MATCH (o:SkillOption {id: "opposite_action:size:love-stalk:small"}), (c:ActionUrge {id: "love-stalk"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:love-stalk:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-stalk:medium", label: "Mute or unfollow them", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"love-stalk\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-stalk:medium", label: "A little further: Mute or unfollow them", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"love-stalk\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:love-stalk:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 181};
 MATCH (o:SkillOption {id: "opposite_action:size:love-stalk:medium"}), (c:ActionUrge {id: "love-stalk"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:love-stalk:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-stalk:bigger", label: "Block or remove them from your feed entirely", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"love-stalk\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-stalk:bigger", label: "Fuller practice: Block or remove them from your feed entirely", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"love-stalk\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:love-stalk:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 182};
 MATCH (o:SkillOption {id: "opposite_action:size:love-stalk:bigger"}), (c:ActionUrge {id: "love-stalk"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:love-proximity:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-proximity:small", label: "Choose a different route or venue today", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"love-proximity\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-proximity:small", label: "A small start: Choose a different route or venue today", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"love-proximity\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:love-proximity:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 183};
 MATCH (o:SkillOption {id: "opposite_action:size:love-proximity:small"}), (c:ActionUrge {id: "love-proximity"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:love-proximity:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-proximity:medium", label: "Make plans that have nothing to do with them", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"love-proximity\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-proximity:medium", label: "A little further: Make plans that have nothing to do with them", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"love-proximity\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:love-proximity:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 184};
 MATCH (o:SkillOption {id: "opposite_action:size:love-proximity:medium"}), (c:ActionUrge {id: "love-proximity"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:love-proximity:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-proximity:bigger", label: "Fill the time you'd spend thinking about them with something that builds your life", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"love-proximity\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-proximity:bigger", label: "Fuller practice: Fill the time you'd spend thinking about them with something that builds your life", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"love-proximity\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:love-proximity:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 185};
 MATCH (o:SkillOption {id: "opposite_action:size:love-proximity:bigger"}), (c:ActionUrge {id: "love-proximity"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:love-idealize:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-idealize:small", label: "Write down one realistic negative", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"love-idealize\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-idealize:small", label: "A small start: Write down one realistic negative", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"love-idealize\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:love-idealize:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 186};
 MATCH (o:SkillOption {id: "opposite_action:size:love-idealize:small"}), (c:ActionUrge {id: "love-idealize"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:love-idealize:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-idealize:medium", label: "Write the full honest picture — good and bad", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"love-idealize\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-idealize:medium", label: "A little further: Write the full honest picture — good and bad", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"love-idealize\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:love-idealize:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 187};
 MATCH (o:SkillOption {id: "opposite_action:size:love-idealize:medium"}), (c:ActionUrge {id: "love-idealize"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:love-idealize:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-idealize:bigger", label: "Talk to a friend about the reality, not the fantasy", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"love-idealize\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "love-idealize:bigger", label: "Fuller practice: Talk to a friend about the reality, not the fantasy", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"love-idealize\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:love-idealize:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 188};
 MATCH (o:SkillOption {id: "opposite_action:size:love-idealize:bigger"}), (c:ActionUrge {id: "love-idealize"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:text-again:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "text-again:small", label: "Write it in your notes, not to them", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"text-again\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "text-again:small", label: "A small start: Write it in your notes, not to them", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"text-again\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:text-again:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 189};
 MATCH (o:SkillOption {id: "opposite_action:size:text-again:small"}), (c:ActionUrge {id: "text-again"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:text-again:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "text-again:medium", label: "Put the phone in another room for an hour, then decide", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"text-again\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "text-again:medium", label: "A little further: Put the phone in another room for an hour, then decide", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"text-again\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:text-again:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 190};
 MATCH (o:SkillOption {id: "opposite_action:size:text-again:medium"}), (c:ActionUrge {id: "text-again"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:text-again:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "text-again:bigger", label: "Leave it unsent today and do something that needs your hands", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"text-again\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "text-again:bigger", label: "Fuller practice: Leave it unsent today and do something that needs your hands", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"text-again\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:text-again:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 191};
 MATCH (o:SkillOption {id: "opposite_action:size:text-again:bigger"}), (c:ActionUrge {id: "text-again"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:love:small"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "love:small", label: "Write what you want to say, and don't send it", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"love\", \"size\": \"small\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "love:small", label: "A small start: Write what you want to say, and don't send it", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"love\", \"size\": \"small\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:love:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 192};
 MERGE (o:SkillOption {id: "opposite_action:size:love:medium"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "love:medium", label: "Put your phone away and do something that requires your full attention", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"love\", \"size\": \"medium\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "love:medium", label: "A little further: Put your phone away and do something that requires your full attention", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"love\", \"size\": \"medium\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:love:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 193};
 MERGE (o:SkillOption {id: "opposite_action:size:love:bigger"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "love:bigger", label: "Go no-contact and fill the space with something that builds YOUR life", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"love\", \"size\": \"bigger\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "love:bigger", label: "Fuller practice: Go no-contact and fill the space with something that builds YOUR life", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"love\", \"size\": \"bigger\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:love:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 194};
 MERGE (o:SkillOption {id: "opposite_action:size:sad-bed:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-bed:small", label: "Sit up and open the blinds", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"sad-bed\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-bed:small", label: "A small start: Sit up and open the blinds", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"sad-bed\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:sad-bed:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 195};
 MATCH (o:SkillOption {id: "opposite_action:size:sad-bed:small"}), (c:ActionUrge {id: "sad-bed"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:sad-bed:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-bed:medium", label: "Take a shower and get dressed", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"sad-bed\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-bed:medium", label: "A little further: Take a shower and get dressed", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"sad-bed\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:sad-bed:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 196};
 MATCH (o:SkillOption {id: "opposite_action:size:sad-bed:medium"}), (c:ActionUrge {id: "sad-bed"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:sad-bed:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-bed:bigger", label: "Go for a 10-minute walk outside", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"sad-bed\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-bed:bigger", label: "Fuller practice: Go for a 10-minute walk outside", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"sad-bed\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:sad-bed:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 197};
 MATCH (o:SkillOption {id: "opposite_action:size:sad-bed:bigger"}), (c:ActionUrge {id: "sad-bed"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:sad-isolate:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-isolate:small", label: "Text one person back", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"sad-isolate\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-isolate:small", label: "A small start: Text one person back", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"sad-isolate\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:sad-isolate:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 198};
 MATCH (o:SkillOption {id: "opposite_action:size:sad-isolate:small"}), (c:ActionUrge {id: "sad-isolate"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:sad-isolate:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-isolate:medium", label: "Keep one plan today", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"sad-isolate\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-isolate:medium", label: "A little further: Keep one plan today", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"sad-isolate\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:sad-isolate:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 199};
 MATCH (o:SkillOption {id: "opposite_action:size:sad-isolate:medium"}), (c:ActionUrge {id: "sad-isolate"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:sad-isolate:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-isolate:bigger", label: "Call someone and talk for 5 minutes", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"sad-isolate\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-isolate:bigger", label: "Fuller practice: Call someone and talk for 5 minutes", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"sad-isolate\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:sad-isolate:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 200};
 MATCH (o:SkillOption {id: "opposite_action:size:sad-isolate:bigger"}), (c:ActionUrge {id: "sad-isolate"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:sad-give-up:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-give-up:small", label: "Do the tiniest next step — open the file, write one sentence", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"sad-give-up\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-give-up:small", label: "A small start: Do the tiniest next step — open the file, write one sentence", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"sad-give-up\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:sad-give-up:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 201};
 MATCH (o:SkillOption {id: "opposite_action:size:sad-give-up:small"}), (c:ActionUrge {id: "sad-give-up"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:sad-give-up:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-give-up:medium", label: "Work on it for 10 minutes, then stop if you need to", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"sad-give-up\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-give-up:medium", label: "A little further: Work on it for 10 minutes, then stop if you need to", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"sad-give-up\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:sad-give-up:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 202};
 MATCH (o:SkillOption {id: "opposite_action:size:sad-give-up:medium"}), (c:ActionUrge {id: "sad-give-up"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:sad-give-up:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-give-up:bigger", label: "Complete one meaningful piece of it", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"sad-give-up\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-give-up:bigger", label: "Fuller practice: Complete one meaningful piece of it", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"sad-give-up\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:sad-give-up:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 203};
 MATCH (o:SkillOption {id: "opposite_action:size:sad-give-up:bigger"}), (c:ActionUrge {id: "sad-give-up"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:sad-scroll:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-scroll:small", label: "Put the phone in another room for 15 minutes", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"sad-scroll\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-scroll:small", label: "A small start: Put the phone in another room for 15 minutes", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"sad-scroll\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:sad-scroll:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 204};
 MATCH (o:SkillOption {id: "opposite_action:size:sad-scroll:small"}), (c:ActionUrge {id: "sad-scroll"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:sad-scroll:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-scroll:medium", label: "Do one small task you've been putting off", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"sad-scroll\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-scroll:medium", label: "A little further: Do one small task you've been putting off", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"sad-scroll\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:sad-scroll:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 205};
 MATCH (o:SkillOption {id: "opposite_action:size:sad-scroll:medium"}), (c:ActionUrge {id: "sad-scroll"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:sad-scroll:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-scroll:bigger", label: "Spend 30 minutes doing something that requires your full attention", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"sad-scroll\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "sad-scroll:bigger", label: "Fuller practice: Spend 30 minutes doing something that requires your full attention", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"sad-scroll\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:sad-scroll:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 206};
 MATCH (o:SkillOption {id: "opposite_action:size:sad-scroll:bigger"}), (c:ActionUrge {id: "sad-scroll"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:pull-away:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "pull-away:small", label: "Send one ordinary message back", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"pull-away\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "pull-away:small", label: "A small start: Send one ordinary message back", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"pull-away\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:pull-away:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 207};
 MATCH (o:SkillOption {id: "opposite_action:size:pull-away:small"}), (c:ActionUrge {id: "pull-away"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:pull-away:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "pull-away:medium", label: "Keep one plan with them", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"pull-away\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "pull-away:medium", label: "A little further: Keep one plan with them", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"pull-away\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:pull-away:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 208};
 MATCH (o:SkillOption {id: "opposite_action:size:pull-away:medium"}), (c:ActionUrge {id: "pull-away"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:pull-away:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "pull-away:bigger", label: "If they are safe to tell, tell them a little of what has been going on", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"pull-away\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "pull-away:bigger", label: "Fuller practice: If they are safe to tell, tell them a little of what has been going on", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"pull-away\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:pull-away:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 209};
 MATCH (o:SkillOption {id: "opposite_action:size:pull-away:bigger"}), (c:ActionUrge {id: "pull-away"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:go-quiet:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "go-quiet:small", label: "Send one line: I need a minute, I'll come back to this", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"go-quiet\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "go-quiet:small", label: "A small start: Send one line: I need a minute, I'll come back to this", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"go-quiet\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:go-quiet:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 210};
 MATCH (o:SkillOption {id: "opposite_action:size:go-quiet:small"}), (c:ActionUrge {id: "go-quiet"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:go-quiet:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "go-quiet:medium", label: "Come back to it later today, as you said", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"go-quiet\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "go-quiet:medium", label: "A little further: Come back to it later today, as you said", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"go-quiet\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:go-quiet:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 211};
 MATCH (o:SkillOption {id: "opposite_action:size:go-quiet:medium"}), (c:ActionUrge {id: "go-quiet"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:go-quiet:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "go-quiet:bigger", label: "If they are safe to tell, say plainly what upset you", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"go-quiet\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "go-quiet:bigger", label: "Fuller practice: If they are safe to tell, say plainly what upset you", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"go-quiet\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:go-quiet:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 212};
 MATCH (o:SkillOption {id: "opposite_action:size:go-quiet:bigger"}), (c:ActionUrge {id: "go-quiet"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:sadness:small"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "sadness:small", label: "Do one tiny thing — sit up, open the blinds, send one text", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"sadness\", \"size\": \"small\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "sadness:small", label: "A small start: Do one tiny thing — sit up, open the blinds, send one text", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"sadness\", \"size\": \"small\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:sadness:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 213};
 MERGE (o:SkillOption {id: "opposite_action:size:sadness:medium"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "sadness:medium", label: "Get up and do something active for 10 minutes", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"sadness\", \"size\": \"medium\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "sadness:medium", label: "A little further: Get up and do something active for 10 minutes", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"sadness\", \"size\": \"medium\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:sadness:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 214};
 MERGE (o:SkillOption {id: "opposite_action:size:sadness:bigger"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "sadness:bigger", label: "Go be around people, even if you don't feel like it", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"sadness\", \"size\": \"bigger\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "sadness:bigger", label: "Fuller practice: Go be around people, even if you don't feel like it", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"sadness\", \"size\": \"bigger\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:sadness:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 215};
 MERGE (o:SkillOption {id: "opposite_action:size:shame-hide:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-hide:small", label: "Stay where you are instead of leaving", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"shame-hide\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-hide:small", label: "A small start: Stay where you are instead of leaving", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"shame-hide\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:shame-hide:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 216};
 MATCH (o:SkillOption {id: "opposite_action:size:shame-hide:small"}), (c:ActionUrge {id: "shame-hide"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:shame-hide:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-hide:medium", label: "Make eye contact with one person", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"shame-hide\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-hide:medium", label: "A little further: Make eye contact with one person", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"shame-hide\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:shame-hide:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 217};
 MATCH (o:SkillOption {id: "opposite_action:size:shame-hide:medium"}), (c:ActionUrge {id: "shame-hide"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:shame-hide:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-hide:bigger", label: "Stand tall, shoulders back, and take up space", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"shame-hide\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-hide:bigger", label: "Fuller practice: Stand tall, shoulders back, and take up space", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"shame-hide\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:shame-hide:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 218};
 MATCH (o:SkillOption {id: "opposite_action:size:shame-hide:bigger"}), (c:ActionUrge {id: "shame-hide"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:shame-secret:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-secret:small", label: "Write it down, even if it's only for yourself", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"shame-secret\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-secret:small", label: "A small start: Write it down, even if it's only for yourself", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"shame-secret\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:shame-secret:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 219};
 MATCH (o:SkillOption {id: "opposite_action:size:shame-secret:small"}), (c:ActionUrge {id: "shame-secret"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:shame-secret:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-secret:medium", label: "Tell one trusted person a small piece of it", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"shame-secret\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-secret:medium", label: "A little further: Tell one trusted person a small piece of it", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"shame-secret\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:shame-secret:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 220};
 MATCH (o:SkillOption {id: "opposite_action:size:shame-secret:medium"}), (c:ActionUrge {id: "shame-secret"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:shame-secret:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-secret:bigger", label: "Share openly with someone you trust, looking them in the eye", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"shame-secret\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-secret:bigger", label: "Fuller practice: Share openly with someone you trust, looking them in the eye", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"shame-secret\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:shame-secret:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 221};
 MATCH (o:SkillOption {id: "opposite_action:size:shame-secret:bigger"}), (c:ActionUrge {id: "shame-secret"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:shame-shrink:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-shrink:small", label: "Uncross your arms and take up your normal space", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"shame-shrink\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-shrink:small", label: "A small start: Uncross your arms and take up your normal space", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"shame-shrink\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:shame-shrink:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 222};
 MATCH (o:SkillOption {id: "opposite_action:size:shame-shrink:small"}), (c:ActionUrge {id: "shame-shrink"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:shame-shrink:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-shrink:medium", label: "Speak at your normal volume — don't mumble or trail off", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"shame-shrink\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-shrink:medium", label: "A little further: Speak at your normal volume — don't mumble or trail off", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"shame-shrink\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:shame-shrink:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 223};
 MATCH (o:SkillOption {id: "opposite_action:size:shame-shrink:medium"}), (c:ActionUrge {id: "shame-shrink"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:shame-shrink:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-shrink:bigger", label: "Share your opinion or ask for what you need out loud", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"shame-shrink\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-shrink:bigger", label: "Fuller practice: Share your opinion or ask for what you need out loud", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"shame-shrink\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:shame-shrink:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 224};
 MATCH (o:SkillOption {id: "opposite_action:size:shame-shrink:bigger"}), (c:ActionUrge {id: "shame-shrink"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:shame-avoid-people:small"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-avoid-people:small", label: "Don't cancel your next social plan", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"shame-avoid-people\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-avoid-people:small", label: "A small start: Don't cancel your next social plan", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"small\", \"urgeFor\": \"shame-avoid-people\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:shame-avoid-people:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 225};
 MATCH (o:SkillOption {id: "opposite_action:size:shame-avoid-people:small"}), (c:ActionUrge {id: "shame-avoid-people"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:shame-avoid-people:medium"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-avoid-people:medium", label: "Go where people are, even briefly", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"shame-avoid-people\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-avoid-people:medium", label: "A little further: Go where people are, even briefly", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"medium\", \"urgeFor\": \"shame-avoid-people\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:shame-avoid-people:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 226};
 MATCH (o:SkillOption {id: "opposite_action:size:shame-avoid-people:medium"}), (c:ActionUrge {id: "shame-avoid-people"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:shame-avoid-people:bigger"})
-SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-avoid-people:bigger", label: "Initiate contact with someone — text, call, or show up", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"shame-avoid-people\"}";
+SET o:SkillOption, o += {skillId: "opposite_action", list: "size", value: "shame-avoid-people:bigger", label: "Fuller practice: Initiate contact with someone — text, call, or show up", version: "oa-skill-v1"}, o.propsJson = "{\"size\": \"bigger\", \"urgeFor\": \"shame-avoid-people\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:shame-avoid-people:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 227};
 MATCH (o:SkillOption {id: "opposite_action:size:shame-avoid-people:bigger"}), (c:ActionUrge {id: "shame-avoid-people"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "opposite_action:size:shame:small"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "shame:small", label: "Stay where you are instead of leaving", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"shame\", \"size\": \"small\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "shame:small", label: "A small start: Stay where you are instead of leaving", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"shame\", \"size\": \"small\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:shame:small"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 228};
 MERGE (o:SkillOption {id: "opposite_action:size:shame:medium"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "shame:medium", label: "Make eye contact and speak at your normal volume", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"shame\", \"size\": \"medium\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "shame:medium", label: "A little further: Make eye contact and speak at your normal volume", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"shame\", \"size\": \"medium\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:shame:medium"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 229};
 MERGE (o:SkillOption {id: "opposite_action:size:shame:bigger"})
-SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "shame:bigger", label: "Tell someone you trust what happened, with your head held high", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"shame\", \"size\": \"bigger\"}";
+SET o:SkillOption:OppositeDefault, o += {skillId: "opposite_action", list: "size", value: "shame:bigger", label: "Fuller practice: Tell someone you trust what happened, with your head held high", version: "oa-skill-v1"}, o.propsJson = "{\"parent\": \"shame\", \"size\": \"bigger\"}";
 MATCH (s:Skill {id: "opposite_action"}), (o:SkillOption {id: "opposite_action:size:shame:bigger"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "size", order: 230};

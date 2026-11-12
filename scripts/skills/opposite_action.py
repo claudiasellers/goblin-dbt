@@ -79,13 +79,17 @@ COPY = {
     # Per feeling.
     "urge_q": "What is it pushing you to do?",
     "urge_own": "In my own words",
-    "want_title": "Do you want to turn {each} down?",
+    "carry_on": "Carry on with the next feeling",
+    "pick_of": "{n} of {count}",
     "want_yes": "Yes, turn it down",
     "want_not_sure": "Not sure",
     "want_no": "No, I want to keep it",
     "keep_title": "Some feelings are worth keeping",
+    # *Punish yourself*: never "worth keeping" or "acting on it" (Gate 3). The crisis banner stays on screen.
+    "pun_title": "The pull to punish yourself deserves care",
+    "pun_line": "You don't have to act on it. If something needs making right, there are kinder ways to do it.",
     "keep_line": "Want help acting on it well?",
-    "fits_title": "Does {each} fit the facts?",
+
     "help_title_any": "If you follow this urge, will it help?",
     "clar_title": "It may be serving a different goal",
     "clar_line": "The facts are worth a closer look before you act either way.",
@@ -96,12 +100,12 @@ COPY = {
     "repr_title": "When guilt or shame fits, repair is the opposite of hiding",
     "repr_line": "Owning it and making it right is the skill here.",
     "cue_title": "Let your body go first",
-    "cue_hint": "Pick one to try now",
+    "cue_hint": "Pick one to try now, or go on without one",
     "hold_label": "Hold",
     "hold_running": "Stay with it",
     "hold_hint": "Press and hold while you do it",
-    "after_body_title": "The pull to {urge}, compared with before?",
-    "size_title": "Pick a step for {each}",
+    "after_body_title": "After that, the pull is…",
+
     "size_own": "My own step",
     # Once, after every feeling.
     "pred_title": "If you do it, what do you expect?",
@@ -131,9 +135,29 @@ COPY = {
     "miss_strong": "When the urge is that strong, waiting it out comes first.",
     "end_line": "Done for now.",
 }
-# The validation line is the parent's own acknowledgment (the graph's words, read at build).
+# The validation line is the first sentence of the parent's own acknowledgment (the graph's words, read at build): a
+# title stays a line (≤ 90 characters), and the rest of it makes claims a title shouldn't (Gate 3).
+def _first_sentence(text):
+    first = (text or "").split(". ")[0].rstrip(".")
+    return f"{first}." if first and len(first) < 90 else None
+
+
 for pid in PARENTS:
-    COPY[f"ack_{pid}"] = C["parents"][pid]["acknowledgment"] or COPY["urge_q"]
+    COPY[f"ack_{pid}"] = _first_sentence(C["parents"][pid]["acknowledgment"]) or COPY["urge_q"]
+# Per-feeling titles name the feeling by its DBT parent ("the fear"), never the grid word ("Does fearful fit…", Gate 2).
+NOUN = {"anger": "the anger", "disgust": "the disgust", "envy": "the envy", "fear": "the fear", "guilt": "the guilt",
+        "jealousy": "the jealousy", "love": "the love", "sadness": "the sadness", "shame": "the shame"}
+for pid in PARENTS:
+    n = NOUN.get(pid, "this feeling")
+    COPY[f"want_title_{pid}"] = f"Do you want to turn {n} down?"
+    COPY[f"fits_title_{pid}"] = f"Does {n} fit the facts?"
+    COPY[f"size_title_{pid}"] = f"Pick a step for {n}"
+COPY.update({"want_title": "Do you want to turn this feeling down?", "fits_title": "Does this feeling fit the facts?",
+             "size_title": "Pick a step for this feeling"})
+
+
+def by_parent(key):
+    return [{"when": {"eq": ["$d.parent", pid]}, "key": f"{key}_{pid}"} for pid in PARENTS] + [{"key": key}]
 
 GOALS = [(c["id"], c["label"]) for c in CH["goal"]]
 # How the goal reads inside "will it help you {goal}?".
@@ -153,10 +177,17 @@ PREDICT = [("badly", "It'll go badly"), ("worse", "I'll feel worse"), ("react", 
            ("nothing", "Nothing much"), ("not_sure", "Not sure")]
 ACTUAL = [("badly", "It went badly"), ("worse", "I felt worse"), ("react", "They reacted badly"),
           ("nothing", "Nothing much"), ("better", "It went better than I thought")]
+# The size names the hand-built page showed (the flow's copy), ahead of each step (Gate 2).
+SIZE_NAME = {"small": C["flow"]["copy"]["sizeSmall"], "medium": C["flow"]["copy"]["sizeMedium"], "bigger": C["flow"]["copy"]["sizeBigger"]}
 TVN = [("worse", "Stronger"), ("same", "About the same"), ("better", "A bit weaker"), ("much_better", "Much weaker")]
 
 # The route after *will it help?*, one feeling at a time. Repair first (guilt or shame that fits, goal repair harm: H11),
 # then the graph's table for a safe answer (danger, a boundary and not sure never reach this step).
+# *Punish yourself* can mean self-harm (#89's gates): its pick opens safety.open over the next screen (C6.5), and the
+# crisis banner stays on that feeling's screens after it.
+PUNISH = EQ("urge", "guilt-punish")
+# The prediction gap reads only when it went well: "It didn't" never answers "It went badly" (Gate 3).
+WENT_WELL = {"in": [a("actual"), ["nothing", "better"]]}
 ROUTE_STEP = {"opposite": "cue", "clarify": "clar", "problem": "prob"}
 REPAIR = {"all": [{"in": ["$d.parent", ["guilt", "shame"]]}, EQ("fits", "fits"), EQ("goal", "repair")]}
 def _route_to(step):
@@ -165,7 +196,8 @@ def _route_to(step):
 
 
 # One jump per target (NEXT is one edge per step pair); clarify is the table's rest and the fallback.
-HELP_NEXT = [{"when": REPAIR, "to": "repr"}, {"when": _route_to("prob"), "to": "prob"},
+HELP_NEXT = [{"when": REPAIR, "to": "repr"}, {"when": {"all": [PUNISH, _route_to("prob")]}, "to": "pun"},
+             {"when": _route_to("prob"), "to": "prob"},
              {"when": _route_to("cue"), "to": "cue"}, {"to": "clar"}]
 
 URGE_WHERE = {"has": ["$opt.parents", "$d.parent"]}
@@ -175,16 +207,16 @@ CUE_WHERE = {"any": [{"has": ["$opt.urges", a("urge")]},
 # A step: the urge's graduated opposites, or the parent's defaults for an urge in your own words.
 SIZE_WHERE = {"any": [{"all": [{"in": [a("urge"), URGE_IDS]}, {"eq": ["$opt.urgeFor", a("urge")]}]},
                       {"all": [{"not": {"in": [a("urge"), URGE_IDS]}}, {"eq": ["$opt.parent", "$d.parent"]}]}]}
-# *Punish yourself* can mean self-harm (#89's gates): its pick opens safety.open over the next screen (C6.5), and the
-# crisis banner stays on that feeling's screens after it.
-PUNISH = EQ("urge", "guilt-punish")
 PUNISH_CRISIS = [{"variant": "crisis", "when": PUNISH}]
 DANGER_CRISIS = [{"variant": "other_person", "when": {"in": [a("safety"), ["danger", "unsure"]]}}]
 SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
 
 
-def handoff(step_id, title, lines, offers, each=True, crisis=None):
+def handoff(step_id, title, lines, offers, each=True, crisis=None, no_close=False):
     s = {"id": step_id, "kind": "handoff", "title": title, "lines": lines, "offers": offers, "done": "done", "next": []}
+    if no_close:
+        # A safety hand-off: no skill was done, so no "did it help?" after it (Gate 1).
+        s.update({"complete": True, "noClose": True})
     if each:
         s.update({"each": "feel", "carryOn": "pred"})
     crisis = crisis or (PUNISH_CRISIS if each else None)
@@ -207,21 +239,24 @@ STEPS = [
         "next": [{"to": "goal"}],
     },
     {
-        "id": "goal", "kind": "ask", "title": "goal_title", "crisis": DANGER_CRISIS,
-        "fields": [
-            {"id": "goal", "options": {"list": "goal"}, "max": 1, "required": True},
-            {"id": "safety", "label": "safety_label", "options": {"list": "safety"}, "max": 1, "required": True},
-        ],
+        "id": "goal", "kind": "ask", "title": "goal_title",
+        "fields": [{"id": "goal", "options": {"list": "goal"}, "max": 1, "required": True}],
+        "next": [{"to": "safe"}],
+    },
+    {
+        # One question per screen (Gate 2): the safety split on its own, the slot right under its four chips.
+        "id": "safe", "kind": "ask", "title": "safety_label", "crisis": DANGER_CRISIS,
+        "fields": [{"id": "safety", "options": {"list": "safety"}, "max": 1, "required": True}],
         "next": [{"when": EQ("safety", "danger"), "to": "dang"}, {"when": EQ("safety", "boundary"), "to": "bnd"},
                  {"when": EQ("safety", "unsure"), "to": "uns"}, {"to": "vald"}],
     },
     handoff("dang", "danger_title", [{"when": ALWAYS, "key": "danger_line"}],
-            [{"exit": "ending", "when": ALWAYS}, {"exit": "pause", "when": ALWAYS}], each=False, crisis=DANGER_CRISIS),
+            [{"exit": "ending", "when": ALWAYS}, {"exit": "pause", "when": ALWAYS}], each=False, crisis=DANGER_CRISIS, no_close=True),
     handoff("bnd", "boundary_title", [{"when": ALWAYS, "key": "boundary_line"}],
             [{"exit": "fast", "when": ALWAYS}, {"exit": "dear_man", "when": ALWAYS}, {"exit": "pause", "when": ALWAYS}],
-            each=False),
+            each=False, no_close=True),
     handoff("uns", "unsure_title", [{"when": ALWAYS, "key": "unsure_line"}],
-            [{"exit": "pause", "when": ALWAYS}, {"exit": "ending", "when": ALWAYS}], each=False, crisis=DANGER_CRISIS),
+            [{"exit": "pause", "when": ALWAYS}, {"exit": "ending", "when": ALWAYS}], each=False, crisis=DANGER_CRISIS, no_close=True),
     {
         # Validation first (ER-03 item 1): the parent's acknowledgment is the screen's title, then the urge.
         "id": "vald", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS,
@@ -231,16 +266,17 @@ STEPS = [
         "next": [{"to": "want"}],
     },
     {
-        "id": "want", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "safetyFirst": PUNISH, "title": "want_title",
+        "id": "want", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "safetyFirst": PUNISH, "title": by_parent("want_title"),
         "fields": [{"id": "want", "options": {"list": "want"}, "max": 1, "required": True}],
-        "next": [{"when": EQ("want", "no"), "to": "keep"}, {"to": "fits"}],
+        "next": [{"when": {"all": [PUNISH, EQ("want", "no")]}, "to": "pun"}, {"when": EQ("want", "no"), "to": "keep"},
+                 {"to": "fits"}],
     },
     handoff("keep", "keep_title", [{"when": ALWAYS, "key": "keep_line"}],
             [{"exit": "problem_solve", "when": ALWAYS}, {"exit": "dear_man", "when": ALWAYS},
              {"exit": "ride", "when": ALWAYS}]),
     {
         # The parent's fit statements above the verdict (Check the Facts' list); the full check is a quiet link.
-        "id": "fits", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "title": "fits_title",
+        "id": "fits", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "title": by_parent("fits_title"),
         "fields": [{"id": "fits", "options": {"list": "fits"}, "max": 1, "required": True,
                     "list": {"table": "fitsWhen", "key": "$d.fitsParent"},
                     "links": [{"exit": "check_the_facts", "label": "check_link", "when": ALWAYS}]}],
@@ -259,11 +295,15 @@ STEPS = [
     handoff("prob", "prob_title",
             [{"when": EQ("fits", "excessive"), "key": "prob_excessive"}, {"when": {"not": EQ("fits", "excessive")}, "key": "prob_line"}],
             [{"exit": "cool_down", "when": EQ("fits", "excessive")}, {"exit": "problem_solve", "when": ALWAYS}]),
+    # *Punish yourself*, kept or "helpful": a kinder way to make it right, or riding the urge out; never a plan for it.
+    handoff("pun", "pun_title", [{"when": ALWAYS, "key": "pun_line"}],
+            [{"exit": "problem_solve", "when": ALWAYS}, {"exit": "ride", "when": ALWAYS}]),
     handoff("repr", "repr_title", [{"when": ALWAYS, "key": "repr_line"}], [{"exit": "problem_solve", "when": ALWAYS}]),
     {
         "id": "cue", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "title": "cue_title", "hint": "cue_hint",
-        "fields": [{"id": "cue", "options": {"list": "cue", "where": CUE_WHERE}, "max": 1, "required": True}],
-        "next": [{"to": "hold"}],
+        # Optional (the hand-built page's *None of these work for me*): no cue, no hold, straight to the step.
+        "fields": [{"id": "cue", "options": {"list": "cue", "where": CUE_WHERE}, "max": 1}],
+        "next": [{"when": {"set": a("cue")}, "to": "hold"}, {"to": "size"}],
     },
     {
         "id": "hold", "kind": "embed", "embed": "holdRing", "each": "feel", "crisis": PUNISH_CRISIS, "title": "hold_title",
@@ -274,12 +314,11 @@ STEPS = [
     },
     {
         "id": "aftb", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "title": "after_body_title",
-        "titleSlots": {"urge": {"labelOf": "urge"}},
         "fields": [{"id": "tvnb", "options": {"list": "tvn"}, "max": 1, "required": True, "askFresh": "thenVsNow"}],
         "next": [{"to": "size"}],
     },
     {
-        "id": "size", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "title": "size_title",
+        "id": "size", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "title": by_parent("size_title"),
         "fields": [{"id": "size", "options": {"list": "size", "where": SIZE_WHERE}, "max": 1, "required": True,
                     "own": {"hint": "size_own", "countsAsPick": True, "max": OWN_MAX}}],
         "next": [{"to": "pred"}],
@@ -290,7 +329,7 @@ STEPS = [
         "next": [{"to": "when"}],
     },
     {
-        "id": "when", "kind": "ask", "title": "when_title",
+        "id": "when", "kind": "ask", "title": "when_title", "slots": [{"after": "$title", "embed": "oaSteps", "showWhen": ALWAYS, "record": "steps"}],
         "fields": [
             {"id": "when", "options": {"list": "when"}, "max": 1, "required": True},
             {"id": "due", "label": "due_label", "options": {"list": "due"}, "max": 1,
@@ -301,16 +340,25 @@ STEPS = [
         "next": [{"when": EQ("when", "now"), "to": "try"}, {"to": "plan"}],
     },
     {
-        "id": "try", "kind": "ask", "title": "try_title", "hint": "try_hint", "primary": "tried",
+        "id": "try", "kind": "ask", "title": "try_title", "hint": "try_hint", "primary": "tried", "slots": [{"after": "$title", "embed": "oaSteps", "showWhen": ALWAYS, "record": "steps"}],
         "next": [{"to": "aftr"}],
     },
     {
+        # One question per screen (Gate 2): what happened (the slot right under it), what actually happened, the pull.
         "id": "aftr", "kind": "ask", "title": "after_title",
-        "fields": [
-            {"id": "outcome", "options": {"list": "outcome"}, "max": 1, "required": True},
-            {"id": "actual", "label": "actual_label", "options": {"list": "actual"}, "max": 1},
-            {"id": "tvna", "label": "tvn_label", "options": {"list": "tvn"}, "max": 1, "required": True, "askFresh": "thenVsNow"},
-        ],
+        "fields": [{"id": "outcome", "options": {"list": "outcome"}, "max": 1, "required": True}],
+        "crisis": [{"variant": "other_person", "when": EQ("outcome", "unsafe")}],
+        "next": [{"to": "act"}],
+    },
+    {
+        "id": "act", "kind": "ask", "title": "actual_label",
+        "fields": [{"id": "actual", "options": {"list": "actual"}, "max": 1}],
+        "crisis": [{"variant": "other_person", "when": EQ("outcome", "unsafe")}],
+        "next": [{"to": "tvna"}],
+    },
+    {
+        "id": "tvna", "kind": "ask", "title": "tvn_label",
+        "fields": [{"id": "tvna", "options": {"list": "tvn"}, "max": 1, "required": True, "askFresh": "thenVsNow"}],
         "crisis": [{"variant": "other_person", "when": EQ("outcome", "unsafe")}],
         "next": [{"to": "read"}],
     },
@@ -320,9 +368,9 @@ STEPS = [
         "crisis": [{"variant": "other_person", "when": EQ("outcome", "unsafe")}],
         # One line shows (the first that holds): the prediction gap when there is one, then what was tried, then the pull.
         "lines": [
-            {"when": {"all": [EQ("predict", "badly"), {"not": EQ("actual", "badly")}, {"set": a("actual")}]}, "key": "read_gap"},
-            {"when": {"all": [EQ("predict", "worse"), {"not": EQ("actual", "worse")}, {"set": a("actual")}]}, "key": "read_worse_gap"},
-            {"when": {"all": [EQ("predict", "react"), {"not": EQ("actual", "react")}, {"set": a("actual")}]}, "key": "read_react_gap"},
+            {"when": {"all": [EQ("predict", "badly"), WENT_WELL]}, "key": "read_gap"},
+            {"when": {"all": [EQ("predict", "worse"), WENT_WELL]}, "key": "read_worse_gap"},
+            {"when": {"all": [EQ("predict", "react"), WENT_WELL]}, "key": "read_react_gap"},
             {"when": EQ("outcome", "partial"), "key": "read_part"},
             {"when": EQ("outcome", "unclear"), "key": "read_unclear"},
             {"when": {"in": [a("tvna"), ["better", "much_better"]]}, "key": "read_down"},
@@ -341,7 +389,7 @@ STEPS = [
         # The oa_try card's link reopens the run here, on a run that reached the plan card. The plan stays; what
         # happened is asked fresh (a second reopen doesn't read the last answers back).
         "id": "back", "kind": "ask", "reopens": {"after": "when"}, "clears": ["tried", "outcome", "actual"],
-        "title": "back_title",
+        "title": "back_title", "slots": [{"after": "$title", "embed": "oaSteps", "showWhen": ALWAYS, "record": "steps"}],
         "fields": [{"id": "tried", "options": {"list": "tried"}, "max": 1, "required": True}],
         "next": [{"when": EQ("tried", "yes"), "to": "aft2"}, {"to": "miss"}],
     },
@@ -349,10 +397,13 @@ STEPS = [
         # What happened, on a later day: the same two questions without the pull (a reopened run reads nothing
         # ask-fresh; the pull then was another moment's).
         "id": "aft2", "kind": "ask", "title": "after_title",
-        "fields": [
-            {"id": "outcome", "options": {"list": "outcome"}, "max": 1, "required": True},
-            {"id": "actual", "label": "actual_label", "options": {"list": "actual"}, "max": 1},
-        ],
+        "fields": [{"id": "outcome", "options": {"list": "outcome"}, "max": 1, "required": True}],
+        "crisis": [{"variant": "other_person", "when": EQ("outcome", "unsafe")}],
+        "next": [{"to": "act2"}],
+    },
+    {
+        "id": "act2", "kind": "ask", "title": "actual_label",
+        "fields": [{"id": "actual", "options": {"list": "actual"}, "max": 1}],
         "crisis": [{"variant": "other_person", "when": EQ("outcome", "unsafe")}],
         "next": [{"to": "read2"}],
     },
@@ -360,9 +411,9 @@ STEPS = [
         "id": "read2", "kind": "handoff", "complete": True, "noClose": True, "title": "read_title",
         "crisis": [{"variant": "other_person", "when": EQ("outcome", "unsafe")}],
         "lines": [
-            {"when": {"all": [EQ("predict", "badly"), {"not": EQ("actual", "badly")}, {"set": a("actual")}]}, "key": "read_gap"},
-            {"when": {"all": [EQ("predict", "worse"), {"not": EQ("actual", "worse")}, {"set": a("actual")}]}, "key": "read_worse_gap"},
-            {"when": {"all": [EQ("predict", "react"), {"not": EQ("actual", "react")}, {"set": a("actual")}]}, "key": "read_react_gap"},
+            {"when": {"all": [EQ("predict", "badly"), WENT_WELL]}, "key": "read_gap"},
+            {"when": {"all": [EQ("predict", "worse"), WENT_WELL]}, "key": "read_worse_gap"},
+            {"when": {"all": [EQ("predict", "react"), WENT_WELL]}, "key": "read_react_gap"},
             {"when": EQ("outcome", "partial"), "key": "read_part"},
             {"when": EQ("outcome", "unclear"), "key": "read_unclear"},
             {"key": "read_later"},
@@ -436,10 +487,10 @@ def options():
             done.add(u["id"])
             for size in ("small", "medium", "bigger"):
                 if u[size]:
-                    out.append(("size", f"{u['id']}:{size}", u[size], {"urgeFor": u["id"], "size": size}, ("ActionUrge", u["id"])))
+                    out.append(("size", f"{u['id']}:{size}", f"{SIZE_NAME[size]}: {u[size]}", {"urgeFor": u["id"], "size": size}, ("ActionUrge", u["id"])))
         for size in ("small", "medium", "bigger"):
             if p["defaults"][size]:
-                out.append(("size", f"{pid}:{size}", p["defaults"][size], {"parent": pid, "size": size}, "OppositeDefault"))
+                out.append(("size", f"{pid}:{size}", f"{SIZE_NAME[size]}: {p['defaults'][size]}", {"parent": pid, "size": size}, "OppositeDefault"))
     out += [("predict", v, label, {}, None) for v, label in PREDICT]
     out += [("when", v, label, {}, None) for v, label in WHEN]
     out += [("due", v, label, {}, None) for v, label in DUE]

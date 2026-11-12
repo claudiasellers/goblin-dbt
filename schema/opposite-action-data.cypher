@@ -84,7 +84,7 @@ SET c.fitsFactsGuidance = "If you genuinely violated your own values: apologize 
     c.bodyOpposite = "Stand normally — don't hunch or grovel. Keep a calm, steady voice. Don't wring your hands.",
     c.defaultOppositeSmall = "Notice the self-punishment urge and don't act on it",
     c.defaultOppositeMedium = "Do something neutral instead of punishing yourself",
-    c.defaultOppositeBigger = "Act freely, as if you did nothing wrong — because you didn't";
+    c.defaultOppositeBigger = "Go about your day openly, without hiding or making yourself small";
 
 // --- JEALOUSY ---
 MATCH (c:EmotionRegulationContent {dbtParent: 'jealousy'})
@@ -128,7 +128,7 @@ MATCH (c:EmotionRegulationContent {dbtParent: 'fear'})
 WITH c
 UNWIND [
   {id: "fear-avoid", label: "Avoid it entirely", small: "Stay in the room 2 more minutes", medium: "Approach the thing for 10 minutes, then reassess", bigger: "Do the thing you've been avoiding, start to finish", order: 1},
-  {id: "fear-escape", label: "Run away or escape", small: "Plant your feet and take 3 slow breaths", medium: "Stay until the fear drops one notch", bigger: "Stay until the fear passes on its own", order: 2},
+  {id: "fear-escape", label: "Run away or escape", small: "Plant your feet and take 3 slow breaths", medium: "Stay until the fear drops one notch", bigger: "Stay a while, and let the fear rise and settle", order: 2},
   {id: "fear-cancel", label: "Cancel plans", small: "Don't cancel yet — wait 30 minutes and decide then", medium: "Go, and give yourself permission to leave early", bigger: "Go and stay the whole time", order: 3},
   {id: "fear-freeze", label: "Freeze and do nothing", small: "Move one part of your body — stand up, stretch", medium: "Take one small action related to what you're avoiding", bigger: "Start the task fully, even imperfectly", order: 4}
 ] AS urge
@@ -142,7 +142,7 @@ WITH c
 UNWIND [
   {id: "anger-lash", label: "Lash out or say something cutting", small: "Pause and count to 10 before responding", medium: "Write down what you want to say, then set it aside for an hour", bigger: "Say something kind to the person instead", order: 1},
   {id: "anger-stonewall", label: "Shut someone out", small: "Don't block or unfriend yet. Pause", medium: "Send a brief, neutral message acknowledging them", bigger: "Have an honest, gentle conversation about what happened", order: 2},
-  {id: "anger-destroy", label: "Break or throw something", small: "Squeeze ice in your hands for 30 seconds", medium: "Do 30 jumping jacks or a brisk walk around the block", bigger: "Channel the energy into cleaning, building, or creating something", order: 3},
+  {id: "anger-destroy", label: "Break or throw something", small: "Squeeze a cushion or a stress ball hard for 30 seconds", medium: "Do 30 jumping jacks or a brisk walk around the block", bigger: "Channel the energy into cleaning, building, or creating something", order: 3},
   {id: "anger-criticize", label: "Criticize or blame someone", small: "Pause and name one thing they might be going through", medium: "Ask a genuine question about their perspective", bigger: "Offer an honest compliment or acknowledgment", order: 4}
 ] AS urge
 MERGE (u:ActionUrge {id: urge.id})

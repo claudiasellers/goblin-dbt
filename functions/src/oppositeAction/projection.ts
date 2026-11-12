@@ -92,7 +92,7 @@ export function oaFromRun(run: Record<string, unknown>): OaRun {
 export const repairRule = (parentId: string, facts: string, goal: string | null) =>
   (parentId === 'guilt' || parentId === 'shame') && facts === 'fits' && goal === 'repair';
 
-const CHECK_PICK = `
+export const CHECK_PICK = `
   MATCH (e:Emotion {id: $emotionId})-[:HAS_REGULATION_CONTENT]->(c:EmotionRegulationContent)
   WHERE e.oppositeActionApplicable = true
   MATCH (p:OppositeActionFlow {id: 'opposite_action_flow'})
@@ -100,7 +100,7 @@ const CHECK_PICK = `
   RETURN c.dbtParent AS parentId, urge.id AS urgeId, p.contentJson AS flow
   LIMIT 1`;
 
-const WRITE_PICK = `
+export const WRITE_PICK = `
   MATCH (u:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $tsKey})
   MERGE (s:OppositeActionSession {key: $key})
   ON CREATE SET s:UserData:LogRecord, s.createdAt = datetime(), s.id = $id, s.ownerId = $uid
@@ -121,14 +121,14 @@ const WRITE_PICK = `
   FOREACH (n IN CASE WHEN urge IS NULL THEN [] ELSE [urge] END | MERGE (s)-[:TARGETED_URGE]->(n))`;
 
 /** The first visit's planned records, through the oa_try card that opened this visit (the caller's own only). */
-const FIRST_RECORDS = `
+export const FIRST_RECORDS = `
   MATCH (u:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $tsKey})
   MATCH (ts)-[:RESOLVING]->(:FollowUp {type: 'oa_try'})<-[:SCHEDULED]-(first:ToolSession)<-[:HAS_TOOL_SESSION]-(u)
   MATCH (first)-[:DETAIL]->(s:OppositeActionSession)<-[:COMPLETED_SESSION]-(u)
   WHERE s.schemaVersion = 3 AND s.status IN ['planned', 'missed']
   RETURN s.key AS key, s.dataJson AS dataJson`;
 
-const MOVE_ON = `
+export const MOVE_ON = `
   MATCH (u:User {id: $uid})-[:COMPLETED_SESSION]->(s:OppositeActionSession {key: $key})
   WHERE s.status IN ['planned', 'missed']
   SET s.status = $status, s.outcome = $outcome, s.missedReason = $missedReason, s.dataJson = $dataJson, s.updatedAt = datetime()`;

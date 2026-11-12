@@ -20,23 +20,26 @@ Two PRs:
 
 `scripts/skills/opposite_action.py`, played under the `opposite-action` tool id (`playerTools.ts`). Steps, in order:
 `door` (the `doorPicker` embed: #48's start screen as it is; reports up to three grid words, loudest first) → `calm`
-(a settle hold, only for a carried flooded reading) → `goal` (the goal and the safety split, once) → `dang` / `bnd` /
+(a settle hold, only for a carried flooded reading) → `goal` → `safe` (the goal, then the safety split on its own screen, once) → `dang` / `bnd` /
 `uns` (danger: the `other_person` slot, Ending careful, Hold to wait; a boundary: FAST, DEAR MAN, Hold to wait; not
-sure: the slot and Hold to wait) or, per feeling, `vald` (the parent's acknowledgment as the title, its urges, own
+sure: the slot and Hold to wait) or, per feeling, `vald` (the first sentence of the parent's acknowledgment as the
+title, ≤ 90 characters; its urges, own
 words) → `want` (*No* → `keep`: Problem Solve, DEAR MAN, Ride it out) → `fits` (the parent's fit statements above the
 verdict; *Check the facts properly* quietly) → `help` → the route: `repr` (guilt or shame, fits, goal repair), `prob`
 (fits or too big + helpful; too big offers First, the body first), `cue` (the graph's `opposite`), else `clar` (Check
-the Facts; its own line for doesn't fit + helpful). Each route hand-off offers *Carry on with the others*. On the
+the Facts; its own line for doesn't fit + helpful). Each route hand-off offers *Carry on with the next feeling*; with two or three feelings, every per-feeling screen says which one it is about (the parent's noun in its title, and the player's small *anxious · 1 of 2* header, `pickTrack`). On the
 opposite route: `cue` (the urge's own cues, or the parent's unless the urge replaces them) → `hold` (press and hold the
 cue) → `aftb` (the pull compared with before, `thenVsNow`) → `size` (the urge's three steps, or the parent's defaults
-for an urge in your own words). Then once: `pred` (what you expect, optional) → `when` → `try` → `aftr` (what
-happened, what actually happened, the pull: `thenVsNow`, newest wins) → `read` (one line: the prediction gap first,
-then partial / unclear, then the pull); or `plan`, whose chip books **`oa_try`** (*Did you get to try it?*), which
-reopens the run at `back` → `aft2` / `read2` (no pull asked: a reopened run reads nothing ask-fresh) or `miss` (the
+for an urge in your own words). Then once: `pred` (what you expect, optional) → `when` → `try` → `aftr` → `act` → `tvna` (what
+happened, what actually happened, the pull, one per screen: `thenVsNow`, newest wins) → `read` (one line: the prediction gap first,
+only when it went well (*Nothing much* or *Better than I thought*), then partial / unclear, then the pull); or `plan`, whose chip books **`oa_try`** (*Did you get to try it?*), which
+reopens the run at `back` → `aft2` → `act2` → `read2` (no pull asked: a reopened run reads nothing ask-fresh) or `miss` (the
 reason; too strong offers Hold to wait).
 
 Safety: *Punish yourself* (`guilt-punish`, `danger: self`) opens `safety.open` over `want` (`safetyFirst`) and keeps the
-crisis banner on that feeling's screens; the danger and not-sure answers keep the `other_person` slot; *It felt
+crisis banner on that feeling's screens. Kept (*No, I want to keep it*) or on the `prob` route (fits + helpful), it
+goes to `pun` instead (*The pull to punish yourself deserves care*: Problem Solve or Ride it out, never "worth
+keeping" or a plan to act on it; the banner stays). The danger and not-sure answers keep the `other_person` slot; *It felt
 unsafe* shows it on the readout and offers Hold to wait.
 
 Saved: `ext.run`; close kind `regulation_down` (the in-flow then-vs-now is the close); `urgeIds` are each feeling's urge
@@ -44,7 +47,8 @@ Saved: `ext.run`; close kind `regulation_down` (the in-flow then-vs-now is the c
 **v3** per feeling that reached `size` (ids only: `emotionId`, `parentId`, `urgeId` or `custom`, `actionSize`, `goal`,
 `facts`, `effectiveness`, `cueId`, `outcome`, `predict`, `actual`, `thenVsNowBody`, `status`), `DETAIL` from the visit,
 after re-checking the word (`oppositeActionApplicable`), the urge (its parent's) and the route (the graph's `opposite`,
-not the repair rule) on the server. A reopened visit moves the first visit's records to `practiced` or `missed`. The
+not the repair rule) on the server. A reopened visit moves the first visit's records to `practiced` or `missed`; its rep is off the phone when it was
+tried and none when it wasn't (`OFF_PHONE_SKILLS.opposite_action`), as the hand-built page logged none for a missed plan. The
 parts stats read v3 as they read v2 (`actionSize` in `dataJson`, `TARGETED_URGE`); the hand-built page's lists read v2
 only. With parts on, the close's tag row (`TAG_ROW_TOOLS`, `PROFILE_NEEDS['opposite-action'] = ['parts']`).
 
@@ -52,18 +56,35 @@ Old links: `?followUp=<id>` without `run` (the `oa_plan` cards the hand-built pa
 page (`legacyLink`). **Remove it, and the hand-built page's route, 7 days after this port deploys** (`oa_plan` goes
 stale after 168 h).
 
-Departures from the tables below, each deferred:
+Departures from the tables below. Each says why, and the batch that picks it up (ER-B5 is the ER lane's next
+polish batch, with Check the Facts' inline mini-card; "none" means it stays this way by design):
 
-- No `elsewhere` step: the doors offer only words Do the Opposite works on (#48 says the rest on screen).
-- `flood`: a settle hold before the goal, then the same flow (no small-first size default or deferred fit check yet).
-- `fits`: the fit statements as a list above the verdict, not the `fitStack` card embed.
-- `readout`: a hand-off with one line, not the `urgeReadout` embed; no then-vs-now bar.
+- No `elsewhere` step: the doors offer only words Do the Opposite works on, and #48's start screen says the rest on
+  screen. *None.*
+- `flood`: a settle hold before the goal, then the same flow. The small step is always listed first, for everyone; it
+  is never pre-selected (nothing is pre-filled), so there is no band- or then-vs-now-driven default and no deferred fit
+  check yet. *ER-B5* (the deferred fit check).
+- `bodyReset`: per-feeling cue chips (the urge's own body cues, or the parent's) and a press-and-hold of the one picked,
+  instead of the hand-built page's card grid; the cue is optional (the old *None of these work for me*). The rich
+  moment is the hold. *ER-B5* if the gallery shows the grid is missed.
+- `stepPicker`: the size step's three options, each led by its size name (*A small start*, *A little further*,
+  *Fuller practice*), plus your own; the step card (`oaSteps`) shows the chosen steps on *When*, *Try it now* and
+  *Did you get to try it?*. *None.*
+- Prediction and what happened are asked **once per visit**, after every feeling, not per feeling: with up to three
+  feelings, three predictions in a row read as a form. The projection copies the one answer into each feeling's record.
+  *None* (revisit if per-feeling predictions are asked for).
+- `fits`: the fit statements as a list above the verdict, not the `fitStack` card embed. *ER-B5.*
+- `readout`: a hand-off with one line, not the `urgeReadout` embed; no then-vs-now bar. *ER-B5.*
 - Parts lines (the unblend line under the urge, the goal line above `help`): not placed yet (the old page has them).
-- `repr` opens Problem Solve with no frame (Problem Solve doesn't accept `repair` yet).
-- `oa_plan` → `oa_try` (a skill follow-up whose card reopens the run, as `ps_review`); one card per visit, not per
-  feeling. `ext.er.oaFacts / oaEffect / oaRoute` are not written (the run holds them; Reflect reads close answers).
-- `UrgeTrend` stays on the hand-built page; v3 has no numbers to trend.
-- The readout's *Not sure* re-ask and the loop guard (third same/louder in 7 days) need server-side reads.
+  *ER-B5*, with the parts lane.
+- `repr` opens Problem Solve with no frame (Problem Solve doesn't accept `repair` yet). *ER-B5.*
+- `oa_plan` → `oa_try` (a skill follow-up whose card reopens the run, as `ps_review`; `followUpResume` is the runtime's
+  R9 reopen); one card per visit, not per feeling. `ext.er.oaFacts / oaEffect / oaRoute` are not written (the run
+  holds them; Reflect reads close answers). *None.*
+- The check-in's `activationPatternId` (route state the hand-built page read for its tool suggestions) isn't read: the
+  skill's exits don't depend on it. *None.*
+- `UrgeTrend` stays on the hand-built page; v3 has no numbers to trend. *None.*
+- The readout's *Not sure* re-ask and the loop guard (third same/louder in 7 days) need server-side reads. *ER-B5.*
 
 ## The flow (design)
 
@@ -170,6 +191,6 @@ with the others* records the offer, not the exit; the grid check on an embed's e
 - Fit statements are cards, not a collapsed list; the observe / meaning boxes move to Check the Facts.
 - `not_fit:helpful → clarify`; clarify opens Check the Facts; a repair route for guilt and shame.
 - The safety question splits danger (crisis slot, other person) from a boundary and not sure.
-- Prediction vs what happened, stored per rep.
-- The step's size default follows the band and the then-vs-now, not a number ≥ 7.
+- Prediction vs what happened, asked once per visit and stored on each feeling's record.
+- The small step is listed first for everyone and never pre-selected; no size default from a number ≥ 7.
 - Repair (PRD open question): Problem Solve with the repair frame, not a plan inside Do the Opposite.

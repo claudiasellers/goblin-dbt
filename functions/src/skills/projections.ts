@@ -44,6 +44,9 @@ export const OFF_PHONE_SKILLS: Readonly<Record<string, { toolId: string; happene
   // Say no's afterwards (the no_outcome card reopens the run at *Did you say no?*): said is the rep. The first visit,
   // which never asks it, keeps the close's own rep (`unansweredKeepsOwn`).
   say_no: { toolId: 'say-no', happenedField: 'said', yes: 'yes', unansweredKeepsOwn: true },
+  // Do the Opposite's later visit (the oa_try card reopens the run at *Did you get to try it?*): tried is the rep, and
+  // a plan not tried logs none (the hand-built page's `oaSkillIds('missed')`). The first visit keeps the close's own.
+  opposite_action: { toolId: 'opposite-action', happenedField: 'tried', yes: 'yes', unansweredKeepsOwn: true },
 };
 
 /** The rep a run's close logs: off the phone (it happened), none (it didn't), or the close's own (null). */

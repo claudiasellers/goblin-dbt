@@ -75,6 +75,8 @@ EMBEDS = {
     # ER-03's doors (#48, src/components/tools/oppositeAction/OppositeActionStart.tsx): up to three grid words, loudest
     # first. `emotions`: its ids are grid word ids (the machine keeps only words on the grid, at most this many).
     "doorPicker": {"emotions": 3},
+    # Do the Opposite's step card (a slot): each feeling's chosen step, read from the run's labels. Reports nothing.
+    "oaSteps": {},
 }
 # What each embed takes from the skill (embeds.ts EMBED_PROPS; the contract test keeps the two equal). build.py
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
@@ -85,6 +87,7 @@ EMBED_PROPS = {
     "partLater": {},
     "debriefWho": {},
     "doorPicker": {},
+    "oaSteps": {},
     "holdRing": {
         "variant": {"type": "enum", "values": ["press", "timed", "settle"]},
         "seconds": {"type": "int", "min": 1, "max": 900},
