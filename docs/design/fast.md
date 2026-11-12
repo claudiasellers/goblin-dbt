@@ -74,8 +74,8 @@ sentence. Every line is short and non-attacking, says what the person will do, a
 `src/components/skillPlayer/BoundaryLine.tsx`, registered in `embeds.ts` and mirrored in `scripts/skills/content.py`
 `EMBEDS` with one output id, `copied`. Props: `from` (the fields whose picks make the line, their labels joined,
 own words last), `copyable` (false for the values list), `labels`. **Never locked**, at any band: this is the
-primitive that replaces Recover's `boundaryLocked` copy lock (the swap itself is IE-B4's, with Recover's other
-locks). No clipboard falls back to selecting the line and saying so (*The line is selected, ready to copy.*, a
+primitive that replaced Recover's `boundaryLocked` copy lock: since IE-B4 Recover's *Let it land* shows its line
+on this card, with the optional `skipLabel` (*I don't need to say anything*) as the way on until it's copied. No clipboard falls back to selecting the line and saying so (*The line is selected, ready to copy.*, a
 status line). Focus stays on the step's title. A copyable card is one line; only the values card is a list. The step records
 `<card>_copied: ['copied']` when the copy went through, nothing otherwise.
 
@@ -125,7 +125,6 @@ close offers the tag row, like Check the Facts.
 | Follow-up *next time with {label}*; the flooded *this is a tomorrow thing* follow-up | Follow-up action (R5, F2) and a `FollowUpType` row |
 | Rehearse it after the review | IE-02 (IE-B5); the exit is in place, planned |
 | Let it be inline in Let go | DT-04 (DT-B4); planned exit until then, inline in IE-B4 |
-| Recover dropping `boundaryLocked` and using this embed | IE-B4 |
 | The Witness deck as a place to meet the need (Arch #30) | WMP's witness pieces (F2 `witness` embed) |
 | `SkillPractice` reps `self_respect` / `let_go` | The spine's reps from a run (F2) |
 | Let go for an unsafe or refusing person (`reason=unsafe`): start on *I don't need to say anything* and hide the other lines (the PRD's "step away without saying anything") | The safety batch / IE-03. No host links `frame=let_go` until then |

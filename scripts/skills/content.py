@@ -149,6 +149,8 @@ EMBED_PROPS = {
         "copiedLabel": {"type": "copy", "optional": True},
         "selectedLabel": {"type": "copy", "optional": True},
         "next": {"type": "copy"},
+        # The way on before the line is copied (Recover's *I don't need to say anything*); `next` once it is.
+        "skipLabel": {"type": "copy", "optional": True},
     },
     "messageComposer": {
         "field": {"type": "field"},

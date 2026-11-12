@@ -1,10 +1,13 @@
 import { m, useReducedMotion } from 'motion/react';
 import { useState, type ReactNode } from 'react';
-import { primaryButton, linkButton, secondaryText } from '../oppositeAction/styles';
+import { primaryButton, secondaryText } from '../oppositeAction/styles';
 import type { Pull } from '../../../data/invalidationRecoveryTypes';
 import { Choice, Pill } from './shared';
 import { buzz } from '../regulation/hooks';
 import { WaitLock, type WaitLockCopy } from '../regulation/WaitLock';
+import { BoundaryLine } from '../../skillPlayer/BoundaryLine';
+
+const noop = () => {};
 
 /** Copy blocks come straight from the graph flow document (flow.copy.*). */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -13,12 +16,11 @@ type Copy = Record<string, any>;
 export interface ExitResult { skills: string[] }
 
 // ── Let it land: grieve, optional boundary, meet the need elsewhere ──
-export function LetItLand({ c, pull, tooHot, elsewhere, onDone }: {
-  c: Copy; pull: Pull; tooHot: boolean; elsewhere: { title: string; act: string; skill: string; social: string }; onDone: (r: ExitResult) => void;
+export function LetItLand({ c, pull, elsewhere, onDone }: {
+  c: Copy; pull: Pull; elsewhere: { title: string; act: string; skill: string; social: string }; onDone: (r: ExitResult) => void;
 }) {
   const [i, setI] = useState(0);
   const [stage, setStage] = useState<'grieve' | 'boundary' | 'elsewhere'>('grieve');
-  const [copied, setCopied] = useState(false);
   const [value, setValue] = useState<string | null>(null);
   const grief: string[] = c.grief;
   // Shutdown and hiding get an orienting cue, never a relaxation cue.
@@ -37,18 +39,13 @@ export function LetItLand({ c, pull, tooHot, elsewhere, onDone }: {
       </button>
     </div>
   );
+  // The boundary line on the keepsake paper (FAST's `boundaryLine`): copyable at any intensity, never locked
+  // (IE-B4 dropped Recover's copy lock). *I don't need to say anything* is the way on until it's copied.
   if (stage === 'boundary') return (
     <div className="space-y-4">
       <p className={secondaryText}>{c.boundaryIntro}</p>
-      <div className="p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] text-lg leading-relaxed font-medium">{c.boundary}</div>
-      {tooHot
-        ? <p className={`${secondaryText} p-3 rounded-xl bg-[var(--color-bg-secondary)]`}>{c.boundaryLocked}</p>
-        : (
-          <button type="button" className={primaryButton} onClick={async () => { try { await navigator.clipboard.writeText(c.boundary); setCopied(true); } catch { /* selection fallback */ } }}>
-            {copied ? c.copied : c.copy}
-          </button>
-        )}
-      <button type="button" className={linkButton} onClick={() => setStage('elsewhere')}>{copied ? c.continue : c.skipBoundary}</button>
+      <BoundaryLine picked={{ line: [c.boundary] }} onShown={noop} onDone={() => setStage('elsewhere')}
+        props={{ field: 'line', shape: 'line', copyLabel: c.copy, copiedLabel: c.copied, selectedLabel: c.selected, next: c.continue, skipLabel: c.skipBoundary }} />
     </div>
   );
   return (

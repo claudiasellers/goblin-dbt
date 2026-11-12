@@ -122,5 +122,5 @@ content and projection stay; with the flag off nothing opens the skill.
 
 ## Still in IE-B4
 
-Recover drops `boundaryLocked` and `tooHot`; IE-06 Keep it warm; IE-12's myths into the barrier step; Let go inline;
+Recover drops `boundaryLocked` and `tooHot` (built 12 Nov, the second PR: [`recover-from-invalidation.md`](recover-from-invalidation.md)); IE-06 Keep it warm; IE-12's myths into the barrier step; Let go inline;
 then DEAR MAN's hand-built page can be deleted.

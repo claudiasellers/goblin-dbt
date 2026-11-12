@@ -160,6 +160,7 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     copiedLabel: { type: 'copy', optional: true },
     selectedLabel: { type: 'copy', optional: true },
     next: { type: 'copy' },
+    skipLabel: { type: 'copy', optional: true },
   },
   messageComposer: {
     field: { type: 'field' },
