@@ -18,6 +18,7 @@ import { MessageComposer } from './MessageComposer';
 import { DoorPickerEmbed } from './DoorPickerEmbed';
 import { OaStepsEmbed } from './OaStepsEmbed';
 import { PocketCard } from './PocketCard';
+import { BatteryRead } from './BatteryRead';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -84,6 +85,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   doorPicker: DoorPickerEmbed,
   oaSteps: OaStepsEmbed,
   pocketCard: PocketCard,
+  batteryRead: BatteryRead,
 };
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
@@ -117,6 +119,7 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   doorPicker: { emotions: 3 },
   oaSteps: {},
   pocketCard: { ids: ['seen_all', 'copied'] },
+  batteryRead: { ids: ['read'] },
 };
 
 /**
@@ -370,6 +373,16 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
   },
   doorPicker: {},
   oaSteps: {},
+  batteryRead: {
+    /** The rows, in order: one cell each (answered full, skipped an outline). */
+    fields: { type: 'fields' },
+    /** The loudest row: its cell drains to a sliver. */
+    low: { type: 'field' },
+    /** The cells' names, split on " · ", in the order of `fields`. */
+    names: { type: 'copy' },
+    line: { type: 'copy', optional: true },
+    next: { type: 'copy' },
+  },
   lidShelf: {
     /** The field whose pick is the container: `jar` · `tin` · `box` (its id; anything else draws a jar). */
     containerField: { type: 'field' },

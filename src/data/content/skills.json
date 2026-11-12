@@ -31098,7 +31098,9 @@
           "vol_food": "Food is part of why the volume's up today.",
           "vol_subs": "Last night is part of why the volume's up today.",
           "vol_moved": "Not moving yet is part of why the volume's up today.",
-          "fix_hint": "One thing for today. Pick the smallest one you'd actually do.",
+          "tank_names": "Sleep · Food · Body · Last night · Moving",
+          "fix_title": "One thing for today",
+          "fix_hint": "Pick the smallest one you'd actually do.",
           "fix_own": "Something else",
           "heavy_link": "Rest doesn't refill me: find the feeling",
           "none_title": "Nothing obvious from the body today",
@@ -31231,54 +31233,62 @@
             ],
             "next": [
               {
-                "to": "fix",
+                "to": "read_body",
                 "when": {
-                  "any": [
-                    {
-                      "in": [
-                        "$a.body",
-                        [
-                          "body_ill",
-                          "body_pain",
-                          "body_meds"
-                        ]
-                      ]
-                    },
-                    {
-                      "in": [
-                        "$a.sleep",
-                        [
-                          "sleep_short",
-                          "sleep_broken",
-                          "sleep_much"
-                        ]
-                      ]
-                    },
-                    {
-                      "in": [
-                        "$a.food",
-                        [
-                          "food_skipped",
-                          "food_all_over"
-                        ]
-                      ]
-                    },
-                    {
-                      "in": [
-                        "$a.subs",
-                        [
-                          "subs_some"
-                        ]
-                      ]
-                    },
-                    {
-                      "in": [
-                        "$a.moved",
-                        [
-                          "moved_not_yet"
-                        ]
-                      ]
-                    }
+                  "in": [
+                    "$a.body",
+                    [
+                      "body_ill",
+                      "body_pain",
+                      "body_meds"
+                    ]
+                  ]
+                }
+              },
+              {
+                "to": "read_sleep",
+                "when": {
+                  "in": [
+                    "$a.sleep",
+                    [
+                      "sleep_short",
+                      "sleep_broken",
+                      "sleep_much"
+                    ]
+                  ]
+                }
+              },
+              {
+                "to": "read_food",
+                "when": {
+                  "in": [
+                    "$a.food",
+                    [
+                      "food_skipped",
+                      "food_all_over"
+                    ]
+                  ]
+                }
+              },
+              {
+                "to": "read_subs",
+                "when": {
+                  "in": [
+                    "$a.subs",
+                    [
+                      "subs_some"
+                    ]
+                  ]
+                }
+              },
+              {
+                "to": "read_moved",
+                "when": {
+                  "in": [
+                    "$a.moved",
+                    [
+                      "moved_not_yet"
+                    ]
                   ]
                 }
               },
@@ -31290,70 +31300,139 @@
             "offers": []
           },
           {
-            "id": "fix",
-            "kind": "ask",
-            "title": [
+            "id": "read_body",
+            "kind": "embed",
+            "embed": "batteryRead",
+            "answerAs": "tank",
+            "title": "vol_body",
+            "props": {
+              "fields": [
+                "sleep",
+                "food",
+                "body",
+                "subs",
+                "moved"
+              ],
+              "low": "body",
+              "names": "tank_names",
+              "next": "next"
+            },
+            "next": [
               {
-                "when": {
-                  "in": [
-                    "$a.body",
-                    [
-                      "body_ill",
-                      "body_pain",
-                      "body_meds"
-                    ]
-                  ]
-                },
-                "key": "vol_body"
-              },
-              {
-                "when": {
-                  "in": [
-                    "$a.sleep",
-                    [
-                      "sleep_short",
-                      "sleep_broken",
-                      "sleep_much"
-                    ]
-                  ]
-                },
-                "key": "vol_sleep"
-              },
-              {
-                "when": {
-                  "in": [
-                    "$a.food",
-                    [
-                      "food_skipped",
-                      "food_all_over"
-                    ]
-                  ]
-                },
-                "key": "vol_food"
-              },
-              {
-                "when": {
-                  "in": [
-                    "$a.subs",
-                    [
-                      "subs_some"
-                    ]
-                  ]
-                },
-                "key": "vol_subs"
-              },
-              {
-                "when": {
-                  "in": [
-                    "$a.moved",
-                    [
-                      "moved_not_yet"
-                    ]
-                  ]
-                },
-                "key": "vol_moved"
+                "to": "fix",
+                "when": null
               }
             ],
+            "offers": []
+          },
+          {
+            "id": "read_sleep",
+            "kind": "embed",
+            "embed": "batteryRead",
+            "answerAs": "tank",
+            "title": "vol_sleep",
+            "props": {
+              "fields": [
+                "sleep",
+                "food",
+                "body",
+                "subs",
+                "moved"
+              ],
+              "low": "sleep",
+              "names": "tank_names",
+              "next": "next"
+            },
+            "next": [
+              {
+                "to": "fix",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "read_food",
+            "kind": "embed",
+            "embed": "batteryRead",
+            "answerAs": "tank",
+            "title": "vol_food",
+            "props": {
+              "fields": [
+                "sleep",
+                "food",
+                "body",
+                "subs",
+                "moved"
+              ],
+              "low": "food",
+              "names": "tank_names",
+              "next": "next"
+            },
+            "next": [
+              {
+                "to": "fix",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "read_subs",
+            "kind": "embed",
+            "embed": "batteryRead",
+            "answerAs": "tank",
+            "title": "vol_subs",
+            "props": {
+              "fields": [
+                "sleep",
+                "food",
+                "body",
+                "subs",
+                "moved"
+              ],
+              "low": "subs",
+              "names": "tank_names",
+              "next": "next"
+            },
+            "next": [
+              {
+                "to": "fix",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "read_moved",
+            "kind": "embed",
+            "embed": "batteryRead",
+            "answerAs": "tank",
+            "title": "vol_moved",
+            "props": {
+              "fields": [
+                "sleep",
+                "food",
+                "body",
+                "subs",
+                "moved"
+              ],
+              "low": "moved",
+              "names": "tank_names",
+              "next": "next"
+            },
+            "next": [
+              {
+                "to": "fix",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "fix",
+            "kind": "ask",
+            "title": "fix_title",
             "hint": "fix_hint",
             "fields": [
               {

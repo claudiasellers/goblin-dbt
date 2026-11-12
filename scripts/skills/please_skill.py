@@ -47,13 +47,15 @@ COPY = {
     "subs_title": "Any alcohol or drugs in the last day?",
     "subs_hint": "Any answer is fine here, and so is not saying.",
     "moved_title": "Have you moved much today?",
-    # The readout (step 2): the loudest row, in a fixed order (the body first: pain and missed meds matter most).
+    # The readout (step 2, the batteryRead screens' titles): the loudest row, in a fixed order (the body first: pain and missed meds matter most).
     "vol_body": "Your body is part of why the volume's up today.",
     "vol_sleep": "Sleep is part of why the volume's up today.",
     "vol_food": "Food is part of why the volume's up today.",
     "vol_subs": "Last night is part of why the volume's up today.",
     "vol_moved": "Not moving yet is part of why the volume's up today.",
-    "fix_hint": "One thing for today. Pick the smallest one you'd actually do.",
+    "tank_names": "Sleep · Food · Body · Last night · Moving",
+    "fix_title": "One thing for today",
+    "fix_hint": "Pick the smallest one you'd actually do.",
     "fix_own": "Something else",
     # Tired, or heavy? (PR #33's check, as two quiet links): sadness and shame can feel like tiredness.
     "heavy_link": "Rest doesn't refill me: find the feeling",
@@ -135,13 +137,19 @@ def steps():
         if sid == "sleep":
             # Not offered flooded (PRD): a carried flooded reading gets a quiet way to settle first; going on is fine.
             field["links"] = [{"exit": "cool_down", "label": "settle_first", "when": FLOODED}]
-        step["next"] = [{"to": nxt}] if nxt else [{"when": ANY_LOUD, "to": "fix"}, {"to": "none"}]
+        # The last row: the loudest row's readout, in ORDER (the first loud row wins), or nothing loud.
+        step["next"] = [{"to": nxt}] if nxt else [{"when": LOUD_ROW[f], "to": f"read_{f}"} for f in ORDER] + [{"to": "none"}]
         out.append(step)
+    # The readout (PRD step 2): the day's tank, one cell per row, the loudest drained (`batteryRead`); its title names it.
+    for f in ORDER:
+        out.append({
+            "id": f"read_{f}", "kind": "embed", "embed": "batteryRead", "answerAs": "tank", "title": f"vol_{f}",
+            "props": {"fields": [r[1] for r in ROWS], "low": f, "names": "tank_names", "next": "next"},
+            "next": [{"to": "fix"}],
+        })
     out += [
         {
-            "id": "fix", "kind": "ask",
-            "title": [{"when": LOUD_ROW[f], "key": f"vol_{f}"} for f in ORDER],
-            "hint": "fix_hint",
+            "id": "fix", "kind": "ask", "title": "fix_title", "hint": "fix_hint",
             "fields": [{"id": "fix", "options": {"list": "fix", "where": FIX_WHERE}, "max": 1, "required": True,
                         "own": {"hint": "fix_own", "countsAsPick": True, "max": OWN_MAX},
                         # Sleep or moving loud: tiredness can be a feeling (PR #33's *tired or heavy?*), one quiet tap.
