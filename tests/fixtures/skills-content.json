@@ -7208,6 +7208,1178 @@
    }
   },
   {
+   "id": "dear_man_one",
+   "toolId": "dear-man",
+   "version": "dm-one-v1",
+   "start": "source",
+   "accepts": [
+    "personId",
+    "frame",
+    "band",
+    "emotionId",
+    "refused"
+   ],
+   "ownMax": 100,
+   "emotionFields": [],
+   "copy": {
+    "source_title": "Before you write it: where's this coming from?",
+    "source_hint": "Any answer is fine. It only changes what comes after the message.",
+    "cool_down": "Settle my body first",
+    "about_title": "What's the message about?",
+    "about_title_heads_up": "Keep it short, written, and about one thing. What's it about?",
+    "fact_title": "What happened? Say it the way a camera would see it.",
+    "fact_hint": "Pick the closest, or say it your way.",
+    "felt_title": "How did it feel?",
+    "felt_hint": "One word is enough.",
+    "give_title": "A warm line can help it land. Want one?",
+    "give_hint": "Optional.",
+    "ask_title": "What's the one thing you're asking for?",
+    "ask_hint": "One small ask is often easier to say yes to.",
+    "ask_title_heads_up": "What's the one practical thing you're asking for?",
+    "let_go": "I've asked them to hear me before. Look at letting this one go",
+    "why_title": "Why it matters (optional)",
+    "own_line": "In my own words",
+    "message_title": "Here's your message.",
+    "sorry_line": "There's a sorry in there. Asking for something isn't a wrong. Keep it only if it's for something you did.",
+    "drop_sorry": "Take the sorry out",
+    "copy": "Copy",
+    "copied": "Copied",
+    "selected": "Selected. Copy it from here.",
+    "open_messages": "Open messages",
+    "next": "Next",
+    "done": "Done",
+    "cool_title": "Your message is put together. Send it now, or give it a little time first?",
+    "cool_hint": "Sending is up to you. Messages sent from a hot place tend to land harder than we mean.",
+    "aloud_title": "Read it out loud once.",
+    "aloud_hint": "If a part sounds sharper than you mean, change it once you've pasted it.",
+    "wait_title": "Phone down. The message will keep.",
+    "wait_waiting": "Put the phone face down and come back when you're ready. Your message is still here.",
+    "wait_short": "Waiting",
+    "wait_done": "That's the wait. Read it once more and see if it still fits.",
+    "wait_done_short": "Done",
+    "wait_back": "I'm back",
+    "resend_title": "Your message, ready when you are.",
+    "later_label": "When do you want the reminder?",
+    "later_line": "Pick a time and a reminder brings it back. It won't say who it's for or what it says.",
+    "settle_line": "Settle your body first. Pick a time and a reminder brings the message back.",
+    "predict_title": "How do you think they'll take it?",
+    "sure_label": "How sure are you?",
+    "again_label": "Want me to ask how it went?",
+    "sent_line": "One message, said once. Give them room to answer.",
+    "sent_line_badly": "You're sending it knowing it might not go well. That takes something.",
+    "back_title": "Still want to send it?",
+    "back_hint": "Whatever you decide is fine.",
+    "dropped_line": "You decided not to send it. That's a real choice too.",
+    "picker_personWhoOne": "Who's the message for?",
+    "picker_personNew": "Someone new",
+    "picker_personNameLabel": "What do you call them?",
+    "picker_personNameHint": "A nickname is fine. No real names needed.",
+    "picker_personRoleLabel": "Who are they to you?",
+    "picker_personKeepLine": "The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.",
+    "picker_personNoNameLine": "Without a name, nothing about them is kept.",
+    "picker_personSignedOutLine": "This stays on this screen only.",
+    "picker_personGoOn": "Go on",
+    "picker_personChanged": "Things changed with someone?",
+    "picker_personChangedHint": "Pick who it is, and you'll be asked about them again.",
+    "picker_safeQuestion": "Is it safe to bring hard things up with {who}?",
+    "picker_safeYes": "Yes, mostly",
+    "picker_safeNo": "No",
+    "picker_safeUnsure": "Not sure",
+    "picker_riskQuestion": "Is it more that they might hurt or control you, or that it tends to go badly?",
+    "picker_riskHarm": "They might hurt or control me",
+    "picker_riskBadly": "It tends to go badly",
+    "picker_riskUnsaid": "I'd rather not say",
+    "picker_safetyRouteOneHeading": "A message to {who} can wait. Your safety comes first.",
+    "picker_safetyRouteBody": "The people below can help you think it through, any time, and you don't have to be sure.",
+    "picker_safetyRouteEnding": "Thinking about ending the relationship",
+    "picker_safetyRouteBack": "This is about someone else"
+   },
+   "tables": {},
+   "derive": [],
+   "steps": [
+    {
+     "id": "source",
+     "kind": "ask",
+     "title": "source_title",
+     "hint": "source_hint",
+     "fields": [
+      {
+       "id": "source",
+       "options": {
+        "list": "source"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "cool_down",
+         "label": "cool_down",
+         "when": {
+          "eq": [
+           "$ctx.band",
+           "flooded"
+          ]
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "about",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "about",
+     "kind": "ask",
+     "title": [
+      {
+       "key": "about_title_heads_up",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "heads_up"
+        ]
+       }
+      },
+      {
+       "key": "about_title"
+      }
+     ],
+     "fields": [
+      {
+       "id": "about",
+       "options": {
+        "list": "about"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "fact",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "fact",
+     "kind": "ask",
+     "title": "fact_title",
+     "hint": "fact_hint",
+     "fields": [
+      {
+       "id": "fact",
+       "options": {
+        "list": "fact",
+        "where": {
+         "has": [
+          "$opt.about",
+          "$a.about"
+         ]
+        }
+       },
+       "max": 1,
+       "required": true,
+       "own": {
+        "hint": "own_line",
+        "countsAsPick": true,
+        "max": 100
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "felt",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "felt",
+     "kind": "ask",
+     "title": "felt_title",
+     "hint": "felt_hint",
+     "fields": [
+      {
+       "id": "felt",
+       "options": {
+        "list": "felt",
+        "firstFrom": "$ctx.emotionId"
+       },
+       "max": 1,
+       "required": true,
+       "own": {
+        "hint": "own_line",
+        "countsAsPick": true,
+        "max": 40
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "give",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "give",
+     "kind": "ask",
+     "title": "give_title",
+     "hint": "give_hint",
+     "fields": [
+      {
+       "id": "give",
+       "options": {
+        "list": "give",
+        "where": {
+         "has": [
+          "$opt.about",
+          "$a.about"
+         ]
+        }
+       },
+       "max": 1,
+       "own": {
+        "hint": "own_line",
+        "countsAsPick": true,
+        "max": 60
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "ask",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "ask",
+     "kind": "ask",
+     "title": [
+      {
+       "key": "ask_title_heads_up",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "heads_up"
+        ]
+       }
+      },
+      {
+       "key": "ask_title"
+      }
+     ],
+     "hint": "ask_hint",
+     "fields": [
+      {
+       "id": "ask",
+       "options": {
+        "list": "ask",
+        "where": {
+         "all": [
+          {
+           "has": [
+            "$opt.about",
+            "$a.about"
+           ]
+          },
+          {
+           "any": [
+            {
+             "not": {
+              "eq": [
+               "$ctx.frame",
+               "heads_up"
+              ]
+             }
+            },
+            {
+             "not": {
+              "eq": [
+               "$opt.validation",
+               true
+              ]
+             }
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "max": 1,
+       "required": true,
+       "own": {
+        "hint": "own_line",
+        "countsAsPick": true,
+        "max": 100
+       },
+       "links": [
+        {
+         "exit": "let_go",
+         "label": "let_go",
+         "when": {
+          "all": [
+           {
+            "eq": [
+             "$ctx.refused",
+             "validation"
+            ]
+           },
+           {
+            "in": [
+             "$a.about",
+             [
+              "address",
+              "pattern"
+             ]
+            ]
+           }
+          ]
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "why",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "why",
+     "kind": "ask",
+     "title": "why_title",
+     "fields": [
+      {
+       "id": "why",
+       "options": {
+        "list": "why"
+       },
+       "max": 1,
+       "own": {
+        "hint": "own_line",
+        "countsAsPick": true,
+        "max": 60
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "cool",
+       "when": {
+        "any": [
+         {
+          "in": [
+           "$a.source",
+           [
+            "hot",
+            "unsure"
+           ]
+          ]
+         },
+         {
+          "in": [
+           "$ctx.band",
+           [
+            "stirred",
+            "flooded"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "message",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "message",
+     "kind": "embed",
+     "embed": "messageComposer",
+     "title": "message_title",
+     "answerAs": "sent_how",
+     "props": {
+      "parts": [
+       "fact",
+       "felt",
+       "give",
+       "ask",
+       "why"
+      ],
+      "field": "ask",
+      "sorryLine": "sorry_line",
+      "dropSorry": "drop_sorry",
+      "copyLabel": "copy",
+      "copiedLabel": "copied",
+      "selectedLabel": "selected",
+      "openLabel": "open_messages",
+      "next": "next"
+     },
+     "next": [
+      {
+       "to": "predict",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "cool",
+     "kind": "ask",
+     "title": "cool_title",
+     "hint": "cool_hint",
+     "fields": [
+      {
+       "id": "cool",
+       "options": {
+        "list": "cool"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "aloud",
+       "when": {
+        "eq": [
+         "$a.cool",
+         "aloud"
+        ]
+       }
+      },
+      {
+       "to": "wait",
+       "when": {
+        "eq": [
+         "$a.cool",
+         "hold"
+        ]
+       }
+      },
+      {
+       "to": "later",
+       "when": {
+        "in": [
+         "$a.cool",
+         [
+          "later",
+          "settle"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "message",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "aloud",
+     "kind": "embed",
+     "embed": "messageComposer",
+     "title": "aloud_title",
+     "hint": "aloud_hint",
+     "answerAs": "aloud_how",
+     "props": {
+      "parts": [
+       "fact",
+       "felt",
+       "give",
+       "ask",
+       "why"
+      ],
+      "field": "ask",
+      "sorryLine": "sorry_line",
+      "dropSorry": "drop_sorry",
+      "copyLabel": "copy",
+      "copiedLabel": "copied",
+      "selectedLabel": "selected",
+      "openLabel": "open_messages",
+      "next": "next"
+     },
+     "next": [
+      {
+       "to": "predict",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "wait",
+     "kind": "embed",
+     "embed": "waitLock",
+     "answerAs": "wait",
+     "title": "wait_title",
+     "props": {
+      "minutes": 10,
+      "waiting": "wait_waiting",
+      "waitingShort": "wait_short",
+      "done": "wait_done",
+      "doneShort": "wait_done_short",
+      "next": "wait_back"
+     },
+     "next": [
+      {
+       "to": "resend",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "resend",
+     "kind": "embed",
+     "embed": "messageComposer",
+     "title": "resend_title",
+     "answerAs": "resend_how",
+     "props": {
+      "parts": [
+       "fact",
+       "felt",
+       "give",
+       "ask",
+       "why"
+      ],
+      "field": "ask",
+      "sorryLine": "sorry_line",
+      "dropSorry": "drop_sorry",
+      "copyLabel": "copy",
+      "copiedLabel": "copied",
+      "selectedLabel": "selected",
+      "openLabel": "open_messages",
+      "next": "next"
+     },
+     "next": [
+      {
+       "to": "predict",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "later",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.cool",
+         "settle"
+        ]
+       },
+       "key": "settle_line"
+      },
+      {
+       "when": null,
+       "key": "later_line"
+      }
+     ],
+     "fields": [
+      {
+       "id": "later_when",
+       "label": "later_label",
+       "max": 1,
+       "options": {
+        "list": "later"
+       }
+      }
+     ],
+     "followUp": {
+      "type": "ask_delayed",
+      "whenFrom": "later_when"
+     },
+     "done": "done",
+     "next": [],
+     "offers": [
+      {
+       "exit": "cool_down",
+       "when": {
+        "eq": [
+         "$a.cool",
+         "settle"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "id": "predict",
+     "kind": "ask",
+     "title": "predict_title",
+     "fields": [
+      {
+       "id": "predict",
+       "options": {
+        "list": "predict"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "sure",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "sure",
+     "kind": "ask",
+     "title": "sure_label",
+     "fields": [
+      {
+       "id": "sure",
+       "options": {
+        "list": "sure"
+       },
+       "max": 1
+      }
+     ],
+     "next": [
+      {
+       "to": "sent",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "sent",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.predict",
+         "badly"
+        ]
+       },
+       "key": "sent_line_badly"
+      },
+      {
+       "when": null,
+       "key": "sent_line"
+      }
+     ],
+     "fields": [
+      {
+       "id": "again",
+       "label": "again_label",
+       "max": 1,
+       "options": {
+        "list": "again"
+       }
+      }
+     ],
+     "followUp": {
+      "type": "ask_outcome",
+      "whenFrom": "again"
+     },
+     "done": "done",
+     "next": [],
+     "offers": []
+    },
+    {
+     "id": "back",
+     "kind": "ask",
+     "reopens": {
+      "after": "later"
+     },
+     "clears": [
+      "back"
+     ],
+     "title": "back_title",
+     "hint": "back_hint",
+     "fields": [
+      {
+       "id": "back",
+       "options": {
+        "list": "back"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "later",
+       "when": {
+        "eq": [
+         "$a.back",
+         "not_yet"
+        ]
+       }
+      },
+      {
+       "to": "dropped",
+       "when": {
+        "eq": [
+         "$a.back",
+         "dropped"
+        ]
+       }
+      },
+      {
+       "to": "resend",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "dropped",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": null,
+       "key": "dropped_line"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": []
+    }
+   ],
+   "exits": [
+    {
+     "id": "cool_down",
+     "toolId": "cool-down",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "done",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": true
+    },
+    {
+     "id": "let_go",
+     "toolId": "fast",
+     "query": {
+      "frame": "let_go"
+     },
+     "carry": [],
+     "done": false
+    }
+   ],
+   "options": {
+    "source": [
+     {
+      "value": "calm",
+      "label": "A calm, clear place"
+     },
+     {
+      "value": "hot",
+      "label": "Mostly hurt or angry"
+     },
+     {
+      "value": "unsure",
+      "label": "Not sure"
+     }
+    ],
+    "about": [
+     {
+      "value": "ask",
+      "label": "Something I need from them"
+     },
+     {
+      "value": "address",
+      "label": "Something that happened"
+     },
+     {
+      "value": "pattern",
+      "label": "Something that keeps happening"
+     }
+    ],
+    "fact": [
+     {
+      "value": "f_need_help",
+      "label": "I've got a lot on right now",
+      "about": [
+       "ask"
+      ]
+     },
+     {
+      "value": "f_need_time",
+      "label": "Something's come up that I need time for",
+      "about": [
+       "ask"
+      ]
+     },
+     {
+      "value": "f_going_through",
+      "label": "I'm going through something hard at the moment",
+      "about": [
+       "ask"
+      ]
+     },
+     {
+      "value": "f_how_we_do",
+      "label": "We've been doing this the same way for a while",
+      "about": [
+       "ask",
+       "pattern"
+      ]
+     },
+     {
+      "value": "f_didnt_follow",
+      "label": "You said you'd do something, and it didn't happen",
+      "about": [
+       "address"
+      ]
+     },
+     {
+      "value": "f_said_hurtful",
+      "label": "Something you said the other day stayed with me",
+      "about": [
+       "address"
+      ]
+     },
+     {
+      "value": "f_decided",
+      "label": "A decision got made that affects me, without me",
+      "about": [
+       "address"
+      ]
+     },
+     {
+      "value": "f_told_you",
+      "label": "When I told you how I felt, the conversation moved on",
+      "about": [
+       "address",
+       "pattern"
+      ]
+     },
+     {
+      "value": "f_keeps",
+      "label": "Something I've asked about before is still happening",
+      "about": [
+       "pattern"
+      ]
+     },
+     {
+      "value": "f_one_sided",
+      "label": "Lately I've been the one getting in touch first",
+      "about": [
+       "pattern"
+      ]
+     }
+    ],
+    "felt": [
+     {
+      "value": "hurt",
+      "label": "I felt hurt"
+     },
+     {
+      "value": "let_down",
+      "label": "I felt let down"
+     },
+     {
+      "value": "frustrated",
+      "label": "I felt frustrated"
+     },
+     {
+      "value": "excluded",
+      "label": "I felt left out"
+     },
+     {
+      "value": "dismissed",
+      "label": "I felt unheard"
+     },
+     {
+      "value": "disrespected",
+      "label": "I felt small"
+     },
+     {
+      "value": "lonely",
+      "label": "I felt lonely"
+     },
+     {
+      "value": "anxious",
+      "label": "I've been anxious about it"
+     },
+     {
+      "value": "overwhelmed",
+      "label": "I've been overwhelmed"
+     },
+     {
+      "value": "sad",
+      "label": "I felt sad"
+     },
+     {
+      "value": "angry",
+      "label": "I felt angry"
+     },
+     {
+      "value": "embarrassed",
+      "label": "I felt embarrassed"
+     }
+    ],
+    "give": [
+     {
+      "value": "g_not_agree",
+      "label": "I'm not asking you to agree with me",
+      "about": [
+       "ask",
+       "address",
+       "pattern"
+      ]
+     },
+     {
+      "value": "g_matter",
+      "label": "You matter to me, which is why I'm saying this",
+      "about": [
+       "ask",
+       "address",
+       "pattern"
+      ]
+     },
+     {
+      "value": "g_not_mean",
+      "label": "I'm not assuming you meant it that way",
+      "about": [
+       "address"
+      ]
+     },
+     {
+      "value": "g_busy",
+      "label": "I know you've got a lot on too",
+      "about": [
+       "ask",
+       "address",
+       "pattern"
+      ]
+     }
+    ],
+    "ask": [
+     {
+      "value": "a_help",
+      "label": "Could you give me a hand with it this week?",
+      "about": [
+       "ask"
+      ],
+      "validation": false
+     },
+     {
+      "value": "a_time",
+      "label": "Could we find a time that works for both of us?",
+      "about": [
+       "ask",
+       "pattern"
+      ],
+      "validation": false
+     },
+     {
+      "value": "a_space",
+      "label": "Could I have a few days before we talk about it?",
+      "about": [
+       "ask",
+       "address"
+      ],
+      "validation": false
+     },
+     {
+      "value": "a_check_first",
+      "label": "Could you check with me before deciding things that affect me?",
+      "about": [
+       "address",
+       "pattern"
+      ],
+      "validation": false
+     },
+     {
+      "value": "a_follow_through",
+      "label": "Could you let me know if plans change?",
+      "about": [
+       "address",
+       "pattern"
+      ],
+      "validation": false
+     },
+     {
+      "value": "a_try_new",
+      "label": "Could we try doing it a different way?",
+      "about": [
+       "ask",
+       "pattern"
+      ],
+      "validation": false
+     },
+     {
+      "value": "a_hear_me",
+      "label": "Could you hear me out when we next talk?",
+      "about": [
+       "address",
+       "pattern"
+      ],
+      "validation": true
+     },
+     {
+      "value": "a_acknowledge",
+      "label": "Could you tell me you get why it mattered to me?",
+      "about": [
+       "address",
+       "pattern"
+      ],
+      "validation": true
+     },
+     {
+      "value": "a_support",
+      "label": "Could you be there for me with this for a bit?",
+      "about": [
+       "ask"
+      ],
+      "validation": true
+     }
+    ],
+    "why": [
+     {
+      "value": "w_easier",
+      "label": "It would make things easier between us"
+     },
+     {
+      "value": "w_help",
+      "label": "It would help me a lot"
+     },
+     {
+      "value": "w_less",
+      "label": "I'd stop carrying it around"
+     },
+     {
+      "value": "w_closer",
+      "label": "I'd feel closer to you"
+     }
+    ],
+    "cool": [
+     {
+      "value": "aloud",
+      "label": "Read it out loud first"
+     },
+     {
+      "value": "hold",
+      "label": "Hold it for ten minutes"
+     },
+     {
+      "value": "later",
+      "label": "Save it and remind me"
+     },
+     {
+      "value": "settle",
+      "label": "Settle my body first. Keep the message"
+     },
+     {
+      "value": "send",
+      "label": "I'm good to send it"
+     }
+    ],
+    "later": [
+     {
+      "value": "hour",
+      "label": "In an hour"
+     },
+     {
+      "value": "today",
+      "label": "This evening"
+     },
+     {
+      "value": "tomorrow",
+      "label": "Tomorrow"
+     }
+    ],
+    "predict": [
+     {
+      "value": "well",
+      "label": "Well"
+     },
+     {
+      "value": "mixed",
+      "label": "Mixed"
+     },
+     {
+      "value": "badly",
+      "label": "Badly"
+     },
+     {
+      "value": "no_answer",
+      "label": "They won't answer"
+     }
+    ],
+    "sure": [
+     {
+      "value": "sure",
+      "label": "Sure"
+     },
+     {
+      "value": "think_so",
+      "label": "Think so"
+     },
+     {
+      "value": "not_sure",
+      "label": "Not sure"
+     }
+    ],
+    "again": [
+     {
+      "value": "today",
+      "label": "This evening"
+     },
+     {
+      "value": "tomorrow",
+      "label": "Tomorrow"
+     },
+     {
+      "value": "this_week",
+      "label": "In a few days"
+     }
+    ],
+    "back": [
+     {
+      "value": "send",
+      "label": "Yes, show me the message"
+     },
+     {
+      "value": "not_yet",
+      "label": "Not yet"
+     },
+     {
+      "value": "dropped",
+      "label": "I've changed my mind"
+     }
+    ]
+   }
+  },
+  {
    "id": "ending_relationships",
    "toolId": "ending-relationships",
    "version": "ending-v1",

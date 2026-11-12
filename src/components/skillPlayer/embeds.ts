@@ -165,6 +165,7 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
   },
   messageComposer: {
     field: { type: 'field' },
+    parts: { type: 'fields', optional: true },
     opener: { type: 'field', optional: true },
     reason: { type: 'field', optional: true },
     alt: { type: 'field', optional: true },

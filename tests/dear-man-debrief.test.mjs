@@ -120,7 +120,8 @@ test("page: the context in is the kept person's id (empty clears a link's), and 
 test("page: DearMan picks the mode once; the debrief is lazy and the prep keeps no debrief steps or check-in", () => {
   const page = read("src/pages/tools/DearMan.tsx");
   assert.match(page, /const \[mode\] = useState\(\(\) => new URLSearchParams\(search\)\.get\('mode'\)\);/);
-  assert.match(page, /return mode === 'debrief' \? <Suspense fallback=\{<ToolLoading \/>\}><LazyDearManDebrief \/><\/Suspense> : <DearManPrep \/>;/);
+  assert.match(page, /if \(mode === 'debrief'\) return <Suspense fallback=\{<ToolLoading \/>\}><LazyDearManDebrief \/><\/Suspense>;/);
+  assert.match(page, /if \(mode === 'one'\) return <Suspense fallback=\{<ToolLoading \/>\}><LazyDearManOne \/><\/Suspense>;\s*return <DearManPrep \/>;/, "One message (IE-B3) on ?mode=one");
   assert.match(page, /const LazyDearManDebrief = lazy\(\(\) => import\('\.\.\/\.\.\/components\/tools\/dearMan\/DearManDebrief'\)/);
   for (const gone of ["debrief-", "getStateAndTools", "saveCheckIn", "getDearManDebriefContent", "getDearManReflection", "debriefCheckInId", "recommendationCards"]) {
     assert.ok(!page.includes(gone), `${gone} is gone from the prep page (Claudia, 11 Nov: no end cards, no silent check-in)`);
@@ -133,7 +134,7 @@ test("page: picker first; the safety route gets the safety screen, never the ski
   const page = read("src/components/people/PersonFirstSkill.tsx");
   assert.match(page, /<PersonPicker key=\{pickerKey\} people=\{profile\.slices\?\.people \?\? null\} copy=\{pickerCopy\}/);
   assert.match(page, /if \(who\.route === 'safety'\) \{\s*return \(\s*<PersonSafetyRoute copy=\{safetyCopy\}/);
-  assert.match(page, /return <SkillPlayer skillId=\{skillId\} ctx=\{ctxFor\(who\)\} \{\.\.\.\(reopening \? \{ resumeRecord: resumeAfterPicker\(checked, who\) \} : \{\}\)\} \/>;/);
+  assert.match(page, /return <SkillPlayer skillId=\{skillId\} ctx=\{ctxFor\(who, profile\.slices\?\.people \?\? null\)\} \{\.\.\.\(reopening \? \{ resumeRecord: resumeAfterPicker\(checked, who\) \} : \{\}\)\} \/>;/);
   assert.match(page, /if \(copyFailed\) return <ToolLoadError/, "fails closed without the picker's copy");
   assert.doesNotMatch(page, /navigate\(/, "no navigation between the picker and the skill: the ToolSession (and a card's RESOLVING) stays");
   const debrief = read("src/components/tools/dearMan/DearManDebrief.tsx");

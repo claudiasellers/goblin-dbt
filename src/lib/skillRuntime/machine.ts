@@ -110,7 +110,8 @@ const PATH_MAX = 48;
 const ID = /^[a-z0-9][a-z0-9_:-]{0,63}$/i;
 /**
  * Context keys that are recorded. `returnTo` is a path: it steers, it isn't kept. `band` is ask-fresh: it may
- * steer this run (carried by `band.current()`), but it is never recorded or carried on (C4.6).
+ * steer this run (carried by `band.current()`), but it is never recorded or carried on (C4.6). `emotionId` (a word a
+ * hand-off carried, first on a list) and `refused` (read from the person's profile) steer too, and aren't kept.
  */
 const RECORDED_CTX = ['urgeId', 'personId', 'frame', 'enterAt', 'situationId', 'partId'] as const;
 const BAND_VALUES = new Set(['steady', 'stirred', 'flooded']);

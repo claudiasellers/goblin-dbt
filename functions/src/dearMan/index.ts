@@ -702,6 +702,7 @@ export const getDearManSessions = onCall(
         MATCH (u:User {id: $userId})-[:COMPLETED_SESSION]->(s:DearManSession)
         RETURN s.id AS id,
                s.type AS type,
+               s.mode AS mode,
                s.relationshipType AS relationshipType,
                s.situationType AS situationType,
                s.priorities AS priorities,
@@ -734,6 +735,7 @@ export const getDearManSessions = onCall(
       const sessions = result.records.map((r: Neo4jRecord) => ({
         id: r.get('id'),
         type: r.get('type'),
+        mode: r.get('mode') || '',
         relationshipType: r.get('relationshipType') || '',
         situationType: r.get('situationType') || '',
         priorities: r.get('priorities') || [],

@@ -110,6 +110,7 @@ SIGNED_OFF = {
     # Connected by default (Claudia, 12 Nov: "why are we leaving things disconnected and hedging by default at ALL?"):
     # FAST's two word rows and Say no's row go live with the module.
     "rf_social_threat_shame_words_self-respect_fast": "2026-11-12",
+    "rf_social_threat_shame_words_ask-for-it_dear-man": "2026-11-12",
     "rf_reactive_aggression_words_grievance_fast": "2026-11-12",
     "rf_acute_alarm_words_demand_say-no": "2026-11-12",
 }
@@ -132,7 +133,9 @@ CONCEPT_TAGS = {
 # Tools whose rows are authored but switched off (content kill switch per row).
 INACTIVE_TOOLS: dict = {}
 # Tools that must have no rows at all yet.
-NO_ROWS = {"dear-man": "IE-01's 'is it safe with them?' question ships with the safety batch (R9, D-02)"}
+# Tools that may never have a row, with the reason. DEAR MAN left this list on 12 Nov 2026: its "is it safe with
+# them?" question shipped with IE-B2 (the picker opens every prep, docs/design/people.md), so it has its word row.
+NO_ROWS: dict[str, str] = {}
 
 # Planned tools (Oct 2026 review): the routing names them now; each concept is in the graph but has no
 # app module yet, so its rows are written switched off (and the routing slice skips concepts without an
@@ -330,6 +333,8 @@ WORD_RULES = [
      "why": "Planned: Check the Facts beside Do the Opposite (unhiding) for shame about the self."},
     {"key": "let-down", "pattern": "social_threat_shame", "tool": "give", "priority": 1.5, "words": ["let_down"],
      "why": "Planned: GIVE (keep the relationship) as the alternative to Recover."},
+    {"key": "ask-for-it", "pattern": "social_threat_shame", "tool": "dear-man", "priority": 1.5, "words": ["let_down", "excluded"], "beside": ["recovering-from-invalidation"],
+     "why": "DEAR MAN (ask for what you need) as the alternative to Recover after a let-down or being left out: the person's own ask, after the picker and the safety question (IE-01, D4). Not rejected or humiliated: a wound to recover from first."},
     {"key": "self-respect", "pattern": "social_threat_shame", "tool": "fast", "priority": 1.5, "words": ["betrayed", "disrespected"],
      "why": "FAST (keep self-respect) as the alternative to Recover. Not violated (Claudia, 10 Nov, IE-B1): the review opens on what the person did, which reads as self-blame after a violation."},
     # --- Ready to fight ---

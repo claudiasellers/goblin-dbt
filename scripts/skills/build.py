@@ -28,7 +28,7 @@ PROFILE_OPTION_SLICES = {"parts", "ownLines", "savedLines", "people", "values", 
 THEN_VS_NOW = {"worse", "same", "better", "much_better"}
 FOLLOW_UPS = {t["id"]: t for t in FOLLOW_UP_TYPES}
 # Context keys a skill may accept (src/data/skillTypes.ts CtxKey).
-CTX_KEYS = {"urgeId", "personId", "frame", "enterAt", "situationId", "partId", "band", "returnTo"}
+CTX_KEYS = {"urgeId", "personId", "frame", "enterAt", "situationId", "partId", "band", "returnTo", "emotionId", "refused"}
 CRISIS_VARIANTS = {"crisis", "other_person", "medical"}
 # An option's `danger` → the crisis slot variant its step must declare (plan C6.4). `medical`: DT-01's chest pain or
 # fainting (call the emergency number, not a crisis line).
@@ -126,6 +126,8 @@ def check_embed_props(name, props, copy, fields, w):
             assert v in sp["values"], (w, f"{name}.{k} is one of {sp['values']}", v)
         elif t == "field":
             assert v in fields, (w, f"{name}.{k} is a field of the skill", v)
+        elif t == "fields":
+            assert isinstance(v, list) and v and len(set(v)) == len(v) and all(x in fields for x in v), (w, f"{name}.{k} lists fields of the skill", v)
         else:
             assert isinstance(v, str) and ID.match(v), (w, f"{name}.{k} is an id", v)
 

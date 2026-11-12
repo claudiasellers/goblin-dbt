@@ -33,6 +33,7 @@ export const FOLLOW_UP_SESSION_TOOL: Readonly<Record<string, string>> = {
   ask_outcome: 'dear-man',
   // Say no's "How did it go?" (IE-B3, docs/design/say-no.md): only from a Say no visit that made its no.
   no_outcome: 'say-no',
+  ask_delayed: 'dear-man',
   // Do the Opposite's plan for later (ER-B3): only from a Do the Opposite visit.
   oa_try: 'opposite-action',
 };
