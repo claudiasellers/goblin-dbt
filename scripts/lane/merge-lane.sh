@@ -23,7 +23,7 @@ prtitle() { gh pr view "$1" -R "$REPO" --json title -q .title 2>/dev/null; }
 mkdir "$LANE/lock" 2>/dev/null || { log "another run holds $LANE/lock"; exit 0; }
 trap 'rmdir "$LANE/lock"' EXIT
 
-# Node 22, the same line CI uses (ci.yml `node-version: 22` = the latest 22.x), from nodejs.org with its
+# Node 22, the line Deploy uses (`node-version: 22` = the latest 22.x), from nodejs.org with its
 # checksum checked, kept in $LANE/node. Looks for a newer 22.x at most once a day; whatever Node the Mac
 # has installed is never used.
 ensure_node22() {
@@ -52,7 +52,7 @@ case "$(node -v)" in v22.*) ;; *) log "node on PATH is $(node -v), not 22; skipp
 [ -d "$WORK/.git" ] || git clone -q "https://github.com/$REPO.git" "$WORK"
 cd "$WORK" || exit 1
 
-run_checks() {  # the same gate as .github/workflows/ci.yml
+run_checks() {  # every check; the only place tests run (no CI workflow, Deploy doesn't test)
   npm ci && npm ci --prefix functions &&
   npm run build && npm --prefix functions run build &&
   npm test && node scripts/ci/lint-budget.mjs

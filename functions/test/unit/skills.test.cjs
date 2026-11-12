@@ -38,6 +38,14 @@ test('getSkillContent: skills with their steps, jumps, offers, exits and options
       { skillId: 'check_the_facts', list: 'alt', order: 1, value: 'sad_gone_alt1', label: 'Some of it might come back', props: '{}', forOwn: null, forStory: 'sad_gone' },
       { skillId: 'check_the_facts', list: 'alt', order: 2, value: 'own_alt_unknown', label: "There's something I don't know yet", props: '{}', forOwn: true, forStory: null },
     ];
+    if (/FELT_LIKE/.test(q)) return [{
+      id: 'sadness', label: 'Sadness', contentJson: JSON.stringify({ function: 'It tells you something is lost.', prompts: ['A loss'] }),
+      ladder: ['disappointed', 'sad'], urgesHeld: ['sad-held'],
+      urges: [{ id: 'sad-bed', label: 'Stay in bed', order: 2, kind: 'emotion' }, { id: 'sad-held', label: 'Held', order: 1, kind: 'emotion' },
+        { id: 'use', label: 'Use', order: 0, kind: 'behaviour' }, { id: null, label: null, order: null, kind: null }],
+      felt: [{ emotionId: null, region: null, regionName: null, sensationId: null, label: null, energy: null, weight: null }],
+    }];
+    if (/IN_GUIDE/.test(q)) return [{ id: 'proud', guide: 'happiness', via: 1 }, { id: 'hurt', guide: 'sadness', via: 0 }];
     if (/HAS_REGULATION_CONTENT/.test(q)) return [{ id: 'hurt', parent: 'sadness' }];
     if (/fitsTheFactsWhen/.test(q)) return [{ parent: 'sadness', label: 'Sadness', lines: ["I've lost something or someone."] }];
     return [];
@@ -47,6 +55,10 @@ test('getSkillContent: skills with their steps, jumps, offers, exits and options
   assert.equal(out.version, 'skills-v1');
   assert.deepEqual(out.parentOf, { hurt: 'sadness' });
   assert.deepEqual(out.fitsWhen, { sadness: { label: 'Sadness', lines: ["I've lost something or someone."] } });
+  // ER-10: the card rows, emotion urges only (never behaviour, never held), the all-null collect rows dropped.
+  assert.deepEqual(out.feelingOf.sadness, { label: 'Sadness', functionLine: 'It tells you something is lost.', prompts: ['A loss'],
+    urges: ['Stay in bed'], body: [], ladder: ['disappointed', 'sad'] });
+  assert.deepEqual(out.feelingGuideOf, { hurt: 'sadness', proud: 'happiness' });
   const [s] = out.skills;
   assert.deepEqual([s.id, s.toolId, s.start, s.ownMax], ['check_the_facts', 'check-the-facts', 'feel', 140]);
   assert.deepEqual(s.accepts, ['situationId']);

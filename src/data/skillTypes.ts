@@ -183,7 +183,9 @@ export type EmbedPropSpec =
   /** Ids written by build.py, never by hand (the `inlineSkill` step's `outcomes`: its sub-skill's own). */
   | { type: 'ids'; optional?: boolean }
   /** Context for another run: context key → a ref read in this run (`$a.`, `$d.`, `$ctx.`, `$each`) as it renders. */
-  | { type: 'ctx'; optional?: boolean };
+  | { type: 'ctx'; optional?: boolean }
+  /** A ref (`$d.`, `$a.`, `$ctx.`) whose value keys a shared table's row; the embed receives the row (or nothing). */
+  | { type: 'row'; table: 'feelingOf'; optional?: boolean };
 
 /**
  * What an embed may report through `onDone` (src/components/skillPlayer/embeds.ts EMBED_OUTPUTS, mirrored in
@@ -294,6 +296,8 @@ export interface OptionDef { value: string; label: string; for?: string; [prop: 
 export interface DeriveDef {
   name: string; kind?: 'lookup' | 'count'; from?: string; fields?: string[]; weights?: Record<string, number>;
   table: string; default?: string; keep?: 'key' | 'value';
+  /** A lookup that keeps one field of the row (`feelingOf`'s `ladder`, for an `emotionsFrom` list). */
+  field?: string;
 }
 
 export interface SkillDef {
@@ -340,5 +344,23 @@ export interface SkillsContent {
   parentOf: Record<string, string>;
   /** DBT parent → its EmotionRegulationContent label and fitsTheFactsWhen, unchanged. */
   fitsWhen: Record<string, { label: string | null; lines: string[] }>;
+  /** Feeling guide id → its card (ER-10, FeelingGuide; functions/src/skills/feelingOf.ts). */
+  feelingOf: Record<string, FeelingRow>;
+  /** Emotion id → its feeling guide: the parent's guide (GUIDES), or IN_GUIDE (happiness words). */
+  feelingGuideOf: Record<string, string>;
   skills: SkillDef[];
+}
+
+/**
+ * One feeling guide's card (ER-10, docs/design/emotion-guide.md): what it's for, what often sets it off, its
+ * parent's emotion urges (never DT's behaviour urges; `urgesHeld` left out), the strongest signed-off places of its
+ * body map, and its ladder (grid words, milder to stronger).
+ */
+export interface FeelingRow {
+  label: string;
+  functionLine: string;
+  prompts: string[];
+  urges: string[];
+  body: Array<{ region: string; label: string }>;
+  ladder: string[];
 }

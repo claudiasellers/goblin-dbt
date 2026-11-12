@@ -29,6 +29,11 @@ test("buildSkills (the callable's Cypher, mirrored) over the replayed load equal
   assert.deepEqual(built.fitsWhen, fixture.fitsWhen);
   // The replay doesn't run UNWIND, so it sees only part of HAS_ACTION_URGE's parents: what it sees agrees.
   for (const [id, parent] of Object.entries(built.parentOf)) assert.equal(fixture.parentOf[id], parent, id);
+  // ER-10's feeling guide tables: the cards whole (functions/src/skills/feelingOf.ts over the mirrored rows), the
+  // word map as far as the replay sees parents (every happiness word in full).
+  assert.deepEqual(built.feelingOf, fixture.feelingOf);
+  for (const [id, guide] of Object.entries(built.feelingGuideOf)) assert.equal(fixture.feelingGuideOf[id], guide, id);
+  for (const [id, guide] of Object.entries(fixture.feelingGuideOf)) if (guide === "happiness") assert.equal(built.feelingGuideOf[id], "happiness", id);
 });
 
 test("the skill types are mirrored between functions and the app", () => {

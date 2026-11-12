@@ -2,7 +2,8 @@
  * The query layer behind getStateAndTools (plan E4-1): Cypher plus record → row mapping, nothing
  * else. `graphDeps(tx)` is what the callable hands to the pure handler.
  */
-import { evaluateSafetyFlag, type QueryRunner } from '../safety/checkinSafetyFlag';
+import { evaluateReferralFlag, evaluateSafetyFlag, type QueryRunner } from '../safety/checkinSafetyFlag';
+import { evaluateSafetyAsk, safetyPolicyEnabled } from '../safety/safetyAsk';
 import type { StateDeps } from './handler';
 import type {
   Band, CoOccurrence, Direction, EmotionEvidenceRow, LegacyToolRow, PatternDetail, PatternSlice, ResponseEvidenceRow,
@@ -88,7 +89,7 @@ export const LEGACY_TOOLS_QUERY = `
 export const ROUTING_POLICY_QUERY = `
   OPTIONAL MATCH (rp:RoutingPolicy {id: 'checkin_result'})
   OPTIONAL MATCH (fb:TherapyConcept {id: rp.fallbackConceptId})
-  RETURN rp { .version, .enabled, .maxCards, .fallbackConceptId, .defaultBand, .floodedPatterns } AS policy,
+  RETURN rp { .version, .enabled, .maxCards, .fallbackConceptId, .defaultBand, .floodedPatterns, .answerWeight, .tieBreak } AS policy,
          fb { .id, .appToolId, .name, .description, .whenToUse, .dbtBasis, .side, .skillKind, .direction } AS fallback
 `;
 
@@ -174,10 +175,20 @@ export function toRoutingPolicy(p: Obj | null | undefined): RoutingPolicy | null
     fallbackConceptId: str(p.fallbackConceptId) ?? 'se_orienting',
     defaultBand: (band === 'steady' || band === 'stirred' || band === 'flooded' ? band : 'stirred'),
     floodedPatterns: strs(p.floodedPatterns),
+    ...(answerWeight(p.answerWeight) != null ? { answerWeight: answerWeight(p.answerWeight) as number } : {}),
+    ...(p.tieBreak === 'words' ? { tieBreak: 'words' as const } : {}),
   };
 }
 
-export function graphDeps(tx: QueryRunner): StateDeps {
+/** A usable answer weight (0 < w ≤ 4), else null: a bad value falls back to the default, never to 0. */
+function answerWeight(v: unknown): number | null {
+  if (v == null) return null;
+  const n = toNum(v);
+  return Number.isFinite(n) && n > 0 && n <= 4 ? n : null;
+}
+
+/** `uid`: the caller (the safety route reads their own SafetyChecks); without it the route stays off. */
+export function graphDeps(tx: QueryRunner, uid?: string): StateDeps {
   return {
     async emotionEvidence(candidatePatterns, emotionIds, useAliases): Promise<EmotionEvidenceRow[]> {
       const res = await tx.run(EMOTION_EVIDENCE_QUERY, { candidatePatterns, emotionIds, useAliases });
@@ -229,6 +240,12 @@ export function graphDeps(tx: QueryRunner): StateDeps {
       }));
     },
     safetyFlag: (patternId, quadrant) => evaluateSafetyFlag(tx, patternId, quadrant),
+    async safetyRoute(a) {
+      if (!uid || !(await safetyPolicyEnabled(tx))) return null;
+      const ask = await evaluateSafetyAsk(tx, uid, a);
+      const flag = await evaluateReferralFlag(tx, a.patternIds[0]);
+      return { ask, ...(flag ? { flag } : {}) };
+    },
     async routingPolicy() {
       const res = await tx.run(ROUTING_POLICY_QUERY, {});
       const r = res.records[0];

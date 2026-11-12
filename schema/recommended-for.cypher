@@ -23,9 +23,10 @@ SET p.blank = row.blank;
 
 // --- 3. Routing policy (kill switch, card count, fallback, default band) ---
 MERGE (rp:RoutingPolicy {id: "checkin_result"})
-SET rp.version = "rf-v2", rp.enabled = true, rp.maxCards = 2,
+SET rp.version = "rf-v2.1", rp.enabled = true, rp.maxCards = 2,
     rp.fallbackConceptId = "se_orienting", rp.defaultBand = "stirred",
-    rp.floodedPatterns = ["emotional_flooding"], rp.reviewStatus = "approved";
+    rp.floodedPatterns = ["emotional_flooding"], rp.answerWeight = 2,
+    rp.tieBreak = "words", rp.reviewStatus = "approved";
 
 // --- 4. Pattern × band rows (P = priority 1, swap = 2; gated rows 0 / 1.5) ---
 // acute_alarm

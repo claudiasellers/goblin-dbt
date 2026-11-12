@@ -60,6 +60,9 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   // Notice them (IE-10, docs/design/notice-them.md): no close question; the practice is checked by the `notice_back`
   // card (*Did you get to notice them?*), and the two columns have no then-vs-now.
   'mindfulness-of-others': { module: 'ie', closeKind: 'none' },
+  // Know this feeling (ER-10, docs/design/emotion-guide.md): no close question; a card and a closer word aren't a
+  // state change to rate.
+  'emotion-guide': { module: 'er', closeKind: 'none' },
   // These ask their own questions inside their flows; the spine adds none (PR-S4 wraps them).
   'opposite-action': { module: 'er', closeKind: 'regulation_down' },
   'dear-man': { module: 'ie', closeKind: 'none' },

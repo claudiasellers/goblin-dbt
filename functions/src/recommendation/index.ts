@@ -30,7 +30,7 @@ import { CALL_OPTS } from '../shared/callOptions';
  */
 export const getStateAndTools = callable<unknown, StateResult | { warm: true }>(
   { auth: 'required', label: 'getStateAndTools', errorMessage: 'Failed to analyze emotional state' },
-  async ({ data }) => {
+  async ({ uid, data }) => {
     // Warm-up (isWarmRequest): open the Neo4j connection with a trivial read and answer at once.
     // No routing, no log line, nothing stored.
     if (isWarmRequest(data)) {
@@ -40,7 +40,7 @@ export const getStateAndTools = callable<unknown, StateResult | { warm: true }>(
     const input = parseOrInvalid(() => parseStateRequest(data), 'Invalid check-in');
     let result: StateResult;
     try {
-      result = await readTx((tx) => getStateAndToolsHandler(input, graphDeps(tx)));
+      result = await readTx((tx) => getStateAndToolsHandler(input, graphDeps(tx, uid as string)));
     } catch (error) {
       if (error instanceof PatternNotFoundError) throw new HttpsError('not-found', error.message);
       throw error;
@@ -60,6 +60,7 @@ export const getStateAndTools = callable<unknown, StateResult | { warm: true }>(
       filtered: r?.filtered ?? [],
       receiveFirst: r?.receiveFirst ?? null,
       safetyFlag: result.safetyFlag?.type ?? null,
+      safetyAsk: result.safetyAsk ? result.safetyAsk.reasons : null,
     }));
     return result;
   },

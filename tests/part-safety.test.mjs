@@ -67,7 +67,10 @@ test("the flag rides on the parts slice, getMe's part and the check-back's part,
 });
 
 test("CrisisBanner is the one crisis seam: the numbers live only there; compact is the same resources", () => {
-  const files = walk("src").filter((f) => /\.(ts|tsx|json)$/.test(f) && f !== join("src", "components", "safety", "CrisisBanner.tsx"));
+  // The safety route's helplines (CORE-01) are generated content from the graph (scripts/safety/content.py →
+  // src/data/content/safety.json), the other place numbers may live; no hand-written file carries one.
+  const files = walk("src").filter((f) => /\.(ts|tsx|json)$/.test(f) && f !== join("src", "components", "safety", "CrisisBanner.tsx")
+    && f !== join("src", "data", "content", "safety.json"));
   for (const f of files) assert.doesNotMatch(read(f), /\b988\b|741741|Crisis Lifeline/, f);
   assert.doesNotMatch(read("scripts/parts/content.py"), /\b988\b|741741|Lifeline/, "no crisis copy in parts content");
   const full = renderToStaticMarkup(h(CrisisBanner));

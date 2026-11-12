@@ -33,6 +33,9 @@
  *                          cut to the fields screens read (an allowlist, partsAllowlist.mjs)
  *   tool-names.json        each app tool's official skill name: TherapyConcept.name by appToolId (the admin
  *                          "Official DBT names" switch on the Tools page; no Cloud Function serves it)
+ *   safety.json            the safety route (CORE-01, schema/safety-route.cypher): SafetyScreenFlow's copy, each
+ *                          SafetyFlag's userCopy (never the clinician action), countries and their CrisisLines by
+ *                          order (never checkedAt / verifiedAt / source: the audit stays in the graph)
  *   opposite-action-picker.json  getOppositeActionContent's word → DBT parent rows and each parent's
  *                          label, acknowledgment and urges, for every word (Do the Opposite's doors)
  * Each builder mirrors the Cypher in the Cloud Function it replaces (named on the function).
@@ -50,6 +53,7 @@ export const BACKUPS_DIR = resolve(root, 'backups');
 export const USER_LABELS = ['User', 'UserData', 'LogRecord', 'ProfileItem', 'System'];
 
 const { placesFromFelt } = await importTs('functions/src/bodyMap/places.ts');
+const { feelingOf } = await importTs('functions/src/skills/feelingOf.ts');
 
 /** A string constant from a source file, so a content / code version mismatch fails here, not in the app. */
 function constant(file, name) {
@@ -64,6 +68,7 @@ export const SPINE_VERSION = constant('functions/src/spine/registry.ts', 'SPINE_
 export const WISE_MIND_VERSION = constant('functions/src/wiseMind/index.ts', 'WISE_MIND_VERSION');
 export const COPE_AHEAD_VERSION = constant('functions/src/copeAhead/index.ts', 'COPE_AHEAD_VERSION');
 export const SKILLS_VERSION = constant('functions/src/skills/index.ts', 'SKILLS_VERSION');
+export const SAFETY_VERSION = constant('functions/src/safety/safetyAsk.ts', 'SAFETY_VERSION');
 
 /** Refuses anything but a content-only export with no user data and no dangling relationships. */
 export function assertContentOnly(exp) {
@@ -546,7 +551,35 @@ export function buildSkills(g) {
   for (const c of g.nodes('EmotionRegulationContent').map((n) => n.props).filter((c) => (c.fitsTheFactsWhen ?? []).length).sort((a, b) => asc(a.dbtParent, b.dbtParent))) {
     fitsWhen[c.dbtParent] = { label: c.label ?? null, lines: c.fitsTheFactsWhen };
   }
-  return { version: SKILLS_VERSION, parentOf, fitsWhen, skills };
+  // ER-10's feeling guide tables, as getSkillContent reads them (functions/src/skills/feelingOf.ts shapes both).
+  const guideOfErc = new Map(g.rels('GUIDES', 'FeelingGuide', 'EmotionRegulationContent').map((r) => [r.a, r.b]));
+  const urgeRows = g.rels('HAS_ACTION_URGE', 'EmotionRegulationContent', 'ActionUrge');
+  const mapOf = new Map(g.rels('FELT_LIKE', 'FeelingGuide', 'BodyMap').map((r) => [r.a, r.b]));
+  const groupRows = g.rels('GROUPS', 'BodyMap', 'Emotion');
+  const liveFelt = g.rels('FELT_AS', 'Emotion', 'SensationType').filter((r) => r.props.status === 'live' && r.b.props.padStatus === 'live');
+  const regionName = new Map(g.nodes('BodyRegion').map((n) => [n.props.id, n.props.name ?? null]));
+  const guides = g.nodes('FeelingGuide').map((n) => {
+    const erc = guideOfErc.get(n);
+    const m = mapOf.get(n);
+    const emotions = m && m.props.status === 'live' ? new Set(groupRows.filter((r) => r.a === m).map((r) => r.b)) : new Set();
+    return {
+      id: n.props.id, label: n.props.label, contentJson: n.props.contentJson ?? null, ladder: n.props.ladder ?? null,
+      urgesHeld: n.props.urgesHeld ?? null,
+      urges: erc ? urgeRows.filter((r) => r.a === erc).map((r) => ({ id: r.b.props.id, label: r.b.props.label ?? null, order: r.b.props.order ?? null, kind: r.b.props.kind ?? null })) : [],
+      felt: liveFelt.filter((r) => emotions.has(r.a)).map((r) => ({
+        emotionId: r.a.props.id, region: r.props.region ?? null, regionName: regionName.get(r.props.region) ?? null, sensationId: r.b.props.id,
+        label: r.b.props.padLabel ?? null, energy: r.b.props.energy ?? null, weight: typeof r.props.weight === 'number' ? r.props.weight : null,
+      })),
+    };
+  });
+  const feelingGuideOf = {};
+  const guideOfParent = new Map([...guideOfErc].map(([gn, c]) => [c, gn.props.id]));
+  const guideRows = [
+    ...g.rels('HAS_REGULATION_CONTENT', 'Emotion', 'EmotionRegulationContent').filter((r) => guideOfParent.has(r.b)).map((r) => [r.a.props.id, guideOfParent.get(r.b)]),
+    ...g.rels('IN_GUIDE', 'Emotion', 'FeelingGuide').map((r) => [r.a.props.id, r.b.props.id]),
+  ].sort((x, y) => asc(x[0], y[0]));
+  for (const [id, guide] of guideRows) feelingGuideOf[id] = guide;
+  return { version: SKILLS_VERSION, parentOf, fitsWhen, feelingOf: feelingOf(guides), feelingGuideOf, skills };
 }
 
 /**
@@ -605,8 +638,33 @@ export function buildOppositeActionPicker(g) {
   return { parents, words };
 }
 
+/**
+ * The safety route (CORE-01): the same payload scripts/safety/fixture.py writes. null when the graph has no
+ * SafetyScreenFlow yet (a load before schema/safety-route.cypher's first load): the committed safety.json
+ * is kept. A wrong version throws.
+ */
+export function buildSafety(g) {
+  const flow = g.nodes('SafetyScreenFlow').find((n) => n.props.id === 'safety_screen');
+  if (!flow) return null;
+  if (flow.props.version !== SAFETY_VERSION) throw new Error(`Safety content is ${flow.props.version}; the app expects ${SAFETY_VERSION}`);
+  const flags = {};
+  for (const f of g.nodes('SafetyFlag').map((n) => n.props).sort((a, b) => asc(a.id, b.id))) {
+    if (typeof f.userCopy === 'string') flags[f.id] = f.userCopy;
+  }
+  const linesOf = new Map();
+  for (const r of g.rels('COVERS', 'CrisisLine', 'Country')) pushTo(linesOf, r.b.props.id, r.a.props);
+  const countries = g.nodes('Country').map((n) => n.props).sort((a, b) => asc(a.id, b.id)).map((c) => ({
+    id: c.id, name: c.name, emergency: c.emergency, emergencyAlt: c.emergencyAlt ?? null, firearmPrompt: c.firearmPrompt === true,
+    lines: (linesOf.get(c.id) ?? []).sort((a, b) => asc(a.order, b.order) || asc(a.id, b.id)).map((l) => ({
+      id: l.id, name: l.name, kind: l.kind, phone: l.phone ?? null, sms: l.sms ?? null, smsBody: l.smsBody ?? null,
+      chatUrl: l.chatUrl ?? null, hours: l.hours ?? null, languages: l.languages ?? [],
+    })),
+  }));
+  return { version: SAFETY_VERSION, flow: JSON.parse(flow.props.contentJson), flags, countries };
+}
+
 /** Files a graph may not have content for yet: missing from an export, the committed file is kept. */
-export const KEPT_WHEN_MISSING = ['wise-mind.json', 'cope-ahead.json', 'skills.json'];
+export const KEPT_WHEN_MISSING = ['wise-mind.json', 'cope-ahead.json', 'skills.json', 'safety.json'];
 
 /**
  * All the snapshots from one export (pure apart from reading the version constants). A file in
@@ -618,6 +676,7 @@ export function buildSnapshots(exp) {
   const wiseMind = buildWiseMind(g);
   const copeAhead = buildCopeAhead(g);
   const skills = buildSkills(g);
+  const safety = buildSafety(g);
   return {
     'related-words.json': buildRelatedWords(g),
     'body-map.json': buildBodyMap(g),
@@ -631,6 +690,7 @@ export function buildSnapshots(exp) {
     ...(wiseMind ? { 'wise-mind.json': wiseMind } : {}),
     ...(copeAhead ? { 'cope-ahead.json': copeAhead } : {}),
     ...(skills ? { 'skills.json': skills } : {}),
+    ...(safety ? { 'safety.json': safety } : {}),
   };
 }
 

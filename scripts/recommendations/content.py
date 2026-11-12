@@ -28,6 +28,17 @@
 # `rationale` strings are clinician-facing (never shown to users).
 
 VERSION = "rf-v2"  # rf-v2: Oct 2026 routing review (no capacity bands, word rules, planned tools)
+# The policy's own version, recorded on every check-in it routes (CheckIn.routingVersion). Rows keep VERSION.
+# rf-v2.1 (Claudia, 5 Oct 2026): a tie for the top pattern goes to the person's words instead of
+# candidate order (her 21:42 check-in: alarm 2.2 = vigilance 2.2, settled by list order). The runner-up
+# is picked as before: breaking its ties by words too would drop dissociation-alongside for 17 one-word
+# check-ins with "I can't tell what my body feels" and bring back Do the Opposite, which it filters.
+# answerWeight stays 2. ×1.5 was approved the same day on a measurement that left out the co-occurrence
+# swap; the full engine over every unpleasant word × every answer changes 18 results, all
+# "My mind keeps looping" + a low-drive or freeze word swapped away from rumination by CO_OCCURS_WITH
+# (and golden #9, Sad + looping → rumination, would break). Change it here (one line + reload) if that
+# trade is wanted.
+POLICY_VERSION = "rf-v2.1"
 # Earlier versions whose rows a load removes whole (their ids changed).
 RETIRED_VERSIONS = ["rf-v1"]
 # Sign-off: add a row id (or the policy id "checkin_result") with its review date; that row is then
@@ -37,7 +48,7 @@ RETIRED_VERSIONS = ["rf-v1"]
 # until their tool ships and they're reviewed. To revisit a row: take it out of here and either
 # fix it or set POLICY["enabled"] back to False (build.py won't enable with a draft active row).
 SIGNED_OFF = {
-    "checkin_result": "2026-10-05",
+    "checkin_result": "2026-10-05",  # rf-v2.1 (ties to words) approved by Claudia the same day
     # Claudia, 12 Nov 2026: default to connected. Ride it out, Let it be and Give your mind a job go live as built
     # (a clinician tweaks after).
     "rf_chronic_vigilance_words_worry_urge-surfing": "2026-11-12",
@@ -440,12 +451,14 @@ PLANNED_ROWS = [
 # CORE's routing policy: the kill switch (enabled False → today's legacy ranker), card count,
 # the fallback when every row is filtered, the band assumed when none was given.
 POLICY = {
-    "version": VERSION,
+    "version": POLICY_VERSION,
     "enabled": True,           # on 5 Oct 2026 (Claudia); False = the legacy ranker, the kill switch
     "maxCards": 2,
     "fallbackConceptId": "se_orienting",
     "defaultBand": "stirred",
     "floodedPatterns": ["emotional_flooding"],
+    "answerWeight": 2,         # each discriminating answer's evidence weight × this (see POLICY_VERSION)
+    "tieBreak": "words",       # rf-v2.1: a pattern tie goes to the person's words (was candidate order)
 }
 
 

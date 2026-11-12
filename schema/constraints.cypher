@@ -159,6 +159,7 @@ CREATE CONSTRAINT part_link_key IF NOT EXISTS FOR (n:PartLink) REQUIRE n.key IS 
 CREATE CONSTRAINT den_snapshot_key IF NOT EXISTS FOR (n:DenSnapshot) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT person_key IF NOT EXISTS FOR (n:Person) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT interaction_key IF NOT EXISTS FOR (n:Interaction) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT safety_check_key IF NOT EXISTS FOR (n:SafetyCheck) REQUIRE n.key IS UNIQUE;
 CREATE INDEX user_data_owner IF NOT EXISTS FOR (n:UserData) ON (n.ownerId);
 CREATE INDEX tool_session_owner_started IF NOT EXISTS FOR (n:ToolSession) ON (n.ownerId, n.startedAt);
 CREATE INDEX follow_up_status_due IF NOT EXISTS FOR (n:FollowUp) ON (n.status, n.dueAt);
@@ -192,8 +193,18 @@ CREATE CONSTRAINT hard_moment_id IF NOT EXISTS FOR (n:HardMoment) REQUIRE n.id I
 CREATE CONSTRAINT cope_move_id IF NOT EXISTS FOR (n:CopeMove) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT rehearsal_beat_id IF NOT EXISTS FOR (n:RehearsalBeat) REQUIRE n.id IS UNIQUE;
 
+// --- Know this feeling (ER-10, docs/design/emotion-guide.md, schema/emotion-guide.cypher) ---
+CREATE CONSTRAINT feeling_guide_id IF NOT EXISTS FOR (n:FeelingGuide) REQUIRE n.id IS UNIQUE;
+
 // --- The skill runtime (docs/design/skill-runtime.md, schema/skills.cypher) ---
 CREATE CONSTRAINT skill_id IF NOT EXISTS FOR (n:Skill) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT skill_step_id IF NOT EXISTS FOR (n:SkillStep) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT skill_exit_id IF NOT EXISTS FOR (n:SkillExit) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT skill_option_id IF NOT EXISTS FOR (n:SkillOption) REQUIRE n.id IS UNIQUE;
+
+// --- The safety route (CORE-01, schema/safety-route.cypher) ---
+CREATE CONSTRAINT safety_screen_flow_id IF NOT EXISTS FOR (n:SafetyScreenFlow) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT country_id IF NOT EXISTS FOR (n:Country) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT crisis_line_id IF NOT EXISTS FOR (n:CrisisLine) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT safety_policy_id IF NOT EXISTS FOR (n:SafetyPolicy) REQUIRE n.id IS UNIQUE;
+CREATE INDEX safety_check_owner_at IF NOT EXISTS FOR (n:SafetyCheck) ON (n.ownerId, n.at);

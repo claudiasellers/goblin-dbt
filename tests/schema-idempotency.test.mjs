@@ -113,7 +113,7 @@ function relKeys(f) {
 
 test("knowledge-graph.cypher is nodes only; count pins for the base files", () => {
   const kg = statements["knowledge-graph.cypher"];
-  assert.equal(kg.length, 319, "316 until Oct 2026; the 8 old BodyRegion nodes moved to body-map.cypher; + dbt_troubleshooting (ER-14, Nov 2026); + dbt_nightmare_protocol (ER-15); + dbt_ending_relationships (IE-08); + dbt_saying_no (IE-04); + dbt_self_soothe (DT-07); + dbt_mindfulness_current_thoughts (DT-08); + dbt_dialectical_abstinence (DT-09); + dbt_crisis_survival_kit (DT-03); + dbt_values_priorities (ER-09); + dbt_building_relationships (IE-09); + dbt_mindfulness_of_others (IE-10)");
+  assert.equal(kg.length, 320, "316 until Oct 2026; the 8 old BodyRegion nodes moved to body-map.cypher; + dbt_troubleshooting (ER-14, Nov 2026); + dbt_nightmare_protocol (ER-15); + dbt_ending_relationships (IE-08); + dbt_saying_no (IE-04); + dbt_self_soothe (DT-07); + dbt_mindfulness_current_thoughts (DT-08); + dbt_dialectical_abstinence (DT-09); + dbt_crisis_survival_kit (DT-03); + dbt_values_priorities (ER-09); + dbt_building_relationships (IE-09); + dbt_mindfulness_of_others (IE-10); + dbt_model_of_emotions (ER-10)");
   for (const s of kg) {
     assert.match(s, /^MERGE \(\w+:\w+ \{id: "[^"]+"\}\)\nSET \w+ \+= \{/, s.slice(0, 80));
     assert.doesNotMatch(code(s), /\]->|<-\[/, s.slice(0, 80));
@@ -123,9 +123,9 @@ test("knowledge-graph.cypher is nodes only; count pins for the base files", () =
   assert.equal(opposite.length, 16);
   const nonOpposite = rels.filter((r) => r.type !== "OPPOSITE_OF");
   // 575 until Oct 2026; the 40 FELT_AS edges moved to body-map.cypher (scripts/body-map/content.py).
-  assert.equal(new Set(nonOpposite.map((r) => r.key)).size, 546); // + dbt_mindfulness_of_others PART_OF (IE-10), + dbt_building_relationships PART_OF (IE-09), + dbt_values_priorities PART_OF (ER-09), + dbt_troubleshooting PART_OF (ER-14), + dbt_nightmare_protocol PART_OF (ER-15), + dbt_ending_relationships (IE-08), + dbt_saying_no (IE-04), + dbt_self_soothe (DT-07), + dbt_mindfulness_current_thoughts (DT-08), + dbt_dialectical_abstinence (DT-09), + dbt_crisis_survival_kit (DT-03)
-  assert.equal(nonOpposite.length, 546, "no relationship declared twice");
-  assert.equal(statements["relationships.cypher"].length, 546 + 16);
+  assert.equal(new Set(nonOpposite.map((r) => r.key)).size, 547); // + dbt_model_of_emotions PART_OF (ER-10), + dbt_mindfulness_of_others PART_OF (IE-10), + dbt_building_relationships PART_OF (IE-09), + dbt_values_priorities PART_OF (ER-09), + dbt_troubleshooting PART_OF (ER-14), + dbt_nightmare_protocol PART_OF (ER-15), + dbt_ending_relationships (IE-08), + dbt_saying_no (IE-04), + dbt_self_soothe (DT-07), + dbt_mindfulness_current_thoughts (DT-08), + dbt_dialectical_abstinence (DT-09), + dbt_crisis_survival_kit (DT-03)
+  assert.equal(nonOpposite.length, 547, "no relationship declared twice");
+  assert.equal(statements["relationships.cypher"].length, 547 + 16);
 });
 
 test("FELT_AS region variants survive (the 66 original keys), now all in body-map.cypher", () => {

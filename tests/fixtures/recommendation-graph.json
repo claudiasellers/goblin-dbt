@@ -536,6 +536,17 @@
    "direction": "neutral",
    "addresses": []
   },
+  "dbt_model_of_emotions": {
+   "appToolId": "emotion-guide",
+   "name": "Understanding and Naming Emotions",
+   "description": "Knowing what a feeling is for, what sets it off, how it shows up and what it pulls toward, and finding a closer word for it",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": []
+  },
   "dbt_nightmare_protocol": {
    "appToolId": "nightmare-rescript",
    "name": "Nightmare Protocol",
@@ -4405,7 +4416,7 @@
   }
  ],
  "routingPolicy": {
-  "version": "rf-v2",
+  "version": "rf-v2.1",
   "enabled": true,
   "maxCards": 2,
   "fallbackConceptId": "se_orienting",
@@ -4413,6 +4424,8 @@
   "floodedPatterns": [
    "emotional_flooding"
   ],
+  "answerWeight": 2,
+  "tieBreak": "words",
   "reviewStatus": "approved"
  }
 }

@@ -1473,6 +1473,18 @@ SET saying_no += {
 };
 
 
+// ER Handouts 3-6 (PRD ER-10): what emotions do, the model of emotions, describing them; Know this feeling
+// (docs/design/emotion-guide.md).
+MERGE (model_of_emotions:TherapyConcept {id: "dbt_model_of_emotions"})
+SET model_of_emotions += {
+  name: "Understanding and Naming Emotions",
+  description: "Knowing what a feeling is for, what sets it off, how it shows up and what it pulls toward, and finding a closer word for it",
+  modality: "DBT",
+  module: "Emotion Regulation",
+  skill_type: "emotion_knowledge"
+};
+
+
 // ER Handouts 17-18 (PRD ER-09): values and priorities; What matters to me (docs/design/values.md).
 MERGE (values_priorities:TherapyConcept {id: "dbt_values_priorities"})
 SET values_priorities += {

@@ -5,12 +5,13 @@
  */
 import { ValidationError } from '../shared/validate';
 import {
-  GUIDED_ACTIVITY, POSITIVE_STATE, applyCoOccurrence, candidatesFor, normaliseEmotionId, rankPatterns,
-  scorePatterns, wantsCoOccurrence, withConfidence,
+  DEFAULT_ANSWER_WEIGHT, GUIDED_ACTIVITY, POSITIVE_STATE, applyCoOccurrence, candidatesFor, normaliseEmotionId,
+  rankPatterns, scorePatternParts, wantsCoOccurrence, withConfidence,
 } from './patternScoring';
 import { legacyTools } from './legacy';
 import { resolveBand } from './band';
 import { selectRecommendations, type RoutingPick } from './select';
+import type { SafetyAsk } from '../safety/safetyAsk';
 import type {
   ActivationPatternResult, CheckInInput, CoOccurrence, EmotionEvidenceRow, GuidedActivityRecommendation,
   LegacyToolRow, PatternDetail, PatternSlice, ResponseEvidenceRow, Routing, RoutingConcept, RoutingPolicy, SafetyFlag,
@@ -26,10 +27,21 @@ export interface StateDeps {
   legacyTools(patternId: string): Promise<LegacyToolRow[]>;
   /** The safety seam (functions/src/safety/checkinSafetyFlag.ts). */
   safetyFlag(patternId: string, quadrant: string): Promise<SafetyFlag | undefined>;
+  /**
+   * The safety route (CORE-01, functions/src/safety/safetyAsk.ts): null while SafetyPolicy is off (or for
+   * a caller without it, the goldens), which leaves `safetyFlag` exactly as before. On: whether to ask the
+   * question, and the result's flag is a clinical referral only (no crisis banner from a pattern).
+   */
+  safetyRoute?(a: { quadrant: string; patternIds: string[]; emotionIds: string[]; band: string | null }): Promise<SafetyRouteResult | null>;
   /** E4-3: RoutingPolicy {id: 'checkin_result'} and its fallback concept (both null if not loaded). */
   routingPolicy(): Promise<{ policy: RoutingPolicy | null; fallback: RoutingConcept | null }>;
   /** E4-3: RECOMMENDED_FOR rows (+ concept tags, addresses, contraindications) for these patterns. */
   routingSlice(patternIds: string[]): Promise<PatternSlice[]>;
+}
+
+export interface SafetyRouteResult {
+  ask: SafetyAsk;
+  flag?: SafetyFlag;
 }
 
 export class PatternNotFoundError extends Error {
@@ -53,9 +65,22 @@ export interface PatternSelection {
  * with the legacy ranker, newly reachable patterns would get no card (chronic_vigilance) or the
  * flooding banner with OA.
  */
-export interface Reachability { aliases: boolean; highUnpleasantAnswers: boolean }
-export const FULL_REACH: Reachability = { aliases: true, highUnpleasantAnswers: true };
-export const NO_REACH: Reachability = { aliases: false, highUnpleasantAnswers: false };
+export interface Reachability {
+  aliases: boolean;
+  highUnpleasantAnswers: boolean;
+  /** Each answer's evidence weight × this (rf-v2.1: the policy's answerWeight). */
+  answerWeight: number;
+  /** Break pattern ties toward the person's words (rf-v2.1: the policy's tieBreak "words"). */
+  wordTieBreak: boolean;
+}
+export const FULL_REACH: Reachability = { aliases: true, highUnpleasantAnswers: true, answerWeight: DEFAULT_ANSWER_WEIGHT, wordTieBreak: false };
+export const NO_REACH: Reachability = { aliases: false, highUnpleasantAnswers: false, answerWeight: DEFAULT_ANSWER_WEIGHT, wordTieBreak: false };
+
+/** What the policy turns on. Off (or missing): NO_REACH, the pre-review scoring whole. */
+export function reachFor(policy: RoutingPolicy | null): Reachability {
+  if (!policy?.enabled) return NO_REACH;
+  return { ...FULL_REACH, answerWeight: policy.answerWeight ?? DEFAULT_ANSWER_WEIGHT, wordTieBreak: policy.tieBreak === 'words' };
+}
 
 export async function selectPattern(
   input: CheckInInput, candidates: string[], deps: StateDeps, reach: Reachability = FULL_REACH,
@@ -65,9 +90,10 @@ export async function selectPattern(
   const answers = input.quadrant === 'high-unpleasant' && !reach.highUnpleasantAnswers ? [] : (input.discriminatingAnswers ?? []);
   const responseIds = answers.map((a) => a.responseId);
   const responseRows = responseIds.length > 0 ? await deps.responseEvidence(candidates, responseIds) : [];
-  const ranked = rankPatterns(scorePatterns({
-    candidates, emotionIds, intensityY: input.intensity?.y, emotionRows, responseRows,
-  }));
+  const parts = scorePatternParts({
+    candidates, emotionIds, intensityY: input.intensity?.y, emotionRows, responseRows, answerWeight: reach.answerWeight,
+  });
+  const ranked = rankPatterns(parts.scores, reach.wordTieBreak ? parts.wordScores : undefined);
 
   const detail = await deps.patternDetail(ranked.primaryId);
   if (!detail) throw new PatternNotFoundError(input.quadrant);
@@ -122,7 +148,7 @@ export async function getStateAndToolsHandler(input: CheckInInput, deps: StateDe
   const { policy, fallback } = await deps.routingPolicy();
   const candidates = candidatesFor(input.quadrant, policy?.enabled === true);
   const { pattern, secondaryPattern, coOccurrence, emotionIds } = await selectPattern(
-    input, candidates, deps, policy?.enabled ? FULL_REACH : NO_REACH,
+    input, candidates, deps, reachFor(policy),
   );
   const { band, bandSource } = resolveBand(input, pattern.id, policy);
   const surface = input.surface ?? 'checkin';
@@ -152,7 +178,18 @@ export async function getStateAndToolsHandler(input: CheckInInput, deps: StateDe
     };
   }
 
-  const safetyFlag = await deps.safetyFlag(pattern.id, input.quadrant);
+  const route = deps.safetyRoute
+    ? await deps.safetyRoute({
+      quadrant: input.quadrant,
+      patternIds: secondaryPattern ? [pattern.id, secondaryPattern.id] : [pattern.id],
+      emotionIds,
+      band,
+    })
+    : null;
+  const safetyFlag = route ? route.flag : await deps.safetyFlag(pattern.id, input.quadrant);
   const guidedActivity = guidedActivityFor(input.quadrant, pattern.id);
-  return { pattern, tools, safetyFlag, secondaryPattern, coOccurrence, guidedActivity, routing };
+  return {
+    pattern, tools, safetyFlag, secondaryPattern, coOccurrence, guidedActivity, routing,
+    ...(route ? { safetyAsk: route.ask } : {}),
+  };
 }

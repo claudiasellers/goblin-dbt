@@ -86,6 +86,8 @@ export interface SafetyFlag {
   type: string;
   trigger: string;
   action: string;
+  /** CORE-01: the only text a screen may show (`action` is the clinician's). Set by the safety route. */
+  userCopy?: string | null;
 }
 
 export interface CoOccurrence {
@@ -105,6 +107,8 @@ export interface StateResult {
   pattern: ActivationPatternResult;
   tools: ToolRecommendation[];
   safetyFlag?: SafetyFlag;
+  /** CORE-01: present only while SafetyPolicy is on. `ask`: show the safety question before the result. */
+  safetyAsk?: { ask: boolean; reasons: string[] };
   secondaryPattern?: ActivationPatternResult;
   coOccurrence?: CoOccurrence;
   guidedActivity?: GuidedActivityRecommendation;
@@ -163,6 +167,10 @@ export interface RoutingPolicy {
   fallbackConceptId: string;
   defaultBand: Band;
   floodedPatterns: string[];
+  /** rf-v2.1: each discriminating answer counts weight × this (absent → 2, the pre-rf-v2.1 scoring). */
+  answerWeight?: number;
+  /** rf-v2.1: 'words' breaks a pattern tie toward the person's words (absent → candidate order). */
+  tieBreak?: 'words' | null;
 }
 
 /** An ActivationPattern's display fields as stored (confidence is added by the engine). */

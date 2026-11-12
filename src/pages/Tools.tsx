@@ -71,9 +71,10 @@ export function Tools() {
                 {mod.name}
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {tools.map(tool => (
-                  <ToolCard key={tool.id} tool={tool} state={tool.id === 'meet-a-part' ? toolsMeetLink().state : undefined} />
-                ))}
+                {tools.flatMap(tool => [
+                  <ToolCard key={tool.id} tool={tool} state={tool.id === 'meet-a-part' ? toolsMeetLink().state : undefined} />,
+                  ...(tool.moreCards ?? []).map(m => <ToolCard key={`${tool.id}:${m.key}`} tool={tool} mode={m} />),
+                ])}
               </div>
             </div>
           ))}

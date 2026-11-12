@@ -11,7 +11,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from content import SKILLS, CONTENT_VERSION  # noqa: E402
 from build import spec_of, runtime_of  # noqa: E402  (also runs the content checks)
-from graph_tables import tables  # noqa: E402
+from graph_tables import tables, feeling_tables  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(HERE))
 
@@ -47,7 +47,9 @@ def served(sk):
 
 def payload():
     parent_of, fits_when = tables()
+    feeling_of, feeling_guide_of = feeling_tables(parent_of=parent_of)
     return {"version": CONTENT_VERSION, "parentOf": parent_of, "fitsWhen": fits_when,
+            "feelingOf": feeling_of, "feelingGuideOf": feeling_guide_of,
             "skills": [served(sk) for sk in sorted(SKILLS, key=lambda s: s["id"])]}
 
 
