@@ -138,7 +138,7 @@ test("skill: the repair_outcome card reopens the run at *Did you get to say it?*
   assert.deepEqual(M.offersFor(ctx(), step("r_wait"), ans({ repaired: "wait" })), ["fast_let_go"]);
   assert.deepEqual(exitOf("fast_let_go").query, { frame: "let_go" });
   assert.deepEqual(M.offersFor(ctx(), step("r_end"), ans({ between: "no" })), ["fast_let_go"]);
-  assert.equal(exitOf("rehearse").planned, true);
+  assert.deepEqual(exitOf("rehearse").query, { situationId: "repair", person: "$ctx.personId" }, "Rehearse it (IE-02)");
 });
 
 test("skill: break and return: the line says the time, the card comes at that time, and *not yet* books it again", () => {

@@ -9515,9 +9515,21 @@
               {
                 "exit": "rehearse",
                 "when": {
-                  "eq": [
-                    "$a.factor",
-                    "no_words"
+                  "all": [
+                    {
+                      "eq": [
+                        "$a.factor",
+                        "no_words"
+                      ]
+                    },
+                    {
+                      "not": {
+                        "has": [
+                          "$a.moment.ids",
+                          "tp_escalated"
+                        ]
+                      }
+                    }
                   ]
                 }
               },
@@ -9770,10 +9782,12 @@
           {
             "id": "rehearse",
             "toolId": "rehearse",
-            "query": {},
+            "query": {
+              "situationId": "ask",
+              "person": "$ctx.personId"
+            },
             "carry": [],
-            "done": false,
-            "planned": true
+            "done": false
           },
           {
             "id": "safety_open",
@@ -11434,6 +11448,7 @@
           "situation_title_heads_up": "When talks with them tend to go badly, it can help to keep it short, about one thing, and in writing if that suits. What kind of conversation is this?",
           "debrief_link": "I've already had the conversation",
           "notice_them_offer": "Notice them next time, with curiosity",
+          "rehearse_offer": "Practise it out loud",
           "cool_down": "Settle my body first",
           "scared_line": "Your safety comes first. You don't have to plan this conversation. The people below can help, any time.",
           "matters_title": "What matters most to you here?",
@@ -12802,6 +12817,10 @@
             "next": [],
             "offers": [
               {
+                "exit": "rehearse",
+                "when": null
+              },
+              {
                 "exit": "cope_ahead",
                 "when": null
               },
@@ -12874,6 +12893,17 @@
             "carry": [],
             "done": false,
             "label": "notice_them_offer"
+          },
+          {
+            "id": "rehearse",
+            "toolId": "rehearse",
+            "query": {
+              "situationId": "ask",
+              "person": "$ctx.personId"
+            },
+            "carry": [],
+            "done": false,
+            "label": "rehearse_offer"
           },
           {
             "id": "safety_open",
@@ -14308,62 +14338,62 @@
         "ownMax": 140,
         "emotionFields": [],
         "copy": {
-          "advocate_line": "Planning this with someone who does it every day is often the safest way. They can help with when, where and how, at your pace.",
-          "advocate_line_not_yet": "Whenever you want to plan anything, the hotline can help, in confidence.",
-          "after_help": "I might hurt myself",
-          "after_line": "Holding steady takes something. People who help can make it lighter.",
-          "after_line_back": "Going back happens a lot. You can look at it again whenever you want.",
-          "after_line_not_yet": "It's still your decision, and your timing.",
-          "after_line_pull": "The pull back is expected. It doesn't mean the decision was wrong.",
-          "after_low_line": "You don't have to hold this alone. Talking to someone right now can help.",
-          "after_title": "How's it going?",
-          "after_unsafe_line": "Your safety comes first. The time around leaving can be the most dangerous, and the hotline can plan with you now. Nothing from this check-in is saved.",
-          "again_label": "Another check-in?",
-          "ahead_line": "Their reaction can be the hardest part. Planning for it ahead can make it easier to hold your ground.",
-          "card_copied": "Copied",
-          "card_copy": "Copy",
-          "card_selected": "The words are selected, ready to copy.",
-          "card_title": "Here's what you could say.",
-          "change_line": "Working on it first is a real choice. If it doesn't change, this is here.",
-          "change_line_unsafe": "Changing it safely is worth planning with someone who knows about safety. The hotline can help with that too.",
-          "channel_hint": "A message is fine, and often the wisest way.",
-          "channel_title": "How will you tell them?",
-          "channel_title_harms": "How will you tell them? If you're worried how they'll react, a message is often safer than in person.",
-          "checkin_hint": "Check-ins say nothing about what they're for.",
-          "checkin_title": "Do you want a check-in after you've told them?",
-          "decide_hint": "Not yet is a real answer, and so is staying.",
-          "decide_title": "What do you want to do?",
-          "decide_title_unsure": "It's OK not to know yet. Where are you leaning?",
-          "decide_wise": "Check it with Wise mind first",
-          "decision_hint": "No over-explaining, and no apology for deciding. It isn't up for debate.",
-          "decision_title": "Now say what you've decided, plainly.",
-          "done": "Done",
-          "next": "Next",
-          "not_yet_hint": "Check-ins say nothing about what they're for.",
-          "not_yet_line": "It stays here for whenever you want to look again.",
-          "not_yet_title": "Do you want a check-in in two weeks?",
-          "open_title": "How do you want to start? One line is enough.",
-          "own_hint": "Say it my way",
-          "practical_hint": "Only practical things. If there's nothing, go on.",
-          "practical_title": "Anything practical to sort out?",
-          "safe_done_line": "Whenever you want to come back, this is here. The hotline can help you plan, at your pace.",
-          "safe_hint": "Ending things with someone who might hurt you can be the most dangerous time. People who help with this every day can plan it with you, in confidence.",
-          "safe_note": "Nothing from here on is saved unless you choose to save it. Calls and texts to these numbers show in your phone's history, so a phone nobody checks can be safer.",
-          "safe_title": "Your safety comes first.",
-          "safety_hint": "For example, they've hurt or threatened you, or you're scared of how they'd react. Whatever you answer, you can still think it through and decide here.",
           "safety_title": "Before anything: would ending this, or even talking about it, put you at risk?",
           "safety_title_scared": "Earlier you said you're scared of them. Would ending this, or talking about it, put you at risk?",
-          "save_hint": "Nothing has been saved so far. If someone else could open this app, it's safer to leave it unsaved.",
-          "save_title": "Do you want any of this saved?",
+          "safety_hint": "For example, they've hurt or threatened you, or you're scared of how they'd react. Whatever you answer, you can still think it through and decide here.",
+          "safe_title": "Your safety comes first.",
+          "safe_hint": "Ending things with someone who might hurt you can be the most dangerous time. People who help with this every day can plan it with you, in confidence.",
+          "safe_note": "Nothing from here on is saved unless you choose to save it. Calls and texts to these numbers show in your phone's history, so a phone nobody checks can be safer.",
+          "safe_done_line": "Whenever you want to come back, this is here. The hotline can help you plan, at your pace.",
+          "steady_title": "Big decisions go better from steady. Everything stays here.",
           "steady_cool": "Cool my body first",
           "steady_pause": "Pause first",
-          "steady_title": "Big decisions go better from steady. Everything stays here.",
-          "try_title": "It might be worth trying to change it first. Do you want to?",
-          "what_hint": "Harm can look like put-downs, fear, control, or pressure to act against what you value.",
-          "what_pros": "Weigh it up",
           "what_title": "What is this relationship doing to you?",
+          "what_hint": "Harm can look like put-downs, fear, control, or pressure to act against what you value.",
           "what_wise": "Think it through with Wise mind",
-          "when_title": "When are you thinking of doing it?"
+          "what_pros": "Weigh it up",
+          "try_title": "It might be worth trying to change it first. Do you want to?",
+          "decide_wise": "Check it with Wise mind first",
+          "change_line": "Working on it first is a real choice. If it doesn't change, this is here.",
+          "change_line_unsafe": "Changing it safely is worth planning with someone who knows about safety. The hotline can help with that too.",
+          "decide_title": "What do you want to do?",
+          "decide_title_unsure": "It's OK not to know yet. Where are you leaning?",
+          "decide_hint": "Not yet is a real answer, and so is staying.",
+          "save_title": "Do you want any of this saved?",
+          "save_hint": "Nothing has been saved so far. If someone else could open this app, it's safer to leave it unsaved.",
+          "advocate_line": "Planning this with someone who does it every day is often the safest way. They can help with when, where and how, at your pace.",
+          "advocate_line_not_yet": "Whenever you want to plan anything, the hotline can help, in confidence.",
+          "not_yet_title": "Do you want a check-in in two weeks?",
+          "not_yet_hint": "Check-ins say nothing about what they're for.",
+          "not_yet_line": "It stays here for whenever you want to look again.",
+          "channel_title": "How will you tell them?",
+          "channel_title_harms": "How will you tell them? If you're worried how they'll react, a message is often safer than in person.",
+          "channel_hint": "A message is fine, and often the wisest way.",
+          "open_title": "How do you want to start? One line is enough.",
+          "decision_title": "Now say what you've decided, plainly.",
+          "decision_hint": "No over-explaining, and no apology for deciding. It isn't up for debate.",
+          "practical_title": "Anything practical to sort out?",
+          "practical_hint": "Only practical things. If there's nothing, go on.",
+          "card_title": "Here's what you could say.",
+          "when_title": "When are you thinking of doing it?",
+          "checkin_title": "Do you want a check-in after you've told them?",
+          "checkin_hint": "Check-ins say nothing about what they're for.",
+          "ahead_line": "Their reaction can be the hardest part. Planning for it ahead can make it easier to hold your ground.",
+          "after_title": "How's it going?",
+          "again_label": "Another check-in?",
+          "after_line_pull": "The pull back is expected. It doesn't mean the decision was wrong.",
+          "after_line_back": "Going back happens a lot. You can look at it again whenever you want.",
+          "after_line_not_yet": "It's still your decision, and your timing.",
+          "after_line": "Holding steady takes something. People who help can make it lighter.",
+          "after_unsafe_line": "Your safety comes first. The time around leaving can be the most dangerous, and the hotline can plan with you now. Nothing from this check-in is saved.",
+          "after_low_line": "You don't have to hold this alone. Talking to someone right now can help.",
+          "after_help": "I might hurt myself",
+          "own_hint": "Say it my way",
+          "next": "Next",
+          "done": "Done",
+          "card_copy": "Copy",
+          "card_copied": "Copied",
+          "card_selected": "The words are selected, ready to copy."
         },
         "tables": {},
         "derive": [],
@@ -14371,29 +14401,29 @@
           {
             "id": "safety",
             "kind": "ask",
-            "fields": [
-              {
-                "id": "safety",
-                "max": 1,
-                "options": {
-                  "list": "safety"
-                },
-                "required": true
-              }
-            ],
-            "hint": "safety_hint",
             "title": [
               {
-                "key": "safety_title_scared",
                 "when": {
                   "eq": [
                     "$ctx.frame",
                     "careful"
                   ]
-                }
+                },
+                "key": "safety_title_scared"
               },
               {
                 "key": "safety_title"
+              }
+            ],
+            "hint": "safety_hint",
+            "fields": [
+              {
+                "id": "safety",
+                "options": {
+                  "list": "safety"
+                },
+                "max": 1,
+                "required": true
               }
             ],
             "next": [
@@ -14439,6 +14469,9 @@
           {
             "id": "safe_first",
             "kind": "ask",
+            "title": "safe_title",
+            "hint": "safe_hint",
+            "note": "safe_note",
             "crisis": [
               {
                 "variant": "other_person",
@@ -14450,16 +14483,13 @@
             "fields": [
               {
                 "id": "go",
-                "max": 1,
                 "options": {
                   "list": "go"
                 },
+                "max": 1,
                 "required": true
               }
             ],
-            "hint": "safe_hint",
-            "note": "safe_note",
-            "title": "safe_title",
             "next": [
               {
                 "to": "safe_done",
@@ -14490,6 +14520,7 @@
             "id": "safe_done",
             "kind": "handoff",
             "complete": true,
+            "noClose": true,
             "crisis": [
               {
                 "variant": "other_person",
@@ -14498,20 +14529,20 @@
                 }
               }
             ],
-            "done": "done",
             "lines": [
               {
-                "key": "safe_done_line",
-                "when": null
+                "when": null,
+                "key": "safe_done_line"
               }
             ],
-            "noClose": true,
+            "done": "done",
             "next": [],
             "offers": []
           },
           {
             "id": "steady",
             "kind": "ask",
+            "title": "steady_title",
             "crisis": [
               {
                 "variant": "other_person",
@@ -14540,6 +14571,11 @@
             "fields": [
               {
                 "id": "first",
+                "options": {
+                  "list": "first"
+                },
+                "max": 1,
+                "required": true,
                 "links": [
                   {
                     "exit": "cool_down",
@@ -14555,15 +14591,9 @@
                       "all": []
                     }
                   }
-                ],
-                "max": 1,
-                "options": {
-                  "list": "first"
-                },
-                "required": true
+                ]
               }
             ],
-            "title": "steady_title",
             "next": [
               {
                 "to": "what",
@@ -14575,6 +14605,8 @@
           {
             "id": "what",
             "kind": "ask",
+            "title": "what_title",
+            "hint": "what_hint",
             "crisis": [
               {
                 "variant": "other_person",
@@ -14603,6 +14635,11 @@
             "fields": [
               {
                 "id": "what",
+                "options": {
+                  "list": "what"
+                },
+                "max": 1,
+                "required": true,
                 "links": [
                   {
                     "exit": "wise_mind",
@@ -14668,16 +14705,9 @@
                       ]
                     }
                   }
-                ],
-                "max": 1,
-                "options": {
-                  "list": "what"
-                },
-                "required": true
+                ]
               }
             ],
-            "hint": "what_hint",
-            "title": "what_title",
             "next": [
               {
                 "to": "try_first",
@@ -14723,6 +14753,7 @@
           {
             "id": "try_first",
             "kind": "ask",
+            "title": "try_title",
             "crisis": [
               {
                 "variant": "other_person",
@@ -14751,14 +14782,13 @@
             "fields": [
               {
                 "id": "try",
-                "max": 1,
                 "options": {
                   "list": "try"
                 },
+                "max": 1,
                 "required": true
               }
             ],
-            "title": "try_title",
             "next": [
               {
                 "to": "change",
@@ -14805,10 +14835,8 @@
                 }
               }
             ],
-            "done": "done",
             "lines": [
               {
-                "key": "change_line_unsafe",
                 "when": {
                   "not": {
                     "all": [
@@ -14828,13 +14856,15 @@
                       }
                     ]
                   }
-                }
+                },
+                "key": "change_line_unsafe"
               },
               {
-                "key": "change_line",
-                "when": null
+                "when": null,
+                "key": "change_line"
               }
             ],
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -14905,6 +14935,21 @@
           {
             "id": "decide",
             "kind": "ask",
+            "title": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.what",
+                    "unsure"
+                  ]
+                },
+                "key": "decide_title_unsure"
+              },
+              {
+                "key": "decide_title"
+              }
+            ],
+            "hint": "decide_hint",
             "crisis": [
               {
                 "variant": "other_person",
@@ -14933,6 +14978,11 @@
             "fields": [
               {
                 "id": "decide",
+                "options": {
+                  "list": "decide"
+                },
+                "max": 1,
+                "required": true,
                 "links": [
                   {
                     "exit": "wise_mind",
@@ -14956,27 +15006,7 @@
                       ]
                     }
                   }
-                ],
-                "max": 1,
-                "options": {
-                  "list": "decide"
-                },
-                "required": true
-              }
-            ],
-            "hint": "decide_hint",
-            "title": [
-              {
-                "key": "decide_title_unsure",
-                "when": {
-                  "eq": [
-                    "$a.what",
-                    "unsure"
-                  ]
-                }
-              },
-              {
-                "key": "decide_title"
+                ]
               }
             ],
             "next": [
@@ -15031,6 +15061,8 @@
           {
             "id": "save",
             "kind": "ask",
+            "title": "save_title",
+            "hint": "save_hint",
             "crisis": [
               {
                 "variant": "other_person",
@@ -15042,15 +15074,13 @@
             "fields": [
               {
                 "id": "save",
-                "max": 1,
                 "options": {
                   "list": "save"
                 },
+                "max": 1,
                 "required": true
               }
             ],
-            "hint": "save_hint",
-            "title": "save_title",
             "next": [
               {
                 "to": "advocate",
@@ -15063,6 +15093,7 @@
             "id": "advocate",
             "kind": "handoff",
             "complete": true,
+            "noClose": true,
             "crisis": [
               {
                 "variant": "other_person",
@@ -15071,36 +15102,37 @@
                 }
               }
             ],
-            "done": "done",
             "lines": [
               {
-                "key": "advocate_line_not_yet",
                 "when": {
                   "eq": [
                     "$a.decide",
                     "not_yet"
                   ]
-                }
+                },
+                "key": "advocate_line_not_yet"
               },
               {
-                "key": "advocate_line",
-                "when": null
+                "when": null,
+                "key": "advocate_line"
               }
             ],
-            "noClose": true,
+            "done": "done",
             "next": [],
             "offers": []
           },
           {
             "id": "not_yet",
             "kind": "ask",
+            "title": "not_yet_title",
+            "hint": "not_yet_hint",
             "fields": [
               {
                 "id": "revisit",
-                "max": 1,
                 "options": {
                   "list": "revisit"
                 },
+                "max": 1,
                 "required": true
               }
             ],
@@ -15113,8 +15145,6 @@
                 ]
               }
             },
-            "hint": "not_yet_hint",
-            "title": "not_yet_title",
             "next": [
               {
                 "to": "not_yet_done",
@@ -15127,42 +15157,42 @@
             "id": "not_yet_done",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "not_yet_line",
-                "when": null
+                "when": null,
+                "key": "not_yet_line"
               }
             ],
+            "done": "done",
             "next": [],
             "offers": []
           },
           {
             "id": "channel",
             "kind": "ask",
-            "fields": [
-              {
-                "id": "channel",
-                "max": 1,
-                "options": {
-                  "list": "channel"
-                },
-                "required": true
-              }
-            ],
-            "hint": "channel_hint",
             "title": [
               {
-                "key": "channel_title_harms",
                 "when": {
                   "eq": [
                     "$a.what",
                     "harms"
                   ]
-                }
+                },
+                "key": "channel_title_harms"
               },
               {
                 "key": "channel_title"
+              }
+            ],
+            "hint": "channel_hint",
+            "fields": [
+              {
+                "id": "channel",
+                "options": {
+                  "list": "channel"
+                },
+                "max": 1,
+                "required": true
               }
             ],
             "next": [
@@ -15176,21 +15206,21 @@
           {
             "id": "open_line",
             "kind": "ask",
+            "title": "open_title",
             "fields": [
               {
                 "id": "open_line",
-                "max": 1,
                 "options": {
                   "list": "open_line"
                 },
+                "max": 1,
+                "required": true,
                 "own": {
-                  "countsAsPick": true,
-                  "hint": "own_hint"
-                },
-                "required": true
+                  "hint": "own_hint",
+                  "countsAsPick": true
+                }
               }
             ],
-            "title": "open_title",
             "next": [
               {
                 "to": "decision_line",
@@ -15202,10 +15232,11 @@
           {
             "id": "decision_line",
             "kind": "ask",
+            "title": "decision_title",
+            "hint": "decision_hint",
             "fields": [
               {
                 "id": "decision_line",
-                "max": 1,
                 "options": {
                   "list": "decision_line",
                   "where": {
@@ -15215,15 +15246,14 @@
                     ]
                   }
                 },
+                "max": 1,
+                "required": true,
                 "own": {
-                  "countsAsPick": true,
-                  "hint": "own_hint"
-                },
-                "required": true
+                  "hint": "own_hint",
+                  "countsAsPick": true
+                }
               }
             ],
-            "hint": "decision_hint",
-            "title": "decision_title",
             "next": [
               {
                 "to": "practical",
@@ -15235,22 +15265,22 @@
           {
             "id": "practical",
             "kind": "ask",
+            "title": "practical_title",
+            "hint": "practical_hint",
             "fields": [
               {
                 "id": "practical",
-                "max": 2,
                 "options": {
                   "list": "practical"
                 },
+                "max": 2,
+                "swap": true,
                 "own": {
-                  "countsAsPick": true,
-                  "hint": "own_hint"
-                },
-                "swap": true
+                  "hint": "own_hint",
+                  "countsAsPick": true
+                }
               }
             ],
-            "hint": "practical_hint",
-            "title": "practical_title",
             "next": [
               {
                 "to": "card",
@@ -15262,19 +15292,19 @@
           {
             "id": "card",
             "kind": "embed",
-            "answerAs": "card_copied",
             "embed": "boundaryLine",
+            "answerAs": "card_copied",
+            "title": "card_title",
             "props": {
-              "copiedLabel": "card_copied",
-              "copyLabel": "card_copy",
               "field": "open_line",
               "field2": "decision_line",
               "field3": "practical",
-              "next": "next",
+              "shape": "line",
+              "copyLabel": "card_copy",
+              "copiedLabel": "card_copied",
               "selectedLabel": "card_selected",
-              "shape": "line"
+              "next": "next"
             },
-            "title": "card_title",
             "next": [
               {
                 "to": "checkin",
@@ -15286,18 +15316,18 @@
           {
             "id": "checkin",
             "kind": "ask",
+            "title": "checkin_title",
+            "hint": "checkin_hint",
             "fields": [
               {
                 "id": "checkin",
-                "max": 1,
                 "options": {
                   "list": "checkin"
                 },
+                "max": 1,
                 "required": true
               }
             ],
-            "hint": "checkin_hint",
-            "title": "checkin_title",
             "next": [
               {
                 "to": "when",
@@ -15309,27 +15339,27 @@
           {
             "id": "when",
             "kind": "ask",
+            "title": "when_title",
             "fields": [
               {
                 "id": "when",
-                "max": 1,
                 "options": {
                   "list": "when"
                 },
+                "max": 1,
                 "required": true
               }
             ],
             "followUp": {
               "type": "ending_after",
+              "whenFrom": "when",
               "when": {
                 "eq": [
                   "$a.checkin",
                   "yes"
                 ]
-              },
-              "whenFrom": "when"
+              }
             },
-            "title": "when_title",
             "next": [
               {
                 "to": "ahead",
@@ -15342,13 +15372,13 @@
             "id": "ahead",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "ahead_line",
-                "when": null
+                "when": null,
+                "key": "ahead_line"
               }
             ],
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -15357,13 +15387,21 @@
               },
               {
                 "exit": "rehearse",
-                "when": null
+                "when": {
+                  "not": {
+                    "eq": [
+                      "$a.what",
+                      "harms"
+                    ]
+                  }
+                }
               }
             ]
           },
           {
             "id": "after",
             "kind": "ask",
+            "title": "after_title",
             "crisis": [
               {
                 "variant": "other_person",
@@ -15387,6 +15425,11 @@
             "fields": [
               {
                 "id": "after",
+                "options": {
+                  "list": "after"
+                },
+                "max": 1,
+                "required": true,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -15395,20 +15438,15 @@
                       "all": []
                     }
                   }
-                ],
-                "max": 1,
-                "options": {
-                  "list": "after"
-                },
-                "required": true
+                ]
               },
               {
                 "id": "again",
                 "label": "again_label",
-                "max": 1,
                 "options": {
                   "list": "again"
                 },
+                "max": 1,
                 "showWhen": {
                   "all": [
                     {
@@ -15431,6 +15469,7 @@
             ],
             "followUp": {
               "type": "ending_again",
+              "whenFrom": "again",
               "when": {
                 "not": {
                   "in": [
@@ -15441,10 +15480,8 @@
                     ]
                   ]
                 }
-              },
-              "whenFrom": "again"
+              }
             },
-            "title": "after_title",
             "next": [
               {
                 "to": "after_unsafe",
@@ -15475,40 +15512,40 @@
             "id": "after_next",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "after_line_pull",
                 "when": {
                   "eq": [
                     "$a.after",
                     "pull"
                   ]
-                }
+                },
+                "key": "after_line_pull"
               },
               {
-                "key": "after_line_back",
                 "when": {
                   "eq": [
                     "$a.after",
                     "went_back"
                   ]
-                }
+                },
+                "key": "after_line_back"
               },
               {
-                "key": "after_line_not_yet",
                 "when": {
                   "eq": [
                     "$a.after",
                     "not_yet"
                   ]
-                }
+                },
+                "key": "after_line_not_yet"
               },
               {
-                "key": "after_line",
-                "when": null
+                "when": null,
+                "key": "after_line"
               }
             ],
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -15550,6 +15587,7 @@
             "id": "after_unsafe",
             "kind": "handoff",
             "complete": true,
+            "noClose": true,
             "crisis": [
               {
                 "variant": "other_person",
@@ -15558,14 +15596,13 @@
                 }
               }
             ],
-            "done": "done",
             "lines": [
               {
-                "key": "after_unsafe_line",
-                "when": null
+                "when": null,
+                "key": "after_unsafe_line"
               }
             ],
-            "noClose": true,
+            "done": "done",
             "next": [],
             "offers": []
           },
@@ -15573,6 +15610,7 @@
             "id": "after_low",
             "kind": "handoff",
             "complete": true,
+            "noClose": true,
             "crisis": [
               {
                 "variant": "crisis",
@@ -15581,14 +15619,13 @@
                 }
               }
             ],
-            "done": "done",
             "lines": [
               {
-                "key": "after_low_line",
-                "when": null
+                "when": null,
+                "key": "after_low_line"
               }
             ],
-            "noClose": true,
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -15686,10 +15723,11 @@
           {
             "id": "rehearse",
             "toolId": "rehearse",
-            "query": {},
+            "query": {
+              "situationId": "boundary"
+            },
             "carry": [],
-            "done": false,
-            "planned": true
+            "done": false
           },
           {
             "id": "safety_open",
@@ -16854,27 +16892,27 @@
         "ownMax": 140,
         "emotionFields": [],
         "copy": {
-          "after_line": "Making room for it is something you can come back to. What you needed still matters.",
-          "body_line": "That's a lot to carry. Your body first, then the rest can wait.",
-          "card_copied": "Copied",
-          "card_copy": "Copy",
-          "card_selected": "The line is selected, ready to copy.",
-          "card_title": "Your line, to use or not",
-          "done": "Done",
-          "elsewhere_line": "What you needed still matters. It can be met somewhere else.",
-          "elsewhere_line_no": "You said what you needed, and that counts. It's a no for now. What you needed still matters, and it can be met somewhere else.",
-          "elsewhere_line_none": "Saying nothing is a choice too. What you needed still matters, and it can be met somewhere else.",
+          "line_title": "Do you want a line that says where you stand?",
           "line_hint": "A boundary line says what you'll do. It doesn't argue.",
           "line_none": "I don't need to say anything",
-          "line_title": "Do you want a line that says where you stand?",
-          "next": "Next",
           "own_hint": "Say it my way",
-          "room_here": "Yes, here",
-          "room_hint": "Not to agree with the no, or to give up what you need. Only to stop fighting what can't change today.",
-          "room_later": "Not now",
+          "card_title": "Your line, to use or not",
+          "elsewhere_line_no": "You said what you needed, and that counts. It's a no for now. What you needed still matters, and it can be met somewhere else.",
+          "elsewhere_line": "What you needed still matters. It can be met somewhere else.",
+          "elsewhere_line_none": "Saying nothing is a choice too. What you needed still matters, and it can be met somewhere else.",
           "room_title": "Do you want to make some room for it here, for a few minutes?",
+          "room_hint": "Not to agree with the no, or to give up what you need. Only to stop fighting what can't change today.",
+          "room_here": "Yes, here",
+          "room_later": "Not now",
+          "after_line": "Making room for it is something you can come back to. What you needed still matters.",
           "unsafe_line": "Your safety comes first. You don't have to accept anything that's still hurting you. The support here is there any time.",
-          "unsafe_line_made_room": "You made room for what's already happened. You don't have to accept anything that's still hurting you. The support here is there any time."
+          "unsafe_line_made_room": "You made room for what's already happened. You don't have to accept anything that's still hurting you. The support here is there any time.",
+          "body_line": "That's a lot to carry. Your body first, then the rest can wait.",
+          "next": "Next",
+          "done": "Done",
+          "card_copy": "Copy",
+          "card_copied": "Copied",
+          "card_selected": "The line is selected, ready to copy."
         },
         "tables": {},
         "derive": [],
@@ -16882,23 +16920,23 @@
           {
             "id": "line",
             "kind": "ask",
+            "title": "line_title",
+            "hint": "line_hint",
             "fields": [
               {
                 "id": "line",
-                "max": 1,
                 "options": {
                   "list": "line"
                 },
+                "max": 1,
+                "required": true,
                 "own": {
-                  "countsAsPick": true,
                   "hint": "own_hint",
+                  "countsAsPick": true,
                   "max": 90
-                },
-                "required": true
+                }
               }
             ],
-            "hint": "line_hint",
-            "title": "line_title",
             "next": [
               {
                 "to": "room",
@@ -16950,17 +16988,17 @@
           {
             "id": "card",
             "kind": "embed",
-            "answerAs": "card_copied",
             "embed": "boundaryLine",
-            "props": {
-              "copiedLabel": "card_copied",
-              "copyLabel": "card_copy",
-              "field": "line",
-              "next": "next",
-              "selectedLabel": "card_selected",
-              "shape": "line"
-            },
             "title": "card_title",
+            "answerAs": "card_copied",
+            "props": {
+              "field": "line",
+              "shape": "line",
+              "next": "next",
+              "copyLabel": "card_copy",
+              "copiedLabel": "card_copied",
+              "selectedLabel": "card_selected"
+            },
             "next": [
               {
                 "to": "room",
@@ -16993,33 +17031,33 @@
           {
             "id": "room",
             "kind": "ask",
-            "fields": [
-              {
-                "id": "room",
-                "max": 1,
-                "options": {
-                  "list": "room"
-                },
-                "required": true
-              }
-            ],
+            "title": "room_title",
             "hint": "room_hint",
             "lines": [
               {
-                "key": "elsewhere_line_none",
                 "when": {
                   "eq": [
                     "$a.line",
                     "none"
                   ]
-                }
+                },
+                "key": "elsewhere_line_none"
               },
               {
-                "key": "elsewhere_line_no",
-                "when": null
+                "when": null,
+                "key": "elsewhere_line_no"
               }
             ],
-            "title": "room_title",
+            "fields": [
+              {
+                "id": "room",
+                "options": {
+                  "list": "room"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
             "next": [
               {
                 "to": "accept",
@@ -17040,11 +17078,11 @@
           {
             "id": "accept",
             "kind": "embed",
-            "answerAs": "accepted",
             "embed": "inlineSkill",
+            "answerAs": "accepted",
             "props": {
-              "enterAt": "what",
-              "skill": "let_it_be"
+              "skill": "let_it_be",
+              "enterAt": "what"
             },
             "next": [
               {
@@ -17086,19 +17124,19 @@
             "id": "after",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "after_line",
                 "when": {
                   "set": "$a.accepted"
-                }
+                },
+                "key": "after_line"
               },
               {
-                "key": "elsewhere_line",
-                "when": null
+                "when": null,
+                "key": "elsewhere_line"
               }
             ],
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -17115,6 +17153,7 @@
             "id": "unsafe",
             "kind": "handoff",
             "complete": true,
+            "noClose": true,
             "crisis": [
               {
                 "variant": "other_person",
@@ -17123,23 +17162,22 @@
                 }
               }
             ],
-            "done": "done",
             "lines": [
               {
-                "key": "unsafe_line_made_room",
                 "when": {
                   "has": [
                     "$a.accepted.ids",
                     "finished"
                   ]
-                }
+                },
+                "key": "unsafe_line_made_room"
               },
               {
-                "key": "unsafe_line",
-                "when": null
+                "when": null,
+                "key": "unsafe_line"
               }
             ],
-            "noClose": true,
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -17165,14 +17203,14 @@
             "id": "body",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
+            "noClose": true,
             "lines": [
               {
-                "key": "body_line",
-                "when": null
+                "when": null,
+                "key": "body_line"
               }
             ],
-            "noClose": true,
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -17185,31 +17223,31 @@
             "id": "elsewhere",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "elsewhere_line_none",
                 "when": {
                   "eq": [
                     "$a.line",
                     "none"
                   ]
-                }
+                },
+                "key": "elsewhere_line_none"
               },
               {
-                "key": "elsewhere_line_no",
                 "when": {
                   "eq": [
                     "$ctx.frame",
                     "let_go"
                   ]
-                }
+                },
+                "key": "elsewhere_line_no"
               },
               {
-                "key": "elsewhere_line",
-                "when": null
+                "when": null,
+                "key": "elsewhere_line"
               }
             ],
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -17333,28 +17371,28 @@
         "ownMax": 140,
         "emotionFields": [],
         "copy": {
-          "card_a_title": "One sorry for a real wrong. None for having a need.",
-          "card_copied": "Copied",
-          "card_copy": "Copy",
-          "card_f_title": "What you'd say instead",
-          "card_s_title": "The value you'd keep",
-          "card_selected": "The line is selected, ready to copy.",
-          "card_t_title": "The true version",
-          "done": "Done",
-          "instead_title": "What would you say instead, next time?",
-          "next": "Next",
-          "next_line": "That's one move to carry into the next conversation.",
-          "next_line_unsure": "Not sure about the sorry? Check the Facts can help sort it out.",
-          "next_line_wrong": "A sorry for a real wrong is part of keeping your self-respect. Check the Facts can help with whether the guilt fits, and what would repair it.",
-          "own_hint": "Say it my way",
-          "sorry_instead_title": "What could take the place of the extra sorries next time?",
-          "sorry_title": "Was there something you did that needs a sorry?",
-          "truth_title": "What's the true version?",
-          "values_hint": "Pick one or two.",
-          "values_title": "Which value do you want to keep next time?",
+          "what_title": "Looking back, which of these happened?",
           "what_hint": "This happens to a lot of people. Pick the one you'd most like to change.",
           "what_own": "Something else",
-          "what_title": "Looking back, which of these happened?"
+          "sorry_title": "Was there something you did that needs a sorry?",
+          "sorry_instead_title": "What could take the place of the extra sorries next time?",
+          "card_a_title": "One sorry for a real wrong. None for having a need.",
+          "values_title": "Which value do you want to keep next time?",
+          "values_hint": "Pick one or two.",
+          "card_s_title": "The value you'd keep",
+          "truth_title": "What's the true version?",
+          "card_t_title": "The true version",
+          "instead_title": "What would you say instead, next time?",
+          "card_f_title": "What you'd say instead",
+          "own_hint": "Say it my way",
+          "next_line": "That's one move to carry into the next conversation.",
+          "next_line_wrong": "A sorry for a real wrong is part of keeping your self-respect. Check the Facts can help with whether the guilt fits, and what would repair it.",
+          "next_line_unsure": "Not sure about the sorry? Check the Facts can help sort it out.",
+          "next": "Next",
+          "done": "Done",
+          "card_copy": "Copy",
+          "card_copied": "Copied",
+          "card_selected": "The line is selected, ready to copy."
         },
         "tables": {},
         "derive": [],
@@ -17362,23 +17400,23 @@
           {
             "id": "what",
             "kind": "ask",
+            "title": "what_title",
+            "hint": "what_hint",
             "fields": [
               {
                 "id": "what",
-                "max": 1,
                 "options": {
                   "list": "what"
                 },
+                "max": 1,
+                "required": true,
                 "own": {
-                  "countsAsPick": true,
                   "hint": "what_own",
+                  "countsAsPick": true,
                   "max": 90
-                },
-                "required": true
+                }
               }
             ],
-            "hint": "what_hint",
-            "title": "what_title",
             "next": [
               {
                 "to": "sorry",
@@ -17420,17 +17458,17 @@
           {
             "id": "sorry",
             "kind": "ask",
+            "title": "sorry_title",
             "fields": [
               {
                 "id": "sorry",
-                "max": 1,
                 "options": {
                   "list": "sorry"
                 },
+                "max": 1,
                 "required": true
               }
             ],
-            "title": "sorry_title",
             "next": [
               {
                 "to": "sorry_instead",
@@ -17442,22 +17480,22 @@
           {
             "id": "sorry_instead",
             "kind": "ask",
+            "title": "sorry_instead_title",
             "fields": [
               {
                 "id": "sorry_instead",
-                "max": 1,
                 "options": {
                   "list": "sorry_instead"
                 },
+                "max": 1,
+                "required": true,
                 "own": {
-                  "countsAsPick": true,
                   "hint": "own_hint",
+                  "countsAsPick": true,
                   "max": 90
-                },
-                "required": true
+                }
               }
             ],
-            "title": "sorry_instead_title",
             "next": [
               {
                 "to": "card_a",
@@ -17469,17 +17507,17 @@
           {
             "id": "card_a",
             "kind": "embed",
-            "answerAs": "card_a_copied",
             "embed": "boundaryLine",
-            "props": {
-              "copiedLabel": "card_copied",
-              "copyLabel": "card_copy",
-              "field": "sorry_instead",
-              "next": "next",
-              "selectedLabel": "card_selected",
-              "shape": "line"
-            },
             "title": "card_a_title",
+            "answerAs": "card_a_copied",
+            "props": {
+              "field": "sorry_instead",
+              "shape": "line",
+              "next": "next",
+              "copyLabel": "card_copy",
+              "copiedLabel": "card_copied",
+              "selectedLabel": "card_selected"
+            },
             "next": [
               {
                 "to": "next",
@@ -17491,24 +17529,24 @@
           {
             "id": "values",
             "kind": "ask",
+            "title": "values_title",
+            "hint": "values_hint",
             "fields": [
               {
                 "id": "values",
-                "max": 2,
                 "options": {
                   "list": "values"
                 },
-                "own": {
-                  "countsAsPick": true,
-                  "hint": "own_hint",
-                  "max": 40
-                },
+                "max": 2,
+                "swap": true,
                 "required": true,
-                "swap": true
+                "own": {
+                  "hint": "own_hint",
+                  "countsAsPick": true,
+                  "max": 40
+                }
               }
             ],
-            "hint": "values_hint",
-            "title": "values_title",
             "next": [
               {
                 "to": "card_s",
@@ -17520,14 +17558,14 @@
           {
             "id": "card_s",
             "kind": "embed",
-            "answerAs": "card_s_copied",
             "embed": "boundaryLine",
+            "title": "card_s_title",
+            "answerAs": "card_s_copied",
             "props": {
               "field": "values",
-              "next": "next",
-              "shape": "list"
+              "shape": "list",
+              "next": "next"
             },
-            "title": "card_s_title",
             "next": [
               {
                 "to": "next",
@@ -17539,22 +17577,22 @@
           {
             "id": "truth",
             "kind": "ask",
+            "title": "truth_title",
             "fields": [
               {
                 "id": "truth",
-                "max": 1,
                 "options": {
                   "list": "truth"
                 },
+                "max": 1,
+                "required": true,
                 "own": {
-                  "countsAsPick": true,
                   "hint": "own_hint",
+                  "countsAsPick": true,
                   "max": 90
-                },
-                "required": true
+                }
               }
             ],
-            "title": "truth_title",
             "next": [
               {
                 "to": "card_t",
@@ -17566,17 +17604,17 @@
           {
             "id": "card_t",
             "kind": "embed",
-            "answerAs": "card_t_copied",
             "embed": "boundaryLine",
-            "props": {
-              "copiedLabel": "card_copied",
-              "copyLabel": "card_copy",
-              "field": "truth",
-              "next": "next",
-              "selectedLabel": "card_selected",
-              "shape": "line"
-            },
             "title": "card_t_title",
+            "answerAs": "card_t_copied",
+            "props": {
+              "field": "truth",
+              "shape": "line",
+              "next": "next",
+              "copyLabel": "card_copy",
+              "copiedLabel": "card_copied",
+              "selectedLabel": "card_selected"
+            },
             "next": [
               {
                 "to": "next",
@@ -17588,22 +17626,22 @@
           {
             "id": "instead",
             "kind": "ask",
+            "title": "instead_title",
             "fields": [
               {
                 "id": "instead",
-                "max": 1,
                 "options": {
                   "list": "instead"
                 },
+                "max": 1,
+                "required": true,
                 "own": {
-                  "countsAsPick": true,
                   "hint": "own_hint",
+                  "countsAsPick": true,
                   "max": 90
-                },
-                "required": true
+                }
               }
             ],
-            "title": "instead_title",
             "next": [
               {
                 "to": "card_f",
@@ -17615,17 +17653,17 @@
           {
             "id": "card_f",
             "kind": "embed",
-            "answerAs": "card_f_copied",
             "embed": "boundaryLine",
-            "props": {
-              "copiedLabel": "card_copied",
-              "copyLabel": "card_copy",
-              "field": "instead",
-              "next": "next",
-              "selectedLabel": "card_selected",
-              "shape": "line"
-            },
             "title": "card_f_title",
+            "answerAs": "card_f_copied",
+            "props": {
+              "field": "instead",
+              "shape": "line",
+              "next": "next",
+              "copyLabel": "card_copy",
+              "copiedLabel": "card_copied",
+              "selectedLabel": "card_selected"
+            },
             "next": [
               {
                 "to": "next",
@@ -17638,31 +17676,31 @@
             "id": "next",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "next_line_wrong",
                 "when": {
                   "eq": [
                     "$a.sorry",
                     "real_wrong"
                   ]
-                }
+                },
+                "key": "next_line_wrong"
               },
               {
-                "key": "next_line_unsure",
                 "when": {
                   "eq": [
                     "$a.sorry",
                     "unsure"
                   ]
-                }
+                },
+                "key": "next_line_unsure"
               },
               {
-                "key": "next_line",
-                "when": null
+                "when": null,
+                "key": "next_line"
               }
             ],
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -17740,10 +17778,11 @@
           {
             "id": "rehearse",
             "toolId": "rehearse",
-            "query": {},
+            "query": {
+              "situationId": "boundary"
+            },
             "carry": [],
-            "done": false,
-            "planned": true
+            "done": false
           }
         ],
         "options": {
@@ -22111,125 +22150,125 @@
         "ownMax": 140,
         "emotionFields": [],
         "copy": {
-          "ack_label": "What you'd own",
-          "ack_title": "One clear acknowledgement, for what you did. One sorry is enough.",
-          "ack_title_unsure": "If some of it was yours, one acknowledgement for that part. One sorry is enough.",
-          "angry_check_label": "Are you safe with them right now?",
-          "back_hint": "Any answer is fine here.",
-          "back_line": "You came back when you said you would. That's what helps a break feel safe.",
-          "back_line_shaky": "You came back when you said you would. If it still feels raw, a repair can come next.",
-          "back_title": "Did you go back to it?",
-          "between_title": "How are things between you now?",
-          "break_card_title": "Your line",
-          "break_len_label": "How long?",
-          "break_line_label": "What you'll say",
-          "break_set_line": "Something that settles you can help more than the argument on replay. There'll be a card here when it's time.",
-          "break_title": "Say when you'll come back. A return time helps a break feel less like leaving.",
-          "brought_line": "Their feeling first, then yours. You don't have to agree with them to be kind.",
-          "brought_line_disagree": "You can take their feeling seriously and still see it your way. Both can be true.",
-          "brought_title": "What did they bring to you?",
-          "card_ask_them": "Ask about them",
-          "card_finish": "Let them finish before you answer.",
-          "card_heats": "If it heats up: I need half an hour. I'm coming back to this.",
-          "card_how": "How",
-          "card_mine": "Then mine",
-          "card_next_card": "Next card",
-          "card_prev": "Back",
-          "card_say": "Say",
-          "card_stance": "Where I stand",
-          "card_steady": "Stay steady",
-          "card_theirs": "First, theirs",
-          "card_title": "Your lines for the conversation.",
-          "check_facts": "Check the facts first",
-          "cool_down": "Settle my body first",
-          "copied": "Copied",
-          "copy": "Copy",
-          "done": "Done",
-          "fight_hint": "However it went, you can answer honestly here.",
-          "fight_title": "Before the repair: did it get physical, or are you scared of them now?",
-          "g_question_label": "Interested: one question to ask them",
-          "g_validate_label": "Validate: one line for their side",
-          "gentle_card_title": "Take these into your ask.",
-          "gentle_line": "The warmth goes in around the ask. The ask itself stays clear.",
-          "gentle_title": "What would keep it warm while you ask?",
-          "gentle_title_heads_up": "Short and plain with them, and a little warmth. What would help?",
-          "guilt_hint": "Feeling bad and having done something wrong aren't always the same thing.",
-          "guilt_title": "Looking back, was some of it yours?",
-          "guilt_unsure_line": "If you're not sure it was yours, checking the facts first can help.",
-          "interested_label": "One question to ask them",
-          "manner_label": "Easy manner: how it sounds",
-          "mine_label": "Something of yours to say (optional)",
-          "more_line": "There'll be a card here then.",
-          "more_title": "That's okay. When will you go back?",
-          "next": "Next",
-          "no_return_line": "Not going back to it is an answer too. You can choose what happens next with them.",
-          "no_sorry_card_title": "Your line",
-          "no_sorry_hint": "You don't owe an apology for having a need, or for a fair no.",
-          "no_sorry_line": "Warm and steady. You can care about them and not apologise for what wasn't yours.",
-          "no_sorry_title": "What would you say, without a sorry?",
-          "no_sorry_title_unsure": "Something warm, without a sorry. What would you say?",
-          "not_safe_label": "If it isn't safe",
-          "open_messages": "Open messages",
-          "own_line": "In my own words",
-          "picker_personChanged": "Things changed with someone?",
-          "picker_personChangedHint": "Pick who it is, and you'll be asked about them again.",
-          "picker_personGoOn": "Go on",
-          "picker_personKeepLine": "The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.",
-          "picker_personNameHint": "A nickname is fine. No real names needed.",
-          "picker_personNameLabel": "What do you call them?",
-          "picker_personNew": "Someone new",
-          "picker_personNoNameLine": "Without a name, nothing about them is kept.",
-          "picker_personRoleLabel": "Who are they to you?",
-          "picker_personSignedOutLine": "This stays on this screen only.",
-          "picker_personWhoGive": "Who's it with?",
-          "picker_riskBadly": "It tends to go badly",
-          "picker_riskHarm": "They might hurt or control me",
-          "picker_riskQuestion": "Is it more that they might hurt or control you, or that it tends to go badly?",
-          "picker_riskUnsaid": "I'd rather not say",
-          "picker_safeNo": "No",
-          "picker_safeQuestion": "Is it safe to bring hard things up with {who}?",
-          "picker_safeUnsure": "Not sure",
-          "picker_safeYes": "Yes, mostly",
-          "picker_safetyRouteBack": "This is about someone else",
-          "picker_safetyRouteBody": "The people below can help you think it through, any time, and you don't have to be sure.",
-          "picker_safetyRouteEnding": "Thinking about ending the relationship",
-          "picker_safetyRouteGiveHeading": "Keeping it warm isn't your job with {who}. Your safety comes first.",
-          "r_ask_label": "One question about what would help (optional)",
-          "r_commit_label": "Something you'll do differently (optional)",
-          "r_validate_label": "A line for how it was for them (optional)",
-          "refused_line": "You came back. That part was yours, and you did it. They may need longer.",
-          "refused_line_ask": "With them, this works best for practical asks. Being heard is something they haven't been able to give lately.",
-          "repair_again_label": "Want me to ask how it went?",
-          "repair_explain": "Keep it to what you did. A long explanation can sound like an excuse.",
-          "repair_msg_title": "Here's your repair.",
-          "repair_sent_heads_up": "With them, short and in writing can be kinder for you both.",
-          "repair_sent_line": "Your repair is ready. When you say it is up to you.",
-          "repaired_line": "You owned your part, and things feel okay again.",
-          "repaired_line_shaky": "Repairs often take more than one go. Your part was the acknowledgement, and you did it.",
-          "repaired_not_ready": "You said your part. When they're ready to hear it is theirs.",
-          "repaired_not_yet": "Not yet. Your words are still here when you're ready.",
-          "repaired_title": "Did you get to say it?",
-          "scared_line": "Someone's safety comes before any repair. The people above can help, any time, whichever side of it you're on.",
-          "selected": "Selected. Copy it from here.",
-          "situation_hint": "Pick the one closest.",
           "situation_title": "What's going on with them?",
           "situation_title_flooded": "Your body's running hot. A break you come back from can be the kind move right now.",
-          "soft_done": "Done",
-          "soft_running": "Open hands, soft face",
-          "soft_start": "Start",
+          "situation_hint": "Pick the one closest.",
+          "cool_down": "Settle my body first",
+          "next": "Next",
+          "done": "Done",
+          "copy": "Copy",
+          "copied": "Copied",
+          "selected": "Selected. Copy it from here.",
+          "open_messages": "Open messages",
+          "stirred_line": "This is a lot to hold. Your side matters too, and it gets its turn.",
+          "brought_title": "What did they bring to you?",
+          "their_title": "First, their side.",
+          "their_hint": "Their feeling can make sense even when you see the facts differently.",
+          "validate_label": "One line for how they feel",
+          "interested_label": "One question to ask them",
+          "own_line": "In my own words",
+          "yours_title": "Then yours. You can hear them and still disagree.",
+          "stance_label": "Where are you with it?",
+          "angry_check_label": "Are you safe with them right now?",
+          "mine_label": "Something of yours to say (optional)",
+          "card_title": "Your lines for the conversation.",
+          "card_theirs": "First, theirs",
+          "card_steady": "Stay steady",
+          "card_mine": "Then mine",
+          "card_prev": "Back",
+          "card_next_card": "Next card",
+          "card_stance": "Where I stand",
+          "card_heats": "If it heats up: I need half an hour. I'm coming back to this.",
+          "card_finish": "Let them finish before you answer.",
+          "brought_line": "Their feeling first, then yours. You don't have to agree with them to be kind.",
+          "brought_line_disagree": "You can take their feeling seriously and still see it your way. Both can be true.",
+          "fight_title": "Before the repair: did it get physical, or are you scared of them now?",
+          "fight_hint": "However it went, you can answer honestly here.",
+          "scared_line": "Someone's safety comes before any repair. The people above can help, any time, whichever side of it you're on.",
+          "guilt_title": "Looking back, was some of it yours?",
+          "guilt_hint": "Feeling bad and having done something wrong aren't always the same thing.",
+          "check_facts": "Check the facts first",
+          "guilt_unsure_line": "If you're not sure it was yours, checking the facts first can help.",
+          "unsure_title": "Not sure is a fair answer. What would you like to do?",
+          "ack_title": "One clear acknowledgement, for what you did. One sorry is enough.",
+          "ack_title_unsure": "If some of it was yours, one acknowledgement for that part. One sorry is enough.",
+          "ack_label": "What you'd own",
+          "r_validate_label": "A line for how it was for them (optional)",
+          "r_ask_label": "One question about what would help (optional)",
+          "r_commit_label": "Something you'll do differently (optional)",
+          "repair_msg_title": "Here's your repair.",
+          "repair_explain": "Keep it to what you did. A long explanation can sound like an excuse.",
+          "repair_again_label": "Want me to ask how it went?",
+          "repair_sent_line": "Your repair is ready. When you say it is up to you.",
+          "repair_sent_heads_up": "With them, short and in writing can be kinder for you both.",
+          "no_sorry_title": "What would you say, without a sorry?",
+          "no_sorry_title_unsure": "Something warm, without a sorry. What would you say?",
+          "no_sorry_hint": "You don't owe an apology for having a need, or for a fair no.",
+          "no_sorry_card_title": "Your line",
+          "no_sorry_line": "Warm and steady. You can care about them and not apologise for what wasn't yours.",
+          "repaired_title": "Did you get to say it?",
+          "between_title": "How are things between you now?",
+          "repaired_line": "You owned your part, and things feel okay again.",
+          "repaired_line_shaky": "Repairs often take more than one go. Your part was the acknowledgement, and you did it.",
+          "repaired_not_yet": "Not yet. Your words are still here when you're ready.",
+          "repaired_not_ready": "You said your part. When they're ready to hear it is theirs.",
+          "break_title": "Say when you'll come back. A return time helps a break feel less like leaving.",
+          "break_len_label": "How long?",
+          "break_line_label": "What you'll say",
+          "break_card_title": "Your line",
+          "break_set_line": "Something that settles you can help more than the argument on replay. There'll be a card here when it's time.",
+          "back_title": "Did you go back to it?",
+          "back_hint": "Any answer is fine here.",
+          "still_ok_title": "How are things between you now?",
+          "back_line": "You came back when you said you would. That's what helps a break feel safe.",
+          "back_line_shaky": "You came back when you said you would. If it still feels raw, a repair can come next.",
+          "more_title": "That's okay. When will you go back?",
+          "more_line": "There'll be a card here then.",
+          "no_return_line": "Not going back to it is an answer too. You can choose what happens next with them.",
+          "not_safe_label": "If it isn't safe",
+          "refused_line": "You came back. That part was yours, and you did it. They may need longer.",
+          "gentle_title": "What would keep it warm while you ask?",
+          "gentle_title_heads_up": "Short and plain with them, and a little warmth. What would help?",
+          "refused_line_ask": "With them, this works best for practical asks. Being heard is something they haven't been able to give lately.",
+          "swap_label": "Gentle: any sharp words to swap?",
+          "g_question_label": "Interested: one question to ask them",
+          "g_validate_label": "Validate: one line for their side",
+          "manner_label": "Easy manner: how it sounds",
+          "soft_title": "Easy manner starts in the body.",
           "soft_step1": "Let your hands rest open, palms up.",
           "soft_step2": "Soften your face and jaw.",
           "soft_step3": "Breathe out slowly once.",
-          "soft_title": "Easy manner starts in the body.",
-          "stance_label": "Where are you with it?",
-          "still_ok_title": "How are things between you now?",
-          "stirred_line": "This is a lot to hold. Your side matters too, and it gets its turn.",
-          "swap_label": "Gentle: any sharp words to swap?",
-          "their_hint": "Their feeling can make sense even when you see the facts differently.",
-          "their_title": "First, their side.",
-          "unsure_title": "Not sure is a fair answer. What would you like to do?",
-          "validate_label": "One line for how they feel",
-          "yours_title": "Then yours. You can hear them and still disagree."
+          "soft_start": "Start",
+          "soft_running": "Open hands, soft face",
+          "soft_done": "Done",
+          "gentle_card_title": "Take these into your ask.",
+          "card_say": "Say",
+          "card_how": "How",
+          "card_ask_them": "Ask about them",
+          "gentle_line": "The warmth goes in around the ask. The ask itself stays clear.",
+          "picker_personWhoGive": "Who's it with?",
+          "picker_personNew": "Someone new",
+          "picker_personNameLabel": "What do you call them?",
+          "picker_personNameHint": "A nickname is fine. No real names needed.",
+          "picker_personRoleLabel": "Who are they to you?",
+          "picker_personKeepLine": "The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.",
+          "picker_personNoNameLine": "Without a name, nothing about them is kept.",
+          "picker_personSignedOutLine": "This stays on this screen only.",
+          "picker_personGoOn": "Go on",
+          "picker_personChanged": "Things changed with someone?",
+          "picker_personChangedHint": "Pick who it is, and you'll be asked about them again.",
+          "picker_safeQuestion": "Is it safe to bring hard things up with {who}?",
+          "picker_safeYes": "Yes, mostly",
+          "picker_safeNo": "No",
+          "picker_safeUnsure": "Not sure",
+          "picker_riskQuestion": "Is it more that they might hurt or control you, or that it tends to go badly?",
+          "picker_riskHarm": "They might hurt or control me",
+          "picker_riskBadly": "It tends to go badly",
+          "picker_riskUnsaid": "I'd rather not say",
+          "picker_safetyRouteGiveHeading": "Keeping it warm isn't your job with {who}. Your safety comes first.",
+          "picker_safetyRouteBody": "The people below can help you think it through, any time, and you don't have to be sure.",
+          "picker_safetyRouteEnding": "Thinking about ending the relationship",
+          "picker_safetyRouteBack": "This is about someone else"
         },
         "tables": {},
         "derive": [],
@@ -22237,24 +22276,37 @@
           {
             "id": "what",
             "kind": "ask",
+            "title": [
+              {
+                "key": "situation_title_flooded",
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "flooded"
+                  ]
+                }
+              },
+              {
+                "key": "situation_title"
+              }
+            ],
+            "lines": [
+              {
+                "when": {
+                  "not": {
+                    "eq": [
+                      "$ctx.band",
+                      "flooded"
+                    ]
+                  }
+                },
+                "key": "situation_hint"
+              }
+            ],
             "fields": [
               {
                 "id": "situation",
-                "links": [
-                  {
-                    "exit": "cool_down",
-                    "label": "cool_down",
-                    "when": {
-                      "eq": [
-                        "$ctx.band",
-                        "flooded"
-                      ]
-                    }
-                  }
-                ],
-                "max": 1,
                 "options": {
-                  "firstFrom": "$ctx.situationId",
                   "list": "situation",
                   "where": {
                     "any": [
@@ -22273,36 +22325,23 @@
                         ]
                       }
                     ]
-                  }
+                  },
+                  "firstFrom": "$ctx.situationId"
                 },
-                "required": true
-              }
-            ],
-            "lines": [
-              {
-                "key": "situation_hint",
-                "when": {
-                  "not": {
-                    "eq": [
-                      "$ctx.band",
-                      "flooded"
-                    ]
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "cool_down",
+                    "label": "cool_down",
+                    "when": {
+                      "eq": [
+                        "$ctx.band",
+                        "flooded"
+                      ]
+                    }
                   }
-                }
-              }
-            ],
-            "title": [
-              {
-                "key": "situation_title_flooded",
-                "when": {
-                  "eq": [
-                    "$ctx.band",
-                    "flooded"
-                  ]
-                }
-              },
-              {
-                "key": "situation_title"
+                ]
               }
             ],
             "next": [
@@ -22353,6 +22392,43 @@
           {
             "id": "brought",
             "kind": "ask",
+            "title": "brought_title",
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "stirred"
+                  ]
+                },
+                "key": "stirred_line"
+              }
+            ],
+            "fields": [
+              {
+                "id": "brought",
+                "options": {
+                  "list": "brought"
+                },
+                "max": 1,
+                "required": true
+              },
+              {
+                "id": "angry_ok",
+                "label": "angry_check_label",
+                "options": {
+                  "list": "angry_ok"
+                },
+                "max": 1,
+                "required": true,
+                "showWhen": {
+                  "eq": [
+                    "$a.brought",
+                    "angry"
+                  ]
+                }
+              }
+            ],
             "crisis": [
               {
                 "variant": "other_person",
@@ -22364,43 +22440,6 @@
                 }
               }
             ],
-            "fields": [
-              {
-                "id": "brought",
-                "max": 1,
-                "options": {
-                  "list": "brought"
-                },
-                "required": true
-              },
-              {
-                "id": "angry_ok",
-                "label": "angry_check_label",
-                "max": 1,
-                "options": {
-                  "list": "angry_ok"
-                },
-                "required": true,
-                "showWhen": {
-                  "eq": [
-                    "$a.brought",
-                    "angry"
-                  ]
-                }
-              }
-            ],
-            "lines": [
-              {
-                "key": "stirred_line",
-                "when": {
-                  "eq": [
-                    "$ctx.band",
-                    "stirred"
-                  ]
-                }
-              }
-            ],
-            "title": "brought_title",
             "next": [
               {
                 "to": "scared",
@@ -22421,11 +22460,12 @@
           {
             "id": "theirs",
             "kind": "ask",
+            "title": "their_title",
+            "hint": "their_hint",
             "fields": [
               {
                 "id": "validate",
                 "label": "validate_label",
-                "max": 1,
                 "options": {
                   "list": "validate",
                   "where": {
@@ -22435,17 +22475,17 @@
                     ]
                   }
                 },
+                "max": 1,
+                "required": true,
                 "own": {
-                  "countsAsPick": true,
                   "hint": "own_line",
+                  "countsAsPick": true,
                   "max": 36
-                },
-                "required": true
+                }
               },
               {
                 "id": "interested",
                 "label": "interested_label",
-                "max": 1,
                 "options": {
                   "list": "interested",
                   "where": {
@@ -22454,11 +22494,10 @@
                       "$a.brought"
                     ]
                   }
-                }
+                },
+                "max": 1
               }
             ],
-            "hint": "their_hint",
-            "title": "their_title",
             "next": [
               {
                 "to": "yours",
@@ -22470,20 +22509,20 @@
           {
             "id": "yours",
             "kind": "ask",
+            "title": "yours_title",
             "fields": [
               {
                 "id": "stance",
                 "label": "stance_label",
-                "max": 1,
                 "options": {
                   "list": "stance"
                 },
+                "max": 1,
                 "required": true
               },
               {
                 "id": "mine",
                 "label": "mine_label",
-                "max": 1,
                 "options": {
                   "list": "mine",
                   "where": {
@@ -22503,12 +22542,12 @@
                     ]
                   }
                 },
+                "max": 1,
                 "showWhen": {
                   "set": "$a.stance"
                 }
               }
             ],
-            "title": "yours_title",
             "next": [
               {
                 "to": "b_card",
@@ -22520,34 +22559,34 @@
           {
             "id": "b_card",
             "kind": "embed",
-            "answerAs": "b_card_how",
             "embed": "pocketCard",
+            "title": "card_title",
+            "answerAs": "b_card_how",
             "props": {
-              "copiedLabel": "copied",
-              "copyLabel": "copy",
-              "labelA": "card_stance",
-              "labelAField": "stance",
-              "next": "next",
-              "nextCardLabel": "card_next_card",
-              "prevLabel": "card_prev",
-              "push": [
-                "mine"
-              ],
-              "pushLabel": "card_mine",
               "say": [
                 "validate",
                 "interested"
               ],
-              "sayLabel": "card_theirs",
-              "selectedLabel": "selected",
               "steady": [
                 "stance"
               ],
+              "push": [
+                "mine"
+              ],
+              "sayLabel": "card_theirs",
               "steadyLabel": "card_steady",
+              "pushLabel": "card_mine",
+              "labelAField": "stance",
+              "labelA": "card_stance",
               "steadyNoteA": "card_finish",
-              "steadyNoteB": "card_heats"
+              "steadyNoteB": "card_heats",
+              "prevLabel": "card_prev",
+              "nextCardLabel": "card_next_card",
+              "copyLabel": "copy",
+              "copiedLabel": "copied",
+              "selectedLabel": "selected",
+              "next": "next"
             },
-            "title": "card_title",
             "next": [
               {
                 "to": "b_end",
@@ -22560,22 +22599,22 @@
             "id": "b_end",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "brought_line_disagree",
                 "when": {
                   "eq": [
                     "$a.stance",
                     "disagree"
                   ]
-                }
+                },
+                "key": "brought_line_disagree"
               },
               {
-                "key": "brought_line",
-                "when": null
+                "when": null,
+                "key": "brought_line"
               }
             ],
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -22596,6 +22635,29 @@
           {
             "id": "fight",
             "kind": "ask",
+            "title": "fight_title",
+            "hint": "fight_hint",
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "stirred"
+                  ]
+                },
+                "key": "stirred_line"
+              }
+            ],
+            "fields": [
+              {
+                "id": "fight",
+                "options": {
+                  "list": "fight"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
             "crisis": [
               {
                 "variant": "other_person",
@@ -22610,29 +22672,6 @@
                 }
               }
             ],
-            "fields": [
-              {
-                "id": "fight",
-                "max": 1,
-                "options": {
-                  "list": "fight"
-                },
-                "required": true
-              }
-            ],
-            "hint": "fight_hint",
-            "lines": [
-              {
-                "key": "stirred_line",
-                "when": {
-                  "eq": [
-                    "$ctx.band",
-                    "stirred"
-                  ]
-                }
-              }
-            ],
-            "title": "fight_title",
             "next": [
               {
                 "to": "scared",
@@ -22657,6 +22696,7 @@
             "id": "scared",
             "kind": "handoff",
             "complete": true,
+            "noClose": true,
             "crisis": [
               {
                 "variant": "other_person",
@@ -22665,14 +22705,13 @@
                 }
               }
             ],
-            "done": "done",
             "lines": [
               {
-                "key": "scared_line",
-                "when": null
+                "when": null,
+                "key": "scared_line"
               }
             ],
-            "noClose": true,
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -22688,18 +22727,18 @@
           {
             "id": "guilt",
             "kind": "ask",
+            "title": "guilt_title",
+            "hint": "guilt_hint",
             "fields": [
               {
                 "id": "guilt",
-                "max": 1,
                 "options": {
                   "list": "guilt"
                 },
+                "max": 1,
                 "required": true
               }
             ],
-            "hint": "guilt_hint",
-            "title": "guilt_title",
             "next": [
               {
                 "to": "no_sorry",
@@ -22729,9 +22768,16 @@
           {
             "id": "unsure",
             "kind": "ask",
+            "title": "unsure_title",
+            "hint": "guilt_unsure_line",
             "fields": [
               {
                 "id": "unsure",
+                "options": {
+                  "list": "unsure"
+                },
+                "max": 1,
+                "required": true,
                 "links": [
                   {
                     "exit": "check_the_facts",
@@ -22740,16 +22786,9 @@
                       "all": []
                     }
                   }
-                ],
-                "max": 1,
-                "options": {
-                  "list": "unsure"
-                },
-                "required": true
+                ]
               }
             ],
-            "hint": "guilt_unsure_line",
-            "title": "unsure_title",
             "next": [
               {
                 "to": "no_sorry",
@@ -22770,46 +22809,6 @@
           {
             "id": "owning",
             "kind": "ask",
-            "fields": [
-              {
-                "id": "ack",
-                "label": "ack_label",
-                "max": 1,
-                "options": {
-                  "list": "ack"
-                },
-                "own": {
-                  "countsAsPick": true,
-                  "hint": "own_line",
-                  "max": 36
-                },
-                "required": true
-              },
-              {
-                "id": "r_validate",
-                "label": "r_validate_label",
-                "max": 1,
-                "options": {
-                  "list": "r_validate"
-                }
-              },
-              {
-                "id": "commit",
-                "label": "r_commit_label",
-                "max": 1,
-                "options": {
-                  "list": "commit"
-                }
-              },
-              {
-                "id": "r_ask",
-                "label": "r_ask_label",
-                "max": 1,
-                "options": {
-                  "list": "r_ask"
-                }
-              }
-            ],
             "hint": "repair_explain",
             "title": [
               {
@@ -22825,6 +22824,46 @@
                 "key": "ack_title"
               }
             ],
+            "fields": [
+              {
+                "id": "ack",
+                "label": "ack_label",
+                "options": {
+                  "list": "ack"
+                },
+                "max": 1,
+                "required": true,
+                "own": {
+                  "hint": "own_line",
+                  "countsAsPick": true,
+                  "max": 36
+                }
+              },
+              {
+                "id": "r_validate",
+                "label": "r_validate_label",
+                "options": {
+                  "list": "r_validate"
+                },
+                "max": 1
+              },
+              {
+                "id": "commit",
+                "label": "r_commit_label",
+                "options": {
+                  "list": "commit"
+                },
+                "max": 1
+              },
+              {
+                "id": "r_ask",
+                "label": "r_ask_label",
+                "options": {
+                  "list": "r_ask"
+                },
+                "max": 1
+              }
+            ],
             "next": [
               {
                 "to": "r_msg",
@@ -22836,23 +22875,23 @@
           {
             "id": "r_msg",
             "kind": "embed",
-            "answerAs": "repair_how",
             "embed": "messageComposer",
+            "title": "repair_msg_title",
+            "answerAs": "repair_how",
             "props": {
-              "copiedLabel": "copied",
-              "copyLabel": "copy",
-              "field": "ack",
-              "next": "next",
-              "openLabel": "open_messages",
               "parts": [
                 "ack",
                 "r_validate",
                 "commit",
                 "r_ask"
               ],
-              "selectedLabel": "selected"
+              "field": "ack",
+              "copyLabel": "copy",
+              "copiedLabel": "copied",
+              "selectedLabel": "selected",
+              "openLabel": "open_messages",
+              "next": "next"
             },
-            "title": "repair_msg_title",
             "next": [
               {
                 "to": "r_sent",
@@ -22865,7 +22904,21 @@
             "id": "r_sent",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "heads_up"
+                  ]
+                },
+                "key": "repair_sent_heads_up"
+              },
+              {
+                "when": null,
+                "key": "repair_sent_line"
+              }
+            ],
             "fields": [
               {
                 "id": "again",
@@ -22880,21 +22933,7 @@
               "type": "repair_outcome",
               "whenFrom": "again"
             },
-            "lines": [
-              {
-                "key": "repair_sent_heads_up",
-                "when": {
-                  "eq": [
-                    "$ctx.frame",
-                    "heads_up"
-                  ]
-                }
-              },
-              {
-                "key": "repair_sent_line",
-                "when": null
-              }
-            ],
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -22906,29 +22945,6 @@
           {
             "id": "no_sorry",
             "kind": "ask",
-            "fields": [
-              {
-                "id": "no_sorry",
-                "max": 1,
-                "options": {
-                  "list": "no_sorry"
-                },
-                "required": true
-              }
-            ],
-            "lines": [
-              {
-                "key": "no_sorry_hint",
-                "when": {
-                  "not": {
-                    "eq": [
-                      "$a.guilt",
-                      "unsure"
-                    ]
-                  }
-                }
-              }
-            ],
             "title": [
               {
                 "key": "no_sorry_title_unsure",
@@ -22943,6 +22959,29 @@
                 "key": "no_sorry_title"
               }
             ],
+            "lines": [
+              {
+                "when": {
+                  "not": {
+                    "eq": [
+                      "$a.guilt",
+                      "unsure"
+                    ]
+                  }
+                },
+                "key": "no_sorry_hint"
+              }
+            ],
+            "fields": [
+              {
+                "id": "no_sorry",
+                "options": {
+                  "list": "no_sorry"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
             "next": [
               {
                 "to": "ns_card",
@@ -22954,17 +22993,17 @@
           {
             "id": "ns_card",
             "kind": "embed",
-            "answerAs": "ns_copied",
             "embed": "boundaryLine",
-            "props": {
-              "copiedLabel": "copied",
-              "copyLabel": "copy",
-              "field": "no_sorry",
-              "next": "next",
-              "selectedLabel": "selected",
-              "shape": "line"
-            },
             "title": "no_sorry_card_title",
+            "answerAs": "ns_copied",
+            "props": {
+              "field": "no_sorry",
+              "shape": "line",
+              "copyLabel": "copy",
+              "copiedLabel": "copied",
+              "selectedLabel": "selected",
+              "next": "next"
+            },
             "next": [
               {
                 "to": "ns_end",
@@ -22977,13 +23016,13 @@
             "id": "ns_end",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "no_sorry_line",
-                "when": null
+                "when": null,
+                "key": "no_sorry_line"
               }
             ],
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -22995,9 +23034,23 @@
           {
             "id": "repaired",
             "kind": "ask",
+            "reopens": {
+              "after": "r_sent"
+            },
             "clears": [
               "repaired",
               "between"
+            ],
+            "title": "repaired_title",
+            "fields": [
+              {
+                "id": "repaired",
+                "options": {
+                  "list": "repaired"
+                },
+                "max": 1,
+                "required": true
+              }
             ],
             "crisis": [
               {
@@ -23010,20 +23063,6 @@
                 }
               }
             ],
-            "fields": [
-              {
-                "id": "repaired",
-                "max": 1,
-                "options": {
-                  "list": "repaired"
-                },
-                "required": true
-              }
-            ],
-            "reopens": {
-              "after": "r_sent"
-            },
-            "title": "repaired_title",
             "next": [
               {
                 "to": "scared",
@@ -23062,6 +23101,17 @@
           {
             "id": "between",
             "kind": "ask",
+            "title": "between_title",
+            "fields": [
+              {
+                "id": "between",
+                "options": {
+                  "list": "between"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
             "crisis": [
               {
                 "variant": "other_person",
@@ -23073,17 +23123,6 @@
                 }
               }
             ],
-            "fields": [
-              {
-                "id": "between",
-                "max": 1,
-                "options": {
-                  "list": "between"
-                },
-                "required": true
-              }
-            ],
-            "title": "between_title",
             "next": [
               {
                 "to": "scared",
@@ -23105,10 +23144,8 @@
             "id": "r_end",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "repaired_line_shaky",
                 "when": {
                   "in": [
                     "$a.between",
@@ -23117,13 +23154,15 @@
                       "no"
                     ]
                   ]
-                }
+                },
+                "key": "repaired_line_shaky"
               },
               {
-                "key": "repaired_line",
-                "when": null
+                "when": null,
+                "key": "repaired_line"
               }
             ],
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -23141,13 +23180,13 @@
             "id": "r_later",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "repaired_not_yet",
-                "when": null
+                "when": null,
+                "key": "repaired_not_yet"
               }
             ],
+            "done": "done",
             "next": [],
             "offers": []
           },
@@ -23155,13 +23194,13 @@
             "id": "r_wait",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "repaired_not_ready",
-                "when": null
+                "when": null,
+                "key": "repaired_not_ready"
               }
             ],
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -23173,25 +23212,15 @@
           {
             "id": "break",
             "kind": "ask",
-            "crisis": [
-              {
-                "variant": "other_person",
-                "when": {
-                  "eq": [
-                    "$a.not_safe",
-                    "unsafe"
-                  ]
-                }
-              }
-            ],
+            "title": "break_title",
             "fields": [
               {
                 "id": "break_len",
                 "label": "break_len_label",
-                "max": 1,
                 "options": {
                   "list": "break_len"
                 },
+                "max": 1,
                 "required": true,
                 "showWhen": {
                   "not": {
@@ -23205,7 +23234,6 @@
               {
                 "id": "break_line",
                 "label": "break_line_label",
-                "max": 1,
                 "options": {
                   "list": "break_line",
                   "where": {
@@ -23215,6 +23243,7 @@
                     ]
                   }
                 },
+                "max": 1,
                 "required": true,
                 "showWhen": {
                   "all": [
@@ -23235,9 +23264,20 @@
               {
                 "id": "not_safe",
                 "label": "not_safe_label",
-                "max": 1,
                 "options": {
                   "list": "not_safe"
+                },
+                "max": 1
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.not_safe",
+                    "unsafe"
+                  ]
                 }
               }
             ],
@@ -23245,7 +23285,6 @@
               "type": "break_return",
               "whenFrom": "break_len"
             },
-            "title": "break_title",
             "next": [
               {
                 "to": "scared",
@@ -23266,17 +23305,17 @@
           {
             "id": "b_line",
             "kind": "embed",
-            "answerAs": "break_copied",
             "embed": "boundaryLine",
-            "props": {
-              "copiedLabel": "copied",
-              "copyLabel": "copy",
-              "field": "break_line",
-              "next": "next",
-              "selectedLabel": "selected",
-              "shape": "line"
-            },
             "title": "break_card_title",
+            "answerAs": "break_copied",
+            "props": {
+              "field": "break_line",
+              "shape": "line",
+              "copyLabel": "copy",
+              "copiedLabel": "copied",
+              "selectedLabel": "selected",
+              "next": "next"
+            },
             "next": [
               {
                 "to": "b_set",
@@ -23289,13 +23328,13 @@
             "id": "b_set",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "break_set_line",
-                "when": null
+                "when": null,
+                "key": "break_set_line"
               }
             ],
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -23307,10 +23346,28 @@
           {
             "id": "back",
             "kind": "ask",
+            "reopens": {
+              "after": "break",
+              "again": [
+                "more"
+              ]
+            },
             "clears": [
               "back",
               "still_ok",
               "more"
+            ],
+            "title": "back_title",
+            "hint": "back_hint",
+            "fields": [
+              {
+                "id": "back",
+                "options": {
+                  "list": "back"
+                },
+                "max": 1,
+                "required": true
+              }
             ],
             "crisis": [
               {
@@ -23323,24 +23380,6 @@
                 }
               }
             ],
-            "fields": [
-              {
-                "id": "back",
-                "max": 1,
-                "options": {
-                  "list": "back"
-                },
-                "required": true
-              }
-            ],
-            "hint": "back_hint",
-            "reopens": {
-              "after": "break",
-              "again": [
-                "more"
-              ]
-            },
-            "title": "back_title",
             "next": [
               {
                 "to": "scared",
@@ -23388,6 +23427,17 @@
           {
             "id": "still_ok",
             "kind": "ask",
+            "title": "still_ok_title",
+            "fields": [
+              {
+                "id": "still_ok",
+                "options": {
+                  "list": "between"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
             "crisis": [
               {
                 "variant": "other_person",
@@ -23399,17 +23449,6 @@
                 }
               }
             ],
-            "fields": [
-              {
-                "id": "still_ok",
-                "max": 1,
-                "options": {
-                  "list": "between"
-                },
-                "required": true
-              }
-            ],
-            "title": "still_ok_title",
             "next": [
               {
                 "to": "scared",
@@ -23431,10 +23470,8 @@
             "id": "back_end",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "back_line_shaky",
                 "when": {
                   "in": [
                     "$a.still_ok",
@@ -23443,13 +23480,15 @@
                       "no"
                     ]
                   ]
-                }
+                },
+                "key": "back_line_shaky"
               },
               {
-                "key": "back_line",
-                "when": null
+                "when": null,
+                "key": "back_line"
               }
             ],
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -23469,13 +23508,14 @@
           {
             "id": "more",
             "kind": "ask",
+            "title": "more_title",
             "fields": [
               {
                 "id": "more",
-                "max": 1,
                 "options": {
                   "list": "break_len"
                 },
+                "max": 1,
                 "required": true
               }
             ],
@@ -23483,7 +23523,6 @@
               "type": "break_return",
               "whenFrom": "more"
             },
-            "title": "more_title",
             "next": [
               {
                 "to": "more_set",
@@ -23496,13 +23535,13 @@
             "id": "more_set",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "more_line",
-                "when": null
+                "when": null,
+                "key": "more_line"
               }
             ],
+            "done": "done",
             "next": [],
             "offers": []
           },
@@ -23510,13 +23549,13 @@
             "id": "refused",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "refused_line",
-                "when": null
+                "when": null,
+                "key": "refused_line"
               }
             ],
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -23529,13 +23568,13 @@
             "id": "no_back",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "no_return_line",
-                "when": null
+                "when": null,
+                "key": "no_return_line"
               }
             ],
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -23547,60 +23586,6 @@
           {
             "id": "gentle",
             "kind": "ask",
-            "fields": [
-              {
-                "id": "swap",
-                "label": "swap_label",
-                "max": 2,
-                "options": {
-                  "list": "swap"
-                }
-              },
-              {
-                "id": "g_question",
-                "label": "g_question_label",
-                "max": 1,
-                "options": {
-                  "list": "g_question"
-                }
-              },
-              {
-                "id": "g_validate",
-                "label": "g_validate_label",
-                "max": 1,
-                "options": {
-                  "list": "g_validate"
-                }
-              },
-              {
-                "id": "manner",
-                "label": "manner_label",
-                "max": 1,
-                "options": {
-                  "list": "manner"
-                }
-              }
-            ],
-            "lines": [
-              {
-                "key": "refused_line_ask",
-                "when": {
-                  "eq": [
-                    "$ctx.refused",
-                    "validation"
-                  ]
-                }
-              },
-              {
-                "key": "stirred_line",
-                "when": {
-                  "eq": [
-                    "$ctx.band",
-                    "stirred"
-                  ]
-                }
-              }
-            ],
             "title": [
               {
                 "key": "gentle_title_heads_up",
@@ -23615,6 +23600,60 @@
                 "key": "gentle_title"
               }
             ],
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$ctx.refused",
+                    "validation"
+                  ]
+                },
+                "key": "refused_line_ask"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "stirred"
+                  ]
+                },
+                "key": "stirred_line"
+              }
+            ],
+            "fields": [
+              {
+                "id": "swap",
+                "label": "swap_label",
+                "options": {
+                  "list": "swap"
+                },
+                "max": 2
+              },
+              {
+                "id": "g_question",
+                "label": "g_question_label",
+                "options": {
+                  "list": "g_question"
+                },
+                "max": 1
+              },
+              {
+                "id": "g_validate",
+                "label": "g_validate_label",
+                "options": {
+                  "list": "g_validate"
+                },
+                "max": 1
+              },
+              {
+                "id": "manner",
+                "label": "manner_label",
+                "options": {
+                  "list": "manner"
+                },
+                "max": 1
+              }
+            ],
             "next": [
               {
                 "to": "soft",
@@ -23626,20 +23665,20 @@
           {
             "id": "soft",
             "kind": "embed",
-            "answerAs": "soft_how",
             "embed": "bodyCard",
+            "title": "soft_title",
+            "answerAs": "soft_how",
             "props": {
-              "done": "soft_done",
               "kind": "willing",
-              "next": "next",
-              "running": "soft_running",
               "seconds": 20,
-              "start": "soft_start",
               "step1": "soft_step1",
               "step2": "soft_step2",
-              "step3": "soft_step3"
+              "step3": "soft_step3",
+              "start": "soft_start",
+              "running": "soft_running",
+              "done": "soft_done",
+              "next": "next"
             },
-            "title": "soft_title",
             "next": [
               {
                 "to": "g_card",
@@ -23670,31 +23709,31 @@
           {
             "id": "g_card",
             "kind": "embed",
-            "answerAs": "g_card_how",
             "embed": "pocketCard",
+            "title": "gentle_card_title",
+            "answerAs": "g_card_how",
             "props": {
-              "copiedLabel": "copied",
-              "copyLabel": "copy",
-              "next": "next",
-              "nextCardLabel": "card_next_card",
-              "prevLabel": "card_prev",
-              "push": [
-                "g_question"
-              ],
-              "pushLabel": "card_ask_them",
               "say": [
                 "g_validate"
               ],
-              "sayLabel": "card_say",
-              "selectedLabel": "selected",
               "steady": [
                 "manner",
                 "swap"
               ],
+              "push": [
+                "g_question"
+              ],
+              "steadyNoteA": "card_finish",
+              "sayLabel": "card_say",
               "steadyLabel": "card_how",
-              "steadyNoteA": "card_finish"
+              "pushLabel": "card_ask_them",
+              "prevLabel": "card_prev",
+              "nextCardLabel": "card_next_card",
+              "copyLabel": "copy",
+              "copiedLabel": "copied",
+              "selectedLabel": "selected",
+              "next": "next"
             },
-            "title": "gentle_card_title",
             "next": [
               {
                 "to": "g_end",
@@ -23707,13 +23746,13 @@
             "id": "g_end",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "gentle_line",
-                "when": null
+                "when": null,
+                "key": "gentle_line"
               }
             ],
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -23783,8 +23822,8 @@
             "id": "give_repair",
             "toolId": "give",
             "query": {
-              "person": "$ctx.personId",
-              "situationId": "repair"
+              "situationId": "repair",
+              "person": "$ctx.personId"
             },
             "carry": [],
             "done": false
@@ -23802,10 +23841,12 @@
           {
             "id": "rehearse",
             "toolId": "rehearse",
-            "query": {},
+            "query": {
+              "situationId": "repair",
+              "person": "$ctx.personId"
+            },
             "carry": [],
-            "done": false,
-            "planned": true
+            "done": false
           },
           {
             "id": "safety_open",
@@ -23969,63 +24010,63 @@
             {
               "value": "m_sorry",
               "label": "I'm sorry for my part in it.",
-              "about": [
-                "complaint",
-                "angry"
-              ],
               "stance": [
                 "agree",
                 "partly"
+              ],
+              "about": [
+                "complaint",
+                "angry"
               ]
             },
             {
               "value": "m_my_side",
               "label": "I see it a bit differently, and I'd like to tell you how.",
+              "stance": [
+                "partly",
+                "disagree"
+              ],
               "about": [
                 "complaint",
                 "request",
                 "upset",
                 "angry"
-              ],
-              "stance": [
-                "partly",
-                "disagree"
               ]
             },
             {
               "value": "m_think",
               "label": "Can I think about it and come back to you?",
+              "stance": [
+                "partly",
+                "disagree",
+                "unsure"
+              ],
               "about": [
                 "complaint",
                 "request",
                 "upset",
                 "angry"
-              ],
-              "stance": [
-                "partly",
-                "disagree",
-                "unsure"
               ]
             },
             {
               "value": "m_yes",
               "label": "Yes, I can do that.",
-              "about": [
-                "request"
-              ],
               "stance": [
                 "agree"
+              ],
+              "about": [
+                "request"
               ]
             },
             {
               "value": "m_other",
               "label": "I can't do that, and I'd like to help another way.",
-              "about": [
-                "request"
-              ],
               "stance": [
                 "partly",
                 "disagree"
+              ],
+              "about": [
+                "request"
               ]
             }
           ],
@@ -52409,6 +52450,1355 @@
         }
       },
       {
+        "id": "rehearse",
+        "toolId": "rehearse",
+        "version": "rh-v1",
+        "start": "kind",
+        "accepts": [
+          "personId",
+          "band",
+          "situationId",
+          "frame"
+        ],
+        "ownMax": 90,
+        "emotionFields": [],
+        "copy": {
+          "kind_title": "What's the conversation?",
+          "kind_flooded": "Practising works better once your body settles. The easy version is here if you want it now.",
+          "cool_down": "Settle my body first",
+          "line_title": "What's the first thing you'll say?",
+          "line_hint": "Your words. You can change them any time.",
+          "tier_title": "How will they respond?",
+          "tier_hint": "You choose how hard. Stopping always counts.",
+          "tier_heads_up": "With them, practising a calm way out can help too.",
+          "tier_flooded": "The easy version, or practising a way out, for now.",
+          "stage_title": "Say it.",
+          "stage_hint": "Out loud if you can, or in your head.",
+          "aloud": "I said it out loud",
+          "in_head": "I said it in my head",
+          "your_move": "What do you do?",
+          "stop": "Stop practising",
+          "pose_closer": "steps closer",
+          "pose_arms": "arms folded",
+          "pose_turn_away": "turns away",
+          "pose_still": "goes still",
+          "you": "You",
+          "them": "Them",
+          "end_line": "That's the conversation.",
+          "next": "Next",
+          "ifthen_title": "If it goes that way for real, what will you do?",
+          "ifthen_hint": "One thing you can do in the moment.",
+          "close_title": "Saying it for real feels…",
+          "close_done": "You practised it. That counts.",
+          "close_stopped": "You stopped. That counts too.",
+          "ready_title": "Could you say it for real?",
+          "end_title": "That's the practice.",
+          "end_ready": "The real conversation is yours to choose. Planning it can help.",
+          "end_not_sure": "Another practice can help. Pick a harder version when you're ready.",
+          "end_harder": "Saying it for real feels harder right now. Settle your body first, or leave it for today.",
+          "end_plan_title": "For the hard moment: {plan}.",
+          "plan_offer": "Plan the conversation",
+          "again_offer": "Practise again",
+          "cope_offer": "Plan for the hardest moment",
+          "safety_open": "Talk to someone now",
+          "done": "Done",
+          "own_words": "Something else",
+          "picker_personNew": "Someone new",
+          "picker_personNameLabel": "What do you call them?",
+          "picker_personNameHint": "A nickname is fine. No real names needed.",
+          "picker_personRoleLabel": "Who are they to you?",
+          "picker_personKeepLine": "The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.",
+          "picker_personNoNameLine": "Without a name, nothing about them is kept.",
+          "picker_personSignedOutLine": "This stays on this screen only.",
+          "picker_personGoOn": "Go on",
+          "picker_personChanged": "Things changed with someone?",
+          "picker_personChangedHint": "Pick who it is, and you'll be asked about them again.",
+          "picker_safeQuestion": "Is it safe to bring hard things up with {who}?",
+          "picker_safeYes": "Yes, mostly",
+          "picker_safeNo": "No",
+          "picker_safeUnsure": "Not sure",
+          "picker_riskQuestion": "Is it more that they might hurt or control you, or that it tends to go badly?",
+          "picker_riskHarm": "They might hurt or control me",
+          "picker_riskBadly": "It tends to go badly",
+          "picker_riskUnsaid": "I'd rather not say",
+          "picker_safetyRouteBody": "The people below can help you think it through, any time, and you don't have to be sure.",
+          "picker_safetyRouteEnding": "Thinking about ending the relationship",
+          "picker_safetyRouteBack": "This is about someone else",
+          "picker_personWhoRehearse": "Who's the conversation with?",
+          "picker_safetyRouteRehearseHeading": "With {who}, your safety comes before any practice conversation."
+        },
+        "tables": {},
+        "derive": [],
+        "steps": [
+          {
+            "id": "kind",
+            "kind": "ask",
+            "title": "kind_title",
+            "fields": [
+              {
+                "id": "kind",
+                "options": {
+                  "list": "kind",
+                  "firstFrom": "$ctx.situationId"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "cool_down",
+                    "label": "cool_down",
+                    "when": {
+                      "eq": [
+                        "$ctx.band",
+                        "flooded"
+                      ]
+                    }
+                  },
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "flooded"
+                  ]
+                },
+                "key": "kind_flooded"
+              }
+            ],
+            "next": [
+              {
+                "to": "line",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "line",
+            "kind": "ask",
+            "title": "line_title",
+            "fields": [
+              {
+                "id": "line",
+                "options": {
+                  "list": "line",
+                  "where": {
+                    "eq": [
+                      "$opt.kind",
+                      "$a.kind"
+                    ]
+                  }
+                },
+                "max": 1,
+                "required": true,
+                "own": {
+                  "hint": "own_words",
+                  "countsAsPick": true,
+                  "max": 90
+                },
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "hint": "line_hint",
+            "next": [
+              {
+                "to": "tier",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "tier",
+            "kind": "ask",
+            "title": "tier_title",
+            "fields": [
+              {
+                "id": "tier",
+                "options": {
+                  "list": "tier",
+                  "where": {
+                    "all": [
+                      {
+                        "any": [
+                          {
+                            "not": {
+                              "eq": [
+                                "$ctx.band",
+                                "flooded"
+                              ]
+                            }
+                          },
+                          {
+                            "eq": [
+                              "$opt.flooded",
+                              true
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "any": [
+                          {
+                            "not": {
+                              "eq": [
+                                "$ctx.band",
+                                "stirred"
+                              ]
+                            }
+                          },
+                          {
+                            "eq": [
+                              "$opt.stirred",
+                              true
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "any": [
+                          {
+                            "not": {
+                              "eq": [
+                                "$ctx.frame",
+                                "heads_up"
+                              ]
+                            }
+                          },
+                          {
+                            "eq": [
+                              "$opt.stirred",
+                              true
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "flooded"
+                  ]
+                },
+                "key": "tier_flooded"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "heads_up"
+                  ]
+                },
+                "key": "tier_heads_up"
+              }
+            ],
+            "hint": "tier_hint",
+            "next": [
+              {
+                "to": "stage",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "stage",
+            "kind": "embed",
+            "embed": "rehearsalStage",
+            "answerAs": "stage",
+            "title": "stage_title",
+            "hint": "stage_hint",
+            "props": {
+              "fromSkill": "rehearse",
+              "kind": "kind",
+              "tier": "tier",
+              "line": "line",
+              "aloud": "aloud",
+              "inHead": "in_head",
+              "yourMove": "your_move",
+              "stop": "stop",
+              "you": "you",
+              "them": "them",
+              "endLine": "end_line",
+              "next": "next",
+              "poseCloser": "pose_closer",
+              "poseArms": "pose_arms",
+              "poseTurnAway": "pose_turn_away",
+              "poseStill": "pose_still"
+            },
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "ifthen",
+                "when": {
+                  "any": [
+                    {
+                      "has": [
+                        "$a.stage.ids",
+                        "lost_it"
+                      ]
+                    },
+                    {
+                      "all": [
+                        {
+                          "eq": [
+                            "$a.tier",
+                            "hardest"
+                          ]
+                        },
+                        {
+                          "any": [
+                            {
+                              "has": [
+                                "$a.stage.ids",
+                                "finished"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$a.stage.ids",
+                                "stepped_out"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$a.stage.ids",
+                                "lost_it"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "close",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "ifthen",
+            "kind": "ask",
+            "title": "ifthen_title",
+            "fields": [
+              {
+                "id": "ifthen",
+                "options": {
+                  "list": "ifthen"
+                },
+                "max": 1,
+                "required": false,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "hint": "ifthen_hint",
+            "next": [
+              {
+                "to": "close",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "close",
+            "kind": "ask",
+            "title": "close_title",
+            "fields": [
+              {
+                "id": "close",
+                "options": {
+                  "list": "tvn"
+                },
+                "max": 1,
+                "required": true,
+                "askFresh": "thenVsNow",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "lines": [
+              {
+                "when": {
+                  "has": [
+                    "$a.stage.ids",
+                    "stopped"
+                  ]
+                },
+                "key": "close_stopped"
+              },
+              {
+                "when": {
+                  "any": [
+                    {
+                      "has": [
+                        "$a.stage.ids",
+                        "finished"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$a.stage.ids",
+                        "stepped_out"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$a.stage.ids",
+                        "lost_it"
+                      ]
+                    }
+                  ]
+                },
+                "key": "close_done"
+              }
+            ],
+            "next": [
+              {
+                "to": "end",
+                "when": {
+                  "eq": [
+                    "$a.close",
+                    "worse"
+                  ]
+                }
+              },
+              {
+                "to": "ready",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "ready",
+            "kind": "ask",
+            "title": "ready_title",
+            "fields": [
+              {
+                "id": "ready",
+                "options": {
+                  "list": "ready"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "end",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "end",
+            "kind": "handoff",
+            "complete": true,
+            "done": "done",
+            "title": [
+              {
+                "key": "end_plan_title",
+                "when": {
+                  "all": [
+                    {
+                      "set": "$a.ifthen"
+                    },
+                    {
+                      "not": {
+                        "eq": [
+                          "$a.close",
+                          "worse"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "key": "end_title"
+              }
+            ],
+            "titleSlots": {
+              "plan": {
+                "labelOf": "ifthen"
+              }
+            },
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.close",
+                    "worse"
+                  ]
+                },
+                "key": "end_harder"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$a.ready",
+                    "not_sure"
+                  ]
+                },
+                "key": "end_not_sure"
+              },
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "end_ready"
+              }
+            ],
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "next": [],
+            "offers": [
+              {
+                "exit": "cool_down",
+                "when": {
+                  "eq": [
+                    "$a.close",
+                    "worse"
+                  ]
+                }
+              },
+              {
+                "exit": "plan",
+                "when": {
+                  "not": {
+                    "eq": [
+                      "$a.close",
+                      "worse"
+                    ]
+                  }
+                }
+              },
+              {
+                "exit": "cope_ahead",
+                "when": {
+                  "all": [
+                    {
+                      "set": "$a.ifthen"
+                    },
+                    {
+                      "not": {
+                        "eq": [
+                          "$a.close",
+                          "worse"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "exit": "again",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
+          }
+        ],
+        "exits": [
+          {
+            "id": "again",
+            "toolId": "rehearse",
+            "query": {
+              "situationId": "$a.kind",
+              "person": "$ctx.personId"
+            },
+            "carry": [],
+            "done": false,
+            "label": "again_offer"
+          },
+          {
+            "id": "cool_down",
+            "toolId": "cool-down",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "cope_ahead",
+            "toolId": "cope-ahead",
+            "query": {
+              "situationId": "conversation"
+            },
+            "carry": [],
+            "done": false,
+            "label": "cope_offer"
+          },
+          {
+            "id": "done",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": true
+          },
+          {
+            "id": "plan",
+            "toolId": "dear-man",
+            "query": {
+              "person": "$ctx.personId"
+            },
+            "carry": [],
+            "done": false,
+            "label": "plan_offer"
+          },
+          {
+            "id": "safety_open",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": false,
+            "safety": true
+          }
+        ],
+        "options": {
+          "kind": [
+            {
+              "value": "ask",
+              "label": "Asking for something"
+            },
+            {
+              "value": "say_no",
+              "label": "Saying no"
+            },
+            {
+              "value": "boundary",
+              "label": "Setting a limit"
+            },
+            {
+              "value": "address",
+              "label": "Bringing up a problem"
+            },
+            {
+              "value": "repair",
+              "label": "Making a repair"
+            }
+          ],
+          "line": [
+            {
+              "value": "ask_1",
+              "label": "Could you help me with something?",
+              "kind": "ask"
+            },
+            {
+              "value": "ask_2",
+              "label": "I need to ask you for something.",
+              "kind": "ask"
+            },
+            {
+              "value": "ask_3",
+              "label": "Would you be willing to help this week?",
+              "kind": "ask"
+            },
+            {
+              "value": "say_no_1",
+              "label": "No, I can't do that.",
+              "kind": "say_no"
+            },
+            {
+              "value": "say_no_2",
+              "label": "I'm going to say no this time.",
+              "kind": "say_no"
+            },
+            {
+              "value": "say_no_3",
+              "label": "That doesn't work for me.",
+              "kind": "say_no"
+            },
+            {
+              "value": "boundary_1",
+              "label": "I need this to stop.",
+              "kind": "boundary"
+            },
+            {
+              "value": "boundary_2",
+              "label": "I'm not okay with that.",
+              "kind": "boundary"
+            },
+            {
+              "value": "boundary_3",
+              "label": "Please don't do that again.",
+              "kind": "boundary"
+            },
+            {
+              "value": "address_1",
+              "label": "Can we talk about what happened?",
+              "kind": "address"
+            },
+            {
+              "value": "address_2",
+              "label": "Something's been bothering me.",
+              "kind": "address"
+            },
+            {
+              "value": "address_3",
+              "label": "I want to bring something up.",
+              "kind": "address"
+            },
+            {
+              "value": "repair_1",
+              "label": "I'm sorry for what I said.",
+              "kind": "repair"
+            },
+            {
+              "value": "repair_2",
+              "label": "I got that wrong, and I'm sorry.",
+              "kind": "repair"
+            },
+            {
+              "value": "repair_3",
+              "label": "I'd like to make things right.",
+              "kind": "repair"
+            }
+          ],
+          "tier": [
+            {
+              "value": "easy",
+              "label": "The easy version: they listen",
+              "flooded": true,
+              "stirred": true
+            },
+            {
+              "value": "realistic",
+              "label": "Realistic: they push back, then partly",
+              "flooded": false,
+              "stirred": true
+            },
+            {
+              "value": "hardest",
+              "label": "The hardest likely: they say no or turn it on you",
+              "flooded": false,
+              "stirred": false
+            },
+            {
+              "value": "leave",
+              "label": "Practise leaving: a calm way out",
+              "flooded": true,
+              "stirred": true
+            }
+          ],
+          "move": [
+            {
+              "value": "again",
+              "label": "Say it again",
+              "letter": "M"
+            },
+            {
+              "value": "acknowledge",
+              "label": "Acknowledge, then come back",
+              "letter": "V+M",
+              "says": "I hear you. And this still matters to me."
+            },
+            {
+              "value": "name",
+              "label": "Name what's happening",
+              "letter": "M",
+              "says": "I notice we keep moving away from it."
+            },
+            {
+              "value": "middle",
+              "label": "Offer a middle",
+              "letter": "N",
+              "says": "Could we find something in between?"
+            },
+            {
+              "value": "turn",
+              "label": "Ask what would work for them",
+              "letter": "N",
+              "says": "What would work for you?"
+            },
+            {
+              "value": "break",
+              "label": "Step out, come back later",
+              "letter": "walk_away",
+              "says": "I'm going to take a break and come back to this."
+            },
+            {
+              "value": "done",
+              "label": "End the conversation",
+              "letter": "walk_away",
+              "says": "I'm done with this conversation for now."
+            },
+            {
+              "value": "lost_it",
+              "label": "I'd lose it here"
+            }
+          ],
+          "turn": [
+            {
+              "value": "ask_easy_1",
+              "label": "What do you need?",
+              "kind": "ask",
+              "tier": "easy",
+              "n": 1,
+              "pose": "open",
+              "moves": "again,acknowledge,turn,done"
+            },
+            {
+              "value": "ask_easy_2",
+              "label": "Okay, that makes sense.",
+              "kind": "ask",
+              "tier": "easy",
+              "n": 2,
+              "pose": "open",
+              "moves": "again,acknowledge,turn,done"
+            },
+            {
+              "value": "ask_easy_3",
+              "label": "Sure, I can do that.",
+              "kind": "ask",
+              "tier": "easy",
+              "n": 3,
+              "pose": "open",
+              "moves": "again,acknowledge,turn,done"
+            },
+            {
+              "value": "ask_realistic_1",
+              "label": "Can we talk about this later?",
+              "kind": "ask",
+              "tier": "realistic",
+              "n": 1,
+              "pose": "turn_away",
+              "moves": "again,acknowledge,middle,turn,break"
+            },
+            {
+              "value": "ask_realistic_2",
+              "label": "I don't know if I can do all of that.",
+              "kind": "ask",
+              "tier": "realistic",
+              "n": 2,
+              "pose": "neutral",
+              "moves": "again,acknowledge,middle,turn,break"
+            },
+            {
+              "value": "ask_realistic_3",
+              "label": "I could do part of it.",
+              "kind": "ask",
+              "tier": "realistic",
+              "n": 3,
+              "pose": "open",
+              "moves": "again,acknowledge,middle,turn,break"
+            },
+            {
+              "value": "ask_hardest_1",
+              "label": "No. That's not happening.",
+              "kind": "ask",
+              "tier": "hardest",
+              "n": 1,
+              "pose": "arms",
+              "moves": "again,acknowledge,name,break,done,lost_it"
+            },
+            {
+              "value": "ask_hardest_2",
+              "label": "You always want something from me.",
+              "kind": "ask",
+              "tier": "hardest",
+              "n": 2,
+              "pose": "arms",
+              "moves": "again,acknowledge,name,break,done,lost_it"
+            },
+            {
+              "value": "ask_hardest_3",
+              "label": "(They go quiet and look away.)",
+              "kind": "ask",
+              "tier": "hardest",
+              "n": 3,
+              "pose": "still",
+              "moves": "again,acknowledge,name,break,done,lost_it"
+            },
+            {
+              "value": "say_no_easy_1",
+              "label": "Oh. Is there a reason?",
+              "kind": "say_no",
+              "tier": "easy",
+              "n": 1,
+              "pose": "neutral",
+              "moves": "again,acknowledge,turn,done"
+            },
+            {
+              "value": "say_no_easy_2",
+              "label": "Okay, I'll ask someone else.",
+              "kind": "say_no",
+              "tier": "easy",
+              "n": 2,
+              "pose": "open",
+              "moves": "again,acknowledge,turn,done"
+            },
+            {
+              "value": "say_no_easy_3",
+              "label": "Fair enough.",
+              "kind": "say_no",
+              "tier": "easy",
+              "n": 3,
+              "pose": "open",
+              "moves": "again,acknowledge,turn,done"
+            },
+            {
+              "value": "say_no_realistic_1",
+              "label": "Come on, it's only this once.",
+              "kind": "say_no",
+              "tier": "realistic",
+              "n": 1,
+              "pose": "closer",
+              "moves": "again,acknowledge,turn,break"
+            },
+            {
+              "value": "say_no_realistic_2",
+              "label": "I really thought I could count on you.",
+              "kind": "say_no",
+              "tier": "realistic",
+              "n": 2,
+              "pose": "neutral",
+              "moves": "again,acknowledge,turn,break"
+            },
+            {
+              "value": "say_no_realistic_3",
+              "label": "Fine. Maybe next time?",
+              "kind": "say_no",
+              "tier": "realistic",
+              "n": 3,
+              "pose": "open",
+              "moves": "again,acknowledge,turn,break"
+            },
+            {
+              "value": "say_no_hardest_1",
+              "label": "You can't be serious.",
+              "kind": "say_no",
+              "tier": "hardest",
+              "n": 1,
+              "pose": "arms",
+              "moves": "again,acknowledge,name,break,done,lost_it"
+            },
+            {
+              "value": "say_no_hardest_2",
+              "label": "After everything I've done for you?",
+              "kind": "say_no",
+              "tier": "hardest",
+              "n": 2,
+              "pose": "still",
+              "moves": "again,acknowledge,name,break,done,lost_it"
+            },
+            {
+              "value": "say_no_hardest_3",
+              "label": "(They turn away and go quiet.)",
+              "kind": "say_no",
+              "tier": "hardest",
+              "n": 3,
+              "pose": "turn_away",
+              "moves": "again,acknowledge,name,break,done,lost_it"
+            },
+            {
+              "value": "boundary_easy_1",
+              "label": "I didn't know it bothered you.",
+              "kind": "boundary",
+              "tier": "easy",
+              "n": 1,
+              "pose": "neutral",
+              "moves": "again,acknowledge,turn,done"
+            },
+            {
+              "value": "boundary_easy_2",
+              "label": "Okay. I'll try.",
+              "kind": "boundary",
+              "tier": "easy",
+              "n": 2,
+              "pose": "open",
+              "moves": "again,acknowledge,turn,done"
+            },
+            {
+              "value": "boundary_easy_3",
+              "label": "Thanks for telling me.",
+              "kind": "boundary",
+              "tier": "easy",
+              "n": 3,
+              "pose": "open",
+              "moves": "again,acknowledge,turn,done"
+            },
+            {
+              "value": "boundary_realistic_1",
+              "label": "I didn't think it was a big deal.",
+              "kind": "boundary",
+              "tier": "realistic",
+              "n": 1,
+              "pose": "arms",
+              "moves": "again,acknowledge,middle,turn,break"
+            },
+            {
+              "value": "boundary_realistic_2",
+              "label": "I'll think about it.",
+              "kind": "boundary",
+              "tier": "realistic",
+              "n": 2,
+              "pose": "neutral",
+              "moves": "again,acknowledge,middle,turn,break"
+            },
+            {
+              "value": "boundary_realistic_3",
+              "label": "I can try, sometimes.",
+              "kind": "boundary",
+              "tier": "realistic",
+              "n": 3,
+              "pose": "open",
+              "moves": "again,acknowledge,middle,turn,break"
+            },
+            {
+              "value": "boundary_hardest_1",
+              "label": "Who are you to tell me what to do?",
+              "kind": "boundary",
+              "tier": "hardest",
+              "n": 1,
+              "pose": "arms",
+              "moves": "again,acknowledge,name,break,done,lost_it"
+            },
+            {
+              "value": "boundary_hardest_2",
+              "label": "I don't see why it matters so much.",
+              "kind": "boundary",
+              "tier": "hardest",
+              "n": 2,
+              "pose": "turn_away",
+              "moves": "again,acknowledge,name,break,done,lost_it"
+            },
+            {
+              "value": "boundary_hardest_3",
+              "label": "(They fold their arms and say nothing.)",
+              "kind": "boundary",
+              "tier": "hardest",
+              "n": 3,
+              "pose": "still",
+              "moves": "again,acknowledge,name,break,done,lost_it"
+            },
+            {
+              "value": "address_easy_1",
+              "label": "Oh, what happened?",
+              "kind": "address",
+              "tier": "easy",
+              "n": 1,
+              "pose": "open",
+              "moves": "again,acknowledge,turn,done"
+            },
+            {
+              "value": "address_easy_2",
+              "label": "I didn't realise. I'm sorry.",
+              "kind": "address",
+              "tier": "easy",
+              "n": 2,
+              "pose": "neutral",
+              "moves": "again,acknowledge,turn,done"
+            },
+            {
+              "value": "address_easy_3",
+              "label": "Let's sort it out.",
+              "kind": "address",
+              "tier": "easy",
+              "n": 3,
+              "pose": "open",
+              "moves": "again,acknowledge,turn,done"
+            },
+            {
+              "value": "address_realistic_1",
+              "label": "This isn't a good time.",
+              "kind": "address",
+              "tier": "realistic",
+              "n": 1,
+              "pose": "turn_away",
+              "moves": "again,acknowledge,middle,turn,break"
+            },
+            {
+              "value": "address_realistic_2",
+              "label": "That's not how I remember it.",
+              "kind": "address",
+              "tier": "realistic",
+              "n": 2,
+              "pose": "arms",
+              "moves": "again,acknowledge,middle,turn,break"
+            },
+            {
+              "value": "address_realistic_3",
+              "label": "Okay, maybe I could have handled it better.",
+              "kind": "address",
+              "tier": "realistic",
+              "n": 3,
+              "pose": "neutral",
+              "moves": "again,acknowledge,middle,turn,break"
+            },
+            {
+              "value": "address_hardest_1",
+              "label": "Here we go again.",
+              "kind": "address",
+              "tier": "hardest",
+              "n": 1,
+              "pose": "arms",
+              "moves": "again,acknowledge,name,break,done,lost_it"
+            },
+            {
+              "value": "address_hardest_2",
+              "label": "What about what you did?",
+              "kind": "address",
+              "tier": "hardest",
+              "n": 2,
+              "pose": "arms",
+              "moves": "again,acknowledge,name,break,done,lost_it"
+            },
+            {
+              "value": "address_hardest_3",
+              "label": "(They look at their phone and don't answer.)",
+              "kind": "address",
+              "tier": "hardest",
+              "n": 3,
+              "pose": "turn_away",
+              "moves": "again,acknowledge,name,break,done,lost_it"
+            },
+            {
+              "value": "repair_easy_1",
+              "label": "Thanks for saying that.",
+              "kind": "repair",
+              "tier": "easy",
+              "n": 1,
+              "pose": "open",
+              "moves": "acknowledge,turn,done"
+            },
+            {
+              "value": "repair_easy_2",
+              "label": "I was upset, yes.",
+              "kind": "repair",
+              "tier": "easy",
+              "n": 2,
+              "pose": "neutral",
+              "moves": "acknowledge,turn,done"
+            },
+            {
+              "value": "repair_easy_3",
+              "label": "Okay. I appreciate it.",
+              "kind": "repair",
+              "tier": "easy",
+              "n": 3,
+              "pose": "open",
+              "moves": "acknowledge,turn,done"
+            },
+            {
+              "value": "repair_realistic_1",
+              "label": "Sorry doesn't really fix it.",
+              "kind": "repair",
+              "tier": "realistic",
+              "n": 1,
+              "pose": "arms",
+              "moves": "acknowledge,middle,turn,break"
+            },
+            {
+              "value": "repair_realistic_2",
+              "label": "I need a bit of time.",
+              "kind": "repair",
+              "tier": "realistic",
+              "n": 2,
+              "pose": "turn_away",
+              "moves": "acknowledge,middle,turn,break"
+            },
+            {
+              "value": "repair_realistic_3",
+              "label": "Okay. Let's see how it goes.",
+              "kind": "repair",
+              "tier": "realistic",
+              "n": 3,
+              "pose": "neutral",
+              "moves": "acknowledge,middle,turn,break"
+            },
+            {
+              "value": "repair_hardest_1",
+              "label": "It's too late for that.",
+              "kind": "repair",
+              "tier": "hardest",
+              "n": 1,
+              "pose": "arms",
+              "moves": "acknowledge,name,break,done,lost_it"
+            },
+            {
+              "value": "repair_hardest_2",
+              "label": "You always say that.",
+              "kind": "repair",
+              "tier": "hardest",
+              "n": 2,
+              "pose": "still",
+              "moves": "acknowledge,name,break,done,lost_it"
+            },
+            {
+              "value": "repair_hardest_3",
+              "label": "(They walk away.)",
+              "kind": "repair",
+              "tier": "hardest",
+              "n": 3,
+              "pose": "turn_away",
+              "moves": "acknowledge,name,break,done,lost_it"
+            },
+            {
+              "value": "any_leave_1",
+              "label": "Can we keep going?",
+              "kind": "any",
+              "tier": "leave",
+              "n": 1,
+              "pose": "neutral",
+              "moves": "again,break,done"
+            },
+            {
+              "value": "any_leave_2",
+              "label": "I'd rather finish this now.",
+              "kind": "any",
+              "tier": "leave",
+              "n": 2,
+              "pose": "neutral",
+              "moves": "again,break,done"
+            },
+            {
+              "value": "any_leave_3",
+              "label": "(They keep talking.)",
+              "kind": "any",
+              "tier": "leave",
+              "n": 3,
+              "pose": "neutral",
+              "moves": "again,break,done"
+            }
+          ],
+          "ifthen": [
+            {
+              "value": "again",
+              "label": "Say my line again, calmly"
+            },
+            {
+              "value": "acknowledge",
+              "label": "Acknowledge them, then come back to it"
+            },
+            {
+              "value": "name",
+              "label": "Name what's happening"
+            },
+            {
+              "value": "break",
+              "label": "Step out and come back later"
+            },
+            {
+              "value": "done",
+              "label": "End the conversation"
+            }
+          ],
+          "tvn": [
+            {
+              "value": "worse",
+              "label": "Harder"
+            },
+            {
+              "value": "same",
+              "label": "About the same"
+            },
+            {
+              "value": "better",
+              "label": "Easier"
+            },
+            {
+              "value": "much_better",
+              "label": "Much easier"
+            }
+          ],
+          "ready": [
+            {
+              "value": "sure",
+              "label": "Sure"
+            },
+            {
+              "value": "think_so",
+              "label": "I think so"
+            },
+            {
+              "value": "not_sure",
+              "label": "Not sure"
+            }
+          ]
+        }
+      },
+      {
         "id": "ride_it_out",
         "toolId": "urge-surfing",
         "version": "ro-v1",
@@ -54857,96 +56247,96 @@
         "ownMax": 140,
         "emotionFields": [],
         "copy": {
-          "again_label": "Want me to ask how it went?",
-          "alt_label": "Something else you could offer (optional)",
+          "ask_title": "What are they asking for?",
           "ask_hint": "You're allowed to say no. You don't owe anyone a script.",
           "ask_own": "Something else",
-          "ask_title": "What are they asking for?",
-          "compose_title": "Put your no together.",
-          "compose_title_flooded": "Your body's running hot. Your no can still go, short and plain.",
-          "compose_title_heads_up": "Keep it short, written, and about one thing.",
-          "compose_title_self": "Put your no together. One reason at most, and no extra sorry.",
-          "compose_title_warm": "Put your no together. A warm line first can help it land.",
           "cool_down": "Settle my body first",
-          "copied": "Copied",
-          "copy": "Copy",
-          "done": "Done",
-          "drop_sorry": "Take the sorry out",
-          "enough_card_title": "Your line",
-          "enough_hint": "You don't have to explain, or be nice about it. Pick the line you'd use.",
-          "enough_line": "Your safety comes first. Somewhere safe, then your line. The people below can help, any time.",
+          "talk_now": "Talk to someone now",
+          "pressure_title": "What do you think happens if you say no?",
+          "pressure_hint": "Pick any that fit.",
           "enough_title": "No is enough.",
+          "enough_hint": "You don't have to explain, or be nice about it. Pick the line you'd use.",
+          "enough_card_title": "Your line",
+          "why_title": "What matters most to you here?",
+          "why_hint": "Pick the one that matters most.",
+          "firm_title": "A few questions to size it.",
+          "firm_hint": "Yes, no or not sure. There's no right answer.",
+          "level_hint": "From what you said.",
+          "nudge_label": "Does that sit right?",
+          "compose_title": "Put your no together.",
+          "compose_title_warm": "Put your no together. A warm line first can help it land.",
+          "compose_title_self": "Put your no together. One reason at most, and no extra sorry.",
+          "compose_title_heads_up": "Keep it short, written, and about one thing.",
+          "compose_title_flooded": "Your body's running hot. Your no can still go, short and plain.",
+          "opener_label": "A warm line first (optional)",
+          "no_label": "Your no",
+          "reason_label": "One reason (optional)",
+          "reason_hint": "You don't have to justify it. One reason at most.",
+          "alt_label": "Something else you could offer (optional)",
+          "own_line": "In my own words",
+          "message_title": "Here's your no.",
+          "repeat_label": "If they push, say it again:",
+          "sorry_line": "There's a sorry in there. You don't owe one for saying no.",
+          "drop_sorry": "Take the sorry out",
           "explain_line": "One reason is enough. A long one can sound like it's up for debate.",
+          "copy": "Copy",
+          "copied": "Copied",
+          "selected": "Selected. Copy it from here.",
+          "open_messages": "Open messages",
+          "next": "Next",
+          "done": "Done",
+          "predict_title": "How do you think they'll take it?",
+          "sure_label": "How sure are you?",
+          "how_label": "How will you say it?",
+          "again_label": "Want me to ask how it went?",
+          "sent_line": "Your no is ready. When you say it is up to you.",
+          "sent_line_push": "If they push, say the same line again. You don't need a new reason.",
+          "sent_line_in_person": "Saying it out loud a couple of times first can help it come out steady.",
+          "enough_line": "Your safety comes first. Somewhere safe, then your line. The people below can help, any time.",
+          "said_title": "Did you say no?",
+          "held_title": "Did it hold when they pushed?",
+          "proud_title": "Are you proud of how you handled it?",
+          "proud_hint": "However it went.",
+          "held_line_proud": "You said no, and it held. That's the skill working.",
+          "held_line": "You said no, and it held.",
+          "no_push_line": "You said no, and they took it. Not every no gets pushed on.",
+          "gave_in_line": "That happens. Your line is still here if you want it again.",
+          "gave_in_guilt": "If guilt is what pulled you back, checking the facts can help. Guilt about a fair no often doesn't fit.",
+          "not_said_line": "Not this time. Your line is still here when you want it.",
+          "partly_line": "A maybe buys time. When you're ready, your no is still here.",
+          "level_yes_part": "The facts lean toward yes, or yes to part of it. It's still your call.",
+          "level_gentle": "Say no gently, or say not yet.",
+          "level_offer": "Say no, and offer something else if you want to.",
+          "level_firm": "Say no firmly, and hold it if they push.",
+          "level_firm_hold": "Say no firmly, and don't reconsider.",
           "f_cost_q": "Would saying yes cost you something you can't spare, like time, money or energy?",
+          "f_values_q": "Would saying yes go against what matters to you?",
           "f_fair_q": "Is it more than they have a right to ask of you?",
           "f_given_q": "Have you already given a lot in this relationship lately?",
           "f_later_q": "Would a yes now make things harder later, for you or for them?",
-          "f_values_q": "Would saying yes go against what matters to you?",
-          "firm_hint": "Yes, no or not sure. There's no right answer.",
-          "firm_title": "A few questions to size it.",
-          "gave_in_guilt": "If guilt is what pulled you back, checking the facts can help. Guilt about a fair no often doesn't fit.",
-          "gave_in_line": "That happens. Your line is still here if you want it again.",
-          "held_line": "You said no, and it held.",
-          "held_line_proud": "You said no, and it held. That's the skill working.",
-          "held_title": "Did it hold when they pushed?",
-          "how_label": "How will you say it?",
-          "level_firm": "Say no firmly, and hold it if they push.",
-          "level_firm_hold": "Say no firmly, and don't reconsider.",
-          "level_gentle": "Say no gently, or say not yet.",
-          "level_hint": "From what you said.",
-          "level_offer": "Say no, and offer something else if you want to.",
-          "level_yes_part": "The facts lean toward yes, or yes to part of it. It's still your call.",
-          "message_title": "Here's your no.",
-          "next": "Next",
-          "no_label": "Your no",
-          "no_push_line": "You said no, and they took it. Not every no gets pushed on.",
-          "not_said_line": "Not this time. Your line is still here when you want it.",
-          "nudge_label": "Does that sit right?",
-          "open_messages": "Open messages",
-          "opener_label": "A warm line first (optional)",
-          "own_line": "In my own words",
-          "partly_line": "A maybe buys time. When you're ready, your no is still here.",
+          "picker_personWhoSayNo": "Who's asking?",
+          "picker_personNew": "Someone new",
+          "picker_personNameLabel": "What do you call them?",
+          "picker_personNameHint": "A nickname is fine. No real names needed.",
+          "picker_personRoleLabel": "Who are they to you?",
+          "picker_personKeepLine": "The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.",
+          "picker_personNoNameLine": "Without a name, nothing about them is kept.",
+          "picker_personSignedOutLine": "This stays on this screen only.",
+          "picker_personGoOn": "Go on",
           "picker_personChanged": "Things changed with someone?",
           "picker_personChangedHint": "Pick who it is, and you'll be asked about them again.",
-          "picker_personGoOn": "Go on",
-          "picker_personKeepLine": "The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.",
-          "picker_personNameHint": "A nickname is fine. No real names needed.",
-          "picker_personNameLabel": "What do you call them?",
-          "picker_personNew": "Someone new",
-          "picker_personNoNameLine": "Without a name, nothing about them is kept.",
-          "picker_personRoleLabel": "Who are they to you?",
-          "picker_personSignedOutLine": "This stays on this screen only.",
-          "picker_personWhoSayNo": "Who's asking?",
-          "picker_riskBadly": "It tends to go badly",
-          "picker_riskHarm": "They might hurt or control me",
-          "picker_riskQuestion": "Is it more that they might hurt or control you, or that it tends to go badly?",
-          "picker_riskUnsaid": "I'd rather not say",
-          "picker_safeNo": "No",
           "picker_safeQuestion": "Is it safe to bring hard things up with {who}?",
-          "picker_safeUnsure": "Not sure",
           "picker_safeYes": "Yes, mostly",
-          "picker_safetyRouteBack": "This is about someone else",
+          "picker_safeNo": "No",
+          "picker_safeUnsure": "Not sure",
+          "picker_riskQuestion": "Is it more that they might hurt or control you, or that it tends to go badly?",
+          "picker_riskHarm": "They might hurt or control me",
+          "picker_riskBadly": "It tends to go badly",
+          "picker_riskUnsaid": "I'd rather not say",
+          "picker_safetyRouteSayNoHeading": "With {who}, your safety comes first. Working out how to say no can wait.",
           "picker_safetyRouteBody": "The people below can help you think it through, any time, and you don't have to be sure.",
           "picker_safetyRouteEnding": "Thinking about ending the relationship",
-          "picker_safetyRouteSayNoHeading": "With {who}, your safety comes first. Working out how to say no can wait.",
-          "predict_title": "How do you think they'll take it?",
-          "pressure_hint": "Pick any that fit.",
-          "pressure_title": "What do you think happens if you say no?",
-          "proud_hint": "However it went.",
-          "proud_title": "Are you proud of how you handled it?",
-          "reason_hint": "You don't have to justify it. One reason at most.",
-          "reason_label": "One reason (optional)",
-          "repeat_label": "If they push, say it again:",
-          "said_title": "Did you say no?",
-          "selected": "Selected. Copy it from here.",
-          "sent_line": "Your no is ready. When you say it is up to you.",
-          "sent_line_in_person": "Saying it out loud a couple of times first can help it come out steady.",
-          "sent_line_push": "If they push, say the same line again. You don't need a new reason.",
-          "sorry_line": "There's a sorry in there. You don't owe one for saying no.",
-          "sure_label": "How sure are you?",
-          "talk_now": "Talk to someone now",
-          "why_hint": "Pick the one that matters most.",
-          "why_title": "What matters most to you here?"
+          "picker_safetyRouteBack": "This is about someone else"
         },
         "tables": {
           "level": {
@@ -54959,6 +56349,8 @@
         },
         "derive": [
           {
+            "name": "level",
+            "kind": "count",
             "fields": [
               "f_cost",
               "f_values",
@@ -54966,19 +56358,19 @@
               "f_given",
               "f_later"
             ],
-            "kind": "count",
-            "name": "level",
-            "table": "level",
             "weights": {
-              "firmer": 1,
-              "no": 0,
+              "yes": 1,
               "not_sure": 0.5,
-              "right": 0,
+              "no": 0,
               "softer": -1,
-              "yes": 1
-            }
+              "right": 0,
+              "firmer": 1
+            },
+            "table": "level"
           },
           {
+            "name": "final",
+            "kind": "count",
             "fields": [
               "f_cost",
               "f_values",
@@ -54987,26 +56379,36 @@
               "f_later",
               "nudge"
             ],
-            "kind": "count",
-            "name": "final",
-            "table": "level",
             "weights": {
-              "firmer": 1,
-              "no": 0,
+              "yes": 1,
               "not_sure": 0.5,
-              "right": 0,
+              "no": 0,
               "softer": -1,
-              "yes": 1
-            }
+              "right": 0,
+              "firmer": 1
+            },
+            "table": "level"
           }
         ],
         "steps": [
           {
             "id": "ask",
             "kind": "ask",
+            "title": "ask_title",
+            "hint": "ask_hint",
             "fields": [
               {
                 "id": "asking",
+                "options": {
+                  "list": "asking"
+                },
+                "max": 1,
+                "required": true,
+                "own": {
+                  "hint": "ask_own",
+                  "countsAsPick": true,
+                  "max": 60
+                },
                 "links": [
                   {
                     "exit": "cool_down",
@@ -55018,21 +56420,9 @@
                       ]
                     }
                   }
-                ],
-                "max": 1,
-                "options": {
-                  "list": "asking"
-                },
-                "own": {
-                  "countsAsPick": true,
-                  "hint": "ask_own",
-                  "max": 60
-                },
-                "required": true
+                ]
               }
             ],
-            "hint": "ask_hint",
-            "title": "ask_title",
             "next": [
               {
                 "to": "pressure",
@@ -55044,6 +56434,19 @@
           {
             "id": "pressure",
             "kind": "ask",
+            "title": "pressure_title",
+            "hint": "pressure_hint",
+            "fields": [
+              {
+                "id": "pressure",
+                "options": {
+                  "list": "pressure"
+                },
+                "max": 3,
+                "swap": true,
+                "required": true
+              }
+            ],
             "crisis": [
               {
                 "variant": "other_person",
@@ -55055,19 +56458,6 @@
                 }
               }
             ],
-            "fields": [
-              {
-                "id": "pressure",
-                "max": 3,
-                "options": {
-                  "list": "pressure"
-                },
-                "required": true,
-                "swap": true
-              }
-            ],
-            "hint": "pressure_hint",
-            "title": "pressure_title",
             "next": [
               {
                 "to": "enough",
@@ -55107,6 +56497,18 @@
           {
             "id": "enough",
             "kind": "ask",
+            "title": "enough_title",
+            "hint": "enough_hint",
+            "fields": [
+              {
+                "id": "safe_line",
+                "options": {
+                  "list": "safe_line"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
             "crisis": [
               {
                 "variant": "other_person",
@@ -55128,18 +56530,6 @@
                 }
               }
             ],
-            "fields": [
-              {
-                "id": "safe_line",
-                "max": 1,
-                "options": {
-                  "list": "safe_line"
-                },
-                "required": true
-              }
-            ],
-            "hint": "enough_hint",
-            "title": "enough_title",
             "next": [
               {
                 "to": "safe_card",
@@ -55151,7 +56541,17 @@
           {
             "id": "safe_card",
             "kind": "embed",
+            "embed": "boundaryLine",
+            "title": "enough_card_title",
             "answerAs": "safe_copied",
+            "props": {
+              "field": "safe_line",
+              "shape": "line",
+              "copyLabel": "copy",
+              "copiedLabel": "copied",
+              "selectedLabel": "selected",
+              "next": "next"
+            },
             "crisis": [
               {
                 "variant": "other_person",
@@ -55173,16 +56573,6 @@
                 }
               }
             ],
-            "embed": "boundaryLine",
-            "props": {
-              "copiedLabel": "copied",
-              "copyLabel": "copy",
-              "field": "safe_line",
-              "next": "next",
-              "selectedLabel": "selected",
-              "shape": "line"
-            },
-            "title": "enough_card_title",
             "next": [
               {
                 "to": "safe_end",
@@ -55195,6 +56585,7 @@
             "id": "safe_end",
             "kind": "handoff",
             "complete": true,
+            "noClose": true,
             "crisis": [
               {
                 "variant": "other_person",
@@ -55203,14 +56594,13 @@
                 }
               }
             ],
-            "done": "done",
             "lines": [
               {
-                "key": "enough_line",
-                "when": null
+                "when": null,
+                "key": "enough_line"
               }
             ],
-            "noClose": true,
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -55241,18 +56631,18 @@
           {
             "id": "why",
             "kind": "ask",
+            "title": "why_title",
+            "hint": "why_hint",
             "fields": [
               {
                 "id": "why",
-                "max": 1,
                 "options": {
                   "list": "why"
                 },
+                "max": 1,
                 "required": true
               }
             ],
-            "hint": "why_hint",
-            "title": "why_title",
             "next": [
               {
                 "to": "firm",
@@ -55264,55 +56654,55 @@
           {
             "id": "firm",
             "kind": "ask",
+            "title": "firm_title",
+            "hint": "firm_hint",
             "fields": [
               {
                 "id": "f_cost",
                 "label": "f_cost_q",
-                "max": 1,
                 "options": {
                   "list": "factor"
                 },
+                "max": 1,
                 "required": true
               },
               {
                 "id": "f_values",
                 "label": "f_values_q",
-                "max": 1,
                 "options": {
                   "list": "factor"
                 },
+                "max": 1,
                 "required": true
               },
               {
                 "id": "f_fair",
                 "label": "f_fair_q",
-                "max": 1,
                 "options": {
                   "list": "factor"
                 },
+                "max": 1,
                 "required": true
               },
               {
                 "id": "f_given",
                 "label": "f_given_q",
-                "max": 1,
                 "options": {
                   "list": "factor"
                 },
+                "max": 1,
                 "required": true
               },
               {
                 "id": "f_later",
                 "label": "f_later_q",
-                "max": 1,
                 "options": {
                   "list": "factor"
                 },
+                "max": 1,
                 "required": true
               }
             ],
-            "hint": "firm_hint",
-            "title": "firm_title",
             "next": [
               {
                 "to": "level",
@@ -55324,18 +56714,6 @@
           {
             "id": "level",
             "kind": "ask",
-            "fields": [
-              {
-                "id": "nudge",
-                "label": "nudge_label",
-                "max": 1,
-                "options": {
-                  "list": "nudge"
-                },
-                "required": true
-              }
-            ],
-            "hint": "level_hint",
             "title": [
               {
                 "key": "level_firm_hold",
@@ -55383,6 +56761,18 @@
                 }
               }
             ],
+            "hint": "level_hint",
+            "fields": [
+              {
+                "id": "nudge",
+                "label": "nudge_label",
+                "options": {
+                  "list": "nudge"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
             "next": [
               {
                 "to": "compose",
@@ -55394,76 +56784,6 @@
           {
             "id": "compose",
             "kind": "ask",
-            "fields": [
-              {
-                "id": "opener",
-                "label": "opener_label",
-                "max": 1,
-                "options": {
-                  "list": "opener"
-                },
-                "own": {
-                  "countsAsPick": true,
-                  "hint": "own_line",
-                  "max": 60
-                }
-              },
-              {
-                "id": "no",
-                "label": "no_label",
-                "max": 1,
-                "options": {
-                  "list": "no",
-                  "where": {
-                    "any": [
-                      {
-                        "not": {
-                          "set": "$a.f_cost"
-                        }
-                      },
-                      {
-                        "has": [
-                          "$opt.levels",
-                          "$d.final"
-                        ]
-                      }
-                    ]
-                  }
-                },
-                "own": {
-                  "countsAsPick": true,
-                  "hint": "own_line",
-                  "max": 90
-                },
-                "required": true
-              },
-              {
-                "id": "reason",
-                "label": "reason_label",
-                "max": 1,
-                "options": {
-                  "list": "reason"
-                },
-                "own": {
-                  "countsAsPick": true,
-                  "hint": "reason_hint",
-                  "max": 90
-                }
-              },
-              {
-                "id": "alt",
-                "label": "alt_label",
-                "max": 1,
-                "options": {
-                  "list": "alt"
-                },
-                "own": {
-                  "countsAsPick": true,
-                  "hint": "own_line",
-                  "max": 60
-                }
-              }
-            ],
             "title": [
               {
                 "key": "compose_title_flooded",
@@ -55505,6 +56825,76 @@
                 "key": "compose_title"
               }
             ],
+            "fields": [
+              {
+                "id": "opener",
+                "label": "opener_label",
+                "options": {
+                  "list": "opener"
+                },
+                "max": 1,
+                "own": {
+                  "hint": "own_line",
+                  "countsAsPick": true,
+                  "max": 60
+                }
+              },
+              {
+                "id": "no",
+                "label": "no_label",
+                "options": {
+                  "list": "no",
+                  "where": {
+                    "any": [
+                      {
+                        "not": {
+                          "set": "$a.f_cost"
+                        }
+                      },
+                      {
+                        "has": [
+                          "$opt.levels",
+                          "$d.final"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "max": 1,
+                "required": true,
+                "own": {
+                  "hint": "own_line",
+                  "countsAsPick": true,
+                  "max": 90
+                }
+              },
+              {
+                "id": "reason",
+                "label": "reason_label",
+                "options": {
+                  "list": "reason"
+                },
+                "max": 1,
+                "own": {
+                  "hint": "reason_hint",
+                  "countsAsPick": true,
+                  "max": 90
+                }
+              },
+              {
+                "id": "alt",
+                "label": "alt_label",
+                "options": {
+                  "list": "alt"
+                },
+                "max": 1,
+                "own": {
+                  "hint": "own_line",
+                  "countsAsPick": true,
+                  "max": 60
+                }
+              }
+            ],
             "next": [
               {
                 "to": "message",
@@ -55516,24 +56906,24 @@
           {
             "id": "message",
             "kind": "embed",
-            "answerAs": "sent_how",
             "embed": "messageComposer",
+            "title": "message_title",
+            "answerAs": "sent_how",
             "props": {
-              "alt": "alt",
-              "copiedLabel": "copied",
-              "copyLabel": "copy",
-              "dropSorry": "drop_sorry",
-              "explainLine": "explain_line",
               "field": "no",
-              "next": "next",
-              "openLabel": "open_messages",
               "opener": "opener",
               "reason": "reason",
+              "alt": "alt",
               "repeatLabel": "repeat_label",
+              "sorryLine": "sorry_line",
+              "dropSorry": "drop_sorry",
+              "explainLine": "explain_line",
+              "copyLabel": "copy",
+              "copiedLabel": "copied",
               "selectedLabel": "selected",
-              "sorryLine": "sorry_line"
+              "openLabel": "open_messages",
+              "next": "next"
             },
-            "title": "message_title",
             "next": [
               {
                 "to": "predict",
@@ -55545,33 +56935,33 @@
           {
             "id": "predict",
             "kind": "ask",
+            "title": "predict_title",
             "fields": [
               {
                 "id": "predict",
-                "max": 1,
                 "options": {
                   "list": "predict"
                 },
+                "max": 1,
                 "required": true
               },
               {
                 "id": "sure",
                 "label": "sure_label",
-                "max": 1,
                 "options": {
                   "list": "sure"
-                }
+                },
+                "max": 1
               },
               {
                 "id": "how",
                 "label": "how_label",
-                "max": 1,
                 "options": {
                   "list": "how"
-                }
+                },
+                "max": 1
               }
             ],
-            "title": "predict_title",
             "next": [
               {
                 "to": "sent",
@@ -55584,7 +56974,30 @@
             "id": "sent",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.predict",
+                    "push"
+                  ]
+                },
+                "key": "sent_line_push"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$a.how",
+                    "in_person"
+                  ]
+                },
+                "key": "sent_line_in_person"
+              },
+              {
+                "when": null,
+                "key": "sent_line"
+              }
+            ],
             "fields": [
               {
                 "id": "again",
@@ -55599,30 +57012,7 @@
               "type": "no_outcome",
               "whenFrom": "again"
             },
-            "lines": [
-              {
-                "key": "sent_line_push",
-                "when": {
-                  "eq": [
-                    "$a.predict",
-                    "push"
-                  ]
-                }
-              },
-              {
-                "key": "sent_line_in_person",
-                "when": {
-                  "eq": [
-                    "$a.how",
-                    "in_person"
-                  ]
-                }
-              },
-              {
-                "key": "sent_line",
-                "when": null
-              }
-            ],
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -55639,25 +57029,25 @@
           {
             "id": "said",
             "kind": "ask",
+            "reopens": {
+              "after": "sent"
+            },
             "clears": [
               "said",
               "held",
               "proud"
             ],
+            "title": "said_title",
             "fields": [
               {
                 "id": "said",
-                "max": 1,
                 "options": {
                   "list": "said"
                 },
+                "max": 1,
                 "required": true
               }
             ],
-            "reopens": {
-              "after": "sent"
-            },
-            "title": "said_title",
             "next": [
               {
                 "to": "not_said",
@@ -55687,17 +57077,17 @@
           {
             "id": "held",
             "kind": "ask",
+            "title": "held_title",
             "fields": [
               {
                 "id": "held",
-                "max": 1,
                 "options": {
                   "list": "held"
                 },
+                "max": 1,
                 "required": true
               }
             ],
-            "title": "held_title",
             "next": [
               {
                 "to": "gave_in",
@@ -55718,18 +57108,18 @@
           {
             "id": "proud",
             "kind": "ask",
+            "title": "proud_title",
+            "hint": "proud_hint",
             "fields": [
               {
                 "id": "proud",
-                "max": 1,
                 "options": {
                   "list": "proud"
                 },
+                "max": 1,
                 "required": true
               }
             ],
-            "hint": "proud_hint",
-            "title": "proud_title",
             "next": [
               {
                 "to": "held_end",
@@ -55742,31 +57132,31 @@
             "id": "held_end",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "no_push_line",
                 "when": {
                   "eq": [
                     "$a.held",
                     "no_push"
                   ]
-                }
+                },
+                "key": "no_push_line"
               },
               {
-                "key": "held_line_proud",
                 "when": {
                   "eq": [
                     "$a.proud",
                     "yes"
                   ]
-                }
+                },
+                "key": "held_line_proud"
               },
               {
-                "key": "held_line",
-                "when": null
+                "when": null,
+                "key": "held_line"
               }
             ],
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -55784,17 +57174,17 @@
             "id": "gave_in",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "gave_in_line",
-                "when": null
+                "when": null,
+                "key": "gave_in_line"
               },
               {
-                "key": "gave_in_guilt",
-                "when": null
+                "when": null,
+                "key": "gave_in_guilt"
               }
             ],
+            "done": "done",
             "next": [],
             "offers": [
               {
@@ -55811,13 +57201,13 @@
             "id": "not_said",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "not_said_line",
-                "when": null
+                "when": null,
+                "key": "not_said_line"
               }
             ],
+            "done": "done",
             "next": [],
             "offers": []
           },
@@ -55825,13 +57215,13 @@
             "id": "partly",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "partly_line",
-                "when": null
+                "when": null,
+                "key": "partly_line"
               }
             ],
+            "done": "done",
             "next": [],
             "offers": []
           }
@@ -55877,10 +57267,12 @@
           {
             "id": "rehearse",
             "toolId": "rehearse",
-            "query": {},
+            "query": {
+              "situationId": "say_no",
+              "person": "$ctx.personId"
+            },
             "carry": [],
-            "done": false,
-            "planned": true
+            "done": false
           },
           {
             "id": "safety_open",

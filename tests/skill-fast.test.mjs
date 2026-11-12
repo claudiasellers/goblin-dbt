@@ -29,7 +29,8 @@ test("both skills are the one fast tool; nothing in either is a planned exit off
   for (const s of [review, letGo]) {
     assert.equal(s.toolId, "fast");
   }
-  assert.deepEqual(review.exits.filter((x) => x.planned).map((x) => x.toolId), ["rehearse"]);
+  assert.deepEqual(review.exits.filter((x) => x.planned).map((x) => x.toolId), [], "Rehearse it is built (IE-02)");
+  assert.deepEqual(review.exits.find((x) => x.id === "rehearse").query, { situationId: "boundary" });
   assert.deepEqual(letGo.exits.filter((x) => x.planned).map((x) => x.toolId).sort(), [], "Find your people is built (IE-09)");
 });
 
@@ -39,13 +40,13 @@ test("A: a sorry for a real wrong is kept to one; the card shows the instead lin
   const done = M.runNext(ctx(review), s, copied);
   assert.equal(done.stepId, "next");
   assert.deepEqual(done.answers.card_a_copied.ids, ["copied"]);
-  assert.deepEqual(done.offered, ["check_the_facts"], "rehearse is planned and hidden; DEAR MAN only for a dropped ask");
+  assert.deepEqual(done.offered, ["check_the_facts", "rehearse"], "DEAR MAN only for a dropped ask");
   assert.equal(M.handoffLine(ctx(review), M.stepOf(review, "next"), done), review.copy.next_line_wrong);
 });
 
 test("A: no wrong done gives the plain line and no Check the Facts", () => {
   const s = run(review, [pick("what", "over_sorry"), next, pick("sorry", "no_wrong"), next, pick("sorry_instead", "matters"), next, notCopied]);
-  assert.deepEqual(s.offered, []);
+  assert.deepEqual(s.offered, ["rehearse"], "practising the line (IE-02) is always offered");
   assert.deepEqual(s.answers.card_a_copied.ids, []);
   assert.equal(M.handoffLine(ctx(review), M.stepOf(review, "next"), s), review.copy.next_line);
 });
@@ -63,7 +64,7 @@ test("S: the values, two at most, a third swaps; the card is a list, not copyabl
 
 test("A: not sure about the sorry gets its own line and Check the Facts", () => {
   const s = run(review, [pick("what", "over_sorry"), next, pick("sorry", "unsure"), next, pick("sorry_instead", "matters"), next, notCopied]);
-  assert.deepEqual(s.offered, ["check_the_facts"]);
+  assert.deepEqual(s.offered, ["check_the_facts", "rehearse"]);
   assert.equal(M.handoffLine(ctx(review), M.stepOf(review, "next"), s), review.copy.next_line_unsure);
 });
 
@@ -76,10 +77,10 @@ test("T and F: truth and instead each lead to their card; a dropped ask or own w
   assert.deepEqual(run(review, [pick("what", "bent_truth"), next, pick("truth", "plainly"), next]).path, ["what", "truth", "card_t"]);
   const f = run(review, [pick("what", "dropped_ask"), next, pick("instead", "heres_what"), next, notCopied]);
   assert.deepEqual(f.path, ["what", "instead", "card_f", "next"]);
-  assert.deepEqual(f.offered, ["dear_man"]);
+  assert.deepEqual(f.offered, ["rehearse", "dear_man"]);
   const o = run(review, [own("what", "I agreed to cover their shift again"), next, pick("instead", "still_want"), next, notCopied]);
   assert.deepEqual(o.path, ["what", "instead", "card_f", "next"]);
-  assert.deepEqual(o.offered, ["dear_man"]);
+  assert.deepEqual(o.offered, ["rehearse", "dear_man"]);
 });
 
 test("the card only keeps what boundaryLine declares", () => {

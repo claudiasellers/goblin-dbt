@@ -9510,9 +9510,21 @@
       {
        "exit": "rehearse",
        "when": {
-        "eq": [
-         "$a.factor",
-         "no_words"
+        "all": [
+         {
+          "eq": [
+           "$a.factor",
+           "no_words"
+          ]
+         },
+         {
+          "not": {
+           "has": [
+            "$a.moment.ids",
+            "tp_escalated"
+           ]
+          }
+         }
         ]
        }
       },
@@ -9765,10 +9777,12 @@
     {
      "id": "rehearse",
      "toolId": "rehearse",
-     "query": {},
+     "query": {
+      "situationId": "ask",
+      "person": "$ctx.personId"
+     },
      "carry": [],
-     "done": false,
-     "planned": true
+     "done": false
     },
     {
      "id": "safety_open",
@@ -11429,6 +11443,7 @@
     "situation_title_heads_up": "When talks with them tend to go badly, it can help to keep it short, about one thing, and in writing if that suits. What kind of conversation is this?",
     "debrief_link": "I've already had the conversation",
     "notice_them_offer": "Notice them next time, with curiosity",
+    "rehearse_offer": "Practise it out loud",
     "cool_down": "Settle my body first",
     "scared_line": "Your safety comes first. You don't have to plan this conversation. The people below can help, any time.",
     "matters_title": "What matters most to you here?",
@@ -12797,6 +12812,10 @@
      "next": [],
      "offers": [
       {
+       "exit": "rehearse",
+       "when": null
+      },
+      {
        "exit": "cope_ahead",
        "when": null
       },
@@ -12869,6 +12888,17 @@
      "carry": [],
      "done": false,
      "label": "notice_them_offer"
+    },
+    {
+     "id": "rehearse",
+     "toolId": "rehearse",
+     "query": {
+      "situationId": "ask",
+      "person": "$ctx.personId"
+     },
+     "carry": [],
+     "done": false,
+     "label": "rehearse_offer"
     },
     {
      "id": "safety_open",
@@ -15352,7 +15382,14 @@
       },
       {
        "exit": "rehearse",
-       "when": null
+       "when": {
+        "not": {
+         "eq": [
+          "$a.what",
+          "harms"
+         ]
+        }
+       }
       }
      ]
     },
@@ -15681,10 +15718,11 @@
     {
      "id": "rehearse",
      "toolId": "rehearse",
-     "query": {},
+     "query": {
+      "situationId": "boundary"
+     },
      "carry": [],
-     "done": false,
-     "planned": true
+     "done": false
     },
     {
      "id": "safety_open",
@@ -17735,10 +17773,11 @@
     {
      "id": "rehearse",
      "toolId": "rehearse",
-     "query": {},
+     "query": {
+      "situationId": "boundary"
+     },
      "carry": [],
-     "done": false,
-     "planned": true
+     "done": false
     }
    ],
    "options": {
@@ -23797,10 +23836,12 @@
     {
      "id": "rehearse",
      "toolId": "rehearse",
-     "query": {},
+     "query": {
+      "situationId": "repair",
+      "person": "$ctx.personId"
+     },
      "carry": [],
-     "done": false,
-     "planned": true
+     "done": false
     },
     {
      "id": "safety_open",
@@ -52404,6 +52445,1355 @@
    }
   },
   {
+   "id": "rehearse",
+   "toolId": "rehearse",
+   "version": "rh-v1",
+   "start": "kind",
+   "accepts": [
+    "personId",
+    "band",
+    "situationId",
+    "frame"
+   ],
+   "ownMax": 90,
+   "emotionFields": [],
+   "copy": {
+    "kind_title": "What's the conversation?",
+    "kind_flooded": "Practising works better once your body settles. The easy version is here if you want it now.",
+    "cool_down": "Settle my body first",
+    "line_title": "What's the first thing you'll say?",
+    "line_hint": "Your words. You can change them any time.",
+    "tier_title": "How will they respond?",
+    "tier_hint": "You choose how hard. Stopping always counts.",
+    "tier_heads_up": "With them, practising a calm way out can help too.",
+    "tier_flooded": "The easy version, or practising a way out, for now.",
+    "stage_title": "Say it.",
+    "stage_hint": "Out loud if you can, or in your head.",
+    "aloud": "I said it out loud",
+    "in_head": "I said it in my head",
+    "your_move": "What do you do?",
+    "stop": "Stop practising",
+    "pose_closer": "steps closer",
+    "pose_arms": "arms folded",
+    "pose_turn_away": "turns away",
+    "pose_still": "goes still",
+    "you": "You",
+    "them": "Them",
+    "end_line": "That's the conversation.",
+    "next": "Next",
+    "ifthen_title": "If it goes that way for real, what will you do?",
+    "ifthen_hint": "One thing you can do in the moment.",
+    "close_title": "Saying it for real feels…",
+    "close_done": "You practised it. That counts.",
+    "close_stopped": "You stopped. That counts too.",
+    "ready_title": "Could you say it for real?",
+    "end_title": "That's the practice.",
+    "end_ready": "The real conversation is yours to choose. Planning it can help.",
+    "end_not_sure": "Another practice can help. Pick a harder version when you're ready.",
+    "end_harder": "Saying it for real feels harder right now. Settle your body first, or leave it for today.",
+    "end_plan_title": "For the hard moment: {plan}.",
+    "plan_offer": "Plan the conversation",
+    "again_offer": "Practise again",
+    "cope_offer": "Plan for the hardest moment",
+    "safety_open": "Talk to someone now",
+    "done": "Done",
+    "own_words": "Something else",
+    "picker_personNew": "Someone new",
+    "picker_personNameLabel": "What do you call them?",
+    "picker_personNameHint": "A nickname is fine. No real names needed.",
+    "picker_personRoleLabel": "Who are they to you?",
+    "picker_personKeepLine": "The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.",
+    "picker_personNoNameLine": "Without a name, nothing about them is kept.",
+    "picker_personSignedOutLine": "This stays on this screen only.",
+    "picker_personGoOn": "Go on",
+    "picker_personChanged": "Things changed with someone?",
+    "picker_personChangedHint": "Pick who it is, and you'll be asked about them again.",
+    "picker_safeQuestion": "Is it safe to bring hard things up with {who}?",
+    "picker_safeYes": "Yes, mostly",
+    "picker_safeNo": "No",
+    "picker_safeUnsure": "Not sure",
+    "picker_riskQuestion": "Is it more that they might hurt or control you, or that it tends to go badly?",
+    "picker_riskHarm": "They might hurt or control me",
+    "picker_riskBadly": "It tends to go badly",
+    "picker_riskUnsaid": "I'd rather not say",
+    "picker_safetyRouteBody": "The people below can help you think it through, any time, and you don't have to be sure.",
+    "picker_safetyRouteEnding": "Thinking about ending the relationship",
+    "picker_safetyRouteBack": "This is about someone else",
+    "picker_personWhoRehearse": "Who's the conversation with?",
+    "picker_safetyRouteRehearseHeading": "With {who}, your safety comes before any practice conversation."
+   },
+   "tables": {},
+   "derive": [],
+   "steps": [
+    {
+     "id": "kind",
+     "kind": "ask",
+     "title": "kind_title",
+     "fields": [
+      {
+       "id": "kind",
+       "options": {
+        "list": "kind",
+        "firstFrom": "$ctx.situationId"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "cool_down",
+         "label": "cool_down",
+         "when": {
+          "eq": [
+           "$ctx.band",
+           "flooded"
+          ]
+         }
+        },
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       },
+       "key": "kind_flooded"
+      }
+     ],
+     "next": [
+      {
+       "to": "line",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "line",
+     "kind": "ask",
+     "title": "line_title",
+     "fields": [
+      {
+       "id": "line",
+       "options": {
+        "list": "line",
+        "where": {
+         "eq": [
+          "$opt.kind",
+          "$a.kind"
+         ]
+        }
+       },
+       "max": 1,
+       "required": true,
+       "own": {
+        "hint": "own_words",
+        "countsAsPick": true,
+        "max": 90
+       },
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "line_hint",
+     "next": [
+      {
+       "to": "tier",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "tier",
+     "kind": "ask",
+     "title": "tier_title",
+     "fields": [
+      {
+       "id": "tier",
+       "options": {
+        "list": "tier",
+        "where": {
+         "all": [
+          {
+           "any": [
+            {
+             "not": {
+              "eq": [
+               "$ctx.band",
+               "flooded"
+              ]
+             }
+            },
+            {
+             "eq": [
+              "$opt.flooded",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "any": [
+            {
+             "not": {
+              "eq": [
+               "$ctx.band",
+               "stirred"
+              ]
+             }
+            },
+            {
+             "eq": [
+              "$opt.stirred",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "any": [
+            {
+             "not": {
+              "eq": [
+               "$ctx.frame",
+               "heads_up"
+              ]
+             }
+            },
+            {
+             "eq": [
+              "$opt.stirred",
+              true
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       },
+       "key": "tier_flooded"
+      },
+      {
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "heads_up"
+        ]
+       },
+       "key": "tier_heads_up"
+      }
+     ],
+     "hint": "tier_hint",
+     "next": [
+      {
+       "to": "stage",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "stage",
+     "kind": "embed",
+     "embed": "rehearsalStage",
+     "answerAs": "stage",
+     "title": "stage_title",
+     "hint": "stage_hint",
+     "props": {
+      "fromSkill": "rehearse",
+      "kind": "kind",
+      "tier": "tier",
+      "line": "line",
+      "aloud": "aloud",
+      "inHead": "in_head",
+      "yourMove": "your_move",
+      "stop": "stop",
+      "you": "you",
+      "them": "them",
+      "endLine": "end_line",
+      "next": "next",
+      "poseCloser": "pose_closer",
+      "poseArms": "pose_arms",
+      "poseTurnAway": "pose_turn_away",
+      "poseStill": "pose_still"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "ifthen",
+       "when": {
+        "any": [
+         {
+          "has": [
+           "$a.stage.ids",
+           "lost_it"
+          ]
+         },
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.tier",
+             "hardest"
+            ]
+           },
+           {
+            "any": [
+             {
+              "has": [
+               "$a.stage.ids",
+               "finished"
+              ]
+             },
+             {
+              "has": [
+               "$a.stage.ids",
+               "stepped_out"
+              ]
+             },
+             {
+              "has": [
+               "$a.stage.ids",
+               "lost_it"
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "close",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "ifthen",
+     "kind": "ask",
+     "title": "ifthen_title",
+     "fields": [
+      {
+       "id": "ifthen",
+       "options": {
+        "list": "ifthen"
+       },
+       "max": 1,
+       "required": false,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "ifthen_hint",
+     "next": [
+      {
+       "to": "close",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "close",
+     "kind": "ask",
+     "title": "close_title",
+     "fields": [
+      {
+       "id": "close",
+       "options": {
+        "list": "tvn"
+       },
+       "max": 1,
+       "required": true,
+       "askFresh": "thenVsNow",
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "has": [
+         "$a.stage.ids",
+         "stopped"
+        ]
+       },
+       "key": "close_stopped"
+      },
+      {
+       "when": {
+        "any": [
+         {
+          "has": [
+           "$a.stage.ids",
+           "finished"
+          ]
+         },
+         {
+          "has": [
+           "$a.stage.ids",
+           "stepped_out"
+          ]
+         },
+         {
+          "has": [
+           "$a.stage.ids",
+           "lost_it"
+          ]
+         }
+        ]
+       },
+       "key": "close_done"
+      }
+     ],
+     "next": [
+      {
+       "to": "end",
+       "when": {
+        "eq": [
+         "$a.close",
+         "worse"
+        ]
+       }
+      },
+      {
+       "to": "ready",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "ready",
+     "kind": "ask",
+     "title": "ready_title",
+     "fields": [
+      {
+       "id": "ready",
+       "options": {
+        "list": "ready"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "end",
+     "kind": "handoff",
+     "complete": true,
+     "done": "done",
+     "title": [
+      {
+       "key": "end_plan_title",
+       "when": {
+        "all": [
+         {
+          "set": "$a.ifthen"
+         },
+         {
+          "not": {
+           "eq": [
+            "$a.close",
+            "worse"
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "key": "end_title"
+      }
+     ],
+     "titleSlots": {
+      "plan": {
+       "labelOf": "ifthen"
+      }
+     },
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.close",
+         "worse"
+        ]
+       },
+       "key": "end_harder"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.ready",
+         "not_sure"
+        ]
+       },
+       "key": "end_not_sure"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "end_ready"
+      }
+     ],
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "cool_down",
+       "when": {
+        "eq": [
+         "$a.close",
+         "worse"
+        ]
+       }
+      },
+      {
+       "exit": "plan",
+       "when": {
+        "not": {
+         "eq": [
+          "$a.close",
+          "worse"
+         ]
+        }
+       }
+      },
+      {
+       "exit": "cope_ahead",
+       "when": {
+        "all": [
+         {
+          "set": "$a.ifthen"
+         },
+         {
+          "not": {
+           "eq": [
+            "$a.close",
+            "worse"
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "exit": "again",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    }
+   ],
+   "exits": [
+    {
+     "id": "again",
+     "toolId": "rehearse",
+     "query": {
+      "situationId": "$a.kind",
+      "person": "$ctx.personId"
+     },
+     "carry": [],
+     "done": false,
+     "label": "again_offer"
+    },
+    {
+     "id": "cool_down",
+     "toolId": "cool-down",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "cope_ahead",
+     "toolId": "cope-ahead",
+     "query": {
+      "situationId": "conversation"
+     },
+     "carry": [],
+     "done": false,
+     "label": "cope_offer"
+    },
+    {
+     "id": "done",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": true
+    },
+    {
+     "id": "plan",
+     "toolId": "dear-man",
+     "query": {
+      "person": "$ctx.personId"
+     },
+     "carry": [],
+     "done": false,
+     "label": "plan_offer"
+    },
+    {
+     "id": "safety_open",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": false,
+     "safety": true
+    }
+   ],
+   "options": {
+    "kind": [
+     {
+      "value": "ask",
+      "label": "Asking for something"
+     },
+     {
+      "value": "say_no",
+      "label": "Saying no"
+     },
+     {
+      "value": "boundary",
+      "label": "Setting a limit"
+     },
+     {
+      "value": "address",
+      "label": "Bringing up a problem"
+     },
+     {
+      "value": "repair",
+      "label": "Making a repair"
+     }
+    ],
+    "line": [
+     {
+      "value": "ask_1",
+      "label": "Could you help me with something?",
+      "kind": "ask"
+     },
+     {
+      "value": "ask_2",
+      "label": "I need to ask you for something.",
+      "kind": "ask"
+     },
+     {
+      "value": "ask_3",
+      "label": "Would you be willing to help this week?",
+      "kind": "ask"
+     },
+     {
+      "value": "say_no_1",
+      "label": "No, I can't do that.",
+      "kind": "say_no"
+     },
+     {
+      "value": "say_no_2",
+      "label": "I'm going to say no this time.",
+      "kind": "say_no"
+     },
+     {
+      "value": "say_no_3",
+      "label": "That doesn't work for me.",
+      "kind": "say_no"
+     },
+     {
+      "value": "boundary_1",
+      "label": "I need this to stop.",
+      "kind": "boundary"
+     },
+     {
+      "value": "boundary_2",
+      "label": "I'm not okay with that.",
+      "kind": "boundary"
+     },
+     {
+      "value": "boundary_3",
+      "label": "Please don't do that again.",
+      "kind": "boundary"
+     },
+     {
+      "value": "address_1",
+      "label": "Can we talk about what happened?",
+      "kind": "address"
+     },
+     {
+      "value": "address_2",
+      "label": "Something's been bothering me.",
+      "kind": "address"
+     },
+     {
+      "value": "address_3",
+      "label": "I want to bring something up.",
+      "kind": "address"
+     },
+     {
+      "value": "repair_1",
+      "label": "I'm sorry for what I said.",
+      "kind": "repair"
+     },
+     {
+      "value": "repair_2",
+      "label": "I got that wrong, and I'm sorry.",
+      "kind": "repair"
+     },
+     {
+      "value": "repair_3",
+      "label": "I'd like to make things right.",
+      "kind": "repair"
+     }
+    ],
+    "tier": [
+     {
+      "value": "easy",
+      "label": "The easy version: they listen",
+      "flooded": true,
+      "stirred": true
+     },
+     {
+      "value": "realistic",
+      "label": "Realistic: they push back, then partly",
+      "flooded": false,
+      "stirred": true
+     },
+     {
+      "value": "hardest",
+      "label": "The hardest likely: they say no or turn it on you",
+      "flooded": false,
+      "stirred": false
+     },
+     {
+      "value": "leave",
+      "label": "Practise leaving: a calm way out",
+      "flooded": true,
+      "stirred": true
+     }
+    ],
+    "move": [
+     {
+      "value": "again",
+      "label": "Say it again",
+      "letter": "M"
+     },
+     {
+      "value": "acknowledge",
+      "label": "Acknowledge, then come back",
+      "letter": "V+M",
+      "says": "I hear you. And this still matters to me."
+     },
+     {
+      "value": "name",
+      "label": "Name what's happening",
+      "letter": "M",
+      "says": "I notice we keep moving away from it."
+     },
+     {
+      "value": "middle",
+      "label": "Offer a middle",
+      "letter": "N",
+      "says": "Could we find something in between?"
+     },
+     {
+      "value": "turn",
+      "label": "Ask what would work for them",
+      "letter": "N",
+      "says": "What would work for you?"
+     },
+     {
+      "value": "break",
+      "label": "Step out, come back later",
+      "letter": "walk_away",
+      "says": "I'm going to take a break and come back to this."
+     },
+     {
+      "value": "done",
+      "label": "End the conversation",
+      "letter": "walk_away",
+      "says": "I'm done with this conversation for now."
+     },
+     {
+      "value": "lost_it",
+      "label": "I'd lose it here"
+     }
+    ],
+    "turn": [
+     {
+      "value": "ask_easy_1",
+      "label": "What do you need?",
+      "kind": "ask",
+      "tier": "easy",
+      "n": 1,
+      "pose": "open",
+      "moves": "again,acknowledge,turn,done"
+     },
+     {
+      "value": "ask_easy_2",
+      "label": "Okay, that makes sense.",
+      "kind": "ask",
+      "tier": "easy",
+      "n": 2,
+      "pose": "open",
+      "moves": "again,acknowledge,turn,done"
+     },
+     {
+      "value": "ask_easy_3",
+      "label": "Sure, I can do that.",
+      "kind": "ask",
+      "tier": "easy",
+      "n": 3,
+      "pose": "open",
+      "moves": "again,acknowledge,turn,done"
+     },
+     {
+      "value": "ask_realistic_1",
+      "label": "Can we talk about this later?",
+      "kind": "ask",
+      "tier": "realistic",
+      "n": 1,
+      "pose": "turn_away",
+      "moves": "again,acknowledge,middle,turn,break"
+     },
+     {
+      "value": "ask_realistic_2",
+      "label": "I don't know if I can do all of that.",
+      "kind": "ask",
+      "tier": "realistic",
+      "n": 2,
+      "pose": "neutral",
+      "moves": "again,acknowledge,middle,turn,break"
+     },
+     {
+      "value": "ask_realistic_3",
+      "label": "I could do part of it.",
+      "kind": "ask",
+      "tier": "realistic",
+      "n": 3,
+      "pose": "open",
+      "moves": "again,acknowledge,middle,turn,break"
+     },
+     {
+      "value": "ask_hardest_1",
+      "label": "No. That's not happening.",
+      "kind": "ask",
+      "tier": "hardest",
+      "n": 1,
+      "pose": "arms",
+      "moves": "again,acknowledge,name,break,done,lost_it"
+     },
+     {
+      "value": "ask_hardest_2",
+      "label": "You always want something from me.",
+      "kind": "ask",
+      "tier": "hardest",
+      "n": 2,
+      "pose": "arms",
+      "moves": "again,acknowledge,name,break,done,lost_it"
+     },
+     {
+      "value": "ask_hardest_3",
+      "label": "(They go quiet and look away.)",
+      "kind": "ask",
+      "tier": "hardest",
+      "n": 3,
+      "pose": "still",
+      "moves": "again,acknowledge,name,break,done,lost_it"
+     },
+     {
+      "value": "say_no_easy_1",
+      "label": "Oh. Is there a reason?",
+      "kind": "say_no",
+      "tier": "easy",
+      "n": 1,
+      "pose": "neutral",
+      "moves": "again,acknowledge,turn,done"
+     },
+     {
+      "value": "say_no_easy_2",
+      "label": "Okay, I'll ask someone else.",
+      "kind": "say_no",
+      "tier": "easy",
+      "n": 2,
+      "pose": "open",
+      "moves": "again,acknowledge,turn,done"
+     },
+     {
+      "value": "say_no_easy_3",
+      "label": "Fair enough.",
+      "kind": "say_no",
+      "tier": "easy",
+      "n": 3,
+      "pose": "open",
+      "moves": "again,acknowledge,turn,done"
+     },
+     {
+      "value": "say_no_realistic_1",
+      "label": "Come on, it's only this once.",
+      "kind": "say_no",
+      "tier": "realistic",
+      "n": 1,
+      "pose": "closer",
+      "moves": "again,acknowledge,turn,break"
+     },
+     {
+      "value": "say_no_realistic_2",
+      "label": "I really thought I could count on you.",
+      "kind": "say_no",
+      "tier": "realistic",
+      "n": 2,
+      "pose": "neutral",
+      "moves": "again,acknowledge,turn,break"
+     },
+     {
+      "value": "say_no_realistic_3",
+      "label": "Fine. Maybe next time?",
+      "kind": "say_no",
+      "tier": "realistic",
+      "n": 3,
+      "pose": "open",
+      "moves": "again,acknowledge,turn,break"
+     },
+     {
+      "value": "say_no_hardest_1",
+      "label": "You can't be serious.",
+      "kind": "say_no",
+      "tier": "hardest",
+      "n": 1,
+      "pose": "arms",
+      "moves": "again,acknowledge,name,break,done,lost_it"
+     },
+     {
+      "value": "say_no_hardest_2",
+      "label": "After everything I've done for you?",
+      "kind": "say_no",
+      "tier": "hardest",
+      "n": 2,
+      "pose": "still",
+      "moves": "again,acknowledge,name,break,done,lost_it"
+     },
+     {
+      "value": "say_no_hardest_3",
+      "label": "(They turn away and go quiet.)",
+      "kind": "say_no",
+      "tier": "hardest",
+      "n": 3,
+      "pose": "turn_away",
+      "moves": "again,acknowledge,name,break,done,lost_it"
+     },
+     {
+      "value": "boundary_easy_1",
+      "label": "I didn't know it bothered you.",
+      "kind": "boundary",
+      "tier": "easy",
+      "n": 1,
+      "pose": "neutral",
+      "moves": "again,acknowledge,turn,done"
+     },
+     {
+      "value": "boundary_easy_2",
+      "label": "Okay. I'll try.",
+      "kind": "boundary",
+      "tier": "easy",
+      "n": 2,
+      "pose": "open",
+      "moves": "again,acknowledge,turn,done"
+     },
+     {
+      "value": "boundary_easy_3",
+      "label": "Thanks for telling me.",
+      "kind": "boundary",
+      "tier": "easy",
+      "n": 3,
+      "pose": "open",
+      "moves": "again,acknowledge,turn,done"
+     },
+     {
+      "value": "boundary_realistic_1",
+      "label": "I didn't think it was a big deal.",
+      "kind": "boundary",
+      "tier": "realistic",
+      "n": 1,
+      "pose": "arms",
+      "moves": "again,acknowledge,middle,turn,break"
+     },
+     {
+      "value": "boundary_realistic_2",
+      "label": "I'll think about it.",
+      "kind": "boundary",
+      "tier": "realistic",
+      "n": 2,
+      "pose": "neutral",
+      "moves": "again,acknowledge,middle,turn,break"
+     },
+     {
+      "value": "boundary_realistic_3",
+      "label": "I can try, sometimes.",
+      "kind": "boundary",
+      "tier": "realistic",
+      "n": 3,
+      "pose": "open",
+      "moves": "again,acknowledge,middle,turn,break"
+     },
+     {
+      "value": "boundary_hardest_1",
+      "label": "Who are you to tell me what to do?",
+      "kind": "boundary",
+      "tier": "hardest",
+      "n": 1,
+      "pose": "arms",
+      "moves": "again,acknowledge,name,break,done,lost_it"
+     },
+     {
+      "value": "boundary_hardest_2",
+      "label": "I don't see why it matters so much.",
+      "kind": "boundary",
+      "tier": "hardest",
+      "n": 2,
+      "pose": "turn_away",
+      "moves": "again,acknowledge,name,break,done,lost_it"
+     },
+     {
+      "value": "boundary_hardest_3",
+      "label": "(They fold their arms and say nothing.)",
+      "kind": "boundary",
+      "tier": "hardest",
+      "n": 3,
+      "pose": "still",
+      "moves": "again,acknowledge,name,break,done,lost_it"
+     },
+     {
+      "value": "address_easy_1",
+      "label": "Oh, what happened?",
+      "kind": "address",
+      "tier": "easy",
+      "n": 1,
+      "pose": "open",
+      "moves": "again,acknowledge,turn,done"
+     },
+     {
+      "value": "address_easy_2",
+      "label": "I didn't realise. I'm sorry.",
+      "kind": "address",
+      "tier": "easy",
+      "n": 2,
+      "pose": "neutral",
+      "moves": "again,acknowledge,turn,done"
+     },
+     {
+      "value": "address_easy_3",
+      "label": "Let's sort it out.",
+      "kind": "address",
+      "tier": "easy",
+      "n": 3,
+      "pose": "open",
+      "moves": "again,acknowledge,turn,done"
+     },
+     {
+      "value": "address_realistic_1",
+      "label": "This isn't a good time.",
+      "kind": "address",
+      "tier": "realistic",
+      "n": 1,
+      "pose": "turn_away",
+      "moves": "again,acknowledge,middle,turn,break"
+     },
+     {
+      "value": "address_realistic_2",
+      "label": "That's not how I remember it.",
+      "kind": "address",
+      "tier": "realistic",
+      "n": 2,
+      "pose": "arms",
+      "moves": "again,acknowledge,middle,turn,break"
+     },
+     {
+      "value": "address_realistic_3",
+      "label": "Okay, maybe I could have handled it better.",
+      "kind": "address",
+      "tier": "realistic",
+      "n": 3,
+      "pose": "neutral",
+      "moves": "again,acknowledge,middle,turn,break"
+     },
+     {
+      "value": "address_hardest_1",
+      "label": "Here we go again.",
+      "kind": "address",
+      "tier": "hardest",
+      "n": 1,
+      "pose": "arms",
+      "moves": "again,acknowledge,name,break,done,lost_it"
+     },
+     {
+      "value": "address_hardest_2",
+      "label": "What about what you did?",
+      "kind": "address",
+      "tier": "hardest",
+      "n": 2,
+      "pose": "arms",
+      "moves": "again,acknowledge,name,break,done,lost_it"
+     },
+     {
+      "value": "address_hardest_3",
+      "label": "(They look at their phone and don't answer.)",
+      "kind": "address",
+      "tier": "hardest",
+      "n": 3,
+      "pose": "turn_away",
+      "moves": "again,acknowledge,name,break,done,lost_it"
+     },
+     {
+      "value": "repair_easy_1",
+      "label": "Thanks for saying that.",
+      "kind": "repair",
+      "tier": "easy",
+      "n": 1,
+      "pose": "open",
+      "moves": "acknowledge,turn,done"
+     },
+     {
+      "value": "repair_easy_2",
+      "label": "I was upset, yes.",
+      "kind": "repair",
+      "tier": "easy",
+      "n": 2,
+      "pose": "neutral",
+      "moves": "acknowledge,turn,done"
+     },
+     {
+      "value": "repair_easy_3",
+      "label": "Okay. I appreciate it.",
+      "kind": "repair",
+      "tier": "easy",
+      "n": 3,
+      "pose": "open",
+      "moves": "acknowledge,turn,done"
+     },
+     {
+      "value": "repair_realistic_1",
+      "label": "Sorry doesn't really fix it.",
+      "kind": "repair",
+      "tier": "realistic",
+      "n": 1,
+      "pose": "arms",
+      "moves": "acknowledge,middle,turn,break"
+     },
+     {
+      "value": "repair_realistic_2",
+      "label": "I need a bit of time.",
+      "kind": "repair",
+      "tier": "realistic",
+      "n": 2,
+      "pose": "turn_away",
+      "moves": "acknowledge,middle,turn,break"
+     },
+     {
+      "value": "repair_realistic_3",
+      "label": "Okay. Let's see how it goes.",
+      "kind": "repair",
+      "tier": "realistic",
+      "n": 3,
+      "pose": "neutral",
+      "moves": "acknowledge,middle,turn,break"
+     },
+     {
+      "value": "repair_hardest_1",
+      "label": "It's too late for that.",
+      "kind": "repair",
+      "tier": "hardest",
+      "n": 1,
+      "pose": "arms",
+      "moves": "acknowledge,name,break,done,lost_it"
+     },
+     {
+      "value": "repair_hardest_2",
+      "label": "You always say that.",
+      "kind": "repair",
+      "tier": "hardest",
+      "n": 2,
+      "pose": "still",
+      "moves": "acknowledge,name,break,done,lost_it"
+     },
+     {
+      "value": "repair_hardest_3",
+      "label": "(They walk away.)",
+      "kind": "repair",
+      "tier": "hardest",
+      "n": 3,
+      "pose": "turn_away",
+      "moves": "acknowledge,name,break,done,lost_it"
+     },
+     {
+      "value": "any_leave_1",
+      "label": "Can we keep going?",
+      "kind": "any",
+      "tier": "leave",
+      "n": 1,
+      "pose": "neutral",
+      "moves": "again,break,done"
+     },
+     {
+      "value": "any_leave_2",
+      "label": "I'd rather finish this now.",
+      "kind": "any",
+      "tier": "leave",
+      "n": 2,
+      "pose": "neutral",
+      "moves": "again,break,done"
+     },
+     {
+      "value": "any_leave_3",
+      "label": "(They keep talking.)",
+      "kind": "any",
+      "tier": "leave",
+      "n": 3,
+      "pose": "neutral",
+      "moves": "again,break,done"
+     }
+    ],
+    "ifthen": [
+     {
+      "value": "again",
+      "label": "Say my line again, calmly"
+     },
+     {
+      "value": "acknowledge",
+      "label": "Acknowledge them, then come back to it"
+     },
+     {
+      "value": "name",
+      "label": "Name what's happening"
+     },
+     {
+      "value": "break",
+      "label": "Step out and come back later"
+     },
+     {
+      "value": "done",
+      "label": "End the conversation"
+     }
+    ],
+    "tvn": [
+     {
+      "value": "worse",
+      "label": "Harder"
+     },
+     {
+      "value": "same",
+      "label": "About the same"
+     },
+     {
+      "value": "better",
+      "label": "Easier"
+     },
+     {
+      "value": "much_better",
+      "label": "Much easier"
+     }
+    ],
+    "ready": [
+     {
+      "value": "sure",
+      "label": "Sure"
+     },
+     {
+      "value": "think_so",
+      "label": "I think so"
+     },
+     {
+      "value": "not_sure",
+      "label": "Not sure"
+     }
+    ]
+   }
+  },
+  {
    "id": "ride_it_out",
    "toolId": "urge-surfing",
    "version": "ro-v1",
@@ -55872,10 +57262,12 @@
     {
      "id": "rehearse",
      "toolId": "rehearse",
-     "query": {},
+     "query": {
+      "situationId": "say_no",
+      "person": "$ctx.personId"
+     },
      "carry": [],
-     "done": false,
-     "planned": true
+     "done": false
     },
     {
      "id": "safety_open",

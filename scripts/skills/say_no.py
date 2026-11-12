@@ -360,7 +360,7 @@ EXITS = [
     {"id": "cool_down", "toolId": "cool-down"},
     {"id": "fast", "toolId": "fast"},
     {"id": "check_the_facts", "toolId": "check-the-facts"},
-    {"id": "rehearse", "toolId": "rehearse", "planned": True},
+    {"id": "rehearse", "toolId": "rehearse", "query": {"situationId": "say_no", "person": "$ctx.personId"}},  # IE-02
     {"id": "ending_careful", "toolId": "ending-relationships", "query": {"frame": "careful"}},
     {"id": "safety_open", "toolId": None, "safety": True},
     {"id": "done", "done": True},

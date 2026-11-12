@@ -213,4 +213,6 @@ test("the FAST and Wise mind rows show on the check-in result, not only sit acti
   for (const w of ["Skeptical", "Jealous", "Persecuted"]) assert.ok((await shown(w)).includes("wise-mind"), w);
   // IE-10 (12 Nov): a judgement about someone else gets Notice them beside Check the Facts instead.
   for (const w of ["Critical", "Dismissive"]) assert.ok((await shown(w)).includes("mindfulness-of-others"), w);
+  // IE-02 (12 Nov): hesitant on replay gets Rehearse it beside Check the Facts.
+  assert.ok((await run({ quadrant: "low-unpleasant", emotions: ["Hesitant"] }, live)).tools.map((t) => t.id).includes("rehearse"), "Hesitant");
 });
