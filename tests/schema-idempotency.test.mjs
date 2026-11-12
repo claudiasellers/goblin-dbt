@@ -124,8 +124,8 @@ test("knowledge-graph.cypher is nodes only; count pins for the base files", () =
   const nonOpposite = rels.filter((r) => r.type !== "OPPOSITE_OF");
   // 575 until Oct 2026; the 40 FELT_AS edges moved to body-map.cypher (scripts/body-map/content.py).
   assert.equal(new Set(nonOpposite.map((r) => r.key)).size, 544); // + dbt_values_priorities PART_OF (ER-09), + dbt_troubleshooting PART_OF (ER-14), + dbt_nightmare_protocol PART_OF (ER-15), + dbt_ending_relationships (IE-08), + dbt_saying_no (IE-04), + dbt_self_soothe (DT-07), + dbt_mindfulness_current_thoughts (DT-08), + dbt_dialectical_abstinence (DT-09), + dbt_crisis_survival_kit (DT-03)
-  assert.equal(nonOpposite.length, 543, "no relationship declared twice");
-  assert.equal(statements["relationships.cypher"].length, 543 + 16);
+  assert.equal(nonOpposite.length, 544, "no relationship declared twice");
+  assert.equal(statements["relationships.cypher"].length, 544 + 16);
 });
 
 test("FELT_AS region variants survive (the 66 original keys), now all in body-map.cypher", () => {
