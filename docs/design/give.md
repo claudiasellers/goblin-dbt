@@ -89,8 +89,8 @@ sorry: *Own the part I'm sure of* or *Say something warm, without a sorry*, with
 
 - Yours or partly: **one acknowledgement, for what you did. One sorry is enough** (FAST: one apology, no grovelling),
   an optional line for how it was for them, an optional line for what you'll do differently (Linehan's repair:
-acknowledge, repair, commit), an optional question about what would help. The message card (no
-  *Take the sorry out* here: the sorry is the point; a long explanation gets *Keep it to what you did*). Then *Want me
+  acknowledge, repair, commit), an optional question about what would help, under the hint *Keep it to what you did*.
+  The message card (no *Take the sorry out* here: the sorry is the point). Then *Want me
   to ask how it went?* (`repair_outcome`).
 - Not yours: **You don't owe an apology for having a need, or for a fair no.** Something warm without a sorry, on the
   boundary card. FAST offered.
@@ -112,8 +112,10 @@ needs anyway.
 
 GIVE's four rows, every one optional: Gentle (sharp words and their softer swap), Interested (a question to ask them),
 Validate (a line for their side), Easy manner (lighter, warmth, plain; never sarcasm). Willing hands for twenty seconds
-(`bodyCard` kind `willing`). The pocket card (*Say* · *How* · *Then ask them*), then One message or the prep, with the
-person.
+(`bodyCard` kind `willing`). The pocket card (*Say* · *How* · *Ask about them*; skipped when nothing was picked), then
+One message with the person (one button: the prep is DEAR MAN's own way in, and two buttons would both read *Ask for
+what you need*). After two refused asks to be heard, FAST's Let go sits beside it. The four rows stay on one screen
+(the PRD's under-30-seconds inline layer), a named departure from one question per screen.
 
 ## Ways in
 

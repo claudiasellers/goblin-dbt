@@ -15777,7 +15777,7 @@
           "brought_line_disagree": "You can take their feeling seriously and still see it your way. Both can be true.",
           "fight_title": "Before the repair: did it get physical, or are you scared of them now?",
           "fight_hint": "However it went, you can answer honestly here.",
-          "scared_line": "Someone's safety comes before any repair. The people below can help, any time, whichever side of it you're on.",
+          "scared_line": "Someone's safety comes before any repair. The people above can help, any time, whichever side of it you're on.",
           "guilt_title": "Looking back, was some of it yours?",
           "guilt_hint": "Feeling bad and having done something wrong aren't always the same thing.",
           "check_facts": "Check the facts first",
@@ -15794,9 +15794,9 @@
           "repair_again_label": "Want me to ask how it went?",
           "repair_sent_line": "Your repair is ready. When you say it is up to you.",
           "repair_sent_heads_up": "With them, short and in writing can be kinder for you both.",
-          "no_sorry_title": "You don't owe an apology for having a need, or for a fair no.",
-          "no_sorry_title_unsure": "Something warm, without a sorry. You can come back to the rest.",
-          "no_sorry_hint": "You can still keep it warm. Pick something you'd say, without a sorry.",
+          "no_sorry_title": "What would you say, without a sorry?",
+          "no_sorry_title_unsure": "Something warm, without a sorry. What would you say?",
+          "no_sorry_hint": "You don't owe an apology for having a need, or for a fair no.",
           "no_sorry_card_title": "Your line",
           "no_sorry_line": "Warm and steady. You can care about them and not apologise for what wasn't yours.",
           "repaired_title": "Did you get to say it?",
@@ -15811,7 +15811,7 @@
           "break_card_title": "Your line",
           "break_set_line": "Something that settles you can help more than the argument on replay. There'll be a card here when it's time.",
           "back_title": "Did you go back to it?",
-          "back_hint": "Whichever way it went.",
+          "back_hint": "Any answer is fine here.",
           "still_ok_title": "How are things between you now?",
           "back_line": "You came back when you said you would. That's what helps a break feel safe.",
           "back_line_shaky": "You came back when you said you would. If it still feels raw, a repair can come next.",
@@ -15820,8 +15820,8 @@
           "no_return_line": "Not going back to it is an answer too. You can choose what happens next with them.",
           "not_safe_link": "I don't feel safe with them",
           "refused_line": "You came back. That part was yours, and you did it. They may need longer.",
-          "gentle_title": "Keep it warm while you ask.",
-          "gentle_title_heads_up": "Keep it short and plain with them. A little warmth still helps.",
+          "gentle_title": "What would keep it warm while you ask?",
+          "gentle_title_heads_up": "Short and plain with them, and a little warmth. What would help?",
           "refused_line_ask": "With them, this works best for practical asks. Being heard is something they haven't been able to give lately.",
           "swap_label": "Gentle: any sharp words to swap?",
           "g_question_label": "Interested: one question to ask them",
@@ -15837,7 +15837,7 @@
           "gentle_card_title": "Take these into your ask.",
           "card_say": "Say",
           "card_how": "How",
-          "card_ask_them": "Then ask them",
+          "card_ask_them": "Ask about them",
           "gentle_line": "The warmth goes in around the ask. The ask itself stays clear.",
           "picker_personWhoGive": "Who's it with?",
           "picker_personNew": "Someone new",
@@ -15883,7 +15883,19 @@
                 "key": "situation_title"
               }
             ],
-            "hint": "situation_hint",
+            "lines": [
+              {
+                "when": {
+                  "not": {
+                    "eq": [
+                      "$ctx.band",
+                      "flooded"
+                    ]
+                  }
+                },
+                "key": "situation_hint"
+              }
+            ],
             "fields": [
               {
                 "id": "situation",
@@ -16107,9 +16119,19 @@
                 "options": {
                   "list": "mine",
                   "where": {
-                    "has": [
-                      "$opt.stance",
-                      "$a.stance"
+                    "all": [
+                      {
+                        "has": [
+                          "$opt.stance",
+                          "$a.stance"
+                        ]
+                      },
+                      {
+                        "has": [
+                          "$opt.about",
+                          "$a.brought"
+                        ]
+                      }
                     ]
                   }
                 },
@@ -16200,10 +16222,6 @@
                     "disagree"
                   ]
                 }
-              },
-              {
-                "exit": "give_break",
-                "when": null
               }
             ]
           },
@@ -16384,6 +16402,7 @@
           {
             "id": "owning",
             "kind": "ask",
+            "hint": "repair_explain",
             "title": [
               {
                 "key": "ack_title_unsure",
@@ -16460,7 +16479,6 @@
                 "r_ask"
               ],
               "field": "ack",
-              "explainLine": "repair_explain",
               "copyLabel": "copy",
               "copiedLabel": "copied",
               "selectedLabel": "selected",
@@ -16534,7 +16552,19 @@
                 "key": "no_sorry_title"
               }
             ],
-            "hint": "no_sorry_hint",
+            "lines": [
+              {
+                "when": {
+                  "not": {
+                    "eq": [
+                      "$a.guilt",
+                      "unsure"
+                    ]
+                  }
+                },
+                "key": "no_sorry_hint"
+              }
+            ],
             "fields": [
               {
                 "id": "no_sorry",
@@ -17186,6 +17216,25 @@
             "next": [
               {
                 "to": "g_card",
+                "when": {
+                  "any": [
+                    {
+                      "set": "$a.swap"
+                    },
+                    {
+                      "set": "$a.g_question"
+                    },
+                    {
+                      "set": "$a.g_validate"
+                    },
+                    {
+                      "set": "$a.manner"
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "g_end",
                 "when": null
               }
             ],
@@ -17252,10 +17301,6 @@
               {
                 "exit": "one_message",
                 "when": null
-              },
-              {
-                "exit": "dear_man",
-                "when": null
               }
             ]
           }
@@ -17272,15 +17317,6 @@
             "id": "cool_down",
             "toolId": "cool-down",
             "query": {},
-            "carry": [],
-            "done": false
-          },
-          {
-            "id": "dear_man",
-            "toolId": "dear-man",
-            "query": {
-              "person": "$ctx.personId"
-            },
             "carry": [],
             "done": false
           },
@@ -17312,16 +17348,6 @@
             "toolId": "fast",
             "query": {
               "frame": "let_go"
-            },
-            "carry": [],
-            "done": false
-          },
-          {
-            "id": "give_break",
-            "toolId": "give",
-            "query": {
-              "situationId": "heated",
-              "person": "$ctx.personId"
             },
             "carry": [],
             "done": false
@@ -17519,6 +17545,10 @@
               "stance": [
                 "agree",
                 "partly"
+              ],
+              "about": [
+                "complaint",
+                "angry"
               ]
             },
             {
@@ -17527,6 +17557,12 @@
               "stance": [
                 "partly",
                 "disagree"
+              ],
+              "about": [
+                "complaint",
+                "request",
+                "upset",
+                "angry"
               ]
             },
             {
@@ -17536,6 +17572,12 @@
                 "partly",
                 "disagree",
                 "unsure"
+              ],
+              "about": [
+                "complaint",
+                "request",
+                "upset",
+                "angry"
               ]
             },
             {
@@ -17543,6 +17585,9 @@
               "label": "Yes, I can do that.",
               "stance": [
                 "agree"
+              ],
+              "about": [
+                "request"
               ]
             },
             {
@@ -17551,6 +17596,9 @@
               "stance": [
                 "partly",
                 "disagree"
+              ],
+              "about": [
+                "request"
               ]
             }
           ],
@@ -17802,19 +17850,19 @@
           "swap": [
             {
               "value": "s_always",
-              "label": "\"You always…\" → \"Sometimes…\""
+              "label": "Swap \"You always…\" for \"Sometimes…\""
             },
             {
               "value": "s_never",
-              "label": "\"You never…\" → \"It's been a while since…\""
+              "label": "Swap \"You never…\" for \"It's been a while since…\""
             },
             {
               "value": "s_why",
-              "label": "\"Why do you…\" → \"I noticed…\""
+              "label": "Swap \"Why do you…\" for \"I noticed…\""
             },
             {
               "value": "s_if",
-              "label": "\"If you don't…\" → \"I'd like…\""
+              "label": "Swap \"If you don't…\" for \"I'd like…\""
             }
           ],
           "g_question": [

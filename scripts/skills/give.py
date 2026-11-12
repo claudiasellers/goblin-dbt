@@ -116,7 +116,7 @@ COPY = {
     # --- Repair after a fight ---
     "fight_title": "Before the repair: did it get physical, or are you scared of them now?",
     "fight_hint": "However it went, you can answer honestly here.",
-    "scared_line": "Someone's safety comes before any repair. The people below can help, any time, whichever side of it you're on.",
+    "scared_line": "Someone's safety comes before any repair. The people above can help, any time, whichever side of it you're on.",
     "guilt_title": "Looking back, was some of it yours?",
     "guilt_hint": "Feeling bad and having done something wrong aren't always the same thing.",
     "check_facts": "Check the facts first",
@@ -133,9 +133,9 @@ COPY = {
     "repair_again_label": "Want me to ask how it went?",
     "repair_sent_line": "Your repair is ready. When you say it is up to you.",
     "repair_sent_heads_up": "With them, short and in writing can be kinder for you both.",
-    "no_sorry_title": "You don't owe an apology for having a need, or for a fair no.",
-    "no_sorry_title_unsure": "Something warm, without a sorry. You can come back to the rest.",
-    "no_sorry_hint": "You can still keep it warm. Pick something you'd say, without a sorry.",
+    "no_sorry_title": "What would you say, without a sorry?",
+    "no_sorry_title_unsure": "Something warm, without a sorry. What would you say?",
+    "no_sorry_hint": "You don't owe an apology for having a need, or for a fair no.",
     "no_sorry_card_title": "Your line",
     "no_sorry_line": "Warm and steady. You can care about them and not apologise for what wasn't yours.",
     # Afterwards (the repair_outcome card reopens the run here)
@@ -152,7 +152,7 @@ COPY = {
     "break_card_title": "Your line",
     "break_set_line": "Something that settles you can help more than the argument on replay. There'll be a card here when it's time.",
     "back_title": "Did you go back to it?",
-    "back_hint": "Whichever way it went.",
+    "back_hint": "Any answer is fine here.",
     "still_ok_title": "How are things between you now?",
     "back_line": "You came back when you said you would. That's what helps a break feel safe.",
     "back_line_shaky": "You came back when you said you would. If it still feels raw, a repair can come next.",
@@ -162,8 +162,8 @@ COPY = {
     "not_safe_link": "I don't feel safe with them",
     "refused_line": "You came back. That part was yours, and you did it. They may need longer.",
     # --- Before an ask: GIVE's four rows ---
-    "gentle_title": "Keep it warm while you ask.",
-    "gentle_title_heads_up": "Keep it short and plain with them. A little warmth still helps.",
+    "gentle_title": "What would keep it warm while you ask?",
+    "gentle_title_heads_up": "Short and plain with them, and a little warmth. What would help?",
     "refused_line_ask": "With them, this works best for practical asks. Being heard is something they haven't been able to give lately.",
     "swap_label": "Gentle: any sharp words to swap?",
     "g_question_label": "Interested: one question to ask them",
@@ -179,7 +179,7 @@ COPY = {
     "gentle_card_title": "Take these into your ask.",
     "card_say": "Say",
     "card_how": "How",
-    "card_ask_them": "Then ask them",
+    "card_ask_them": "Ask about them",
     "gentle_line": "The warmth goes in around the ask. The ask itself stays clear.",
     **PICKER_COPY,
 }
@@ -221,11 +221,11 @@ STANCE = [
     ("unsure", "I'm not sure yet"),
 ]
 MINE = [
-    ("m_sorry", "I'm sorry for my part in it.", ["agree", "partly"]),
-    ("m_my_side", "I see it a bit differently, and I'd like to tell you how.", ["partly", "disagree"]),
-    ("m_think", "Can I think about it and come back to you?", ["partly", "disagree", "unsure"]),
-    ("m_yes", "Yes, I can do that.", ["agree"]),
-    ("m_other", "I can't do that, and I'd like to help another way.", ["partly", "disagree"]),
+    ("m_sorry", "I'm sorry for my part in it.", ["agree", "partly"], ["complaint", "angry"]),
+    ("m_my_side", "I see it a bit differently, and I'd like to tell you how.", ["partly", "disagree"], ALL_B),
+    ("m_think", "Can I think about it and come back to you?", ["partly", "disagree", "unsure"], ALL_B),
+    ("m_yes", "Yes, I can do that.", ["agree"], ["request"]),
+    ("m_other", "I can't do that, and I'd like to help another way.", ["partly", "disagree"], ["request"]),
 ]
 FIGHT = [("no", "No"), ("physical", "It got physical"), ("scared", "I'm scared of them")]
 GUILT = [
@@ -284,10 +284,10 @@ BACK = [("yes", "Yes"), ("not_yet", "Not yet"), ("they_didnt", "They didn't want
         ("unsafe", "I don't feel safe going back")]
 # Gentle's swaps (Handout 6: no attacks, threats or judgments): the sharp word and its softer swap, on one chip.
 SWAP = [
-    ("s_always", "\"You always…\" → \"Sometimes…\""),
-    ("s_never", "\"You never…\" → \"It's been a while since…\""),
-    ("s_why", "\"Why do you…\" → \"I noticed…\""),
-    ("s_if", "\"If you don't…\" → \"I'd like…\""),
+    ("s_always", "Swap \"You always…\" for \"Sometimes…\""),
+    ("s_never", "Swap \"You never…\" for \"It's been a while since…\""),
+    ("s_why", "Swap \"Why do you…\" for \"I noticed…\""),
+    ("s_if", "Swap \"If you don't…\" for \"I'd like…\""),
 ]
 G_QUESTION = [
     ("gq_been", "How's this been for you?"),
@@ -314,7 +314,7 @@ STEPS = [
     {
         "id": "what", "kind": "ask",
         "title": [{"key": "situation_title_flooded", "when": FLOODED}, {"key": "situation_title"}],
-        "hint": "situation_hint",
+        "lines": [{"when": {"not": FLOODED}, "key": "situation_hint"}],
         "fields": [{"id": "situation", "options": {"list": "situation", "where": SITUATION_WHERE, "firstFrom": "$ctx.situationId"},
                     "max": 1, "required": True,
                     "links": [{"exit": "cool_down", "label": "cool_down", "when": FLOODED}]}],
@@ -345,7 +345,7 @@ STEPS = [
         "id": "yours", "kind": "ask", "title": "yours_title",
         "fields": [
             {"id": "stance", "label": "stance_label", "options": {"list": "stance"}, "max": 1, "required": True},
-            {"id": "mine", "label": "mine_label", "options": {"list": "mine", "where": STANCE_WHERE}, "max": 1,
+            {"id": "mine", "label": "mine_label", "options": {"list": "mine", "where": {"all": [STANCE_WHERE, BROUGHT_WHERE]}}, "max": 1,
              "showWhen": {"set": a("stance")}},
         ],
         "next": [{"to": "b_card"}],
@@ -361,8 +361,7 @@ STEPS = [
     {
         "id": "b_end", "kind": "handoff", "complete": True,
         "lines": [{"when": is_("stance", "disagree"), "key": "brought_line_disagree"}, {"when": None, "key": "brought_line"}],
-        "offers": [{"exit": "one_message", "when": None}, {"exit": "fast", "when": is_("stance", "disagree")},
-                   {"exit": "give_break", "when": None}],
+        "offers": [{"exit": "one_message", "when": None}, {"exit": "fast", "when": is_("stance", "disagree")}],
         "done": "done",
     },
     # --- Repair after a fight ---
@@ -395,7 +394,7 @@ STEPS = [
         "next": [{"when": is_("unsure", "warm"), "to": "no_sorry"}, {"to": "owning"}],
     },
     {
-        "id": "owning", "kind": "ask",
+        "id": "owning", "kind": "ask", "hint": "repair_explain",
         "title": [{"key": "ack_title_unsure", "when": is_("guilt", "unsure")}, {"key": "ack_title"}],
         "fields": [
             {"id": "ack", "label": "ack_label", "options": {"list": "ack"}, "max": 1, "required": True,
@@ -408,7 +407,7 @@ STEPS = [
     },
     {
         "id": "r_msg", "kind": "embed", "embed": "messageComposer", "title": "repair_msg_title", "answerAs": "repair_how",
-        "props": {"parts": ["ack", "r_validate", "commit", "r_ask"], "field": "ack", "explainLine": "repair_explain",
+        "props": {"parts": ["ack", "r_validate", "commit", "r_ask"], "field": "ack",
                   "copyLabel": "copy", "copiedLabel": "copied", "selectedLabel": "selected", "openLabel": "open_messages",
                   "next": "next"},
         "next": [{"to": "r_sent"}],
@@ -424,7 +423,8 @@ STEPS = [
     {
         # Guilt that doesn't fit the facts (PRD): a FAST line instead of an apology, and still something warm.
         "id": "no_sorry", "kind": "ask",
-        "title": [{"key": "no_sorry_title_unsure", "when": is_("guilt", "unsure")}, {"key": "no_sorry_title"}], "hint": "no_sorry_hint",
+        "title": [{"key": "no_sorry_title_unsure", "when": is_("guilt", "unsure")}, {"key": "no_sorry_title"}],
+        "lines": [{"when": {"not": is_("guilt", "unsure")}, "key": "no_sorry_hint"}],
         "fields": [{"id": "no_sorry", "options": {"list": "no_sorry"}, "max": 1, "required": True}],
         "next": [{"to": "ns_card"}],
     },
@@ -551,7 +551,9 @@ STEPS = [
         "id": "soft", "kind": "embed", "embed": "bodyCard", "title": "soft_title", "answerAs": "soft_how",
         "props": {"kind": "willing", "seconds": 20, "step1": "soft_step1", "step2": "soft_step2", "step3": "soft_step3",
                   "start": "soft_start", "running": "soft_running", "done": "soft_done", "next": "next"},
-        "next": [{"to": "g_card"}],
+        # Nothing picked on the four rows: no empty card.
+        "next": [{"when": {"any": [{"set": a("swap")}, {"set": a("g_question")}, {"set": a("g_validate")}, {"set": a("manner")}]},
+                  "to": "g_card"}, {"to": "g_end"}],
     },
     {
         "id": "g_card", "kind": "embed", "embed": "pocketCard", "title": "gentle_card_title", "answerAs": "g_card_how",
@@ -562,7 +564,7 @@ STEPS = [
     {
         "id": "g_end", "kind": "handoff", "complete": True,
         "lines": [{"when": None, "key": "gentle_line"}],
-        "offers": [{"exit": "fast_let_go", "when": REFUSED}, {"exit": "one_message", "when": None}, {"exit": "dear_man", "when": None}],
+        "offers": [{"exit": "fast_let_go", "when": REFUSED}, {"exit": "one_message", "when": None}],
         "done": "done",
     },
 ]
@@ -571,10 +573,8 @@ EXITS = [
     {"id": "cool_down", "toolId": "cool-down"},
     {"id": "fast", "toolId": "fast"},
     {"id": "fast_let_go", "toolId": "fast", "query": {"frame": "let_go"}},
-    {"id": "give_break", "toolId": "give", "query": {"situationId": "heated", "person": "$ctx.personId"}},
     {"id": "check_the_facts", "toolId": "check-the-facts"},
     {"id": "one_message", "toolId": "dear-man", "query": {"mode": "one", "person": "$ctx.personId"}},
-    {"id": "dear_man", "toolId": "dear-man", "query": {"person": "$ctx.personId"}},
     {"id": "give_repair", "toolId": "give", "query": {"situationId": "repair", "person": "$ctx.personId"}},
     {"id": "rehearse", "toolId": "rehearse", "planned": True},
     {"id": "ending_careful", "toolId": "ending-relationships", "query": {"frame": "careful"}},
@@ -589,7 +589,7 @@ def options():
     out += [("validate", v, l, {"about": ab}, None) for v, l, ab in VALIDATE]
     out += [("interested", v, l, {"about": ab}, None) for v, l, ab in INTERESTED]
     out += [("stance", v, l, {}, None) for v, l in STANCE]
-    out += [("mine", v, l, {"stance": st}, None) for v, l, st in MINE]
+    out += [("mine", v, l, {"stance": st, "about": ab}, None) for v, l, st, ab in MINE]
     out += [("fight", v, l, {"danger": "other"} if v != "no" else {}, None) for v, l in FIGHT]
     out += [("guilt", v, l, {}, None) for v, l in GUILT]
     out += [("ack", v, l, {}, None) for v, l in ACK]

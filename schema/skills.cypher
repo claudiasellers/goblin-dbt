@@ -16324,13 +16324,13 @@ SET r += {list: "actual", order: 256};
 
 // --- give (give-v1) ---
 MERGE (s:Skill {id: "give"})
-SET s += {toolId: "give", version: "give-v1", contentVersion: "skills-v1", start: "what", ownMax: 140, emotionFields: [], accepts: ["personId", "frame", "band", "situationId", "refused"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"ack_label\": \"What you'd own\", \"ack_title\": \"One clear acknowledgement, for what you did. One sorry is enough.\", \"ack_title_unsure\": \"If some of it was yours, one acknowledgement for that part. One sorry is enough.\", \"angry_check_label\": \"Are you safe with them right now?\", \"back_hint\": \"Whichever way it went.\", \"back_line\": \"You came back when you said you would. That's what helps a break feel safe.\", \"back_line_shaky\": \"You came back when you said you would. If it still feels raw, a repair can come next.\", \"back_title\": \"Did you go back to it?\", \"between_title\": \"How are things between you now?\", \"break_card_title\": \"Your line\", \"break_len_label\": \"How long?\", \"break_line_label\": \"What you'll say\", \"break_set_line\": \"Something that settles you can help more than the argument on replay. There'll be a card here when it's time.\", \"break_title\": \"Say when you'll come back. A return time helps a break feel less like leaving.\", \"brought_line\": \"Their feeling first, then yours. You don't have to agree with them to be kind.\", \"brought_line_disagree\": \"You can take their feeling seriously and still see it your way. Both can be true.\", \"brought_title\": \"What did they bring to you?\", \"card_ask_them\": \"Then ask them\", \"card_finish\": \"Let them finish before you answer.\", \"card_heats\": \"If it heats up: I need half an hour. I'm coming back to this.\", \"card_how\": \"How\", \"card_mine\": \"Then mine\", \"card_next_card\": \"Next card\", \"card_prev\": \"Back\", \"card_say\": \"Say\", \"card_stance\": \"Where I stand\", \"card_steady\": \"Stay steady\", \"card_theirs\": \"First, theirs\", \"card_title\": \"Your lines for the conversation.\", \"check_facts\": \"Check the facts first\", \"cool_down\": \"Settle my body first\", \"copied\": \"Copied\", \"copy\": \"Copy\", \"done\": \"Done\", \"fight_hint\": \"However it went, you can answer honestly here.\", \"fight_title\": \"Before the repair: did it get physical, or are you scared of them now?\", \"g_question_label\": \"Interested: one question to ask them\", \"g_validate_label\": \"Validate: one line for their side\", \"gentle_card_title\": \"Take these into your ask.\", \"gentle_line\": \"The warmth goes in around the ask. The ask itself stays clear.\", \"gentle_title\": \"Keep it warm while you ask.\", \"gentle_title_heads_up\": \"Keep it short and plain with them. A little warmth still helps.\", \"guilt_hint\": \"Feeling bad and having done something wrong aren't always the same thing.\", \"guilt_title\": \"Looking back, was some of it yours?\", \"guilt_unsure_line\": \"If you're not sure it was yours, checking the facts first can help.\", \"interested_label\": \"One question to ask them\", \"manner_label\": \"Easy manner: how it sounds\", \"mine_label\": \"Something of yours to say (optional)\", \"more_line\": \"There'll be a card here then.\", \"more_title\": \"That's okay. When will you go back?\", \"next\": \"Next\", \"no_return_line\": \"Not going back to it is an answer too. You can choose what happens next with them.\", \"no_sorry_card_title\": \"Your line\", \"no_sorry_hint\": \"You can still keep it warm. Pick something you'd say, without a sorry.\", \"no_sorry_line\": \"Warm and steady. You can care about them and not apologise for what wasn't yours.\", \"no_sorry_title\": \"You don't owe an apology for having a need, or for a fair no.\", \"no_sorry_title_unsure\": \"Something warm, without a sorry. You can come back to the rest.\", \"not_safe_link\": \"I don't feel safe with them\", \"open_messages\": \"Open messages\", \"own_line\": \"In my own words\", \"picker_personChanged\": \"Things changed with someone?\", \"picker_personChangedHint\": \"Pick who it is, and you'll be asked about them again.\", \"picker_personGoOn\": \"Go on\", \"picker_personKeepLine\": \"The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.\", \"picker_personNameHint\": \"A nickname is fine. No real names needed.\", \"picker_personNameLabel\": \"What do you call them?\", \"picker_personNew\": \"Someone new\", \"picker_personNoNameLine\": \"Without a name, nothing about them is kept.\", \"picker_personRoleLabel\": \"Who are they to you?\", \"picker_personSignedOutLine\": \"This stays on this screen only.\", \"picker_personWhoGive\": \"Who's it with?\", \"picker_riskBadly\": \"It tends to go badly\", \"picker_riskHarm\": \"They might hurt or control me\", \"picker_riskQuestion\": \"Is it more that they might hurt or control you, or that it tends to go badly?\", \"picker_riskUnsaid\": \"I'd rather not say\", \"picker_safeNo\": \"No\", \"picker_safeQuestion\": \"Is it safe to bring hard things up with {who}?\", \"picker_safeUnsure\": \"Not sure\", \"picker_safeYes\": \"Yes, mostly\", \"picker_safetyRouteBack\": \"This is about someone else\", \"picker_safetyRouteBody\": \"The people below can help you think it through, any time, and you don't have to be sure.\", \"picker_safetyRouteEnding\": \"Thinking about ending the relationship\", \"picker_safetyRouteGiveHeading\": \"Keeping it warm isn't your job with {who}. Your safety comes first.\", \"r_ask_label\": \"One question about what would help (optional)\", \"r_commit_label\": \"Something you'll do differently (optional)\", \"r_validate_label\": \"A line for how it was for them (optional)\", \"refused_line\": \"You came back. That part was yours, and you did it. They may need longer.\", \"refused_line_ask\": \"With them, this works best for practical asks. Being heard is something they haven't been able to give lately.\", \"repair_again_label\": \"Want me to ask how it went?\", \"repair_explain\": \"Keep it to what you did. A long explanation can sound like an excuse.\", \"repair_msg_title\": \"Here's your repair.\", \"repair_sent_heads_up\": \"With them, short and in writing can be kinder for you both.\", \"repair_sent_line\": \"Your repair is ready. When you say it is up to you.\", \"repaired_line\": \"You owned your part, and things feel okay again.\", \"repaired_line_shaky\": \"Repairs often take more than one go. Your part was the acknowledgement, and you did it.\", \"repaired_not_ready\": \"You said your part. When they're ready to hear it is theirs.\", \"repaired_not_yet\": \"Not yet. Your words are still here when you're ready.\", \"repaired_title\": \"Did you get to say it?\", \"scared_line\": \"Someone's safety comes before any repair. The people below can help, any time, whichever side of it you're on.\", \"selected\": \"Selected. Copy it from here.\", \"situation_hint\": \"Pick the one closest.\", \"situation_title\": \"What's going on with them?\", \"situation_title_flooded\": \"Your body's running hot. A break you come back from can be the kind move right now.\", \"soft_done\": \"Done\", \"soft_running\": \"Open hands, soft face\", \"soft_start\": \"Start\", \"soft_step1\": \"Let your hands rest open, palms up.\", \"soft_step2\": \"Soften your face and jaw.\", \"soft_step3\": \"Breathe out slowly once.\", \"soft_title\": \"Easy manner starts in the body.\", \"stance_label\": \"Where are you with it?\", \"still_ok_title\": \"How are things between you now?\", \"stirred_line\": \"This is a lot to hold. Your side matters too, and it gets its turn.\", \"swap_label\": \"Gentle: any sharp words to swap?\", \"their_hint\": \"Their feeling can make sense even when you see the facts differently.\", \"their_title\": \"First, their side.\", \"unsure_title\": \"Not sure is a fair answer. What would you like to do?\", \"validate_label\": \"One line for how they feel\", \"yours_title\": \"Then yours. You can hear them and still disagree.\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "give", version: "give-v1", contentVersion: "skills-v1", start: "what", ownMax: 140, emotionFields: [], accepts: ["personId", "frame", "band", "situationId", "refused"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"ack_label\": \"What you'd own\", \"ack_title\": \"One clear acknowledgement, for what you did. One sorry is enough.\", \"ack_title_unsure\": \"If some of it was yours, one acknowledgement for that part. One sorry is enough.\", \"angry_check_label\": \"Are you safe with them right now?\", \"back_hint\": \"Any answer is fine here.\", \"back_line\": \"You came back when you said you would. That's what helps a break feel safe.\", \"back_line_shaky\": \"You came back when you said you would. If it still feels raw, a repair can come next.\", \"back_title\": \"Did you go back to it?\", \"between_title\": \"How are things between you now?\", \"break_card_title\": \"Your line\", \"break_len_label\": \"How long?\", \"break_line_label\": \"What you'll say\", \"break_set_line\": \"Something that settles you can help more than the argument on replay. There'll be a card here when it's time.\", \"break_title\": \"Say when you'll come back. A return time helps a break feel less like leaving.\", \"brought_line\": \"Their feeling first, then yours. You don't have to agree with them to be kind.\", \"brought_line_disagree\": \"You can take their feeling seriously and still see it your way. Both can be true.\", \"brought_title\": \"What did they bring to you?\", \"card_ask_them\": \"Ask about them\", \"card_finish\": \"Let them finish before you answer.\", \"card_heats\": \"If it heats up: I need half an hour. I'm coming back to this.\", \"card_how\": \"How\", \"card_mine\": \"Then mine\", \"card_next_card\": \"Next card\", \"card_prev\": \"Back\", \"card_say\": \"Say\", \"card_stance\": \"Where I stand\", \"card_steady\": \"Stay steady\", \"card_theirs\": \"First, theirs\", \"card_title\": \"Your lines for the conversation.\", \"check_facts\": \"Check the facts first\", \"cool_down\": \"Settle my body first\", \"copied\": \"Copied\", \"copy\": \"Copy\", \"done\": \"Done\", \"fight_hint\": \"However it went, you can answer honestly here.\", \"fight_title\": \"Before the repair: did it get physical, or are you scared of them now?\", \"g_question_label\": \"Interested: one question to ask them\", \"g_validate_label\": \"Validate: one line for their side\", \"gentle_card_title\": \"Take these into your ask.\", \"gentle_line\": \"The warmth goes in around the ask. The ask itself stays clear.\", \"gentle_title\": \"What would keep it warm while you ask?\", \"gentle_title_heads_up\": \"Short and plain with them, and a little warmth. What would help?\", \"guilt_hint\": \"Feeling bad and having done something wrong aren't always the same thing.\", \"guilt_title\": \"Looking back, was some of it yours?\", \"guilt_unsure_line\": \"If you're not sure it was yours, checking the facts first can help.\", \"interested_label\": \"One question to ask them\", \"manner_label\": \"Easy manner: how it sounds\", \"mine_label\": \"Something of yours to say (optional)\", \"more_line\": \"There'll be a card here then.\", \"more_title\": \"That's okay. When will you go back?\", \"next\": \"Next\", \"no_return_line\": \"Not going back to it is an answer too. You can choose what happens next with them.\", \"no_sorry_card_title\": \"Your line\", \"no_sorry_hint\": \"You don't owe an apology for having a need, or for a fair no.\", \"no_sorry_line\": \"Warm and steady. You can care about them and not apologise for what wasn't yours.\", \"no_sorry_title\": \"What would you say, without a sorry?\", \"no_sorry_title_unsure\": \"Something warm, without a sorry. What would you say?\", \"not_safe_link\": \"I don't feel safe with them\", \"open_messages\": \"Open messages\", \"own_line\": \"In my own words\", \"picker_personChanged\": \"Things changed with someone?\", \"picker_personChangedHint\": \"Pick who it is, and you'll be asked about them again.\", \"picker_personGoOn\": \"Go on\", \"picker_personKeepLine\": \"The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.\", \"picker_personNameHint\": \"A nickname is fine. No real names needed.\", \"picker_personNameLabel\": \"What do you call them?\", \"picker_personNew\": \"Someone new\", \"picker_personNoNameLine\": \"Without a name, nothing about them is kept.\", \"picker_personRoleLabel\": \"Who are they to you?\", \"picker_personSignedOutLine\": \"This stays on this screen only.\", \"picker_personWhoGive\": \"Who's it with?\", \"picker_riskBadly\": \"It tends to go badly\", \"picker_riskHarm\": \"They might hurt or control me\", \"picker_riskQuestion\": \"Is it more that they might hurt or control you, or that it tends to go badly?\", \"picker_riskUnsaid\": \"I'd rather not say\", \"picker_safeNo\": \"No\", \"picker_safeQuestion\": \"Is it safe to bring hard things up with {who}?\", \"picker_safeUnsure\": \"Not sure\", \"picker_safeYes\": \"Yes, mostly\", \"picker_safetyRouteBack\": \"This is about someone else\", \"picker_safetyRouteBody\": \"The people below can help you think it through, any time, and you don't have to be sure.\", \"picker_safetyRouteEnding\": \"Thinking about ending the relationship\", \"picker_safetyRouteGiveHeading\": \"Keeping it warm isn't your job with {who}. Your safety comes first.\", \"r_ask_label\": \"One question about what would help (optional)\", \"r_commit_label\": \"Something you'll do differently (optional)\", \"r_validate_label\": \"A line for how it was for them (optional)\", \"refused_line\": \"You came back. That part was yours, and you did it. They may need longer.\", \"refused_line_ask\": \"With them, this works best for practical asks. Being heard is something they haven't been able to give lately.\", \"repair_again_label\": \"Want me to ask how it went?\", \"repair_explain\": \"Keep it to what you did. A long explanation can sound like an excuse.\", \"repair_msg_title\": \"Here's your repair.\", \"repair_sent_heads_up\": \"With them, short and in writing can be kinder for you both.\", \"repair_sent_line\": \"Your repair is ready. When you say it is up to you.\", \"repaired_line\": \"You owned your part, and things feel okay again.\", \"repaired_line_shaky\": \"Repairs often take more than one go. Your part was the acknowledgement, and you did it.\", \"repaired_not_ready\": \"You said your part. When they're ready to hear it is theirs.\", \"repaired_not_yet\": \"Not yet. Your words are still here when you're ready.\", \"repaired_title\": \"Did you get to say it?\", \"scared_line\": \"Someone's safety comes before any repair. The people above can help, any time, whichever side of it you're on.\", \"selected\": \"Selected. Copy it from here.\", \"situation_hint\": \"Pick the one closest.\", \"situation_title\": \"What's going on with them?\", \"situation_title_flooded\": \"Your body's running hot. A break you come back from can be the kind move right now.\", \"soft_done\": \"Done\", \"soft_running\": \"Open hands, soft face\", \"soft_start\": \"Start\", \"soft_step1\": \"Let your hands rest open, palms up.\", \"soft_step2\": \"Soften your face and jaw.\", \"soft_step3\": \"Breathe out slowly once.\", \"soft_title\": \"Easy manner starts in the body.\", \"stance_label\": \"Where are you with it?\", \"still_ok_title\": \"How are things between you now?\", \"stirred_line\": \"This is a lot to hold. Your side matters too, and it gets its turn.\", \"swap_label\": \"Gentle: any sharp words to swap?\", \"their_hint\": \"Their feeling can make sense even when you see the facts differently.\", \"their_title\": \"First, their side.\", \"unsure_title\": \"Not sure is a fair answer. What would you like to do?\", \"validate_label\": \"One line for how they feel\", \"yours_title\": \"Then yours. You can hear them and still disagree.\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "dbt_give"}), (s:Skill {id: "give"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "give"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
 MATCH (:Skill {id: "give"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
 MERGE (n:SkillStep {id: "give:what"})
-SET n += {skillId: "give", step: "what", kind: "ask", version: "give-v1"}, n.specJson = "{\"fields\": [{\"id\": \"situation\", \"links\": [{\"exit\": \"cool_down\", \"label\": \"cool_down\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}], \"max\": 1, \"options\": {\"firstFrom\": \"$ctx.situationId\", \"list\": \"situation\", \"where\": {\"any\": [{\"not\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"eq\": [\"$opt.flooded\", true]}]}}, \"required\": true}], \"hint\": \"situation_hint\", \"title\": [{\"key\": \"situation_title_flooded\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"situation_title\"}]}";
+SET n += {skillId: "give", step: "what", kind: "ask", version: "give-v1"}, n.specJson = "{\"fields\": [{\"id\": \"situation\", \"links\": [{\"exit\": \"cool_down\", \"label\": \"cool_down\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}], \"max\": 1, \"options\": {\"firstFrom\": \"$ctx.situationId\", \"list\": \"situation\", \"where\": {\"any\": [{\"not\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"eq\": [\"$opt.flooded\", true]}]}}, \"required\": true}], \"lines\": [{\"key\": \"situation_hint\", \"when\": {\"not\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}}], \"title\": [{\"key\": \"situation_title_flooded\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"situation_title\"}]}";
 MATCH (s:Skill {id: "give"}), (n:SkillStep {id: "give:what"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 0};
@@ -16345,7 +16345,7 @@ MATCH (s:Skill {id: "give"}), (n:SkillStep {id: "give:theirs"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 2};
 MERGE (n:SkillStep {id: "give:yours"})
-SET n += {skillId: "give", step: "yours", kind: "ask", version: "give-v1"}, n.specJson = "{\"fields\": [{\"id\": \"stance\", \"label\": \"stance_label\", \"max\": 1, \"options\": {\"list\": \"stance\"}, \"required\": true}, {\"id\": \"mine\", \"label\": \"mine_label\", \"max\": 1, \"options\": {\"list\": \"mine\", \"where\": {\"has\": [\"$opt.stance\", \"$a.stance\"]}}, \"showWhen\": {\"set\": \"$a.stance\"}}], \"title\": \"yours_title\"}";
+SET n += {skillId: "give", step: "yours", kind: "ask", version: "give-v1"}, n.specJson = "{\"fields\": [{\"id\": \"stance\", \"label\": \"stance_label\", \"max\": 1, \"options\": {\"list\": \"stance\"}, \"required\": true}, {\"id\": \"mine\", \"label\": \"mine_label\", \"max\": 1, \"options\": {\"list\": \"mine\", \"where\": {\"all\": [{\"has\": [\"$opt.stance\", \"$a.stance\"]}, {\"has\": [\"$opt.about\", \"$a.brought\"]}]}}, \"showWhen\": {\"set\": \"$a.stance\"}}], \"title\": \"yours_title\"}";
 MATCH (s:Skill {id: "give"}), (n:SkillStep {id: "give:yours"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 3};
@@ -16380,12 +16380,12 @@ MATCH (s:Skill {id: "give"}), (n:SkillStep {id: "give:unsure"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 9};
 MERGE (n:SkillStep {id: "give:owning"})
-SET n += {skillId: "give", step: "owning", kind: "ask", version: "give-v1"}, n.specJson = "{\"fields\": [{\"id\": \"ack\", \"label\": \"ack_label\", \"max\": 1, \"options\": {\"list\": \"ack\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"own_line\", \"max\": 40}, \"required\": true}, {\"id\": \"r_validate\", \"label\": \"r_validate_label\", \"max\": 1, \"options\": {\"list\": \"r_validate\"}}, {\"id\": \"commit\", \"label\": \"r_commit_label\", \"max\": 1, \"options\": {\"list\": \"commit\"}}, {\"id\": \"r_ask\", \"label\": \"r_ask_label\", \"max\": 1, \"options\": {\"list\": \"r_ask\"}}], \"title\": [{\"key\": \"ack_title_unsure\", \"when\": {\"eq\": [\"$a.guilt\", \"unsure\"]}}, {\"key\": \"ack_title\"}]}";
+SET n += {skillId: "give", step: "owning", kind: "ask", version: "give-v1"}, n.specJson = "{\"fields\": [{\"id\": \"ack\", \"label\": \"ack_label\", \"max\": 1, \"options\": {\"list\": \"ack\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"own_line\", \"max\": 40}, \"required\": true}, {\"id\": \"r_validate\", \"label\": \"r_validate_label\", \"max\": 1, \"options\": {\"list\": \"r_validate\"}}, {\"id\": \"commit\", \"label\": \"r_commit_label\", \"max\": 1, \"options\": {\"list\": \"commit\"}}, {\"id\": \"r_ask\", \"label\": \"r_ask_label\", \"max\": 1, \"options\": {\"list\": \"r_ask\"}}], \"hint\": \"repair_explain\", \"title\": [{\"key\": \"ack_title_unsure\", \"when\": {\"eq\": [\"$a.guilt\", \"unsure\"]}}, {\"key\": \"ack_title\"}]}";
 MATCH (s:Skill {id: "give"}), (n:SkillStep {id: "give:owning"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 10};
 MERGE (n:SkillStep {id: "give:r_msg"})
-SET n += {skillId: "give", step: "r_msg", kind: "embed", version: "give-v1"}, n.specJson = "{\"answerAs\": \"repair_how\", \"embed\": \"messageComposer\", \"props\": {\"copiedLabel\": \"copied\", \"copyLabel\": \"copy\", \"explainLine\": \"repair_explain\", \"field\": \"ack\", \"next\": \"next\", \"openLabel\": \"open_messages\", \"parts\": [\"ack\", \"r_validate\", \"commit\", \"r_ask\"], \"selectedLabel\": \"selected\"}, \"title\": \"repair_msg_title\"}";
+SET n += {skillId: "give", step: "r_msg", kind: "embed", version: "give-v1"}, n.specJson = "{\"answerAs\": \"repair_how\", \"embed\": \"messageComposer\", \"props\": {\"copiedLabel\": \"copied\", \"copyLabel\": \"copy\", \"field\": \"ack\", \"next\": \"next\", \"openLabel\": \"open_messages\", \"parts\": [\"ack\", \"r_validate\", \"commit\", \"r_ask\"], \"selectedLabel\": \"selected\"}, \"title\": \"repair_msg_title\"}";
 MATCH (s:Skill {id: "give"}), (n:SkillStep {id: "give:r_msg"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 11};
@@ -16395,7 +16395,7 @@ MATCH (s:Skill {id: "give"}), (n:SkillStep {id: "give:r_sent"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 12};
 MERGE (n:SkillStep {id: "give:no_sorry"})
-SET n += {skillId: "give", step: "no_sorry", kind: "ask", version: "give-v1"}, n.specJson = "{\"fields\": [{\"id\": \"no_sorry\", \"max\": 1, \"options\": {\"list\": \"no_sorry\"}, \"required\": true}], \"hint\": \"no_sorry_hint\", \"title\": [{\"key\": \"no_sorry_title_unsure\", \"when\": {\"eq\": [\"$a.guilt\", \"unsure\"]}}, {\"key\": \"no_sorry_title\"}]}";
+SET n += {skillId: "give", step: "no_sorry", kind: "ask", version: "give-v1"}, n.specJson = "{\"fields\": [{\"id\": \"no_sorry\", \"max\": 1, \"options\": {\"list\": \"no_sorry\"}, \"required\": true}], \"lines\": [{\"key\": \"no_sorry_hint\", \"when\": {\"not\": {\"eq\": [\"$a.guilt\", \"unsure\"]}}}], \"title\": [{\"key\": \"no_sorry_title_unsure\", \"when\": {\"eq\": [\"$a.guilt\", \"unsure\"]}}, {\"key\": \"no_sorry_title\"}]}";
 MATCH (s:Skill {id: "give"}), (n:SkillStep {id: "give:no_sorry"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 13};
@@ -16522,12 +16522,6 @@ MATCH (s:Skill {id: "give"}), (x:SkillExit {id: "give:fast_let_go"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "give:fast_let_go"}), (t:TherapyConcept {appToolId: "fast"})
 MERGE (x)-[:OPENS]->(t);
-MERGE (x:SkillExit {id: "give:give_break"})
-SET x += {skillId: "give", exit: "give_break", toolId: "give", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"person\": \"$ctx.personId\", \"situationId\": \"heated\"}";
-MATCH (s:Skill {id: "give"}), (x:SkillExit {id: "give:give_break"})
-MERGE (s)-[:HAS_EXIT]->(x);
-MATCH (x:SkillExit {id: "give:give_break"}), (t:TherapyConcept {appToolId: "give"})
-MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "give:check_the_facts"})
 SET x += {skillId: "give", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
 MATCH (s:Skill {id: "give"}), (x:SkillExit {id: "give:check_the_facts"})
@@ -16539,12 +16533,6 @@ SET x += {skillId: "give", exit: "one_message", toolId: "dear-man", done: false,
 MATCH (s:Skill {id: "give"}), (x:SkillExit {id: "give:one_message"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "give:one_message"}), (t:TherapyConcept {appToolId: "dear-man"})
-MERGE (x)-[:OPENS]->(t);
-MERGE (x:SkillExit {id: "give:dear_man"})
-SET x += {skillId: "give", exit: "dear_man", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"person\": \"$ctx.personId\"}";
-MATCH (s:Skill {id: "give"}), (x:SkillExit {id: "give:dear_man"})
-MERGE (s)-[:HAS_EXIT]->(x);
-MATCH (x:SkillExit {id: "give:dear_man"}), (t:TherapyConcept {appToolId: "dear-man"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "give:give_repair"})
 SET x += {skillId: "give", exit: "give_repair", toolId: "give", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"person\": \"$ctx.personId\", \"situationId\": \"repair\"}";
@@ -16608,9 +16596,6 @@ SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": null}]";
 MATCH (a:SkillStep {id: "give:b_end"}), (x:SkillExit {id: "give:fast"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"eq\": [\"$a.stance\", \"disagree\"]}}]";
-MATCH (a:SkillStep {id: "give:b_end"}), (x:SkillExit {id: "give:give_break"})
-MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": null}]";
 MATCH (a:SkillStep {id: "give:fight"}), (b:SkillStep {id: "give:scared"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"in\": [\"$a.fight\", [\"physical\", \"scared\"]]}";
@@ -16730,7 +16715,10 @@ MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "give:soft"}), (b:SkillStep {id: "give:g_card"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "null";
+SET r += {order: 0}, r.whenJson = "{\"any\": [{\"set\": \"$a.swap\"}, {\"set\": \"$a.g_question\"}, {\"set\": \"$a.g_validate\"}, {\"set\": \"$a.manner\"}]}";
+MATCH (a:SkillStep {id: "give:soft"}), (b:SkillStep {id: "give:g_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "give:g_card"}), (b:SkillStep {id: "give:g_end"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
@@ -16740,9 +16728,6 @@ SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"eq\": [\"$ctx.re
 MATCH (a:SkillStep {id: "give:g_end"}), (x:SkillExit {id: "give:one_message"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": null}]";
-MATCH (a:SkillStep {id: "give:g_end"}), (x:SkillExit {id: "give:dear_man"})
-MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": null}]";
 MERGE (o:SkillOption {id: "give:situation:brought"})
 SET o:SkillOption, o += {skillId: "give", list: "situation", value: "brought", label: "They brought something to me", version: "give-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "give"}), (o:SkillOption {id: "give:situation:brought"})
@@ -16854,27 +16839,27 @@ MATCH (s:Skill {id: "give"}), (o:SkillOption {id: "give:stance:unsure"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "stance", order: 21};
 MERGE (o:SkillOption {id: "give:mine:m_sorry"})
-SET o:SkillOption, o += {skillId: "give", list: "mine", value: "m_sorry", label: "I'm sorry for my part in it.", version: "give-v1"}, o.propsJson = "{\"stance\": [\"agree\", \"partly\"]}";
+SET o:SkillOption, o += {skillId: "give", list: "mine", value: "m_sorry", label: "I'm sorry for my part in it.", version: "give-v1"}, o.propsJson = "{\"about\": [\"complaint\", \"angry\"], \"stance\": [\"agree\", \"partly\"]}";
 MATCH (s:Skill {id: "give"}), (o:SkillOption {id: "give:mine:m_sorry"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "mine", order: 22};
 MERGE (o:SkillOption {id: "give:mine:m_my_side"})
-SET o:SkillOption, o += {skillId: "give", list: "mine", value: "m_my_side", label: "I see it a bit differently, and I'd like to tell you how.", version: "give-v1"}, o.propsJson = "{\"stance\": [\"partly\", \"disagree\"]}";
+SET o:SkillOption, o += {skillId: "give", list: "mine", value: "m_my_side", label: "I see it a bit differently, and I'd like to tell you how.", version: "give-v1"}, o.propsJson = "{\"about\": [\"complaint\", \"request\", \"upset\", \"angry\"], \"stance\": [\"partly\", \"disagree\"]}";
 MATCH (s:Skill {id: "give"}), (o:SkillOption {id: "give:mine:m_my_side"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "mine", order: 23};
 MERGE (o:SkillOption {id: "give:mine:m_think"})
-SET o:SkillOption, o += {skillId: "give", list: "mine", value: "m_think", label: "Can I think about it and come back to you?", version: "give-v1"}, o.propsJson = "{\"stance\": [\"partly\", \"disagree\", \"unsure\"]}";
+SET o:SkillOption, o += {skillId: "give", list: "mine", value: "m_think", label: "Can I think about it and come back to you?", version: "give-v1"}, o.propsJson = "{\"about\": [\"complaint\", \"request\", \"upset\", \"angry\"], \"stance\": [\"partly\", \"disagree\", \"unsure\"]}";
 MATCH (s:Skill {id: "give"}), (o:SkillOption {id: "give:mine:m_think"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "mine", order: 24};
 MERGE (o:SkillOption {id: "give:mine:m_yes"})
-SET o:SkillOption, o += {skillId: "give", list: "mine", value: "m_yes", label: "Yes, I can do that.", version: "give-v1"}, o.propsJson = "{\"stance\": [\"agree\"]}";
+SET o:SkillOption, o += {skillId: "give", list: "mine", value: "m_yes", label: "Yes, I can do that.", version: "give-v1"}, o.propsJson = "{\"about\": [\"request\"], \"stance\": [\"agree\"]}";
 MATCH (s:Skill {id: "give"}), (o:SkillOption {id: "give:mine:m_yes"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "mine", order: 25};
 MERGE (o:SkillOption {id: "give:mine:m_other"})
-SET o:SkillOption, o += {skillId: "give", list: "mine", value: "m_other", label: "I can't do that, and I'd like to help another way.", version: "give-v1"}, o.propsJson = "{\"stance\": [\"partly\", \"disagree\"]}";
+SET o:SkillOption, o += {skillId: "give", list: "mine", value: "m_other", label: "I can't do that, and I'd like to help another way.", version: "give-v1"}, o.propsJson = "{\"about\": [\"request\"], \"stance\": [\"partly\", \"disagree\"]}";
 MATCH (s:Skill {id: "give"}), (o:SkillOption {id: "give:mine:m_other"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "mine", order: 26};
@@ -17134,22 +17119,22 @@ MATCH (s:Skill {id: "give"}), (o:SkillOption {id: "give:commit:rc_check"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "commit", order: 77};
 MERGE (o:SkillOption {id: "give:swap:s_always"})
-SET o:SkillOption, o += {skillId: "give", list: "swap", value: "s_always", label: "\"You always…\" → \"Sometimes…\"", version: "give-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "give", list: "swap", value: "s_always", label: "Swap \"You always…\" for \"Sometimes…\"", version: "give-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "give"}), (o:SkillOption {id: "give:swap:s_always"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "swap", order: 78};
 MERGE (o:SkillOption {id: "give:swap:s_never"})
-SET o:SkillOption, o += {skillId: "give", list: "swap", value: "s_never", label: "\"You never…\" → \"It's been a while since…\"", version: "give-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "give", list: "swap", value: "s_never", label: "Swap \"You never…\" for \"It's been a while since…\"", version: "give-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "give"}), (o:SkillOption {id: "give:swap:s_never"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "swap", order: 79};
 MERGE (o:SkillOption {id: "give:swap:s_why"})
-SET o:SkillOption, o += {skillId: "give", list: "swap", value: "s_why", label: "\"Why do you…\" → \"I noticed…\"", version: "give-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "give", list: "swap", value: "s_why", label: "Swap \"Why do you…\" for \"I noticed…\"", version: "give-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "give"}), (o:SkillOption {id: "give:swap:s_why"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "swap", order: 80};
 MERGE (o:SkillOption {id: "give:swap:s_if"})
-SET o:SkillOption, o += {skillId: "give", list: "swap", value: "s_if", label: "\"If you don't…\" → \"I'd like…\"", version: "give-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "give", list: "swap", value: "s_if", label: "Swap \"If you don't…\" for \"I'd like…\"", version: "give-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "give"}), (o:SkillOption {id: "give:swap:s_if"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "swap", order: 81};

@@ -62,6 +62,7 @@ test("skill: someone brought something: their side first (one validation line, l
   assert.equal(s.stepId, "yours");
   assert.match(skill.copy.yours_title, /hear them and still disagree/);
   assert.ok(values(ctx(), step("yours"), "mine", play([pick("stance", "disagree")], ctx(), s)).every((v) => v !== "m_sorry"), "no apology offered for a view you don't share");
+  assert.ok(!values(ctx(), step("yours"), "mine", play([pick("stance", "agree")], ctx(), s)).includes("m_yes"), "yes, I can do that: only for a request");
   s = play([pick("stance", "disagree"), next], ctx(), s);
   assert.equal(s.stepId, "b_card");
   assert.equal(step("b_card").embed, "pocketCard");
@@ -69,8 +70,7 @@ test("skill: someone brought something: their side first (one validation line, l
   assert.deepEqual(step("b_card").next.map((n) => n.to), ["b_end"]);
   const end = play([{ type: "embedDone", output: { ids: ["seen_all"] } }], ctx(), s);
   assert.equal(end.stepId, "b_end");
-  assert.deepEqual(M.offersFor(ctx(), step("b_end"), end), ["one_message", "fast", "give_break"]);
-  assert.deepEqual(exitOf("give_break").query, { situationId: "heated", person: "$ctx.personId" });
+  assert.deepEqual(M.offersFor(ctx(), step("b_end"), end), ["one_message", "fast"]);
   assert.match(skill.copy.card_heats, /half an hour/, "the pocket card's break says when you'll be back");
   assert.deepEqual(exitOf("one_message").query, { mode: "one", person: "$ctx.personId" });
 });
@@ -116,7 +116,7 @@ test("skill: repair: guilt that fits gets one acknowledgement; guilt that doesn'
   assert.equal(step("r_msg").props.dropSorry, undefined, "a repair's sorry is the point: no *Take the sorry out*");
   const notMine = play([...base, pick("guilt", "not_mine"), next]);
   assert.equal(notMine.stepId, "no_sorry");
-  assert.match(skill.copy.no_sorry_title, /don't owe an apology/);
+  assert.match(skill.copy.no_sorry_hint, /don't owe an apology/);
   for (const o of skill.options.no_sorry) assert.doesNotMatch(o.label, /sorry|apologi/i, o.value);
   // Not sure: a choice, never a forced sorry; Check the Facts as a link.
   const unsure = play([...base, pick("guilt", "unsure"), next]);
@@ -187,14 +187,16 @@ test("skill: before an ask: GIVE's four rows, all optional, willing hands, then 
   const soft = play([next], ctx(), s);
   assert.equal(soft.stepId, "soft");
   assert.equal(step("soft").props.kind, "willing");
-  assert.deepEqual(step("g_end").offers.map((o) => o.exit), ["fast_let_go", "one_message", "dear_man"]);
+  assert.deepEqual(step("g_end").offers.map((o) => o.exit), ["fast_let_go", "one_message"], "one button per tool: never two that read the same");
+  // Nothing picked on the four rows: straight past the card, never an empty one.
+  assert.equal(play([{ type: "embedDone", output: { ids: ["done"] } }], ctx(), soft).stepId, "g_end");
+  assert.equal(play([pick("manner", "warmth"), next, { type: "embedDone", output: { ids: ["done"] } }], ctx(), s).stepId, "g_card");
   assert.equal(step("g_card").props.steadyNoteA, "card_finish");
-  assert.deepEqual(exitOf("dear_man").query, { person: "$ctx.personId" });
   // Two refused asks to be heard: GIVE for practical asks only (PRD), said on the screen.
   const lines = (c) => (step("gentle").lines ?? []).filter((l) => C.holds(l.when, M.scope(c, s))).map((l) => l.key);
   assert.deepEqual(lines(ctx({ refused: "validation" })), ["refused_line_ask"]);
-  assert.deepEqual(M.offersFor(ctx({ refused: "validation" }), step("g_end"), s), ["fast_let_go", "one_message", "dear_man"], "Let go beside the asks");
-  assert.deepEqual(M.offersFor(ctx(), step("g_end"), s), ["one_message", "dear_man"]);
+  assert.deepEqual(M.offersFor(ctx({ refused: "validation" }), step("g_end"), s), ["fast_let_go", "one_message"], "Let go beside the ask");
+  assert.deepEqual(M.offersFor(ctx(), step("g_end"), s), ["one_message"]);
   assert.deepEqual(lines(ctx()), []);
   assert.equal(M.copyText(ctx({ frame: "heads_up" }), step("gentle").title, s), skill.copy.gentle_title_heads_up);
 });
