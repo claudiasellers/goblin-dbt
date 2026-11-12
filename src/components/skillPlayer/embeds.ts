@@ -288,5 +288,7 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     holdSec: { type: 'int', min: 1, max: 10 },
     done: { type: 'copy' },
     next: { type: 'copy' },
+    /** The quiet way on after a let-go, worded as what it does (going on with the lid open). */
+    skip: { type: 'copy' },
   },
 };

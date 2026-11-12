@@ -13896,11 +13896,11 @@
         "accepts": [
           "band"
         ],
-        "ownMax": 40,
+        "ownMax": 36,
         "emotionFields": [],
         "copy": {
           "what_title": "What would help right now?",
-          "what_hint": "Each one comes back to it, at a time you pick.",
+          "what_hint": "Each one comes back to it, so nothing's pushed away for good.",
           "heads_up_title": "Your body's loud right now.",
           "heads_up_hint": "You can settle your body first, or try a short find task.",
           "settle_line": "Body first. Your mind's job is here when you're ready.",
@@ -13923,8 +13923,8 @@
           "t_soft": "Find something soft. Touch it if you can.",
           "t_hum": "Listen for a sound you don't mind.",
           "t_made": "Find something you chose or made.",
-          "t_liked": "Find something that reminds you of someone who likes you.",
-          "t_ahead": "Think of something you're looking forward to, even something small.",
+          "t_liked": "Find something that reminds you of a kind moment.",
+          "t_ahead": "Find something that's part of a plan you're looking forward to, even a small one.",
           "stay_title": "Stay with it for a few seconds.",
           "stay_step1": "Let your eyes rest on it, or keep it in mind.",
           "stay_step2": "Notice one thing you like about it.",
@@ -13935,24 +13935,25 @@
           "how_hint": "Too much goes cooler. More goes warmer.",
           "back_title": "Back. Is it louder, the same, quieter?",
           "fork_title": "Can anything be done about it right now?",
-          "louder_line": "Still loud. Let's look after your body first.",
+          "louder_line": "It got louder. That happens. Let's look after your body first.",
+          "too_much_line": "That was a lot. Let's look after your body first.",
           "end_change": "Then let's look at what can be done.",
-          "end_cant": "Then the fight with it can ease. Let it be can help.",
-          "end_gone": "Your mind did a job, and it's quieter. That's the skill.",
+          "end_cant": "Then the fight with it can ease. Let it be is for that.",
+          "end_gone": "It's gone for now. You gave your mind a job and came back to check. That's the skill.",
           "end_later": "Then put it away for later, with a time to come back.",
           "break_title": "What could you do for a while?",
           "break_hint": "Something that takes your hands or your attention.",
-          "break_own": "Something else",
+          "break_own": "Something else that doesn't hurt you",
           "break_when_title": "When do you want to come back to it?",
-          "break_when_hint": "I'll ask how it is then.",
-          "break_line": "Go do it. When you're back, I'll ask how it is.",
+          "break_when_hint": "You'll get a check-in then.",
+          "break_line": "Take your time. When you're back, there'll be a check-in.",
           "lid_pick_title": "Put it in something. Pick one.",
           "lid_pick_hint": "It stays on the shelf until you open it.",
           "lid_title": "Put it in, then hold the lid shut.",
           "lid_put": "Put it in",
           "lid_hold": "Hold the lid shut",
           "lid_holding": "Holding",
-          "lid_hold_hint": "Press and hold until the lid is shut.",
+          "lid_hold_hint": "Press and hold until the lid is shut. If it keeps going after a tap, tap again to stop.",
           "lid_done": "It's shut, and on the shelf.",
           "lid_label_title": "Want to give it a label?",
           "lid_label_hint": "Skipping is fine.",
@@ -13960,17 +13961,21 @@
           "lid_when_title": "When will you open it again?",
           "lid_when_hint": "It'll keep until then.",
           "lid_line": "It's on the shelf. It'll keep until you open it.",
-          "reopen_title": "It's still on the shelf. Open it for five minutes?",
+          "reopen_title": "It's still on the shelf. Open it for a few minutes?",
           "reopen_hint": "You can put it back.",
           "opened_title": "Take the lid off. What's in there?",
           "opened_hint": "Pick the closest.",
           "reopen_fork_title": "Can anything be done about it?",
           "repark_title": "When will you open it?",
-          "repark_hint": "It's okay to wait. It'll keep.",
+          "repark_hint": "It's okay to wait. If it keeps coming back, someone can look at it with you.",
           "reopen_change": "Then let's look at what can be done.",
           "reopen_facts": "Checking the facts can show how big it is now.",
-          "reopen_cant": "Then the fight with it can ease. Let it be can help.",
+          "reopen_cant": "Then the fight with it can ease. Let it be is for that.",
           "reopen_gone": "Then it can go. You opened it, and that's enough.",
+          "reopen_skip": "Then it can go. You came back to check, and that's enough.",
+          "re_heads_title": "Your body's loud right now.",
+          "re_heads_hint": "It can stay shut until you're steadier.",
+          "lid_skip": "Leave it open for now",
           "safety_open": "Talk to someone now",
           "next": "Next",
           "done": "Done"
@@ -14013,20 +14018,20 @@
                 }
               },
               {
-                "to": "break",
-                "when": {
-                  "eq": [
-                    "$a.what",
-                    "break"
-                  ]
-                }
-              },
-              {
                 "to": "heads_up",
                 "when": {
                   "eq": [
                     "$ctx.band",
                     "flooded"
+                  ]
+                }
+              },
+              {
+                "to": "break",
+                "when": {
+                  "eq": [
+                    "$a.what",
+                    "break"
                   ]
                 }
               },
@@ -14141,7 +14146,25 @@
               {
                 "id": "to_find",
                 "options": {
-                  "list": "task_find"
+                  "list": "task_find",
+                  "where": {
+                    "any": [
+                      {
+                        "not": {
+                          "eq": [
+                            "$ctx.band",
+                            "flooded"
+                          ]
+                        }
+                      },
+                      {
+                        "eq": [
+                          "$opt.calm",
+                          true
+                        ]
+                      }
+                    ]
+                  }
                 },
                 "max": 1,
                 "required": true,
@@ -14665,7 +14688,25 @@
               {
                 "id": "how_find",
                 "options": {
-                  "list": "how"
+                  "list": "how",
+                  "where": {
+                    "any": [
+                      {
+                        "not": {
+                          "eq": [
+                            "$ctx.band",
+                            "flooded"
+                          ]
+                        }
+                      },
+                      {
+                        "eq": [
+                          "$opt.calm",
+                          true
+                        ]
+                      }
+                    ]
+                  }
                 },
                 "max": 1,
                 "required": true,
@@ -15086,7 +15127,7 @@
                 "when": {
                   "all": []
                 },
-                "key": "louder_line"
+                "key": "too_much_line"
               }
             ],
             "done": "done",
@@ -15287,7 +15328,8 @@
               "hint": "lid_hold_hint",
               "holdSec": 3,
               "done": "lid_done",
-              "next": "next"
+              "next": "next",
+              "skip": "lid_skip"
             },
             "links": [
               {
@@ -15436,6 +15478,7 @@
             },
             "clears": [
               "reopen",
+              "re_heads",
               "opened",
               "can_do",
               "repark"
@@ -15460,7 +15503,57 @@
                 }
               },
               {
+                "to": "re_heads",
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "flooded"
+                  ]
+                }
+              },
+              {
                 "to": "opened",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "re_heads",
+            "kind": "ask",
+            "title": "re_heads_title",
+            "fields": [
+              {
+                "id": "re_heads",
+                "options": {
+                  "list": "re_heads"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "hint": "re_heads_hint",
+            "next": [
+              {
+                "to": "settle",
+                "when": {
+                  "eq": [
+                    "$a.re_heads",
+                    "body"
+                  ]
+                }
+              },
+              {
+                "to": "repark",
                 "when": null
               }
             ],
@@ -15577,7 +15670,7 @@
                     "gone"
                   ]
                 },
-                "key": "reopen_gone"
+                "key": "reopen_skip"
               },
               {
                 "when": {
@@ -15754,12 +15847,14 @@
             {
               "value": "blue",
               "label": "Five blue things",
-              "level": "find"
+              "level": "find",
+              "calm": true
             },
             {
               "value": "sound",
               "label": "The farthest sound",
-              "level": "find"
+              "level": "find",
+              "calm": true
             },
             {
               "value": "round",
@@ -15797,19 +15892,20 @@
             },
             {
               "value": "liked",
-              "label": "Something that reminds me of someone who likes me",
+              "label": "Something that reminds me of a kind moment",
               "level": "good"
             },
             {
               "value": "ahead",
-              "label": "Something I'm looking forward to",
+              "label": "Something for a plan I'm looking forward to",
               "level": "good"
             }
           ],
           "how": [
             {
               "value": "too_much",
-              "label": "Too much"
+              "label": "Too much",
+              "calm": true
             },
             {
               "value": "right",
@@ -15821,7 +15917,8 @@
             },
             {
               "value": "enough",
-              "label": "That's enough for now"
+              "label": "That's enough for now",
+              "calm": true
             }
           ],
           "tvn": [
@@ -15878,7 +15975,7 @@
             },
             {
               "value": "feeling",
-              "label": "A different feeling on purpose: music or a show I love",
+              "label": "A different feeling on purpose: a song I love",
               "family": "Emotions"
             },
             {
@@ -15967,6 +16064,16 @@
             {
               "value": "gone",
               "label": "It's gone"
+            }
+          ],
+          "re_heads": [
+            {
+              "value": "body",
+              "label": "My body first"
+            },
+            {
+              "value": "later",
+              "label": "Put it back for now"
             }
           ],
           "reopen_fork": [

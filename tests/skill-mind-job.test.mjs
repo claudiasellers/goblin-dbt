@@ -77,7 +77,7 @@ test("a task, then how it was: about right stays, more goes warmer, too much goe
   assert.deepEqual(offers(cool), ["cool_down"]);
 });
 
-test("the tasks: eyes open and outward at every warmth, never numbered, never compared with anyone", () => {
+test("the tasks: eyes open and outward at every warmth (the plan one included), never numbered, never compared with anyone", () => {
   const levels = Object.fromEntries(["find", "like", "good"].map((lv) => [lv, skill.options[`task_${lv}`].map((o) => o.value)]));
   assert.deepEqual(levels, { find: ["blue", "sound", "round", "edges"], like: ["look", "soft", "hum"], good: ["made", "liked", "ahead"] });
   for (const st of skill.steps.filter((x) => x.embed === "orientFind")) {
@@ -85,7 +85,7 @@ test("the tasks: eyes open and outward at every warmth, never numbered, never co
     assert.ok(st.links.some((l) => l.exit === "safety_open"), `${st.id}: a quiet way to someone`);
   }
   const text = Object.values(skill.copy).join(" ");
-  assert.doesNotMatch(text, /level \d|\bother people\b|\beveryone else\b|close your eyes/i);
+  assert.doesNotMatch(text, /level \d|\bother people\b|\beveryone else\b|close your eyes|\bthink of\b/i);
 });
 
 test("a carried flooded reading: the body first, or the coolest tasks only; more never goes warmer", () => {
@@ -96,9 +96,14 @@ test("a carried flooded reading: the body first, or the coolest tasks only; more
   assert.deepEqual(offers(body, FLOODED), ["cool_down"]);
   const find = run([pick("heads_up", "find"), next], FLOODED, s);
   assert.equal(find.stepId, "to_find");
-  const how = run([pick("to_find", "round"), next, found], FLOODED, find);
-  assert.equal(run([pick("how_find", "more"), next], FLOODED, how).stepId, "to_find");
-  // Not flooded: the break and the lid don't ask first.
+  assert.deepEqual(ids(find, "to_find", FLOODED), ["blue", "sound"], "two choices while flooded (T8)");
+  const how = run([pick("to_find", "sound"), next, found], FLOODED, find);
+  assert.deepEqual(ids(how, "how_find", FLOODED), ["too_much", "enough"]);
+  assert.equal(run([pick("how_find", "more"), next], FLOODED, how).stepId, "how_find", "more isn't there to pick");
+  assert.equal(run([pick("how_find", "too_much"), next], FLOODED, how).stepId, "too_much");
+  assert.equal(run([pick("how_find", "enough"), next], FLOODED, how).stepId, "back");
+  // A break asks first too; the lid doesn't (holding it shut is containing).
+  assert.equal(run([pick("what", "break"), next], FLOODED).stepId, "heads_up");
   assert.equal(run([pick("what", "lid"), next], FLOODED).stepId, "lid_pick");
 });
 
@@ -123,7 +128,7 @@ test("a break: one family of ACCEPTS (never food, shopping or scrolling), then w
   const s = run([pick("what", "break"), next]);
   assert.deepEqual(ids(s, "break"), ["move", "hands", "kind", "feeling", "cold"]);
   assert.deepEqual([...new Set(skill.options.break.map((o) => o.family))].sort(), ["Activities", "Contributing", "Emotions", "Sensations"]);
-  assert.doesNotMatch(skill.options.break.map((o) => o.label).join(" "), /food|eat|snack|shop|drink|scroll|phone/i);
+  assert.doesNotMatch(skill.options.break.map((o) => o.label).join(" "), /food|eat|snack|shop|drink|scroll|phone|show/i);
   const at = run([own("break", "walk the dog"), next], ctx(), s);
   assert.equal(at.stepId, "break_at");
   assert.deepEqual(ids(at, "break_at"), ["m5", "m15", "m30", "m60"]);
@@ -149,6 +154,7 @@ test("the lid: pick a container, put it in and hold the lid shut, an optional la
   assert.equal(lid.embed, "lidShelf");
   assert.equal(lid.props.containerField, "lid_pick");
   assert.equal(lid.props.holdSec, 3);
+  assert.equal(skill.copy[lid.props.skip], "Leave it open for now", "the way on after a let-go says what it does");
   const when = run([next], ctx(), s);
   assert.equal(when.stepId, "lid_when", "the label can be skipped");
   assert.equal(M.canGoOn(ctx(), when), false, "the reopen time can't be skipped");
@@ -186,7 +192,14 @@ test("the reopen: only a lid that was booked reopens; open it → name it → wh
   // Gone straight away: the end card says so, nothing else to do.
   const gone = run([pick("reopen", "gone"), next], ctx(), r);
   assert.equal(gone.stepId, "lid_off");
-  assert.match(M.handoffLine(ctx(), M.stepOf(skill, "lid_off"), gone), /You opened it/);
+  assert.match(M.handoffLine(ctx(), M.stepOf(skill, "lid_off"), gone), /You came back to check/, "never 'you opened it' when they didn't");
+  assert.match(M.handoffLine(ctx(), M.stepOf(skill, "lid_off"), off("gone")), /You opened it/);
+  // A carried flooded reading when the card is opened: the body first, or back on the shelf (never opened at the worst moment).
+  const fr = M.resumeRun(FLOODED, M.runRecord(ctx(), booked), "reopen");
+  const heads = run([pick("reopen", "open"), next], FLOODED, fr);
+  assert.equal(heads.stepId, "re_heads");
+  assert.equal(run([pick("re_heads", "body"), next], FLOODED, heads).stepId, "settle");
+  assert.equal(run([pick("re_heads", "later"), next], FLOODED, heads).stepId, "repark");
 });
 
 test("every screen has a quiet way to someone", () => {

@@ -20,21 +20,22 @@ a reopen. Nothing on the shelf is thrown away unopened.
 | Step | What the person sees | PRD DT-06 |
 |---|---|---|
 | `what` | *What would help right now?* My mind won't stop · A break from it for a while · Put it away until later | Entry |
-| `heads_up` | A carried flooded reading, tasks only: *Your body's loud right now.* My body first → `settle` (First, the body) · A short find task (the coolest tasks only, and *more* never goes warmer) | Capacity: flooded |
+| `heads_up` | A carried flooded reading, for the tasks or a break: *Your body's loud right now.* My body first → `settle` (First, the body) · A short find task (two choices only, five blue things or the farthest sound; afterwards only *Too much* or *That's enough for now*, so it never goes warmer) | Capacity: flooded |
 | `warmth` | *What kind of job?* Something to find · Something I like · Something good (*Some days the warmer ones are harder. Any is fine.*) | The ladder, levels 0–2 |
-| `to_find` · `to_like` · `to_good` | One task to pick at that warmth. Find: five blue things, the farthest sound, three round things, four things with straight edges. Like: one thing I like the look of, something soft, a sound I don't mind. Good: something I chose or made, something that reminds me of someone who likes me, something I'm looking forward to | Level 0 neutral, 1 pleasant, 2 positive |
+| `to_find` · `to_like` · `to_good` | One task to pick at that warmth. Find: five blue things, the farthest sound, three round things, four things with straight edges. Like: one thing I like the look of, something soft, a sound I don't mind. Good: something I chose or made, something that reminds me of a kind moment, something for a plan I'm looking forward to (all eyes open) | Level 0 neutral, 1 pleasant, 2 positive |
 | `do_<task>` | The task, eyes open (`orientFind`: tap for each one found, or *Heard it* for the listening ones) | Every task outward |
 | `stay` | Good tasks only: *Stay with it for a few seconds.* (`bodyCard` kind `still`, 10 s) | Level 2's savouring |
 | `how_<warmth>` | *How was that?* Too much · About right · Could do more · That's enough for now. Too much goes a step cooler (at the coolest: `too_much`, First, the body); more a step warmer; about right another at the same warmth; enough goes back to it | The person's own tap moves the ladder |
 | `back` | *Back. Is it louder, the same, quieter?* Louder · About the same · Quieter · Much quieter (the session's close, `askFresh: 'thenVsNow'`, `regulation_down`). Louder → `louder` (First, the body, no close) | The return |
 | `fork` → `end` | *Can anything be done about it right now?* Yes → Problem Solve, DEAR MAN · No, it can't be changed → Let it be · Not now → the lid · It's gone for now (*Your mind did a job, and it's quieter. That's the skill.*) | The fork |
-| `break` | *What could you do for a while?* Move my body · Something with my hands · One small kind thing for someone · A different feeling on purpose · Something cold in my hand · own words. Never food, shopping, alcohol or scrolling | ACCEPTS' other families |
+| `break` | *What could you do for a while?* Move my body · Something with my hands · One small kind thing for someone · A different feeling on purpose: a song I love · Something cold in my hand · own words (*Something else that doesn't hurt you*). Never food, shopping, alcohol, scrolling or a show | ACCEPTS' other families |
 | `break_at` → `break_ok` | *When do you want to come back to it?* 5 · 15 · 30 minutes · When I'm done (about an hour). Books `mind_job_back`, whose card reopens this visit at `back` (`resumeAt`) | The return card |
 | `lid_pick` | *Put it in something.* A jar · A tin · A box | The lid |
-| `lid_shut` | *Put it in, then hold the lid shut.* (`lidShelf`: the swirl goes in, press and hold 3 s, the lid lowers, it sits on the shelf. Letting go early keeps nothing back; after the first try a quiet *Next* appears) | The hold |
+| `lid_shut` | *Put it in, then hold the lid shut.* (`lidShelf`: the swirl goes in, press and hold 3 s, the lid lowers, it sits on the shelf. Letting go early keeps nothing back; after the first try a quiet *Leave it open for now* appears). A flooded reading goes straight here: holding it shut is containing | The hold |
 | `lid_name` | *Want to give it a label?* A worry · Something someone said · Something I did · A feeling · Nothing to name yet · own words (optional) | The label |
 | `lid_when` → `lid_end` | *When will you open it again?* Tonight · Tomorrow · In a few days (required). Books `lid_reopen` | The lid always books a reopen |
-| `reopen` | From the `lid_reopen` card (`reopens: {after: lid_when, again: [repark]}`): *It's still on the shelf. Open it for five minutes?* Open it · Not yet → `repark` (a new time, once more booked) · It's gone → `lid_off` | The reopen |
+| `reopen` | From the `lid_reopen` card (`reopens: {after: lid_when, again: [repark]}`): *It's still on the shelf. Open it for a few minutes?* Open it · Not yet → `repark` (a new time, once more booked; *If it keeps coming back, someone can look at it with you.*) · It's gone → `lid_off` (*You came back to check, and that's enough.*) | The reopen |
+| `re_heads` | Open it with a carried flooded reading: *Your body's loud right now. It can stay shut until you're steadier.* My body first → First, the body · Put it back for now → `repark` | Capacity: flooded |
 | `opened` → `can_do` → `lid_off` | *Take the lid off. What's in there?* (pick the closest, optional), then *Can anything be done about it?* Yes → Problem Solve · It might not be as big as it felt → Check the Facts · No → Let it be · It's gone now | The reopen fork |
 
 *Talk to someone now* is on every screen. Every end card (break, lid, louder, too much, settle) has no close
@@ -79,6 +80,14 @@ a different kind of swap. `schema/app-tool-ids.cypher` gives `dbt_accepts` its `
 
 | PRD | Built | Why |
 |---|---|---|
+| The park links (First, the body's *Not right now*, Hold to wait's *check*) open the lid | They open the first screen, where *Put it away until later* is one tap | The runtime has no page-level `enterAt` yet (also deferred for DT-04's willingness entry) |
+| Per-emotion ceilings (shame, grief, rejection stay at levels 0–1) | Not built; the person picks the warmth, and the warmest tasks were reworded (*a kind moment*, not *someone who likes you*) | Needs the check-in's emotion carried in; part 2 |
+| The `Thoughts` family (a 3-minute visuospatial puzzle) | Not offered | Needs its own embed |
+| Count back from seven in the room's objects | Four things with straight edges | Counting backwards reads as a test; the clinician pass can bring it back |
+| Label: three word guesses from Find the feeling's signatures | A fixed short list, or own words | The FTF signature read isn't on the runtime |
+| Reopen in MF-01's reopen mode (outward first) | Straight to *What's in there?* | MF-01 isn't built |
+| Reopen time: *I'll choose later* | Not offered: the lid always books a time | A lid with no time is the avoidance the PRD warns about |
+| Entry from the rumination results, the kit, Problem Solve's rumination guard, DT-09 | Not wired | Their hosts aren't built, or the routing row is off until sign-off |
 | The ladder starts where the last visit left off | The person picks the warmth each visit | Remembering needs a profile kind and the person's yes (part 2) |
 | Level 3 (ER-04 things I like) | Not offered | ER-04 isn't built |
 | Re-park: a heads-up after the third | *Not yet* always puts it back, with a new time | Counting needs part 2's record; nothing locks |
@@ -87,11 +96,23 @@ a different kind of swap. `schema/app-tool-ids.cypher` gives `dbt_accepts` its `
 | The wave (ER-08) on the reopen fork | Not offered | ER-08 isn't built (ER-B5) |
 | The lid as its own entry | A way in on this tool's first screen | One tool, three ways in; no separate tool id |
 
+## DBT handouts, step by step
+
+| Steps | DBT DT handout |
+|---|---|
+| `warmth`, `to_*`, `do_*`, `how_*` | Handout 7, ACCEPTS: Thoughts / Sensations (eyes-open finding and listening) |
+| `stay` | Handout 9, IMPROVE: Imagery, a few seconds of something pleasant |
+| `break` | Handout 7, ACCEPTS: Activities, Contributing, Emotions (a different one on purpose), Sensations (cold in the hand) |
+| `lid_*`, `reopen`, `opened`, `can_do` | Handout 7, ACCEPTS: Pushing away (put it in a box, on a shelf), always with a time to come back |
+| `back`, `fork`, `end` | Handout 7's point that distraction is for now: the return, then Problem Solve (ER 12), Check the Facts (ER 8) or radical acceptance (DT 11) |
+
 ## Clinician pass (open)
 
-- The task lists at each warmth, and whether *something that reminds you of someone who likes you* can sting on a
-  lonely day (it's in the warmest list, which the person chooses).
+- The task lists at each warmth, and whether the warmest ones can still sting on a lonely or grieving day (no
+  per-emotion ceiling yet).
+- `skillKind: redirect` is shared with Rebel without the wreckage, so the diversity rule never pairs the two on one
+  result.
 - The break families and the excluded ones; whether *something cold in my hand* needs the DT-01 self-check (it's a
   cold object, not cold water).
-- Whether the lid should ask anything before a reopen when the person was flooded when they put it away.
+- Whether the lid itself should check in first when the person is flooded (it goes straight to the hold now).
 - Louder on return goes to the body with no further question; whether it should also offer the lid.

@@ -10,10 +10,11 @@ import type { EmbedProps } from './embeds';
  * lidShelf (DT-06 Give your mind a job, docs/design/mind-job.md; plan C3b, DT-owned): the too-much goes into the jar,
  * tin or box the person picked, then they press and hold the lid shut, and it sits on the shelf. The drawing is the
  * only progress (no digits). Letting go early keeps nothing back: after the first try a quiet way past appears, and
- * nothing locks. Reduced motion keeps the swirl still. Rules in src/lib/lidShelf.ts.
+ * nothing locks. Reduced motion keeps the swirl still; the lid still moves with the hold on purpose, since it is the
+ * only progress. Rules in src/lib/lidShelf.ts.
  *
  * Props (copy props arrive as text): containerField (the field whose pick is the container), put, hold, holding, hint
- * (what a screen reader hears with the hold), holdSec, done, next. Reports `shut` · `partly` · `skipped` and the seconds
+ * (what a screen reader hears with the hold), holdSec, done, next, skip (the way on with the lid open). Reports `shut` · `partly` · `skipped` and the seconds
  * held.
  */
 export function LidShelf({ props, answerIds, onShown, onDone }: EmbedProps) {
@@ -28,6 +29,7 @@ export function LidShelf({ props, answerIds, onShown, onDone }: EmbedProps) {
   const heldMs = useRef(0);
   const pressedAt = useRef<number | null>(null);
   const hintId = useId();
+  const doneId = useId();
   const nextRef = useRef<HTMLButtonElement>(null);
   const holdRef = useRef<HTMLButtonElement>(null);
 
@@ -56,8 +58,8 @@ export function LidShelf({ props, answerIds, onShown, onDone }: EmbedProps) {
       </div>
       {shut ? (
         <>
-          <p role="status" className="text-center text-[var(--color-text-secondary)]">{text('done')}</p>
-          <button ref={nextRef} type="button" className={primaryButton} onClick={finish}>{text('next')}</button>
+          <p id={doneId} className="text-center text-[var(--color-text-secondary)]">{text('done')}</p>
+          <button ref={nextRef} type="button" aria-describedby={doneId} className={primaryButton} onClick={finish}>{text('next')}</button>
         </>
       ) : inside ? (
         <>
@@ -66,7 +68,8 @@ export function LidShelf({ props, answerIds, onShown, onDone }: EmbedProps) {
             className={`${primaryButton} select-none touch-none [-webkit-touch-callout:none]`}>
             {mode === 'idle' ? text('hold') : text('holding')}
           </button>
-          {tried && <div className="flex justify-center"><button type="button" className={linkButton} onClick={finish}>{text('next')}</button></div>}
+          <p className="sr-only" aria-live="polite">{mode === 'idle' ? '' : text('holding')}</p>
+          {tried && <div className="flex justify-center pt-4"><button type="button" className={linkButton} onClick={finish}>{text('skip')}</button></div>}
         </>
       ) : (
         <button type="button" className={primaryButton} data-put="" onClick={() => { buzz(15); setInside(true); }}>{text('put')}</button>
@@ -91,7 +94,9 @@ function Drawing({ container, inside, lift, shelf }: { container: Container; ins
       ? { x: 40, w: 120, h: 14, r: 3 }
       : { x: 64, w: 72, h: 14, r: 5 };
   const cx = body.x + body.w / 2;
-  const cy = body.y + body.h / 2 + 6;
+  const cy = body.y + body.h / 2 + 2;
+  // The swirl stays inside the body: the lowest dot (dy 22, r 7) is scaled to clear the bottom edge.
+  const k = Math.min(1, (body.h / 2 - 10) / 29);
   return (
     <svg viewBox="0 0 200 200" width="200" height="200" aria-hidden="true" className="overflow-visible">
       {shelf && <rect x="18" y={body.y + body.h} width="164" height="6" rx="3" fill="var(--color-text-tertiary)" opacity="0.5" />}
@@ -99,12 +104,12 @@ function Drawing({ container, inside, lift, shelf }: { container: Container; ins
         fill="var(--color-bg-card)" stroke="var(--color-text-secondary)" strokeWidth="2.5" />
       {DOTS.map(([dx, dy], i) => (
         <circle key={i} r={i % 2 ? 5 : 7} fill="var(--color-accent)" opacity={inside ? 0.75 : 0}
-          cx={cx + dx} cy={cy + dy}
-          style={{ transform: inside ? 'none' : `translateY(${-(cy + dy - 16)}px)`,
+          cx={cx + dx * k} cy={cy + dy * k}
+          style={{ transform: inside ? 'none' : `translateY(${-(cy + dy * k - 16)}px)`,
             transition: reduce ? undefined : `transform 900ms ease-in ${i * 80}ms, opacity 400ms ease-in ${i * 80}ms` }} />
       ))}
       <rect x={lid.x} y={body.y - lid.h} width={lid.w} height={lid.h} rx={lid.r}
-        fill="var(--color-text-secondary)" opacity={inside ? 1 : 0.35}
+        fill="var(--color-text-secondary)" opacity={inside ? 1 : 0.6}
         style={{ transform: `translateY(${-lift}px)`, transition: reduce ? undefined : 'transform 80ms linear, opacity 300ms ease' }} />
     </svg>
   );

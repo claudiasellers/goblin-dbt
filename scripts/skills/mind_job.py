@@ -26,18 +26,18 @@ level 3 into ER-04's directory, the re-park heads-up, comparisons with their own
 reopen times, the Stage rooms) and where it departs from the PRD.
 
 Safety (plan C6): *Talk to someone now* on every screen; nothing passive for a loop (every task is eyes open and
-outward); no comparisons with other people; the lid always books a reopen.
+outward, the plan one included); no comparisons with other people; the lid always books a reopen.
 """
 
 ID = "mind_job"
 TOOL_ID = "mind-job"
 CONCEPT = "dbt_accepts"
 VERSION = "mj-v1"
-OWN_MAX = 40  # an activity, or a label, in their words (short: the record keeps every own-words field)
+OWN_MAX = 36  # an activity, or a label, in their words (short: the record keeps every own-words field)
 
 COPY = {
     "what_title": "What would help right now?",
-    "what_hint": "Each one comes back to it, at a time you pick.",
+    "what_hint": "Each one comes back to it, so nothing's pushed away for good.",
     # A carried flooded reading (PRD: DT-01 first, then level-0 find tasks only).
     "heads_up_title": "Your body's loud right now.",
     "heads_up_hint": "You can settle your body first, or try a short find task.",
@@ -62,8 +62,8 @@ COPY = {
     "t_soft": "Find something soft. Touch it if you can.",
     "t_hum": "Listen for a sound you don't mind.",
     "t_made": "Find something you chose or made.",
-    "t_liked": "Find something that reminds you of someone who likes you.",
-    "t_ahead": "Think of something you're looking forward to, even something small.",
+    "t_liked": "Find something that reminds you of a kind moment.",
+    "t_ahead": "Find something that's part of a plan you're looking forward to, even a small one.",
     "stay_title": "Stay with it for a few seconds.",
     "stay_step1": "Let your eyes rest on it, or keep it in mind.",
     "stay_step2": "Notice one thing you like about it.",
@@ -75,18 +75,19 @@ COPY = {
     # The return (in the flow, or from the return card), then the fork.
     "back_title": "Back. Is it louder, the same, quieter?",
     "fork_title": "Can anything be done about it right now?",
-    "louder_line": "Still loud. Let's look after your body first.",
+    "louder_line": "It got louder. That happens. Let's look after your body first.",
+    "too_much_line": "That was a lot. Let's look after your body first.",
     "end_change": "Then let's look at what can be done.",
-    "end_cant": "Then the fight with it can ease. Let it be can help.",
-    "end_gone": "Your mind did a job, and it's quieter. That's the skill.",
+    "end_cant": "Then the fight with it can ease. Let it be is for that.",
+    "end_gone": "It's gone for now. You gave your mind a job and came back to check. That's the skill.",
     "end_later": "Then put it away for later, with a time to come back.",
     # A break (ACCEPTS' other families).
     "break_title": "What could you do for a while?",
     "break_hint": "Something that takes your hands or your attention.",
-    "break_own": "Something else",
+    "break_own": "Something else that doesn't hurt you",
     "break_when_title": "When do you want to come back to it?",
-    "break_when_hint": "I'll ask how it is then.",
-    "break_line": "Go do it. When you're back, I'll ask how it is.",
+    "break_when_hint": "You'll get a check-in then.",
+    "break_line": "Take your time. When you're back, there'll be a check-in.",
     # The lid.
     "lid_pick_title": "Put it in something. Pick one.",
     "lid_pick_hint": "It stays on the shelf until you open it.",
@@ -94,7 +95,7 @@ COPY = {
     "lid_put": "Put it in",
     "lid_hold": "Hold the lid shut",
     "lid_holding": "Holding",
-    "lid_hold_hint": "Press and hold until the lid is shut.",
+    "lid_hold_hint": "Press and hold until the lid is shut. If it keeps going after a tap, tap again to stop.",
     "lid_done": "It's shut, and on the shelf.",
     "lid_label_title": "Want to give it a label?",
     "lid_label_hint": "Skipping is fine.",
@@ -103,17 +104,22 @@ COPY = {
     "lid_when_hint": "It'll keep until then.",
     "lid_line": "It's on the shelf. It'll keep until you open it.",
     # The reopen (from the lid_reopen card).
-    "reopen_title": "It's still on the shelf. Open it for five minutes?",
+    "reopen_title": "It's still on the shelf. Open it for a few minutes?",
     "reopen_hint": "You can put it back.",
     "opened_title": "Take the lid off. What's in there?",
     "opened_hint": "Pick the closest.",
     "reopen_fork_title": "Can anything be done about it?",
     "repark_title": "When will you open it?",
-    "repark_hint": "It's okay to wait. It'll keep.",
+    "repark_hint": "It's okay to wait. If it keeps coming back, someone can look at it with you.",
     "reopen_change": "Then let's look at what can be done.",
     "reopen_facts": "Checking the facts can show how big it is now.",
-    "reopen_cant": "Then the fight with it can ease. Let it be can help.",
+    "reopen_cant": "Then the fight with it can ease. Let it be is for that.",
     "reopen_gone": "Then it can go. You opened it, and that's enough.",
+    "reopen_skip": "Then it can go. You came back to check, and that's enough.",
+    # A carried flooded reading when the reopen card is opened: the body first, or back on the shelf.
+    "re_heads_title": "Your body's loud right now.",
+    "re_heads_hint": "It can stay shut until you're steadier.",
+    "lid_skip": "Leave it open for now",
     "safety_open": "Talk to someone now",
     "next": "Next",
     "done": "Done",
@@ -126,6 +132,13 @@ def a(field):
 
 ALWAYS = {"all": []}
 FLOODED = {"eq": ["$ctx.band", "flooded"]}
+# A carried flooded reading keeps the choices short (T8): only the options marked `calm`.
+def FLOODED_ONLY(flag):
+    return {"any": [{"not": FLOODED}, {"eq": [f"$opt.{flag}", True]}]}
+
+
+CALM_TASKS = {"blue", "sound"}
+CALM_HOW = {"too_much", "enough"}
 SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
 
 WHAT = [
@@ -147,15 +160,15 @@ WARMTH = [
 # loop).
 TASKS = [
     ("blue", "Five blue things", "find", "find", 5, "t_blue", "found"),
-    ("sound", "The farthest sound", "find", "listen", 1, "t_sound", "found_sound"),
+    ("sound", "The farthest sound", "find", "listen", 1, "t_sound", "found_sound"),  # these two: the flooded pair
     ("round", "Three round things", "find", "find", 3, "t_round", "found"),
     ("edges", "Four things with straight edges", "find", "find", 4, "t_edges", "found"),
     ("look", "One thing I like the look of", "like", "find", 1, "t_look", "found"),
     ("soft", "Something soft", "like", "find", 1, "t_soft", "found"),
     ("hum", "A sound I don't mind", "like", "listen", 1, "t_hum", "found_sound"),
     ("made", "Something I chose or made", "good", "find", 1, "t_made", "found"),
-    ("liked", "Something that reminds me of someone who likes me", "good", "find", 1, "t_liked", "found"),
-    ("ahead", "Something I'm looking forward to", "good", "find", 1, "t_ahead", "found_one"),
+    ("liked", "Something that reminds me of a kind moment", "good", "find", 1, "t_liked", "found"),
+    ("ahead", "Something for a plan I'm looking forward to", "good", "find", 1, "t_ahead", "found_one"),
 ]
 LEVELS = ["find", "like", "good"]
 HOW = [
@@ -177,7 +190,7 @@ BREAK = [
     ("move", "Move my body", "Activities"),
     ("hands", "Something with my hands", "Activities"),
     ("kind", "One small kind thing for someone", "Contributing"),
-    ("feeling", "A different feeling on purpose: music or a show I love", "Emotions"),
+    ("feeling", "A different feeling on purpose: a song I love", "Emotions"),
     ("cold", "Something cold in my hand", "Sensations"),
 ]
 # The return (ReturnOption): the chips are mind_job_back's window chips.
@@ -205,6 +218,10 @@ LID_WHEN = [
     ("tomorrow", "Tomorrow"),
     ("few_days", "In a few days"),
 ]
+RE_HEADS = [
+    ("body", "My body first"),
+    ("later", "Put it back for now"),
+]
 REOPEN = [
     ("open", "Open it"),
     ("not_yet", "Not yet"),
@@ -218,8 +235,8 @@ REOPEN_FORK = [
 ]
 
 
-def ask(step_id, title, hint, field, lst, nxt, *, required=True, own=None, extra=None, field_extra=None):
-    f = {"id": field, "options": {"list": lst}, "max": 1, "required": required, "links": [SAFETY_LINK], **(field_extra or {})}
+def ask(step_id, title, hint, field, lst, nxt, *, required=True, own=None, extra=None, field_extra=None, where=None):
+    f = {"id": field, "options": {"list": lst, **({"where": where} if where else {})}, "max": 1, "required": required, "links": [SAFETY_LINK], **(field_extra or {})}
     if own:
         f["own"] = {"hint": own, "countsAsPick": True}
     s = {"id": step_id, "kind": "ask", "title": title, "fields": [f], "next": nxt}
@@ -264,13 +281,15 @@ def how_step(level):
             continue
         grouped.setdefault(j["to"], []).append(j["when"])
     jumps = [{"when": ws[0] if len(ws) == 1 else {"any": ws}, "to": to} for to, ws in grouped.items()]
-    return ask(f, "how_title", "how_hint", f, "how", [*jumps, {"to": default}])
+    return ask(f, "how_title", "how_hint", f, "how", [*jumps, {"to": default}],
+               where=FLOODED_ONLY("calm") if level == "find" else None)
 
 
 def task_pick(level):
     f = f"to_{level}"
     return ask(f, f"task_{level}_title", None, f, f"task_{level}",
-               [{"when": {"eq": [a(f), v]}, "to": f"do_{v}"} for v, _, lv, *_ in TASKS if lv == level])
+               [{"when": {"eq": [a(f), v]}, "to": f"do_{v}"} for v, _, lv, *_ in TASKS if lv == level],
+               where=FLOODED_ONLY("calm") if level == "find" else None)
 
 
 def do_step(v, level, variant, count, task, found):
@@ -282,8 +301,8 @@ def do_step(v, level, variant, count, task, found):
 
 STEPS = [
     ask("what", "what_title", "what_hint", "what", "what",
-        [{"when": {"eq": [a("what"), "lid"]}, "to": "lid_pick"}, {"when": {"eq": [a("what"), "break"]}, "to": "break"},
-         {"when": FLOODED, "to": "heads_up"}, {"to": "warmth"}]),
+        [{"when": {"eq": [a("what"), "lid"]}, "to": "lid_pick"}, {"when": FLOODED, "to": "heads_up"},
+         {"when": {"eq": [a("what"), "break"]}, "to": "break"}, {"to": "warmth"}]),
     ask("heads_up", "heads_up_title", "heads_up_hint", "heads_up", "heads_up",
         [{"when": {"eq": [a("heads_up"), "body"]}, "to": "settle"}, {"to": "to_find"}]),
     ask("warmth", "warmth_title", "warmth_hint", "warmth", "warmth",
@@ -306,7 +325,7 @@ STEPS = [
              {"exit": "dear_man", "when": {"eq": [a("fork"), "change"]}},
              {"exit": "let_it_be", "when": {"eq": [a("fork"), "cant"]}}]),
     handoff("louder", [{"when": ALWAYS, "key": "louder_line"}], [{"exit": "cool_down", "when": ALWAYS}]),
-    handoff("too_much", [{"when": ALWAYS, "key": "louder_line"}], [{"exit": "cool_down", "when": ALWAYS}]),
+    handoff("too_much", [{"when": ALWAYS, "key": "too_much_line"}], [{"exit": "cool_down", "when": ALWAYS}]),
     handoff("settle", [{"when": ALWAYS, "key": "settle_line"}], [{"exit": "cool_down", "when": ALWAYS}]),
     # A break: one family, then the return booked.
     ask("break", "break_title", "break_hint", "break", "break", [{"to": "break_at"}], own="break_own"),
@@ -317,7 +336,7 @@ STEPS = [
     ask("lid_pick", "lid_pick_title", "lid_pick_hint", "lid_pick", "lid_pick", [{"to": "lid_shut"}]),
     {"id": "lid_shut", "kind": "embed", "embed": "lidShelf", "answerAs": "lid_shut", "title": "lid_title",
      "props": {"containerField": "lid_pick", "put": "lid_put", "hold": "lid_hold", "holding": "lid_holding",
-               "hint": "lid_hold_hint", "holdSec": 3, "done": "lid_done", "next": "next"},
+               "hint": "lid_hold_hint", "holdSec": 3, "done": "lid_done", "next": "next", "skip": "lid_skip"},
      "links": [SAFETY_LINK], "next": [{"to": "lid_name"}]},
     ask("lid_name", "lid_label_title", "lid_label_hint", "lid_name", "label", [{"to": "lid_when"}], required=False,
         own="lid_label_own"),
@@ -327,14 +346,16 @@ STEPS = [
     # The reopen: only a run whose path reached lid_when starts here, from the lid_reopen card.
     ask("reopen", "reopen_title", "reopen_hint", "reopen", "reopen",
         [{"when": {"eq": [a("reopen"), "not_yet"]}, "to": "repark"}, {"when": {"eq": [a("reopen"), "gone"]}, "to": "lid_off"},
-         {"to": "opened"}],
-        extra={"reopens": {"after": "lid_when", "again": ["repark"]}, "clears": ["reopen", "opened", "can_do", "repark"]}),
+         {"when": FLOODED, "to": "re_heads"}, {"to": "opened"}],
+        extra={"reopens": {"after": "lid_when", "again": ["repark"]}, "clears": ["reopen", "re_heads", "opened", "can_do", "repark"]}),
+    ask("re_heads", "re_heads_title", "re_heads_hint", "re_heads", "re_heads",
+        [{"when": {"eq": [a("re_heads"), "body"]}, "to": "settle"}, {"to": "repark"}]),
     ask("opened", "opened_title", "opened_hint", "opened", "label", [{"to": "can_do"}], required=False),
     ask("can_do", "reopen_fork_title", None, "can_do", "reopen_fork", [{"to": "lid_off"}]),
     ask("repark", "repark_title", "repark_hint", "repark", "lid_when", [{"to": "lid_end"}],
         extra={"followUp": {"type": "lid_reopen", "whenFrom": "repark"}}),
     handoff("lid_off",
-            [{"when": {"eq": [a("reopen"), "gone"]}, "key": "reopen_gone"},
+            [{"when": {"eq": [a("reopen"), "gone"]}, "key": "reopen_skip"},
              *[{"when": {"eq": [a("can_do"), v]}, "key": f"reopen_{v}"} for v in ("change", "facts", "cant", "gone")]],
             [{"exit": "problem_solve", "when": {"eq": [a("can_do"), "change"]}},
              {"exit": "check_the_facts", "when": {"eq": [a("can_do"), "facts"]}},
@@ -357,8 +378,9 @@ def options():
     out += [("heads_up", v, label, {}, None) for v, label in HEADS_UP]
     out += [("warmth", v, label, {}, None) for v, label in WARMTH]
     for lv in LEVELS:
-        out += [(f"task_{lv}", v, label, {"level": lv}, "AttentionTask") for v, label, tl, *_ in TASKS if tl == lv]
-    out += [("how", v, label, {}, None) for v, label in HOW]
+        out += [(f"task_{lv}", v, label, {"level": lv, **({"calm": True} if v in CALM_TASKS else {})}, "AttentionTask")
+                for v, label, tl, *_ in TASKS if tl == lv]
+    out += [("how", v, label, {"calm": True} if v in CALM_HOW else {}, None) for v, label in HOW]
     out += [("tvn", v, label, {}, None) for v, label in TVN]
     out += [("fork", v, label, {}, None) for v, label in FORK]
     out += [("break", v, label, {"family": fam}, "AcceptsOption") for v, label, fam in BREAK]
@@ -367,6 +389,7 @@ def options():
     out += [("label", v, label, {}, None) for v, label in LABELS]
     out += [("lid_when", v, label, {}, "ParkReopenOption") for v, label in LID_WHEN]
     out += [("reopen", v, label, {}, None) for v, label in REOPEN]
+    out += [("re_heads", v, label, {}, None) for v, label in RE_HEADS]
     out += [("reopen_fork", v, label, {}, None) for v, label in REOPEN_FORK]
     return out
 

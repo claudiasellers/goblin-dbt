@@ -250,6 +250,7 @@ EMBED_PROPS = {
         "holdSec": {"type": "int", "min": 1, "max": 10},
         "done": {"type": "copy"},
         "next": {"type": "copy"},
+        "skip": {"type": "copy"},
     },
 }
 # Shared tables the graph supplies to every skill (never written here).
