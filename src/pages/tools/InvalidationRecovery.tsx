@@ -489,7 +489,7 @@ function RouteStep({ c, exits, options, now, chasing, settleLabel, onPick, onSet
           const reasonId = `lock-${o.id}`;
           return (
             <div key={o.id} className="space-y-1.5">
-              <button type="button" aria-disabled={Boolean(o.lock)} aria-describedby={o.lock ? reasonId : undefined}
+              <button type="button" aria-disabled={Boolean(o.lock)} aria-describedby={o.lock ? reasonId : o.hot ? `hot-${o.id}` : undefined}
                 onClick={() => { if (!o.lock) onPick(o.id); }}
                 className={`w-full text-left p-4 rounded-2xl border flex gap-3 items-start ${
                   o.lock ? 'bg-[var(--color-bg-secondary)] border-[var(--color-border)] cursor-not-allowed'
@@ -499,12 +499,12 @@ function RouteStep({ c, exits, options, now, chasing, settleLabel, onPick, onSet
                   {o.recommended && <span className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-accent)]">{c.route.best}</span>}
                   <span className={`block font-semibold ${o.lock ? 'text-[var(--color-text-tertiary)]' : ''}`}>{x.title}</span>
                   <span id={reasonId} className={`block ${secondaryText}`}>{o.lock ? lockText(o.lock) : (chasing && x.chaseSub) || x.sub}</span>
-                  {o.hot && <span className={`block ${secondaryText}`}>{fill(c.route.hot, { now })}</span>}
                 </span>
                 {o.lock && <span aria-hidden="true" className="mt-1">🔒</span>}
               </button>
-              {/* Never a lock (IE-B4): the ask stays open; settling first is an offer beside it. */}
-              {o.hot && <button type="button" className={linkButton} onClick={onSettle}>{settleLabel} →</button>}
+              {/* Never a lock (IE-B4): the ask stays open, with a heads-up; settling first is an offer beside it. */}
+              {o.hot && <p id={`hot-${o.id}`} className={`${secondaryText} px-1`}>{c.route.hot}</p>}
+              {o.hot && <button type="button" className={linkButton} onClick={onSettle}>{settleLabel} <span aria-hidden="true">→</span></button>}
             </div>
           );
         })}

@@ -82,6 +82,35 @@ test('saveInvalidationRecoverySession maps a uniqueness-constraint race to alrea
   assert.ok(f.allClosed());
 });
 
+test('saveInvalidationRecoverySession accepts an ask above askMax (IE-B4: never a lock) and still refuses deliberate caricature', async () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const cypher = fs.readFileSync(path.join(__dirname, '../../../schema/invalidation-recovery.cypher'), 'utf8');
+  const flowJson = JSON.parse(cypher.match(/f\.contentJson = (".*");/)[1]);
+  const askMax = JSON.parse(flowJson).gates.askMax;
+  const respond = (highRisk) => (q) => (/f\.contentJson AS flow/.test(q)
+    ? [{ flow: flowJson, highRisk, lowArousal: false, knownSkills: 1 }]
+    : /AS created/.test(q) ? [{ created: 1 }] : []);
+  const data = {
+    schemaVersion: 1, id: '3f2c9a0e-1b2c-4d5e-8f90-123456789abd', contentVersion: 'recovery-v1',
+    stateId: 'brushed', pull: 'chase', gate: 'none', emotionId: 'hurt', needId: 'heard',
+    exitId: 'ask', zone: 'both', safe: 'yes', asks: 0, startIntensity: 6, startUrge: 6,
+    readings: [6, askMax + 2, askMax + 2], endIntensity: askMax + 2, endUrge: 5,
+    skills: ['request'], followUps: [],
+  };
+  let f = fakeDriver(respond(false));
+  setDriver(f.driver);
+  assert.deepEqual(await fns.saveInvalidationRecoverySession.run({ auth: auth(), data }), { success: true }, 'a hot ask is saved');
+  assert.ok(f.allClosed());
+  f = fakeDriver(respond(true));
+  setDriver(f.driver);
+  await assert.rejects(
+    fns.saveInvalidationRecoverySession.run({ auth: auth(), data: { ...data, zone: 'real' } }),
+    (e) => e.code === 'invalid-argument',
+    'deliberate caricature still refuses the ask',
+  );
+});
+
 test('updateUserProfile rejects an unknown palette before any query', async () => {
   const f = fakeDriver();
   setDriver(f.driver);

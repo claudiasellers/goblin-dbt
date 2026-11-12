@@ -193,8 +193,15 @@ test("asking is locked only for unsafe people, two refusals, and deliberate cari
   assert.equal(ask(base).hot, false);
   assert.equal(ask({ ...base, safe: "no", intensityNow: 9 }).hot, false, "a hard lock is never also hot");
   for (const o of lib.routeExits({ ...base, intensityNow: 9 })) if (o.id !== "ask") assert.equal(o.hot, false);
-  // Hot fight still leads with the opposite action; the ask is second, open.
+  // Hot: the ask is never first (never recommended alongside its own heads-up); it moves behind the next exit.
   assert.deepEqual(lib.routeExits({ ...base, intensityNow: 9 }).map((o) => [o.id, o.recommended]), [["opposite", true], ["ask", false], ["land", false]]);
+  assert.deepEqual(lib.routeExits({ ...base, pull: "chase", intensityNow: 9 }).map((o) => [o.id, o.recommended]), [["opposite", true], ["ask", false], ["land", false]], "hot chase leads with waiting");
+  assert.deepEqual(lib.routeExits({ ...base, pull: "freeze", intensityNow: 9 }).map((o) => [o.id, o.recommended]), [["land", true], ["ask", false], ["opposite", false]]);
+  assert.deepEqual(lib.routeExits({ ...base, pull: "chase" }).map((o) => o.id), ["ask", "land", "opposite"], "not hot: unchanged");
+  for (const pull of ["fight", "chase", "freeze", "hide"]) for (const state of [base.state, { id: "blocked", protocol: "blocked_wronged", highRisk: false }, { id: "x", protocol: "attachment_alarm", highRisk: false }]) {
+    const opts = lib.routeExits({ ...base, pull, state, intensityNow: 9 });
+    assert.ok(!opts.find((o) => o.recommended).hot, `${pull}/${state.id}: the recommended exit never carries the heads-up`);
+  }
   // The recommended option is always usable.
   for (const safe of ["yes", "no"]) for (const asks of [0, 1, 2]) for (const now of [2, 8]) {
     const opts = lib.routeExits({ ...base, safe, asks, intensityNow: now });
@@ -336,8 +343,10 @@ test("IE-B4: Recover's locks are gone (no tooHot, no boundaryLocked), the line u
   assert.match(exits, /<BoundaryLine picked=\{\{ line: \[c\.boundary\] \}\}/, "the Land line is the boundaryLine card");
   assert.match(exits, /skipLabel: c\.skipBoundary/, "saying nothing stays the way on until it's copied");
   assert.match(page, /\{o\.hot && <button type="button" className=\{linkButton\} onClick=\{onSettle\}>/, "settling first is offered beside a hot ask, not instead of it");
-  assert.equal(flow.copy.locks.tooHot, undefined);
-  assert.equal(flow.copy.land.boundaryLocked, undefined);
+  // Kept one release for the pre-IE-B4 page (an open tab, or the window between the graph load and hosting):
+  // without them its route step would throw on fill(undefined). Remove with the follow-up.
+  for (const k of ["unlockBreathe", "unlockOrient"]) assert.ok(flow.copy.route[k], `legacy route.${k}`);
+  assert.ok(flow.copy.locks.tooHot && flow.copy.land.boundaryLocked, "legacy lock copy");
   for (const k of ["hot", "firstBreathe", "firstOrient"]) assert.ok(flow.copy.route[k], `route.${k}`);
   assert.ok(flow.copy.land.selected);
   assert.doesNotMatch(flow.copy.route.hot, /\b(just|should|but|unlock)\b|!/i);

@@ -65,8 +65,9 @@ export interface RouteInput {
 /**
  * Order the exits for this moment. The first usable one is recommended.
  * Asking is locked only for unsafe people, after two refusals, or against deliberate
- * caricature. Above askMax it stays open with a heads-up (`hot`) and the body first on offer;
- * the ask's own cooling screen (One message) does the rest (IE-B4 dropped the soft lock).
+ * caricature. Above askMax it stays open, never first, with a heads-up (`hot`) and the body first on offer;
+ * the DEAR MAN skill it opens cools down too (One message's cooling screen for chase, the prep's hot step
+ * otherwise). IE-B4 dropped the soft lock.
  */
 export function routeExits(r: RouteInput): ExitOption[] {
   const hardLock: LockReason | null =
@@ -83,8 +84,11 @@ export function routeExits(r: RouteInput): ExitOption[] {
   else if (r.state.id === 'stewing') order = ['park', 'land', 'ask'];
   else if (r.state.protocol === 'diminished_self') order = ['opposite', 'land', 'ask'];
   else if (r.state.protocol === 'attachment_alarm') order = ['opposite', 'ask', 'land'];
-  else if (r.pull === 'fight') order = hot ? ['opposite', 'ask', 'land'] : ['ask', 'opposite', 'land'];
+  else if (r.pull === 'fight') order = ['ask', 'opposite', 'land'];
   else order = ['ask', 'land', 'opposite'];
+  // Hot: the ask stays open, never first, so the recommendation and the heads-up never sit on the same card. Chase
+  // leads with its opposite action (waiting); every other pull with the next exit in its order.
+  if (!hardLock && hot && order[0] === 'ask') order = r.pull === 'chase' ? ['opposite', 'ask', 'land'] : [order[1], 'ask', ...order.slice(2)];
 
   const options = order.map(id => ({ id, lock: id === 'ask' ? hardLock : null, recommended: false, hot: id === 'ask' && !hardLock && hot }));
   const first = options.find(o => !o.lock);
