@@ -186,6 +186,21 @@ FOLLOW_UP_TYPES = [
         "notification": "Your check from Running low is ready.",
     },
     {
+        # What matters to me (ER-09, docs/design/values.md): the one small step for a value, checked when the person
+        # said (tomorrow, three days, a week; evenings). The card reopens that visit at `back` (R9 `reopens`: *Did it
+        # happen?*). Opening it is the resolution. Content-free: never names the value or the step.
+        "id": "value_step", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/values-clarification?run={sourceSessionId}&at=back&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
+                                             "few_days": {"kind": "at_local", "days": 3, "time": "18:00"},
+                                             "this_week": {"kind": "at_local", "days": 6, "time": "18:00"}}},
+        "staleAfterHours": 72, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Your small step", "body": "A step you picked for something that matters to you. Did it happen?"},
+        "choices": [{"id": "dismiss", "label": "Not this time", "status": "dismissed"}],
+        "notification": "Your small step is ready to check.",
+    },
+    {
         # Good things (ER-04, docs/design/good-things.md): the one good thing the person picked for today, at the time
         # they picked (now → an hour from now). The card reopens that visit at `back` (R9 `reopens`: *Did it happen?*,
         # then lighter / same / heavier and where the mind was). Opening it is the resolution. Content-free (PRD).

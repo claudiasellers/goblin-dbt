@@ -1453,6 +1453,17 @@ SET saying_no += {
 };
 
 
+// ER Handouts 17-18 (PRD ER-09): values and priorities; What matters to me (docs/design/values.md).
+MERGE (values_priorities:TherapyConcept {id: "dbt_values_priorities"})
+SET values_priorities += {
+  name: "Values and Priorities",
+  description: "Naming what matters to you, keeping a few for now, and taking one small step in that direction",
+  modality: "DBT",
+  module: "Emotion Regulation",
+  skill_type: "values"
+};
+
+
 // DT Handouts 8 and 8a (PRD DT-07): self-soothing with the five senses, hand on heart; Held (docs/design/held.md).
 MERGE (self_soothe:TherapyConcept {id: "dbt_self_soothe"})
 SET self_soothe += {

@@ -40882,9 +40882,10 @@
             "id": "values_clarification",
             "toolId": "values-clarification",
             "query": {},
-            "carry": [],
-            "done": false,
-            "planned": true
+            "carry": [
+              "feel"
+            ],
+            "done": false
           },
           {
             "id": "willingness",
@@ -49759,6 +49760,1441 @@
             {
               "value": "much_better",
               "label": "Much further away"
+            }
+          ]
+        }
+      },
+      {
+        "id": "values",
+        "toolId": "values-clarification",
+        "version": "vc-v1",
+        "start": "start",
+        "accepts": [
+          "band"
+        ],
+        "ownMax": 60,
+        "emotionFields": [],
+        "copy": {
+          "start_title": "What matters to you?",
+          "start_hint": "There are no right answers, and they can change.",
+          "start_back_title": "You've kept a few things that matter to you.",
+          "heads_up_title": "Your body's loud right now.",
+          "heads_up_hint": "This works better once it settles a little.",
+          "settle_line": "This will keep. Look after the next few minutes first.",
+          "sort_title": "Which of these sound like you?",
+          "sort_hint": "Pick as many as fit, then Next. None is a full answer: not sure yet.",
+          "sort_own": "Add your own",
+          "keep_title": "Which ones matter most for now? Up to three.",
+          "keep_hint": "Two can pull different ways. Both can matter. Not sure yet? Save with none picked. Your list is kept either way.",
+          "keep_own": "In my words",
+          "keep_primary": "Keep these",
+          "not_sure_title": "Not sure yet is fine.",
+          "not_sure_line": "What matters can take a while to find. Come back any time.",
+          "sorted_line": "Your sort is in Me. You can pick three another time.",
+          "one_title": "Which one do you want to take a small step for?",
+          "one_hint": "One is enough for this week.",
+          "focus_own": "One in my words",
+          "step_title": "One small step this week.",
+          "step_hint": "Small enough that you'd likely do it, and safe to do. If it means facing someone who hurts you, that's not the step.",
+          "step_own": "My own step",
+          "when_title": "When could you do it?",
+          "remind_label": "Want me to ask how it went?",
+          "set_title": "Your step: {step}.",
+          "set_line": "It's a direction, not a rule. Doing part of it counts.",
+          "set_remind": "I'll ask how it went. Doing part of it counts.",
+          "back_title": "Earlier you picked: {step}.",
+          "happened_label": "Did it happen?",
+          "back_yes_title": "{focus}, in action.",
+          "back_yes_line": "Steps like that are what a value looks like from the outside.",
+          "back_yes_title_own": "That was something that matters to you, in action.",
+          "back_hurt_title": "That took something, and it hurt.",
+          "back_hurt_line": "Doing it still counts. How it landed isn't all on you.",
+          "back_no_title": "Not this time is a real answer.",
+          "back_no_hint": "Values are directions, not rules. A smaller step still counts.",
+          "safety_open": "Talk to someone now",
+          "next": "Next",
+          "done": "Done",
+          "profile_unnamed": "something that matters to you",
+          "back_yes_title_kept": "{focus_kept}, in action.",
+          "back_partly_line": "Part of it counts. Steps like that are what a value looks like from the outside.",
+          "sorted_title": "Your list is kept.",
+          "back_end_line": "It'll keep. Come back to it any time."
+        },
+        "tables": {},
+        "derive": [],
+        "steps": [
+          {
+            "id": "start",
+            "kind": "ask",
+            "title": [
+              {
+                "when": {
+                  "set": "$p.values"
+                },
+                "key": "start_back_title"
+              },
+              {
+                "key": "start_title"
+              }
+            ],
+            "fields": [
+              {
+                "id": "start",
+                "options": {
+                  "list": "start",
+                  "where": {
+                    "set": "$p.values"
+                  }
+                },
+                "max": 1,
+                "required": false,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "hint": "start_hint",
+            "next": [
+              {
+                "to": "heads_up",
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "flooded"
+                  ]
+                }
+              },
+              {
+                "to": "one_kept",
+                "when": {
+                  "eq": [
+                    "$a.start",
+                    "step"
+                  ]
+                }
+              },
+              {
+                "to": "sort",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "heads_up",
+            "kind": "ask",
+            "title": "heads_up_title",
+            "fields": [
+              {
+                "id": "heads_up",
+                "options": {
+                  "list": "heads_up"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "hint": "heads_up_hint",
+            "next": [
+              {
+                "to": "settle",
+                "when": {
+                  "eq": [
+                    "$a.heads_up",
+                    "settle"
+                  ]
+                }
+              },
+              {
+                "to": "one_kept",
+                "when": {
+                  "eq": [
+                    "$a.start",
+                    "step"
+                  ]
+                }
+              },
+              {
+                "to": "sort",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "settle",
+            "kind": "handoff",
+            "complete": true,
+            "title": "heads_up_title",
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "settle_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
+            "next": [],
+            "offers": [
+              {
+                "exit": "cool_down",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
+          },
+          {
+            "id": "sort",
+            "kind": "ask",
+            "title": "sort_title",
+            "fields": [
+              {
+                "id": "mine",
+                "options": {
+                  "list": "value"
+                },
+                "max": 25,
+                "required": false,
+                "own": {
+                  "hint": "sort_own",
+                  "countsAsPick": true,
+                  "max": 60
+                },
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "hint": "sort_hint",
+            "next": [
+              {
+                "to": "keep",
+                "when": {
+                  "set": "$a.mine"
+                }
+              },
+              {
+                "to": "not_sure",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "not_sure",
+            "kind": "handoff",
+            "complete": true,
+            "title": "not_sure_title",
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "not_sure_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
+            "next": [],
+            "offers": []
+          },
+          {
+            "id": "keep",
+            "kind": "ask",
+            "title": "keep_title",
+            "fields": [
+              {
+                "id": "kept",
+                "options": {
+                  "list": "value",
+                  "where": {
+                    "has": [
+                      "$a.mine.ids",
+                      "$opt.value"
+                    ]
+                  }
+                },
+                "max": 3,
+                "required": false,
+                "own": {
+                  "hint": "keep_own",
+                  "countsAsPick": true,
+                  "max": 60
+                },
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "keep": {
+              "kind": "values",
+              "many": false,
+              "from": [
+                "mine",
+                "kept"
+              ]
+            },
+            "primary": "keep_primary",
+            "hint": "keep_hint",
+            "next": [
+              {
+                "to": "one",
+                "when": {
+                  "set": "$a.kept.ids"
+                }
+              },
+              {
+                "to": "step",
+                "when": {
+                  "set": "$a.kept"
+                }
+              },
+              {
+                "to": "sorted",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "sorted",
+            "kind": "handoff",
+            "complete": true,
+            "title": "sorted_title",
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "sorted_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
+            "next": [],
+            "offers": []
+          },
+          {
+            "id": "one",
+            "kind": "ask",
+            "title": "one_title",
+            "fields": [
+              {
+                "id": "focus",
+                "options": {
+                  "list": "value",
+                  "where": {
+                    "has": [
+                      "$a.kept.ids",
+                      "$opt.value"
+                    ]
+                  }
+                },
+                "max": 1,
+                "required": true,
+                "own": {
+                  "hint": "focus_own",
+                  "countsAsPick": true,
+                  "max": 60
+                },
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "hint": "one_hint",
+            "next": [
+              {
+                "to": "step",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "one_kept",
+            "kind": "ask",
+            "title": "one_title",
+            "fields": [
+              {
+                "id": "focus_kept",
+                "options": {
+                  "list": "value",
+                  "where": {
+                    "any": []
+                  },
+                  "profile": "values"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "hint": "one_hint",
+            "next": [
+              {
+                "to": "step",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "step",
+            "kind": "ask",
+            "title": "step_title",
+            "fields": [
+              {
+                "id": "step",
+                "options": {
+                  "list": "step",
+                  "where": {
+                    "any": [
+                      {
+                        "eq": [
+                          "$opt.value_id",
+                          "$a.focus"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "$opt.value_id",
+                          "$a.focus_kept"
+                        ]
+                      },
+                      {
+                        "all": [
+                          {
+                            "eq": [
+                              "$opt.value_id",
+                              "own"
+                            ]
+                          },
+                          {
+                            "any": [
+                              {
+                                "all": [
+                                  {
+                                    "not": {
+                                      "set": "$a.focus.ids"
+                                    }
+                                  },
+                                  {
+                                    "not": {
+                                      "set": "$a.focus_kept.ids"
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "eq": [
+                                  "$a.focus_kept",
+                                  "own"
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "max": 1,
+                "required": true,
+                "own": {
+                  "hint": "step_own",
+                  "countsAsPick": true,
+                  "max": 60
+                },
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "hint": "step_hint",
+            "next": [
+              {
+                "to": "when",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "when",
+            "kind": "ask",
+            "title": "when_title",
+            "fields": [
+              {
+                "id": "when",
+                "options": {
+                  "list": "when"
+                },
+                "max": 1,
+                "required": true
+              },
+              {
+                "id": "remind",
+                "options": {
+                  "list": "remind"
+                },
+                "max": 1,
+                "required": false,
+                "label": "remind_label",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "followUp": {
+              "type": "value_step",
+              "whenFrom": "when",
+              "when": {
+                "eq": [
+                  "$a.remind",
+                  "yes"
+                ]
+              }
+            },
+            "next": [
+              {
+                "to": "set",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "set",
+            "kind": "handoff",
+            "complete": true,
+            "title": "set_title",
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.remind",
+                    "yes"
+                  ]
+                },
+                "key": "set_remind"
+              },
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "set_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "titleSlots": {
+              "step": {
+                "labelOf": "step"
+              }
+            },
+            "next": [],
+            "offers": []
+          },
+          {
+            "id": "back",
+            "kind": "ask",
+            "title": "back_title",
+            "fields": [
+              {
+                "id": "happened",
+                "options": {
+                  "list": "happened"
+                },
+                "max": 1,
+                "required": true,
+                "label": "happened_label",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "reopens": {
+              "after": "when"
+            },
+            "clears": [
+              "happened",
+              "again"
+            ],
+            "titleSlots": {
+              "step": {
+                "labelOf": "step"
+              }
+            },
+            "next": [
+              {
+                "to": "back_no",
+                "when": {
+                  "eq": [
+                    "$a.happened",
+                    "no"
+                  ]
+                }
+              },
+              {
+                "to": "back_hurt",
+                "when": {
+                  "eq": [
+                    "$a.happened",
+                    "hurt"
+                  ]
+                }
+              },
+              {
+                "to": "back_yes",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "back_yes",
+            "kind": "handoff",
+            "complete": true,
+            "title": [
+              {
+                "when": {
+                  "set": "$a.focus"
+                },
+                "key": "back_yes_title"
+              },
+              {
+                "when": {
+                  "set": "$a.focus_kept"
+                },
+                "key": "back_yes_title_kept"
+              },
+              {
+                "key": "back_yes_title_own"
+              }
+            ],
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.happened",
+                    "partly"
+                  ]
+                },
+                "key": "back_partly_line"
+              },
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "back_yes_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "titleSlots": {
+              "focus": {
+                "labelOf": "focus"
+              },
+              "focus_kept": {
+                "labelOf": "focus_kept"
+              }
+            },
+            "noClose": true,
+            "next": [],
+            "offers": []
+          },
+          {
+            "id": "back_hurt",
+            "kind": "handoff",
+            "complete": true,
+            "title": "back_hurt_title",
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "back_hurt_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
+            "next": [],
+            "offers": [
+              {
+                "exit": "recover",
+                "when": {
+                  "all": []
+                }
+              },
+              {
+                "exit": "cool_down",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
+          },
+          {
+            "id": "back_no",
+            "kind": "ask",
+            "title": "back_no_title",
+            "fields": [
+              {
+                "id": "again",
+                "options": {
+                  "list": "again"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "hint": "back_no_hint",
+            "next": [
+              {
+                "to": "step",
+                "when": {
+                  "eq": [
+                    "$a.again",
+                    "smaller"
+                  ]
+                }
+              },
+              {
+                "to": "back_end",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "back_end",
+            "kind": "handoff",
+            "complete": true,
+            "title": null,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "back_end_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
+            "next": [],
+            "offers": []
+          }
+        ],
+        "exits": [
+          {
+            "id": "cool_down",
+            "toolId": "cool-down",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "done",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": true
+          },
+          {
+            "id": "recover",
+            "toolId": "recovering-from-invalidation",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "safety_open",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": false,
+            "safety": true
+          }
+        ],
+        "options": {
+          "start": [
+            {
+              "value": "step",
+              "label": "Take a small step for one of them"
+            },
+            {
+              "value": "sort",
+              "label": "Sort them again"
+            }
+          ],
+          "heads_up": [
+            {
+              "value": "settle",
+              "label": "Look after the next few minutes first"
+            },
+            {
+              "value": "try",
+              "label": "Try it anyway"
+            }
+          ],
+          "value": [
+            {
+              "value": "belonging",
+              "label": "Belonging somewhere"
+            },
+            {
+              "value": "count_on",
+              "label": "Being someone people can count on"
+            },
+            {
+              "value": "fairness",
+              "label": "Fairness"
+            },
+            {
+              "value": "making",
+              "label": "Making things"
+            },
+            {
+              "value": "learning",
+              "label": "Learning"
+            },
+            {
+              "value": "health",
+              "label": "Looking after my body"
+            },
+            {
+              "value": "fun",
+              "label": "Fun and play"
+            },
+            {
+              "value": "independence",
+              "label": "Being independent"
+            },
+            {
+              "value": "honesty",
+              "label": "Honesty"
+            },
+            {
+              "value": "caring",
+              "label": "Caring for others"
+            },
+            {
+              "value": "calm",
+              "label": "Calm and peace"
+            },
+            {
+              "value": "adventure",
+              "label": "Adventure and new things"
+            },
+            {
+              "value": "meaning",
+              "label": "Meaning, or something bigger than me"
+            },
+            {
+              "value": "achievement",
+              "label": "Getting things done"
+            },
+            {
+              "value": "beauty",
+              "label": "Beauty and nature"
+            },
+            {
+              "value": "family",
+              "label": "Family, or the people who feel like family"
+            },
+            {
+              "value": "friendship",
+              "label": "Friendship"
+            },
+            {
+              "value": "standing_up",
+              "label": "Standing up for myself"
+            },
+            {
+              "value": "kindness",
+              "label": "Kindness"
+            },
+            {
+              "value": "respect",
+              "label": "Treating people with respect"
+            },
+            {
+              "value": "community",
+              "label": "Community"
+            },
+            {
+              "value": "self_respect",
+              "label": "Self-respect"
+            },
+            {
+              "value": "love",
+              "label": "Love and closeness"
+            },
+            {
+              "value": "work",
+              "label": "Work that matters to me"
+            }
+          ],
+          "step": [
+            {
+              "value": "belonging_1",
+              "label": "Go somewhere I feel part of things",
+              "value_id": "belonging"
+            },
+            {
+              "value": "belonging_2",
+              "label": "Say yes to one invitation",
+              "value_id": "belonging"
+            },
+            {
+              "value": "belonging_3",
+              "label": "Message a group I'm part of",
+              "value_id": "belonging"
+            },
+            {
+              "value": "count_on_1",
+              "label": "Do one thing I said I'd do",
+              "value_id": "count_on"
+            },
+            {
+              "value": "count_on_2",
+              "label": "Check in on someone who relies on me",
+              "value_id": "count_on"
+            },
+            {
+              "value": "count_on_3",
+              "label": "Say no to one thing I can't keep",
+              "value_id": "count_on"
+            },
+            {
+              "value": "fairness_1",
+              "label": "Speak up once when something's unfair, if it's safe to",
+              "value_id": "fairness"
+            },
+            {
+              "value": "fairness_2",
+              "label": "Hear out someone I disagree with",
+              "value_id": "fairness"
+            },
+            {
+              "value": "fairness_3",
+              "label": "Share something out fairly at home",
+              "value_id": "fairness"
+            },
+            {
+              "value": "making_1",
+              "label": "Make something small, for ten minutes",
+              "value_id": "making"
+            },
+            {
+              "value": "making_2",
+              "label": "Fix one thing that's broken",
+              "value_id": "making"
+            },
+            {
+              "value": "making_3",
+              "label": "Cook something simple",
+              "value_id": "making"
+            },
+            {
+              "value": "learning_1",
+              "label": "Spend ten minutes on something new",
+              "value_id": "learning"
+            },
+            {
+              "value": "learning_2",
+              "label": "Ask someone how they do something",
+              "value_id": "learning"
+            },
+            {
+              "value": "learning_3",
+              "label": "Try one new thing once",
+              "value_id": "learning"
+            },
+            {
+              "value": "health_1",
+              "label": "Go to bed a little earlier one night",
+              "value_id": "health"
+            },
+            {
+              "value": "health_2",
+              "label": "Take a short walk",
+              "value_id": "health"
+            },
+            {
+              "value": "health_3",
+              "label": "Book a check-up",
+              "value_id": "health"
+            },
+            {
+              "value": "fun_1",
+              "label": "Do one thing only because it's fun",
+              "value_id": "fun"
+            },
+            {
+              "value": "fun_2",
+              "label": "Play a game",
+              "value_id": "fun"
+            },
+            {
+              "value": "fun_3",
+              "label": "Put on music and move",
+              "value_id": "fun"
+            },
+            {
+              "value": "independence_1",
+              "label": "Do one thing on my own that I'd usually ask for help with",
+              "value_id": "independence"
+            },
+            {
+              "value": "independence_2",
+              "label": "Make one small decision without checking with anyone",
+              "value_id": "independence"
+            },
+            {
+              "value": "independence_3",
+              "label": "Plan an hour that's all mine",
+              "value_id": "independence"
+            },
+            {
+              "value": "honesty_1",
+              "label": "Say one true thing I've been holding back, to someone safe",
+              "value_id": "honesty"
+            },
+            {
+              "value": "honesty_2",
+              "label": "Tell someone safe how I really am",
+              "value_id": "honesty"
+            },
+            {
+              "value": "honesty_3",
+              "label": "Tell one small truth",
+              "value_id": "honesty"
+            },
+            {
+              "value": "caring_1",
+              "label": "Do one kind thing for someone",
+              "value_id": "caring"
+            },
+            {
+              "value": "caring_2",
+              "label": "Ask someone how they're really doing",
+              "value_id": "caring"
+            },
+            {
+              "value": "caring_3",
+              "label": "Help with one small task",
+              "value_id": "caring"
+            },
+            {
+              "value": "calm_1",
+              "label": "Take five quiet minutes",
+              "value_id": "calm"
+            },
+            {
+              "value": "calm_2",
+              "label": "Clear one small space",
+              "value_id": "calm"
+            },
+            {
+              "value": "calm_3",
+              "label": "Leave my phone in another room for a while",
+              "value_id": "calm"
+            },
+            {
+              "value": "adventure_1",
+              "label": "Go somewhere I haven't been",
+              "value_id": "adventure"
+            },
+            {
+              "value": "adventure_2",
+              "label": "Take a different route",
+              "value_id": "adventure"
+            },
+            {
+              "value": "adventure_3",
+              "label": "Try something I've never done",
+              "value_id": "adventure"
+            },
+            {
+              "value": "meaning_1",
+              "label": "Spend a few minutes somewhere quiet or sacred to me",
+              "value_id": "meaning"
+            },
+            {
+              "value": "meaning_2",
+              "label": "Read something that matters to me",
+              "value_id": "meaning"
+            },
+            {
+              "value": "meaning_3",
+              "label": "Give some time to a cause",
+              "value_id": "meaning"
+            },
+            {
+              "value": "achievement_1",
+              "label": "Finish one small thing I've started",
+              "value_id": "achievement"
+            },
+            {
+              "value": "achievement_2",
+              "label": "Do the first step of something bigger",
+              "value_id": "achievement"
+            },
+            {
+              "value": "achievement_3",
+              "label": "Call one thing done at good enough",
+              "value_id": "achievement"
+            },
+            {
+              "value": "beauty_1",
+              "label": "Spend time outside, looking",
+              "value_id": "beauty"
+            },
+            {
+              "value": "beauty_2",
+              "label": "Put something I find beautiful where I'll see it",
+              "value_id": "beauty"
+            },
+            {
+              "value": "beauty_3",
+              "label": "Notice one beautiful thing and stay with it",
+              "value_id": "beauty"
+            },
+            {
+              "value": "family_1",
+              "label": "Spend time with someone who feels like family",
+              "value_id": "family"
+            },
+            {
+              "value": "family_2",
+              "label": "Do one thing from a family tradition I like",
+              "value_id": "family"
+            },
+            {
+              "value": "family_3",
+              "label": "Message someone in my family, if that feels safe",
+              "value_id": "family"
+            },
+            {
+              "value": "friendship_1",
+              "label": "Reach out to a friend",
+              "value_id": "friendship"
+            },
+            {
+              "value": "friendship_2",
+              "label": "See a friend in person",
+              "value_id": "friendship"
+            },
+            {
+              "value": "friendship_3",
+              "label": "Be a bit more honest with a friend",
+              "value_id": "friendship"
+            },
+            {
+              "value": "standing_up_1",
+              "label": "Say what I need to someone safe, once, plainly",
+              "value_id": "standing_up"
+            },
+            {
+              "value": "standing_up_2",
+              "label": "Say no to one small thing",
+              "value_id": "standing_up"
+            },
+            {
+              "value": "standing_up_3",
+              "label": "Ask for one thing I want",
+              "value_id": "standing_up"
+            },
+            {
+              "value": "kindness_1",
+              "label": "Do one kind thing no one will see",
+              "value_id": "kindness"
+            },
+            {
+              "value": "kindness_2",
+              "label": "Say something kind to someone",
+              "value_id": "kindness"
+            },
+            {
+              "value": "kindness_3",
+              "label": "Go easy on myself about one mistake",
+              "value_id": "kindness"
+            },
+            {
+              "value": "respect_1",
+              "label": "Listen without interrupting, once",
+              "value_id": "respect"
+            },
+            {
+              "value": "respect_2",
+              "label": "Keep one boundary that matters to me",
+              "value_id": "respect"
+            },
+            {
+              "value": "respect_3",
+              "label": "Thank someone properly",
+              "value_id": "respect"
+            },
+            {
+              "value": "community_1",
+              "label": "Help a neighbour with something small",
+              "value_id": "community"
+            },
+            {
+              "value": "community_2",
+              "label": "Go to one local event",
+              "value_id": "community"
+            },
+            {
+              "value": "community_3",
+              "label": "Give an hour to something local",
+              "value_id": "community"
+            },
+            {
+              "value": "self_respect_1",
+              "label": "Keep one promise to myself",
+              "value_id": "self_respect"
+            },
+            {
+              "value": "self_respect_2",
+              "label": "Do one thing I'd be proud of",
+              "value_id": "self_respect"
+            },
+            {
+              "value": "self_respect_3",
+              "label": "Step away from one conversation that puts me down",
+              "value_id": "self_respect"
+            },
+            {
+              "value": "love_1",
+              "label": "Tell someone safe that I love them",
+              "value_id": "love"
+            },
+            {
+              "value": "love_2",
+              "label": "Spend unhurried time with someone close",
+              "value_id": "love"
+            },
+            {
+              "value": "love_3",
+              "label": "Do something thoughtful for someone I love",
+              "value_id": "love"
+            },
+            {
+              "value": "work_1",
+              "label": "Spend twenty minutes on work that matters to me",
+              "value_id": "work"
+            },
+            {
+              "value": "work_2",
+              "label": "Ask for feedback once",
+              "value_id": "work"
+            },
+            {
+              "value": "work_3",
+              "label": "Learn one small thing for my work",
+              "value_id": "work"
+            },
+            {
+              "value": "own_1",
+              "label": "Spend ten minutes on it",
+              "value_id": "own"
+            },
+            {
+              "value": "own_2",
+              "label": "Tell someone safe it matters to me",
+              "value_id": "own"
+            },
+            {
+              "value": "own_3",
+              "label": "Notice one moment it shows up this week",
+              "value_id": "own"
+            }
+          ],
+          "when": [
+            {
+              "value": "tomorrow",
+              "label": "Tomorrow"
+            },
+            {
+              "value": "few_days",
+              "label": "In a few days"
+            },
+            {
+              "value": "this_week",
+              "label": "Sometime this week"
+            }
+          ],
+          "remind": [
+            {
+              "value": "yes",
+              "label": "Yes, ask me"
+            },
+            {
+              "value": "no",
+              "label": "No thanks"
+            }
+          ],
+          "happened": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "partly",
+              "label": "Partly"
+            },
+            {
+              "value": "hurt",
+              "label": "It happened, and it hurt"
+            },
+            {
+              "value": "no",
+              "label": "Not this time"
+            }
+          ],
+          "again": [
+            {
+              "value": "smaller",
+              "label": "Pick a smaller one"
+            },
+            {
+              "value": "not_now",
+              "label": "Not now"
             }
           ]
         }
