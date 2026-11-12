@@ -1,7 +1,7 @@
 import type { ManagedTransaction } from 'neo4j-driver';
 import { personRoute, storedRisk } from '../safety/personSafety';
 import type { ProjectionInput } from '../skills/projections';
-import { answersOf, NOBODY, PERSON_RISK_QUERY, UUID } from './debriefProjection';
+import { answersOf, NOBODY, PERSON_RISK_QUERY, SAFETY_RECHECK, UUID } from './debriefProjection';
 
 /**
  * DEAR MAN's prep on the skill player (IE-01 Mode B, IE-B4; docs/design/dear-man-prep.md): the run (`ext.run`, skill
@@ -11,8 +11,9 @@ import { answersOf, NOBODY, PERSON_RISK_QUERY, UUID } from './debriefProjection'
  * `ask_outcome` card this visit booked (debriefProjection.ts DEBRIEF_PREP_QUERY): the person and `situationType` (for
  * the refusal counts) carry over; History lists it.
  *
- * Option ids only, never own words (an own-words answer is stored as `own`). Someone on the safety route is never linked
- * (as saveDearManSession refused them, D4). Only the caller's own records.
+ * Option ids only, never own words (an own-words answer is stored as `own`). A plan with someone on the safety route
+ * writes nothing (as saveDearManSession refused them, D4); one with a person no longer kept is linked to no one; *I'm scared of what
+ * they'd do* writes no plan and sets the person's `safetyRecheckAt`. Only the caller's own records.
  */
 export const PREP_WRITE = `
   MATCH (u:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $tsKey})
@@ -82,17 +83,31 @@ export function prepReachedCard(run: Record<string, unknown>): boolean {
   return Array.isArray(run.path) && run.path.includes('card');
 }
 
+/** *I'm scared of what they'd do* on the barriers step: no plan, and the person's safety answer goes stale. */
+export function prepScared(run: Record<string, unknown>): boolean {
+  return (answersOf(run).hard?.ids ?? []).includes('scared');
+}
+
 export async function projectDearManPrep(tx: ManagedTransaction, input: ProjectionInput): Promise<void> {
   const { uid, toolSessionId, run } = input;
-  if (run.skillId !== 'dear_man_prep' || !prepReachedCard(run)) return;
+  if (run.skillId !== 'dear_man_prep') return;
   const ctx = (run.ctx && typeof run.ctx === 'object' ? run.ctx : {}) as Record<string, unknown>;
-  let personId = ctx.personId !== NOBODY && typeof ctx.personId === 'string' && UUID.test(ctx.personId) ? ctx.personId : null;
-  if (personId) {
-    const risk = (await tx.run(PERSON_RISK_QUERY, { uid, personKey: `${uid}:${personId}` })).records[0];
-    if (!risk || personRoute(storedRisk(risk.get('v'))) === 'safety') personId = null;
+  const personId = ctx.personId !== NOBODY && typeof ctx.personId === 'string' && UUID.test(ctx.personId) ? ctx.personId : null;
+  const personKey = personId ? `${uid}:${personId}` : null;
+  // Scared of them: the next visit with them asks the safety question again (people.md, as Say no and Give do).
+  if (prepScared(run)) {
+    if (personKey) await tx.run(SAFETY_RECHECK, { uid, personKey });
+    return;
+  }
+  if (!prepReachedCard(run)) return;
+  let linkKey = personKey;
+  if (personKey) {
+    const risk = (await tx.run(PERSON_RISK_QUERY, { uid, personKey })).records[0];
+    // Someone on the safety route gets no plan at all, as saveDearManSession refused one (D4). A person no longer
+    // kept: the plan, linked to no one.
+    if (risk && personRoute(storedRisk(risk.get('v'))) === 'safety') return;
+    if (!risk) linkKey = null;
   }
   const tsKey = `${uid}:${toolSessionId}`;
-  await tx.run(PREP_WRITE, {
-    uid, tsKey, sKey: tsKey, id: toolSessionId, personKey: personId ? `${uid}:${personId}` : null, props: prepFields(run),
-  });
+  await tx.run(PREP_WRITE, { uid, tsKey, sKey: tsKey, id: toolSessionId, personKey: linkKey, props: prepFields(run) });
 }

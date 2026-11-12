@@ -13493,7 +13493,7 @@ MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 1}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "dear_man_prep:thought"}), (b:SkillStep {id: "dear_man_prep:who"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "{\"set\": \"$p.parts\"}";
+SET r += {order: 0}, r.whenJson = "{\"all\": [{\"set\": \"$p.parts\"}, {\"not\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}]}";
 MATCH (a:SkillStep {id: "dear_man_prep:thought"}), (b:SkillStep {id: "dear_man_prep:describe"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 1}, r.whenJson = "null";

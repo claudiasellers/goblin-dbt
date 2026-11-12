@@ -23,7 +23,6 @@ const HOSTS = {
   "src/pages/Insights.tsx": [["PartsReflect", "LazyPartsReflect"], ["TrailsReflect", "LazyTrailsReflect"]],
   "src/pages/ToolPage.tsx": [["MeetAPart", "LazyMeetAPart", "loadMeetAPart"]],
   "src/pages/tools/InvalidationRecovery.tsx": [["AngryPartCard", "LazyAngryPartCard", "loadAngryCard"]],
-  "src/pages/tools/DearMan.tsx": [["CopeAheadStep", "LazyCopeAheadStep", "loadCope"]],
   "src/components/skillPlayer/DebriefWhoEmbed.tsx": [["DebriefWho", "LazyDebriefWho", "loadWho"]],
   "src/pages/tools/CopeAhead.tsx": [["CopeAheadStep", "LazyCopeAheadStep", "loadCope"], ["PlanAnchor", "LazyPlanAnchor", "loadAnchor"]],
   "src/pages/tools/ProblemSolve.tsx": [["PartLaterLine", "LazyPartLaterLine", "loadLater"]],
@@ -108,8 +107,6 @@ test("prefetch: each tool step is fetched once its gate holds, before it renders
   const ir = read("src/pages/tools/InvalidationRecovery.tsx");
   const loud = ir.slice(ir.indexOf("function LoudStep("), ir.indexOf("function LabelStep("));
   assert.match(loud, /useEffect\(\(\) => \{ if \(cardThisVisit\) void loadAngryCard\(\)\.catch\(/, "with the pull options");
-  const dm = read("src/pages/tools/DearMan.tsx");
-  assert.match(dm, /useEffect\(\(\) => \{ if \(copeShown\) void loadCope\(\)\.catch\(/);
   // DEAR MAN's debrief (a skill since IE-B2): the embed fetches the step with its copy, only with parts on.
   assert.match(read("src/components/skillPlayer/DebriefWhoEmbed.tsx"), /if \(!partsOn\) return;[\s\S]*?Promise\.all\(\[getPartsContent\(\), loadWho\(\)\]\)/);
   // Problem Solve: the line's chunk comes with its copy; no line until both are there.

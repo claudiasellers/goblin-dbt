@@ -784,6 +784,10 @@ test("own.seed: a chip writes its words into the open box to change; once the wo
 test("covered: P2 or safety.open over an embed step reaches the embed; a new step starts uncovered", () => {
   const player = read("src/components/skillPlayer/SkillPlayer.tsx");
   assert.match(player, /covered=\{safetyOpen \|\| p2Open \|\| !!inline\?\.covered\}/, "an inline run is covered by its host's P2 too");
+  assert.match(player, /\.then\(\(r\) => \(r && !tvn \? answerToolOutcome\(toolSession\.id, \{ dismissed: true \}\) : null\)\)/,
+    "an inline sub-run with no change check answered is never asked about on Today (its own session id)");
+  assert.match(player, /if \(r\.thenVsNow === 'much_better'\) setCtxIn\(\(c\) => \{ if \(!\('band' in c\)\) return c; const \{ band: _gone, \.\.\.rest \} = c;/,
+    "a much-quieter reread drops the carried band: no heads-up after it says it's still loud (R3)");
   assert.match(player, /inert=\{safetyOpen \|\| p2Open\}/, "under P2 the step is inert: nothing underneath takes focus from the dialog");
   assert.match(player, /onOpen=\{\(\) => setP2Open\(true\)\} onClose=\{\(\) => setP2Open\(false\)\}/);
   assert.match(player, /useEffect\(\(\) => \{ setP2Open\(false\); \}, \[st\.stepId\]\);/);

@@ -10,7 +10,7 @@ const chip = 'min-h-11 px-4 py-2 rounded-full border border-[var(--color-border)
 const quiet = 'min-h-11 px-3 text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]';
 
 /**
- * DEAR MAN's debrief: who showed up? (src/lib/debriefWho.ts). DearMan.tsx mounts it as its own step
+ * DEAR MAN's debrief: who showed up? (src/lib/debriefWho.ts). The debrief skill's `debriefWho` embed mounts it
  * only when the gate holds. Every tap moves on (`onDone`); writes are fire and forget, so nothing here
  * ever holds up the debrief. The named form reports its answer (`onAnswer`, for ext); the general form
  * is the tag row itself (its chips, A new one → later, Skip), with the debrief's question.

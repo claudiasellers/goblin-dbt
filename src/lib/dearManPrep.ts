@@ -12,9 +12,6 @@ import type { DearManHandoff } from '../data/dearManHandoff';
 import { oneMessageCtx } from './dearManOne';
 import type { KeptPerson, PickedPerson } from './people';
 
-/** Rolling the port back is setting this to false: the hand-built prep (DearManPrep in DearMan.tsx) stays in the tree. */
-export const PREP_ON_PLAYER = true;
-
 /** A word's DEAR MAN feeling chip id (`feel_<slug>`): the chips are named after the words ("Hurt" → `feel_hurt`). */
 export function feelingChipId(word: string | null | undefined): string | null {
   const slug = (word ?? '').trim().toLowerCase().replace(/[^a-z]+/g, '_').replace(/^_+|_+$/g, '');

@@ -401,7 +401,11 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
     returned.current = true;
     const r = inlineResult(ctx, st, finished);
     const tvn = r?.thenVsNow as ThenVsNow | null | undefined;
-    void toolSession.close({ status: finished ? 'completed' : 'exited_early', ...(tvn ? { thenVsNow: tvn } : {}) });
+    // With no change check answered, the outcome is dismissed too: the sub-run is never asked about later, so a
+    // safety or too-much hand-off doesn't come back as Today's "Did it help?" (the noClose rule, for the sub-session).
+    void toolSession.close({ status: finished ? 'completed' : 'exited_early', ...(tvn ? { thenVsNow: tvn } : {}) })
+      .then((r) => (r && !tvn ? answerToolOutcome(toolSession.id, { dismissed: true }) : null))
+      .catch(() => { /* signed out, or offline: nothing to dismiss */ });
     inline.onReturn?.({ answers: r?.answers ?? {}, finished, ids: r?.ids ?? [finished ? 'finished' : 'left'] });
   }, [inline, ctx, st, toolSession]);
   useEffect(() => { if (inline && step.kind === 'handoff') giveBack(true); }, [inline, step.kind, giveBack]);
@@ -466,6 +470,9 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
           <TooMuchLink host={skill.toolId} onOpen={() => setP2Open(true)} onClose={() => setP2Open(false)} onResult={(r) => {
             handoffs.current.push(r);
             toolSession.setExt({ run: { handoffs: handoffExt(handoffs.current) } });
+            // The reread said much quieter: the band carried in is no longer what they told us, so nothing after this
+            // says it's still loud (R3, as the hand-built DEAR MAN prep's heads-up did).
+            if (r.thenVsNow === 'much_better') setCtxIn((c) => { if (!('band' in c)) return c; const { band: _gone, ...rest } = c; void _gone; return rest; });
           }} />
         </div>
       )}

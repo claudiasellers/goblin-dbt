@@ -27,11 +27,6 @@
       "state": "built"
     },
     {
-      "from": "src/lib/dearManDebrief.ts",
-      "to": "dear-man",
-      "state": "built"
-    },
-    {
       "from": "src/lib/dearManOne.ts",
       "to": "dear-man",
       "state": "built"
@@ -74,16 +69,6 @@
     {
       "from": "src/pages/tools/CopeAhead.tsx",
       "to": "five-senses",
-      "state": "built"
-    },
-    {
-      "from": "src/pages/tools/DearMan.tsx",
-      "to": "dear-man",
-      "state": "built"
-    },
-    {
-      "from": "src/pages/tools/DearMan.tsx",
-      "to": "fast",
       "state": "built"
     },
     {

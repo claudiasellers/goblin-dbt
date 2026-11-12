@@ -143,16 +143,41 @@ History labels it *Prep*.
   angry card (`dearManHurt.ts`) isn't carried; the debrief opened from the `ask_outcome` card doesn't get the part
   (`ext.er.copeAheadPartId` isn't written, so its *who showed up* stays in its general form for these plans; a C8
   amendment); History shows no anchor preview (the old prep stored the phrase's text, this one its id), and a plan
-  whose ask was in own words shows no *Asking for*; device-only `?resume=<sessionId>` drafts still open the old page
-  until their tokens age out; the rep source for the prep isn't set; per-step parity tests against the old page
-  (C8.5): the old page's own tests stay with it until it's deleted.
+  whose ask was in own words shows no *Asking for*; the rep source for the prep isn't set.
 
-## Rolling back
+## The hand-built page is gone (IE-B4, 12 Nov)
 
-`PREP_ON_PLAYER` in `src/lib/dearManPrep.ts` (false → the hand-built `DearManPrep` again, unchanged). The skill's
-content and projection stay; with the flag off nothing opens the skill.
+`DearManPrep` and the `PREP_ON_PLAYER` rollback are deleted: `src/pages/tools/DearMan.tsx` only picks the mode
+(prep, `?mode=debrief`, `?mode=one`). With them went the old page's device-only resume draft
+(`src/lib/dearManResume.ts`), its band gate, summary heads-up and hand-off prefill (`src/lib/dearManSafety.ts` keeps
+only Recover's `withBand`), `debriefLink` / `offerLetGo` / `ASK_OUTCOME_CHIPS` (the skills carry these now),
+`withAnswer` and `dearManRepSource`. An old `?resume=<sessionId>` link (a 24-hour token on one device) opens the
+prep fresh. The callables `getDearManContent` and `saveDearManSession` stay deployed for open tabs of the old page;
+nothing in the app calls them. Kept for ports still open: `src/lib/dearManHurt.ts` (the parts hurt chip, above)
+and `src/lib/copeAhead.ts` with `CopeAheadStep` (Cope Ahead's hand-built page and the parts review use them).
+The old page's source pins went with it; what they guarded on the skill is pinned in `tests/dear-man-prep.test.mjs`.
+
+What the old page did that the skill now does too (Gate 3 on the deletion):
+- **The visit's answers.** `PersonFirstSkill` folds each answer given this visit into the kept list (`withAnswer`,
+  restored from the old page). Without that, *This is about someone else* after a harm answer offered the old fresh
+  *Yes*, and the prep ran for someone just named as dangerous. This holds for every person-first skill.
+- **No plan with someone on the safety route.** The projection writes nothing then, as `saveDearManSession` refused.
+- **Scared of them.** *I'm scared of what they'd do* sets the person's `safetyRecheckAt`, as Say no and Give do, so
+  the next visit asks again.
+- **Flooded.** *Who might show up* (parts) is skipped on a carried flooded reading, as `showCopeAhead` did.
+- **Much quieter.** A P2 reread of *much quieter* drops the carried band, so the heads-up never says it's still loud
+  (R3; the player does this for every skill).
+- **Old drafts.** An old `?resume=` link drops its device draft as it opens, as the old page did.
+
+No per-step parity test against the old page (C8.5): it is deleted, and what its pins guarded that still matters is
+pinned on the skill (never a lock, scared, Rehearse it, `ask_outcome`, Let go after a refusal, the carried band).
+`copeReady` / `copeExt` in `src/lib/copeAhead.ts` are kept with that file (only tests read them now) for the parts
+review's DEAR MAN surface until the parts port decides it.
+
+Not carried: the *Carried over* card from Recover (the situation and feeling chips are offered instead), and Recover's
+word kept as own words when no chip matches.
 
 ## Still in IE-B4
 
-Recover drops `boundaryLocked` and `tooHot` (built 12 Nov, the second PR: [`recover-from-invalidation.md`](recover-from-invalidation.md)); IE-06 Keep it warm (built 12 Nov, [`give.md`](give.md)); IE-12's thoughts about asking (built 12 Nov, above); Let go inline;
-then DEAR MAN's hand-built page can be deleted.
+Recover drops `boundaryLocked` and `tooHot` (built 12 Nov, the second PR: [`recover-from-invalidation.md`](recover-from-invalidation.md)); IE-06 Keep it warm (built 12 Nov, [`give.md`](give.md)); IE-12's thoughts about asking (built 12 Nov, above); Let go inline (built 12 Nov, [`fast.md`](fast.md));
+and DEAR MAN's hand-built page is deleted (above).
