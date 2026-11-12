@@ -67,9 +67,11 @@ test("DEAR MAN's one word row, Pause active; planned tools are written switched 
   assert.equal(graph.concepts.dbt_wise_mind.appToolId, "wise-mind");
   const wise = rows.filter((r) => r.conceptId === "dbt_wise_mind");
   assert.deepEqual(wise.map((r) => [r.id, r.active, r.reviewStatus]), [["rf_chronic_vigilance_words_watchful_wise-mind", true, "approved"]]);
-  // Keep it warm (IE-06): built, tagged, no row; the review's two planned rows were dropped (docs/design/give.md).
+  // Keep it warm (IE-06): built, tagged, one word row live (remorseful beside Check the Facts); the review's two planned
+  // rows were dropped (docs/design/give.md).
   assert.equal(graph.concepts.dbt_give.appToolId, "give");
-  assert.deepEqual(rows.filter((r) => r.conceptId === "dbt_give"), []);
+  assert.deepEqual(rows.filter((r) => r.conceptId === "dbt_give").map((r) => [r.id, r.active, r.reviewStatus, r.words]),
+    [["rf_rumination_loop_words_repair_give", true, "approved", ["remorseful"]]]);
   // Cope Ahead and Check the Facts: built and live (Claudia, 12 Nov: default to connected), every row approved.
   assert.equal(graph.concepts.dbt_cope_ahead.appToolId, "cope-ahead");
   const cope = rows.filter((r) => r.conceptId === "dbt_cope_ahead");

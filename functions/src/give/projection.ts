@@ -10,8 +10,10 @@ import type { ProjectionInput } from '../skills/projections';
  *   - the `Interaction` (log, IE-03's interaction log), once the person has said how it went: `kind: 'repair'` when
  *     the `repair_outcome` card's visit answered *Did you get to say it?*, `kind: 'break_return'` when the
  *     `break_return` card's visit answered *Did you go back?*; `WITH` the person, ids only, never their words;
- *   - *Did anyone get hurt, or are you scared of them now?* answered yes: that person's safety answer goes stale
- *     (`safetyRecheckAt`), so the next visit with them asks the safety question again (as Say no's *scared*).
+ *   - any answer that says it isn't safe with them (*It got physical* or *I'm scared of them* after a fight, *I'm
+ *     scared of how angry they are*, *I don't feel safe going back* / *with them* on a card's visit): that person's
+ *     safety answer goes stale (`safetyRecheckAt`), so the next visit with them asks the safety question again (as
+ *     Say no's *scared*), and nothing is logged for the visit.
  *
  * The person is the run's own `$ctx.personId` (a reopened visit carries the first visit's), or, failing that, the one
  * the first visit named (its session SCHEDULED the card this visit is RESOLVING). Someone on the safety route is never
@@ -46,13 +48,15 @@ export function giveFields(run: Record<string, unknown>) {
   const one = (f: string) => a[f]?.ids[0] ?? null;
   const repaired = one('repaired');
   const back = one('back');
-  const kind: 'repair' | 'break_return' | null = repaired ? 'repair' : back ? 'break_return' : null;
+  const hurt = ['physical', 'scared'].includes(one('fight') ?? '') || one('angry_ok') === 'scared'
+    || [one('back'), one('between'), one('still_ok')].includes('unsafe');
+  const kind: 'repair' | 'break_return' | null = hurt ? null : repaired ? 'repair' : back ? 'break_return' : null;
   return {
     kind,
-    outcome: repaired ?? back,
+    outcome: kind ? repaired ?? back : null,
     between: kind === 'repair' ? one('between') : kind === 'break_return' ? one('still_ok') : null,
     guilt: one('guilt'),
-    hurt: one('fight') === 'hurt',
+    hurt,
   };
 }
 
@@ -67,7 +71,7 @@ export async function projectGive(tx: ManagedTransaction, input: ProjectionInput
   const f = giveFields(run);
   if (!f.kind && !f.hurt) return;
   let personId = ctxPerson(run);
-  if (!personId && f.kind) {
+  if (!personId) {
     const src = (await tx.run(SOURCE_RUN_QUERY, { uid, tsKey: `${uid}:${toolSessionId}` })).records[0];
     try {
       const srcRun = (JSON.parse(String(src?.get('ext') ?? 'null')) as { run?: unknown } | null)?.run;

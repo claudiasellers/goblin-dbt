@@ -3940,6 +3940,34 @@
    "rationale": "Held (self-soothe, hand on heart) beside Recover for cold shame: kindness first, which shame makes hardest to take in; Do the Opposite (unhiding) asks more than a low-energy moment has. Never on a blank result (direction down)."
   },
   {
+   "id": "rf_rumination_loop_words_repair_give",
+   "conceptId": "dbt_give",
+   "patternId": "rumination_loop",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.6,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "remorseful"
+   ],
+   "beside": [
+    "check-the-facts"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "approved",
+   "rationale": "Keep it warm's repair (IE-06) beside Check the Facts for remorse: is the guilt justified, then repair with the person (one acknowledgement, one sorry). Its repair route asks whether some of it was yours first. Not guilty: guilt is often about the self, not someone to repair with."
+  },
+  {
    "id": "rf_social_threat_shame_addresses_recovering-from-invalidation",
    "conceptId": "dbt_recovering_from_invalidation",
    "patternId": "social_threat_shame",

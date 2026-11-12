@@ -52,7 +52,7 @@ test("skill: a carried flooded reading offers break and return only (you can't v
 });
 
 test("skill: someone brought something: their side first (one validation line, level-matched), then yours (FAST), then the pocket card", () => {
-  let s = play([pick("situation", "brought"), next, pick("brought", "angry"), next]);
+  let s = play([pick("situation", "brought"), next, pick("brought", "angry"), pick("angry_ok", "safe"), next]);
   assert.equal(s.stepId, "theirs");
   const lines = values(ctx(), step("theirs"), "validate", s);
   assert.ok(lines.includes("v_angry") && lines.includes("v_hear"));
@@ -69,15 +69,29 @@ test("skill: someone brought something: their side first (one validation line, l
   assert.deepEqual(step("b_card").next.map((n) => n.to), ["b_end"]);
   const end = play([{ type: "embedDone", output: { ids: ["seen_all"] } }], ctx(), s);
   assert.equal(end.stepId, "b_end");
-  assert.deepEqual(M.offersFor(ctx(), step("b_end"), end), ["one_message", "fast"]);
+  assert.deepEqual(M.offersFor(ctx(), step("b_end"), end), ["one_message", "fast", "give_break"]);
+  assert.deepEqual(exitOf("give_break").query, { situationId: "heated", person: "$ctx.personId" });
+  assert.match(skill.copy.card_heats, /half an hour/, "the pocket card's break says when you'll be back");
   assert.deepEqual(exitOf("one_message").query, { mode: "one", person: "$ctx.personId" });
 });
 
-test("skill: repair asks about safety first; hurt or scared of them is the other-person resources and no repair", () => {
+test("skill: they're angry at me asks if you're safe with them on the same screen; scared goes to the resources", () => {
+  const s = play([pick("situation", "brought"), next, pick("brought", "angry")]);
+  assert.equal(M.canGoOn(ctx(), s), false, "the safety check is required when they're angry");
+  assert.equal(M.canGoOn(ctx(), play([pick("situation", "brought"), next, pick("brought", "request")])), true, "only when they're angry");
+  const scared = play([pick("angry_ok", "scared")], ctx(), s);
+  assert.equal(M.crisisFor(ctx(), step("brought"), scared)?.variant, "other_person");
+  assert.equal(play([next], ctx(), scared).stepId, "scared");
+  assert.equal(play([pick("angry_ok", "safe"), next], ctx(), s).stepId, "theirs");
+});
+
+test("skill: repair asks about safety first; physical or scared of them is the other-person resources and no repair", () => {
   const s = play([pick("situation", "repair"), next]);
   assert.equal(s.stepId, "fight");
-  assert.equal(skill.options.fight.find((o) => o.value === "hurt").danger, "other");
-  const hurt = play([pick("fight", "hurt")], ctx(), s);
+  assert.match(skill.copy.fight_title, /physical/, "not *hurt*: after a fight that reads as hurt feelings");
+  assert.deepEqual(skill.options.fight.map((o) => [o.value, o.danger]), [["no", undefined], ["physical", "other"], ["scared", "other"]]);
+  assert.equal(play([pick("fight", "physical"), next], ctx(), s).stepId, "scared");
+  const hurt = play([pick("fight", "scared")], ctx(), s);
   assert.equal(M.crisisFor(ctx(), step("fight"), hurt)?.variant, "other_person");
   const out = play([next], ctx(), hurt);
   assert.equal(out.stepId, "scared");
@@ -97,15 +111,22 @@ test("skill: repair: guilt that fits gets one acknowledgement; guilt that doesn'
   const msg = play([pick("ack", "a_said"), next], ctx(), mine);
   assert.equal(msg.stepId, "r_msg");
   assert.equal(step("r_msg").embed, "messageComposer");
-  assert.deepEqual(step("r_msg").props.parts, ["ack", "r_validate", "r_ask"]);
+  assert.deepEqual(step("r_msg").props.parts, ["ack", "r_validate", "commit", "r_ask"], "acknowledge, repair, commit");
+  assert.ok(!step("owning").fields.find((f) => f.id === "commit").required);
   assert.equal(step("r_msg").props.dropSorry, undefined, "a repair's sorry is the point: no *Take the sorry out*");
   const notMine = play([...base, pick("guilt", "not_mine"), next]);
   assert.equal(notMine.stepId, "no_sorry");
   assert.match(skill.copy.no_sorry_title, /don't owe an apology/);
   for (const o of skill.options.no_sorry) assert.doesNotMatch(o.label, /sorry|apologi/i, o.value);
-  const unsure = play([...base, pick("guilt", "unsure")]);
-  assert.deepEqual(M.fieldLinks(ctx(), step("guilt").fields[0], unsure).map((l) => l.exit.toolId), ["check-the-facts"]);
-  assert.equal(M.copyText(ctx(), step("owning").title, play([next], ctx(), unsure)), skill.copy.ack_title_unsure);
+  // Not sure: a choice, never a forced sorry; Check the Facts as a link.
+  const unsure = play([...base, pick("guilt", "unsure"), next]);
+  assert.equal(unsure.stepId, "unsure");
+  assert.deepEqual(M.fieldLinks(ctx(), step("unsure").fields[0], unsure).map((l) => l.exit.toolId), ["check-the-facts"]);
+  const warm = play([pick("unsure", "warm"), next], ctx(), unsure);
+  assert.equal(warm.stepId, "no_sorry");
+  assert.equal(M.copyText(ctx(), step("no_sorry").title, warm), skill.copy.no_sorry_title_unsure);
+  const own = play([pick("unsure", "own_part"), next], ctx(), unsure);
+  assert.equal(M.copyText(ctx(), step("owning").title, own), skill.copy.ack_title_unsure);
 });
 
 test("skill: the repair_outcome card reopens the run at *Did you get to say it?*, asked fresh each time", () => {
@@ -114,7 +135,9 @@ test("skill: the repair_outcome card reopens the run at *Did you get to say it?*
   assert.deepEqual(step("repaired").reopens, { after: "r_sent" });
   assert.deepEqual(step("repaired").clears, ["repaired", "between"]);
   assert.deepEqual(step("repaired").next.map((n) => n.to), ["r_later", "r_wait", "between"]);
-  assert.deepEqual(M.offersFor(ctx(), step("r_wait"), ans({ repaired: "wait" })), ["fast"]);
+  assert.deepEqual(M.offersFor(ctx(), step("r_wait"), ans({ repaired: "wait" })), ["fast_let_go"]);
+  assert.deepEqual(exitOf("fast_let_go").query, { frame: "let_go" });
+  assert.deepEqual(M.offersFor(ctx(), step("r_end"), ans({ between: "no" })), ["fast_let_go"]);
   assert.equal(exitOf("rehearse").planned, true);
 });
 
@@ -127,7 +150,11 @@ test("skill: break and return: the line says the time, the card comes at that ti
   assert.equal(card.stepId, "b_line");
   assert.equal(step("b_line").embed, "boundaryLine");
   assert.deepEqual(step("back").reopens, { after: "break", again: ["more"] });
-  assert.deepEqual(step("back").next.map((n) => n.to), ["more", "refused", "still_ok"]);
+  assert.deepEqual(step("back").next.map((n) => n.to), ["scared", "more", "refused", "no_back", "still_ok"]);
+  assert.deepEqual(M.offersFor(ctx(), step("refused"), ans({})), ["fast_let_go"]);
+  assert.equal(step("no_back").followUp, undefined, "not going back: no card after it");
+  // The break screen keeps a quiet way out for someone who isn't safe with them.
+  assert.deepEqual(M.fieldLinks(ctx(), step("break").fields[0], s).map((l) => [l.exit.id, l.label]), [["safety_open", skill.copy.not_safe_link]]);
   assert.deepEqual(step("more").followUp, { type: "break_return", whenFrom: "more" });
   assert.deepEqual(M.offersFor(ctx(), step("back_end"), ans({ still_ok: "shaky" })), ["give_repair"]);
   assert.deepEqual(M.offersFor(ctx(), step("back_end"), ans({ still_ok: "yes" })), []);
@@ -141,6 +168,16 @@ test("skill: break and return: the line says the time, the card comes at that ti
   for (const t of ["break_return", "repair_outcome"]) assert.doesNotMatch(JSON.stringify(spine.find((x) => x.id === t).copy), /fight|sorry|break/i, `${t}: the card names nothing`);
 });
 
+test("skill: every visit a card reopens has a way out for *I don't feel safe with them*: the resources, no repair, no close", () => {
+  for (const [st, field, value] of [["back", "back", "unsafe"], ["between", "between", "unsafe"], ["still_ok", "still_ok", "unsafe"]]) {
+    const o = skill.options[step(st).fields[0].options.list].find((x) => x.value === value);
+    assert.equal(o.danger, "other", st);
+    assert.equal(M.crisisFor(ctx(), step(st), ans({ [field]: value }))?.variant, "other_person", st);
+    assert.equal(step(st).next[0].to, "scared", st);
+    assert.ok(step(st).next[0].when, st);
+  }
+});
+
 test("skill: before an ask: GIVE's four rows, all optional, willing hands, then One message or the prep with the person", () => {
   const s = play([pick("situation", "before_ask"), next]);
   assert.equal(s.stepId, "gentle");
@@ -150,11 +187,14 @@ test("skill: before an ask: GIVE's four rows, all optional, willing hands, then 
   const soft = play([next], ctx(), s);
   assert.equal(soft.stepId, "soft");
   assert.equal(step("soft").props.kind, "willing");
-  assert.deepEqual(step("g_end").offers.map((o) => o.exit), ["one_message", "dear_man"]);
+  assert.deepEqual(step("g_end").offers.map((o) => o.exit), ["fast_let_go", "one_message", "dear_man"]);
+  assert.equal(step("g_card").props.steadyNoteA, "card_finish");
   assert.deepEqual(exitOf("dear_man").query, { person: "$ctx.personId" });
   // Two refused asks to be heard: GIVE for practical asks only (PRD), said on the screen.
   const lines = (c) => (step("gentle").lines ?? []).filter((l) => C.holds(l.when, M.scope(c, s))).map((l) => l.key);
   assert.deepEqual(lines(ctx({ refused: "validation" })), ["refused_line_ask"]);
+  assert.deepEqual(M.offersFor(ctx({ refused: "validation" }), step("g_end"), s), ["fast_let_go", "one_message", "dear_man"], "Let go beside the asks");
+  assert.deepEqual(M.offersFor(ctx(), step("g_end"), s), ["one_message", "dear_man"]);
   assert.deepEqual(lines(ctx()), []);
   assert.equal(M.copyText(ctx({ frame: "heads_up" }), step("gentle").title, s), skill.copy.gentle_title_heads_up);
 });

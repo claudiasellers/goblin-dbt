@@ -123,6 +123,7 @@ SIGNED_OFF = {
     "rf_social_threat_shame_words_ask-for-it_dear-man": "2026-11-12",
     "rf_reactive_aggression_words_grievance_fast": "2026-11-12",
     "rf_acute_alarm_words_demand_say-no": "2026-11-12",
+    "rf_rumination_loop_words_repair_give": "2026-11-12",
 }
 BANDS = ["steady", "stirred", "flooded"]
 
@@ -204,7 +205,8 @@ CONCEPT_TAGS["soothe"] = {"concept": "dbt_self_soothe", "side": "acceptance", "s
 # contraindicatedTools list mindfulness_of_thoughts, schema/pattern-co-occurrence.cypher).
 CONCEPT_TAGS["thoughts-passing"] = {"concept": "dbt_mindfulness_current_thoughts", "side": "acceptance", "skillKind": "hold", "direction": "neutral"}
 # Keep it warm (IE-06, appToolId 'give', docs/design/give.md) has shipped on the skill runtime: out of PLANNED, tagged,
-# and no row (12 Nov 2026). The review's two planned rows don't fit what was built and were dropped: *let down* already
+# and one word row, live (12 Nov 2026): *remorseful* on replay, beside Check the Facts (facts first, then repair). The
+# review's two planned rows don't fit what was built and were dropped: *let down* already
 # has DEAR MAN beside Recover (a GIVE row there is a second relational card the diversity rule never shows), and
 # *lonely* / *isolated* asks for reaching out to people, which the skill doesn't do (it is for one person: something
 # they brought, a repair, a break and return, an ask). Its ways in are the Tools list and intent, the debrief's *shaky*
@@ -378,6 +380,8 @@ WORD_RULES = [
      "why": "Give your mind a job (ACCEPTS) as the alternative."},
     {"key": "guilt", "pattern": "rumination_loop", "tool": "check-the-facts", "priority": 0.4, "words": ["guilty", "remorseful", "hesitant"],
      "why": "Planned: Check the Facts leads for guilt (is it justified?) and hesitation."},
+    {"key": "repair", "pattern": "rumination_loop", "tool": "give", "priority": WORD_NEXT, "words": ["remorseful"], "beside": ["check-the-facts"],
+     "why": "Keep it warm's repair (IE-06) beside Check the Facts for remorse: is the guilt justified, then repair with the person (one acknowledgement, one sorry). Its repair route asks whether some of it was yours first. Not guilty: guilt is often about the self, not someone to repair with."},
     {"key": "low-shame", "pattern": "rumination_loop", "tool": "recovering-from-invalidation", "priority": WORD_LEAD, "words": ["embarrassed", "ashamed", "victimized"],
      "why": "Low-energy shame: Recover (self-validation) first. The review's Cool Down isn't used on this side: the person marked low energy and Cool Down brings it down further."},
     {"key": "low-shame", "pattern": "rumination_loop", "tool": "soothe", "priority": 0.55, "words": ["embarrassed", "ashamed"], "beside": ["recovering-from-invalidation"],

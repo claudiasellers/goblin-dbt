@@ -151,7 +151,7 @@ test("the barriers route as the old page did; each answer gets what to say and t
   assert.deepEqual(values("go", reply("involves-person", "person-scared-reaction")), ["keep"]);
   const links = (s) => M.fieldLinks(ctx(), M.stepOf(skill, "sub_reply").fields[0], s).map((l) => l.exit.id);
   assert.deepEqual(links(reply("involves-person", "person-scared-reaction")).sort(), ["cope_ahead", "dear_man"]);
-  assert.deepEqual(links(reply("involves-person", "person-tried-they-dont-listen")), [], "give and dialectics are planned: never shown");
+  assert.deepEqual(links(reply("involves-person", "person-tried-they-dont-listen")), ["give"], "Keep it warm shipped (IE-06); dialectics is planned: never shown");
   const small = run([pick("go", "options"), next], ctx(), reply("tried-nothing-works", "tried-thinking-constantly"));
   assert.match(M.copyText(ctx(), M.stepOf(skill, "solutions").title, small), /start small/);
 });
@@ -364,7 +364,8 @@ test("the second gate pass: never *it can wait* on the danger path; hopeless wor
 test("every dead link of the old page is a planned exit until its tool ships: recorded, never offered or linked", () => {
   const planned = skill.exits.filter((x) => x.planned).map((x) => x.toolId);
   assert.ok(!planned.includes("let-it-be"), "Let it be shipped (DT-04)");
-  for (const t of ["give", "dialectics", "please-skill", "build-mastery", "willingness", "turning-the-mind", "self-validate"]) {
+  assert.ok(!planned.includes("give"), "Keep it warm shipped (IE-06)");
+  for (const t of ["dialectics", "please-skill", "build-mastery", "willingness", "turning-the-mind", "self-validate"]) {
     assert.ok(planned.includes(t), t);
   }
   const tools = readFileSync("src/data/tools.ts", "utf8");

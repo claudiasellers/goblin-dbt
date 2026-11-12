@@ -32,19 +32,25 @@ Who it's with first: `PersonFirstSkill`, the same picker and safety question as 
 ## The skill
 
 ```
-what ─┬─ brought ─► theirs ─► yours ─► b_card (pocketCard) ─► b_end
-      ├─ repair ──► fight ─┬─ hurt ─► scared (other_person, Ending careful, safety.open, no close)
-      │                    └─ no ───► guilt ─┬─ mine / partly / unsure ─► owning ─► r_msg (messageComposer) ─► r_sent
+what ─┬─ brought (angry → safe with them? scared ─► scared) ─► theirs ─► yours ─► b_card (pocketCard) ─► b_end
+      ├─ repair ──► fight ─┬─ physical / scared ─► scared (other_person, Ending careful, safety.open, no close)
+      │                    └─ no ───► guilt ─┬─ mine / partly ─► owning ─► r_msg (messageComposer) ─► r_sent
+      │                                      ├─ unsure ─► unsure ─┬─ own the part I'm sure of ─► owning
+      │                                      │                        └─ something warm ─► no_sorry
       │                                      └─ not mine ─► no_sorry ─► ns_card (boundaryLine) ─► ns_end
       ├─ heated ──► break ─► b_line (boundaryLine) ─► b_set
       └─ before_ask ─► gentle ─► soft (bodyCard willing) ─► g_card (pocketCard) ─► g_end
 
-repair_outcome card ─► repaired ─┬─ yes ─► between ─► r_end
+repair_outcome card ─► repaired ─┬─ yes ─► between ─┬─ unsafe ─► scared
+                                 │                  └─ else ─► r_end (not okay → Let go)
                                  ├─ not yet ─► r_later
-                                 └─ they weren't ready ─► r_wait (FAST)
-break_return card ─► back ─┬─ yes ─► still_ok ─► back_end (shaky → the repair)
+                                 └─ they weren't ready ─► r_wait (Let go)
+break_return card ─► back ─┬─ yes ─► still_ok ─┬─ unsafe ─► scared
+                           │                   └─ else ─► back_end (shaky → the repair)
                            ├─ not yet ─► more (another time, another card) ─► more_set
-                           └─ they didn't want to ─► refused (FAST)
+                           ├─ they didn't want to ─► refused (Let go)
+                           ├─ not going back to it for now ─► no_back (no card)
+                           └─ I don't feel safe going back ─► scared
 ```
 
 **What's going on with them?** One tap: *They brought something to me*, *We had a fight and I want to repair it*,
@@ -58,6 +64,8 @@ with *This is a lot to hold. Your side matters too, and it gets its turn.* (PRD:
 ### Someone brought something to me
 
 What they brought (a complaint about me, a request, upset about something else, angry at me) sets which lines show.
+*They're angry at me* adds *Are you safe with them right now?* on the same screen (required): *I'm scared of how
+angry they are* goes to `scared`.
 **Their side first**: one validation line for how they feel (Validate; own words allowed), one question (Interested). One
 line, never a stack (the PRD's parentification risk). The hint: *Their feeling can make sense even when you see the
 facts differently* (validate the feeling, not the point). **Then yours**: *You can hear them and still disagree* (FAST),
@@ -68,16 +76,20 @@ when you see it differently, FAST.
 
 ### Repair after a fight
 
-**Safety first**: *Did anyone get hurt, or are you scared of them now?* A yes (`danger: other`) shows the other-person
+**Safety first**: *Did it get physical, or are you scared of them now?* (not *hurt*, which after a fight reads as hurt
+feelings and would route an ordinary repair to the danger screen). *It got physical* or *I'm scared of them*
+(`danger: other`) shows the other-person
 resources, goes to an end card with Ending (`frame=careful`) and `safety.open`, writes no repair and asks no close; the
 projection makes the person's safety answer stale (`safetyRecheckAt`), so their next visit asks the safety question
 again. A fight can have been more than a fight.
 
 **The guilt check** (PRD: ER's, via Check the Facts' inline mini-card once ER-B5 ships; asked plainly until then):
-*Looking back, was some of it yours?* Yes, some of it, not really, not sure (*Check the facts first* as a link).
+*Looking back, was some of it yours?* Yes, some of it, not really, not sure. Not sure is a choice, never a forced
+sorry: *Own the part I'm sure of* or *Say something warm, without a sorry*, with *Check the facts first* as a link.
 
 - Yours or partly: **one acknowledgement, for what you did. One sorry is enough** (FAST: one apology, no grovelling),
-  an optional line for how it was for them, an optional question about what would help. The message card (no
+  an optional line for how it was for them, an optional line for what you'll do differently (Linehan's repair:
+acknowledge, repair, commit), an optional question about what would help. The message card (no
   *Take the sorry out* here: the sorry is the point; a long explanation gets *Keep it to what you did*). Then *Want me
   to ask how it went?* (`repair_outcome`).
 - Not yours: **You don't owe an apology for having a need, or for a fair no.** Something warm without a sorry, on the
@@ -85,11 +97,14 @@ again. A fight can have been more than a fight.
 
 ### Break and return
 
-*Say when you'll come back. The return time is what makes a break feel safe to them.* (Unannounced breaks read as
+*Say when you'll come back. A return time helps a break feel less like leaving.* (Unannounced breaks read as
 abandonment, PRD KB §4.6.) How long (half an hour, an hour, till tomorrow), then a line that says that time, copied from
 the boundary card. The `break_return` card comes at that time and reopens the run at *Did you go back?*: yes → *How are
 things between you now?* (shaky or not okay → the repair, with the person); not yet → another time and another card;
-they didn't want to → *You came back. That part was yours, and you did it.* and FAST. The PRD's 20 minutes is half an
+they didn't want to → *You came back. That part was yours, and you did it.* and FAST's Let go; *I'm not going back to
+it for now* → an end with no card. Every one of these visits, and the break screen itself (a quiet link), has a way
+out for someone who isn't safe with them: *I don't feel safe going back* / *with them* → `scared`, the safety answer
+made stale, nothing logged. The pocket card's break line says when: *I need half an hour. I'm coming back to this.* The PRD's 20 minutes is half an
 hour here: the server's window list has 30 and 60 (`m30`, `m60`), and 20 minutes is the low end of what the break
 needs anyway.
 
@@ -112,7 +127,10 @@ person.
 
 ## Routing
 
-Tagged (`change`, `relational`, `neutral`), no row. The Oct 2026 review planned two, and neither fits what was built:
+Tagged (`change`, `relational`, `neutral`), with one word row, live: *remorseful* (On replay) gets the repair beside
+Check the Facts (`rf_rumination_loop_words_repair_give`): is the guilt justified, then repair with the person. Not
+*guilty*, which is often about the self with nobody to repair with. The Oct 2026 review planned two other rows, and
+neither fits what was built:
 *let down* already shows DEAR MAN beside Recover (a GIVE row there is a second relational card the diversity rule never
 shows), and *lonely* / *isolated* asks for reaching out to people, which this skill doesn't do: it is for one person you
 already have something going on with. Both rows were dropped from `scripts/recommendations/content.py`.
@@ -122,7 +140,8 @@ already have something going on with. Both rows were dropped from `scripts/recom
 - `ToolSession.ext.run`: option ids, own words encrypted at close. Close kind `none`.
 - `Interaction` (log, `WITH` the person, ids only): `kind: 'repair'` once a `repair_outcome` visit answers *Did you
   get to say it?*; `kind: 'break_return'` once a `break_return` visit answers *Did you go back?*; with `outcome`,
-  `between` and (repair) `guilt`. Never for someone on the safety route.
+  `between` and (repair) `guilt`. Never for someone on the safety route, and nothing for a visit that said it isn't
+  safe with them (that person's `safetyRecheckAt` is set instead).
 - The rep: `followup_offphone` when either afterwards is *Yes*, none otherwise (`OFF_PHONE_SKILLS.give`).
 - Follow-ups: `break_return` (chips `m30`, `m60`, `tomorrow`; copy *Time to go back?*) and `repair_outcome` (*How did
   it go?*). Both session-bound (only a Keep it warm visit books them), opened is resolved, and the copy names no one.

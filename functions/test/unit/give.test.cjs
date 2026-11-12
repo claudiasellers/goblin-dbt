@@ -46,7 +46,13 @@ test('fields: option ids only; the kind comes from which afterwards was answered
   const own = G.giveFields(run([ans('repaired', 'yes'), { fieldId: 'ack', optionIds: [], valueOwn: 'I was cruel about her mum' }]));
   assert.equal(JSON.stringify(own).includes('mum'), false, 'own words never reach the Interaction');
   assert.equal(G.giveFields(run([ans('situation', 'brought')])).kind, null);
-  assert.equal(G.giveFields(run([ans('fight', 'hurt')])).hurt, true);
+  for (const v of ['physical', 'scared']) assert.equal(G.giveFields(run([ans('fight', v)])).hurt, true, v);
+  assert.equal(G.giveFields(run([ans('fight', 'no')])).hurt, false);
+  assert.equal(G.giveFields(run([ans('brought', 'angry'), ans('angry_ok', 'scared')])).hurt, true);
+  for (const r of [[ans('back', 'unsafe')], [ans('back', 'yes'), ans('still_ok', 'unsafe')], [ans('repaired', 'yes'), ans('between', 'unsafe')]]) {
+    const f = G.giveFields(run(r));
+    assert.deepEqual([f.hurt, f.kind, f.outcome], [true, null, null], 'not safe with them: nothing logged');
+  }
 });
 
 test('a first visit writes nothing (no afterwards yet, nobody hurt)', async () => {
@@ -57,7 +63,7 @@ test('a first visit writes nothing (no afterwards yet, nobody hurt)', async () =
 
 test('hurt, or scared of them: the person\'s safety answer goes stale, and nothing is logged', async () => {
   const tx = fakeTx();
-  await G.projectGive(tx, input(run([ans('situation', 'repair'), ans('fight', 'hurt')], { personId: PERSON })));
+  await G.projectGive(tx, input(run([ans('situation', 'repair'), ans('fight', 'scared')], { personId: PERSON })));
   const re = tx.calls.filter((c) => c.query === D.SAFETY_RECHECK);
   assert.equal(re.length, 1);
   assert.equal(re[0].params.personKey, `u1:${PERSON}`);
@@ -88,6 +94,16 @@ test('a reopened visit that carries its person reads no source run; the safety r
   const broken = fakeTx((q) => (q === G.SOURCE_RUN_QUERY ? [{ ext: '{not json' }] : undefined));
   await G.projectGive(broken, input(run([ans('back', 'not_yet')])));
   assert.equal(writes(broken)[0].params.personKey, null);
+});
+
+test('a card\'s visit that says it isn\'t safe: the first visit\'s person goes stale, and nothing is logged', async () => {
+  const src = JSON.stringify({ run: run([ans('situation', 'heated')], { personId: PERSON }) });
+  const tx = fakeTx((q) => (q === G.SOURCE_RUN_QUERY ? [{ ext: src }] : undefined));
+  await G.projectGive(tx, input(run([ans('back', 'unsafe')])));
+  const re = tx.calls.filter((c) => c.query === D.SAFETY_RECHECK);
+  assert.equal(re.length, 1);
+  assert.equal(re[0].params.personKey, `u1:${PERSON}`);
+  assert.equal(writes(tx).length, 0);
 });
 
 test('another skill is left alone; registered under give; no close question', async () => {
