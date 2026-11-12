@@ -33,6 +33,7 @@ export const TOOL_CLOSE_KIND: Record<string, { module: SpineModule; closeKind: C
   'values-clarification': { module: 'er', closeKind: 'none' },
   'build-mastery': { module: 'er', closeKind: 'none' },
   'finding-connection': { module: 'ie', closeKind: 'none' },
+  'emotion-guide': { module: 'er', closeKind: 'none' },
   'opposite-action': { module: 'er', closeKind: 'regulation_down' },
   'dear-man': { module: 'ie', closeKind: 'none' },
   'fast': { module: 'ie', closeKind: 'regulation_down' },

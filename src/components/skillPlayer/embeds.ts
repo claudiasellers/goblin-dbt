@@ -21,6 +21,7 @@ import { PocketCard } from './PocketCard';
 import { BatteryRead } from './BatteryRead';
 import { KitDeck } from './KitDeck';
 import { InlineSkillEmbed } from './InlineSkillEmbed';
+import { FeelingCard } from './FeelingCard';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -88,6 +89,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   oaSteps: OaStepsEmbed,
   pocketCard: PocketCard,
   batteryRead: BatteryRead,
+  feelingCard: FeelingCard,
   kitDeck: KitDeck,
   inlineSkill: InlineSkillEmbed,
 };
@@ -124,6 +126,8 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   oaSteps: {},
   pocketCard: { ids: ['seen_all', 'copied'] },
   batteryRead: { ids: ['read'] },
+  // ER-10's feeling card: read, then on.
+  feelingCard: { ids: ['read'] },
   kitDeck: { ids: ['body', 'hands', 'soothe', 'words', 'place', 'reasons', 'pros_cons', 'starter'], measures: ['durationSec', 'doneCount'] },
   inlineSkill: { ids: ['finished', 'left', 'stopped', 'body', 'unsafe'] },
 };
@@ -404,6 +408,16 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     /** The cells' names, split on " · ", in the order of `fields`. */
     names: { type: 'copy' },
     line: { type: 'copy', optional: true },
+    next: { type: 'copy' },
+  },
+  // ER-10: the guide's feelingOf row (a `row` prop from a ref), and the card's words.
+  feelingCard: {
+    guide: { type: 'row', table: 'feelingOf' },
+    /** Above the card: which family the word is in (`{family}`, the guide's label in lower case). */
+    familyLine: { type: 'copy' },
+    forLabel: { type: 'copy' }, promptsLabel: { type: 'copy' }, bodyLabel: { type: 'copy' }, urgesLabel: { type: 'copy' },
+    /** Under the urges: a pull isn't something to do. */
+    urgeNote: { type: 'copy' },
     next: { type: 'copy' },
   },
   // R8: another skill run inline; `skill` names it (it must declare `inline`), `enterAt` one of its `inline.enterAt`.

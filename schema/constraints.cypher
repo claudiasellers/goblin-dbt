@@ -193,6 +193,9 @@ CREATE CONSTRAINT hard_moment_id IF NOT EXISTS FOR (n:HardMoment) REQUIRE n.id I
 CREATE CONSTRAINT cope_move_id IF NOT EXISTS FOR (n:CopeMove) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT rehearsal_beat_id IF NOT EXISTS FOR (n:RehearsalBeat) REQUIRE n.id IS UNIQUE;
 
+// --- Know this feeling (ER-10, docs/design/emotion-guide.md, schema/emotion-guide.cypher) ---
+CREATE CONSTRAINT feeling_guide_id IF NOT EXISTS FOR (n:FeelingGuide) REQUIRE n.id IS UNIQUE;
+
 // --- The skill runtime (docs/design/skill-runtime.md, schema/skills.cypher) ---
 CREATE CONSTRAINT skill_id IF NOT EXISTS FOR (n:Skill) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT skill_step_id IF NOT EXISTS FOR (n:SkillStep) REQUIRE n.id IS UNIQUE;

@@ -27,6 +27,7 @@ export const PLAYER_TOOLS: Readonly<Record<string, string>> = {
   'values-clarification': 'values',
   'build-mastery': 'build_mastery',
   'finding-connection': 'finding_connection',
+  'emotion-guide': 'emotion_guide',
 };
 
 /**

@@ -170,7 +170,8 @@ EXITS = [
     {"id": "let_it_be", "toolId": "let-it-be"},             # DT-04 willingness (DT-B4)
     {"id": "mindfulness_emotions", "toolId": "mindfulness-emotions", "planned": True},  # ER-08 the wave (ER-B5)
     {"id": "five_senses", "toolId": "five-senses"},                          # orienting (DT-01's orient entry)
-    {"id": "emotion_guide", "toolId": "emotion-guide", "planned": True},     # ER-10 myth cards (ER-B5)
+    # ER-10 myth cards (part 4): Know this feeling is built, its myths frame isn't yet, so this waits on the frame.
+    {"id": "emotion_guide", "toolId": "emotion-guide", "planned": True, "query": {"frame": "myths"}},
     {"id": "missing_links", "toolId": "missing-links", "planned": True},     # CORE-11 (outside the lanes)
     {"id": "safety_open", "safety": True},                                   # safety.open (R6)
     {"id": "done", "done": True},

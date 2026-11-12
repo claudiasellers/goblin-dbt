@@ -8,8 +8,9 @@
  * Ids only: the person's own urge or step stays in `ext.run` (encrypted at close), never copied. Nothing is trusted from
  * the client beyond the ids: each pick must be a word that works on Opposite Action (`HAS_REGULATION_CONTENT`,
  * `oppositeActionApplicable`), its urge one of its parent's, and its route the graph's `opposite` (safe, and not the
- * repair rule), or the clarify route where Check the Facts, run inline (ER-B5), found it doesn't fit and nothing unsafe
- * was told (`checked`: the skill's own jump to the cue; recorded as `factsChecked`). A pick that fails is skipped, never
+ * repair rule). For *I still do not know*, Check the Facts run inline (ER-B5) gives the verdict that stands in for the fit
+ * (fits → fits, partly → excessive, doesn't fit → not fit) when it finished with nothing unsafe told (`checked`, recorded
+ * as `factsChecked`). A pick that fails is skipped, never
  * fatal: the close still saves.
  *
  * A reopened visit (the `oa_try` card: *Did you get to try it?*) doesn't write new records: it moves the first visit's
@@ -35,8 +36,8 @@ export interface OaPick {
   actionSize: 'small' | 'medium' | 'bigger' | 'custom';
   facts: string;
   effectiveness: string;
-  /** Check the Facts inline (ER-B5): `doesnt_fit` when its verdict sent this feeling to the cue, else null. */
-  checked: 'doesnt_fit' | null;
+  /** Check the Facts inline (ER-B5): its verdict when the check finished with nothing unsafe told, else null. */
+  checked: CheckVerdict | null;
   thenVsNowBody: string | null;
 }
 
@@ -74,9 +75,11 @@ export function oaFromRun(run: Record<string, unknown>): OaRun {
     const facts = one('fits', emotionId);
     const effectiveness = one('help', emotionId);
     if (!actionSize || !urgeId || !facts || !effectiveness) return;
-    // The inline check's outcome ids: its verdict sent the feeling to the cue only when nothing unsafe came with it.
+    // The inline check's outcome ids: a verdict counts only when the check finished (not left early, as the skill's
+    // `ctf` sends `left` to the clarify card) and nothing unsafe came with it.
     const chk = get('checked', emotionId)?.ids ?? [];
-    const checked = chk.includes('doesnt_fit') && !chk.includes('unsafe') && !chk.includes('stopped') ? 'doesnt_fit' : null;
+    const verdict = (Object.keys(CHECK_FACTS) as CheckVerdict[]).find((v) => chk.includes(v)) ?? null;
+    const checked = facts === 'unsure' && verdict && !chk.some((x) => x === 'unsafe' || x === 'stopped' || x === 'left') ? verdict : null;
     picks.push({ index, emotionId, urgeId, actionSize, facts, effectiveness, checked, thenVsNowBody: one('tvnb', emotionId) });
   });
   const goal = one('goal');
@@ -94,6 +97,10 @@ export function oaFromRun(run: Record<string, unknown>): OaRun {
     tried: path.includes('back') ? one('tried') : null,
   };
 }
+
+/** The inline check's verdict as *does it fit?* in the route table (the skill's `VERDICT`, opposite_action.py). */
+export const CHECK_FACTS = { fits: 'fits', partly: 'excessive', doesnt_fit: 'not_fit' } as const;
+export type CheckVerdict = keyof typeof CHECK_FACTS;
 
 /** The repair rule (H11; the skill's `repr` jump, ahead of the route table): guilt or shame that fits, goal repair. */
 export const repairRule = (parentId: string, facts: string, goal: string | null) =>
@@ -169,9 +176,10 @@ export async function projectOppositeAction(tx: ManagedTransaction, { uid, toolS
     if (p.urgeId !== 'custom' && !rec.get('urgeId')) continue;
     let flow: { routes?: Record<string, string> } = {};
     try { flow = JSON.parse(rec.get('flow') as string) as typeof flow; } catch { continue; }
-    const route = flow.routes?.[`${p.facts}:${p.effectiveness}`];
-    // The table's opposite, or its clarify where the inline check found it doesn't fit (the skill's `ctf` → `cue`).
-    if (!(route === 'opposite' || (route === 'clarify' && p.checked === 'doesnt_fit')) || repairRule(parentId, p.facts, oa.goal)) continue;
+    // An inline check's verdict stands in for *does it fit?* (the skill's `ctf` reads the same table on it).
+    const facts = p.checked ? CHECK_FACTS[p.checked] : p.facts;
+    const route = flow.routes?.[`${facts}:${p.effectiveness}`];
+    if (route !== 'opposite' || repairRule(parentId, facts, oa.goal)) continue;
     const id = `${toolSessionId}-${p.index + 1}`;
     const data = {
       schemaVersion: 3, id, status: oa.status, emotionId: p.emotionId, parentId, urgeId: p.urgeId,
