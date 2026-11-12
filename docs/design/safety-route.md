@@ -1,8 +1,15 @@
 # The safety route (CORE-01) and safety plan (CORE-02)
 
 **Status:** PR 1 built 12 Nov 2026 (content, the server side and the record). PR 2 (12 Nov 2026) adds the screens and
-**switches the route on** (`SafetyPolicy {id: 'safety_route'}.enabled`, PR 4 folded in: build and connect, a clinician
-tweaks after). PR 3, the safety plan, is next. Source of truth for the PRD:
+**switches the route on** (`SafetyPolicy {id: 'safety_route'}.routeOn`, PR 4 folded in: build and connect, a clinician
+tweaks after).
+
+**No crisis gap at any deploy step.** The switch is a new field, `routeOn`, read only by PR 2's functions; `enabled`
+(what older functions read) stays `false`, so between the graph load and the functions deploy the old banner still
+fires. And the route only applies when the client says it can show it: the check-in sends `safetyRoute: true` to
+`getStateAndTools`, and without it the server leaves the caller's uid out of `graphDeps`, so `safetyRoute()` returns
+null and the old crisis flag decides. An old client on new functions keeps the banner; nobody gets neither the
+question nor the banner. PR 3, the safety plan, is next. Source of truth for the PRD:
 *PRD Structure & Behavioural Analysis* §CORE-01 / §CORE-02 and the architecture map's safety sections (Arch §4.1, §6.2).
 
 ## Why

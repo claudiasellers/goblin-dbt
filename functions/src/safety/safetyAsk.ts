@@ -74,7 +74,7 @@ export function safetyAskFor(i: SafetyAskInput): SafetyAsk {
 
 export const SAFETY_POLICY_QUERY = `
   OPTIONAL MATCH (p:SafetyPolicy {id: 'safety_route'})
-  RETURN coalesce(p.enabled, false) AS enabled
+  RETURN coalesce(p.routeOn, false) AS enabled
 `;
 
 /** The graph side: does a pattern ask, does a word screen. */

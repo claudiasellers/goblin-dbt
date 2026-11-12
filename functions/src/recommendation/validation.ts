@@ -52,5 +52,6 @@ export function parseStateRequest(raw: unknown): CheckInInput {
     if (!(SURFACES as readonly unknown[]).includes(raw.surface)) throw new ValidationError('Unknown surface');
     out.surface = raw.surface as CheckInInput['surface'];
   }
+  if (raw.safetyRoute === true) out.safetyRoute = true;
   return out;
 }

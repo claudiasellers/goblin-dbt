@@ -308,6 +308,8 @@ export function CheckIn() {
         ...(cap ? { band: cap.value, bandViaCantTell: cap.viaCantTell, bandSource: routingBandSource(cap) } : {}),
         ...(ftfBlank.current ? { blank: true } : {}),
         surface: 'checkin',
+        // This build shows the safety route; an older one gets the old crisis banner whatever the switch says.
+        safetyRoute: true,
       });
       
       if (shouldAsk(result, askedThisSession())) {

@@ -137,3 +137,14 @@ test("the check-in stores the visit's id, kept once set", () => {
   assert.match(read("functions/src/checkin/index.ts"), /c\.safetyCheckId = coalesce\(\$safetyCheckId, c\.safetyCheckId\)/);
   assert.match(read("src/lib/spine/checkInPayload.ts"), /if \(s\.safetyCheckId\) req\.safetyCheckId = s\.safetyCheckId;/);
 });
+
+test("only a client that can show the route gets it; any other keeps the old crisis flag (no gap mid-deploy)", async () => {
+  const { parseStateRequest } = await importTs("functions/src/recommendation/validation.ts");
+  assert.equal(parseStateRequest({ quadrant: "high-unpleasant" }).safetyRoute, undefined);
+  assert.equal(parseStateRequest({ quadrant: "high-unpleasant", safetyRoute: "yes" }).safetyRoute, undefined);
+  assert.equal(parseStateRequest({ quadrant: "high-unpleasant", safetyRoute: true }).safetyRoute, true);
+  // Without the caller's uid the route stays off (queries.ts), so the old flag decides.
+  assert.match(read("functions/src/recommendation/index.ts"), /graphDeps\(tx, input\.safetyRoute \? \(uid as string\) : undefined\)/);
+  assert.match(read("functions/src/recommendation/queries.ts"), /if \(!uid \|\| !\(await safetyPolicyEnabled\(tx\)\)\) return null;/);
+  assert.match(read("src/pages/CheckIn.tsx"), /safetyRoute: true,/);
+});

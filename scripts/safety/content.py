@@ -293,7 +293,10 @@ VERIFIED = {}
 LINE_KINDS = ["crisis", "text", "chat", "poison", "urgent", "youth", "lgbtq", "warmline"]
 
 # ---- The switch ---------------------------------------------------------------------------------------
-# On since CORE-01 PR 2 (the screens). build.py refuses `enabled: True` while REVIEW_STATUS is "draft"
-# unless APPROVED_TO_SHIP names the reason. Switching it off restores the old crisis banner whole.
-POLICY = {"id": "safety_route", "enabled": True, "version": VERSION}
+# The switch is `routeOn` (since CORE-01 PR 2). `enabled` is the field servers before PR 2 read: it stays False
+# for good, so a graph load that lands before the new functions never drops the old banner anywhere. Even with
+# `routeOn`, the route applies only to clients that say they can show it (`safetyRoute: true`); any other client
+# keeps the old crisis banner. build.py refuses `routeOn: True` while REVIEW_STATUS is "draft" unless
+# APPROVED_TO_SHIP names the reason. Switching `routeOn` off restores the old crisis banner whole.
+POLICY = {"id": "safety_route", "enabled": False, "routeOn": True, "version": VERSION}
 APPROVED_TO_SHIP = "Claudia, 12 Nov 2026: build and connect everything; a clinician reviews the copy after"
