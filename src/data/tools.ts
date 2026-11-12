@@ -404,6 +404,18 @@ export const tools: Tool[] = [
     bare: true,
   },
   {
+    // IE-02 on the skill runtime (docs/design/rehearse.md): practise a hard conversation, after the person picker.
+    id: 'rehearse',
+    name: 'Rehearse it',
+    tagline: 'Practise a hard conversation, with them pushing back as much as you choose',
+    description: 'Pick who it\'s with and what you\'ll say. Then practise it on a little stage: they reply the easy way, the realistic way or the hardest likely way, and you pick your move. Stopping always counts.',
+    whenToUse: 'When you know what you want to say and you\'re scared you\'ll freeze or cave when they push back.',
+    module: 'interpersonal-effectiveness',
+    dbtBasis: 'DBT IE Handouts 5, 6 and 8 (behavioural rehearsal)',
+    emoji: '🎭',
+    bare: true,
+  },
+  {
     // On the skill runtime (docs/design/ending-relationships.md). Safety first: nothing is saved before the
     // safety answer, and nothing at all in the safety branch unless the person saves it.
     id: 'ending-relationships',
@@ -499,6 +511,7 @@ export const allIntents: Intent[] = [
   { id: 'give', label: 'Repair things after a fight, or keep it warm', toolId: 'give', emoji: '🤝' },
   { id: 'less-alone', label: 'Feel less alone', toolId: 'finding-connection', emoji: '🌱' },
   { id: 'look-again', label: 'I was sure they meant it', toolId: 'mindfulness-of-others', emoji: '🌤️' },
+  { id: 'practise-conversation', label: 'Practise a hard conversation', toolId: 'rehearse', emoji: '🎭' },
   { id: 'overreacting', label: 'I can\'t tell if I\'m overreacting', toolId: 'check-the-facts', emoji: '🔍' },
   { id: 'not-working', label: 'My skills aren\'t working', toolId: 'er-troubleshoot', emoji: '🧩' },
   { id: 'running-low', label: 'Everything feels like too much today', toolId: 'please-skill', emoji: '🔋' },

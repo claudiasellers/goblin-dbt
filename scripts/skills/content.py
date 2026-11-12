@@ -33,6 +33,7 @@ import values  # noqa: E402
 import build_mastery  # noqa: E402
 import finding_connection  # noqa: E402
 import notice_them  # noqa: E402
+import rehearse  # noqa: E402
 import crisis_kit  # noqa: E402
 import emotion_guide  # noqa: E402
 import emotion_myths  # noqa: E402
@@ -43,7 +44,7 @@ SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKIL
           ending_relationships.SKILL, cope_ahead.SKILL, hold_to_wait.SKILL, dear_man_debrief.SKILL, pros_cons.SKILL, first_body.SKILL,
           ride_it_out.SKILL, let_it_be.SKILL, mind_job.SKILL, say_no.SKILL, dear_man_one.SKILL, held.SKILL, thoughts_passing.SKILL, dear_man_prep.SKILL,
           opposite_action.SKILL, habit_plan.SKILL, please_skill.SKILL, give.SKILL, good_things.SKILL, *crisis_kit.SKILLS, values.SKILL, build_mastery.SKILL,
-          finding_connection.SKILL, notice_them.SKILL, emotion_guide.SKILL, emotion_myths.SKILL]
+          finding_connection.SKILL, notice_them.SKILL, rehearse.SKILL, emotion_guide.SKILL, emotion_myths.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -105,6 +106,10 @@ EMBEDS = {
     # IE-10's two columns (plan C3b, the Wound PRD's primitive; IE-owned): what they did and what I added, side by side
     # on the paper, with an optional maybe line; read once, no input.
     "twoColumns": {"ids": ["read"]},
+    # IE-02's stage (plan C3b `rehearsalStage`, IE-owned): two figures, the script's replies, your moves, Stop. Reports
+    # the moves used, whether a line was said out loud, how it ended, and how many exchanges.
+    "rehearsalStage": {"ids": ["again", "acknowledge", "name", "middle", "turn", "break", "done", "aloud",
+                               "finished", "stopped", "lost_it", "stepped_out"], "measures": ["doneCount"]},
     # DT-03's deck (plan C3b `cardDeck`, DT-owned): the kit one card at a time; reports which kinds of card it showed.
     "kitDeck": {"ids": ["body", "hands", "soothe", "words", "place", "reasons", "pros_cons", "starter"], "measures": ["durationSec", "doneCount"]},
     # R8: another skill run inline (runtime-owned); its `inline.ends` / `flags` give these ids.
@@ -209,6 +214,24 @@ EMBED_PROPS = {
         "foot": {"type": "field", "optional": True},
         "footLabel": {"type": "copy", "optional": True},
         "next": {"type": "copy"},
+    },
+    "rehearsalStage": {
+        "fromSkill": {"type": "id"},
+        "kind": {"type": "field"},
+        "tier": {"type": "field"},
+        "line": {"type": "field"},
+        "aloud": {"type": "copy"},
+        "inHead": {"type": "copy"},
+        "yourMove": {"type": "copy"},
+        "stop": {"type": "copy"},
+        "you": {"type": "copy"},
+        "them": {"type": "copy"},
+        "endLine": {"type": "copy"},
+        "next": {"type": "copy"},
+        "poseCloser": {"type": "copy", "optional": True},
+        "poseArms": {"type": "copy", "optional": True},
+        "poseTurnAway": {"type": "copy", "optional": True},
+        "poseStill": {"type": "copy", "optional": True},
     },
     "boundaryLine": {
         "field": {"type": "field"},

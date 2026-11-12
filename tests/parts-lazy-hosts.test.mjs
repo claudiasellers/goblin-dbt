@@ -63,11 +63,11 @@ test("each one comes through lazy(), in its own Suspense", () => {
   assert.match(read("src/components/spine/SessionClose.tsx"), /import \{ PartTagSlot \} from '\.\/PartTagSlot';/);
 });
 
-test("Meet a part, Two pulls, Wise mind, Cope Ahead, Check the Facts, Rebel without the wreckage, It isn't working, Keep your self-respect, Say no, Keep it warm, Notice them and Know this feeling are the lazy tools; the parts gates stay eager and fetch the content on demand", () => {
+test("Meet a part, Two pulls, Wise mind, Cope Ahead, Check the Facts, Rebel without the wreckage, It isn't working, Keep your self-respect, Say no, Keep it warm, Notice them, Rehearse it and Know this feeling are the lazy tools; the parts gates stay eager and fetch the content on demand", () => {
   const page = read("src/pages/ToolPage.tsx");
   const tools = importsOf(page).filter((s) => s.startsWith("./tools/")).map((s) => s.slice("./tools/".length)).sort();
   assert.deepEqual(tools, ["CoolDown", "DearMan", "FindTheFeeling", "FiveSenses", "InvalidationRecovery", "OppositeAction", "Pause", "ProblemSolve", "UrgeSurfing"]);
-  assert.equal((page.match(/\blazy\(/g) ?? []).length, 11, "eleven lazy tools");
+  assert.equal((page.match(/\blazy\(/g) ?? []).length, 12, "twelve lazy tools");
   // Check the Facts (not a parts surface): played by the skill player (playerTools.ts), its own chunk, for everyone.
   assert.match(page, /const LazySkillPlayer = lazy\(\(\) => import\('\.\.\/components\/skillPlayer\/SkillPlayer'\)/);
   assert.match(read("src/lib/skillRuntime/playerTools.ts"), /'check-the-facts': 'check_the_facts',/);
@@ -85,6 +85,9 @@ test("Meet a part, Two pulls, Wise mind, Cope Ahead, Check the Facts, Rebel with
   // Notice them (IE-10, not a parts surface): its own chunk, who it's about first, then the skill.
   assert.match(page, /const LazyNoticeThem = lazy\(\(\) => import\('\.\/tools\/NoticeThem'\)/);
   assert.match(page, /'mindfulness-of-others': NoticeThem,/);
+  // Rehearse it (IE-02, not a parts surface): its own chunk, who it's with first, then the skill.
+  assert.match(page, /const LazyRehearse = lazy\(\(\) => import\('\.\/tools\/Rehearse'\)/);
+  assert.match(page, /'rehearse': Rehearse,/);
   // My crisis kit (DT-03, not a parts surface): its own chunk, which picks open it or make it.
   assert.match(page, /const LazyCrisisKit = lazy\(\(\) => import\('\.\/tools\/CrisisKit'\)/);
   assert.match(page, /'crisis-kit': CrisisKit,/);

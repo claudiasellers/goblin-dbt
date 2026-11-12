@@ -62,7 +62,9 @@ function SayNo() { return <Suspense fallback={<ToolLoading />}><LazySayNo /></Su
 const LazyGive = lazy(() => import('./tools/Give').then((m) => ({ default: m.Give })));
 function Give() { return <Suspense fallback={<ToolLoading />}><LazyGive /></Suspense>; }
 const LazyNoticeThem = lazy(() => import('./tools/NoticeThem').then((m) => ({ default: m.NoticeThem })));
+const LazyRehearse = lazy(() => import('./tools/Rehearse').then((m) => ({ default: m.Rehearse })));
 function NoticeThem() { return <Suspense fallback={<ToolLoading />}><LazyNoticeThem /></Suspense>; }
+function Rehearse() { return <Suspense fallback={<ToolLoading />}><LazyRehearse /></Suspense>; }
 // My crisis kit (DT-03): open it or make it, two skills under one tool id (docs/design/crisis-kit.md).
 const LazyCrisisKit = lazy(() => import('./tools/CrisisKit').then((m) => ({ default: m.CrisisKit })));
 function CrisisKit() { return <Suspense fallback={<ToolLoading />}><LazyCrisisKit /></Suspense>; }
@@ -84,6 +86,7 @@ const toolComponents: Record<string, React.ComponentType> = {
   'say-no': SayNo,
   'give': Give,
   'mindfulness-of-others': NoticeThem,
+  'rehearse': Rehearse,
   'crisis-kit': CrisisKit,
   'emotion-guide': EmotionGuide,
   'recovering-from-invalidation': InvalidationRecovery,

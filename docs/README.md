@@ -94,7 +94,7 @@ Waves follow the index: 1 safety floor and platform, 2 validation and the transf
 | 24 | ER-04 | Good things + "things I like" | partial | Tiny-win activity on low-energy results only |
 | 25 | WMP-05 | Small steps, real rewards (ladder) | spec only | |
 | 26 | DT-05 | Ride it out (urge surfing rebuilt) | partial | Old Urge Surfing ships (copy fixed in M0); rebuild not done |
-| 27 | IE-02 | Rehearse it (Stage) | partial | First-person rehearsal inside Cope Ahead; DEAR MAN's *Rehearse it* links there. No Stage runtime |
+| 27 | IE-02 | Rehearse it (Stage) | built (part 1) | Practise a hard conversation on a 2D stage: scripted replies, DEAR MAN / GIVE / FAST moves, Stop always counts ([design/rehearse.md](design/rehearse.md)). The Stage room waits on Recover v2 |
 | 28 | CORE-06 | Day 0: orientation, commitment, goals | spec only | |
 | 29 | ER-07 | PLEASE check | spec only | Built as *Running low* on PR #33, closed unmerged 2 Oct (§6) |
 | 30 | DT-04 | Let it be (radical acceptance family) | spec only | Problem Solve and routing rows already point at it |

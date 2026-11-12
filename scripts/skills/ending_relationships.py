@@ -309,7 +309,7 @@ STEPS = [
         # PRD step 5: rehearse it (IE-02, planned), then cope ahead for their likely reaction.
         "id": "ahead", "kind": "handoff", "complete": True,
         "lines": [{"when": None, "key": "ahead_line"}],
-        "offers": [{"exit": "cope_ahead", "when": None}, {"exit": "rehearse", "when": None}],
+        "offers": [{"exit": "cope_ahead", "when": None}, {"exit": "rehearse", "when": {"not": IS("what", "harms")}}],
         "done": "done",
     },
     {
@@ -367,7 +367,7 @@ EXITS = [
     {"id": "give", "toolId": "give"},  # IE-06 Keep it warm (built 12 Nov)
     {"id": "problem_solve", "toolId": "problem-solve"},
     {"id": "cope_ahead", "toolId": "cope-ahead", "query": {"situationId": "conversation"}},
-    {"id": "rehearse", "toolId": "rehearse", "planned": True},
+    {"id": "rehearse", "toolId": "rehearse", "query": {"situationId": "boundary"}},           # IE-02, safe path only
     {"id": "opposite_action", "toolId": "opposite-action"},
     {"id": "finding_connection", "toolId": "finding-connection", "query": {"frame": "elsewhere"}},  # IE-09 Find your people (built 12 Nov): other people, not this one
     {"id": "let_it_be", "toolId": "let-it-be"},

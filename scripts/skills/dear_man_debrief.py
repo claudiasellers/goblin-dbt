@@ -384,7 +384,7 @@ STEPS = [
         "id": "fix", "kind": "handoff", "complete": True,
         "lines": [{"when": is_("factor", f), "key": f"fix_{f}"} for f in FACTOR_FIX],
         "offers": [
-            {"exit": "rehearse", "when": is_("factor", "no_words")},
+            {"exit": "rehearse", "when": {"all": [is_("factor", "no_words"), {"not": has("moment", "tp_escalated")}]}},
             {"exit": "cope_ahead", "when": {"in": [a("factor"), ["no_words", "feelings"]]}},
             {"exit": "check_the_facts", "when": is_("factor", "belief")},
             {"exit": "thoughts", "when": is_("factor", "belief")},                # DT-08: the worry as a thought
@@ -407,7 +407,7 @@ EXITS = [
     {"id": "thoughts", "toolId": "thoughts-passing"},                     # DT-08 Thoughts passing through
     {"id": "dear_man", "toolId": "dear-man"},
     {"id": "cope_ahead", "toolId": "cope-ahead", "query": {"situationId": "conversation"}},
-    {"id": "rehearse", "toolId": "rehearse", "planned": True},
+    {"id": "rehearse", "toolId": "rehearse", "query": {"situationId": "ask", "person": "$ctx.personId"}},  # IE-02
     {"id": "check_the_facts", "toolId": "check-the-facts"},
     {"id": "fast", "toolId": "fast"},
     {"id": "fast_let_go", "toolId": "fast", "query": {"frame": "let_go"}},

@@ -28,7 +28,7 @@ const GRID = new Set(emotions.map((e) => e.id));
 
 export function PersonFirstSkill({ skillId, toolId, questionKey, headingKey, ctxFor }: {
   skillId: string;
-  toolId: 'dear-man' | 'say-no' | 'give' | 'mindfulness-of-others';
+  toolId: 'dear-man' | 'say-no' | 'give' | 'mindfulness-of-others' | 'rehearse';
   /** The picker's question, as a `picker_<key>` of the skill's copy. */
   questionKey: string;
   /** The safety screen's heading, as a `picker_<key>` of the skill's copy. */
