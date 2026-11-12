@@ -27,7 +27,7 @@ const next = { type: "next" };
 const values = (c, stepId, fieldId, s) =>
   M.optionGroups(c, step(stepId).fields.find((f) => f.id === fieldId), s.answers).flatMap((g) => g.options.map((o) => o.value));
 const toAssert = (c = ctx(), situation = "address", describe = "addr_broke_promise") => play([
-  pick("situation", situation), next, pick("matters", "relationship"), next, pick("hard", "barrier_angry"), next,
+  pick("situation", situation), next, pick("matters", "relationship"), next, pick("hard", "barrier_angry"), next, next,
   pick("describe", describe), next, pick("express", "feel_disappointed"), next,
 ], c);
 const toCard = (c = ctx()) => play([
@@ -44,10 +44,10 @@ test("skill: under the dear-man tool id (D11), the third of its skills; takes th
   assert.deepEqual(skill.options.situation.map((o) => o.value), ["ask", "boundary", "address", "pattern"], "DEAR MAN's situation ids, so the debrief counts refusals");
 });
 
-test("skill: the path is situation → matters → hard → describe → express → assert → reinforce → mindful → phrase → confident → middle → walk → the pocket card → when", () => {
+test("skill: the path is situation → matters → hard → thought → describe → express → assert → reinforce → mindful → phrase → confident → middle → walk → the pocket card → when", () => {
   const s = toCard();
   assert.equal(s.stepId, "card");
-  assert.deepEqual(s.path, ["situation", "matters", "hard", "describe", "express", "assert", "reinforce", "mindful", "phrase", "confident", "middle", "walk", "card"]);
+  assert.deepEqual(s.path, ["situation", "matters", "hard", "thought", "describe", "express", "assert", "reinforce", "mindful", "phrase", "confident", "middle", "walk", "card"]);
   assert.equal(step("card").embed, "pocketCard");
   const done = M.runNext(ctx(), s, { type: "embedDone", output: { ids: ["seen_all"] } });
   assert.equal(done.stepId, "when", "steady (no band): straight to *When is the conversation?*");
@@ -56,7 +56,7 @@ test("skill: the path is situation → matters → hard → describe → express
 });
 
 test("skill: the options are DEAR MAN's own nodes (PRESENTS), per situation; the mirror line follows the description, under a plain question", () => {
-  const s = play([pick("situation", "boundary"), next, pick("matters", "self_respect"), next, next]);
+  const s = play([pick("situation", "boundary"), next, pick("matters", "self_respect"), next, next, next]);
   const describe = values(ctx(), "describe", "describe", s);
   assert.ok(describe.includes("bound_pressure") && !describe.includes("addr_hurtful"));
   const cypher = read("schema/skills.cypher");
@@ -67,7 +67,7 @@ test("skill: the options are DEAR MAN's own nodes (PRESENTS), per situation; the
     }
   }
   const at = toAssert();
-  const atExpress = play([pick("situation", "address"), next, pick("matters", "objective"), next, next, pick("describe", "addr_broke_promise"), next]);
+  const atExpress = play([pick("situation", "address"), next, pick("matters", "objective"), next, next, next, pick("describe", "addr_broke_promise"), next]);
   assert.equal(M.copyText(ctx(), step("express").title, atExpress), skill.copy.express_title, "the question stays the question (Gate 2)");
   assert.equal(M.handoffLine(ctx(), step("express"), atExpress), skill.copy.mirror_addr_broke_promise);
   assert.match(skill.copy.mirror_addr_broke_promise, /Only keep what fits\.$/, "what people often feel, never what you're supposed to");
@@ -141,9 +141,9 @@ test("skill: a carried band that isn't steady gets the heads-up after the plan, 
 
 test("skill: parts on with a kept part: who might show up comes after the barriers (the parts slice is empty with parts off)", () => {
   const withParts = ctx({}, { parts: [{ id: "p1", name: "the worrier" }] });
-  const s = play([pick("situation", "ask"), next, pick("matters", "objective"), next, next], withParts);
+  const s = play([pick("situation", "ask"), next, pick("matters", "objective"), next, next, next], withParts);
   assert.equal(s.stepId, "who");
-  const off = play([pick("situation", "ask"), next, pick("matters", "objective"), next, next]);
+  const off = play([pick("situation", "ask"), next, pick("matters", "objective"), next, next, next]);
   assert.equal(off.stepId, "describe");
 });
 
@@ -236,24 +236,27 @@ test("page: the prep plays on PersonFirstSkill (the picker and safety question f
   assert.match(read("functions/src/skills/projections.ts"), /await projectDearManPrep\(tx, input\);/);
 });
 
-test("skill: IE-12's myths sit beside the barriers on *what's hard* (DearManBarrier kind myth, PRESENTS), up to two, optional", () => {
-  const f = step("hard").fields.find((x) => x.id === "myth");
+test("skill: IE-12's thoughts about asking (DearManBarrier kind myth, PRESENTS) get their own optional screen after the barriers, up to two", () => {
+  const f = step("thought").fields[0];
+  assert.equal(f.id, "thought");
   assert.equal(f.max, 2);
-  assert.ok(!f.required, "a myth is never required");
-  assert.deepEqual(skill.options.myth.map((o) => o.value), ["myth_deserve", "myth_weak", "myth_matter", "myth_know", "myth_last"]);
-  const cypher = read("schema/dear-man-content.cypher");
-  for (const o of skill.options.myth) assert.match(cypher, new RegExp(`id: m.id[\\s\\S]*${o.value}|${o.value}`), `${o.value} is a DearManBarrier node`);
+  assert.ok(!f.required, "never required");
+  assert.deepEqual(skill.options.thought.map((o) => o.value), ["myth_deserve", "myth_weak", "myth_matter", "myth_know", "myth_last", "myth_sure", "myth_alone"]);
+  assert.ok(!/myth/i.test(skill.copy.thought_title + skill.copy.thought_hint), "the screen never calls them myths");
+  assert.ok(!step("hard").fields.some((x) => x.id === "thought"), "not stacked under the barriers, so the safety banner stays in view");
+  const scared = play([pick("situation", "address"), next, pick("matters", "relationship"), next, pick("hard", "scared"), next]);
+  assert.equal(scared.stepId, "scared", "scared goes to safety, never to the thoughts");
 });
 
-test("skill: a picked myth's coaching leads the anchor screen, ahead of a barrier's; none picked keeps the barrier's", () => {
+test("skill: a picked thought's line leads the anchor screen, ahead of a barrier's; none picked keeps the barrier's", () => {
   const lines = step("mindful").lines;
   const first = (answers) => lines.find((l) => !l.when || (l.when.eq && answers[l.when.eq[0].slice(3)] === l.when.eq[1]))?.key;
-  assert.equal(first({ hard: "barrier_angry", myth: "myth_matter" }), "coach_myth_matter");
+  assert.equal(first({ hard: "barrier_angry", thought: "myth_matter" }), "coach_myth_matter");
   assert.equal(first({ hard: "barrier_angry" }), "coach_barrier_angry");
   assert.equal(first({}), "coach_default");
   const s = play([
-    pick("situation", "address"), next, pick("matters", "relationship"), next, pick("hard", "barrier_angry"), pick("myth", "myth_deserve"), next,
+    pick("situation", "address"), next, pick("matters", "relationship"), next, pick("hard", "barrier_angry"), next, pick("thought", "myth_deserve"), next,
   ]);
-  assert.equal(s.stepId, "describe", "a myth never stops the plan");
+  assert.equal(s.stepId, "describe", "a thought never stops the plan");
   for (const l of lines) assert.ok(skill.copy[l.key], `${l.key} has copy`);
 });

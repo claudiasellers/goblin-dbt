@@ -854,6 +854,8 @@ HELD = {
         "myth_matter":  "A belief about asking, not a move; mapping waits on review.",
         "myth_know":    "An expectation of them; it comes with any move.",
         "myth_last":    "A belief about asking, not a move; mapping waits on review.",
+        "myth_sure":    "A belief about asking, not a move; mapping waits on review.",
+        "myth_alone":   "A belief about asking, not a move; mapping waits on review.",
     },
     "BarrierSubResponse": {
         "cant-no-energy":               "Depletion, not a protective move.",

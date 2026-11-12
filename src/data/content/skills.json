@@ -8429,7 +8429,8 @@
           "matters_hint": "If it gets tough, this is what you'll protect.",
           "hard_title": "What makes this hard?",
           "hard_hint": "Pick any that fit.",
-          "myth_label": "Any of these thoughts too?",
+          "thought_title": "Do any of these thoughts show up too?",
+          "thought_hint": "Pick up to two, or none.",
           "who_title": "Who might show up in this conversation?",
           "describe_title": "What happened? Say it the way a camera would see it.",
           "describe_hint": "Facts are harder to argue with than judgements.",
@@ -8510,10 +8511,12 @@
           "coach_barrier_tried_before": "If your mind pulls you to the last five times, come back to this conversation, this ask, now.",
           "coach_barrier_emotional": "If tears or a shaky voice come, take a breath. You can say this is hard to say and you want to get through it.",
           "coach_barrier_no_right": "If you start doubting yourself: you don't have to earn the right to need things. Asking clearly is respectful.",
-          "coach_myth_deserve": "You can feel undeserving and still ask. Wanting something is reason enough to say it.",
+          "coach_myth_deserve": "Feeling undeserving makes sense. You can feel it and still ask, if you choose to.",
           "coach_myth_weak": "Needing things is human. Saying it plainly takes steadiness.",
-          "coach_myth_matter": "Their no is about this ask, on this day. It isn't a ruling on you.",
-          "coach_myth_know": "People can care and still not guess. Saying it clearly gives them the chance.",
+          "coach_myth_matter": "A no can be about this ask, on this day. It doesn't decide what you're worth.",
+          "coach_myth_know": "Wanting them to know without asking is so human. People can care and still not guess.",
+          "coach_myth_sure": "Nobody gets to know the answer first. You can ask and find out.",
+          "coach_myth_alone": "Needing someone for this doesn't make you less.",
           "coach_myth_last": "Your needs can sit next to theirs. Asking is how they get a place.",
           "fill_ask_specific_help": "What kind of help, and by when?",
           "fill_ask_flexibility": "What would that look like in practice?",
@@ -8645,14 +8648,6 @@
                   "countsAsPick": true,
                   "max": 30
                 }
-              },
-              {
-                "id": "myth",
-                "label": "myth_label",
-                "options": {
-                  "list": "myth"
-                },
-                "max": 2
               }
             ],
             "crisis": [
@@ -8676,6 +8671,28 @@
                   ]
                 }
               },
+              {
+                "to": "thought",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "thought",
+            "kind": "ask",
+            "title": "thought_title",
+            "hint": "thought_hint",
+            "fields": [
+              {
+                "id": "thought",
+                "options": {
+                  "list": "thought"
+                },
+                "max": 2
+              }
+            ],
+            "next": [
               {
                 "to": "who",
                 "when": {
@@ -9268,7 +9285,7 @@
                 "key": "coach_myth_deserve",
                 "when": {
                   "eq": [
-                    "$a.myth",
+                    "$a.thought",
                     "myth_deserve"
                   ]
                 }
@@ -9277,7 +9294,7 @@
                 "key": "coach_myth_weak",
                 "when": {
                   "eq": [
-                    "$a.myth",
+                    "$a.thought",
                     "myth_weak"
                   ]
                 }
@@ -9286,7 +9303,7 @@
                 "key": "coach_myth_matter",
                 "when": {
                   "eq": [
-                    "$a.myth",
+                    "$a.thought",
                     "myth_matter"
                   ]
                 }
@@ -9295,7 +9312,7 @@
                 "key": "coach_myth_know",
                 "when": {
                   "eq": [
-                    "$a.myth",
+                    "$a.thought",
                     "myth_know"
                   ]
                 }
@@ -9304,8 +9321,26 @@
                 "key": "coach_myth_last",
                 "when": {
                   "eq": [
-                    "$a.myth",
+                    "$a.thought",
                     "myth_last"
+                  ]
+                }
+              },
+              {
+                "key": "coach_myth_sure",
+                "when": {
+                  "eq": [
+                    "$a.thought",
+                    "myth_sure"
+                  ]
+                }
+              },
+              {
+                "key": "coach_myth_alone",
+                "when": {
+                  "eq": [
+                    "$a.thought",
+                    "myth_alone"
                   ]
                 }
               },
@@ -9874,7 +9909,7 @@
               "label": "I'm scared of what they'd do"
             }
           ],
-          "myth": [
+          "thought": [
             {
               "value": "myth_deserve",
               "label": "I don't deserve it"
@@ -9894,6 +9929,14 @@
             {
               "value": "myth_last",
               "label": "My needs come last"
+            },
+            {
+              "value": "myth_sure",
+              "label": "I need to know they'll say yes first"
+            },
+            {
+              "value": "myth_alone",
+              "label": "If I can't fix it alone, I'm not good enough"
             }
           ],
           "describe": [
@@ -10502,9 +10545,9 @@
             },
             {
               "value": "anchor_this_ask",
-              "label": "Their no is about this ask, not about me",
+              "label": "A no to this ask isn't a no to me",
               "needs": [
-                "need_reaction"
+                "need_different"
               ]
             },
             {

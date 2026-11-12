@@ -214,11 +214,13 @@ SET bar.label = b.label;
 
 // --- IE-12: myths (Handout 2a), DearManBarrier kind 'myth' ---
 UNWIND [
-  {id: 'myth_deserve', label: "I don't deserve it",                      kind: 'myth'},
-  {id: 'myth_weak',    label: 'Asking makes me look weak',               kind: 'myth'},
-  {id: 'myth_matter',  label: "If they say no, it means I don't matter", kind: 'myth'},
-  {id: 'myth_know',    label: "They'd know if they cared",               kind: 'myth'},
-  {id: 'myth_last',    label: 'My needs come last',                      kind: 'myth'}
+  {id: 'myth_deserve', label: "I don't deserve it",                           kind: 'myth'},
+  {id: 'myth_weak',    label: 'Asking makes me look weak',                    kind: 'myth'},
+  {id: 'myth_matter',  label: "If they say no, it means I don't matter",      kind: 'myth'},
+  {id: 'myth_know',    label: "They'd know if they cared",                    kind: 'myth'},
+  {id: 'myth_last',    label: 'My needs come last',                           kind: 'myth'},
+  {id: 'myth_sure',    label: "I need to know they'll say yes first",         kind: 'myth'},
+  {id: 'myth_alone',   label: "If I can't fix it alone, I'm not good enough", kind: 'myth'}
 ] AS m
 MERGE (bar:DearManBarrier {id: m.id})
 SET bar.label = m.label, bar.kind = m.kind;

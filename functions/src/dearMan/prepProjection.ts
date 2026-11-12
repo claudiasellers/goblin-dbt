@@ -58,8 +58,8 @@ export function prepFields(run: Record<string, unknown>) {
     situationPicked: situation && SITUATIONS.has(situation) ? situation : '',
     priorities: many('matters'),
     barriers: many('hard'),
-    // IE-12's myths about asking, kept apart from the barriers (History labels barriers by id).
-    myths: many('myth'),
+    // IE-12's thoughts about asking (the graph's myths), kept apart from the barriers (History labels barriers by id).
+    askThoughts: many('thought'),
     describeId: one('describe'),
     feelings: many('express'),
     assertId: one('assert'),

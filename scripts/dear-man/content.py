@@ -113,6 +113,8 @@ MYTHS = [
     {"id": "myth_matter", "label": "If they say no, it means I don't matter", "kind": "myth"},
     {"id": "myth_know", "label": "They'd know if they cared", "kind": "myth"},
     {"id": "myth_last", "label": "My needs come last", "kind": "myth"},
+    {"id": "myth_sure", "label": "I need to know they'll say yes first", "kind": "myth"},
+    {"id": "myth_alone", "label": "If I can't fix it alone, I'm not good enough", "kind": "myth"},
 ]
 # Coaching per barrier (DearManBarrierCoaching -[:ADDRESSES]-> DearManBarrier); the last is the default.
 BARRIER_COACHING = [
@@ -302,11 +304,11 @@ ASSERT_PROMPTS = [
 ]
 # 5. Anchor needs (DearManAnchorNeed), each with the barriers it most often answers.
 ANCHOR_NEEDS = [
-    {"id": "need_permission", "label": "That I'm allowed to ask", "sort": 1, "barriers": ["barrier_guilty", "barrier_no_right", "myth_deserve", "myth_weak", "myth_last"]},
-    {"id": "need_reaction", "label": "That their reaction isn't mine to fix", "sort": 2, "barriers": ["barrier_angry", "myth_matter"]},
+    {"id": "need_permission", "label": "That I'm allowed to ask", "sort": 1, "barriers": ["barrier_guilty", "barrier_no_right", "myth_deserve", "myth_weak", "myth_last", "myth_alone"]},
+    {"id": "need_reaction", "label": "That their reaction isn't mine to fix", "sort": 2, "barriers": ["barrier_angry"]},
     {"id": "need_steady", "label": "That I can stay steady", "sort": 3, "barriers": ["barrier_emotional"]},
     {"id": "need_imperfect", "label": "That I don't have to say it perfectly", "sort": 4, "barriers": ["barrier_dont_know"]},
-    {"id": "need_different", "label": "That this time can be different", "sort": 5, "barriers": ["barrier_tried_before"]},
+    {"id": "need_different", "label": "That this time can be different", "sort": 5, "barriers": ["barrier_tried_before", "myth_matter", "myth_sure"]},
     {"id": "need_matters", "label": "That this is worth saying", "sort": 6, "barriers": ["myth_know"]},
 ]
 # 6. Anchor phrases tagged by need and barrier (retags the original four, adds the rest).
@@ -329,13 +331,13 @@ ANCHOR_PHRASES = [
     {"id": "anchor_wrote_it_down", "label": "I wrote it down because it matters", "sort": 16, "needs": ["need_imperfect", "need_matters"], "barriers": ["barrier_dont_know"]},
     {"id": "anchor_this_time", "label": "This time, I'm asking differently", "sort": 17, "needs": ["need_different"], "barriers": ["barrier_tried_before"]},
     {"id": "anchor_not_the_past", "label": "I'm here for this conversation, not the last five", "sort": 18, "needs": ["need_different"], "barriers": ["barrier_tried_before"]},
-    {"id": "anchor_one_ask", "label": "One ask. This one.", "sort": 19, "needs": ["need_different", "need_imperfect"], "barriers": ["barrier_tried_before", "barrier_dont_know"]},
+    {"id": "anchor_one_ask", "label": "One ask. This one.", "sort": 19, "needs": ["need_different", "need_imperfect"], "barriers": ["barrier_tried_before", "barrier_dont_know", "myth_sure"]},
     {"id": "anchor_worth_saying", "label": "This is worth saying", "sort": 20, "needs": ["need_matters"], "barriers": []},
     {"id": "anchor_matters_to_me", "label": "This matters to me, and that's reason enough", "sort": 21, "needs": ["need_matters", "need_permission"], "barriers": ["barrier_no_right"]},
     {"id": "anchor_future_me", "label": "Future me will be glad I said it", "sort": 22, "needs": ["need_matters"], "barriers": []},
     # IE-12's three (PRD: new phrases where a myth had none).
-    {"id": "anchor_human", "label": "Needing things is human, not weak", "sort": 23, "needs": ["need_permission"], "barriers": ["myth_weak", "myth_last"]},
-    {"id": "anchor_this_ask", "label": "Their no is about this ask, not about me", "sort": 24, "needs": ["need_reaction"], "barriers": ["myth_matter"]},
+    {"id": "anchor_human", "label": "Needing things is human, not weak", "sort": 23, "needs": ["need_permission"], "barriers": ["myth_weak", "myth_last", "myth_alone"]},
+    {"id": "anchor_this_ask", "label": "A no to this ask isn't a no to me", "sort": 24, "needs": ["need_different"], "barriers": ["myth_matter"]},
     {"id": "anchor_kinder_than_guess", "label": "Saying it clearly is kinder than hoping they guess", "sort": 25, "needs": ["need_permission", "need_matters"], "barriers": ["myth_know"]},
 ]
 # The anchor generator's copy, on the DEAR MAN TherapyConcept.

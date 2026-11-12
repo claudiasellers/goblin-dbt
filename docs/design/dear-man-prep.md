@@ -21,7 +21,8 @@ heading), then the `dear_man_prep` skill (`scripts/skills/dear_man_prep.py`) on 
 situation  what kind of conversation is it? (DEAR MAN's four; Recover's hand-off puts *something that happened* first)
            links: I've already had the conversation → the debrief; a carried flooded reading → Settle my body first
 matters    what matters most here? getting it · the relationship · my self-respect      (IE-07's ask column, one pick)
-hard       what makes this hard? (barriers, up to 3, own words) · any of these thoughts too? (IE-12's myths, up to 2)
+hard       what makes this hard? (barriers, up to 3, own words)
+thought    do any of these thoughts show up too? (IE-12, up to 2, optional)
    ├─ I'm scared of what they'd do ─► scared: the other_person resources, safety.open, Ending (frame=careful); no plan,
    │                                  no close
    ├─ parts on ─► who: does a part of you have a stake in this? (the parts slice; partAnchor)
@@ -32,7 +33,7 @@ assert     what you're asking for (filtered by situation; heads_up drops asks to
            refused + address / pattern → FAST's Let go offered beside them)
    ├─ an ask with a blank ─► fill: the blank in a few words (two starters, own words)
 reinforce  what's in it for them (up to 2)
-mindful    what do you need to hear in that moment? (a myth's line first, else the barrier picked first's coaching)
+mindful    what do you need to hear in that moment? (a thought's line first, else the barrier picked first's coaching)
 phrase     the line to hold on to (filtered by that need)
 confident  how you'll carry yourself (ConfidenceCue, optional)
 middle     what you'd settle for (the title follows what matters most)
@@ -56,18 +57,32 @@ Every option is DEAR MAN's own graph node (`PRESENTS` → `DearManSituationType`
 `DearManAnchorPhrase`, `ConfidenceCue`, `DearManNegotiateOption`), read from `scripts/dear-man/content.py` at build
 time. Labels are re-voiced in the skill where the graph's predate the house voice; the graph keeps its text.
 
-## The myths (IE-12, built 12 Nov)
+## The thoughts about asking (IE-12, built 12 Nov)
 
-DBT IE Handout 2a's myths about asking sit under the barriers on *What makes this hard?*, as a second, optional field
-(*Any of these thoughts too?*, up to two): *I don't deserve it*, *Asking makes me look weak*, *If they say no, it means
-I don't matter*, *They'd know if they cared*, *My needs come last*. Each is a `DearManBarrier` node with `kind: 'myth'`
-(`MYTHS` in `scripts/dear-man/content.py`), so the old page's barrier query skips them (`kind IS NULL`). A picked
-myth's line leads the anchor screen, received rather than argued (*Their no is about this ask, on this day. It isn't
-a ruling on you.*), and the anchor needs it maps onto (`need_permission`, `need_reaction`, `need_matters`) offer three
-new phrases with it (*Needing things is human, not weak*, *Their no is about this ask, not about me*, *Saying it
-clearly is kinder than hoping they guess*). The projection keeps them as their own list, `myths`, never inside
-`barriers`. Parts holds each myth (`HELD`, a belief, not a protective move). The plan's Check the Facts inline and
-`pileSort` stay part 2.
+After *What makes this hard?*, its own optional screen: *Do any of these thoughts show up too?* (up to two, or none).
+Seven chips: five from DBT IE Handout 2a's myths (*I don't deserve it*, *Asking makes me look weak*, *If they say no,
+it means I don't matter*, *My needs come last*, *If I can't fix it alone, I'm not good enough*), *I need to know
+they'll say yes first* (Handout 2a's *I have to know they'll say yes*), and the PRD's own *They'd know if they cared*
+(its *They should already know*, reworded to keep *should* out). The PRD's *saying no is mean* belongs to Say no
+(IE-04) and waits there. Each is a `DearManBarrier` node with `kind: 'myth'` (`MYTHS` in
+`scripts/dear-man/content.py`), so the old page's barrier query skips them (`kind IS NULL`); the screen never says
+*myth*. It's a screen of its own, not a second field under the barriers, so *I'm scared of what they'd do* keeps its
+banner right under it (Gate 2), and the scared path never reaches it.
+
+A picked thought's line leads the anchor screen, received and hedged rather than argued (*A no can be about this ask,
+on this day. It doesn't decide what you're worth.*). The anchor needs carry them: `need_permission` (deserve, weak,
+last, alone), `need_different` (matter, sure; with *I can hear a no and still be okay*) and `need_matters` (know).
+Three new phrases: *Needing things is human, not weak*, *A no to this ask isn't a no to me*, *Saying it clearly is
+kinder than hoping they guess*. The phrase step filters by the need picked, so a thought reaches a phrase through its
+need. The projection keeps them as their own list, `askThoughts`, never inside `barriers`. Parts holds each one
+(`HELD`, a belief, not a protective move).
+
+Own-word caps went down so the longest record still fits ext's 4 KB: barriers 35 → 30 characters, reinforce, middle
+ground and walk-away 40 → 35.
+
+Part 2 (not built): IE-03's past results with this person on *if they say no it means I don't matter* (*Last three
+nos from them…*), the calm-time sort and the person's own counter lines (`own_counter_line`), WS1's pros and cons
+after *decided not to* twice, `MythCategory` and `IMPLEMENTS → dbt_dear_man`, Check the Facts inline and `pileSort`.
 
 ## The pocket card (`pocketCard`, Mode C)
 
@@ -135,5 +150,5 @@ content and projection stay; with the flag off nothing opens the skill.
 
 ## Still in IE-B4
 
-Recover drops `boundaryLocked` and `tooHot` (built 12 Nov, the second PR: [`recover-from-invalidation.md`](recover-from-invalidation.md)); IE-06 Keep it warm (built 12 Nov, [`give.md`](give.md)); IE-12's myths (built 12 Nov, above); Let go inline;
+Recover drops `boundaryLocked` and `tooHot` (built 12 Nov, the second PR: [`recover-from-invalidation.md`](recover-from-invalidation.md)); IE-06 Keep it warm (built 12 Nov, [`give.md`](give.md)); IE-12's thoughts about asking (built 12 Nov, above); Let go inline;
 then DEAR MAN's hand-built page can be deleted.

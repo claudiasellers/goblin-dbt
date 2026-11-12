@@ -193,14 +193,16 @@ COACHING = {
     "barrier_emotional": "If tears or a shaky voice come, take a breath. You can say this is hard to say and you want to get through it.",
     "barrier_no_right": "If you start doubting yourself: you don't have to earn the right to need things. Asking clearly is respectful.",
 }
-# IE-12: the myths about asking (DBT IE Handout 2a), offered beside the barriers on the same screen. Each one's
+# IE-12: the myths about asking (DBT IE Handout 2a and the PRD), on their own light screen after the barriers. Each one's
 # coaching is received, not argued with, and comes before a barrier's on the anchor screen.
 MYTHS = [(m["id"], m["label"]) for m in DM.MYTHS]
 MYTH_COACHING = {
-    "myth_deserve": "You can feel undeserving and still ask. Wanting something is reason enough to say it.",
+    "myth_deserve": "Feeling undeserving makes sense. You can feel it and still ask, if you choose to.",
     "myth_weak": "Needing things is human. Saying it plainly takes steadiness.",
-    "myth_matter": "Their no is about this ask, on this day. It isn't a ruling on you.",
-    "myth_know": "People can care and still not guess. Saying it clearly gives them the chance.",
+    "myth_matter": "A no can be about this ask, on this day. It doesn't decide what you're worth.",
+    "myth_know": "Wanting them to know without asking is so human. People can care and still not guess.",
+    "myth_sure": "Nobody gets to know the answer first. You can ask and find out.",
+    "myth_alone": "Needing someone for this doesn't make you less.",
     "myth_last": "Your needs can sit next to theirs. Asking is how they get a place.",
 }
 COACHING_DEFAULT = "The hard part is staying with it when it gets uncomfortable. When your mind races or shuts down, come back to one line."
@@ -237,7 +239,8 @@ COPY = {
     "matters_hint": "If it gets tough, this is what you'll protect.",
     "hard_title": "What makes this hard?",
     "hard_hint": "Pick any that fit.",
-    "myth_label": "Any of these thoughts too?",
+    "thought_title": "Do any of these thoughts show up too?",
+    "thought_hint": "Pick up to two, or none.",
     "who_title": "Who might show up in this conversation?",
     "describe_title": "What happened? Say it the way a camera would see it.",
     "describe_hint": "Facts are harder to argue with than judgements.",
@@ -331,12 +334,18 @@ STEPS = [
     {
         "id": "hard", "kind": "ask", "title": "hard_title", "hint": "hard_hint",
         "fields": [{"id": "hard", "options": {"list": "hard"}, "max": 3,
-                    "own": {"hint": "own_line", "countsAsPick": True, "max": 30}},
-                   {"id": "myth", "label": "myth_label", "options": {"list": "myth"}, "max": 2}],
+                    "own": {"hint": "own_line", "countsAsPick": True, "max": 30}}],
         "crisis": OTHER_PERSON,
         # Scared of them: no plan, the safety screen. Parts on, with a kept part: who might show up (the parts slice is
         # empty with parts off).
-        "next": [{"when": SCARED, "to": "scared"}, {"when": {"set": "$p.parts"}, "to": "who"}, {"to": "describe"}],
+        "next": [{"when": SCARED, "to": "scared"}, {"to": "thought"}],
+    },
+    # IE-12: the thoughts about asking that make it hard (the graph calls them myths; the screen never does).
+    # Optional, and its own screen so the barriers' safety option keeps its banner in view.
+    {
+        "id": "thought", "kind": "ask", "title": "thought_title", "hint": "thought_hint",
+        "fields": [{"id": "thought", "options": {"list": "thought"}, "max": 2}],
+        "next": [{"when": {"set": "$p.parts"}, "to": "who"}, {"to": "describe"}],
     },
     {
         "id": "scared", "kind": "handoff", "complete": True, "noClose": True,
@@ -393,7 +402,7 @@ STEPS = [
     # Mindful (stay on track): the coaching for the first barrier picked is the screen's question, then what to hear.
     {
         "id": "mindful", "kind": "ask", "title": "mindful_title",
-        "lines": [{"key": f"coach_{k}", "when": is_("myth", k)} for k, _ in MYTHS]
+        "lines": [{"key": f"coach_{k}", "when": is_("thought", k)} for k, _ in MYTHS]
         + [{"key": f"coach_{k}", "when": is_("hard", k)} for k, _ in BARRIERS] + [{"key": "coach_default", "when": None}],
         "fields": [{"id": "need", "options": {"list": "need"}, "max": 1, "required": True}],
         "next": [{"to": "phrase"}],
@@ -471,7 +480,7 @@ def options():
     out = [("situation", v, l, {}, ("DearManSituationType", v)) for v, l in SITUATIONS]
     out += [("matters", v, l, {}, None) for v, l in MATTERS]
     out += [("hard", v, l, {}, ("DearManBarrier", v)) for v, l in BARRIERS]
-    out += [("myth", v, l, {}, ("DearManBarrier", v)) for v, l in MYTHS]
+    out += [("thought", v, l, {}, ("DearManBarrier", v)) for v, l in MYTHS]
     out += [("hard", SCARED_OPTION[0], SCARED_OPTION[1], {}, None)]
     for s_id, rows in DM.DESCRIBE_OPTIONS.items():
         assert s_id in sit
