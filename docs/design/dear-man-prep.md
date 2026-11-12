@@ -1,7 +1,7 @@
 # DEAR MAN's prep on the skill runtime (IE-B4, first PR)
 
 Built 12 Nov 2026. PRD: `prd-interpersonal-effectiveness.md`, IE-01 Mode B (the full plan) and Mode C (the pocket card);
-DBT IE Handouts 4, 5 and 5a (Handout 8's intensity sizing isn't in it yet: see below). Plan rows: IE-01, IE-07 and IE-B4 in [`dbt-modules-plan.md`](dbt-modules-plan.md), D11
+DBT IE Handouts 4, 5, 5a and 8 (the ask column's sizing, built 12 Nov: *How hard to push*, below). Plan rows: IE-01, IE-07 and IE-B4 in [`dbt-modules-plan.md`](dbt-modules-plan.md), D11
 (three skills under the one `dear-man` id: this prep, [one message](one-message.md), [the debrief](dear-man-debrief.md)).
 It reuses the debrief's and Say no's pieces: `PersonFirstSkill` ([`say-no.md`](say-no.md)), the picker and D4's safety
 question ([`people.md`](people.md)), the `ask_outcome` card into the debrief.
@@ -32,11 +32,14 @@ express    how does it feel? (the mirror line for the description as a line, *On
 assert     what you're asking for (filtered by situation; heads_up drops asks to be heard;
            refused + address / pattern → FAST's Let go offered beside them)
    ├─ an ask with a blank ─► fill: the blank in a few words (two starters, own words)
+   ├─ a carried flooded reading ─► reinforce (no sizing)
+size       how hard to push on this ask? five yes · not sure · no questions (Handout 8's ask column, below)
+level      the named level as the title; That fits · A bit softer · A bit firmer
 reinforce  what's in it for them (up to 2)
 mindful    what do you need to hear in that moment? (a thought's line first, else the barrier picked first's coaching)
 phrase     the line to hold on to (filtered by that need)
 confident  how you'll carry yourself (ConfidenceCue, optional)
-middle     what you'd settle for (the title follows what matters most)
+middle     what you'd settle for (the title follows what matters most; the final level as a line)
 walk       when you'd stop for today
 card       the pocket card: Say it · Stay steady · If they push (one PaperCard each, Copy)
    ├─ stirred or flooded reading ─► hot: take the edge off first (breathPacer) or I'm ready → the card again
@@ -89,6 +92,20 @@ picked, Check the Facts inline and `pileSort`. All land in IE-B5 (IE-03's result
 sort needs `pileSort` from ER-B4, Check the Facts inline needs ER-B5's inline mini-card, the ordering needs a
 `runtime:` PR); the Check the Facts and DT-10 edges stay deferred until then.
 
+## How hard to push (IE-07, Handout 8's ask column, built 12 Nov)
+
+After the ask (and its blank), five questions, each *Yes · Not sure · No*: can they actually give you this, does it matter
+a lot to you right now, is it fair to ask this of them, is this a good time, do you know what you want and have the facts
+straight. The same counting derive as Say no's "no" column (R10): yes counts 1, not sure half, no nothing, and the total
+is looked up in `tables.ask_level` (`$d.ask_level`): *hint* (below 1.5: the facts lean toward waiting or a light first
+mention, still your call), *gentle*, *plain*, *firm*, *firm_hold* (4.5 and up). The level screen shows the named level as
+its title, never a number, and a nudge (*That fits · A bit softer · A bit firmer*) moves it one step (`$d.ask_final`, the
+five fields plus the nudge). The middle-ground screen repeats the final level as its line, so what you'd settle for is
+chosen knowing how hard you meant to push. A carried flooded reading skips both screens (the short path). Departures:
+Linehan's dime game has ten questions (it asks about the relationship and self-respect separately); *what matters most*
+already asked that, so five are kept here, the same five Say no counts in its no form. The level isn't on the pocket
+card or in the projection yet.
+
 ## The pocket card (`pocketCard`, Mode C)
 
 `src/components/skillPlayer/PocketCard.tsx` over the pure `src/lib/pocketCard.ts`. Three sides, built from the run's
@@ -140,7 +157,7 @@ History labels it *Prep*.
 - **Summary and AskOutcome**: replaced by the pocket card and the `when` hand-off.
 - **Own words**: shorter caps than the old page (the record has to fit `ext`'s 4 KB with every field at its cap); no
   own words for the feelings (22 chips, plus the carried word) or the phrase beyond 30 characters.
-- **Not yet**: Handout 8's intensity sizing for the ask (Say no has the "no" column); the parts hurt chip from Recover's
+- **Not yet**: the parts hurt chip from Recover's
   angry card (`dearManHurt.ts`) isn't carried; the debrief opened from the `ask_outcome` card doesn't get the part
   (`ext.er.copeAheadPartId` isn't written, so its *who showed up* stays in its general form for these plans; a C8
   amendment); History shows no anchor preview (the old prep stored the phrase's text, this one its id), and a plan

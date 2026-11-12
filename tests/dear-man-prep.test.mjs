@@ -30,8 +30,9 @@ const toAssert = (c = ctx(), situation = "address", describe = "addr_broke_promi
   pick("situation", situation), next, pick("matters", "relationship"), next, pick("hard", "barrier_angry"), next, next,
   pick("describe", describe), next, pick("express", "feel_disappointed"), next,
 ], c);
+const sized = (v = "yes") => ["s_able", "s_matters", "s_right", "s_timing", "s_ready"].map((f) => pick(f, v));
 const toCard = (c = ctx()) => play([
-  pick("assert", "addr_follow_through"), next, pick("reinforce", "reinf_more_trust"), next,
+  pick("assert", "addr_follow_through"), next, ...sized(), next, pick("nudge", "right"), next, pick("reinforce", "reinf_more_trust"), next,
   pick("need", "need_reaction"), next, pick("phrase", "anchor_their_feelings"), next, pick("confident", "cue_feet"), next,
   pick("middle", "neg_trial"), next, pick("walk", "neg_yelled_at"), next,
 ], c, toAssert(c));
@@ -44,10 +45,10 @@ test("skill: under the dear-man tool id (D11), the third of its skills; takes th
   assert.deepEqual(skill.options.situation.map((o) => o.value), ["ask", "boundary", "address", "pattern"], "DEAR MAN's situation ids, so the debrief counts refusals");
 });
 
-test("skill: the path is situation → matters → hard → thought → describe → express → assert → reinforce → mindful → phrase → confident → middle → walk → the pocket card → when", () => {
+test("skill: the path is situation → matters → hard → thought → describe → express → assert → size → level → reinforce → mindful → phrase → confident → middle → walk → the pocket card → when", () => {
   const s = toCard();
   assert.equal(s.stepId, "card");
-  assert.deepEqual(s.path, ["situation", "matters", "hard", "thought", "describe", "express", "assert", "reinforce", "mindful", "phrase", "confident", "middle", "walk", "card"]);
+  assert.deepEqual(s.path, ["situation", "matters", "hard", "thought", "describe", "express", "assert", "size", "level", "reinforce", "mindful", "phrase", "confident", "middle", "walk", "card"]);
   assert.equal(step("card").embed, "pocketCard");
   const done = M.runNext(ctx(), s, { type: "embedDone", output: { ids: ["seen_all"] } });
   assert.equal(done.stepId, "when", "steady (no band): straight to *When is the conversation?*");
@@ -85,7 +86,7 @@ test("skill: an ask with a blank asks for the words (starters to change); the po
     ["I'd like help with the shopping this week"]);
   assert.deepEqual(PC.fieldLines("assert", { assert: ["I'd like help with [this]"] }, "assert", "fill"), ["I'd like help with [this]"], "a blank nobody filled stays");
   const noBlank = play([pick("assert", "addr_follow_through"), next], ctx(), toAssert());
-  assert.equal(noBlank.stepId, "reinforce", "no blank, no fill screen");
+  assert.equal(noBlank.stepId, "size", "no blank, no fill screen");
 });
 
 test("skill: *it tends to go badly* leaves out asks to be heard and says so up front; a counted refusal offers Let go beside the asks", () => {
@@ -103,7 +104,7 @@ test("skill: *it tends to go badly* leaves out asks to be heard and says so up f
 });
 
 test("skill: the anchor screen asks what you need to hear, with the coaching for the barrier picked first as a line; the phrases follow the need", () => {
-  const s = play([pick("assert", "addr_follow_through"), next, next], ctx(), toAssert());
+  const s = play([pick("assert", "addr_follow_through"), next, ...sized(), next, pick("nudge", "right"), next, next], ctx(), toAssert());
   assert.equal(s.stepId, "mindful");
   assert.equal(M.copyText(ctx(), step("mindful").title, s), skill.copy.mindful_title);
   assert.equal(M.handoffLine(ctx(), step("mindful"), s), skill.copy.coach_barrier_angry);
@@ -269,4 +270,24 @@ test("skill: a picked thought's line leads the anchor screen, ahead of a barrier
   ]);
   assert.equal(s.stepId, "describe", "a thought never stops the plan");
   for (const l of lines) assert.ok(skill.copy[l.key], `${l.key} has copy`);
+});
+
+test("skill: how hard to push (IE-07, Handout 8's ask column): five questions counted into a named level, a nudge, the level on the middle-ground screen", () => {
+  const toLevel = (v, c = ctx()) => play([pick("assert", "addr_follow_through"), next, ...sized(v), next], c, toAssert(c));
+  const levelLine = (v) => M.copyText(ctx(), step("level").title, toLevel(v));
+  assert.equal(toLevel("yes").stepId, "level");
+  assert.equal(levelLine("yes"), skill.copy.ask_level_firm_hold, "every yes: ask firmly and hold to it");
+  assert.equal(levelLine("not_sure"), skill.copy.ask_level_plain);
+  assert.equal(levelLine("no"), skill.copy.ask_level_hint, "every no: wait, or a light mention, still their call");
+  assert.match(skill.copy.ask_level_hint, /your call/);
+  const toMiddle = (v, nudge) => play([pick("nudge", nudge), next, pick("reinforce", "reinf_more_trust"), next, pick("need", "need_reaction"), next,
+    pick("phrase", "anchor_their_feelings"), next, pick("confident", "cue_feet"), next], ctx(), toLevel(v));
+  for (const [v, nudge, key] of [["yes", "right", "firm_hold"], ["yes", "softer", "firm"], ["not_sure", "firmer", "firm"], ["not_sure", "softer", "gentle"], ["no", "softer", "hint"]]) {
+    const s = toMiddle(v, nudge);
+    assert.equal(s.stepId, "middle");
+    assert.equal(M.handoffLine(ctx(), step("middle"), s), skill.copy[`ask_level_${key}`], `${v} + ${nudge}: ${key}`);
+  }
+  const flooded = ctx({ band: "flooded" });
+  assert.equal(play([pick("assert", "addr_follow_through"), next], flooded, toAssert(flooded)).stepId, "reinforce", "a carried flooded reading skips the sizing");
+  assert.ok(Object.keys(skill.copy).filter((k) => k.startsWith("ask_level_") || k.startsWith("s_")).every((k) => !/\d/.test(skill.copy[k])), "never a number on screen (R10)");
 });

@@ -11480,6 +11480,20 @@
           "middle_title_self_respect": "Your self-respect comes first, so notice any pressure to agree to what doesn't sit right. What middle ground could you live with?",
           "walk_title": "What won't you accept?",
           "walk_hint": "Knowing this ahead makes it easier to stop or step away.",
+          "size_title": "How hard to push on this ask?",
+          "size_hint": "Yes, no or not sure. There's no right answer.",
+          "level_hint": "From what you said.",
+          "nudge_label": "Does that sit right?",
+          "s_able_q": "Can they actually give you this?",
+          "s_matters_q": "Does it matter a lot to you right now?",
+          "s_right_q": "Is it fair to ask this of them?",
+          "s_timing_q": "Is this a good time to ask?",
+          "s_ready_q": "Do you know what you want, and have the facts straight?",
+          "ask_level_hint": "The facts lean toward waiting, or a light first mention. It's still your call.",
+          "ask_level_gentle": "Ask gently, and a no is something you can take for now.",
+          "ask_level_plain": "Ask plainly, and listen to what they say.",
+          "ask_level_firm": "Ask firmly, and keep asking if they push back.",
+          "ask_level_firm_hold": "Ask firmly, and hold to it.",
           "card_title": "Your plan, on three cards.",
           "card_say": "Say it",
           "card_steady": "Stay steady",
@@ -11576,8 +11590,58 @@
           "picker_safetyRouteEnding": "Thinking about ending the relationship",
           "picker_safetyRouteBack": "This is about someone else"
         },
-        "tables": {},
-        "derive": [],
+        "tables": {
+          "ask_level": {
+            "-1": "hint",
+            "1.5": "gentle",
+            "2.5": "plain",
+            "3.5": "firm",
+            "4.5": "firm_hold"
+          }
+        },
+        "derive": [
+          {
+            "name": "ask_level",
+            "kind": "count",
+            "fields": [
+              "s_able",
+              "s_matters",
+              "s_right",
+              "s_timing",
+              "s_ready"
+            ],
+            "weights": {
+              "yes": 1,
+              "not_sure": 0.5,
+              "no": 0,
+              "softer": -1,
+              "right": 0,
+              "firmer": 1
+            },
+            "table": "ask_level"
+          },
+          {
+            "name": "ask_final",
+            "kind": "count",
+            "fields": [
+              "s_able",
+              "s_matters",
+              "s_right",
+              "s_timing",
+              "s_ready",
+              "nudge"
+            ],
+            "weights": {
+              "yes": 1,
+              "not_sure": 0.5,
+              "no": 0,
+              "softer": -1,
+              "right": 0,
+              "firmer": 1
+            },
+            "table": "ask_level"
+          }
+        ],
         "steps": [
           {
             "id": "situation",
@@ -12171,6 +12235,15 @@
               },
               {
                 "to": "reinforce",
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "flooded"
+                  ]
+                }
+              },
+              {
+                "to": "size",
                 "when": null
               }
             ],
@@ -12277,6 +12350,145 @@
                   "open": true,
                   "seed": true
                 }
+              }
+            ],
+            "next": [
+              {
+                "to": "reinforce",
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "flooded"
+                  ]
+                }
+              },
+              {
+                "to": "size",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "size",
+            "kind": "ask",
+            "title": "size_title",
+            "hint": "size_hint",
+            "fields": [
+              {
+                "id": "s_able",
+                "label": "s_able_q",
+                "options": {
+                  "list": "size_answer"
+                },
+                "max": 1,
+                "required": true
+              },
+              {
+                "id": "s_matters",
+                "label": "s_matters_q",
+                "options": {
+                  "list": "size_answer"
+                },
+                "max": 1,
+                "required": true
+              },
+              {
+                "id": "s_right",
+                "label": "s_right_q",
+                "options": {
+                  "list": "size_answer"
+                },
+                "max": 1,
+                "required": true
+              },
+              {
+                "id": "s_timing",
+                "label": "s_timing_q",
+                "options": {
+                  "list": "size_answer"
+                },
+                "max": 1,
+                "required": true
+              },
+              {
+                "id": "s_ready",
+                "label": "s_ready_q",
+                "options": {
+                  "list": "size_answer"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
+            "next": [
+              {
+                "to": "level",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "level",
+            "kind": "ask",
+            "title": [
+              {
+                "key": "ask_level_firm_hold",
+                "when": {
+                  "eq": [
+                    "$d.ask_level",
+                    "firm_hold"
+                  ]
+                }
+              },
+              {
+                "key": "ask_level_firm",
+                "when": {
+                  "eq": [
+                    "$d.ask_level",
+                    "firm"
+                  ]
+                }
+              },
+              {
+                "key": "ask_level_plain",
+                "when": {
+                  "eq": [
+                    "$d.ask_level",
+                    "plain"
+                  ]
+                }
+              },
+              {
+                "key": "ask_level_gentle",
+                "when": {
+                  "eq": [
+                    "$d.ask_level",
+                    "gentle"
+                  ]
+                }
+              },
+              {
+                "key": "ask_level_hint",
+                "when": {
+                  "eq": [
+                    "$d.ask_level",
+                    "hint"
+                  ]
+                }
+              }
+            ],
+            "hint": "level_hint",
+            "fields": [
+              {
+                "id": "nudge",
+                "label": "nudge_label",
+                "options": {
+                  "list": "nudge"
+                },
+                "max": 1,
+                "required": true
               }
             ],
             "next": [
@@ -12548,6 +12760,88 @@
               },
               {
                 "key": "middle_title"
+              }
+            ],
+            "lines": [
+              {
+                "key": "ask_level_firm_hold",
+                "when": {
+                  "all": [
+                    {
+                      "set": "$a.s_able"
+                    },
+                    {
+                      "eq": [
+                        "$d.ask_final",
+                        "firm_hold"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "key": "ask_level_firm",
+                "when": {
+                  "all": [
+                    {
+                      "set": "$a.s_able"
+                    },
+                    {
+                      "eq": [
+                        "$d.ask_final",
+                        "firm"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "key": "ask_level_plain",
+                "when": {
+                  "all": [
+                    {
+                      "set": "$a.s_able"
+                    },
+                    {
+                      "eq": [
+                        "$d.ask_final",
+                        "plain"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "key": "ask_level_gentle",
+                "when": {
+                  "all": [
+                    {
+                      "set": "$a.s_able"
+                    },
+                    {
+                      "eq": [
+                        "$d.ask_final",
+                        "gentle"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "key": "ask_level_hint",
+                "when": {
+                  "all": [
+                    {
+                      "set": "$a.s_able"
+                    },
+                    {
+                      "eq": [
+                        "$d.ask_final",
+                        "hint"
+                      ]
+                    }
+                  ]
+                }
               }
             ],
             "fields": [
@@ -13679,6 +13973,34 @@
             {
               "value": "neg_give_up_ask",
               "label": "Giving up on the ask completely"
+            }
+          ],
+          "size_answer": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "not_sure",
+              "label": "Not sure"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "nudge": [
+            {
+              "value": "right",
+              "label": "That fits"
+            },
+            {
+              "value": "softer",
+              "label": "A bit softer"
+            },
+            {
+              "value": "firmer",
+              "label": "A bit firmer"
             }
           ],
           "hot": [
