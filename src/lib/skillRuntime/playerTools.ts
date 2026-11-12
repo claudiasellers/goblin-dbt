@@ -14,6 +14,9 @@ export const PLAYER_TOOLS: Readonly<Record<string, string>> = {
   'problem-solve': 'problem_solve',
   'cope-ahead': 'cope_ahead',
   'pros-cons': 'pros_cons',
+  'cool-down': 'first_body',
+  'urge-surfing': 'ride_it_out',
+  'let-it-be': 'let_it_be',
 };
 
 /**

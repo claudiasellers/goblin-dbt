@@ -24,6 +24,10 @@
  * step's own quiet links stay above the fold on a phone (DT lane, gate 2): the short labels carry the full name
  * and number as their accessible name.
  *
+ * `variant="medical"`: the body might be in danger (First, the body's *Chest pain or fainting*, DT-01). A crisis
+ * line is the wrong call: the emergency number first, with other countries' emergency numbers under *Outside the
+ * US?*. Never a substitute for the person's own judgement: the line says when to call.
+ *
  * Outside the US (decision D5 of docs/design/dbt-modules-plan.md, until CORE-01's helpline list): a quiet
  * *Outside the US?* list under the crisis variant, with a few national lines. Closed by default so the US
  * numbers stay first.
@@ -43,7 +47,17 @@ const OTHER_PERSON_LINKS = [
   { href: 'tel:988', label: 'Call 988 (Suicide & Crisis Lifeline)' },
 ] as const;
 
-export type CrisisBannerVariant = 'crisis' | 'other_person';
+/** Chest pain, fainting or trouble breathing (DT-01): the emergency number, never a crisis line. */
+const MEDICAL_LINE = 'Chest pain, fainting, or trouble breathing? Call 911 now.';
+const MEDICAL_OUTSIDE_US = [
+  { country: 'UK', links: [{ href: 'tel:999', label: 'Call 999' }] },
+  { country: 'Ireland and the EU', links: [{ href: 'tel:112', label: 'Call 112' }] },
+  { country: 'Canada', links: [{ href: 'tel:911', label: 'Call 911' }] },
+  { country: 'Australia', links: [{ href: 'tel:000', label: 'Call 000' }] },
+  { country: 'New Zealand', links: [{ href: 'tel:111', label: 'Call 111' }] },
+] as const;
+
+export type CrisisBannerVariant = 'crisis' | 'other_person' | 'medical';
 
 /** National crisis lines outside the US: country, then each line. */
 const OUTSIDE_US = [
@@ -53,12 +67,12 @@ const OUTSIDE_US = [
   { country: 'New Zealand', links: [{ href: 'tel:1737', label: 'Call 1737' }, { href: 'sms:1737', label: 'Text 1737' }] },
 ] as const;
 
-function OutsideUs({ compact }: { compact: boolean }) {
+function OutsideUs({ compact, list = OUTSIDE_US }: { compact: boolean; list?: typeof OUTSIDE_US | typeof MEDICAL_OUTSIDE_US }) {
   return (
     <details className={`${compact ? 'mt-2 text-sm' : 'mt-4 text-left'} text-[var(--color-q-hu-text)]`} data-testid="crisis-outside-us">
       <summary className="cursor-pointer min-h-11 flex items-center font-medium">Outside the US?</summary>
       <ul className="mt-2 space-y-2">
-        {OUTSIDE_US.map((c) => (
+        {list.map((c) => (
           <li key={c.country}>
             <span className="block">{c.country}</span>
             {c.links.map((l) => (
@@ -106,8 +120,23 @@ function OtherPersonBanner({ compact }: { compact: boolean }) {
   );
 }
 
+function MedicalBanner({ compact }: { compact: boolean }) {
+  return (
+    <section aria-label="Emergency help" data-testid={compact ? 'crisis-banner-compact' : undefined} data-variant="medical"
+      className={`${compact ? 'p-3 rounded-xl' : 'mb-6 p-4 rounded-2xl'} bg-[var(--color-q-hu-bg)] border border-[var(--color-q-hu-border)]`}>
+      <p className={`${compact ? 'text-sm mb-2' : 'mb-4'} text-[var(--color-q-hu-text)]`}>{MEDICAL_LINE}</p>
+      <a href="tel:911"
+        className="inline-flex items-center min-h-11 py-2 px-3 rounded-lg bg-[var(--color-danger)] hover:opacity-90 text-[var(--color-on-danger)] text-sm font-medium transition-colors">
+        Call 911
+      </a>
+      <OutsideUs compact={compact} list={MEDICAL_OUTSIDE_US} />
+    </section>
+  );
+}
+
 export function CrisisBanner({ compact = false, variant = 'crisis' }: { compact?: boolean; variant?: CrisisBannerVariant } = {}) {
   if (variant === 'other_person') return <OtherPersonBanner compact={compact} />;
+  if (variant === 'medical') return <MedicalBanner compact={compact} />;
   if (compact) {
     return (
       <section

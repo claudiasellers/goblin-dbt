@@ -30,7 +30,7 @@ test("both skills are the one fast tool; nothing in either is a planned exit off
     assert.equal(s.toolId, "fast");
   }
   assert.deepEqual(review.exits.filter((x) => x.planned).map((x) => x.toolId), ["rehearse"]);
-  assert.deepEqual(letGo.exits.filter((x) => x.planned).map((x) => x.toolId).sort(), ["finding-connection", "let-it-be"]);
+  assert.deepEqual(letGo.exits.filter((x) => x.planned).map((x) => x.toolId).sort(), ["finding-connection"]);
 });
 
 test("A: a sorry for a real wrong is kept to one; the card shows the instead line; Check the Facts is offered", () => {
@@ -95,7 +95,7 @@ test("Let go: a line, the card, then elsewhere with Recover; I don't need to say
   const first = letGo.options.line[0].value;
   const s = run(letGo, [pick("line", first), next, copied]);
   assert.deepEqual(s.path, ["line", "card", "elsewhere"]);
-  assert.deepEqual(s.offered, ["recover"], "Let it be and Finding connection are planned");
+  assert.deepEqual(s.offered, ["let_it_be", "recover"], "Let it be is built (DT-04); Finding connection is planned");
   assert.equal(M.handoffLine(ctx(letGo), M.stepOf(letGo, "elsewhere"), s), letGo.copy.elsewhere_line);
   const heard = run(letGo, [pick("line", first), next, copied], { frame: "let_go" });
   assert.equal(M.handoffLine(ctx(letGo, { frame: "let_go" }), M.stepOf(letGo, "elsewhere"), heard), letGo.copy.elsewhere_line_no,

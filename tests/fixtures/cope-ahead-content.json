@@ -709,8 +709,8 @@
   {
    "id": "cool_down",
    "kind": "tool",
-   "label": "Circuit Breaker",
-   "line": "do Circuit Breaker",
+   "label": "First, the body",
+   "line": "bring my body down first",
    "forPulls": [
     "fight",
     "chase"
@@ -724,8 +724,8 @@
   {
    "id": "urge_surfing",
    "kind": "tool",
-   "label": "Urge Surfing",
-   "line": "use Urge Surfing",
+   "label": "Ride it out",
+   "line": "ride it out",
    "forPulls": [
     "chase",
     "fight"

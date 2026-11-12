@@ -19,7 +19,7 @@ VERSION = "cope-ahead-v1"
 OWN_MAX = 140       # the situation and the hardest moment
 MOVE_OWN_MAX = 90   # a move ("I'll …")
 
-# Find the feeling's four pulls (the same as Urge Surfing's "What does it want to do?").
+# Find the feeling's four pulls (the same as the old Urge Surfing page's "What does it want to do?").
 PULLS = ["fight", "chase", "hide", "blank"]
 
 # Screen 1 → the follow-up window chip (FollowUpType cope_ahead_after, scripts/practice-spine/content.py).
@@ -110,8 +110,8 @@ MOVES = [
     ("notes", "action", "Look at the points I wrote down", "look at the points I wrote down", ["blank", "hide"], False, None, [], ["conversation", "work_school"]),
     ("pause", "tool", "Hold to wait", "open Hold to wait", ["fight", "chase"], False, "pause", [], []),
     ("five_senses", "tool", "5-4-3-2-1", "do 5-4-3-2-1", ["blank", "hide", "fight"], True, "five-senses", [], []),
-    ("cool_down", "tool", "Circuit Breaker", "do Circuit Breaker", ["fight", "chase"], False, "cool-down", [], []),
-    ("urge_surfing", "tool", "Urge Surfing", "use Urge Surfing", ["chase", "fight"], False, "urge-surfing", [], []),
+    ("cool_down", "tool", "First, the body", "bring my body down first", ["fight", "chase"], False, "cool-down", [], []),
+    ("urge_surfing", "tool", "Ride it out", "ride it out", ["chase", "fight"], False, "urge-surfing", [], []),
 ]
 
 # A danger moment's plan holds only moves that keep the person safe (Gate 3, ER-B2): its own move (listed first),

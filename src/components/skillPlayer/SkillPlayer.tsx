@@ -31,6 +31,7 @@ import { CrisisBanner } from '../safety/CrisisBanner';
 import { SafetyOpen } from '../safety/SafetyOpen';
 import { QuickExit } from '../safety/QuickExit';
 import { SessionClose } from '../spine/SessionClose';
+import { PartTagSlot } from '../spine/PartTagSlot';
 import { EmotionPicker } from '../tools/EmotionPicker';
 import { Chip, Line, Prompt } from '../tools/wiseMind/bits';
 import { choiceButton, linkButton, primaryButton, secondaryText } from '../tools/oppositeAction/styles';
@@ -204,6 +205,8 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx }: {
   const [quietLeave, setQuietLeave] = useState(false);
   // Answered: stay on the close so its tag row ("Was this a part you know?") can show, then go on a tap.
   const [answered, setAnswered] = useState(false);
+  // The close asked in the flow (DT-01): the leaving card shows no question, only what follows a saved close.
+  const [inFlowClose, setInFlowClose] = useState<{ thenVsNow: ThenVsNow; saved: boolean } | null>(null);
   const handoffs = useRef<HandoffResult[]>([]);
   const leavingRef = useRef(false);
   useEffect(() => { if (!leaving) leavingRef.current = false; }, [leaving, st.stepId]);
@@ -230,6 +233,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx }: {
     toolSession.setUrgeIds(runUrgeIds(ctx, st));
     const fresh = askFresh(ctx, st);
     toolSession.setFitsFacts((fresh.fitsFacts as Parameters<typeof toolSession.setFitsFacts>[0]) ?? null);
+    toolSession.setThenVsNow((fresh.thenVsNow as ThenVsNow | undefined) ?? null);
     if (stepOf(skill, st.stepId).complete) toolSession.markComplete();
   }, [st, ctx, skill, toolSession]);
 
@@ -302,6 +306,17 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx }: {
     }
     send({ type: 'exit', exitId: exit.id });
     setLeaving(exit);
+    // The close was asked in the flow (`askFresh: 'thenVsNow'`, DT-01): leave at once, the session closed with it.
+    const asked = askFresh(ctx, st).thenVsNow as ThenVsNow | undefined;
+    // The leaving card then shows what a saved close shows (the parts tag row after a better one), and the way on.
+    if (asked && !stepOf(skill, st.stepId).noClose && persistence(ctx, st) === 'save') {
+      setInFlowClose({ thenVsNow: asked, saved: false });
+      setAnswered(true);
+      void toolSession.close({ status: 'completed', thenVsNow: asked })
+        .then((r) => { if (r) setInFlowClose({ thenVsNow: asked, saved: true }); })
+        .catch(() => { /* offline: the way on is still there */ });
+      return;
+    }
     // A hand-off that asks no close (`noClose`: after a danger route) leaves at once, the session closed completed.
     // So does a run that writes nothing (R15): there is nothing to ask the close for.
     if (stepOf(skill, st.stepId).noClose || persistence(ctx, st) !== 'save') {
@@ -378,7 +393,8 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx }: {
   } else if (leaving) {
     body = (
       <div className="space-y-4">
-        {!quietLeave && <SessionClose onAnswered={() => setAnswered(true)} onSkipped={() => go(leaving)} />}
+        {!quietLeave && !inFlowClose && <SessionClose onAnswered={() => setAnswered(true)} onSkipped={() => go(leaving)} />}
+        {inFlowClose && <PartTagSlot toolId={skill.toolId} toolSessionId={toolSession.id} thenVsNow={inFlowClose.thenVsNow} saved={inFlowClose.saved} />}
         {!leaving.done && leaving.toolId && answered && (
           <button type="button" className={primaryButton} onClick={() => go(leaving)}>
             {getToolById(leaving.toolId)?.name ?? 'Continue'} →
@@ -511,6 +527,7 @@ function EmbedStep({ ctx, step, st, send, onShown, onExit, covered }: {
   return (<>
     {crisis && <CrisisBanner compact variant={crisis.variant} />}
     {title && <Prompt>{title}</Prompt>}
+    {step.hint && ctx.skill.copy[step.hint] && <Line>{ctx.skill.copy[step.hint]}</Line>}
     <Embed props={embedProps(ctx, step.embed ?? '', step.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(st)}
       profile={ctx.profile ?? null} onShown={shown} onDone={done} covered={covered} />
     <StepLinks ctx={ctx} step={step} st={st} onExit={onExit} />

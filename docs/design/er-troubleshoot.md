@@ -23,11 +23,11 @@ to the next check, except on *Did the feeling fit the facts?*, where not sure is
 |---|---|---|---|---|
 | — | Validation: "When a skill doesn't help, that's information. It isn't proof you can't do this." | | | |
 | 1 | Body: could your body be turning the volume up? (PLEASE) | *Maybe, yes* | Low body, louder feelings; looking after one counts as a skill | Running low (`please-skill`, planned) |
-| 2 | The right skill: did the feeling fit the facts? | *Yes, it fit* | The move is the situation, or making room for the feeling | Problem Solve; the wave and Let it be (planned) |
+| 2 | The right skill: did the feeling fit the facts? | *Yes, it fit* | The move is the situation, or making room for the feeling | Problem Solve, Let it be; the wave (planned) |
 | | | *I'm not sure* | Checking the facts shows which kind of skill fits | Check the Facts |
 | 3 | All the way, or partly while still protecting yourself? | *Partly* | A smaller step done all the way | The line itself: retry the same skill |
 | 4 | Is something around you rewarding the old way? | *People back off when I get angry*, *I get out of things when I go quiet*, *Someone steps in when I'm struggling* | The old way is doing a job; find another way to get it | Problem Solve |
-| 5 | Willing, or was part of you not up for it? | *Part of me wasn't up for it* | Willingness comes and goes; make room first | Let it be (`let-it-be`, planned) |
+| 5 | Willing, or was part of you not up for it? | *Part of me wasn't up for it* | Willingness comes and goes; make room first | Let it be (`let-it-be`, built 11 Nov) |
 | 6 | Too much at once? | *Yes, a lot at once* | One skill gets buried; pick one thing | Problem Solve, or 5-4-3-2-1 (grounding) |
 | 7 | A belief in the way? (myths, ER Handout 3) | a myth chip or own words | A belief can feel like a fact | Myth cards (`emotion-guide`, planned) |
 | — | Nothing stood out | | "That's information too … that isn't on you" | Missing links (`missing-links`, planned) |

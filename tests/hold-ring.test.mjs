@@ -63,5 +63,5 @@ test("the embed: no digits in the ring, the shared gesture, the deadline clock f
   assert.match(src, /useKeepAwake\(running\)/);
   assert.doesNotMatch(src, /secondsLeft|mmss|leftMs/, "the acute path shows no digits");
   assert.match(src, /if \(!on \|\| reduce\) return;/, "the pulse stops under reduced motion");
-  assert.match(src, /\{tried && \(/, "a way past appears after the first try: nothing locks");
+  assert.match(src, /\{\(tried \|\| wayOnFromStart\) && \(/, "a way past appears after the first try, or from the start (wayOn: from_start): nothing locks");
 });

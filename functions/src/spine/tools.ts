@@ -14,7 +14,8 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   'cool-down': { module: 'dt', closeKind: 'regulation_down' },
   'five-senses': { module: 'dt', closeKind: 'orienting' },
   'pause': { module: 'dt', closeKind: 'urge_change' },
-  'urge-surfing': { module: 'dt', closeKind: 'urge' },
+  'urge-surfing': { module: 'dt', closeKind: 'urge_change' },
+  'let-it-be': { module: 'dt', closeKind: 'regulation_down' },
   // Pros & cons card (DT-10, docs/design/pros-cons.md): made in calm, so no close question ("how strong is it now?"
   // means little here); its outcome is the replay's, inside Hold to wait's own close.
   'pros-cons': { module: 'dt', closeKind: 'none' },

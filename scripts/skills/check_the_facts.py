@@ -265,8 +265,8 @@ STEPS = [
             {"exit": "opposite_action", "when": {"in": [a("fits"), ["partly", "doesnt_fit"]]}},
             {"exit": "problem_solve", "when": FITS_IS("partly")},
             {"exit": "wise_mind", "when": FITS_IS("unsure")},
-            # v1.1, planned until their tools ship (the owner flips them): it fits and can't be changed today →
-            # the wave (ER-08) or let it be (DT-04); doesn't fit with no urge to act on → the wave.
+            # v1.1: it fits and can't be changed today → the wave (ER-08, planned until it ships) or let it be
+            # (DT-04, built 11 Nov 2026); doesn't fit with no urge to act on → the wave.
             {"exit": "mindfulness_emotions", "when": FITS_IS("fits")},
             {"exit": "let_it_be", "when": FITS_IS("fits")},
             {"exit": "mindfulness_emotions", "when": FITS_IS("doesnt_fit")},
@@ -291,7 +291,7 @@ EXITS = [
     {"id": "wise_mind", "toolId": "wise-mind", "query": {"first": "wm_q_next"}},
     {"id": "cope_ahead", "toolId": "cope-ahead", "query": {"situationId": "other"}},
     {"id": "mindfulness_emotions", "toolId": "mindfulness-emotions", "planned": True},  # ER-08 (ER-B5)
-    {"id": "let_it_be", "toolId": "let-it-be", "planned": True},                        # DT-04 (DT-B4)
+    {"id": "let_it_be", "toolId": "let-it-be"},                        # DT-04 (DT-B4)
     {"id": "safety_open", "safety": True},                                              # safety.open (R6)
     {"id": "done", "done": True},
 ]

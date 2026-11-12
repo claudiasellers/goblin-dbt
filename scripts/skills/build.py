@@ -29,7 +29,13 @@ THEN_VS_NOW = {"worse", "same", "better", "much_better"}
 FOLLOW_UPS = {t["id"]: t for t in FOLLOW_UP_TYPES}
 # Context keys a skill may accept (src/data/skillTypes.ts CtxKey).
 CTX_KEYS = {"urgeId", "personId", "frame", "enterAt", "situationId", "partId", "band", "returnTo"}
-CRISIS_VARIANTS = {"crisis", "other_person"}
+CRISIS_VARIANTS = {"crisis", "other_person", "medical"}
+# An option's `danger` → the crisis slot variant its step must declare (plan C6.4). `medical`: DT-01's chest pain or
+# fainting (call the emergency number, not a crisis line).
+DANGER_VARIANT = {"self": "crisis", "other": "other_person", "medical": "medical"}
+# A field's `askFresh`: which ask-fresh session field its answer is (functions/src/userdata/layers.ts).
+ASK_FRESH = {"fitsFacts", "thenVsNow"}
+THEN_VS_NOW = {"worse", "same", "better", "much_better"}
 RUN_OWN_MAX = 140  # functions/src/spine/extSchemas.ts RUN_OWN_MAX (tests/skill-contracts.test.mjs keeps them equal)
 SAFETY_EXIT_ID = "safety_open"  # the reserved exit (plan C3a R6); a skill has at most one
 OPS = {"set", "eq", "in", "has", "own", "some", "all", "any", "not"}
@@ -181,7 +187,7 @@ def check(skill):
             check_embed_props(s["embed"], s.get("props"), copy, fields, w)
             assert not s.get("fields"), (w, "an embed step has no fields; its output is `answerAs`")
             for v, kind in EMBEDS[s["embed"]].get("danger", {}).items():
-                want = "other_person" if kind == "other" else "crisis"
+                want = DANGER_VARIANT[kind]
                 assert any(c["variant"] == want for c in s.get("crisis", [])), (
                     w, f"embed id {v} can carry danger: the step declares a {want} crisis slot (plan C6.4)")
         else:
@@ -229,6 +235,13 @@ def check(skill):
                 assert o["moreKey"] in copy, (w, o)
             for k in ("label",):
                 assert k not in f or f[k] in copy, (w, f)
+            if "askFresh" in f:
+                assert f["askFresh"] in ASK_FRESH, (w, "an ask-fresh field the session has", f)
+            if f.get("askFresh") == "thenVsNow":
+                # The close, asked in the flow (DT-01): one pick from the spine's four, required, nothing typed.
+                values = {x[1] for x in skill["options"] if x[0] == o.get("list")}
+                assert values == THEN_VS_NOW and f.get("max") == 1 and f.get("required") and "own" not in f, (
+                    w, "an in-flow close is one required pick of worse / same / better / much_better", f)
             if "own" in f:
                 assert f["own"]["hint"] in copy, (w, f)
                 if f["own"].get("seed"):
@@ -243,8 +256,8 @@ def check(skill):
                 check_cond({"set": o["firstFrom"]}, fields, derived, w, accepts)
             if "list" in o:
                 for x in (x for x in skill["options"] if x[0] == o["list"] and x[3].get("danger")):
-                    assert x[3]["danger"] in ("self", "other"), (w, x[1])
-                    want = "other_person" if x[3]["danger"] == "other" else "crisis"
+                    assert x[3]["danger"] in DANGER_VARIANT, (w, x[1])
+                    want = DANGER_VARIANT[x[3]["danger"]]
                     assert any(slot["variant"] == want for slot in s.get("crisis", [])), (
                         w, f"option {x[1]} can carry danger: the step declares a {want} crisis slot (plan C6.4)")
             if "showWhen" in f:

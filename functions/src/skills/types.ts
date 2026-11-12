@@ -106,8 +106,12 @@ export interface FieldDef {
   own?: { hint: string; countsAsPick: boolean; open?: boolean; max?: number; seed?: boolean };
   showWhen?: Cond;
   required?: boolean;
-  /** The answer is also this ask-fresh field on the session (functions/src/userdata/layers.ts). */
-  askFresh?: 'fitsFacts';
+  /**
+   * The answer is also this ask-fresh field on the session (functions/src/userdata/layers.ts). `thenVsNow`: the
+   * close, asked in the flow (DT-01: what happens next depends on it); the latest answered one is the session's
+   * close, and leaving asks no close question after it.
+   */
+  askFresh?: 'fitsFacts' | 'thenVsNow';
   /** A table read shown above the chips (e.g. fitsWhen for the derived parent). */
   list?: { table: string; key: string };
   /** The picked word is one of the session's emotions. */
@@ -123,9 +127,9 @@ export interface SlotDef { after: string; embed: string; props?: Record<string, 
 
 /**
  * Crisis resources above a step while `when` holds (CrisisBanner, compact); a step lists them, the first that holds
- * shows. An option with a `danger` prop (`self` / `other`) needs a slot of the matching variant on its step.
+ * shows. An option with a `danger` prop (`self` / `other` / `medical`) needs a slot of the matching variant on its step.
  */
-export interface CrisisSlot { variant: 'crisis' | 'other_person'; when: Cond }
+export interface CrisisSlot { variant: 'crisis' | 'other_person' | 'medical'; when: Cond }
 
 /** What a whole-screen embed may report (functions/src/spine/extSchemas.ts `run.out`). Measurements, never ratings. */
 export interface EmbedOutput {
@@ -161,7 +165,7 @@ export interface EmbedOutputSchema {
   ids?: readonly string[];
   ownText?: boolean;
   measures?: ReadonlyArray<'durationSec' | 'doneCount' | 'earlyCount'>;
-  danger?: Readonly<Record<string, 'self' | 'other'>>;
+  danger?: Readonly<Record<string, 'self' | 'other' | 'medical'>>;
 }
 
 export interface StepDef {

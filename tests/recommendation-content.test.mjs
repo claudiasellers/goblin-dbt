@@ -60,7 +60,7 @@ test("D-02 defaults kept: Urge Surfing switched off, no DEAR MAN rows, Pause act
   assert.deepEqual([...new Set(rows.filter((r) => !r.active).map((r) => r.conceptId))].sort(), [...planned, "urge_surfing"].sort());
   // Wise mind's module ships before its row is signed off: it has its app tool id, and the watchful row
   // stays switched off and a draft (Claudia signs it off separately; build.py refuses an active draft).
-  for (const c of planned.filter((x) => x !== "dbt_wise_mind" && x !== "dbt_cope_ahead" && x !== "dbt_check_facts" && x !== "dbt_fast")) assert.ok(!graph.concepts[c]?.appToolId, `${c} has no app module yet`);
+  for (const c of planned.filter((x) => x !== "dbt_wise_mind" && x !== "dbt_cope_ahead" && x !== "dbt_check_facts" && x !== "dbt_fast" && x !== "dbt_radical_acceptance")) assert.ok(!graph.concepts[c]?.appToolId, `${c} has no app module yet`);
   assert.equal(graph.concepts.dbt_wise_mind.appToolId, "wise-mind");
   const wise = rows.filter((r) => r.conceptId === "dbt_wise_mind");
   assert.deepEqual(wise.map((r) => [r.id, r.active, r.reviewStatus]), [["rf_chronic_vigilance_words_watchful_wise-mind", false, "draft"]]);
@@ -84,6 +84,11 @@ test("D-02 defaults kept: Urge Surfing switched off, no DEAR MAN rows, Pause act
   assert.equal(fast.length, 2);
   assert.ok(fast.every((r) => !(r.words ?? []).some((w) => w === "violated" || w === "victimized")), "FAST never on violated or victimized");
   assert.ok(fast.every((r) => r.active === false && r.reviewStatus === "draft"), "FAST rows stay off and drafts");
+  // Let it be (docs/design/let-it-be.md, DT-04; D6 renamed radical-acceptance): built, its three rows off and drafts.
+  assert.equal(graph.concepts.dbt_radical_acceptance.appToolId, "let-it-be");
+  const lb = rows.filter((r) => r.conceptId === "dbt_radical_acceptance");
+  assert.equal(lb.length, 3);
+  assert.ok(lb.every((r) => r.active === false && r.reviewStatus === "draft"), "Let it be rows stay off and drafts");
   assert.ok(rows.some((r) => tool(r) === "pause" && r.active));
 });
 
@@ -96,6 +101,7 @@ test("tags (WMP-04 v0 side, skillKind, direction) on the 13 app-tool concepts; D
     "dear-man": ["change", "relational", "neutral"], "recovering-from-invalidation": ["both", "relational", "neutral"],
     "wise-mind": ["both", "naming", "neutral"], "cope-ahead": ["change", "change", "neutral"],
     "check-the-facts": ["change", "change", "neutral"], "alternate-rebellion": ["acceptance", "redirect", "neutral"], fast: ["change", "relational", "neutral"],
+    "let-it-be": ["acceptance", "hold", "neutral"],
   });
   for (const id of Object.keys(tags)) assert.ok(toolIds.includes(id), id);
 });

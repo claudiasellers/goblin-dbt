@@ -404,7 +404,7 @@ EXITS = [
     {"id": "ending_relationships", "toolId": "ending-relationships"},
     {"id": "ending_careful", "toolId": "ending-relationships", "query": {"frame": "careful"}},
     {"id": "safety_open", "toolId": None, "safety": True},
-    {"id": "let_it_be", "toolId": "let-it-be", "planned": True},
+    {"id": "let_it_be", "toolId": "let-it-be"},
     {"id": "finding_connection", "toolId": "finding-connection", "planned": True},
     {"id": "give", "toolId": "give", "planned": True},
     {"id": "done", "done": True},
