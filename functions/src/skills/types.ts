@@ -16,7 +16,7 @@ export type Cond =
   | { not: Cond };
 
 /** Context keys a skill may accept from the page that opens it (`SkillDef.accepts`, refs `$ctx.<key>`). */
-export type CtxKey = 'urgeId' | 'personId' | 'frame' | 'enterAt' | 'situationId' | 'partId' | 'band' | 'returnTo' | 'emotionId' | 'refused';
+export type CtxKey = 'urgeId' | 'personId' | 'frame' | 'enterAt' | 'situationId' | 'partId' | 'band' | 'returnTo' | 'emotionId' | 'refused' | 'feelingId';
 
 /** Profile slices a field can list as options (R3): each item has an id and something to call it. */
 export type ProfileOptionSlice = 'parts' | 'ownLines' | 'savedLines' | 'people' | 'values' | 'goals'

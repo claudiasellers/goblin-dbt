@@ -121,7 +121,9 @@ test("page: DearMan picks the mode once; the debrief is lazy and the prep keeps 
   const page = read("src/pages/tools/DearMan.tsx");
   assert.match(page, /const \[mode\] = useState\(\(\) => new URLSearchParams\(search\)\.get\('mode'\)\);/);
   assert.match(page, /if \(mode === 'debrief'\) return <Suspense fallback=\{<ToolLoading \/>\}><LazyDearManDebrief \/><\/Suspense>;/);
-  assert.match(page, /if \(mode === 'one'\) return <Suspense fallback=\{<ToolLoading \/>\}><LazyDearManOne \/><\/Suspense>;\s*return <DearManPrep \/>;/, "One message (IE-B3) on ?mode=one");
+  assert.match(page, /if \(mode === 'one'\) return <Suspense fallback=\{<ToolLoading \/>\}><LazyDearManOne \/><\/Suspense>;/, "One message (IE-B3) on ?mode=one");
+  // IE-B4: the prep on the skill player; the hand-built prep only for an old ?resume= draft (and as the rollback).
+  assert.match(page, /if \(PREP_ON_PLAYER && !resumeLink\) return <Suspense fallback=\{<ToolLoading \/>\}><LazyDearManPrepSkill \/><\/Suspense>;\s*return <DearManPrep \/>;/);
   assert.match(page, /const LazyDearManDebrief = lazy\(\(\) => import\('\.\.\/\.\.\/components\/tools\/dearMan\/DearManDebrief'\)/);
   for (const gone of ["debrief-", "getStateAndTools", "saveCheckIn", "getDearManDebriefContent", "getDearManReflection", "debriefCheckInId", "recommendationCards"]) {
     assert.ok(!page.includes(gone), `${gone} is gone from the prep page (Claudia, 11 Nov: no end cards, no silent check-in)`);

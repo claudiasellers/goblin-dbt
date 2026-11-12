@@ -17,6 +17,7 @@ import { LidShelf } from './LidShelf';
 import { MessageComposer } from './MessageComposer';
 import { DoorPickerEmbed } from './DoorPickerEmbed';
 import { OaStepsEmbed } from './OaStepsEmbed';
+import { PocketCard } from './PocketCard';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -82,6 +83,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   messageComposer: MessageComposer,
   doorPicker: DoorPickerEmbed,
   oaSteps: OaStepsEmbed,
+  pocketCard: PocketCard,
 };
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
@@ -114,6 +116,7 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   messageComposer: { ids: ['copied', 'opened', 'dropped_sorry'] },
   doorPicker: { emotions: 3 },
   oaSteps: {},
+  pocketCard: { ids: ['seen_all', 'copied'] },
 };
 
 /**
@@ -181,7 +184,33 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     selectedLabel: { type: 'copy' },
     openLabel: { type: 'copy', optional: true },
     next: { type: 'copy' },
+  },  // IE-01 Mode C (DEAR MAN's prep): the plan on three cards; `fill` / `detail` put the fill-in words in an ask's [blank].
+  pocketCard: {
+    say: { type: 'fields' },
+    steady: { type: 'fields' },
+    push: { type: 'fields' },
+    fill: { type: 'field', optional: true },
+    detail: { type: 'field', optional: true },
+    sayLabel: { type: 'copy' },
+    steadyLabel: { type: 'copy' },
+    pushLabel: { type: 'copy' },
+    prevLabel: { type: 'copy' },
+    nextCardLabel: { type: 'copy' },
+    copyLabel: { type: 'copy' },
+    copiedLabel: { type: 'copy' },
+    selectedLabel: { type: 'copy' },
+    next: { type: 'copy' },
+    skipLabel: { type: 'copy', optional: true },
+    joinField: { type: 'field', optional: true },
+    joinLead: { type: 'copy', optional: true },
+    labelAField: { type: 'field', optional: true },
+    labelA: { type: 'copy', optional: true },
+    labelBField: { type: 'field', optional: true },
+    labelB: { type: 'copy', optional: true },
+    steadyNoteA: { type: 'copy', optional: true },
+    steadyNoteB: { type: 'copy', optional: true },
   },
+
   rescriptCard: {
     startField: { type: 'field' },
     turnField: { type: 'field' },

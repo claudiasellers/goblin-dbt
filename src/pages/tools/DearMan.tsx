@@ -36,6 +36,7 @@ import { PERSON_SAFETY_ROUTE_COPY, fillWho, pickerCopy, withAnswer, type KeptPer
 import { roleLabel } from '../../data/people';
 import { ASK_OUTCOME_CHIPS, debriefLink, offerLetGo, type AskOutcomeChip } from '../../lib/dearManDebrief';
 import { getSpineContent, scheduleFollowUps } from '../../services/spine';
+import { PREP_ON_PLAYER } from '../../lib/dearManPrep';
 import { dueAtFor } from '../../lib/spine/windows';
 
 type Phase =
@@ -90,19 +91,25 @@ const textareaClass = `${inputClass} resize-none`;
 const loadCope = () => import('../../components/parts/CopeAheadStep');
 const LazyDearManOne = lazy(() => import('../../components/tools/dearMan/DearManOne').then((m) => ({ default: m.DearManOne })));
 const LazyDearManDebrief = lazy(() => import('../../components/tools/dearMan/DearManDebrief').then((m) => ({ default: m.DearManDebrief })));
+const LazyDearManPrepSkill = lazy(() => import('../../components/tools/dearMan/DearManPrepSkill').then((m) => ({ default: m.DearManPrepSkill })));
 const LazyCopeAheadStep = lazy(() => loadCope().then((m) => ({ default: m.CopeAheadStep })));
 function CopeAheadStep(p: ComponentProps<typeof LazyCopeAheadStep>) { return <Suspense fallback={null}><LazyCopeAheadStep {...p} /></Suspense>; }
 
 /**
- * DEAR MAN's page: the prep (this file), the debrief (`?mode=debrief`, docs/design/dear-man-debrief.md), or One message
+ * DEAR MAN's page: the prep (on the skill player since IE-B4, `DearManPrepSkill`; the hand-built prep below only for an
+ * old `?resume=` draft and as the rollback), the debrief (`?mode=debrief`, docs/design/dear-man-debrief.md), or One message
  * (`?mode=one`, docs/design/one-message.md): who it was with, then that skill on the skill player. The mode is read once: a link to the other mode is a
  * new visit (ToolPage keys the session by location).
  */
 export function DearMan() {
   const { search } = useLocation();
   const [mode] = useState(() => new URLSearchParams(search).get('mode'));
+  // A device-only resume draft (`?resume=`, P2's *come back later* on the hand-built prep) still opens that page.
+  const [resumeLink] = useState(() => new URLSearchParams(search).has('resume'));
   if (mode === 'debrief') return <Suspense fallback={<ToolLoading />}><LazyDearManDebrief /></Suspense>;
   if (mode === 'one') return <Suspense fallback={<ToolLoading />}><LazyDearManOne /></Suspense>;
+  // IE-B4: the prep on the skill player; the hand-built prep below stays in the tree until the follow-up deletes it.
+  if (PREP_ON_PLAYER && !resumeLink) return <Suspense fallback={<ToolLoading />}><LazyDearManPrepSkill /></Suspense>;
   return <DearManPrep />;
 }
 

@@ -937,9 +937,32 @@ export function pickedLabels(ctx: RunContext, s: StateLike): Record<string, stri
   return out;
 }
 
-/** The emotions this run names (the skill's `emotionFields`): the session's `setEmotionIds`. */
+/**
+ * The emotions this run names (the skill's `emotionFields`): the session's `setEmotionIds`. A picked option with an
+ * `emotion` prop names that word (DEAR MAN's feeling chips are `feel_*` ids); any other pick names its own id.
+ */
 export function runEmotionIds(ctx: RunContext, s: Pick<RunState, 'answers'>): string[] {
-  return ctx.skill.emotionFields.flatMap((f) => s.answers[f]?.ids ?? []);
+  return ctx.skill.emotionFields.flatMap((f) => {
+    const list = allFields(ctx.skill).find((x) => x.id === f)?.options.list;
+    return (s.answers[f]?.ids ?? []).map((id) => {
+      const e = list ? ctx.skill.options[list]?.find((o) => o.value === id)?.emotion : undefined;
+      return typeof e === 'string' && e ? e : id;
+    });
+  });
+}
+
+/**
+ * An exit's query as the link carries it: a value starting with `$` is read from the run (`$a.<field>`: its first
+ * pick; `$ctx.<key>`: context in). A value that is missing, `none` or not an id is left out.
+ */
+export function exitQuery(ctx: RunContext, exit: ExitDef, s: Pick<RunState, 'answers'>): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [k, v] of Object.entries(exit.query)) {
+    if (!v.startsWith('$')) { out[k] = v; continue; }
+    const got = v.startsWith('$a.') ? s.answers[v.slice(3)]?.ids[0] : v.startsWith('$ctx.') ? ctx.ctxIn?.[v.slice(5)] : undefined;
+    if (typeof got === 'string' && got !== 'none' && ID.test(got)) out[k] = got;
+  }
+  return out;
 }
 
 /**

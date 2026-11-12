@@ -296,6 +296,7 @@ const priorityLabels: Record<string, string> = {
   objective: 'Getting what I need',
   relationship: 'Keeping the relationship strong',
   'self-respect': 'Keeping my self-respect intact',
+  self_respect: 'Keeping my self-respect intact',
 };
 
 const overallLabels: Record<string, string> = {

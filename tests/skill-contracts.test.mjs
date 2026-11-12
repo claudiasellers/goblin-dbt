@@ -16,7 +16,7 @@ const waitsForFrame = (x) => {
   const target = fixture.skills.find((t) => t.toolId === x.toolId);
   return !!target && typeof x.query?.frame === "string" && !target.accepts.includes("frame");
 };
-const CTX_KEYS = new Set(["urgeId", "personId", "frame", "enterAt", "situationId", "partId", "band", "returnTo", "emotionId", "refused"]);
+const CTX_KEYS = new Set(["urgeId", "personId", "frame", "enterAt", "situationId", "partId", "band", "returnTo", "emotionId", "refused", "feelingId"]);
 const EXT_MAX_BYTES = 4096;
 
 const m = await importTs("src/lib/skillRuntime/machine.ts");
@@ -78,7 +78,8 @@ for (const sk of fixture.skills) {
       const target = fixture.skills.find((t) => t.toolId === x.toolId);
       if (!target) continue; // a page not on the runtime yet: its own entry contract (tests per tool)
       if (x.planned && waitsForFrame(x)) continue; // never opened until its frame is built
-      for (const key of Object.keys(x.query)) assert.ok(target.accepts.includes(key), `${x.id}: ${target.id} doesn't accept ${key}`);
+      // `mode` picks which of a tool's skills the page plays (DEAR MAN: debrief, one message, the prep); it isn't context.
+      for (const key of Object.keys(x.query)) if (key !== "mode") assert.ok(target.accepts.includes(key), `${x.id}: ${target.id} doesn't accept ${key}`);
     }
   });
 
