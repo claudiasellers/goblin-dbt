@@ -166,7 +166,7 @@ test("goldens after reachability: grid words move the pattern; anger has its own
   assert.deepEqual(flooding.tools.map((t) => t.id), ["cool-down", "five-senses"]);
   const stressed = await run({ quadrant: "high-unpleasant", emotions: ["Stressed"], band: "steady" }, on);
   assert.equal(stressed.pattern.id, "acute_alarm");
-  assert.deepEqual(stressed.tools.map((t) => t.id), ["problem-solve", "cool-down"]);
+  assert.deepEqual(stressed.tools.map((t) => t.id), ["mind-job", "problem-solve"], "distraction first, then Problem Solve (the review's bridge; live 12 Nov 2026)");
   const rejected = await run({ quadrant: "high-unpleasant", emotions: ["Rejected"], band: "stirred" }, on);
   assert.equal(rejected.pattern.id, "social_threat_shame");
   assert.deepEqual(rejected.tools.map((t) => t.id), ["recovering-from-invalidation", "opposite-action"]);

@@ -323,7 +323,9 @@ STEPS = [
     handoff("end", [{"when": {"eq": [a("fork"), v]}, "key": f"end_{v}"} for v in ("change", "cant", "gone")],
             [{"exit": "problem_solve", "when": {"eq": [a("fork"), "change"]}},
              {"exit": "dear_man", "when": {"eq": [a("fork"), "change"]}},
-             {"exit": "let_it_be", "when": {"eq": [a("fork"), "cant"]}}]),
+             {"exit": "let_it_be", "when": {"eq": [a("fork"), "cant"]}}],
+            # The close was asked in the flow (`back`): the player's answered-close path, so the parts tag row can follow.
+            no_close=False),
     handoff("louder", [{"when": ALWAYS, "key": "louder_line"}], [{"exit": "cool_down", "when": ALWAYS}]),
     handoff("too_much", [{"when": ALWAYS, "key": "too_much_line"}], [{"exit": "cool_down", "when": ALWAYS}]),
     handoff("settle", [{"when": ALWAYS, "key": "settle_line"}], [{"exit": "cool_down", "when": ALWAYS}]),

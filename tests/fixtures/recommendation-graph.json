@@ -2370,9 +2370,9 @@
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
+   "reviewStatus": "approved",
    "rationale": "Give your mind a job (ACCEPTS) as the alternative."
   },
   {
@@ -2476,9 +2476,9 @@
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
+   "reviewStatus": "approved",
    "rationale": "Give your mind a job (ACCEPTS, distract) leads for strain words."
   },
   {
@@ -2508,7 +2508,7 @@
    "active": true,
    "version": "rf-v2",
    "reviewStatus": "approved",
-   "rationale": "Bridge high agitation: distraction (Give your mind a job) then Problem Solve; until its row is signed off, Problem Solve leads and Cool Down follows."
+   "rationale": "Bridge high agitation: distraction (Give your mind a job) leads, then Problem Solve."
   },
   {
    "id": "rf_chronic_vigilance_addresses_recovering-from-invalidation",
@@ -2744,9 +2744,9 @@
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
+   "reviewStatus": "approved",
    "rationale": "Let it be (radical acceptance) leads for helplessness."
   },
   {
@@ -2772,7 +2772,7 @@
    "active": true,
    "version": "rf-v2",
    "reviewStatus": "approved",
-   "rationale": "Let it be (built, row off until signed off), then Problem Solve in micro-steps; Problem Solve leads until then."
+   "rationale": "Let it be leads (its own row), then Problem Solve in micro-steps."
   },
   {
    "id": "rf_chronic_vigilance_words_watchful_wise-mind",
@@ -2883,10 +2883,10 @@
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
-   "rationale": "Ride it out (DT-05, rebuilt on the skill runtime) for the checking / reassurance urge; off until signed off."
+   "reviewStatus": "approved",
+   "rationale": "Ride it out (DT-05, rebuilt on the skill runtime) for the checking / reassurance urge."
   },
   {
    "id": "rf_conservation_freeze_addresses_recovering-from-invalidation",
@@ -2980,7 +2980,7 @@
    "rationale": "Flooded + blank: orient only (no Cool Down, D-02)."
   },
   {
-   "id": "rf_conservation_freeze_planned_let-it-be",
+   "id": "rf_conservation_freeze_words_grief_let-it-be",
    "conceptId": "dbt_radical_acceptance",
    "patternId": "conservation_freeze",
    "bands": [
@@ -2990,17 +2990,21 @@
    "priority": 1.5,
    "direction": "neutral",
    "side": null,
-   "requiresPrior": null,
-   "emotionGate": null,
-   "words": [],
+   "requiresPrior": "up_regulation",
+   "emotionGate": "words",
+   "words": [
+    "despair",
+    "grief",
+    "empty"
+   ],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
-   "rationale": "Let it be (radical acceptance) after gentle movement for despair, grief, emptiness and numbness."
+   "reviewStatus": "approved",
+   "rationale": "Let it be (radical acceptance) after gentle movement for despair, grief and emptiness; not for numbness, which needs the body first (12 Nov 2026: was a pattern row for all of Shut down)."
   },
   {
    "id": "rf_dissociation_overmodulation_addresses_recovering-from-invalidation",
@@ -3470,9 +3474,9 @@
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
+   "reviewStatus": "approved",
    "rationale": "Let it be (radical acceptance) leads."
   },
   {
@@ -3669,9 +3673,9 @@
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
+   "reviewStatus": "approved",
    "rationale": "Give your mind a job (ACCEPTS) as the alternative."
   },
   {
@@ -4037,6 +4041,10 @@
   }
  ],
  "contraindicated": [
+  {
+   "conceptId": "dbt_accepts",
+   "targetId": "dissociation_overmodulation"
+  },
   {
    "conceptId": "dbt_opposite_action",
    "targetId": "dissociation_overmodulation"

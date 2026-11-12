@@ -122,6 +122,9 @@ test("the return: louder goes to the body; otherwise the fork (change → Proble
   assert.deepEqual(offers(end("gone")), []);
   assert.equal(end("later").stepId, "lid_pick");
   assert.deepEqual(M.askFresh(ctx(), fork), { thenVsNow: "better" });
+  // The end after the in-flow close takes the answered-close path (the parts tag row can follow); the other ends don't ask.
+  assert.ok(!M.stepOf(skill, "end").noClose);
+  for (const id of ["louder", "too_much", "settle", "break_ok", "lid_end", "lid_off"]) assert.equal(M.stepOf(skill, id).noClose, true, id);
 });
 
 test("a break: one family of ACCEPTS (never food, shopping or scrolling), then when to come back books the return card", () => {

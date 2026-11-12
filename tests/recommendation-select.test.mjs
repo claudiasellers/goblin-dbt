@@ -23,7 +23,8 @@ const lu = (extra = {}) => ({ quadrant: "low-unpleasant", ...extra });
 const ans = (...rs) => rs.map((responseId) => ({ questionId: "q", responseId }));
 const grid = parseGrid(readFileSync("src/data/emotions.ts", "utf8"));
 const toolIds = [...readFileSync("src/data/tools.ts", "utf8").matchAll(/^\s+id: '([a-z-]+)',/gm)].map((m) => m[1]);
-const toolComponents = readFileSync("src/pages/ToolPage.tsx", "utf8");
+// Hand-built pages, plus the tools the skill player plays.
+const toolComponents = readFileSync("src/pages/ToolPage.tsx", "utf8") + readFileSync("src/lib/skillRuntime/playerTools.ts", "utf8");
 const PATTERNS = Object.keys(graph.patterns).filter((p) => graph.recommendedFor.some((r) => r.patternId === p));
 const BANDS = ["steady", "stirred", "flooded"];
 
@@ -78,10 +79,10 @@ test("#5 nothing named (somatic skip) → Alarm: Cool Down + Find the feeling", 
   assert.deepEqual(ids(r), ["cool-down", "find-the-feeling"]);
 });
 
-test("#6 freeze: 5-4-3-2-1, then OA only 'once you've moved a little'; gentle movement; no flag", async () => {
+test("#6 freeze: 5-4-3-2-1, then (empty, 12 Nov 2026) Let it be after gentle movement; gentle movement; no flag", async () => {
   const r = await run(lu({ emotions: ["Empty"], band: "steady", discriminatingAnswers: ans("lu_mind_blank", "lu_body_heavy") }));
   assert.equal(r.pattern.id, "conservation_freeze");
-  assert.deepEqual(ids(r), ["five-senses", "opposite-action"]);
+  assert.deepEqual(ids(r), ["five-senses", "let-it-be"]);
   assert.equal(r.tools[1].sequence, "after_primary");
   assert.equal(r.tools[1].slot, "swap");
   assert.equal(r.guidedActivity.activityId, "gentle-movement");
@@ -117,11 +118,11 @@ test("#10 Social threat: Recover + Do the Opposite (unhiding) in any band but fl
   assert.deepEqual(pickIds(await cell("social_threat_shame", "stirred")), ["recovering-from-invalidation", "opposite-action"]);
 });
 
-test("#11 On guard always has a card: 5-4-3-2-1 + Problem Solve; Urge Surfing stays off (D-02)", async () => {
+test("#11 On guard always has a card: 5-4-3-2-1 + Problem Solve; Ride it out for worry (12 Nov 2026)", async () => {
   assert.deepEqual(pickIds(await cell("chronic_vigilance", "steady", { words: ["stressed"] })), ["five-senses", "problem-solve"]);
   assert.deepEqual(pickIds(await cell("chronic_vigilance", "stirred", { words: ["stressed"] })), ["five-senses", "problem-solve"]);
   assert.deepEqual(pickIds(await cell("chronic_vigilance", "flooded")), ["cool-down", "five-senses"]);
-  assert.ok(!pickIds(await cell("chronic_vigilance", "stirred", { words: ["worried"] })).includes("urge-surfing"));
+  assert.deepEqual(pickIds(await cell("chronic_vigilance", "stirred", { words: ["worried"] })), ["opposite-action", "urge-surfing"], "worry: Do the Opposite, Ride it out for the checking urge");
 });
 
 test("#12 flooding: crisis flag as today, and the cards still come (banner above them, R12)", async () => {
@@ -136,7 +137,7 @@ test("#13 co-occurring blank pattern: nothing calming and no Do the Opposite (ac
   const sel = await cell("acute_alarm", "stirred", { blank: true, secondary: "dissociation_overmodulation" });
   assert.deepEqual(pickIds(sel), ["five-senses"]);
   assert.deepEqual(sel.filtered.filter((f) => f.reason !== "emotion_gate").map((f) => [f.toolId, f.reason]), [["cool-down", "direction"], ["opposite-action", "contraindicated"]]);
-  assert.deepEqual(sel.filtered.filter((f) => f.reason === "emotion_gate").map((f) => f.toolId).sort(), ["find-the-feeling", "five-senses", "opposite-action", "pause", "problem-solve", "recovering-from-invalidation"], "gated rows that didn't fire are logged (word rules too)");
+  assert.deepEqual(sel.filtered.filter((f) => f.reason === "emotion_gate").map((f) => f.toolId).sort(), ["find-the-feeling", "five-senses", "mind-job", "mind-job", "opposite-action", "pause", "problem-solve", "recovering-from-invalidation"], "gated rows that didn't fire are logged (word rules too)");
 });
 
 test("#14 FTF flooded + blank → 5-4-3-2-1 only (no Cool Down, D-02)", async () => {

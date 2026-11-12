@@ -50,14 +50,18 @@ test("rows are drafts until signed off; the policy can only be enabled once ever
   }
 });
 
-test("D-02 defaults kept: Urge Surfing switched off, no DEAR MAN rows, Pause active; planned tools are written switched off", () => {
-  const planned = ["dbt_accepts", "dbt_check_facts", "dbt_cope_ahead", "dbt_fast", "dbt_give", "dbt_please", "dbt_radical_acceptance", "dbt_wise_mind"];
+test("no DEAR MAN rows, Pause active; planned and not-yet-signed tools are written switched off; Ride it out, Let it be and Give your mind a job live (12 Nov 2026)", () => {
+  const planned = ["dbt_check_facts", "dbt_cope_ahead", "dbt_fast", "dbt_give", "dbt_please", "dbt_wise_mind"];
   for (const r of rows) {
     assert.notEqual(r.conceptId, "dbt_dear_man", r.id);
-    const off = r.conceptId === "urge_surfing" || planned.includes(r.conceptId);
+    const off = planned.includes(r.conceptId);
     assert.equal(r.active, !off, r.id);
   }
-  assert.deepEqual([...new Set(rows.filter((r) => !r.active).map((r) => r.conceptId))].sort(), [...planned, "urge_surfing"].sort());
+  assert.deepEqual([...new Set(rows.filter((r) => !r.active).map((r) => r.conceptId))].sort(), [...planned].sort());
+  for (const c of ["urge_surfing", "dbt_radical_acceptance", "dbt_accepts"]) {
+    const live = rows.filter((r) => r.conceptId === c);
+    assert.ok(live.length && live.every((r) => r.active && r.reviewStatus === "approved"), c);
+  }
   // Wise mind's module ships before its row is signed off: it has its app tool id, and the watchful row
   // stays switched off and a draft (Claudia signs it off separately; build.py refuses an active draft).
   for (const c of planned.filter((x) => x !== "dbt_wise_mind" && x !== "dbt_cope_ahead" && x !== "dbt_check_facts" && x !== "dbt_fast" && x !== "dbt_radical_acceptance" && x !== "dbt_accepts")) assert.ok(!graph.concepts[c]?.appToolId, `${c} has no app module yet`);
@@ -88,7 +92,8 @@ test("D-02 defaults kept: Urge Surfing switched off, no DEAR MAN rows, Pause act
   assert.equal(graph.concepts.dbt_radical_acceptance.appToolId, "let-it-be");
   const lb = rows.filter((r) => r.conceptId === "dbt_radical_acceptance");
   assert.equal(lb.length, 3);
-  assert.ok(lb.every((r) => r.active === false && r.reviewStatus === "draft"), "Let it be rows stay off and drafts");
+  assert.ok(lb.every((r) => r.active === true && r.reviewStatus === "approved"), "Let it be rows live (12 Nov 2026)");
+  assert.ok(lb.find((r) => r.patternId === "conservation_freeze" || r.id.startsWith("rf_conservation_freeze"))?.words?.length, "Let it be on Shut down is word-gated (not numb)");
   assert.ok(rows.some((r) => tool(r) === "pause" && r.active));
 });
 

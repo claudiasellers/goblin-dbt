@@ -9519,7 +9519,7 @@ MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:fork"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 21};
 MERGE (n:SkillStep {id: "mind_job:end"})
-SET n += {skillId: "mind_job", step: "end", kind: "handoff", version: "mj-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"end_change\", \"when\": {\"eq\": [\"$a.fork\", \"change\"]}}, {\"key\": \"end_cant\", \"when\": {\"eq\": [\"$a.fork\", \"cant\"]}}, {\"key\": \"end_gone\", \"when\": {\"eq\": [\"$a.fork\", \"gone\"]}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true}";
+SET n += {skillId: "mind_job", step: "end", kind: "handoff", version: "mj-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"end_change\", \"when\": {\"eq\": [\"$a.fork\", \"change\"]}}, {\"key\": \"end_cant\", \"when\": {\"eq\": [\"$a.fork\", \"cant\"]}}, {\"key\": \"end_gone\", \"when\": {\"eq\": [\"$a.fork\", \"gone\"]}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}]}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:end"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 22};
