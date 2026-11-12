@@ -22,7 +22,7 @@ to the next check, except on *Did the feeling fit the facts?*, where not sure is
 | # | Check (H24) | Yes | Fix | Move |
 |---|---|---|---|---|
 | — | Validation: "When a skill doesn't help, that's information. It isn't proof you can't do this." | | | |
-| 1 | Body: could your body be turning the volume up? (PLEASE) | *Maybe, yes* | Low body, louder feelings; looking after one counts as a skill | Running low (`please-skill`, planned) |
+| 1 | Body: could your body be turning the volume up? (PLEASE) | *Maybe, yes* | Low body, louder feelings; looking after one counts as a skill | Running low (`please-skill`, built 12 Nov) |
 | 2 | The right skill: did the feeling fit the facts? | *Yes, it fit* | The move is the situation, or making room for the feeling | Problem Solve, Let it be; the wave (planned) |
 | | | *I'm not sure* | Checking the facts shows which kind of skill fits | Check the Facts |
 | 3 | All the way, or partly while still protecting yourself? | *Partly* | A smaller step done all the way | The line itself: retry the same skill |
@@ -86,8 +86,8 @@ linked by `hostSessionId`. No new label, no ask-fresh field, no profile write.
 - **All the way offers no tool.** The PRD's fix is a line ("try a smaller step, but all of it"); the skill to
   retry is the one that didn't help, which the skill can't know yet (no host id in context). Sending everyone
   to Do the Opposite was dropped: it's contraindicated for dissociation and wrong after Problem Solve.
-- **Four fix cards end on Done** (body, all the way, willingness, belief) and so does *nothing stood out*,
-  until Running low, Let it be, the myth cards and missing links land. Their lines and the nudge to try
+- **Two fix cards end on Done** (all the way, belief) and so does *nothing stood out*,
+  until the myth cards and missing links land (Running low and Let it be are built). Their lines and the nudge to try
   again are the move meanwhile.
 - **The check for reinforcers offers Problem Solve,** since the PRD's target is WMP behaviour-change content that
   doesn't exist as a tool. The line carries the explanation.

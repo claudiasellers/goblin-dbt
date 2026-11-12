@@ -4,15 +4,19 @@ PRD ER-07 (`PRD – Emotion Regulation.md` §5; docs/design/dbt-modules-plan.md 
 `please-skill` id named "Running low", D8 the PRD's five rows reusing closed PR #33's copy). For "everything is too
 much today and I don't know why": five rows one tap each (sleep, food, body, alcohol or drugs, moving), verbal
 categories only, then the volume named (the loudest row, a fixed order) and one fix for today from that row's
-fixes (a recommendation and a swap, plus *shrink today*), now or later, with an optional evening check
+fixes (two or three, plus *shrink today*), now or later, with an optional evening check
 (`please_fix`, reopening the run at *Did it happen?*).
 
 Departures from the PRD, all listed in docs/design/running-low.md with a reason and a batch:
 - The readout names the loudest row, not every loud row: one named cause and one fix is the PRD's own transform,
-  and a list of every factor reads as a report card. The fixes offered cover every loud row.
+  and a list of every factor reads as a report card. The fixes are that row's, which keeps the screen short.
+- Not offered flooded (PRD) becomes a quiet *settle your body first* link: nothing locks (C6.2).
+- H20's *avoid* in A and *avoid foods that make you emotional* are left out: harm reduction (food and water first) and
+  eating-disorder safety (C6.7). *See a doctor when necessary* is a quiet line on the fix screen when ill or in pain.
 - One check per visit, not one per day upserted (the diary is CORE's and isn't built; the record is `ext.run`, D2).
 - No weekly pattern card, no "sleep short 3 of 7 → Sleep reset" offer and no monthly *something you've been putting
   off*: each is an aggregate over past visits or a monthly schedule, which a live flow never reads (data layers).
+- Sleep reset (ER-13) from the sleep row is a planned exit until it's built (ER-B5).
 - No per-row hiding in settings: every row can be skipped (nothing is required), and food and substances have
   *not sure* / *rather not say*.
 
@@ -37,7 +41,6 @@ def a(field):
 COPY = {
     "next": "Next",
     "done": "Done",
-    "skip": "Skip this one",
     # The five rows (PRD ER-07 step 1). One tap each, words only: no hours, amounts, calories or weight.
     "sleep_title": "How was your sleep last night?",
     "sleep_hint": "Running low on sleep, food or health can make every feeling louder. One tap each, and any can be skipped.",
@@ -46,16 +49,19 @@ COPY = {
     "body_title": "How's your body today?",
     "subs_title": "Any alcohol or drugs in the last day?",
     "subs_hint": "Any answer is fine here, and so is not saying.",
-    "moved_title": "Have you moved much today?",
+    "moved_title": "Have you moved today?",
     # The readout (step 2, the batteryRead screens' titles): the loudest row, in a fixed order (the body first: pain and missed meds matter most).
-    "vol_body": "Your body is part of why the volume's up today.",
-    "vol_sleep": "Sleep is part of why the volume's up today.",
-    "vol_food": "Food is part of why the volume's up today.",
-    "vol_subs": "Last night is part of why the volume's up today.",
-    "vol_moved": "Not moving yet is part of why the volume's up today.",
-    "tank_names": "Sleep · Food · Body · Last night · Moving",
+    # Hedged (one tap is not a cause) and never effort-blame (voice S5: a still day is the body, not the person).
+    "vol_body": "Your body may be part of why the volume's up today.",
+    "vol_sleep": "Sleep may be part of why the volume's up today.",
+    "vol_food": "Food may be part of why the volume's up today.",
+    "vol_subs": "Alcohol or drugs may be part of why the volume's up today.",
+    "vol_moved": "A still day can keep the volume up. That's the body, not you.",
+    "tank_names": "Sleep · Food · Body · Alcohol or drugs · Moving",
     "fix_title": "One thing for today",
-    "fix_hint": "Pick the smallest one you'd actually do.",
+    "fix_hint": "Pick the smallest one that feels doable.",
+    # Ill or in pain (H20's *see a doctor when necessary*): a quiet line, never a gate.
+    "fix_care": "If it's new, bad or not easing, a doctor or pharmacist can help.",
     "fix_own": "Something else",
     # Tired, or heavy? (PR #33's check, as two quiet links): sadness and shame can feel like tiredness.
     "heavy_link": "Rest doesn't refill me: find the feeling",
@@ -65,13 +71,13 @@ COPY = {
     # Now or later (step 3), with an optional evening check (step 4).
     "when_title": "When will you do it?",
     "remind_label": "Want me to ask tonight if it happened?",
-    "set_title": "Looking after your body is the skill",
+    "set_title": "Your one thing for today: {fix}",
+    "back_end_title": "Looking after your body is the skill",
     "set_now": "Feelings run hotter on an empty tank. This is one small thing for it.",
     "set_later": "It's on for later today.",
     "set_remind": "It'll be on Today this evening, to ask if it happened.",
-    "sleep_more": "If short sleep keeps coming back, a sleep reset can help.",
     # The evening card reopens the run here (step 4).
-    "back_title": "Did the fix happen?",
+    "back_title": "Did it happen? {fix}",
     "back_yes": "That's one thing done for your body today.",
     "back_partly": "Part of it counts. Your body got some of what it needed.",
     "back_no": "Days like that happen. Tomorrow's another go, and a smaller thing can count.",
@@ -106,20 +112,27 @@ ANY_LOUD = {"any": [LOUD_ROW[f] for f in ORDER]}
 # answers it's for; "always" is offered whatever was picked (lowering the bar is the skill on an empty tank).
 # Medication: never advice, only what's already prescribed.
 FIXES = [
-    ("fix_protein", "Eat something with some protein in it, in the next hour", ["food_skipped", "food_all_over", "subs_some"]),
+    # Food (ED-safe, C6.7): regular eating, never a nutrient, a size or "proper".
+    ("fix_snack", "Something to eat in the next hour, whatever's easy", ["food_skipped", "food_all_over", "subs_some"]),
     ("fix_water", "A glass of water now", ["food_skipped", "body_ill", "subs_some", "sleep_short"]),
-    ("fix_meal", "A proper meal, even a small one", ["food_all_over"]),
-    ("fix_lie_down", "A 20-minute lie-down before 3pm, with an alarm", ["sleep_short", "sleep_broken"]),
+    ("fix_mealtime", "A meal or snack at your next usual mealtime", ["food_all_over"]),
+    # Short sleep only: daytime naps work against broken sleep (insomnia care), and no clock time (it may be late).
+    ("fix_rest", "A short rest with an alarm set, if it's not too late in the day", ["sleep_short"]),
     ("fix_daylight", "Five minutes outside, or by an open window", ["sleep_broken", "sleep_much", "moved_not_yet"]),
-    ("fix_sick_care", "Treat it like being sick: rest, fluids, warmth", ["body_ill"]),
+    ("fix_sick_care", "Look after it like a cold: rest, fluids, warmth", ["body_ill"]),
     ("fix_usual", "Whatever you'd usually do for the pain", ["body_pain"]),
     ("fix_sit", "Sit or lie down for 15 minutes", ["body_pain"]),
-    ("fix_meds", "Check what's due and take it as prescribed", ["body_meds"]),
+    # A missed dose: never "take it now" (a late or doubled dose can be wrong); the label or a pharmacist says.
+    ("fix_meds", "Check what's due, and what the label or a pharmacist says about a missed dose", ["body_meds"]),
     ("fix_food_first", "Food and water before any big decisions", ["subs_some"]),
     ("fix_move", "Walk around the block, or the room, for five minutes", ["moved_not_yet", "sleep_much"]),
     ("fix_one_thing", "Shrink today to the one thing that has to happen", ["always"]),
 ]
-FIX_WHERE = {"any": [{"has": ["$opt.on", a(f)]} for f in ORDER] + [{"has": ["$opt.on", "always"]}]}
+# The loudest row's fixes only (the first loud row in ORDER), so the screen stays at two or three plus shrink today.
+# The body first also keeps a walk away from someone ill or in pain.
+FIX_WHERE = {"any": [{"all": [LOUD_ROW[f], *({"not": LOUD_ROW[g]} for g in ORDER[:i]), {"has": ["$opt.on", a(f)]}]}
+                     for i, f in enumerate(ORDER)] + [{"has": ["$opt.on", "always"]}]}
+BODY_HURTS = {"in": [a("body"), ["body_ill", "body_pain"]]}
 
 WHEN = [("now", "Now"), ("later", "Later today")]
 REMIND = [("evening", "Yes, this evening")]
@@ -150,6 +163,7 @@ def steps():
     out += [
         {
             "id": "fix", "kind": "ask", "title": "fix_title", "hint": "fix_hint",
+            "lines": [{"when": BODY_HURTS, "key": "fix_care"}],
             "fields": [{"id": "fix", "options": {"list": "fix", "where": FIX_WHERE}, "max": 1, "required": True,
                         "own": {"hint": "fix_own", "countsAsPick": True, "max": OWN_MAX},
                         # Sleep or moving loud: tiredness can be a feeling (PR #33's *tired or heavy?*), one quiet tap.
@@ -170,7 +184,7 @@ def steps():
             "next": [{"to": "set"}],
         },
         {
-            "id": "set", "kind": "handoff", "complete": True, "title": "set_title",
+            "id": "set", "kind": "handoff", "complete": True, "title": "set_title", "titleSlots": {"fix": {"labelOf": "fix"}},
             "lines": [
                 {"when": {"set": a("remind")}, "key": "set_remind"},
                 {"when": {"eq": [a("when"), "later"]}, "key": "set_later"},
@@ -188,11 +202,12 @@ def steps():
         {
             # The evening card's link reopens the run here, on a run that reached `when`.
             "id": "back", "kind": "ask", "reopens": {"after": "when"}, "clears": ["happened"], "title": "back_title",
+            "titleSlots": {"fix": {"labelOf": "fix"}},
             "fields": [{"id": "happened", "options": {"list": "happened"}, "max": 1, "required": True}],
             "next": [{"to": "back_end"}],
         },
         {
-            "id": "back_end", "kind": "handoff", "complete": True, "noClose": True, "title": "set_title",
+            "id": "back_end", "kind": "handoff", "complete": True, "noClose": True, "title": "back_end_title",
             "lines": [
                 {"when": {"eq": [a("happened"), "done_yes"]}, "key": "back_yes"},
                 {"when": {"eq": [a("happened"), "done_partly"]}, "key": "back_partly"},

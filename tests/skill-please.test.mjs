@@ -90,17 +90,33 @@ test("the readout: the battery screen names the loudest row in a fixed order (bo
   }
 });
 
-test("one fix for today: only the fixes for what was picked, plus shrink today always; own words count", () => {
+test("one fix for today: the loudest row's fixes only (two or three), plus shrink today always; own words count", () => {
   const sleep = run(toFix({ sleep: "sleep_short" }));
-  assert.deepEqual(fixValues(sleep), ["fix_water", "fix_lie_down", "fix_one_thing"]);
+  assert.deepEqual(fixValues(sleep), ["fix_water", "fix_rest", "fix_one_thing"]);
+  assert.deepEqual(fixValues(run(toFix({ sleep: "sleep_broken" }))), ["fix_daylight", "fix_one_thing"], "no daytime nap for broken sleep");
   const pain = run(toFix({ body: "body_pain" }));
   assert.deepEqual(fixValues(pain), ["fix_usual", "fix_sit", "fix_one_thing"]);
   const meds = run(toFix({ body: "body_meds" }));
-  assert.deepEqual(fixValues(meds), ["fix_meds", "fix_one_thing"], "medication: only what's already prescribed");
-  assert.match(skill.options.fix.find((o) => o.value === "fix_meds").label, /as prescribed/);
-  // Several loud rows: every loud row's fixes, each once.
+  assert.deepEqual(fixValues(meds), ["fix_meds", "fix_one_thing"]);
+  assert.match(skill.options.fix.find((o) => o.value === "fix_meds").label, /label or a pharmacist/, "a missed dose: never take it now");
+  // Several loud rows: only the loudest row's, so the screen stays short.
   const many = fixValues(run(toFix({ food: "food_skipped", moved: "moved_not_yet" })));
-  assert.deepEqual(many, ["fix_protein", "fix_water", "fix_daylight", "fix_move", "fix_one_thing"]);
+  assert.deepEqual(many, ["fix_snack", "fix_water", "fix_one_thing"]);
+  // Every loud answer, alone and in the worst case: at most three fixes before shrink today.
+  for (const r of ROWS) for (const v of skill.options[r].map((o) => o.value)) {
+    const n = fixValues(run(toFix({ [r]: v }))).length;
+    if (run(rows({ [r]: v })).stepId !== "none") assert.ok(n >= 2 && n <= 4, `${v}: ${n}`);
+  }
+  const worst = fixValues(run(toFix({ sleep: "sleep_broken", food: "food_all_over", body: "body_ill", subs: "subs_some", moved: "moved_not_yet" })));
+  assert.deepEqual(worst, ["fix_water", "fix_sick_care", "fix_one_thing"], "the body first: never a walk when ill or in pain");
+  // Ill or in pain: the quiet doctor-or-pharmacist line, never a gate.
+  const care = (s) => M.handoffLine(ctx(), M.stepOf(skill, "fix"), s);
+  assert.equal(care(run(toFix({ body: "body_ill" }))), skill.copy.fix_care);
+  assert.equal(care(pain), skill.copy.fix_care);
+  assert.equal(care(meds), null);
+  assert.equal(care(sleep), null);
+  // Food is regular eating: no nutrient, size or "proper".
+  assert.doesNotMatch(skill.options.fix.map((o) => o.label).join(" | "), /protein|proper|small one|calorie|portion/i);
   // A calm answer never offers a fix of its own (sleep_enough is on no list).
   for (const o of skill.options.fix) assert.ok(o.on.every((x) => x === "always" || ROWS.some((r) => skill.options[r].some((y) => y.value === x))), o.value);
   // Required: one pick or own words.
@@ -119,12 +135,16 @@ test("tired or heavy: sleep or moving loud offers a quiet link to Find the feeli
 });
 
 test("now: the set card says why it counts; later without the chip: on for later, no card scheduled", () => {
-  const atWhen = run([...toFix({ food: "food_skipped" }), pick("fix", "fix_protein"), next]);
+  const atWhen = run([...toFix({ food: "food_skipped" }), pick("fix", "fix_snack"), next]);
   assert.equal(atWhen.stepId, "when");
   assert.deepEqual(M.shownFields(ctx(), M.stepOf(skill, "when"), atWhen).map((f) => f.id), ["when"], "the evening chip waits for Later");
   const now = run([pick("when", "now"), next], ctx(), atWhen);
   assert.equal(now.stepId, "set");
   assert.equal(line(now), skill.copy.set_now);
+  assert.equal(M.copyText(ctx(), M.stepOf(skill, "set").title, now, M.titleSlots(ctx(), M.stepOf(skill, "set"), now)),
+    "Your one thing for today: Something to eat in the next hour, whatever's easy", "the end card holds the fix");
+  const mine = run([own("fix", "Ask for a lift home"), next, pick("when", "now"), next], ctx(), run(toFix({ food: "food_skipped" })));
+  assert.equal(M.copyText(ctx(), M.stepOf(skill, "set").title, mine, M.titleSlots(ctx(), M.stepOf(skill, "set"), mine)), "Your one thing for today: Ask for a lift home");
   assert.equal(M.followUpFor(ctx(), M.stepOf(skill, "when"), run([pick("when", "now")], ctx(), atWhen)), null);
   const later = run([pick("when", "later")], ctx(), atWhen);
   assert.deepEqual(M.shownFields(ctx(), M.stepOf(skill, "when"), later).map((f) => f.id), ["when", "remind"]);
@@ -134,7 +154,7 @@ test("now: the set card says why it counts; later without the chip: on for later
 });
 
 test("the evening check: the chip schedules please_fix, whose card reopens the run at Did the fix happen?", () => {
-  const atWhen = run([...toFix({ sleep: "sleep_short" }), pick("fix", "fix_lie_down"), next]);
+  const atWhen = run([...toFix({ sleep: "sleep_short" }), pick("fix", "fix_rest"), next]);
   const s = run([pick("when", "later"), pick("remind", "evening")], ctx(), atWhen);
   assert.deepEqual(M.followUpFor(ctx(), M.stepOf(skill, "when"), s), { type: "please_fix", chip: "evening" });
   const set = run([next], ctx(), s);
@@ -148,6 +168,7 @@ test("the evening check: the chip schedules please_fix, whose card reopens the r
   for (const [v, key] of [["done_yes", "back_yes"], ["done_partly", "back_partly"], ["done_no", "back_no"]]) {
     const r = M.resumeRun(ctx(), rec, "back");
     assert.equal(r?.stepId, "back");
+    assert.match(M.copyText(ctx(), M.stepOf(skill, "back").title, r, M.titleSlots(ctx(), M.stepOf(skill, "back"), r)), /^Did it happen\? A short rest/, "the card names the fix");
     assert.equal(M.canGoOn(ctx(), r), false);
     const end = run([pick("happened", v), next], ctx(), r);
     assert.equal(end.stepId, "back_end");

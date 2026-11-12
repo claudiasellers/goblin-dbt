@@ -31079,7 +31079,6 @@
    "copy": {
     "next": "Next",
     "done": "Done",
-    "skip": "Skip this one",
     "sleep_title": "How was your sleep last night?",
     "sleep_hint": "Running low on sleep, food or health can make every feeling louder. One tap each, and any can be skipped.",
     "settle_first": "Things feel loud right now. You could settle your body first.",
@@ -31087,27 +31086,28 @@
     "body_title": "How's your body today?",
     "subs_title": "Any alcohol or drugs in the last day?",
     "subs_hint": "Any answer is fine here, and so is not saying.",
-    "moved_title": "Have you moved much today?",
-    "vol_body": "Your body is part of why the volume's up today.",
-    "vol_sleep": "Sleep is part of why the volume's up today.",
-    "vol_food": "Food is part of why the volume's up today.",
-    "vol_subs": "Last night is part of why the volume's up today.",
-    "vol_moved": "Not moving yet is part of why the volume's up today.",
-    "tank_names": "Sleep · Food · Body · Last night · Moving",
+    "moved_title": "Have you moved today?",
+    "vol_body": "Your body may be part of why the volume's up today.",
+    "vol_sleep": "Sleep may be part of why the volume's up today.",
+    "vol_food": "Food may be part of why the volume's up today.",
+    "vol_subs": "Alcohol or drugs may be part of why the volume's up today.",
+    "vol_moved": "A still day can keep the volume up. That's the body, not you.",
+    "tank_names": "Sleep · Food · Body · Alcohol or drugs · Moving",
     "fix_title": "One thing for today",
-    "fix_hint": "Pick the smallest one you'd actually do.",
+    "fix_hint": "Pick the smallest one that feels doable.",
+    "fix_care": "If it's new, bad or not easing, a doctor or pharmacist can help.",
     "fix_own": "Something else",
     "heavy_link": "Rest doesn't refill me: find the feeling",
     "none_title": "Nothing obvious from the body today",
     "none_line": "That's worth knowing too. If things still feel loud, it may be a feeling more than the body.",
     "when_title": "When will you do it?",
     "remind_label": "Want me to ask tonight if it happened?",
-    "set_title": "Looking after your body is the skill",
+    "set_title": "Your one thing for today: {fix}",
+    "back_end_title": "Looking after your body is the skill",
     "set_now": "Feelings run hotter on an empty tank. This is one small thing for it.",
     "set_later": "It's on for later today.",
     "set_remind": "It'll be on Today this evening, to ask if it happened.",
-    "sleep_more": "If short sleep keeps coming back, a sleep reset can help.",
-    "back_title": "Did the fix happen?",
+    "back_title": "Did it happen? {fix}",
     "back_yes": "That's one thing done for your body today.",
     "back_partly": "Part of it counts. Your body got some of what it needed.",
     "back_no": "Days like that happen. Tomorrow's another go, and a smaller thing can count."
@@ -31429,6 +31429,20 @@
      "kind": "ask",
      "title": "fix_title",
      "hint": "fix_hint",
+     "lines": [
+      {
+       "when": {
+        "in": [
+         "$a.body",
+         [
+          "body_ill",
+          "body_pain"
+         ]
+        ]
+       },
+       "key": "fix_care"
+      }
+     ],
      "fields": [
       {
        "id": "fix",
@@ -31437,33 +31451,214 @@
         "where": {
          "any": [
           {
-           "has": [
-            "$opt.on",
-            "$a.body"
+           "all": [
+            {
+             "in": [
+              "$a.body",
+              [
+               "body_ill",
+               "body_pain",
+               "body_meds"
+              ]
+             ]
+            },
+            {
+             "has": [
+              "$opt.on",
+              "$a.body"
+             ]
+            }
            ]
           },
           {
-           "has": [
-            "$opt.on",
-            "$a.sleep"
+           "all": [
+            {
+             "in": [
+              "$a.sleep",
+              [
+               "sleep_short",
+               "sleep_broken",
+               "sleep_much"
+              ]
+             ]
+            },
+            {
+             "not": {
+              "in": [
+               "$a.body",
+               [
+                "body_ill",
+                "body_pain",
+                "body_meds"
+               ]
+              ]
+             }
+            },
+            {
+             "has": [
+              "$opt.on",
+              "$a.sleep"
+             ]
+            }
            ]
           },
           {
-           "has": [
-            "$opt.on",
-            "$a.food"
+           "all": [
+            {
+             "in": [
+              "$a.food",
+              [
+               "food_skipped",
+               "food_all_over"
+              ]
+             ]
+            },
+            {
+             "not": {
+              "in": [
+               "$a.body",
+               [
+                "body_ill",
+                "body_pain",
+                "body_meds"
+               ]
+              ]
+             }
+            },
+            {
+             "not": {
+              "in": [
+               "$a.sleep",
+               [
+                "sleep_short",
+                "sleep_broken",
+                "sleep_much"
+               ]
+              ]
+             }
+            },
+            {
+             "has": [
+              "$opt.on",
+              "$a.food"
+             ]
+            }
            ]
           },
           {
-           "has": [
-            "$opt.on",
-            "$a.subs"
+           "all": [
+            {
+             "in": [
+              "$a.subs",
+              [
+               "subs_some"
+              ]
+             ]
+            },
+            {
+             "not": {
+              "in": [
+               "$a.body",
+               [
+                "body_ill",
+                "body_pain",
+                "body_meds"
+               ]
+              ]
+             }
+            },
+            {
+             "not": {
+              "in": [
+               "$a.sleep",
+               [
+                "sleep_short",
+                "sleep_broken",
+                "sleep_much"
+               ]
+              ]
+             }
+            },
+            {
+             "not": {
+              "in": [
+               "$a.food",
+               [
+                "food_skipped",
+                "food_all_over"
+               ]
+              ]
+             }
+            },
+            {
+             "has": [
+              "$opt.on",
+              "$a.subs"
+             ]
+            }
            ]
           },
           {
-           "has": [
-            "$opt.on",
-            "$a.moved"
+           "all": [
+            {
+             "in": [
+              "$a.moved",
+              [
+               "moved_not_yet"
+              ]
+             ]
+            },
+            {
+             "not": {
+              "in": [
+               "$a.body",
+               [
+                "body_ill",
+                "body_pain",
+                "body_meds"
+               ]
+              ]
+             }
+            },
+            {
+             "not": {
+              "in": [
+               "$a.sleep",
+               [
+                "sleep_short",
+                "sleep_broken",
+                "sleep_much"
+               ]
+              ]
+             }
+            },
+            {
+             "not": {
+              "in": [
+               "$a.food",
+               [
+                "food_skipped",
+                "food_all_over"
+               ]
+              ]
+             }
+            },
+            {
+             "not": {
+              "in": [
+               "$a.subs",
+               [
+                "subs_some"
+               ]
+              ]
+             }
+            },
+            {
+             "has": [
+              "$opt.on",
+              "$a.moved"
+             ]
+            }
            ]
           },
           {
@@ -31578,6 +31773,11 @@
      "kind": "handoff",
      "complete": true,
      "title": "set_title",
+     "titleSlots": {
+      "fix": {
+       "labelOf": "fix"
+      }
+     },
      "lines": [
       {
        "when": {
@@ -31653,6 +31853,11 @@
       "happened"
      ],
      "title": "back_title",
+     "titleSlots": {
+      "fix": {
+       "labelOf": "fix"
+      }
+     },
      "fields": [
       {
        "id": "happened",
@@ -31676,7 +31881,7 @@
      "kind": "handoff",
      "complete": true,
      "noClose": true,
-     "title": "set_title",
+     "title": "back_end_title",
      "lines": [
       {
        "when": {
@@ -31828,8 +32033,8 @@
     ],
     "fix": [
      {
-      "value": "fix_protein",
-      "label": "Eat something with some protein in it, in the next hour",
+      "value": "fix_snack",
+      "label": "Something to eat in the next hour, whatever's easy",
       "on": [
        "food_skipped",
        "food_all_over",
@@ -31847,18 +32052,17 @@
       ]
      },
      {
-      "value": "fix_meal",
-      "label": "A proper meal, even a small one",
+      "value": "fix_mealtime",
+      "label": "A meal or snack at your next usual mealtime",
       "on": [
        "food_all_over"
       ]
      },
      {
-      "value": "fix_lie_down",
-      "label": "A 20-minute lie-down before 3pm, with an alarm",
+      "value": "fix_rest",
+      "label": "A short rest with an alarm set, if it's not too late in the day",
       "on": [
-       "sleep_short",
-       "sleep_broken"
+       "sleep_short"
       ]
      },
      {
@@ -31872,7 +32076,7 @@
      },
      {
       "value": "fix_sick_care",
-      "label": "Treat it like being sick: rest, fluids, warmth",
+      "label": "Look after it like a cold: rest, fluids, warmth",
       "on": [
        "body_ill"
       ]
@@ -31893,7 +32097,7 @@
      },
      {
       "value": "fix_meds",
-      "label": "Check what's due and take it as prescribed",
+      "label": "Check what's due, and what the label or a pharmacist says about a missed dose",
       "on": [
        "body_meds"
       ]
