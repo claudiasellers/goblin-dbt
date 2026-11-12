@@ -135,7 +135,11 @@ STEPS = [
              {"when": {"all": [PICKED, {"not": HAPPY}]}, "key": "end_line"},
              {"when": {"all": [{"not": PICKED}, {"not": HAPPY}]}, "key": "end_known"},
              {"when": FITS, "key": "end_fits"}, {"when": HAPPY, "key": "end_happy"}],
-            [{"exit": "check_the_facts", "when": FITS}, {"exit": "opposite_action", "when": FITS},
+            # The closer word goes on when one was picked, else the word they came with (Codex, #120).
+            [{"exit": "check_the_facts_closest", "when": {"all": [FITS, PICKED]}},
+             {"exit": "check_the_facts", "when": {"all": [FITS, {"not": PICKED}]}},
+             {"exit": "opposite_action_closest", "when": {"all": [FITS, PICKED]}},
+             {"exit": "opposite_action", "when": {"all": [FITS, {"not": PICKED}]}},
              {"exit": "good_things", "when": HAPPY}],
             titleSlots={"closest": {"labelOf": "closest"}}),
     handoff("none", "none_title", [{"when": ALWAYS, "key": "none_line"}], [{"exit": "find_the_feeling", "when": ALWAYS}],
@@ -145,6 +149,8 @@ STEPS = [
 EXITS = [
     {"id": "check_the_facts", "toolId": "check-the-facts", "carry": ["feel"]},   # ER-02: does it fit what happened?
     {"id": "opposite_action", "toolId": "opposite-action", "carry": ["feel"]},   # ER-03: the doors pre-tick the word
+    {"id": "check_the_facts_closest", "toolId": "check-the-facts", "carry": ["closest"]},  # the ladder's closer word
+    {"id": "opposite_action_closest", "toolId": "opposite-action", "carry": ["closest"]},
     {"id": "good_things", "toolId": "good-things", "query": {"frame": "savour"}},  # ER-04: stay with a good moment
     {"id": "find_the_feeling", "toolId": "find-the-feeling", "carry": ["feel"]},  # more words for it
     {"id": "cool_down", "toolId": "cool-down"},                                  # DT-01 First, the body (flooded)

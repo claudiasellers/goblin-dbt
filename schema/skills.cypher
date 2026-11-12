@@ -21325,6 +21325,18 @@ MATCH (s:Skill {id: "emotion_guide"}), (x:SkillExit {id: "emotion_guide:opposite
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "emotion_guide:opposite_action"}), (t:TherapyConcept {appToolId: "opposite-action"})
 MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "emotion_guide:check_the_facts_closest"})
+SET x += {skillId: "emotion_guide", exit: "check_the_facts_closest", toolId: "check-the-facts", done: false, carry: ["closest"], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "emotion_guide"}), (x:SkillExit {id: "emotion_guide:check_the_facts_closest"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "emotion_guide:check_the_facts_closest"}), (t:TherapyConcept {appToolId: "check-the-facts"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "emotion_guide:opposite_action_closest"})
+SET x += {skillId: "emotion_guide", exit: "opposite_action_closest", toolId: "opposite-action", done: false, carry: ["closest"], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "emotion_guide"}), (x:SkillExit {id: "emotion_guide:opposite_action_closest"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "emotion_guide:opposite_action_closest"}), (t:TherapyConcept {appToolId: "opposite-action"})
+MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "emotion_guide:good_things"})
 SET x += {skillId: "emotion_guide", exit: "good_things", toolId: "good-things", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"savour\"}", x.label = null;
 MATCH (s:Skill {id: "emotion_guide"}), (x:SkillExit {id: "emotion_guide:good_things"})
@@ -21393,15 +21405,21 @@ SET r += {order: 0}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "emotion_guide:ladder"}), (x:SkillExit {id: "emotion_guide:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "closest", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "emotion_guide:end"}), (x:SkillExit {id: "emotion_guide:check_the_facts_closest"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": [{\"set\": \"$d.fitsParent\"}, {\"set\": \"$a.closest\"}]}}]";
 MATCH (a:SkillStep {id: "emotion_guide:end"}), (x:SkillExit {id: "emotion_guide:check_the_facts"})
 MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"set\": \"$d.fitsParent\"}}]";
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": [{\"set\": \"$d.fitsParent\"}, {\"not\": {\"set\": \"$a.closest\"}}]}}]";
+MATCH (a:SkillStep {id: "emotion_guide:end"}), (x:SkillExit {id: "emotion_guide:opposite_action_closest"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"all\": [{\"set\": \"$d.fitsParent\"}, {\"set\": \"$a.closest\"}]}}]";
 MATCH (a:SkillStep {id: "emotion_guide:end"}), (x:SkillExit {id: "emotion_guide:opposite_action"})
 MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"set\": \"$d.fitsParent\"}}]";
+SET r += {order: 3}, r.rowsJson = "[{\"order\": 3, \"when\": {\"all\": [{\"set\": \"$d.fitsParent\"}, {\"not\": {\"set\": \"$a.closest\"}}]}}]";
 MATCH (a:SkillStep {id: "emotion_guide:end"}), (x:SkillExit {id: "emotion_guide:good_things"})
 MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"eq\": [\"$d.guide\", \"happiness\"]}}]";
+SET r += {order: 4}, r.rowsJson = "[{\"order\": 4, \"when\": {\"eq\": [\"$d.guide\", \"happiness\"]}}]";
 MATCH (a:SkillStep {id: "emotion_guide:end"}), (x:SkillExit {id: "emotion_guide:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";

@@ -13988,15 +13988,59 @@
      "next": [],
      "offers": [
       {
+       "exit": "check_the_facts_closest",
+       "when": {
+        "all": [
+         {
+          "set": "$d.fitsParent"
+         },
+         {
+          "set": "$a.closest"
+         }
+        ]
+       }
+      },
+      {
        "exit": "check_the_facts",
        "when": {
-        "set": "$d.fitsParent"
+        "all": [
+         {
+          "set": "$d.fitsParent"
+         },
+         {
+          "not": {
+           "set": "$a.closest"
+          }
+         }
+        ]
+       }
+      },
+      {
+       "exit": "opposite_action_closest",
+       "when": {
+        "all": [
+         {
+          "set": "$d.fitsParent"
+         },
+         {
+          "set": "$a.closest"
+         }
+        ]
        }
       },
       {
        "exit": "opposite_action",
        "when": {
-        "set": "$d.fitsParent"
+        "all": [
+         {
+          "set": "$d.fitsParent"
+         },
+         {
+          "not": {
+           "set": "$a.closest"
+          }
+         }
+        ]
        }
       },
       {
@@ -14061,6 +14105,15 @@
      "done": false
     },
     {
+     "id": "check_the_facts_closest",
+     "toolId": "check-the-facts",
+     "query": {},
+     "carry": [
+      "closest"
+     ],
+     "done": false
+    },
+    {
      "id": "cool_down",
      "toolId": "cool-down",
      "query": {},
@@ -14098,6 +14151,15 @@
      "query": {},
      "carry": [
       "feel"
+     ],
+     "done": false
+    },
+    {
+     "id": "opposite_action_closest",
+     "toolId": "opposite-action",
+     "query": {},
+     "carry": [
+      "closest"
      ],
      "done": false
     },

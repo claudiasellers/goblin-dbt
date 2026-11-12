@@ -39,7 +39,7 @@ don't have to act on it.*).
    (worthless, empty, despair, helpless, powerless) named or picked puts *Heavy feelings can come with thoughts of
    not being here. If they do, talk to someone now.* first, a line and never a gate. Then by family: for the nine
    DBT parents with fit statements, *Check the Facts looks at whether it fits. Do the Opposite helps when acting on
-   it won't.* with both offers, each carrying the word; for happiness, Good things in its `savour` frame (*stay
+   it won't.* with both offers, each carrying the closer word when one was picked, else the word they came with; for happiness, Good things in its `savour` frame (*stay
    with it a little longer*).
 6. **none**: *There's no card for “{word}” yet.* → Find the feeling, carrying the word. A hand-off can't go back to
    a step, so there's no *Pick another word* here yet (part 3).
