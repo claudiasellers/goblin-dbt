@@ -553,7 +553,7 @@ function embedProps(ctx: RunContext, st: RunState, name: string, props: Record<s
     if (spec.type === 'ctx' && k in out) out[k] = inlineCtxFor(ctx, st, { ctx: props?.[k] });
     // A `row` prop: the ref's value keys a shared table; the embed gets the row, or nothing (never the ref).
     if (spec.type === 'row' && k in out) {
-      const row = sharedRow(ctx, spec.table, resolve(props?.[k], scope(ctx, { answers: answersOf(ctx, st) })));
+      const row = sharedRow(ctx, spec.table, resolve(props?.[k], scope(ctx, st)));
       if (row === undefined) delete out[k];
       else out[k] = row;
     }

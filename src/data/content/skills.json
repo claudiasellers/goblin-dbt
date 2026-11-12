@@ -273,8 +273,8 @@
           }
         ],
         "ladder": [
-          "nervous",
           "worried",
+          "nervous",
           "scared",
           "frightened"
         ]
@@ -372,14 +372,14 @@
         "label": "Love",
         "functionLine": "Love draws you toward people and things that matter to you, and helps you stay close.",
         "prompts": [
-          "Someone being kind or caring towards you",
+          "Someone being kind or caring toward you",
           "Time with someone you feel close to",
           "Thinking about someone who means a lot to you"
         ],
         "urges": [
           "Text, call, or reach out to them",
           "Check their social media",
-          "Go places they might be"
+          "Idealize them and ignore red flags"
         ],
         "body": [
           {
@@ -435,16 +435,16 @@
       },
       "shame": {
         "label": "Shame",
-        "functionLine": "Shame warns you that something about you could get you pushed out, and pulls you to hide.",
+        "functionLine": "Shame warns you that something you did, or something about you, could get you pushed out, and pulls you to hide.",
         "prompts": [
           "Feeling others would turn away if they knew",
           "Being laughed at or put down",
-          "Being criticised in front of people"
+          "Being criticized in front of people"
         ],
         "urges": [
-          "Hide or disappear",
           "Keep it secret",
-          "Make yourself small"
+          "Make yourself small",
+          "Avoid people who might notice"
         ],
         "body": [
           {
@@ -13602,14 +13602,16 @@
           "body_label": "Where it often shows up",
           "urges_label": "The pull it can bring",
           "urge_note": "A pull comes with the feeling. You don't have to act on it.",
-          "ladder_title": "Which of these is closest?",
-          "ladder_hint": "They go from milder to stronger. Close is enough, and none of them is an answer too.",
+          "ladder_title": "You picked {feeling}. Is one of these closer?",
+          "ladder_hint": "They go from milder to stronger. Your word is fine too, and so is none.",
           "end_title": "You know this feeling a little better now.",
           "end_title_picked": "You named it: {closest}.",
           "end_line": "Putting a closer word to a feeling can take some of the edge off.",
-          "end_fits": "If you want to look at whether it fits what happened, Check the Facts goes through it.",
+          "end_known": "Knowing what a feeling is for can make it easier to be with.",
+          "end_heavy": "Heavy feelings can come with thoughts of not being here. If they do, talk to someone now.",
+          "end_fits": "Check the Facts looks at whether it fits. Do the Opposite helps when acting on it won't.",
           "end_happy": "Good things can help you stay with it a little longer.",
-          "none_title": "There isn't a card for feeling {feeling} yet.",
+          "none_title": "There's no card for “{feeling}” yet.",
           "none_line": "Find the feeling can help put more words to it.",
           "safety_open": "Talk to someone now",
           "next": "Next",
@@ -13789,6 +13791,15 @@
               }
             },
             "answerAs": "card",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
             "props": {
               "guide": "$d.guide",
               "familyLine": "family_line",
@@ -13818,6 +13829,11 @@
             "kind": "ask",
             "title": "ladder_title",
             "hint": "ladder_hint",
+            "titleSlots": {
+              "feeling": {
+                "labelOf": "feel"
+              }
+            },
             "fields": [
               {
                 "id": "closest",
@@ -13875,9 +13891,72 @@
             "lines": [
               {
                 "when": {
-                  "all": []
+                  "any": [
+                    {
+                      "in": [
+                        "$a.feel",
+                        [
+                          "worthless",
+                          "empty",
+                          "despair",
+                          "helpless",
+                          "powerless"
+                        ]
+                      ]
+                    },
+                    {
+                      "in": [
+                        "$a.closest",
+                        [
+                          "worthless",
+                          "empty",
+                          "despair",
+                          "helpless",
+                          "powerless"
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                "key": "end_heavy"
+              },
+              {
+                "when": {
+                  "all": [
+                    {
+                      "set": "$a.closest"
+                    },
+                    {
+                      "not": {
+                        "eq": [
+                          "$d.guide",
+                          "happiness"
+                        ]
+                      }
+                    }
+                  ]
                 },
                 "key": "end_line"
+              },
+              {
+                "when": {
+                  "all": [
+                    {
+                      "not": {
+                        "set": "$a.closest"
+                      }
+                    },
+                    {
+                      "not": {
+                        "eq": [
+                          "$d.guide",
+                          "happiness"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "key": "end_known"
               },
               {
                 "when": {
@@ -14040,7 +14119,7 @@
           "heads_up": [
             {
               "value": "settle",
-              "label": "Look after the next few minutes first"
+              "label": "Settle my body first"
             },
             {
               "value": "try",

@@ -33,10 +33,16 @@ export function FeelingCard({ props, onShown, onDone }: EmbedProps) {
     </section>
   );
   const list = (items: string[]) => (
-    <ul className="space-y-1 text-base leading-snug text-[var(--color-text-primary)]">
+    <ul role="list" className="space-y-1 text-base leading-snug text-[var(--color-text-primary)]">
       {items.map((x) => <li key={x} className="flex gap-2"><span aria-hidden="true">·</span><span>{x}</span></li>)}
     </ul>
   );
+  // One chip per place (a place can carry two words: *Chest · heavy, closing up*), in the row's order.
+  const places: Array<{ region: string; labels: string[] }> = [];
+  for (const b of row.body) {
+    const at = places.find((p) => p.region === b.region);
+    if (at) at.labels.push(b.label.toLowerCase()); else places.push({ region: b.region, labels: [b.label.toLowerCase()] });
+  }
   return (
     <div className="space-y-5" data-testid="feeling-card">
       <div className="space-y-4 rounded-2xl border-2 border-[var(--color-fam-er-lip)] bg-[var(--color-bg-card)] p-4">
@@ -44,10 +50,11 @@ export function FeelingCard({ props, onShown, onDone }: EmbedProps) {
         {row.functionLine && part(text('forLabel'), <p className="text-base leading-snug text-[var(--color-text-primary)]">{row.functionLine}</p>)}
         {row.prompts.length > 0 && part(text('promptsLabel'), list(row.prompts))}
         {row.body.length > 0 && part(text('bodyLabel'), (
-          <ul className="flex flex-wrap gap-2">
-            {row.body.map((b) => (
-              <li key={`${b.region}:${b.label}`} className="rounded-full bg-[var(--color-fam-er)] px-3 py-1 text-sm text-[var(--color-text-primary)]">
-                <span className="font-semibold">{b.region}</span> · {b.label.toLowerCase()}
+          <ul role="list" className="flex flex-wrap gap-2">
+            {places.map((p) => (
+              <li key={p.region} className="rounded-full bg-[var(--color-fam-er)] px-3 py-1 text-sm text-[var(--color-text-primary)]">
+                <span className="font-semibold">{p.region}</span><span aria-hidden="true"> · </span>
+                <span className="sr-only">: </span>{p.labels.join(', ')}
               </li>
             ))}
           </ul>

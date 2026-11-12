@@ -48,14 +48,17 @@ COPY = {
     "body_label": "Where it often shows up",
     "urges_label": "The pull it can bring",
     "urge_note": "A pull comes with the feeling. You don't have to act on it.",
-    "ladder_title": "Which of these is closest?",
-    "ladder_hint": "They go from milder to stronger. Close is enough, and none of them is an answer too.",
+    "ladder_title": "You picked {feeling}. Is one of these closer?",
+    "ladder_hint": "They go from milder to stronger. Your word is fine too, and so is none.",
     "end_title": "You know this feeling a little better now.",
     "end_title_picked": "You named it: {closest}.",
     "end_line": "Putting a closer word to a feeling can take some of the edge off.",
-    "end_fits": "If you want to look at whether it fits what happened, Check the Facts goes through it.",
+    "end_known": "Knowing what a feeling is for can make it easier to be with.",
+    # A safety-screen word (scripts/safety/content.py SCREEN_EMOTIONS) named here: say it, never gate it (gate 3).
+    "end_heavy": "Heavy feelings can come with thoughts of not being here. If they do, talk to someone now.",
+    "end_fits": "Check the Facts looks at whether it fits. Do the Opposite helps when acting on it won't.",
     "end_happy": "Good things can help you stay with it a little longer.",
-    "none_title": "There isn't a card for feeling {feeling} yet.",
+    "none_title": "There's no card for “{feeling}” yet.",
     "none_line": "Find the feeling can help put more words to it.",
     "safety_open": "Talk to someone now",
     "next": "Next",
@@ -73,10 +76,14 @@ SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
 
 # One chip per family (the family's most common word), the full list a tap away. Envy has no word on the square.
 FEEL_CHIPS = ["scared", "angry", "sad", "ashamed", "guilty", "disgusted", "jealous", "loving", "happy"]
-HEADS_UP = [("settle", "Look after the next few minutes first"), ("try", "Show me anyway")]
+HEADS_UP = [("settle", "Settle my body first"), ("try", "Show me anyway")]
 
 HAS_GUIDE = {"set": "$d.guide"}
 HAPPY = {"eq": ["$d.guide", "happiness"]}
+PICKED = {"set": "$a.closest"}
+# The safety screen's words (scripts/safety/content.py SCREEN_EMOTIONS) that can reach a card.
+HEAVY_WORDS = ["worthless", "empty", "despair", "helpless", "powerless"]
+HEAVY = {"any": [{"in": [a("feel"), HEAVY_WORDS]}, {"in": [a("closest"), HEAVY_WORDS]}]}
 # A DBT parent with fit statements: Check the Facts and Do the Opposite apply (never happiness).
 FITS = {"set": "$d.fitsParent"}
 
@@ -111,19 +118,23 @@ STEPS = [
     handoff("settle", "heads_up_title", [{"when": ALWAYS, "key": "settle_line"}], [{"exit": "cool_down", "when": ALWAYS}]),
     {
         "id": "card", "kind": "embed", "embed": "feelingCard", "title": "card_title",
-        "titleSlots": {"feeling": {"labelOf": "feel"}}, "answerAs": "card",
+        "titleSlots": {"feeling": {"labelOf": "feel"}}, "answerAs": "card", "links": [SAFETY_LINK],
         "props": {"guide": "$d.guide", "familyLine": "family_line", "forLabel": "for_label", "promptsLabel": "prompts_label",
                   "bodyLabel": "body_label", "urgesLabel": "urges_label", "urgeNote": "urge_note", "next": "next"},
         "next": [{"when": {"set": "$d.ladder"}, "to": "ladder"}, {"to": "end"}],
     },
     {
         "id": "ladder", "kind": "ask", "title": "ladder_title", "hint": "ladder_hint",
+        "titleSlots": {"feeling": {"labelOf": "feel"}},
         "fields": [{"id": "closest", "options": {"emotions": FEEL_CHIPS, "emotionsFrom": "$d.ladder"}, "max": 1,
                     "required": False, "emotion": True, "links": [SAFETY_LINK]}],
         "next": [{"to": "end"}],
     },
     handoff("end", [{"when": {"set": a("closest")}, "key": "end_title_picked"}, {"key": "end_title"}],
-            [{"when": ALWAYS, "key": "end_line"}, {"when": FITS, "key": "end_fits"}, {"when": HAPPY, "key": "end_happy"}],
+            [{"when": HEAVY, "key": "end_heavy"},
+             {"when": {"all": [PICKED, {"not": HAPPY}]}, "key": "end_line"},
+             {"when": {"all": [{"not": PICKED}, {"not": HAPPY}]}, "key": "end_known"},
+             {"when": FITS, "key": "end_fits"}, {"when": HAPPY, "key": "end_happy"}],
             [{"exit": "check_the_facts", "when": FITS}, {"exit": "opposite_action", "when": FITS},
              {"exit": "good_things", "when": HAPPY}],
             titleSlots={"closest": {"labelOf": "closest"}}),

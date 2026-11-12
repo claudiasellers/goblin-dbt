@@ -65,6 +65,7 @@ test("pin 1, body: only signed-off places, the card's map's strongest, named by 
   }
 });
 
+const HELD = new Set(["guilt-punish", "shame-hide", "love-proximity"]);
 test("pin 2, urges: the parent's emotion urges by order, never a behaviour urge, never one the guide holds", () => {
   const behaviour = ["send", "check", "hit", "leave", "use", "self_harm"];
   const oa = readFileSync("schema/opposite-action-data.cypher", "utf8");
@@ -74,10 +75,11 @@ test("pin 2, urges: the parent's emotion urges by order, never a behaviour urge,
     const row = content.feelingOf[p.id];
     assert.ok(row, p.id);
     for (const u of row.urges) assert.ok(!behaviourLabels.has(u), `${p.id}: ${u}`);
-    const want = p.urges.filter((u) => u.id !== "guilt-punish").map((u) => u.label).slice(0, FEELING_CARD_URGES);
+    const want = p.urges.filter((u) => !HELD.has(u.id)).map((u) => u.label).slice(0, FEELING_CARD_URGES);
     assert.deepEqual(row.urges, want, p.id);
   }
   assert.ok(!content.feelingOf.guilt.urges.includes("Punish yourself"), "held: Do the Opposite meets it with safety.open");
+  assert.ok(!content.feelingOf.shame.urges.some((u) => /disappear/i.test(u)), "held: ideation-adjacent next to humiliated (gate 3)");
   assert.deepEqual(content.feelingOf.happiness.urges, [], "happiness has no ActionUrges");
 });
 
@@ -138,16 +140,25 @@ test("a word, its card (the guide's row through the `row` prop), its ladder, the
   assert.equal(M.sharedRow(ctx(), "feelingOf", "nope"), undefined);
   s = [read].reduce((x, e) => M.runNext(ctx(), x, e), run([pick("feel", "worried"), next]));
   assert.equal(s.stepId, "ladder");
-  assert.deepEqual(M.emotionChoices(ctx(), field("ladder", "closest"), s.answers), ["nervous", "worried", "scared", "frightened"]);
+  assert.equal(title(s), "You picked worried. Is one of these closer?", "their word, named");
+  assert.deepEqual(M.emotionChoices(ctx(), field("ladder", "closest"), s.answers), ["worried", "nervous", "scared", "frightened"]);
   const end = [pick("closest", "scared"), next].reduce((x, e) => M.runNext(ctx(), x, e), s);
   assert.equal(end.stepId, "end");
   assert.equal(title(end), "You named it: scared.");
   assert.deepEqual(offers(end), ["check_the_facts", "opposite_action"]);
   assert.ok(lines(end).includes(skill.copy.end_fits));
+  assert.ok(lines(end).includes(skill.copy.end_line), "a closer word was put to it");
+  assert.ok(!lines(end).includes(skill.copy.end_heavy));
   // None of them is an answer too.
   const none = M.runNext(ctx(), s, next);
   assert.equal(none.stepId, "end");
   assert.equal(title(none), skill.copy.end_title);
+  assert.ok(lines(none).includes(skill.copy.end_known) && !lines(none).includes(skill.copy.end_line), "no closer word, no claim it was put");
+  // A safety-screen word named: said plainly, never a gate (gate 3).
+  const sad = [read].reduce((x, e) => M.runNext(ctx(), x, e), run([pick("feel", "sad"), next]));
+  const heavy = [pick("closest", "despair"), next].reduce((x, e) => M.runNext(ctx(), x, e), sad);
+  assert.equal(lines(heavy)[0], skill.copy.end_heavy);
+  assert.deepEqual(offers(heavy), ["check_the_facts", "opposite_action"]);
   assert.ok(M.stepOf(skill, "end").noClose && M.stepOf(skill, "end").complete);
 });
 
@@ -157,6 +168,7 @@ test("happiness: its card and ladder, then Good things to stay with it (never Ch
   assert.deepEqual(M.emotionChoices(ctx(), field("ladder", "closest"), s.answers), ["content", "happy", "joyful"]);
   const end = M.runNext(ctx(), s, next);
   assert.deepEqual(offers(end), ["good_things"]);
+  assert.deepEqual(lines(end), [skill.copy.end_happy], "no edge to take off joy");
   assert.deepEqual(content.skills.find((x) => x.id === "emotion_guide").exits.find((e) => e.id === "good_things").query, { frame: "savour" });
 });
 
@@ -165,7 +177,7 @@ test("a family of one word skips the ladder; a word with no guide gets Find the 
   assert.equal(j.stepId, "end");
   const calm = run([pick("feel", "calm"), next]);
   assert.equal(calm.stepId, "none");
-  assert.equal(title(calm), "There isn't a card for feeling calm yet.");
+  assert.equal(title(calm), "There's no card for “calm” yet.");
   assert.deepEqual(offers(calm), ["find_the_feeling"]);
   assert.equal(M.emotionChoices(ctx({}, ["let_down"]), field("feel", "feel"), {})[0], "let_down", "a carried word first, never pre-picked");
   assert.deepEqual(M.initialRun(skill).answers, {});
@@ -184,7 +196,6 @@ test("a carried flooded reading: a heads-up first, the body or the card anyway (
 test("Talk to someone now on every screen", () => {
   for (const st of skill.steps) {
     const links = [...(st.links ?? []), ...(st.fields ?? []).flatMap((x) => x.links ?? [])];
-    if (st.kind === "embed") continue;
     assert.ok(links.some((l) => l.exit === "safety_open"), st.id);
   }
 });

@@ -23,22 +23,28 @@ don't have to act on it.*).
 1. **feel**: *Which feeling do you want to know better?* One word. A chip per family (the family's most common
    word: scared, angry, sad, ashamed, guilty, disgusted, jealous, loving, happy), carried words first (never
    pre-picked), any grid word under *More words*. A word with no guide (calm, surprised, tired, numb…) goes to
-   **none**.
-2. **heads_up** (a carried flooded reading only): *Your body's loud right now.* *Look after the next few minutes
-   first* → First, the body; *Show me anyway* → the card. A heads-up, never a lock, as Build mastery.
+   **none**. No grid word is in the envy family yet, so envy's card ships but nothing opens it until one is.
+2. **heads_up** (a carried flooded reading only): *Your body's loud right now.* *Settle my body first* → First,
+   the body; *Show me anyway* → the card. A heads-up, never a lock, as Build mastery.
 3. **card**: the `feelingCard` embed, titled *Feeling {word}*. Its family (*Part of the fear family.*), what it's
-   for, what often sets it off, where it often shows up (up to three signed-off body places, as *Chest · tight*),
+   for, what often sets it off, where it often shows up (up to three signed-off body places, one chip per place, as
+   *Chest · heavy, closing up*),
    the pull it can bring (up to three of the parent's emotion urges). Each part shows only when the graph has it;
    with no row at all (content drift) the card shows only *Next*.
-4. **ladder**: *Which of these is closest?* The family's ladder. Not required: *Close is enough, and none of them
-   is an answer too.* Skipped for a family with one word (jealousy, envy).
-5. **end**: *You named it: {closest}.* (or *You know this feeling a little better now.*), *Putting a closer word to a
-   feeling can take some of the edge off.* Then by family: for the nine DBT parents with fit statements, Check the
-   Facts (*does it fit what happened?*) and Do the Opposite, each carrying the word; for happiness, Good things in
-   its `savour` frame (*stay with it a little longer*).
-6. **none**: *There isn't a card for feeling {word} yet.* → Find the feeling, carrying the word.
+4. **ladder**: *You picked {word}. Is one of these closer?* The family's ladder. Not required: *Your word is fine
+   too, and so is none.* Skipped for a family with one word (jealousy, envy).
+5. **end**: *You named it: {closest}.* (or *You know this feeling a little better now.*). A closer word picked:
+   *Putting a closer word to a feeling can take some of the edge off.*; none picked: *Knowing what a feeling is for
+   can make it easier to be with.* (neither for happiness: there is no edge to take off joy). A safety-screen word
+   (worthless, empty, despair, helpless, powerless) named or picked puts *Heavy feelings can come with thoughts of
+   not being here. If they do, talk to someone now.* first, a line and never a gate. Then by family: for the nine
+   DBT parents with fit statements, *Check the Facts looks at whether it fits. Do the Opposite helps when acting on
+   it won't.* with both offers, each carrying the word; for happiness, Good things in its `savour` frame (*stay
+   with it a little longer*).
+6. **none**: *There's no card for “{word}” yet.* → Find the feeling, carrying the word. A hand-off can't go back to
+   a step, so there's no *Pick another word* here yet (part 3).
 
-*Talk to someone now* on every ask and hand-off screen. Close kind `none` (knowing a feeling isn't a state change
+*Talk to someone now* on every screen, the card included. Close kind `none` (knowing a feeling isn't a state change
 to rate), no keep, no follow-up, no routing rows by design. `emotionFields`: `feel` and `closest`, so both are the
 visit's emotions.
 
@@ -60,8 +66,11 @@ Edges:
 - `(:Emotion)-[:IN_GUIDE]->(:FeelingGuide {id: 'happiness'})` for happy, joyful, playful, proud, optimistic, hopeful,
   content, satisfied, excited and eager.
 
-**Held:** guilt's *punish myself* urge is never listed on the card (`urgesHeld`): it sits next to self-harm, and Do
-the Opposite meets it with `safety.open` first. The DT behaviour urges (send, check, hit, leave, use, self_harm) are
+**Held** (`urgesHeld`, Gate 3): guilt's *punish myself* (it sits next to self-harm, and Do the Opposite meets it
+with `safety.open` first), shame's *hide or disappear* (next to *humiliated*, *disappear* reads close to not wanting
+to exist) and love's *go places they might be* (shown as an ordinary pull of love it can normalise pursuing someone
+who said no). Do the Opposite still lists all three, where the steps meet them. Jealousy's and love's *check their
+phone / social media* stay: as recognition they are the feeling's own pulls, while the DT `check` urge is the act. The DT behaviour urges (send, check, hit, leave, use, self_harm) are
 never on the card either: only `kind: 'emotion'` urges reach it.
 
 ## The runtime additions (approved on the plan thread)
@@ -81,8 +90,7 @@ never on the card either: only `kind: 'emotion'` urges reach it.
   doors at nine and keeps happiness out of `parentOf` and `fitsWhen`.
 - **The card is a tool of its own for now**, opened from the Tools list. Hosts showing it after naming (check-in,
   Find the feeling) come with part 3.
-- **The ladder is milder to stronger as written**, not sorted by the square's energy axis (nervous sits above
-  worried there; the order is the content's reviewed judgement).
+- **The ladder is milder to stronger as written**, the content's reviewed judgement, not computed from the square.
 
 ## Not yet
 

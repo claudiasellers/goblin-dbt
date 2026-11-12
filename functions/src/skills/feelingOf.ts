@@ -1,7 +1,7 @@
 /**
  * The skill runtime's feeling guide tables (ER-10, docs/design/emotion-guide.md), shaped from the graph's rows. Pure:
  * getSkillContent (./index.ts) and the content snapshot (scripts/content-snapshot/build.mjs) both call it, and
- * scripts/skills/graph_tables.py does the same for the fixture (tests/content-snapshot.test.mjs pins the three).
+ * scripts/skills/graph_tables.py does the same for the fixture (tests/skill-runtime.test.mjs pins the three).
  *
  * The card shows at most FEELING_CARD_URGES of its parent's emotion urges (by `order`, then id; never one the guide
  * holds and never a DT behaviour urge, `kind: 'behaviour'`) and FEELING_CARD_PLACES of its body map's places,

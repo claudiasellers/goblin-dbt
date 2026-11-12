@@ -59,11 +59,11 @@ export const getSkillContent = callable<unknown, SkillsContent>(
        OPTIONAL MATCH (r:BodyRegion {id: f.region})
        RETURN g.id AS id, g.label AS label, g.contentJson AS contentJson, g.ladder AS ladder, g.urgesHeld AS urgesHeld, urges,
               collect({emotionId: e.id, region: f.region, regionName: r.name, sensationId: s.id, label: s.padLabel, energy: s.energy, weight: f.weight}) AS felt
-       ORDER BY g.id`);
+       ORDER BY id`);
     const guideOfRes = await tx.run(
-      `MATCH (e:Emotion)-[:HAS_REGULATION_CONTENT]->(:EmotionRegulationContent)<-[:GUIDES]-(g:FeelingGuide) RETURN e.id AS id, g.id AS guide
+      `MATCH (e:Emotion)-[:HAS_REGULATION_CONTENT]->(:EmotionRegulationContent)<-[:GUIDES]-(g:FeelingGuide) RETURN e.id AS id, g.id AS guide, 0 AS via
        UNION
-       MATCH (e:Emotion)-[:IN_GUIDE]->(g:FeelingGuide) RETURN e.id AS id, g.id AS guide`);
+       MATCH (e:Emotion)-[:IN_GUIDE]->(g:FeelingGuide) RETURN e.id AS id, g.id AS guide, 1 AS via`);
 
     const skills: SkillDef[] = sRes.records.map((r) => ({
       id: r.get('id'), toolId: r.get('toolId'), version: r.get('version'), start: r.get('start'),
@@ -118,8 +118,12 @@ export const getSkillContent = callable<unknown, SkillsContent>(
       felt: (r.get('felt') as GuideRow['felt']).map((f) => ({ ...f, weight: f.weight === null || f.weight === undefined ? null : toNumber(f.weight) })),
     }));
     const feelingGuideOf: Record<string, string> = {};
-    for (const r of [...guideOfRes.records].sort((a, b) => (a.get('id') < b.get('id') ? -1 : 1))) feelingGuideOf[r.get('id')] = r.get('guide');
-    return { version: SKILLS_VERSION, parentOf, fitsWhen, feelingOf: feelingOf(guides), feelingGuideOf, skills };
+    // A parent's guide first, IN_GUIDE after (it wins, as in the snapshot build and graph_tables.py), then by id.
+    const via = (r: { get: (k: string) => unknown }) => toNumber(r.get('via') ?? 0) ?? 0;
+    const rows = [...guideOfRes.records].sort((a, b) => via(a) - via(b) || String(a.get('id')).localeCompare(String(b.get('id'))));
+    for (const r of rows) feelingGuideOf[r.get('id')] = r.get('guide');
+    const sortedGuideOf = Object.fromEntries(Object.entries(feelingGuideOf).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
+    return { version: SKILLS_VERSION, parentOf, fitsWhen, feelingOf: feelingOf(guides), feelingGuideOf: sortedGuideOf, skills };
   }),
 );
 

@@ -14,7 +14,7 @@
 
 // --- Fear ---
 MERGE (g:FeelingGuide {id: "fear"})
-SET g += {label: "Fear", rank: 0, ladder: ["nervous", "worried", "scared", "frightened"], urgesHeld: [], version: "eg-v1"}, g.contentJson = "{\"function\": \"Fear warns you about danger and gets your body ready to protect you.\", \"prompts\": [\"Something could hurt you or someone you love\", \"You might lose something or someone that matters\", \"Something new or uncertain is coming\"]}";
+SET g += {label: "Fear", rank: 0, ladder: ["worried", "nervous", "scared", "frightened"], urgesHeld: [], version: "eg-v1"}, g.contentJson = "{\"function\": \"Fear warns you about danger and gets your body ready to protect you.\", \"prompts\": [\"Something could hurt you or someone you love\", \"You might lose something or someone that matters\", \"Something new or uncertain is coming\"]}";
 MATCH (g:FeelingGuide {id: "fear"}), (c:EmotionRegulationContent {dbtParent: "fear"})
 MERGE (g)-[:GUIDES]->(c);
 MATCH (g:FeelingGuide {id: "fear"}), (m:BodyMap {id: "fear"})
@@ -38,7 +38,7 @@ MERGE (g)-[:FELT_LIKE]->(m);
 
 // --- Shame ---
 MERGE (g:FeelingGuide {id: "shame"})
-SET g += {label: "Shame", rank: 3, ladder: ["embarrassed", "ashamed", "humiliated"], urgesHeld: [], version: "eg-v1"}, g.contentJson = "{\"function\": \"Shame warns you that something about you could get you pushed out, and pulls you to hide.\", \"prompts\": [\"Feeling others would turn away if they knew\", \"Being laughed at or put down\", \"Being criticised in front of people\"]}";
+SET g += {label: "Shame", rank: 3, ladder: ["embarrassed", "ashamed", "humiliated"], urgesHeld: ["shame-hide"], version: "eg-v1"}, g.contentJson = "{\"function\": \"Shame warns you that something you did, or something about you, could get you pushed out, and pulls you to hide.\", \"prompts\": [\"Feeling others would turn away if they knew\", \"Being laughed at or put down\", \"Being criticized in front of people\"]}";
 MATCH (g:FeelingGuide {id: "shame"}), (c:EmotionRegulationContent {dbtParent: "shame"})
 MERGE (g)-[:GUIDES]->(c);
 MATCH (g:FeelingGuide {id: "shame"}), (m:BodyMap {id: "shame"})
@@ -76,7 +76,7 @@ MERGE (g)-[:GUIDES]->(c);
 
 // --- Love ---
 MERGE (g:FeelingGuide {id: "love"})
-SET g += {label: "Love", rank: 8, ladder: ["tender", "loving"], urgesHeld: [], version: "eg-v1"}, g.contentJson = "{\"function\": \"Love draws you toward people and things that matter to you, and helps you stay close.\", \"prompts\": [\"Someone being kind or caring towards you\", \"Time with someone you feel close to\", \"Thinking about someone who means a lot to you\"]}";
+SET g += {label: "Love", rank: 8, ladder: ["tender", "loving"], urgesHeld: ["love-proximity"], version: "eg-v1"}, g.contentJson = "{\"function\": \"Love draws you toward people and things that matter to you, and helps you stay close.\", \"prompts\": [\"Someone being kind or caring toward you\", \"Time with someone you feel close to\", \"Thinking about someone who means a lot to you\"]}";
 MATCH (g:FeelingGuide {id: "love"}), (c:EmotionRegulationContent {dbtParent: "love"})
 MERGE (g)-[:GUIDES]->(c);
 MATCH (g:FeelingGuide {id: "love"}), (m:BodyMap {id: "love"})
