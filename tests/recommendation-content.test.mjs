@@ -51,19 +51,18 @@ test("rows are drafts until signed off; the policy can only be enabled once ever
 });
 
 test("D-02 defaults kept: Urge Surfing switched off, no DEAR MAN rows, Pause active; planned tools are written switched off", () => {
-  const planned = ["dbt_accepts", "dbt_fast", "dbt_give", "dbt_please", "dbt_radical_acceptance", "dbt_wise_mind"];
+  const planned = ["dbt_accepts", "dbt_give", "dbt_please", "dbt_radical_acceptance"];
   for (const r of rows) {
     assert.notEqual(r.conceptId, "dbt_dear_man", r.id);
     const off = r.conceptId === "urge_surfing" || planned.includes(r.conceptId);
     assert.equal(r.active, !off, r.id);
   }
   assert.deepEqual([...new Set(rows.filter((r) => !r.active).map((r) => r.conceptId))].sort(), [...planned, "urge_surfing"].sort());
-  // Wise mind's module ships before its row is signed off: it has its app tool id, and the watchful row
-  // stays switched off and a draft (Claudia signs it off separately; build.py refuses an active draft).
+  // Default to connected (12 Nov 2026): built tools' rows are signed off and live.
   for (const c of planned.filter((x) => x !== "dbt_wise_mind" && x !== "dbt_cope_ahead" && x !== "dbt_check_facts" && x !== "dbt_fast" && x !== "dbt_radical_acceptance")) assert.ok(!graph.concepts[c]?.appToolId, `${c} has no app module yet`);
   assert.equal(graph.concepts.dbt_wise_mind.appToolId, "wise-mind");
   const wise = rows.filter((r) => r.conceptId === "dbt_wise_mind");
-  assert.deepEqual(wise.map((r) => [r.id, r.active, r.reviewStatus]), [["rf_chronic_vigilance_words_watchful_wise-mind", false, "draft"]]);
+  assert.deepEqual(wise.map((r) => [r.id, r.active, r.reviewStatus]), [["rf_chronic_vigilance_words_watchful_wise-mind", true, "approved"]]);
   // Cope Ahead and Check the Facts: built and live (Claudia, 12 Nov: default to connected), every row approved.
   assert.equal(graph.concepts.dbt_cope_ahead.appToolId, "cope-ahead");
   const cope = rows.filter((r) => r.conceptId === "dbt_cope_ahead");
@@ -82,7 +81,7 @@ test("D-02 defaults kept: Urge Surfing switched off, no DEAR MAN rows, Pause act
   const fast = rows.filter((r) => r.conceptId === "dbt_fast");
   assert.equal(fast.length, 2);
   assert.ok(fast.every((r) => !(r.words ?? []).some((w) => w === "violated" || w === "victimized")), "FAST never on violated or victimized");
-  assert.ok(fast.every((r) => r.active === false && r.reviewStatus === "draft"), "FAST rows stay off and drafts");
+  assert.ok(fast.every((r) => r.active === true && r.reviewStatus === "approved"), "FAST rows live (12 Nov: default to connected)");
   // Let it be (docs/design/let-it-be.md, DT-04; D6 renamed radical-acceptance): built, its three rows off and drafts.
   assert.equal(graph.concepts.dbt_radical_acceptance.appToolId, "let-it-be");
   const lb = rows.filter((r) => r.conceptId === "dbt_radical_acceptance");

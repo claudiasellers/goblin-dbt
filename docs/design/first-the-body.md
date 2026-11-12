@@ -23,10 +23,8 @@ demand (*You don't have to make this go away*) with someone to talk to on the sc
 | `state` | *What's it like right now?* A wave · Restless or buzzing · I want to do something · Frozen or numb · Far away · My mind won't stop · **Chest pain or feeling faint** | Step 1 |
 | `medical` | Chest pain or feeling faint: the `medical` banner (911 first; UK 999, Ireland and the EU 112, Canada 911, Australia 000, New Zealand 111), *Sit or lie down. Even if it eases, get it checked today.* No close | Medical triage |
 | `urge` | I want to do something: *First, a way to wait it out.* → `pause`, which asks about hurting yourself first (C6.5). No *Done* here, so the way on is Hold to wait. No close | State → DT-02 |
-| `screen` | A wave: the one-tap self-check (D4). *Cold on your face can slow your heart. Is any of this true for you?* Heart trouble, a slow heart or heart medicine · fainting · an eating disorder or very low weight · pregnant · Raynaud's or a cold allergy · drinking or using today. Yes, one of these → squeeze · None of these · Not sure | Medical screen (part) |
-| `cold_near` | *Is there cold water, or something cold, near you?* No → squeeze | — |
-| `cold` | *Circuit Breaker: cold on your face.* *Wet a cloth with cold water, or wrap a cold pack in a cloth.* · *Lean forward. Hold it on your forehead, eyes and upper cheeks.* · *Breathe out slowly, or hold your breath if that's comfortable.* The caution (*Never in a shower or a bath. Cold, not ice-cold.*), a 3-second lead-in, a 30-second ring (`doseTimer`). *Cold like that can slow your heart for a bit.* No face in water | TIP-T |
-| `cool` | Not sure on the self-check: *A cool cloth, gently.* 15 seconds, with a caution line | *Not sure* rule |
+| `cold_near` | A wave: *Is there cold water, or something cold, near you?* No → squeeze | — |
+| `cold` | *Circuit Breaker: cold on your face.* *Wet a cloth with cold water, or wrap a cold pack in a cloth.* · *Lean forward. Hold it on your forehead, eyes and upper cheeks.* · *Breathe out slowly, or hold your breath if that's comfortable.* The caution line (*Skip this with heart trouble, fainting, an eating disorder, pregnancy, a cold allergy, or after drinking or using today. Never in a shower or a bath. Cold, not ice-cold.*), a 3-second lead-in, a 30-second ring (`doseTimer`). *Cold like that can slow your heart for a bit.* No face in water | TIP-T |
 | `squeeze` → `tight` | *Squeeze, then let it drop.* Three rounds, press and hold to squeeze, the drop on the out-breath (`squeezeRelease`). Then *How does your body feel now?* Tight · Loose · Can't tell (nothing hangs on it) | TIP-P, the contrast |
 | `move` | Restless or buzzing: *Move fast for a minute.* *Stand up and march on the spot, knees high.* · *Or go up and down the stairs.* *Go at your own pace. Slow down or stop if anything hurts.* A 3-second lead-in, a 60-second ring (`doseTimer`). *That's a minute. Let your breath settle.* The swap is the long out-breath. Never offered for anger (*A wave*) | TIP-I, the move burst |
 | `press` | Frozen: *Press the phone hard between your palms.* *Keep a thumb on the circle while you press. Letting go early still counts.* Three 10-second holds (`holdRing`) | Frozen first (the PRD's "press the phone between the palms") |
@@ -64,9 +62,8 @@ All three are documented in [`skill-runtime.md`](skill-runtime.md).
 
 ## Safety
 
-- **Cold only after the self-check** (D4). Any yes rules cold out for squeeze and drop; *not sure* gets a cool cloth,
-  15 seconds, gently, with a caution. Never a shower or bath, never ice water, and *drinking or using today* is on the
-  check itself.
+- **Cold carries its caution line** (D4, changed 12 Nov: no self-check). The line names who should skip it, *drinking
+  or using today* included. Never a shower or bath, never ice water.
 - **Direction is never wrong** (C6.3). Frozen gets press and wake up; far away gets eyes-open orienting and something
   strong. Neither is offered a calming mode. The long out-breath is only ever the wave's swap, and it has a stop rule.
 - **Chest pain or feeling faint** is on the first screen and goes to the emergency number, never a body mode. Its line never reads as permission to skip care once it eases.
@@ -96,24 +93,8 @@ All three are documented in [`skill-runtime.md`](skill-runtime.md).
 |---|---|---|
 | Pictograms on the state cards and cold steps | Plain short labels; the cold mode has the Circuit Breaker face art | No pictogram set exists yet. A design task, not a flow change |
 | Move burst (TIP-I) never at night outside, with a metronome | Built for *Restless or buzzing* with no gate: *Go at your own pace. Slow down or stop if anything hurts.* Marching on the spot or stairs, indoors. No metronome | Claudia, 11 Nov: fitness apps suggest marching all the time; a pace line is enough. The pulse audio is part 2 |
-| `wave_numb` state | Not a separate card | Frozen or numb covers it. A clinician can split it later |
-| Medical screen once per profile | No screen (D4, changed 12 Nov): cold carries its caution line. The one-tap self-check built here stays until a PR takes it out | — |
-| *Not sure* on the screen | Warns (a cool cloth, gently), doesn't block | As the PRD says |
-| Medical: the emergency number, *then orient* | The number and *Sit or lie down. Even if it eases, get it checked today.* No orient offer | Orienting reads as "carry on" after a possible cardiac event; Gate 3 asked for the line instead. Clinician pass |
+| `wave_numb` state | Not a separate card | Frozen or numb covers it |
+| Medical screen once per profile | No screen and no self-check (D4, changed 12 Nov): the cold card's caution line names who should skip it | — |
+| Medical: the emergency number, *then orient* | The number and *Sit or lie down. Even if it eases, get it checked today.* No orient offer | Orienting reads as "carry on" after a possible cardiac event; Gate 3 asked for the line instead |
 | Direction per state (up for frozen) | Stored as `regulation_down` for every state | The close kind is per tool. See the runtime change above |
 | Sound | The dose's end chime only (the deadline timer's); no rhythm pulse or audio twin | The PRD's pulse audio is off by default anyway |
-
-## Clinician pass (open)
-
-- The self-check list and wording, and whether *not sure* should block cold rather than warn.
-- The two-minute *lower the demand* card: its length, and whether to name a person from the kit there once DT-03
-  ships.
-- Splitting *Frozen or numb* into two cards.
-- From Gate 3: whether asthma belongs on the self-check; whether a cool cloth is acceptable for *not sure if
-  pregnant*; squeeze and drop as the fallback for the cardiac and pregnancy flags; a route for shaking or sobbing
-  while frozen; whether *Done* after the someone screen needs a check-back; trouble breathing on the medical chip
-  (a breathless wave can't be told from a medical one in one tap); whether deferring the two-far-away referral is
-  safe; and *Your heart can slow*: the PRD's close line, softened to *can* because the app can't know it did.
-- The run record keeps the self-check answer as `some` / `none` / `unsure` (never which flag). It's a health signal
-  on a log record; part 2's `body_flags` moves it to a profile item with consent. Until then, it says only that a flag
-  applied.

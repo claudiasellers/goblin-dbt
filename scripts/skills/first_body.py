@@ -9,9 +9,9 @@ talk to on the screen. The tool keeps its id, `cool-down` (D6), named "First, th
 mode and keeps that name. docs/design/first-the-body.md lists what this batch defers and where it departs from the PRD.
 
 Safety (plan C6):
-- **Cold only after the one-tap self-check** (D4): heart trouble or fainting, an eating disorder or very low weight,
-  pregnancy, Raynaud's or a cold allergy, or drinking or using today rules cold out (squeeze and drop instead); *not
-  sure* gets a cool cloth, 15 seconds, gently, with a caution line. Never a shower or a bath, never ice water.
+- **Cold carries its caution line** (D4, changed 12 Nov): the card names who should skip it (heart trouble, fainting,
+  an eating disorder, pregnancy, a cold allergy, drinking or using today). No screen before it. Never a shower or a
+  bath, never ice water.
 - **Direction is never wrong** (C6.3): frozen gets press and wake up, far away gets eyes-open orienting and something
   strong; neither is ever offered a calming mode. The long out-breath is only ever the wave's swap, never the only
   thing on offer, and it has a stop rule (dizzy or tingly → stop, and a different mode).
@@ -39,26 +39,18 @@ COPY = {
     "medical_line": "Sit or lie down. Even if it eases, get it checked today.",
     # A pull to do something: the hand needs a job first (PRD: DT-02, hold first).
     "urge_line": "First, a way to wait it out.",
-    # The one-tap self-check before cold (D4; the full medical screen waits for the safety batch).
-    "screen_title": "Cold on your face can slow your heart. Is any of this true for you?",
-    "screen_hint": "Heart trouble, a slow heart or heart medicine. Fainting. An eating disorder or very low weight. Pregnant. Raynaud's or a cold allergy. Drinking or using today.",
     "cold_near_title": "Is there cold water, or something cold, near you?",
     # Circuit Breaker: cold on the face (TIP, temperature).
     "cold_title": "Circuit Breaker: cold on your face.",
     "cold_step1": "Wet a cloth with cold water, or wrap a cold pack in a cloth.",
     "cold_step2": "Lean forward. Hold it on your forehead, eyes and upper cheeks.",
     "cold_step3": "Breathe out slowly, or hold your breath if that's comfortable.",
-    "cold_caution": "Never in a shower or a bath. Cold, not ice-cold.",
+    # The one caution line (D4, changed 12 Nov): no screen before cold.
+    "cold_caution": "Skip this with heart trouble, fainting, an eating disorder, pregnancy, a cold allergy, or after drinking or using today. Never in a shower or a bath. Cold, not ice-cold.",
     "cold_start": "Tap when it's on",
     "cold_running": "Hold it there",
     "cold_lead": "Ready in",
     "cold_done": "Cold like that can slow your heart for a bit.",
-    # Not sure: a cool cloth, short and gentle (PRD: *not sure* warns, it doesn't block).
-    "cool_title": "A cool cloth, gently.",
-    "cool_step1": "A cool cloth, not ice.",
-    "cool_step2": "Lean forward and rest it on your forehead and eyes.",
-    "cool_caution": "You weren't sure, so this one is short and gentle. Stop if anything feels wrong.",
-    "cool_done": "That's enough cold for now.",
 
     # Restless or buzzing: the move burst (TIP-I). Claudia, 11 Nov: no medical gate, like any fitness app; a pace line.
     "move_title": "Move fast for a minute.",
@@ -164,11 +156,6 @@ STATES = [
     ("loop", "My mind won't stop", {}),
     ("medical", "Chest pain or feeling faint", {"danger": "medical"}),
 ]
-SCREEN = [
-    ("some", "Yes, one of these"),
-    ("none", "None of these"),
-    ("unsure", "Not sure"),
-]
 COLD_NEAR = [
     ("yes", "Yes"),
     ("no", "No, not right now"),
@@ -228,7 +215,7 @@ STEPS = [
         "fields": [{"id": "state", "options": {"list": "state"}, "max": 1, "required": True, "links": [SAFETY_LINK]}],
         "next": [{"when": STATE("medical"), "to": "medical"}, {"when": STATE("urge"), "to": "urge"},
                  {"when": STATE("frozen"), "to": "press"}, {"when": STATE("far_away"), "to": "orient"},
-                 {"when": STATE("loop"), "to": "find"}, {"when": STATE("restless"), "to": "move"}, {"to": "screen"}],
+                 {"when": STATE("loop"), "to": "find"}, {"when": STATE("restless"), "to": "move"}, {"to": "cold_near"}],
     },
     {
         # The emergency number on the card; no body mode, no close question.
@@ -245,24 +232,14 @@ STEPS = [
         "links": [SAFETY_LINK],
     },
     {
-        # The one-tap self-check (D4) before any cold.
-        "id": "screen", "kind": "ask", "title": "screen_title", "hint": "screen_hint",
-        "fields": [{"id": "screen", "options": {"list": "screen"}, "max": 1, "required": True, "links": [SAFETY_LINK]}],
-        "next": [{"when": {"eq": [a("screen"), "some"]}, "to": "squeeze"}, {"to": "cold_near"}],
-    },
-    {
         "id": "cold_near", "kind": "ask", "title": "cold_near_title",
         "fields": [{"id": "cold_near", "options": {"list": "cold_near"}, "max": 1, "required": True, "links": [SAFETY_LINK]}],
-        "next": [{"when": {"eq": [a("cold_near"), "no"]}, "to": "squeeze"},
-                 {"when": {"eq": [a("screen"), "unsure"]}, "to": "cool"}, {"to": "cold"}],
+        "next": [{"when": {"eq": [a("cold_near"), "no"]}, "to": "squeeze"}, {"to": "cold"}],
     },
     embed("cold", "doseTimer", "cold_title", {
         "art": "cold", "seconds": 30, "leadIn": 3, "step1": "cold_step1", "step2": "cold_step2", "step3": "cold_step3",
         "caution": "cold_caution", "start": "cold_start", "running": "cold_running", "lead": "cold_lead",
         "done": "cold_done", "next": "next"}),
-    embed("cool", "doseTimer", "cool_title", {
-        "art": "cold", "seconds": 15, "leadIn": 3, "step1": "cool_step1", "step2": "cool_step2", "caution": "cool_caution",
-        "start": "cold_start", "running": "cold_running", "lead": "cold_lead", "done": "cool_done", "next": "next"}),
     # Restless or buzzing: a minute of fast marching. Its swap is the long out-breath (check1's default).
     embed("move", "doseTimer", "move_title", {
         "seconds": 60, "leadIn": 3, "step1": "move_step1", "step2": "move_step2", "caution": "move_caution",
@@ -346,7 +323,6 @@ EXITS = [
 def options():
     # Part 2 adds CrisisState nodes (PRD DT-01) and points these options at them with PRESENTS, as Problem Solve does.
     out = [("state", v, label, props, None) for v, label, props in STATES]
-    out += [("screen", v, label, {}, None) for v, label in SCREEN]
     out += [("cold_near", v, label, {}, None) for v, label in COLD_NEAR]
     out += [("tight", v, label, {}, None) for v, label in TIGHT]
     out += [("tvn_down", v, label, {}, None) for v, label in TVN_DOWN]
