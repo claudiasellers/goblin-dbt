@@ -53,6 +53,7 @@ export const BACKUPS_DIR = resolve(root, 'backups');
 export const USER_LABELS = ['User', 'UserData', 'LogRecord', 'ProfileItem', 'System'];
 
 const { placesFromFelt } = await importTs('functions/src/bodyMap/places.ts');
+const { feelingOf } = await importTs('functions/src/skills/feelingOf.ts');
 
 /** A string constant from a source file, so a content / code version mismatch fails here, not in the app. */
 function constant(file, name) {
@@ -550,7 +551,35 @@ export function buildSkills(g) {
   for (const c of g.nodes('EmotionRegulationContent').map((n) => n.props).filter((c) => (c.fitsTheFactsWhen ?? []).length).sort((a, b) => asc(a.dbtParent, b.dbtParent))) {
     fitsWhen[c.dbtParent] = { label: c.label ?? null, lines: c.fitsTheFactsWhen };
   }
-  return { version: SKILLS_VERSION, parentOf, fitsWhen, skills };
+  // ER-10's feeling guide tables, as getSkillContent reads them (functions/src/skills/feelingOf.ts shapes both).
+  const guideOfErc = new Map(g.rels('GUIDES', 'FeelingGuide', 'EmotionRegulationContent').map((r) => [r.a, r.b]));
+  const urgeRows = g.rels('HAS_ACTION_URGE', 'EmotionRegulationContent', 'ActionUrge');
+  const mapOf = new Map(g.rels('FELT_LIKE', 'FeelingGuide', 'BodyMap').map((r) => [r.a, r.b]));
+  const groupRows = g.rels('GROUPS', 'BodyMap', 'Emotion');
+  const liveFelt = g.rels('FELT_AS', 'Emotion', 'SensationType').filter((r) => r.props.status === 'live' && r.b.props.padStatus === 'live');
+  const regionName = new Map(g.nodes('BodyRegion').map((n) => [n.props.id, n.props.name ?? null]));
+  const guides = g.nodes('FeelingGuide').map((n) => {
+    const erc = guideOfErc.get(n);
+    const m = mapOf.get(n);
+    const emotions = m && m.props.status === 'live' ? new Set(groupRows.filter((r) => r.a === m).map((r) => r.b)) : new Set();
+    return {
+      id: n.props.id, label: n.props.label, contentJson: n.props.contentJson ?? null, ladder: n.props.ladder ?? null,
+      urgesHeld: n.props.urgesHeld ?? null,
+      urges: erc ? urgeRows.filter((r) => r.a === erc).map((r) => ({ id: r.b.props.id, label: r.b.props.label ?? null, order: r.b.props.order ?? null, kind: r.b.props.kind ?? null })) : [],
+      felt: liveFelt.filter((r) => emotions.has(r.a)).map((r) => ({
+        emotionId: r.a.props.id, region: r.props.region ?? null, regionName: regionName.get(r.props.region) ?? null, sensationId: r.b.props.id,
+        label: r.b.props.padLabel ?? null, energy: r.b.props.energy ?? null, weight: typeof r.props.weight === 'number' ? r.props.weight : null,
+      })),
+    };
+  });
+  const feelingGuideOf = {};
+  const guideOfParent = new Map([...guideOfErc].map(([gn, c]) => [c, gn.props.id]));
+  const guideRows = [
+    ...g.rels('HAS_REGULATION_CONTENT', 'Emotion', 'EmotionRegulationContent').filter((r) => guideOfParent.has(r.b)).map((r) => [r.a.props.id, guideOfParent.get(r.b)]),
+    ...g.rels('IN_GUIDE', 'Emotion', 'FeelingGuide').map((r) => [r.a.props.id, r.b.props.id]),
+  ].sort((x, y) => asc(x[0], y[0]));
+  for (const [id, guide] of guideRows) feelingGuideOf[id] = guide;
+  return { version: SKILLS_VERSION, parentOf, fitsWhen, feelingOf: feelingOf(guides), feelingGuideOf, skills };
 }
 
 /**

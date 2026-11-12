@@ -5,14 +5,18 @@
 import { HttpsError } from 'firebase-functions/v2/https';
 import { callable } from '../shared/callable';
 import { readTx } from '../shared/neo4j';
-import { int } from '../shared/values';
+import { int, toNumber } from '../shared/values';
 import type { ExitDef, OptionDef, SkillDef, SkillsContent, StepDef } from './types';
+import { feelingOf, type GuideRow } from './feelingOf';
 
 export const SKILLS_VERSION = 'skills-v1';
 
 const json = <T>(v: unknown, fallback: T): T => (typeof v === 'string' ? (JSON.parse(v) as T) : fallback);
 
-/** Every skill, with the two shared tables (parentOf, fitsWhen) read from the emotion knowledge itself. */
+/**
+ * Every skill, with the shared tables read from the emotion knowledge itself: parentOf, fitsWhen, and the feeling
+ * guide's feelingOf / feelingGuideOf (ER-10; only signed-off body places, only emotion urges).
+ */
 export const getSkillContent = callable<unknown, SkillsContent>(
   { auth: 'public', label: 'getSkillContent', errorMessage: 'Could not load content' },
   async () => readTx(async (tx) => {
@@ -47,6 +51,19 @@ export const getSkillContent = callable<unknown, SkillsContent>(
     const fitsRes = await tx.run(
       `MATCH (c:EmotionRegulationContent) WHERE size(coalesce(c.fitsTheFactsWhen, [])) > 0
        RETURN c.dbtParent AS parent, c.label AS label, c.fitsTheFactsWhen AS lines ORDER BY c.dbtParent`);
+    const guideRes = await tx.run(
+      `MATCH (g:FeelingGuide)
+       OPTIONAL MATCH (g)-[:GUIDES]->(:EmotionRegulationContent)-[:HAS_ACTION_URGE]->(u:ActionUrge)
+       WITH g, collect(DISTINCT {id: u.id, label: u.label, order: u.order, kind: u.kind}) AS urges
+       OPTIONAL MATCH (g)-[:FELT_LIKE]->(:BodyMap {status: 'live'})-[:GROUPS]->(e:Emotion)-[f:FELT_AS {status: 'live'}]->(s:SensationType {padStatus: 'live'})
+       OPTIONAL MATCH (r:BodyRegion {id: f.region})
+       RETURN g.id AS id, g.label AS label, g.contentJson AS contentJson, g.ladder AS ladder, g.urgesHeld AS urgesHeld, urges,
+              collect({emotionId: e.id, region: f.region, regionName: r.name, sensationId: s.id, label: s.padLabel, energy: s.energy, weight: f.weight}) AS felt
+       ORDER BY g.id`);
+    const guideOfRes = await tx.run(
+      `MATCH (e:Emotion)-[:HAS_REGULATION_CONTENT]->(:EmotionRegulationContent)<-[:GUIDES]-(g:FeelingGuide) RETURN e.id AS id, g.id AS guide
+       UNION
+       MATCH (e:Emotion)-[:IN_GUIDE]->(g:FeelingGuide) RETURN e.id AS id, g.id AS guide`);
 
     const skills: SkillDef[] = sRes.records.map((r) => ({
       id: r.get('id'), toolId: r.get('toolId'), version: r.get('version'), start: r.get('start'),
@@ -94,7 +111,15 @@ export const getSkillContent = callable<unknown, SkillsContent>(
     for (const r of parentRes.records) parentOf[r.get('id')] = r.get('parent');
     const fitsWhen: SkillsContent['fitsWhen'] = {};
     for (const r of fitsRes.records) fitsWhen[r.get('parent')] = { label: (r.get('label') as string | null) ?? null, lines: r.get('lines') as string[] };
-    return { version: SKILLS_VERSION, parentOf, fitsWhen, skills };
+    const guides: GuideRow[] = guideRes.records.map((r) => ({
+      id: r.get('id'), label: r.get('label'), contentJson: r.get('contentJson') ?? null, ladder: r.get('ladder') ?? null,
+      urgesHeld: r.get('urgesHeld') ?? null,
+      urges: (r.get('urges') as GuideRow['urges']).map((u) => ({ ...u, order: u.order === null || u.order === undefined ? null : toNumber(u.order) })),
+      felt: (r.get('felt') as GuideRow['felt']).map((f) => ({ ...f, weight: f.weight === null || f.weight === undefined ? null : toNumber(f.weight) })),
+    }));
+    const feelingGuideOf: Record<string, string> = {};
+    for (const r of [...guideOfRes.records].sort((a, b) => (a.get('id') < b.get('id') ? -1 : 1))) feelingGuideOf[r.get('id')] = r.get('guide');
+    return { version: SKILLS_VERSION, parentOf, fitsWhen, feelingOf: feelingOf(guides), feelingGuideOf, skills };
   }),
 );
 

@@ -19,10 +19,10 @@ import {
   answersOf, askFresh, canGoOn, carried as carriedOf, carryOnOthers, labelOfValue, offersFor, contextIn, inlineCarried, inlineCtxFor, inlineStart, copyText, crisisFor, ctxAfterResume, seededFrom, stepLinks, emotionChoices, fieldLinks, fieldList, followUpFor,
   exitQuery, handoffLine, initialRun, inlineResult, keepFor, opensSafety, optionGroups, ownMaxOf, persistence, pickedLabels, pickTrack, resumeRun, runEmotionIds, runNext, runRecord,
   runUrgeIds,
-  scope, shownFields, stepOf, titleSlots, visitUrgeIds,
+  scope, sharedRow, shownFields, stepOf, titleSlots, visitUrgeIds,
   type Answer, type RunContext, type RunEvent, type RunState,
 } from '../../lib/skillRuntime/machine';
-import { holds } from '../../lib/skillRuntime/conditions';
+import { holds, resolve } from '../../lib/skillRuntime/conditions';
 import { getSkillRun, getSkillsContent } from '../../services/skills';
 import { answerToolOutcome, getSpineContent, scheduleFollowUps } from '../../services/spine';
 import { keepProfileItem } from '../../services/profile';
@@ -165,12 +165,12 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
     return resumeRecord !== null && UUID.test(new URLSearchParams(location.search).get('run') ?? '') ? c : ctxAfterResume(c, false);
   });
   const [carried] = useState(() => (inline
-    ? inlineCarried({ skill, shared: { parentOf: content.parentOf, fitsWhen: content.fitsWhen }, carried: [], gridIds: GRID, emotionLabel, ctxIn })
+    ? inlineCarried({ skill, shared: { parentOf: content.parentOf, fitsWhen: content.fitsWhen, feelingOf: content.feelingOf, feelingGuideOf: content.feelingGuideOf }, carried: [], gridIds: GRID, emotionLabel, ctxIn })
     : carriedFrom(location.search, location.state)));
   const profile = useProfileContext(skill.toolId as ClientProfileConsumer, { enabled: needsProfile(skill.toolId) });
   const slices = profile.slices as Record<string, unknown> | null;
   const ctx = useMemo<RunContext>(() => ({
-    skill, shared: { parentOf: content.parentOf, fitsWhen: content.fitsWhen }, carried, gridIds: GRID, emotionLabel, ctxIn, privateTools: PRIVATE_TOOLS,
+    skill, shared: { parentOf: content.parentOf, fitsWhen: content.fitsWhen, feelingOf: content.feelingOf, feelingGuideOf: content.feelingGuideOf }, carried, gridIds: GRID, emotionLabel, ctxIn, privateTools: PRIVATE_TOOLS,
     embedOutputs: EMBED_OUTPUTS, profile: slices,
   }), [skill, content, carried, ctxIn, slices]);
   const [safetyOpen, setSafetyOpen] = useState(false);
@@ -551,6 +551,12 @@ function embedProps(ctx: RunContext, st: RunState, name: string, props: Record<s
   const out = resolveEmbedProps(EMBED_PROPS[name], props, ctx.skill.copy);
   for (const [k, spec] of Object.entries(EMBED_PROPS[name] ?? {})) {
     if (spec.type === 'ctx' && k in out) out[k] = inlineCtxFor(ctx, st, { ctx: props?.[k] });
+    // A `row` prop: the ref's value keys a shared table; the embed gets the row, or nothing (never the ref).
+    if (spec.type === 'row' && k in out) {
+      const row = sharedRow(ctx, spec.table, resolve(props?.[k], scope(ctx, { answers: answersOf(ctx, st) })));
+      if (row === undefined) delete out[k];
+      else out[k] = row;
+    }
   }
   return out;
 }
