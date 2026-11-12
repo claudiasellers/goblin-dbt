@@ -342,3 +342,15 @@ test("a row reviewed to sit beside the lead fills the second card past the swap 
       !pickIds(await cell("chronic_vigilance", "stirred", { words: ["anxious"], secondary: "rumination_loop", ...opts })).includes("cope-ahead"), JSON.stringify(opts));
   }
 });
+
+test("Held's word row (12 Nov, connected by default): ashamed or embarrassed on replay → Recover, then Held; never on a blank result, never flooded", async () => {
+  for (const w of ["ashamed", "embarrassed"]) {
+    for (const band of ["steady", "stirred"]) assert.deepEqual(pickIds(await cell("rumination_loop", band, { words: [w] })), ["recovering-from-invalidation", "soothe"], `${w}/${band}`);
+    assert.ok(!pickIds(await cell("rumination_loop", "flooded", { words: [w] })).includes("soothe"), `${w}: flooded is body / orient only`);
+    // Held calms (direction down): the blank-pattern ban keeps it off a blank result (the handler resolves blank).
+    const blank = await cell("rumination_loop", "stirred", { words: [w], blank: true });
+    assert.ok(!pickIds(blank).includes("soothe"), `${w}: blank`);
+    assert.equal(blank.filtered.find((f) => f.toolId === "soothe")?.reason, "direction", w);
+  }
+  assert.ok(!pickIds(await cell("rumination_loop", "stirred", { words: ["guilty"] })).includes("soothe"), "only the two shame words");
+});
