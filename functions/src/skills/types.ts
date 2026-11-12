@@ -68,7 +68,7 @@ export interface InlineDef {
   flags?: Array<{ id: string; when: Cond }>;
   /**
    * Outcome ids of the skill's own, beyond the fixed five (`finished`, `left`, `stopped`, `body`, `unsafe`): what its
-   * `ends` and `flags` may give besides them (Check the Facts' verdict: `fits`, `partly`, `not_fit`, `unsure`). A host
+   * `ends` and `flags` may give besides them (Check the Facts' verdict: `fits`, `partly`, `doesnt_fit`, `unsure`). A host
    * that branches on one branches on `unsafe` first (build.py), and its step's `outcomes` prop is this list.
    */
   outcomes?: string[];

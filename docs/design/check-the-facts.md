@@ -156,8 +156,10 @@ Then the regulation close: *"How strong is it now, compared to when you started?
 - **Intents:** *"I can't tell if I'm overreacting"* → Check the Facts.
 - **Do the Opposite:** its fits step gains a quiet link under the detail, *"Go through it slowly with
   Check the Facts"*, which carries the emotion. The step itself is unchanged.
-- **Inline, inside Do the Opposite (ER-B5, built 12 Nov):** on its clarify route the check runs right there, for the
-  feeling it's on (R8, `inline` in `scripts/skills/check_the_facts.py`). With a feeling it has fit statements for it
+- **Inline, inside Do the Opposite (ER-B5, built 12 Nov):** when the person answers *I still do not know* to *does it
+  fit?* (and isn't flooded), the check runs right there, for the feeling it's on (R8, `inline` in
+  `scripts/skills/check_the_facts.py`). Its facts screen asks *Now, with what happened in mind, does one of these
+  match?* (`fits_title_inline`), not the host's question again, and its way back reads *Leave the check here*. With a feeling it has fit statements for it
   starts at *What happened?* with the feeling answered; otherwise it asks for the feeling first (carried, never
   pre-selected), never an empty facts screen. It gives back its verdict (`fits` · `partly` · `doesnt_fit` · `unsure`),
   `unsafe` with a danger chip and `stopped` on the safe card; the host's danger card wins over any verdict. Its offers

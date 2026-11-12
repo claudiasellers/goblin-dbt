@@ -36,7 +36,7 @@ ID = "opposite_action"
 TOOL_ID = "opposite-action"
 CONCEPT = "dbt_opposite_action"
 VERSION = "oa-skill-v1"
-OWN_MAX = 90  # an urge or a step in your own words; three of each must fit ext's 4 KB with the rest of the record
+OWN_MAX = 90  # an urge or a step in your own words; three of each must fit ext's 6 KB with the rest of the record
 PARENTS = sorted(C["parents"])
 URGE_IDS = sorted({u["id"] for p in C["parents"].values() for u in p["urges"]})
 # Urges whose own cues replace the parent's (somaticReplace: freeze and bed need up-regulation, not relaxation).
@@ -97,11 +97,20 @@ COPY = {
     "prob_line": "Then the situation is the thing to work on.",
     "prob_excessive": "It fits, and it's bigger than the situation. Bring it down first, then work on the situation.",
     # ER-B5: Check the Facts inline, on the clarify route. Its verdict picks where the feeling goes next.
-    "ctf_title": "Let's check the facts for this one",
+    "ctf_title": "A closer look at this feeling",
     "prob_title_checked": "You checked, and the feeling fits",
-    "clar_title_unsure": "Not knowing yet is a real answer",
-    "clar_unsure": "Doing the opposite can wait until you know more. One fact to find out is enough for now.",
-    "clar_left": "You can come back to the facts any time.",
+    "prob_title_partly": "You checked, and it's bigger than the situation",
+    "prob_partly": "Something here is worth working on, and the feeling is louder than it needs to be. Bring it down first.",
+    "clar_title_unsure": "You don't have to decide yet",
+    "clar_unsure": "Doing the opposite can wait until you know more.",
+    "clar_title_left": "The facts will keep",
+    "clar_left": "Check the Facts goes through them slowly whenever you're ready.",
+    "clar_checked_helpful": "It doesn't fit the facts, and acting on it still seems useful. Is it serving a different goal?",
+    "clar_checked_open": "The feeling fits. Whether acting on it helps is the open question.",
+    "clar_checked_notfit_open": "It doesn't fit the facts, and whether acting on it would help is still open.",
+    "clar_title_open": "One question is still open",
+    "cdng_safe": "Your read of danger is the one that counts here. You don't have to check it against anything.",
+    "clar_flooded": "Your body's loud right now. The facts can wait until it settles a little.",
     "repr_title": "When guilt or shame fits, repair is the opposite of hiding",
     "repr_line": "Owning it and making it right is the skill here.",
     "cue_title": "Let your body go first",
@@ -160,6 +169,7 @@ for pid in PARENTS:
     COPY[f"want_title_{pid}"] = f"Do you want to turn {n} down?"
     COPY[f"fits_title_{pid}"] = f"Does {n} fit the facts?"
     COPY[f"size_title_{pid}"] = f"Pick a step for {n}"
+    COPY[f"ctf_title_{pid}"] = f"A closer look at {n}"
 COPY.update({"want_title": "Do you want to turn this feeling down?", "fits_title": "Does this feeling fit the facts?",
              "size_title": "Pick a step for this feeling"})
 
@@ -207,9 +217,12 @@ def _route_to(step):
 
 # One jump per target (NEXT is one edge per step pair); clarify is the table's rest and the fallback.
 # Punish yourself that seems helpful goes to its own hand-off, whatever the fit (never "acting on it fits" or clarify).
+# ER-B5 (Gates 2, 3): only *I still do not know* opens the check, inline, and never with a flooded reading (the clarify
+# card says the facts can wait, the body first). Every other clarify row keeps the clarify card.
+CHECK_ENTER = {"all": [EQ("fits", "unsure"), {"not": FLOODED}]}
 HELP_NEXT = [{"when": REPAIR, "to": "repr"}, {"when": {"all": [PUNISH, EQ("help", "helpful")]}, "to": "pun"},
              {"when": _route_to("prob"), "to": "prob"},
-             {"when": _route_to("cue"), "to": "cue"}, {"to": "ctf"}]
+             {"when": _route_to("cue"), "to": "cue"}, {"when": CHECK_ENTER, "to": "ctf"}, {"to": "clar"}]
 
 URGE_WHERE = {"has": ["$opt.parents", "$d.parent"]}
 # A cue: the urge's own, or the parent's (never with an urge that replaces them).
@@ -224,6 +237,22 @@ SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
 # Check the Facts inline (ER-B5): what it gave back, read on `checked` (`unsafe` first: the danger card wins).
 CHECKED = lambda v: {"has": ["$a.checked.ids", v]}  # noqa: E731
 CHECK_UNSAFE = {"any": [CHECKED("unsafe"), CHECKED("stopped")]}
+# The check's verdict stands in for *does it fit?* in the graph's table, with the earlier *will it help?* answer (H10
+# asks both): fits → fits, bigger than this → excessive, not really → not_fit; I'm not sure stays on the clarify card.
+VERDICT = {"fits": "fits", "partly": "excessive", "doesnt_fit": "not_fit"}
+CHECKED_FITS = {"any": [CHECKED("fits"), CHECKED("partly")]}
+NOT_CHECKED = {"not": {"set": a("checked")}}
+
+
+def _checked_to(step):
+    rows = [(v, k.split(":")[1]) for v, f in VERDICT.items() for k, r in ROUTES.items()
+            if k.split(":")[0] == f and ROUTE_STEP[r] == step]
+    return {"any": [{"all": [CHECKED(v), EQ("help", h)]} for v, h in sorted(rows)]}
+
+
+def _no_carry(s):
+    s.pop("carryOn", None)
+    return s
 
 
 def handoff(step_id, title, lines, offers, each=True, crisis=None, no_close=False):
@@ -305,26 +334,44 @@ STEPS = [
     {
         # ER-B5: the clarify route checks the facts here, inline, for this feeling (Check the Facts from what happened
         # when it has fit statements for the feeling, else from the feeling, carried). Its verdict picks the route.
-        "id": "ctf", "kind": "embed", "embed": "inlineSkill", "each": "feel", "crisis": PUNISH_CRISIS, "title": "ctf_title",
-        "answerAs": "checked",
+        "id": "ctf", "kind": "embed", "embed": "inlineSkill", "each": "feel", "crisis": PUNISH_CRISIS,
+        "title": by_parent("ctf_title"), "answerAs": "checked",
         "props": {"skill": "check_the_facts", "enterAt": "event", "ctx": {"feelingId": "$each"}},
+        # Unsafe first; guilt or shame that fits with the repair goal is repair (H11); *Punish yourself* is never "it fits,
+        # work on the situation"; then the table on the verdict; the rest (not sure, left) is the clarify card.
         "next": [{"when": CHECK_UNSAFE, "to": "cdng"},
-                 {"when": {"any": [CHECKED("fits"), CHECKED("partly")]}, "to": "prob"},
-                 {"when": CHECKED("doesnt_fit"), "to": "cue"},
+                 {"when": {"all": [{"in": ["$d.parent", ["guilt", "shame"]]}, CHECKED("fits"), EQ("goal", "repair")]}, "to": "repr"},
+                 {"when": {"all": [PUNISH, CHECKED_FITS]}, "to": "pun"},
+                 {"when": _checked_to("prob"), "to": "prob"},
+                 {"when": _checked_to("cue"), "to": "cue"},
                  {"to": "clar"}],
     },
     # A person hurt or threatened them, told to the check: this feeling's danger card (the whole run's is `dang`).
-    handoff("cdng", "danger_title", [{"when": ALWAYS, "key": "danger_line"}],
-            [{"exit": "ending", "when": ALWAYS}, {"exit": "pause", "when": ALWAYS}, SAFETY_LINK],
-            crisis=[{"variant": "other_person", "when": ALWAYS}], no_close=True),
-    handoff("clar", [{"when": CHECKED("unsure"), "key": "clar_title_unsure"}, {"key": "clar_title"}],
-            [{"when": CHECKED("unsure"), "key": "clar_unsure"},
-             {"when": {"all": [{"not": CHECKED("unsure")}, {"set": a("checked")}]}, "key": "clar_left"},
-             {"when": {"all": [{"not": {"set": a("checked")}}, EQ("fits", "not_fit"), EQ("help", "helpful")]}, "key": "clar_not_fit"},
-             {"when": {"all": [{"not": {"set": a("checked")}}, {"not": {"all": [EQ("fits", "not_fit"), EQ("help", "helpful")]}}]}, "key": "clar_line"}],
-            [{"exit": "check_the_facts", "when": {"not": CHECKED("unsure")}}, {"exit": "wise_mind", "when": CHECKED("unsure")}]),
-    handoff("prob", [{"when": {"any": [CHECKED("fits"), CHECKED("partly")]}, "key": "prob_title_checked"}, {"key": "prob_title"}],
-            [{"when": {"any": [EQ("fits", "excessive"), CHECKED("partly")]}, "key": "prob_excessive"},
+    # Nothing is practised after it (Gate 3): no carry-on to the other feelings, as on `dang`.
+    _no_carry(handoff("cdng", "danger_title", [{"when": ALWAYS, "key": "danger_line"}, {"when": ALWAYS, "key": "cdng_safe"}],
+                      [{"exit": "ending", "when": ALWAYS}, {"exit": "pause", "when": ALWAYS}, SAFETY_LINK],
+                      crisis=[{"variant": "other_person", "when": ALWAYS}, *PUNISH_CRISIS], no_close=True)),
+    handoff("clar", [{"when": CHECKED("unsure"), "key": "clar_title_unsure"},
+                     {"when": {"any": [CHECKED("left"), CHECKED("finished")]}, "key": "clar_title_left"},
+                     {"when": {"any": [CHECKED_FITS, {"all": [CHECKED("doesnt_fit"), {"not": EQ("help", "helpful")}]}]}, "key": "clar_title_open"},
+                     {"key": "clar_title"}],
+            [{"when": {"all": [FLOODED, NOT_CHECKED]}, "key": "clar_flooded"},
+             {"when": CHECKED("unsure"), "key": "clar_unsure"},
+             {"when": {"all": [CHECKED("doesnt_fit"), EQ("help", "helpful")]}, "key": "clar_checked_helpful"},
+             {"when": {"all": [CHECKED("doesnt_fit"), {"not": EQ("help", "helpful")}]}, "key": "clar_checked_notfit_open"},
+             {"when": CHECKED_FITS, "key": "clar_checked_open"},
+             {"when": {"any": [CHECKED("left"), CHECKED("finished")]}, "key": "clar_left"},
+             {"when": {"all": [NOT_CHECKED, {"not": FLOODED}, EQ("fits", "not_fit"), EQ("help", "helpful")]}, "key": "clar_not_fit"},
+             {"when": {"all": [NOT_CHECKED, {"not": FLOODED}, {"not": {"all": [EQ("fits", "not_fit"), EQ("help", "helpful")]}}]}, "key": "clar_line"}],
+            # The full check as a link only when it didn't run to a verdict here; Wise mind after a verdict that leaves a
+            # question; the body first with a flooded reading (the check is skipped then).
+            [{"exit": "cool_down", "when": {"all": [FLOODED, NOT_CHECKED]}},
+             {"exit": "check_the_facts", "when": {"any": [NOT_CHECKED, CHECKED("left"), CHECKED("finished")]}},
+             {"exit": "wise_mind", "when": {"any": [CHECKED("unsure"), CHECKED("doesnt_fit"), CHECKED_FITS]}}]),
+    handoff("prob", [{"when": CHECKED("partly"), "key": "prob_title_partly"}, {"when": CHECKED("fits"), "key": "prob_title_checked"},
+                     {"key": "prob_title"}],
+            [{"when": CHECKED("partly"), "key": "prob_partly"},
+             {"when": {"all": [EQ("fits", "excessive"), {"not": CHECKED("partly")}]}, "key": "prob_excessive"},
              {"when": {"not": {"any": [EQ("fits", "excessive"), CHECKED("partly")]}}, "key": "prob_line"}],
             [{"exit": "cool_down", "when": {"any": [EQ("fits", "excessive"), CHECKED("partly")]}}, {"exit": "problem_solve", "when": ALWAYS}]),
     # *Punish yourself*, kept or "helpful": a kinder way to make it right, or riding the urge out; never a plan for it.

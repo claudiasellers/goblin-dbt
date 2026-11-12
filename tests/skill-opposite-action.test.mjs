@@ -93,14 +93,13 @@ test("the route, per feeling: opposite, clarify (its own line for not fit + help
   const to = (feel, fits, help, goal = "connection") => run([doors(feel), pick("goal", goal), next, pick("safety", "safe"), next,
     pick("urge", chips(ctx(), run([doors(feel), ...SAFE]), "vald", "urge")[0]), next, pick("want", "yes"), next, pick("fits", fits), next, pick("help", help), next]);
   assert.equal(to("anxious", "not_fit", "unhelpful").stepId, "cue");
-  // Clarify checks the facts inline first (ER-B5); going back from it early is the clarify card as before.
-  const ctf = to("anxious", "not_fit", "helpful");
-  assert.equal(ctf.stepId, "ctf");
-  const clar = run([{ type: "embedDone", output: { ids: ["left"] } }], ctx(), ctf);
+  // Only *I still do not know* checks the facts inline (ER-B5, Gate 2); the other clarify rows keep the clarify card.
+  const clar = to("anxious", "not_fit", "helpful");
   assert.equal(clar.stepId, "clar");
-  assert.equal(line(clar), skill.copy.clar_left);
+  assert.equal(line(clar), skill.copy.clar_not_fit);
   assert.deepEqual(offers(clar), ["check_the_facts"]);
-  assert.equal(to("anxious", "unsure", "unhelpful").stepId, "ctf");
+  assert.equal(line(to("anxious", "fits", "unsure")), skill.copy.clar_line);
+  for (const help of ["helpful", "unhelpful", "unsure"]) assert.equal(to("anxious", "unsure", help).stepId, "ctf", help);
   const prob = to("angry", "fits", "helpful");
   assert.equal(prob.stepId, "prob");
   assert.deepEqual(offers(prob), ["problem_solve"]);
@@ -110,35 +109,91 @@ test("the route, per feeling: opposite, clarify (its own line for not fit + help
   assert.equal(to("sad", "fits", "unhelpful", "repair").stepId, "cue", "repair only for guilt or shame");
 });
 
-test("Check the Facts inline on the clarify route (ER-B5): the verdict picks the route, unsafe wins, the feeling goes in", () => {
-  const ctf = run([doors("anxious"), ...SAFE, pick("urge", chips(ctx(), run([doors("anxious"), ...SAFE]), "vald", "urge")[0]), next,
-    pick("want", "yes"), next, pick("fits", "unsure"), next, pick("help", "unsure"), next]);
+const toCheck = (feel, help, { goal = "connection", urge = null } = {}) => run([doors(feel), pick("goal", goal), next,
+  pick("safety", "safe"), next, pick("urge", urge ?? chips(ctx(), run([doors(feel), ...SAFE]), "vald", "urge").find((u) => u !== "guilt-punish")), next,
+  pick("want", "yes"), next, pick("fits", "unsure"), next, pick("help", help), next]);
+const back = (from, ...ids) => run([{ type: "embedDone", output: { ids } }], ctx(), from);
+
+test("Check the Facts inline on I still do not know (ER-B5): the verdict joins will it help? in the table, unsafe wins", () => {
+  const ctf = toCheck("anxious", "unsure");
   assert.equal(ctf.stepId, "ctf");
   const step = M.stepOf(skill, "ctf");
   assert.equal(step.props.skill, "check_the_facts");
   assert.deepEqual(step.props.outcomes, ["fits", "partly", "doesnt_fit", "unsure"], "build.py writes the sub-skill's outcomes on the step");
   assert.deepEqual(M.inlineCtxFor(ctx(), ctf, step.props), { feelingId: "anxious" }, "the feeling it's on goes in");
-  const back = (...ids) => run([{ type: "embedDone", output: { ids } }], ctx(), ctf);
-  assert.equal(back("doesnt_fit").stepId, "cue");
-  const prob = back("fits");
-  assert.equal(prob.stepId, "prob");
+  assert.equal(title(ctf), "A closer look at the fear", "the parent's noun, never the grid word");
+  // The graph's table on the verdict (fits → fits, partly → excessive, doesnt_fit → not_fit) and the help answer.
+  const flow = readFileSync("schema/opposite-action-flow.cypher", "utf8").match(/p\.contentJson = "((?:[^"\\]|\\.)*)"/)[1];
+  const routes = JSON.parse(JSON.parse(`"${flow}"`)).routes;
+  const STEP = { opposite: "cue", problem: "prob", clarify: "clar" };
+  for (const help of ["helpful", "unhelpful", "unsure"]) {
+    const from = toCheck("anxious", help);
+    for (const [v, f] of [["fits", "fits"], ["partly", "excessive"], ["doesnt_fit", "not_fit"]]) {
+      assert.equal(back(from, v).stepId, STEP[routes[`${f}:${help}`]], `${v}:${help}`);
+    }
+    assert.equal(back(from, "unsure").stepId, "clar", `unsure:${help}`);
+  }
+  const prob = back(toCheck("anxious", "helpful"), "fits");
   assert.equal(title(prob), skill.copy.prob_title_checked);
-  const partly = back("partly");
-  assert.equal(line(partly), skill.copy.prob_excessive);
+  const partly = back(toCheck("anxious", "helpful"), "partly");
+  assert.equal(title(partly), skill.copy.prob_title_partly);
+  assert.equal(line(partly), skill.copy.prob_partly);
   assert.deepEqual(offers(partly), ["cool_down", "problem_solve"]);
-  const unsure = back("unsure");
-  assert.equal(unsure.stepId, "clar");
+  // Doesn't fit, and acting on it seems useful: another goal? Wise mind, no second check.
+  const other = back(toCheck("anxious", "helpful"), "doesnt_fit");
+  assert.equal(other.stepId, "clar");
+  assert.equal(line(other), skill.copy.clar_checked_helpful);
+  assert.deepEqual(offers(other), ["wise_mind"]);
+  const open = back(toCheck("anxious", "unsure"), "fits");
+  assert.equal(title(open), skill.copy.clar_title_open);
+  assert.equal(line(open), skill.copy.clar_checked_open);
+  const notFitOpen = back(toCheck("anxious", "unsure"), "doesnt_fit");
+  assert.equal(line(notFitOpen), skill.copy.clar_checked_notfit_open);
+  const unsure = back(ctf, "unsure");
   assert.equal(title(unsure), skill.copy.clar_title_unsure);
+  assert.equal(line(unsure), skill.copy.clar_unsure);
   assert.deepEqual(offers(unsure), ["wise_mind"]);
-  // A danger chip, then a verdict: the danger card wins, with the other-person resources and no close.
+  // Leaving the check early: the facts will keep, the full check as a link.
+  const left = back(ctf, "left");
+  assert.equal(left.stepId, "clar");
+  assert.equal(title(left), skill.copy.clar_title_left);
+  assert.equal(line(left), skill.copy.clar_left);
+  assert.deepEqual(offers(left), ["check_the_facts"]);
+  // A danger chip, then a verdict: the danger card wins, the other-person resources, no close, no carrying on.
+  const cdng = M.stepOf(skill, "cdng");
+  assert.equal(cdng.noClose, true);
+  assert.equal(cdng.carryOn, undefined, "nothing is practised after a danger card");
   for (const ids of [["fits", "unsafe"], ["doesnt_fit", "unsafe"], ["stopped", "unsafe"], ["stopped"]]) {
-    const d = back(...ids);
+    const d = back(ctf, ...ids);
     assert.equal(d.stepId, "cdng", ids.join("+"));
-    assert.equal(M.crisisFor(ctx(), M.stepOf(skill, "cdng"), d)?.variant, "other_person");
-    assert.equal(M.stepOf(skill, "cdng").noClose, true);
+    assert.equal(M.crisisFor(ctx(), cdng, d)?.variant, "other_person");
   }
   // An id the sub-skill can't give is dropped (the machine keeps only the declared ones).
-  assert.equal(back("made_up").stepId, "clar");
+  assert.equal(back(ctf, "made_up").stepId, "clar");
+});
+
+test("the inline check keeps the safety rules (Gate 3): Punish yourself, repair, a flooded reading", () => {
+  // Punish yourself that fits is never "work on the situation": its own hand-off, the banner still on.
+  for (const v of ["fits", "partly"]) {
+    const s = back(toCheck("guilty", "helpful", { urge: "guilt-punish" }), v);
+    assert.equal(s.stepId, "pun", v);
+    assert.equal(M.crisisFor(ctx(), M.stepOf(skill, "pun"), s)?.variant, "crisis");
+  }
+  assert.equal(back(toCheck("guilty", "unhelpful", { urge: "guilt-punish" }), "unsafe", "fits").stepId, "cdng");
+  assert.ok(M.stepOf(skill, "cdng").crisis.some((c) => c.variant === "crisis"), "the Punish banner stays on the danger card");
+  // Fits, but acting on it won't help: the opposite.
+  assert.equal(back(toCheck("anxious", "unhelpful"), "fits").stepId, "cue");
+  assert.equal(back(toCheck("anxious", "unhelpful"), "partly").stepId, "cue");
+  // Guilt that fits with the repair goal: repair (H11).
+  assert.equal(back(toCheck("guilty", "unhelpful", { goal: "repair" }), "fits").stepId, "repr");
+  // A flooded reading never opens the check: the clarify card, the body first.
+  const fc = ctx({ band: "flooded" });
+  let f = run([doors("anxious"), held], fc);
+  const urge = chips(fc, run([...SAFE], fc, f), "vald", "urge")[0];
+  f = run([...SAFE, pick("urge", urge), next, pick("want", "yes"), next, pick("fits", "unsure"), next, pick("help", "unsure"), next], fc, f);
+  assert.equal(f.stepId, "clar");
+  assert.equal(M.handoffLine(fc, M.stepOf(skill, "clar"), { answers: M.answersOf(fc, f) }), skill.copy.clar_flooded);
+  assert.equal(M.offersFor(fc, M.stepOf(skill, "clar"), { answers: M.answersOf(fc, f) })[0], "cool_down");
 });
 
 test("the projection's re-check is the skill's route: opposite exactly where the skill reaches the cue (every fit, help, goal)", () => {
@@ -289,7 +344,7 @@ test("the longest real record through the inline check fits ext: three feelings,
   const W = (c) => c.repeat(skill.ownMax);
   let s = run([doors("sad", "angry", "anxious"), ...SAFE]);
   for (let i = 0; i < 3; i++) {
-    s = run([own("urge", W("愛")), next, pick("want", "yes"), next, pick("fits", "not_fit"), next, pick("help", "helpful"), next], ctx(), s);
+    s = run([own("urge", W("愛")), next, pick("want", "yes"), next, pick("fits", "unsure"), next, pick("help", "unhelpful"), next], ctx(), s);
     assert.equal(s.stepId, "ctf");
     s = run([{ type: "embedDone", output: { ids: ["doesnt_fit"] } }], ctx(), s);
     assert.equal(s.stepId, "cue");

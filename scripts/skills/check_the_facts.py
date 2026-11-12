@@ -30,6 +30,9 @@ COPY = {
     "through_cope_ahead": "Plan for it with Cope Ahead",
     "fits_title": "Here's when feeling {feeling} fits the facts. Does one of these match what happened?",
     "fits_title_general": "Does feeling {feeling} fit what happened?",
+    # Inline in Do the Opposite (ER-B5), which asked *does it fit?* already: this is the closer look, not the same question.
+    "fits_title_inline": "Now, with what happened in mind, does one of these match?",
+    "inline_back": "Leave the check here",
     "next_fits": "When a feeling fits, the move is to work on the situation.",
     "next_partly": "The feeling makes sense, and it's turned up loud. Bring the volume down, then work on what's left.",
     "next_no": "The feeling is bigger than the facts. Acting opposite to its urge helps it settle.",
@@ -227,7 +230,8 @@ STEPS = [
     },
     {
         "id": "fits", "kind": "ask",
-        "title": [{"when": {"set": "$d.fitsParent"}, "key": "fits_title"}, {"key": "fits_title_general"}],
+        "title": [{"when": {"all": [{"set": "$ctx.feelingId"}, {"set": "$d.fitsParent"}]}, "key": "fits_title_inline"},
+                  {"when": {"set": "$d.fitsParent"}, "key": "fits_title"}, {"key": "fits_title_general"}],
         "titleSlots": {"feeling": {"labelOf": "feel"}},
         "fields": [{
             "id": "fits", "options": {"list": "fits"}, "max": 1, "required": True, "askFresh": "fitsFacts",
@@ -241,7 +245,7 @@ STEPS = [
         "id": "missing", "kind": "ask", "title": "missing_title", "hint": "missing_hint",
         "fields": [
             {"id": "fact", "options": {"list": "fact"}, "max": 1,
-             # One fact is short; 60 keeps the worst-case record under ext's 4 KB (tests/skill-contracts.test.mjs).
+             # One fact is short; 60 keeps the worst-case record under ext's 6 KB (tests/skill-contracts.test.mjs).
              "own": {"hint": "own_hint", "countsAsPick": True, "max": 60},
              # Own words aren't read, so someone to talk to stays one quiet tap away, as on the camera screen.
              "links": [{"exit": "safety_open", "label": "safety_open", "when": {"own": "fact"}}]},
