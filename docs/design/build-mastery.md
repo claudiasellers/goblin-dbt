@@ -60,7 +60,8 @@ minutes*, *Make one small thing from start to end*), so they can always be finis
   lists each under About me, named from the graph's option (`SkillOption build_mastery:rung:<id>`) or their words, an
   own-words area after it (*Spend five minutes on it (the garden)*), with *Set aside*; no dates or counts. The
   **`iCanRungs`** slice (`PROFILE_NEEDS['build-mastery']`) is the ladder ids already kept, so the done card doesn't
-  offer one twice (the list never reads as a count).
+  offer one twice (the list never reads as a count). An own-words area's general rungs (`own_1`..`own_3`) are left
+  out: each means something different per area, so it's always offered.
 - **`ext.run`** (plan D2): the visit's answers and the booked follow-up. No `SkillPractice` rep of its own.
 - **`mastery_step`** (`scripts/practice-spine/content.py`): chips `today` (20:00), `tomorrow` (next day 18:00),
   `few_days` (three days, 18:00); stale after 72 h, no missed path, in-tab only; in `OPEN_RESOLVES` and

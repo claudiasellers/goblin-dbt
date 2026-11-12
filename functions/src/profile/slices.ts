@@ -98,6 +98,8 @@ export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
   thingsILikePicks: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'thing_i_like', status: 'active'})
     RETURN p {.id, .valueJson} AS p`,
   // Build mastery (ER-11): the ladder steps already on the I can list, so a done step isn't offered for keeping twice.
+  // The general rungs of an area in the person's own words (`own_1`..`own_3`) are left out: each one means something
+  // different per area (Spend five minutes on it: the garden, the guitar), so it's always offered.
   iCanRungs: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'i_can', status: 'active'})
     RETURN p {.id, .valueJson} AS p`,
 };
@@ -319,7 +321,7 @@ const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
     const r = await tx.run(SLICE_QUERIES.iCanRungs!, { uid });
     const ids = new Set<string>();
     for (const rec of r.records) {
-      try { for (const id of strings((JSON.parse(String((rec.get('p') as Record<string, unknown>).valueJson)) as Record<string, unknown>).rungIds).slice(0, 1)) ids.add(id); } catch { /* unreadable: skip */ }
+      try { for (const id of strings((JSON.parse(String((rec.get('p') as Record<string, unknown>).valueJson)) as Record<string, unknown>).rungIds).slice(0, 1)) if (!id.startsWith('own_')) ids.add(id); } catch { /* unreadable: skip */ }
     }
     return [...ids].map((id) => ({ id }));
   },

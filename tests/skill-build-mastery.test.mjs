@@ -135,6 +135,8 @@ test("done or partly: the I can list on a yes, then the next one up (never past 
   for (const p of ["functions/src/profile/types.ts", "src/data/profileTypes.ts"]) {
     assert.match(readFileSync(p, "utf8"), /'build-mastery': \['iCanRungs'\]/, p);
   }
+  // An own-words area's general rungs mean something different per area, so the slice never lists them.
+  assert.match(readFileSync("functions/src/profile/slices.ts", "utf8"), /if \(!id\.startsWith\('own_'\)\) ids\.add\(id\)/);
   // Up with a carried flooded reading: the heads-up first, as on a first visit.
   const fc = ctx({ band: "flooded" });
   const fl = run([pick("happened", "done"), next, pick("then", "up"), next], fc, reopen(booked("admin_2")));
