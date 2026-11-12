@@ -2,7 +2,8 @@
  * The query layer behind getStateAndTools (plan E4-1): Cypher plus record → row mapping, nothing
  * else. `graphDeps(tx)` is what the callable hands to the pure handler.
  */
-import { evaluateSafetyFlag, type QueryRunner } from '../safety/checkinSafetyFlag';
+import { evaluateReferralFlag, evaluateSafetyFlag, type QueryRunner } from '../safety/checkinSafetyFlag';
+import { evaluateSafetyAsk, safetyPolicyEnabled } from '../safety/safetyAsk';
 import type { StateDeps } from './handler';
 import type {
   Band, CoOccurrence, Direction, EmotionEvidenceRow, LegacyToolRow, PatternDetail, PatternSlice, ResponseEvidenceRow,
@@ -177,7 +178,8 @@ export function toRoutingPolicy(p: Obj | null | undefined): RoutingPolicy | null
   };
 }
 
-export function graphDeps(tx: QueryRunner): StateDeps {
+/** `uid`: the caller (the safety route reads their own SafetyChecks); without it the route stays off. */
+export function graphDeps(tx: QueryRunner, uid?: string): StateDeps {
   return {
     async emotionEvidence(candidatePatterns, emotionIds, useAliases): Promise<EmotionEvidenceRow[]> {
       const res = await tx.run(EMOTION_EVIDENCE_QUERY, { candidatePatterns, emotionIds, useAliases });
@@ -229,6 +231,12 @@ export function graphDeps(tx: QueryRunner): StateDeps {
       }));
     },
     safetyFlag: (patternId, quadrant) => evaluateSafetyFlag(tx, patternId, quadrant),
+    async safetyRoute(a) {
+      if (!uid || !(await safetyPolicyEnabled(tx))) return null;
+      const ask = await evaluateSafetyAsk(tx, uid, a);
+      const flag = await evaluateReferralFlag(tx, a.patternIds[0]);
+      return { ask, ...(flag ? { flag } : {}) };
+    },
     async routingPolicy() {
       const res = await tx.run(ROUTING_POLICY_QUERY, {});
       const r = res.records[0];

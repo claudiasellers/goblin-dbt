@@ -64,6 +64,8 @@ export const USER_DATA: Record<string, UserDataLabel> = {
   // ---- log (IE, docs/design/dear-man-debrief.md) ----
   // One conversation's outcome (IE-03's interaction log), written by DEAR MAN's debrief projection; WITH its Person.
   Interaction: { layer: 'log', rel: 'HAS_INTERACTION', exportAs: 'interactions' },
+  // ---- log (the safety route, CORE-01, docs/design/safety-route.md): one visit, ids and enums only; saveSafetyCheck ----
+  SafetyCheck: { layer: 'log', rel: 'HAS_SAFETY_CHECK', exportAs: 'safetyChecks' },
   // ---- profile ----
   ProfileFact: { layer: 'profile', rel: 'HAS_PROFILE_FACT', exportAs: 'profileFacts' },
   MyPattern: { layer: 'profile', rel: 'HAS_PATTERN', exportAs: 'myPatterns' },

@@ -2058,6 +2058,33 @@
     "labels": {},
     "callableTrigger": {}
   },
+  "saveSafetyCheck": {
+    "availableMemoryMb": null,
+    "timeoutSeconds": null,
+    "minInstances": null,
+    "maxInstances": null,
+    "ingressSettings": null,
+    "concurrency": null,
+    "serviceAccountEmail": null,
+    "vpc": null,
+    "platform": "gcfv2",
+    "secretEnvironmentVariables": [
+      {
+        "key": "NEO4J_URI"
+      },
+      {
+        "key": "NEO4J_USER"
+      },
+      {
+        "key": "NEO4J_PASSWORD"
+      },
+      {
+        "key": "OWN_WORDS_KEY"
+      }
+    ],
+    "labels": {},
+    "callableTrigger": {}
+  },
   "sayToPart": {
     "availableMemoryMb": null,
     "timeoutSeconds": null,
@@ -2599,33 +2626,6 @@
     "callableTrigger": {}
   },
   "upsertProfileFact": {
-    "availableMemoryMb": null,
-    "timeoutSeconds": null,
-    "minInstances": null,
-    "maxInstances": null,
-    "ingressSettings": null,
-    "concurrency": null,
-    "serviceAccountEmail": null,
-    "vpc": null,
-    "platform": "gcfv2",
-    "secretEnvironmentVariables": [
-      {
-        "key": "NEO4J_URI"
-      },
-      {
-        "key": "NEO4J_USER"
-      },
-      {
-        "key": "NEO4J_PASSWORD"
-      },
-      {
-        "key": "OWN_WORDS_KEY"
-      }
-    ],
-    "labels": {},
-    "callableTrigger": {}
-  },
-  "getSkillContent": {
     "availableMemoryMb": null,
     "timeoutSeconds": null,
     "minInstances": null,

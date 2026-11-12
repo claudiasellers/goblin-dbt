@@ -33,6 +33,9 @@
  *                          cut to the fields screens read (an allowlist, partsAllowlist.mjs)
  *   tool-names.json        each app tool's official skill name: TherapyConcept.name by appToolId (the admin
  *                          "Official DBT names" switch on the Tools page; no Cloud Function serves it)
+ *   safety.json            the safety route (CORE-01, schema/safety-route.cypher): SafetyScreenFlow's copy, each
+ *                          SafetyFlag's userCopy (never the clinician action), countries and their CrisisLines by
+ *                          order (never checkedAt / verifiedAt / source: the audit stays in the graph)
  *   opposite-action-picker.json  getOppositeActionContent's word → DBT parent rows and each parent's
  *                          label, acknowledgment and urges, for every word (Do the Opposite's doors)
  * Each builder mirrors the Cypher in the Cloud Function it replaces (named on the function).
@@ -64,6 +67,7 @@ export const SPINE_VERSION = constant('functions/src/spine/registry.ts', 'SPINE_
 export const WISE_MIND_VERSION = constant('functions/src/wiseMind/index.ts', 'WISE_MIND_VERSION');
 export const COPE_AHEAD_VERSION = constant('functions/src/copeAhead/index.ts', 'COPE_AHEAD_VERSION');
 export const SKILLS_VERSION = constant('functions/src/skills/index.ts', 'SKILLS_VERSION');
+export const SAFETY_VERSION = constant('functions/src/safety/safetyAsk.ts', 'SAFETY_VERSION');
 
 /** Refuses anything but a content-only export with no user data and no dangling relationships. */
 export function assertContentOnly(exp) {
@@ -605,8 +609,33 @@ export function buildOppositeActionPicker(g) {
   return { parents, words };
 }
 
+/**
+ * The safety route (CORE-01): the same payload scripts/safety/fixture.py writes. null when the graph has no
+ * SafetyScreenFlow yet (a load before schema/safety-route.cypher's first load): the committed safety.json
+ * is kept. A wrong version throws.
+ */
+export function buildSafety(g) {
+  const flow = g.nodes('SafetyScreenFlow').find((n) => n.props.id === 'safety_screen');
+  if (!flow) return null;
+  if (flow.props.version !== SAFETY_VERSION) throw new Error(`Safety content is ${flow.props.version}; the app expects ${SAFETY_VERSION}`);
+  const flags = {};
+  for (const f of g.nodes('SafetyFlag').map((n) => n.props).sort((a, b) => asc(a.id, b.id))) {
+    if (typeof f.userCopy === 'string') flags[f.id] = f.userCopy;
+  }
+  const linesOf = new Map();
+  for (const r of g.rels('COVERS', 'CrisisLine', 'Country')) pushTo(linesOf, r.b.props.id, r.a.props);
+  const countries = g.nodes('Country').map((n) => n.props).sort((a, b) => asc(a.id, b.id)).map((c) => ({
+    id: c.id, name: c.name, emergency: c.emergency, firearmPrompt: c.firearmPrompt === true,
+    lines: (linesOf.get(c.id) ?? []).sort((a, b) => asc(a.order, b.order) || asc(a.id, b.id)).map((l) => ({
+      id: l.id, name: l.name, kind: l.kind, phone: l.phone ?? null, sms: l.sms ?? null, smsBody: l.smsBody ?? null,
+      chatUrl: l.chatUrl ?? null, hours: l.hours ?? null, languages: l.languages ?? [],
+    })),
+  }));
+  return { version: SAFETY_VERSION, flow: JSON.parse(flow.props.contentJson), flags, countries };
+}
+
 /** Files a graph may not have content for yet: missing from an export, the committed file is kept. */
-export const KEPT_WHEN_MISSING = ['wise-mind.json', 'cope-ahead.json', 'skills.json'];
+export const KEPT_WHEN_MISSING = ['wise-mind.json', 'cope-ahead.json', 'skills.json', 'safety.json'];
 
 /**
  * All the snapshots from one export (pure apart from reading the version constants). A file in
@@ -618,6 +647,7 @@ export function buildSnapshots(exp) {
   const wiseMind = buildWiseMind(g);
   const copeAhead = buildCopeAhead(g);
   const skills = buildSkills(g);
+  const safety = buildSafety(g);
   return {
     'related-words.json': buildRelatedWords(g),
     'body-map.json': buildBodyMap(g),
@@ -631,6 +661,7 @@ export function buildSnapshots(exp) {
     ...(wiseMind ? { 'wise-mind.json': wiseMind } : {}),
     ...(copeAhead ? { 'cope-ahead.json': copeAhead } : {}),
     ...(skills ? { 'skills.json': skills } : {}),
+    ...(safety ? { 'safety.json': safety } : {}),
   };
 }
 

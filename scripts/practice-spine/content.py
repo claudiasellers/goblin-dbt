@@ -391,6 +391,21 @@ FOLLOW_UP_TYPES = [
         "notification": "A stretch you committed to is up.",
     },
     {
+        # The safety route's next-morning check (CORE-01, docs/design/safety-route.md): offered at the route's exit and
+        # after a *passing* answer (opt-in: yes · no thanks). The card and the notification are content-free (Today can
+        # be seen by others): opening it asks *How are you this morning?* on the route's own screen (doing okay · still
+        # hard · I'm not safe; not safe reopens the calm crisis screen). The first tier: it sorts above every other card.
+        # Scheduled by the route only, after the person's yes; nothing schedules it while SafetyPolicy is off.
+        "id": "safety_checkin", "ownerModule": "core", "tier": "safety", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/safety?checkin={followUpId}",
+        "window": {"kind": "chip", "chips": {"tomorrow": {"kind": "at_local", "days": 1, "time": "09:30"}}},
+        "staleAfterHours": 30, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Checking in", "body": "How are you this morning?"},
+        "choices": [{"id": "not_now", "label": "Not now", "status": "dismissed"}],
+        "notification": "Checking in",
+    },
+    {
         # E3 §A4.2.6: "Come back to this later" from the breakdown hand-off (A4-2 schedules it).
         "id": "resume_skill", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
         "deepLinkTemplate": "/tool/{sourceToolId}?resume={sourceSessionId}&followUp={followUpId}",
@@ -558,9 +573,9 @@ FOLLOW_UP_TYPES += [
     },
 ]
 
-# Reserved rows: authored now so the ids exist, enabled false until their owners ship.
+# Reserved rows: authored now so the ids exist, enabled false until their owners ship. (safety_checkin was
+# one until CORE-01 authored it above.)
 RESERVED = [
-    ("safety_checkin", "core", "safety"),   # CORE-01; sorts first, push-cap exempt
     ("chain_nextday", "core", "quality"),   # CORE-08
     ("missed_step", "core", "quality"),     # CORE-11
     ("diary_daily", "core", "practice"),    # CORE-04 (needs rrule)

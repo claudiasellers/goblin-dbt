@@ -80,6 +80,7 @@ export const LOAD_ORDER = [
   'wise-mind.cypher',                              // Wise mind: questions, what each mind says, practices on dbt_wise_mind, answers, flow copy (needs Recover's linehan_skills_2015)
   'cope-ahead.cypher',                             // Cope Ahead: situations, hardest moments, moves, rehearsal beats on dbt_cope_ahead, flow copy (needs Recover's linehan_skills_2015)
   'skills.cypher',                                 // The skill runtime (docs/design/skill-runtime.md): Skill / SkillStep / SkillExit / SkillOption, NEXT / OFFERS / LINKS; Check the Facts (needs app-tool-ids, EmotionRegulationContent)
+  'safety-route.cypher',                          // The safety route (CORE-01): SafetyScreenFlow, Country / CrisisLine, ASKS_SAFETY, Emotion.safetyScreen, the SafetyFlag rewrite, SafetyPolicy (needs knowledge-graph, emotion-wheel-sync)
   'recommended-for.cypher',                        // Check-in routing: RECOMMENDED_FOR pattern × band, concept tags, RoutingPolicy (needs urge_surfing, dbt_find_the_feeling)
 ];
 
