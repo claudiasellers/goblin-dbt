@@ -22,6 +22,7 @@ export const PLAYER_TOOLS: Readonly<Record<string, string>> = {
   'thoughts-passing': 'thoughts_passing',
   'opposite-action': 'opposite_action',
   'habit-plan': 'habit_plan',
+  'please-skill': 'please_skill',
 };
 
 /**

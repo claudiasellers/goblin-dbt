@@ -1507,7 +1507,7 @@ MATCH (s:Skill {id: "er_troubleshoot"}), (n:SkillStep {id: "er_troubleshoot:none
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 15};
 MERGE (x:SkillExit {id: "er_troubleshoot:please"})
-SET x += {skillId: "er_troubleshoot", exit: "please", toolId: "please-skill", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "er_troubleshoot", exit: "please", toolId: "please-skill", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (x:SkillExit {id: "er_troubleshoot:please"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "er_troubleshoot:please"}), (t:TherapyConcept {appToolId: "please-skill"})
@@ -2780,7 +2780,7 @@ MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:pause"}), (t:TherapyConcept {appToolId: "pause"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:please_skill"})
-SET x += {skillId: "problem_solve", exit: "please_skill", toolId: "please-skill", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "please_skill", toolId: "please-skill", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}";
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:please_skill"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:please_skill"}), (t:TherapyConcept {appToolId: "please-skill"})
@@ -9814,7 +9814,7 @@ MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "let_it_be:good_things"}), (t:TherapyConcept {appToolId: "good-things"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "let_it_be:please_skill"})
-SET x += {skillId: "let_it_be", exit: "please_skill", toolId: "please-skill", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "let_it_be", exit: "please_skill", toolId: "please-skill", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
 MATCH (s:Skill {id: "let_it_be"}), (x:SkillExit {id: "let_it_be:please_skill"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "let_it_be:please_skill"}), (t:TherapyConcept {appToolId: "please-skill"})
@@ -17097,3 +17097,312 @@ SET o:SkillOption, o += {skillId: "habit_plan", list: "renew", value: "stop", la
 MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:renew:stop"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "renew", order: 83};
+
+// --- please_skill (pl-v1) ---
+MERGE (s:Skill {id: "please_skill"})
+SET s += {toolId: "please-skill", version: "pl-v1", contentVersion: "skills-v1", start: "sleep", ownMax: 90, emotionFields: [], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"back_no\": \"Days like that happen. Tomorrow's another go, and a smaller thing can count.\", \"back_partly\": \"Part of it counts. Your body got some of what it needed.\", \"back_title\": \"Did the fix happen?\", \"back_yes\": \"That's one thing done for your body today.\", \"body_title\": \"How's your body today?\", \"done\": \"Done\", \"fix_hint\": \"One thing for today. Pick the smallest one you'd actually do.\", \"fix_own\": \"Something else\", \"food_title\": \"How's food been today?\", \"heavy_link\": \"Rest doesn't refill me: find the feeling\", \"moved_title\": \"Have you moved much today?\", \"next\": \"Next\", \"none_line\": \"That's worth knowing too. If things still feel loud, it may be a feeling more than the body.\", \"none_title\": \"Nothing obvious from the body today\", \"remind_label\": \"Want me to ask tonight if it happened?\", \"set_later\": \"It's on for later today.\", \"set_now\": \"Feelings run hotter on an empty tank. This is one small thing for it.\", \"set_remind\": \"It'll be on Today this evening, to ask if it happened.\", \"set_title\": \"Looking after your body is the skill\", \"settle_first\": \"Things feel loud right now. You could settle your body first.\", \"skip\": \"Skip this one\", \"sleep_hint\": \"Running low on sleep, food or health can make every feeling louder. One tap each, and any can be skipped.\", \"sleep_more\": \"If short sleep keeps coming back, a sleep reset can help.\", \"sleep_title\": \"How was your sleep last night?\", \"subs_hint\": \"Any answer is fine here, and so is not saying.\", \"subs_title\": \"Any alcohol or drugs in the last day?\", \"vol_body\": \"Your body is part of why the volume's up today.\", \"vol_food\": \"Food is part of why the volume's up today.\", \"vol_moved\": \"Not moving yet is part of why the volume's up today.\", \"vol_sleep\": \"Sleep is part of why the volume's up today.\", \"vol_subs\": \"Last night is part of why the volume's up today.\", \"when_title\": \"When will you do it?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+MATCH (t:TherapyConcept {id: "dbt_please"}), (s:Skill {id: "please_skill"})
+MERGE (t)-[:HAS_SKILL]->(s);
+MATCH (:SkillStep {skillId: "please_skill"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
+MATCH (:Skill {id: "please_skill"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
+MERGE (n:SkillStep {id: "please_skill:sleep"})
+SET n += {skillId: "please_skill", step: "sleep", kind: "ask", version: "pl-v1"}, n.specJson = "{\"fields\": [{\"id\": \"sleep\", \"links\": [{\"exit\": \"cool_down\", \"label\": \"settle_first\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}], \"max\": 1, \"options\": {\"list\": \"sleep\"}}], \"hint\": \"sleep_hint\", \"title\": \"sleep_title\"}";
+MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:sleep"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 0};
+MERGE (n:SkillStep {id: "please_skill:food"})
+SET n += {skillId: "please_skill", step: "food", kind: "ask", version: "pl-v1"}, n.specJson = "{\"fields\": [{\"id\": \"food\", \"max\": 1, \"options\": {\"list\": \"food\"}}], \"title\": \"food_title\"}";
+MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:food"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 1};
+MERGE (n:SkillStep {id: "please_skill:body"})
+SET n += {skillId: "please_skill", step: "body", kind: "ask", version: "pl-v1"}, n.specJson = "{\"fields\": [{\"id\": \"body\", \"max\": 1, \"options\": {\"list\": \"body\"}}], \"title\": \"body_title\"}";
+MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:body"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 2};
+MERGE (n:SkillStep {id: "please_skill:subs"})
+SET n += {skillId: "please_skill", step: "subs", kind: "ask", version: "pl-v1"}, n.specJson = "{\"fields\": [{\"id\": \"subs\", \"max\": 1, \"options\": {\"list\": \"subs\"}}], \"hint\": \"subs_hint\", \"title\": \"subs_title\"}";
+MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:subs"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 3};
+MERGE (n:SkillStep {id: "please_skill:moved"})
+SET n += {skillId: "please_skill", step: "moved", kind: "ask", version: "pl-v1"}, n.specJson = "{\"fields\": [{\"id\": \"moved\", \"max\": 1, \"options\": {\"list\": \"moved\"}}], \"title\": \"moved_title\"}";
+MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:moved"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 4};
+MERGE (n:SkillStep {id: "please_skill:fix"})
+SET n += {skillId: "please_skill", step: "fix", kind: "ask", version: "pl-v1"}, n.specJson = "{\"fields\": [{\"id\": \"fix\", \"links\": [{\"exit\": \"find_the_feeling\", \"label\": \"heavy_link\", \"when\": {\"any\": [{\"in\": [\"$a.sleep\", [\"sleep_short\", \"sleep_broken\", \"sleep_much\"]]}, {\"in\": [\"$a.moved\", [\"moved_not_yet\"]]}]}}], \"max\": 1, \"options\": {\"list\": \"fix\", \"where\": {\"any\": [{\"has\": [\"$opt.on\", \"$a.body\"]}, {\"has\": [\"$opt.on\", \"$a.sleep\"]}, {\"has\": [\"$opt.on\", \"$a.food\"]}, {\"has\": [\"$opt.on\", \"$a.subs\"]}, {\"has\": [\"$opt.on\", \"$a.moved\"]}, {\"has\": [\"$opt.on\", \"always\"]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"fix_own\", \"max\": 90}, \"required\": true}], \"hint\": \"fix_hint\", \"title\": [{\"key\": \"vol_body\", \"when\": {\"in\": [\"$a.body\", [\"body_ill\", \"body_pain\", \"body_meds\"]]}}, {\"key\": \"vol_sleep\", \"when\": {\"in\": [\"$a.sleep\", [\"sleep_short\", \"sleep_broken\", \"sleep_much\"]]}}, {\"key\": \"vol_food\", \"when\": {\"in\": [\"$a.food\", [\"food_skipped\", \"food_all_over\"]]}}, {\"key\": \"vol_subs\", \"when\": {\"in\": [\"$a.subs\", [\"subs_some\"]]}}, {\"key\": \"vol_moved\", \"when\": {\"in\": [\"$a.moved\", [\"moved_not_yet\"]]}}]}";
+MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:fix"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 5};
+MERGE (n:SkillStep {id: "please_skill:when"})
+SET n += {skillId: "please_skill", step: "when", kind: "ask", version: "pl-v1"}, n.specJson = "{\"fields\": [{\"id\": \"when\", \"max\": 1, \"options\": {\"list\": \"when\"}, \"required\": true}, {\"id\": \"remind\", \"label\": \"remind_label\", \"max\": 1, \"options\": {\"list\": \"remind\"}, \"showWhen\": {\"eq\": [\"$a.when\", \"later\"]}}], \"followUp\": {\"type\": \"please_fix\", \"when\": {\"all\": [{\"eq\": [\"$a.when\", \"later\"]}, {\"set\": \"$a.remind\"}]}, \"whenFrom\": \"remind\"}, \"title\": \"when_title\"}";
+MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:when"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 6};
+MERGE (n:SkillStep {id: "please_skill:set"})
+SET n += {skillId: "please_skill", step: "set", kind: "handoff", version: "pl-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"set_remind\", \"when\": {\"set\": \"$a.remind\"}}, {\"key\": \"set_later\", \"when\": {\"eq\": [\"$a.when\", \"later\"]}}, {\"key\": \"set_now\", \"when\": {\"all\": []}}], \"title\": \"set_title\"}";
+MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:set"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 7};
+MERGE (n:SkillStep {id: "please_skill:none"})
+SET n += {skillId: "please_skill", step: "none", kind: "handoff", version: "pl-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"none_line\", \"when\": {\"all\": []}}], \"title\": \"none_title\"}";
+MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:none"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 8};
+MERGE (n:SkillStep {id: "please_skill:back"})
+SET n += {skillId: "please_skill", step: "back", kind: "ask", version: "pl-v1"}, n.specJson = "{\"clears\": [\"happened\"], \"fields\": [{\"id\": \"happened\", \"max\": 1, \"options\": {\"list\": \"happened\"}, \"required\": true}], \"reopens\": {\"after\": \"when\"}, \"title\": \"back_title\"}";
+MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:back"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 9};
+MERGE (n:SkillStep {id: "please_skill:back_end"})
+SET n += {skillId: "please_skill", step: "back_end", kind: "handoff", version: "pl-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"back_yes\", \"when\": {\"eq\": [\"$a.happened\", \"done_yes\"]}}, {\"key\": \"back_partly\", \"when\": {\"eq\": [\"$a.happened\", \"done_partly\"]}}, {\"key\": \"back_no\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"set_title\"}";
+MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:back_end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 10};
+MERGE (x:SkillExit {id: "please_skill:cool_down"})
+SET x += {skillId: "please_skill", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (x:SkillExit {id: "please_skill:cool_down"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "please_skill:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "please_skill:find_the_feeling"})
+SET x += {skillId: "please_skill", exit: "find_the_feeling", toolId: "find-the-feeling", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (x:SkillExit {id: "please_skill:find_the_feeling"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "please_skill:find_the_feeling"}), (t:TherapyConcept {appToolId: "find-the-feeling"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "please_skill:sleep_reset"})
+SET x += {skillId: "please_skill", exit: "sleep_reset", toolId: "sleep-reset", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (x:SkillExit {id: "please_skill:sleep_reset"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "please_skill:sleep_reset"}), (t:TherapyConcept {appToolId: "sleep-reset"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "please_skill:done"})
+SET x += {skillId: "please_skill", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (x:SkillExit {id: "please_skill:done"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (a:SkillStep {id: "please_skill:sleep"}), (b:SkillStep {id: "please_skill:food"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "please_skill:sleep"}), (x:SkillExit {id: "please_skill:cool_down"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "sleep", label: "settle_first"}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
+MATCH (a:SkillStep {id: "please_skill:food"}), (b:SkillStep {id: "please_skill:body"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "please_skill:body"}), (b:SkillStep {id: "please_skill:subs"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "please_skill:subs"}), (b:SkillStep {id: "please_skill:moved"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "please_skill:moved"}), (b:SkillStep {id: "please_skill:fix"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"any\": [{\"in\": [\"$a.body\", [\"body_ill\", \"body_pain\", \"body_meds\"]]}, {\"in\": [\"$a.sleep\", [\"sleep_short\", \"sleep_broken\", \"sleep_much\"]]}, {\"in\": [\"$a.food\", [\"food_skipped\", \"food_all_over\"]]}, {\"in\": [\"$a.subs\", [\"subs_some\"]]}, {\"in\": [\"$a.moved\", [\"moved_not_yet\"]]}]}";
+MATCH (a:SkillStep {id: "please_skill:moved"}), (b:SkillStep {id: "please_skill:none"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "please_skill:fix"}), (b:SkillStep {id: "please_skill:when"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "please_skill:fix"}), (x:SkillExit {id: "please_skill:find_the_feeling"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "fix", label: "heavy_link"}, r.whenJson = "{\"any\": [{\"in\": [\"$a.sleep\", [\"sleep_short\", \"sleep_broken\", \"sleep_much\"]]}, {\"in\": [\"$a.moved\", [\"moved_not_yet\"]]}]}";
+MATCH (a:SkillStep {id: "please_skill:when"}), (b:SkillStep {id: "please_skill:set"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "please_skill:set"}), (x:SkillExit {id: "please_skill:sleep_reset"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"in\": [\"$a.sleep\", [\"sleep_short\", \"sleep_broken\", \"sleep_much\"]]}}]";
+MATCH (a:SkillStep {id: "please_skill:none"}), (x:SkillExit {id: "please_skill:find_the_feeling"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "please_skill:back"}), (b:SkillStep {id: "please_skill:back_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MERGE (o:SkillOption {id: "please_skill:sleep:sleep_enough"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "sleep", value: "sleep_enough", label: "Enough", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:sleep:sleep_enough"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "sleep", order: 0};
+MERGE (o:SkillOption {id: "please_skill:sleep:sleep_short"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "sleep", value: "sleep_short", label: "Short", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:sleep:sleep_short"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "sleep", order: 1};
+MERGE (o:SkillOption {id: "please_skill:sleep:sleep_broken"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "sleep", value: "sleep_broken", label: "Broken", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:sleep:sleep_broken"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "sleep", order: 2};
+MERGE (o:SkillOption {id: "please_skill:sleep:sleep_much"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "sleep", value: "sleep_much", label: "Too much", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:sleep:sleep_much"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "sleep", order: 3};
+MERGE (o:SkillOption {id: "please_skill:sleep:sleep_unsure"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "sleep", value: "sleep_unsure", label: "Not sure", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:sleep:sleep_unsure"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "sleep", order: 4};
+MERGE (o:SkillOption {id: "please_skill:food:food_regular"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "food", value: "food_regular", label: "Regular so far", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:food:food_regular"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "food", order: 5};
+MERGE (o:SkillOption {id: "please_skill:food:food_skipped"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "food", value: "food_skipped", label: "Skipped something", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:food:food_skipped"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "food", order: 6};
+MERGE (o:SkillOption {id: "please_skill:food:food_all_over"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "food", value: "food_all_over", label: "All over the place", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:food:food_all_over"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "food", order: 7};
+MERGE (o:SkillOption {id: "please_skill:food:food_unsure"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "food", value: "food_unsure", label: "Not sure", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:food:food_unsure"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "food", order: 8};
+MERGE (o:SkillOption {id: "please_skill:body:body_okay"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "body", value: "body_okay", label: "Okay", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:body:body_okay"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "body", order: 9};
+MERGE (o:SkillOption {id: "please_skill:body:body_ill"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "body", value: "body_ill", label: "Ill or sore", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:body:body_ill"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "body", order: 10};
+MERGE (o:SkillOption {id: "please_skill:body:body_pain"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "body", value: "body_pain", label: "In pain", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:body:body_pain"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "body", order: 11};
+MERGE (o:SkillOption {id: "please_skill:body:body_meds"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "body", value: "body_meds", label: "Missed my meds", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:body:body_meds"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "body", order: 12};
+MERGE (o:SkillOption {id: "please_skill:subs:subs_none"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "subs", value: "subs_none", label: "None", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:subs:subs_none"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "subs", order: 13};
+MERGE (o:SkillOption {id: "please_skill:subs:subs_some"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "subs", value: "subs_some", label: "Some", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:subs:subs_some"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "subs", order: 14};
+MERGE (o:SkillOption {id: "please_skill:subs:subs_rather_not"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "subs", value: "subs_rather_not", label: "Rather not say", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:subs:subs_rather_not"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "subs", order: 15};
+MERGE (o:SkillOption {id: "please_skill:moved:moved_yes"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "moved", value: "moved_yes", label: "Yes", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:moved:moved_yes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moved", order: 16};
+MERGE (o:SkillOption {id: "please_skill:moved:moved_bit"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "moved", value: "moved_bit", label: "A bit", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:moved:moved_bit"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moved", order: 17};
+MERGE (o:SkillOption {id: "please_skill:moved:moved_not_yet"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "moved", value: "moved_not_yet", label: "Not yet", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:moved:moved_not_yet"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moved", order: 18};
+MERGE (o:SkillOption {id: "please_skill:fix:fix_protein"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "fix", value: "fix_protein", label: "Eat something with some protein in it, in the next hour", version: "pl-v1"}, o.propsJson = "{\"on\": [\"food_skipped\", \"food_all_over\", \"subs_some\"]}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:fix:fix_protein"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "fix", order: 19};
+MERGE (o:SkillOption {id: "please_skill:fix:fix_water"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "fix", value: "fix_water", label: "A glass of water now", version: "pl-v1"}, o.propsJson = "{\"on\": [\"food_skipped\", \"body_ill\", \"subs_some\", \"sleep_short\"]}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:fix:fix_water"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "fix", order: 20};
+MERGE (o:SkillOption {id: "please_skill:fix:fix_meal"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "fix", value: "fix_meal", label: "A proper meal, even a small one", version: "pl-v1"}, o.propsJson = "{\"on\": [\"food_all_over\"]}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:fix:fix_meal"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "fix", order: 21};
+MERGE (o:SkillOption {id: "please_skill:fix:fix_lie_down"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "fix", value: "fix_lie_down", label: "A 20-minute lie-down before 3pm, with an alarm", version: "pl-v1"}, o.propsJson = "{\"on\": [\"sleep_short\", \"sleep_broken\"]}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:fix:fix_lie_down"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "fix", order: 22};
+MERGE (o:SkillOption {id: "please_skill:fix:fix_daylight"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "fix", value: "fix_daylight", label: "Five minutes outside, or by an open window", version: "pl-v1"}, o.propsJson = "{\"on\": [\"sleep_broken\", \"sleep_much\", \"moved_not_yet\"]}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:fix:fix_daylight"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "fix", order: 23};
+MERGE (o:SkillOption {id: "please_skill:fix:fix_sick_care"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "fix", value: "fix_sick_care", label: "Treat it like being sick: rest, fluids, warmth", version: "pl-v1"}, o.propsJson = "{\"on\": [\"body_ill\"]}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:fix:fix_sick_care"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "fix", order: 24};
+MERGE (o:SkillOption {id: "please_skill:fix:fix_usual"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "fix", value: "fix_usual", label: "Whatever you'd usually do for the pain", version: "pl-v1"}, o.propsJson = "{\"on\": [\"body_pain\"]}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:fix:fix_usual"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "fix", order: 25};
+MERGE (o:SkillOption {id: "please_skill:fix:fix_sit"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "fix", value: "fix_sit", label: "Sit or lie down for 15 minutes", version: "pl-v1"}, o.propsJson = "{\"on\": [\"body_pain\"]}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:fix:fix_sit"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "fix", order: 26};
+MERGE (o:SkillOption {id: "please_skill:fix:fix_meds"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "fix", value: "fix_meds", label: "Check what's due and take it as prescribed", version: "pl-v1"}, o.propsJson = "{\"on\": [\"body_meds\"]}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:fix:fix_meds"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "fix", order: 27};
+MERGE (o:SkillOption {id: "please_skill:fix:fix_food_first"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "fix", value: "fix_food_first", label: "Food and water before any big decisions", version: "pl-v1"}, o.propsJson = "{\"on\": [\"subs_some\"]}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:fix:fix_food_first"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "fix", order: 28};
+MERGE (o:SkillOption {id: "please_skill:fix:fix_move"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "fix", value: "fix_move", label: "Walk around the block, or the room, for five minutes", version: "pl-v1"}, o.propsJson = "{\"on\": [\"moved_not_yet\", \"sleep_much\"]}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:fix:fix_move"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "fix", order: 29};
+MERGE (o:SkillOption {id: "please_skill:fix:fix_one_thing"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "fix", value: "fix_one_thing", label: "Shrink today to the one thing that has to happen", version: "pl-v1"}, o.propsJson = "{\"on\": [\"always\"]}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:fix:fix_one_thing"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "fix", order: 30};
+MERGE (o:SkillOption {id: "please_skill:when:now"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "when", value: "now", label: "Now", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:when:now"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "when", order: 31};
+MERGE (o:SkillOption {id: "please_skill:when:later"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "when", value: "later", label: "Later today", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:when:later"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "when", order: 32};
+MERGE (o:SkillOption {id: "please_skill:remind:evening"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "remind", value: "evening", label: "Yes, this evening", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:remind:evening"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "remind", order: 33};
+MERGE (o:SkillOption {id: "please_skill:happened:done_yes"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "happened", value: "done_yes", label: "Yes", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:happened:done_yes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "happened", order: 34};
+MERGE (o:SkillOption {id: "please_skill:happened:done_partly"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "happened", value: "done_partly", label: "Partly", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:happened:done_partly"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "happened", order: 35};
+MERGE (o:SkillOption {id: "please_skill:happened:done_no"})
+SET o:SkillOption, o += {skillId: "please_skill", list: "happened", value: "done_no", label: "No", version: "pl-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:happened:done_no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "happened", order: 36};
