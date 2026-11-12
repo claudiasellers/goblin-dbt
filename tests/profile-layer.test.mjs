@@ -25,7 +25,7 @@ test("types mirror: src/data/profileTypes.ts equals functions/src/profile/types.
 
 test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 Phase A needs", () => {
   for (const [consumer, needs] of Object.entries(types.PROFILE_NEEDS)) {
-    assert.ok(toolIds.has(consumer) || ["checkin", "today", "witness", "me"].includes(consumer), consumer);
+    assert.ok(toolIds.has(consumer) || ["checkin", "today", "witness", "me", "safety"].includes(consumer), consumer);
     for (const s of needs) assert.ok(types.SLICE_IDS.includes(s), `${consumer}: ${s}`);
   }
   assert.deepEqual(types.PROFILE_NEEDS["recovering-from-invalidation"], ["name"]);
@@ -40,9 +40,11 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
   // The kept pros & cons cards (DT-10): Hold to wait replays them and the crisis kit (DT-03) plays them as cards; Me
   // reads every kept item through getMe.
   assert.deepEqual(types.PROFILE_NEEDS["crisis-kit"], ["crisisKit", "prosCons"], "the kept kit and pros & cons cards (DT-03)");
+  // The safety plan (CORE-02): Help & safety and the route read it, with the kit its step 2 references.
+  assert.deepEqual(types.PROFILE_NEEDS.safety, ["safetyPlan", "crisisKit"], "the plan and its kit (CORE-02)");
   for (const [consumer, needs] of Object.entries(types.PROFILE_NEEDS)) {
     if (!["pause", "crisis-kit"].includes(consumer)) assert.ok(!needs.includes("prosCons"), `${consumer} reads prosCons`);
-    if (consumer !== "crisis-kit") assert.ok(!needs.includes("crisisKit"), `${consumer} reads crisisKit`);
+    if (!["crisis-kit", "safety"].includes(consumer)) assert.ok(!needs.includes("crisisKit"), `${consumer} reads crisisKit`);
   }
   assert.deepEqual(types.PROFILE_NEEDS["urge-surfing"], ["parts"], "the tag row on its urge close");
   assert.deepEqual(types.PROFILE_NEEDS["check-the-facts"], ["parts"], "the tag row on its close");

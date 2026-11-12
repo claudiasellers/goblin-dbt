@@ -15,8 +15,37 @@ export const PLAN_STEPS: readonly PlanStepId[] = ['signs', 'coping', 'distract',
 /** Use mode's order: their own line first (PRD), then Stanley–Brown's order. */
 export const USE_ORDER: readonly PlanStepId[] = ['hear', 'signs', 'coping', 'distract', 'people', 'pros', 'safer', 'reasons'];
 
-/** The device copy, for someone signed out (nothing leaves the device). */
-export const PLAN_KEY = 'goblin.safety.plan.v1';
+/**
+ * The device copy: for someone signed out (nothing leaves the device), or a signed-in save that didn't reach the
+ * server. Stored with the uid it was made under (null signed out) and read only under that uid, or a signed-out copy
+ * by whoever signs in on this device next (offered to move to their account); a signed-in copy is cleared on sign-out.
+ */
+export const PLAN_KEY = 'goblin.safety.plan.v2';
+
+export interface DevicePlan { owner: string | null; plan: SafetyPlan }
+
+/** The device copy for this uid (null signed out), or null when there's none or it's someone else's. */
+export function devicePlanFor(raw: unknown, uid: string | null): DevicePlan | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const o = raw as Record<string, unknown>;
+  const owner = typeof o.owner === 'string' ? o.owner : null;
+  if (owner !== null && owner !== uid) return null;
+  const plan = planFromJson(o.plan);
+  return plan ? { owner, plan } : null;
+}
+
+/** Whether a stored device copy belongs to `uid` (cleared when that uid signs out). */
+export function deviceOwnedBy(raw: unknown, uid: string): boolean {
+  return !!raw && typeof raw === 'object' && (raw as Record<string, unknown>).owner === uid;
+}
+
+/** A short fingerprint of a plan (build mode drops a session draft made from a different starting plan). */
+export function planPrint(p: SafetyPlan): string {
+  const s = JSON.stringify(p);
+  let h = 0;
+  for (let i = 0; i < s.length; i += 1) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return String(h);
+}
 
 export type ProRole = 'therapist' | 'gp' | 'care_team' | 'other';
 export interface PlanPerson { name: string; phone: string; text: string }

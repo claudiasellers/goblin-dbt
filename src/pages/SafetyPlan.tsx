@@ -8,7 +8,7 @@ import { useSafetyPlan } from '../hooks/useSafetyPlan';
 import { useToday } from '../hooks/useToday';
 import { QUICK_PLAN_KEY } from '../lib/safetyRoute';
 import { buildNeedsHeadsUp, emptyPlan, planFromQuick } from '../lib/safetyPlan';
-import { completeFollowUp, getSafetyContent } from '../services/safety';
+import { completeFollowUp, getSafetyContent, scheduleSafetyPlanReview } from '../services/safety';
 import { SafetyPlanBuild } from '../components/safety/SafetyPlanBuild';
 import { SafetyPlanUse } from '../components/safety/SafetyPlanUse';
 import { PlanCard } from '../components/safety/SafetyPlanCard';
@@ -24,7 +24,8 @@ const quiet = 'min-h-11 px-2 text-sm underline underline-offset-4 text-[var(--co
  * My safety plan (`/safety/plan`, CORE-02; docs/design/safety-route.md), from Help & safety:
  *   - no query: build mode (a kept plan opens to change it; else the quick plan as a draft, else empty);
  *   - `?use=1`: use mode (back from a tool it picks up at the step it was on, for this browser session);
- *   - `?review=<followUpId>`: the month-on review (`safety_plan_review`): keep as is, or change something.
+ *   - `?review=<followUpId>`: the month-on review (`safety_plan_review`): keep as is (the next one a month on), or
+ *     change something (`?changing=<id>`: build mode, the card done once the change is saved).
  * Works signed out: the plan stays on the device.
  */
 export function SafetyPlan() {
@@ -57,13 +58,15 @@ export function SafetyPlan() {
         <p className="m-0 text-[var(--color-text-secondary)]">{c.review.line}</p>
         {plan && <PlanCard content={content} country={country} plan={plan} kitCards={kitCards} />}
         <button type="button" className={primary} onClick={() => {
-          if (user) void completeFollowUp(review).then(() => today.drop(review)).catch(() => { /* the card goes stale */ });
+          // Kept as it is: this card is done and the next review is a month on.
+          if (user) {
+            void completeFollowUp(review).then(() => today.drop(review)).catch(() => { /* the card goes stale */ });
+            void scheduleSafetyPlanReview().catch(() => { /* offline: no next card */ });
+          }
           leave();
         }}>{c.review.keep}</button>
-        <button type="button" className={quiet} onClick={() => {
-          if (user) void completeFollowUp(review).then(() => today.drop(review)).catch(() => { /* the card goes stale */ });
-          setParams({});
-        }}>{c.review.change}</button>
+        {/* The card is done once the changed plan is saved (backing out leaves it on Today). */}
+        <button type="button" className={quiet} onClick={() => setParams({ changing: review })}>{c.review.change}</button>
       </div>
     );
   }
@@ -77,11 +80,18 @@ export function SafetyPlan() {
   }
 
   const start = plan ?? planFromQuick(quick, c.person.textDefault);
+  const changing = params.get('changing');
   return (
     <div className="max-w-md mx-auto pb-8">
-      <SafetyPlanBuild content={content} country={country} start={plan ? start : (quick ? start : emptyPlan())}
+      <SafetyPlanBuild content={content} country={country} start={plan || quick ? start : emptyPlan()} isNew={!plan}
         fromDraft={!plan && !!quick} flooded={flooded} kitCards={kitCards} signedIn={!!user}
-        save={(p) => save(p, c)} onUse={() => setParams({ use: '1' })} onLeave={leave} />
+        save={async (p) => {
+          const r = await save(p, c, { review: !!changing });
+          // From the review card: done now the change is saved (the save booked the next one).
+          if (r === 'account' && changing) void completeFollowUp(changing).then(() => today.drop(changing)).catch(() => { /* goes stale */ });
+          return r;
+        }}
+        onUse={() => setParams({ use: '1' })} onLeave={leave} />
     </div>
   );
 }

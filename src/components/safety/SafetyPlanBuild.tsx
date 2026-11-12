@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { PlanChip, SafetyContent, SafetyCountry } from '../../data/safetyTypes';
 import {
-  PLAN_STEPS, cleanPhone, saferChips, type ChipField, type PlanPerson, type PlanPro, type ProRole, type SafetyPlan,
+  PLAN_STEPS, cleanPhone, planPrint, saferChips, type ChipField, type PlanPerson, type PlanPro, type ProRole, type SafetyPlan,
 } from '../../lib/safetyPlan';
 import { fill } from '../../lib/safetyRoute';
 import type { PlanSaved } from '../../hooks/useSafetyPlan';
@@ -14,12 +14,21 @@ const primary = 'w-full min-h-11 px-4 py-3 rounded-lg bg-[var(--color-accent-fil
 const input = 'w-full min-h-11 px-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-card)] text-[var(--color-text-primary)]';
 const card = 'p-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-card)]';
 
-/** The build in progress, kept for this browser session so leaving to make the crisis kit loses nothing. */
-const BUILD_KEY = 'goblin.safety.planBuild.v1';
-function readBuild(): { plan: SafetyPlan; i: number } | null {
-  try { const v = sessionStorage.getItem(BUILD_KEY); return v ? (JSON.parse(v) as { plan: SafetyPlan; i: number }) : null; } catch { return null; }
+/**
+ * The build in progress, kept for this browser session so leaving to make the crisis kit loses nothing. Stored with a
+ * fingerprint of the plan it started from: a draft from a different starting plan (saved since, moved to the account)
+ * is dropped. Written only past the intro; cleared on save and on leaving.
+ */
+const BUILD_KEY = 'goblin.safety.planBuild.v2';
+interface BuildDraft { plan: SafetyPlan; i: number; from: string }
+function readBuild(from: string): BuildDraft | null {
+  try {
+    const v = sessionStorage.getItem(BUILD_KEY);
+    const d = v ? (JSON.parse(v) as BuildDraft) : null;
+    return d && d.from === from && d.plan && typeof d.i === 'number' ? d : null;
+  } catch { return null; }
 }
-function writeBuild(v: { plan: SafetyPlan; i: number } | null): void {
+function writeBuild(v: BuildDraft | null): void {
   try { if (v) sessionStorage.setItem(BUILD_KEY, JSON.stringify(v)); else sessionStorage.removeItem(BUILD_KEY); } catch { /* private mode */ }
 }
 
@@ -54,6 +63,8 @@ interface Props {
   country: SafetyCountry | null;
   /** The plan to start from: the kept one (changing it), the quick plan as a draft, or empty. */
   start: SafetyPlan;
+  /** No plan kept yet: step 2 starts with the crisis kit ticked when there is one (a kept plan keeps its own choice). */
+  isNew: boolean;
   fromDraft: boolean;
   /** A carried flooded reading: a heads-up first (PRD: build in calm). */
   flooded: boolean;
@@ -70,15 +81,17 @@ interface Props {
  * shows the plan as one card and saves it. Kept for this browser session as it goes (leaving to make the crisis kit
  * and coming back picks up where it was).
  */
-export function SafetyPlanBuild({ content, country, start, fromDraft, flooded, kitCards, signedIn, save, onUse, onLeave }: Props) {
+export function SafetyPlanBuild({ content, country, start, isNew, fromDraft, flooded, kitCards, signedIn, save, onUse, onLeave }: Props) {
   const c = content.flow.plan;
-  const [state, setState] = useState(() => readBuild() ?? { plan: { ...start, kit: start.kit || kitCards > 0 }, i: -1 });
+  const [from] = useState(() => planPrint(start));
+  const [state, setState] = useState<BuildDraft>(() => readBuild(from) ?? { plan: { ...start, kit: start.kit || (isNew && kitCards > 0) }, i: -1, from });
   const [saving, setSaving] = useState(false);
   const [result, setResult] = useState<PlanSaved | null>(null);
   const [headsUp, setHeadsUp] = useState(flooded);
   const heading = useRef<HTMLHeadingElement>(null);
   const { plan, i } = state;
-  useEffect(() => { writeBuild(result ? null : state); }, [state, result]);
+  useEffect(() => { if (result) writeBuild(null); else if (state.i >= 0) writeBuild(state); }, [state, result]);
+  const leave = () => { writeBuild(null); onLeave(); };
   useEffect(() => { heading.current?.focus(); }, [i, result, headsUp]);
 
   const set = (patch: Partial<SafetyPlan>) => setState((s) => ({ ...s, plan: { ...s.plan, ...patch } }));
@@ -94,7 +107,7 @@ export function SafetyPlanBuild({ content, country, start, fromDraft, flooded, k
       <div className="space-y-4" data-testid="plan-flooded">
         {title(c.flooded)}
         <button type="button" className={primary} onClick={() => setHeadsUp(false)}>{c.floodedGo}</button>
-        <button type="button" className={quiet} onClick={onLeave}>{c.floodedLater}</button>
+        <button type="button" className={quiet} onClick={leave}>{c.floodedLater}</button>
       </div>
     );
   }
@@ -105,7 +118,7 @@ export function SafetyPlanBuild({ content, country, start, fromDraft, flooded, k
         {title(result === 'account' ? c.saved : result === 'device' ? c.savedDevice : c.saveFailed)}
         <PlanCard content={content} country={country} plan={plan} kitCards={kitCards} />
         <button type="button" className={primary} onClick={onUse}>{c.use.title}</button>
-        <button type="button" className={quiet} onClick={onLeave}>{c.use.done}</button>
+        <button type="button" className={quiet} onClick={leave}>{c.use.done}</button>
       </div>
     );
   }
@@ -117,7 +130,7 @@ export function SafetyPlanBuild({ content, country, start, fromDraft, flooded, k
         <p className="m-0 text-[var(--color-text-secondary)]">{c.intro}</p>
         {fromDraft && <p className="m-0 text-sm text-[var(--color-text-secondary)]">{c.fromDraft}</p>}
         <button type="button" className={primary} onClick={() => go(0)}>{c.next}</button>
-        <button type="button" className={quiet} onClick={onLeave}>{c.floodedLater}</button>
+        <button type="button" className={quiet} onClick={leave}>{c.floodedLater}</button>
       </div>
     );
   }

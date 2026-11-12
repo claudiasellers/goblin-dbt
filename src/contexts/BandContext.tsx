@@ -6,6 +6,15 @@ import {
   type RecordInput,
 } from '../lib/bandStore';
 import { clearResumeTokens } from '../lib/resumeToken';
+import { PLAN_KEY, deviceOwnedBy } from '../lib/safetyPlan';
+
+/** A safety plan kept on this device under an account that just signed out (CORE-02): it goes with them. */
+function clearDevicePlanOf(uid: string): void {
+  try {
+    const v = localStorage.getItem(PLAN_KEY);
+    if (v && deviceOwnedBy(JSON.parse(v), uid)) localStorage.removeItem(PLAN_KEY);
+  } catch { /* private mode */ }
+}
 import { newId } from '../lib/spine/ids';
 import { isCurrent } from '../lib/band';
 
@@ -29,7 +38,7 @@ export function BandProvider({ owner, children, content: initial, loader }: {
   const inflight = useRef<Promise<unknown> | null>(null);
   const prevOwner = useRef<string | null>(owner);
 
-  // Sign-out (or a different account): forget the band and the resume drafts on this device.
+  // Sign-out (or a different account): forget the band, the resume drafts and that account's device plan copy.
   useEffect(() => {
     const prev = prevOwner.current;
     prevOwner.current = owner;
@@ -37,6 +46,7 @@ export function BandProvider({ owner, children, content: initial, loader }: {
       memory.current = null;
       clearStored(sessionStore());
       clearResumeTokens();
+      clearDevicePlanOf(prev);
       setVersion((v) => v + 1);
     }
   }, [owner]);

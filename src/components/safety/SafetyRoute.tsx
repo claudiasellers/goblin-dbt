@@ -163,7 +163,7 @@ export function SafetyRoute({ entry, source, sourceSessionId, followUpId, onDone
       return frame(<>
         {title(f.passing.line)}
         {people}
-        <QuickPlanLink content={content} onOpen={() => send({ type: 'quick_plan' })} label={f.passing.makePlan} sub={f.passing.makePlanSub} plan={plan} />
+        <QuickPlanLink content={content} onOpen={() => { if (plan) send({ type: 'plan_kept' }); send({ type: 'quick_plan' }); }} label={f.passing.makePlan} sub={f.passing.makePlanSub} plan={plan} />
         <button type="button" className={primary} onClick={() => send({ type: 'carry_on' })}>{f.passing.continue}</button>
       </>);
     case 'act':
@@ -207,12 +207,16 @@ export function SafetyRoute({ entry, source, sourceSessionId, followUpId, onDone
       return frame(<>
         {title(f.strong.title)}
         {people}
-        <QuickPlanLink content={content} onOpen={() => send({ type: 'quick_plan' })} label={f.strong.quickPlan} sub={f.strong.quickPlanSub} plan={plan} />
+        <QuickPlanLink content={content} onOpen={() => { if (plan) send({ type: 'plan_kept' }); send({ type: 'quick_plan' }); }} label={f.strong.quickPlan} sub={f.strong.quickPlanSub} plan={plan} />
       </>, { exit: true });
     case 'quick_plan':
+      // The plan in place, the route's people (the lines and the plan's people) above every step, the route's own way out.
       return plan
-        ? frame(<SafetyPlanUse content={content} country={content.countries.find((c) => c.id === country) ?? null} onCountry={setCountry} plan={plan}
-            onContact={(how) => send({ type: 'contacted', how })} onDone={() => { send({ type: 'plan_kept' }); send({ type: 'back' }); }} />)
+        ? frame(<>
+            {people}
+            <SafetyPlanUse content={content} country={content.countries.find((c) => c.id === country) ?? null} onCountry={setCountry} plan={plan} embedded
+              onContact={(how) => send({ type: 'contacted', how })} onDone={() => send({ type: 'back' })} />
+          </>, { exit: true })
         : frame(<QuickPlan content={content} heading={(t) => title(t)} onKept={() => send({ type: 'plan_kept' })} onClose={() => send({ type: 'back' })} />, { exit: true });
     case 'exit':
       return frame(<>
@@ -246,7 +250,7 @@ export function SafetyRoute({ entry, source, sourceSessionId, followUpId, onDone
         {title(hard ? f.morning.hard : f.morning.okay)}
         {twice && <p className="m-0 text-[var(--color-text-secondary)]">{f.morning.twiceHard}</p>}
         {hard && people}
-        {hard && <QuickPlanLink content={content} onOpen={() => send({ type: 'quick_plan' })} label={f.strong.plan} sub="" onlyIfKept plan={plan} />}
+        {hard && <QuickPlanLink content={content} onOpen={() => { if (plan) send({ type: 'plan_kept' }); send({ type: 'quick_plan' }); }} label={f.strong.plan} sub="" onlyIfKept plan={plan} />}
         <button type="button" className={primary} onClick={() => onDone({ safetyCheckId: null, answer: null })}>Done</button>
       </>);
     }

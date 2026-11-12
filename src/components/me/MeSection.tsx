@@ -127,7 +127,7 @@ export function MeSection() {
               ? <KeptHabitPlan value={i.value} />
               : i.meta.kind === 'crisis_kit' && i.value
               ? <KeptCrisisKit value={i.value as Record<string, unknown>} />
-              : i.meta.kind === 'safety_plan'
+              : i.meta.kind === 'safety_plan' && i.meta.status === 'active'
               ? <Link to="/safety/plan?use=1" className="inline-flex min-h-11 items-center text-sm underline underline-offset-2 text-[var(--color-text-secondary)]">Open it</Link>
               : <p className="text-sm text-[var(--color-text-secondary)]">{i.meta.kind === 'cope_ahead_plan'
                 ? (cope ? planLine(cope, planCaFromKept(i.value as Record<string, unknown> | undefined)).text : '')

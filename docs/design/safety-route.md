@@ -57,14 +57,17 @@ Stanley & Brown's plan, built in calm and used in one tap. Copy and chips are `F
   replaces it). Chip ids and own words per step; the people and the professionals are one own-words field each
   (`peopleOwn`, `prosOwn`, a JSON list), so names, numbers and messages are encrypted together. Read through the
   `safetyPlan` slice, which only `PROFILE_NEEDS.safety` reads (Help & safety and the route; the plan isn't browsed from
-  other tools, PRD open question 2). Signed out it stays on the device (`goblin.safety.plan.v1`); signed in later, Help &
-  safety offers *Save this plan to your account?*.
+  other tools, PRD open question 2; Me lists it without its contents). Signed out it stays on the device
+  (`goblin.safety.plan.v2`, stored with the uid it was made under, null signed out); it still shows after signing in
+  until the account has one, and Help & safety offers *Save this plan to your account?*. A signed-in save that fails
+  stays on the device for that account only, cleared when it signs out.
 - **The quick plan** (CORE-01, three lines on the device) is the plan's draft: build mode starts from it, and Help &
   safety says *Finish your safety plan* until a plan is saved.
 - **Help & safety** shows *My safety plan* first once there is one, its people under it. In the route, *Open your plan*
   plays use mode in place, and the plan's people sit under the lines on every screen (*Someone from your plan*).
 - **Review**: saving books `safety_plan_review` a month on (10:00, safety tier, content-free), which opens
-  `/safety/plan?review=<id>`: *Did anything on it help? Anything to change?* (keep as is · change something). The
+  `/safety/plan?review=<id>`: *Did anything on it help? Anything to change?* *Keep it as is* books the next one a month
+  on; *Change something* opens build mode and the card is done once the change is saved. Edits in between book nothing. The
   server's follow-up horizon is 32 days now (it was 14, which also refused Ending's *In a month*).
 - **Me** lists *My safety plan* with *Open it* and *Set aside*, never its contents.
 

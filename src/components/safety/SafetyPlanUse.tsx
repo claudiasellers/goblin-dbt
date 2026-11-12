@@ -19,18 +19,22 @@ const writeAt = (n: number | null) => { try { if (n === null) sessionStorage.rem
  * *Next step*; nothing is required. Step 2 opens the crisis kit or a tool (and comes back here); step 4 calls or
  * texts with the message the person wrote. The end shows the lines again.
  */
-export function SafetyPlanUse({ content, country, onCountry, plan, onDone, onContact, resume = false }: {
+export function SafetyPlanUse({ content, country, onCountry, plan, onDone, onContact, resume = false, embedded = false }: {
   content: SafetyContent; country: SafetyCountry | null; onCountry: (id: string) => void; plan: SafetyPlan;
-  onDone: () => void; onContact?: (how: 'line' | 'person') => void; resume?: boolean;
+  onDone: () => void; onContact?: (how: 'line' | 'person') => void;
+  /** The page: remember the step for this session (back from a tool picks up there). Never inside the route. */
+  resume?: boolean;
+  /** Inside the safety route: the route puts its people (lines and the plan's people) above, and owns the way out. */
+  embedded?: boolean;
 }) {
   const c = content.flow.plan;
   const steps = stepsToUse(plan);
   const [i, setI] = useState(() => (resume ? Math.min(readAt(), steps.length) : 0));
   const heading = useRef<HTMLHeadingElement>(null);
-  useEffect(() => { heading.current?.focus(); writeAt(i); }, [i]);
-  const finish = () => { writeAt(null); onDone(); };
+  useEffect(() => { heading.current?.focus(); if (resume) writeAt(i); }, [i, resume]);
+  const finish = () => { if (resume) writeAt(null); onDone(); };
   const title = (t: string) => <h2 ref={heading} tabIndex={-1} className="m-0 text-xl font-semibold leading-snug text-[var(--color-text-primary)] outline-none">{t}</h2>;
-  const pinned = <PlanPeopleRow content={content} country={country} plan={plan} onContact={onContact} />;
+  const pinned = <PlanPeopleRow content={content} country={country} plan={plan} onContact={onContact} standalone />;
 
   if (i >= steps.length) {
     return (
@@ -89,7 +93,7 @@ export function SafetyPlanUse({ content, country, onCountry, plan, onDone, onCon
 
   return (
     <div className="space-y-4 motion-safe:animate-[stepEnter_300ms_ease-out]" data-testid={`plan-use-${step}`}>
-      {step !== 'people' && pinned}
+      {step !== 'people' && !embedded && pinned}
       {step !== 'hear' && <p className="m-0 text-xs text-[var(--color-text-tertiary)]">{c.use.title}</p>}
       {title(stepTitle)}
       {body}
@@ -104,7 +108,7 @@ export function SafetyPlanUse({ content, country, onCountry, plan, onDone, onCon
       )}
       <div className="flex justify-between">
         {i > 0 ? <button type="button" className={quiet} onClick={() => setI(i - 1)}>{c.back}</button> : <span />}
-        <button type="button" className={quiet} onClick={finish}>{content.flow.exit.button}</button>
+        {!embedded && <button type="button" className={quiet} onClick={finish}>{content.flow.exit.button}</button>}
       </div>
     </div>
   );

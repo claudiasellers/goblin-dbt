@@ -126,8 +126,29 @@ test("wiring: /safety/plan, My safety plan first on Help & safety, the route pla
   const hub = read("src/pages/Safety.tsx");
   assert.ok(hub.indexOf('data-testid="hub-plan"') < hub.indexOf("<SafetyPeople "), "the plan comes before the lines");
   const route = read("src/components/safety/SafetyRoute.tsx");
-  assert.match(route, /return plan\s*\? frame\(<SafetyPlanUse /);
+  // In the route the plan plays in place with the route's people (the lines) above every step.
+  assert.match(route, /return plan\s*\? frame\(<>\s*\{people\}\s*<SafetyPlanUse [\s\S]{0,200}?embedded/);
   assert.match(route, /<PlanPeopleRow content=\{content\} country=\{null\} plan=\{plan\}/);
   assert.match(read("src/components/safety/SafetyPlanUse.tsx"), /to="\/tool\/crisis-kit\?frame=crisis"/);
   assert.match(read("src/components/safety/SafetyPlanBuild.tsx"), /to="\/tool\/crisis-kit\?frame=build"/);
+});
+
+test("the device copy is read only under the uid it was made under; a signed-out copy is offered to whoever signs in", () => {
+  const plan = { ...P.emptyPlan(), hearOwn: "This passes" };
+  assert.equal(P.devicePlanFor({ owner: "a", plan }, "b"), null, "someone else's");
+  assert.equal(P.devicePlanFor({ owner: "a", plan }, null), null, "signed out doesn't see an account's copy");
+  assert.equal(P.devicePlanFor({ owner: "a", plan }, "a").plan.hearOwn, "This passes");
+  assert.equal(P.devicePlanFor({ owner: null, plan }, "b").owner, null);
+  assert.ok(P.deviceOwnedBy({ owner: "a", plan }, "a") && !P.deviceOwnedBy({ owner: null, plan }, "a"));
+  assert.match(read("src/contexts/BandContext.tsx"), /clearDevicePlanOf\(prev\)/, "cleared when that account signs out");
+  assert.notEqual(P.planPrint(plan), P.planPrint({ ...plan, hearOwn: "x" }));
+});
+
+test("Me lists the plan, never its contents; the review card is done only once a change is saved", () => {
+  assert.match(read("functions/src/profile/me.ts"), /if \(meta\.kind === 'safety_plan'\) value = undefined;/);
+  const page = read("src/pages/SafetyPlan.tsx");
+  assert.match(page, /setParams\(\{ changing: review \}\)/);
+  assert.match(page, /if \(r === 'account' && changing\) void completeFollowUp\(changing\)/);
+  // Only a first plan or a save from a review books the next review (never every edit).
+  assert.match(read("src/hooks/useSafetyPlan.ts"), /if \(!hadAccount \|\| opts\.review\) void scheduleSafetyPlanReview\(\)/);
 });
