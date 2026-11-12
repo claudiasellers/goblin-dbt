@@ -243,7 +243,7 @@ test("embed props in the player: only what is declared, copy keys as the skill's
   assert.equal((player.match(/props=\{embedProps\(ctx, /g) ?? []).length, 2, "slots and whole-screen embeds both get resolved props");
   // A slot under `$title` renders between the title and the first field; every other slot under its field.
   assert.match(player, /slotsAfter\(TITLE_SLOT\)[\s\S]*fields\.map[\s\S]*slotsAfter\(f\.id\)/);
-  assert.equal((player.match(/answerIds=\{answerIds\(st\)\}/g) ?? []).length, 2);
+  assert.equal((player.match(/answerIds=\{answerIds\(ctx, st\)\}/g) ?? []).length, 2);
 });
 
 test("witness outcome: own words, skip and none-fit first, then the last line's landed; nothing answered is seen", () => {

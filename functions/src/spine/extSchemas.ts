@@ -125,7 +125,8 @@ export const EXT_SCHEMAS: Record<string, Record<string, Field>> = {
     path: { t: 'ids', max: 48 },                                                   // step ids, in the order shown
     answers: {                                                                     // what was chosen, per question
       t: 'objs', max: 32,
-      of: { fieldId: { t: 'id' }, optionIds: { t: 'ids', max: 12 }, valueOwn: { t: 'text', max: RUN_OWN_MAX } },
+      // `pick`: a per-pick step's answer (R16, Do the Opposite's feelings): the pick it is for.
+      of: { fieldId: { t: 'id' }, pick: { t: 'id' }, optionIds: { t: 'ids', max: 12 }, valueOwn: { t: 'text', max: RUN_OWN_MAX } },
     },
     offeredExitIds: { t: 'ids', max: 8 },                                          // what the hand-off offered
     exitId: { t: 'id' },                                                           // where it went (a SkillExit id, or done)

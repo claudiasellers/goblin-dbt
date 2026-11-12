@@ -224,6 +224,38 @@ Added by IE-08 (`docs/design/ending-relationships.md`, 10 Nov 2026):
   saved Ending session has no `HANDED_OFF_FROM` back to the host. The host's record is kept; the trip is not in it.
   `RunContext.privateTools` (the player passes tools.ts' `deferSession` set); pinned in `tests/skill-contracts.test.mjs`.
 
+Added by ER-B3 (`docs/design/opposite-action-v3.md`, *Runtime pieces*; agreed with the plan thread 12 Nov 2026):
+
+- **Per-pick repeat (R16).** `each: <field>` on a step runs it once per pick of that field (up to 3), in pick order.
+  Consecutive `each` steps over the same field are a segment: each pick goes through the whole segment before the
+  next starts at the segment's entry (`eachEntry`), and after the last pick the run follows the transition out. The
+  path records `step:index`. A per-pick step's answers are kept as `field@pick`; `answersOf(ctx, s)` is the view a step
+  sees: its pick's answers under the plain field ids, plus `$each` (the pick, readable in conditions, `derive.from`
+  and title slots as `{each}`). The session's emotion ids are the feelings field's picks, never the per-pick keys; its
+  urge ids are every pick's. A pick no longer picked loses its answers; each pick's answers are checked against what
+  its step offers for that pick.
+- **Carry on with the others.** `carryOn: <step>` on a per-pick hand-off adds *Carry on with {others}* when other picks
+  are still on their way: the pick is set aside (`aside`, skipped by every later segment) and the run goes on with the
+  next pick, or to `carryOn` after the last. It records the offer (`offered`, which per-pick hand-offs add to), not an
+  exit. An exit taken from a per-pick card carries only that pick. Back onto the card brings the pick back.
+- **Ask-fresh, newest wins.** For a per-pick ask-fresh field, the answer of the per-pick screen latest on the path is the
+  session's (`askFresh`).
+- **The record** keeps `pick` on each per-pick answer (`ext.run.answers[].pick`, shape-checked on the server; a skill's
+  projection that reads per-pick answers drops one whose `pick` isn't among the each-field's ids in the same record, and
+  checks an emotion field's ids against the graph's words). Resume puts each pick's answers back under its key and
+  comes back inside the right pick's sub-run.
+- `build.py`: no `each` on the start step; `each` names a field of a step that isn't per-pick, `max ≤ 3`; no keep,
+  follow-up, reopens or resume point per pick; one field per segment; the each field required (a segment entered with
+  no pick left, every pick set aside, goes to the segment's way out); `carryOn` only on a per-pick hand-off, with the
+  `carry_on` copy; the longest record stays within 32 answers (3 × per-pick fields + the rest) and 8 embed reports
+  (3 × per-pick embed steps + the rest).
+- **Back walks the screens back** (`trail`): every forward move pushes its screen and every Back pops one, so Back
+  twice goes two screens back (before, Back appended the screen it returned to and the second tap found it and went
+  forward again, in every skill). Kept apart from `path`, so a loop step whose next screen is the one before it (First,
+  the body's check → swap, Ride it out's renewed round) is still a forward move. A resumed run has no trail and reads
+  one from its path (`backTrail`), where such a loop reads as a step back. Pinned on every skill by seeded walks
+  (`tests/skill-runtime-back.test.mjs`).
+
 ### The attempt record (what a router reads)
 
 There is no new label. A run **is** a `ToolSession` (the spine's per-visit log record), with one generic

@@ -16,7 +16,7 @@ import { handoffExt } from '../../lib/bandStore';
 import { closeQuestion, closeKindFor } from '../../lib/spine/close';
 import { emotionIdsFromLink } from '../../lib/spine/toolLink';
 import {
-  askFresh, canGoOn, carried as carriedOf, contextIn, copyText, crisisFor, ctxAfterResume, seededFrom, stepLinks, emotionChoices, fieldLinks, fieldList, followUpFor,
+  answersOf, askFresh, canGoOn, carried as carriedOf, carryOnOthers, labelOfValue, offersFor, contextIn, copyText, crisisFor, ctxAfterResume, seededFrom, stepLinks, emotionChoices, fieldLinks, fieldList, followUpFor,
   handoffLine, initialRun, inlineResult, keepFor, opensSafety, optionGroups, ownMaxOf, persistence, pickedLabels, resumeRun, runEmotionIds, runNext, runRecord,
   runUrgeIds,
   scope, shownFields, stepOf, titleSlots,
@@ -261,8 +261,8 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
     // Into a tool that writes nothing until the person saves (R15), the visit carries no host session: once it
     // saves, nothing there may point back at this run, as nothing here names it (runRecord, `private`).
     const to = PRIVATE_TOOLS.has(exit.toolId)
-      ? { pathname: `/tool/${exit.toolId}`, state: { checkinEmotions: carriedOf(exit, st) } }
-      : toolSession.linkTo(exit.toolId, { checkinEmotions: carriedOf(exit, st) });
+      ? { pathname: `/tool/${exit.toolId}`, state: { checkinEmotions: carriedOf(exit, st, ctx) } }
+      : toolSession.linkTo(exit.toolId, { checkinEmotions: carriedOf(exit, st, ctx) });
     const q = new URLSearchParams(exit.query).toString();
     navigate({ pathname: to.pathname, search: q ? `?${q}` : '' }, { state: to.state });
   }, [toolSession, navigate, st]);
@@ -457,7 +457,7 @@ function AskStep({ ctx, step, st, send, onExit, onShown, onPrimary, busy }: {
   if (picker) {
     const f = fields.find((x) => x.id === picker);
     return (
-      <EmotionPicker prompt={title ?? undefined} selectionMode="single" selectedIds={st.answers[picker]?.ids ?? []}
+      <EmotionPicker prompt={title ?? undefined} selectionMode="single" selectedIds={answersOf(ctx, st)[picker]?.ids ?? []}
         onChange={(ids) => { if (ids[0] && f) send({ type: 'pick', fieldId: f.id, value: ids[0] }); }}
         onContinue={() => setPicker(null)} />
     );
@@ -466,13 +466,13 @@ function AskStep({ ctx, step, st, send, onExit, onShown, onPrimary, busy }: {
   // A crisis raised on an earlier screen (it holds without this step's own answers) shows under the title, never
   // pushed below the fold by this step's chips; one raised here shows under the question, where the chip was tapped.
   const own = new Set((step.fields ?? []).map((f) => f.id));
-  const carried = crisis && crisisFor(ctx, step, { answers: Object.fromEntries(Object.entries(st.answers).filter(([k]) => !own.has(k))) });
+  const carried = crisis && crisisFor(ctx, step, { answers: Object.fromEntries(Object.entries(answersOf(ctx, st)).filter(([k]) => !own.has(k))) });
   const slotsAfter = (after: string) => (step.slots ?? []).filter((s) => s.after === after).map((s) => {
     const Embed = EMBEDS[s.embed];
     const show = holds(s.showWhen, sc);
     return (
       <div key={`${s.embed}:${s.record}`} className="min-h-6">
-        {Embed && show ? <Embed props={embedProps(ctx, s.embed, s.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(st)} profile={ctx.profile ?? null} onShown={() => onShown(s.record)} /> : null}
+        {Embed && show ? <Embed props={embedProps(ctx, s.embed, s.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(ctx, st)} carried={ctx.carried} profile={ctx.profile ?? null} onShown={() => onShown(s.record)} /> : null}
       </div>
     );
   });
@@ -509,8 +509,9 @@ function embedProps(ctx: RunContext, name: string, props: Record<string, unknown
 }
 
 /** The run's answers as ids, for an embed that asks the server about them (the witness beat's emotions). */
-function answerIds(st: RunState): Record<string, readonly string[]> {
-  return Object.fromEntries(Object.entries(st.answers).map(([k, a]) => [k, a.ids]));
+function answerIds(ctx: RunContext, st: RunState): Record<string, readonly string[]> {
+  // On a per-pick step (R16), its pick's answers under their field ids and the pick as `$each`.
+  return Object.fromEntries(Object.entries(answersOf(ctx, st)).map(([k, a]) => [k, a.ids]));
 }
 
 /** A whole-screen embed step: the embed owns the screen; its `onDone` output moves the run on. */
@@ -534,7 +535,7 @@ function EmbedStep({ ctx, step, st, send, onShown, onExit, covered }: {
     {crisis && <CrisisBanner compact variant={crisis.variant} />}
     {title && <Prompt>{title}</Prompt>}
     {step.hint && ctx.skill.copy[step.hint] && <Line>{ctx.skill.copy[step.hint]}</Line>}
-    <Embed props={embedProps(ctx, step.embed ?? '', step.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(st)}
+    <Embed props={embedProps(ctx, step.embed ?? '', step.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(ctx, st)} carried={ctx.carried}
       profile={ctx.profile ?? null} onShown={shown} onDone={done} covered={covered} />
     <StepLinks ctx={ctx} step={step} st={st} onExit={onExit} />
   </>);
@@ -557,7 +558,7 @@ function FieldView({ ctx, field, st, send, onMore, onExit }: {
   ctx: RunContext; field: FieldDef; st: RunState; send: (e: RunEvent) => void; onMore: () => void; onExit: (x: ExitDef) => void;
 }) {
   const c = ctx.skill.copy;
-  const a = st.answers[field.id];
+  const a = answersOf(ctx, st)[field.id];
   // A seed field (own.seed): a chip is pressed while the box holds its words unchanged; once the words are the
   // person's own, the chips step aside, so a tap can never erase what they wrote.
   const seeded = field.own?.seed ? seededFrom(ctx, field, a) : null;
@@ -572,14 +573,14 @@ function FieldView({ ctx, field, st, send, onMore, onExit }: {
   if (field.options.emotions) {
     chips = (
       <div className="flex flex-wrap gap-2.5">
-        {emotionChoices(ctx, field, st.answers).map((id) => (
+        {emotionChoices(ctx, field, answersOf(ctx, st)).map((id) => (
           <Chip key={id} label={getEmotionById(id)?.name ?? id} pressed={picked(id)} onClick={() => pick(id)} />
         ))}
         {field.options.moreKey && c[field.options.moreKey] && <Chip label={c[field.options.moreKey]} onClick={onMore} />}
       </div>
     );
   } else {
-    const groups = optionGroups(ctx, field, st.answers);
+    const groups = optionGroups(ctx, field, answersOf(ctx, st));
     chips = groups.map((g) => (
       <div key={g.key ?? 'all'} className="space-y-2">
         {g.label && <p className={`font-serif text-lg text-[var(--color-text-primary)] ${g.own ? 'italic' : ''}`}>{g.label}</p>}
@@ -630,10 +631,13 @@ function HandoffCard({ ctx, step, st, send, onExit, busy }: {
   // them; leaving the card schedules the reminder.
   const chips = (step.fields ?? []).filter((f) => f.id === step.followUp?.whenFrom);
   const line = handoffLine(ctx, step, st);
-  const offers = st.offered
+  // A per-pick hand-off (R16) shows its own pick's offers; the run's `offered` keeps every card's, for the record.
+  const offers = (step.each ? offersFor(ctx, step, st) : st.offered)
     .map((id) => ctx.skill.exits.find((x) => x.id === id))
     .filter((x): x is ExitDef => !!x && (!!x.safety || (!!x.toolId && !!getToolById(x.toolId))));
   const done = step.done ? ctx.skill.exits.find((x) => x.id === step.done) : undefined;
+  // R16: *Carry on with the others* while another pick is still on its way (this one is set aside, its offers stand).
+  const others = carryOnOthers(ctx, st);
   const crisis = crisisFor(ctx, step, st);
   // A hand-off's title (Problem Solve's *Your next step: …*) heads the card, as an ask step's does.
   const title = copyText(ctx, step.title, st, titleSlots(ctx, step, st));
@@ -650,8 +654,13 @@ function HandoffCard({ ctx, step, st, send, onExit, busy }: {
         </fieldset>
       ))}
       <div className="space-y-2">
+        {others.length > 0 && (
+          <button type="button" className={primaryButton} data-testid="carry-on" disabled={busy} onClick={() => send({ type: 'carryOn' })}>
+            {(c.carry_on ?? 'Carry on with {others}').replace('{others}', listOf(others.map((v) => labelOfValue(ctx, step.each!, v))))}
+          </button>
+        )}
         {offers.map((x, i) => (
-          <button key={x.id} type="button" className={i === 0 ? primaryButton : choiceButton} data-exit={x.id}
+          <button key={x.id} type="button" className={i === 0 && !others.length ? primaryButton : choiceButton} data-exit={x.id}
             // Someone to talk to is never held back, not even for the moment a reminder takes to save.
             disabled={busy && !x.safety} aria-busy={busy && !x.safety} onClick={() => onExit(x)}>
             {x.safety ? (c.safety_open ?? 'Talk to someone now') : getToolById(x.toolId!)?.name}
@@ -669,4 +678,9 @@ function HandoffCard({ ctx, step, st, send, onExit, busy }: {
       <StepLinks ctx={ctx} step={step} st={st} onExit={onExit} />
     </section>
   </>);
+}
+
+/** "a", "a and b", "a, b and c". */
+function listOf(xs: string[]): string {
+  return xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`;
 }

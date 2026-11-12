@@ -69,6 +69,8 @@ def check_cond(c, fields, derived, where, accepts=None):
     assert op in OPS, (where, op)
 
     def ref(r):
+        if r == "$each":  # R16: the pick a per-pick step is for (null on any other step)
+            return
         if isinstance(r, str) and r.startswith("$"):
             assert REF.match(r), (where, r)
             kind, name = r[1:].split(".")[:2]
@@ -426,6 +428,54 @@ def check(skill):
             by_type.setdefault(st["followUp"]["type"], []).append(st["id"])
     for t, ids in by_type.items():
         assert len(ids) == 1, (sid, f"one step books {t} (resume restores bookings by type)", ids)
+    check_each(skill)
+
+
+def check_each(skill):
+    """R16, per-pick repeat (`each`, `carryOn`): the shape the machine can run and the record can hold."""
+    sid = skill["id"]
+    by_id = {s["id"]: s for s in skill["steps"]}
+    per = {s["id"]: s["each"] for s in skill["steps"] if s.get("each")}
+    if not per:
+        assert not any(s.get("carryOn") for s in skill["steps"]), (sid, "carryOn is for a per-pick hand-off")
+        return
+    own_fields = {f["id"]: (s["id"], f) for s in skill["steps"] for f in s.get("fields", [])}
+    answer_as = {s["answerAs"]: s["id"] for s in skill["steps"] if s.get("answerAs")}
+    assert skill["start"] not in per, (sid, "a skill doesn't start on a per-pick step")
+    for st_id, each in per.items():
+        s = by_id[st_id]
+        w = f"{sid}.{st_id}"
+        src = own_fields.get(each, (answer_as.get(each), None))[0]
+        assert src and src not in per, (w, "each names a field of a step that isn't per-pick", each)
+        f = own_fields.get(each, (None, None))[1]
+        assert f is None or f.get("max", 1) <= 3, (w, "at most three picks repeat (the record's answer cap)")
+        # A segment entered with no pick would leave Next with nowhere to go: the field is required.
+        assert f is None or f.get("required"), (w, "the each field is required (a segment needs a pick)", each)
+        for k in ("keep", "followUp", "reopens"):
+            assert k not in s, (w, f"a per-pick step has no {k}")
+        assert st_id not in skill.get("resumeAt", []), (w, "a per-pick step isn't a re-entry point")
+        for t in s.get("next", []):
+            to = by_id[t["to"]]
+            assert not to.get("each") or to["each"] == each, (w, "a segment repeats over one field", t["to"])
+        if s.get("carryOn"):
+            assert s["kind"] == "handoff", (w, "carryOn is a hand-off's")
+            assert s["carryOn"] in by_id and not by_id[s["carryOn"]].get("each"), (w, "the others go on to a step that isn't per-pick")
+            assert "carry_on" in skill["copy"], (w, "the carry-on button's copy (carry_on, with {others})")
+    for s in skill["steps"]:
+        assert not s.get("carryOn") or s.get("each"), (sid, s["id"], "carryOn is for a per-pick hand-off")
+        if s.get("reopens"):
+            for x in [s["reopens"]["after"], *s["reopens"].get("again", [])]:
+                assert x not in per, (sid, s["id"], "a reopens step's after / again isn't per-pick")
+    if skill.get("persist"):
+        assert skill["persist"]["after"] not in per, (sid, "persist.after isn't per-pick")
+    # The record's answers: every per-pick field once per pick (three at most) plus the rest, under its 32-answer cap.
+    n_per = len({f["id"] for s in skill["steps"] if s.get("each") for f in s.get("fields", [])} | {s["answerAs"] for s in skill["steps"] if s.get("each") and s.get("answerAs")})
+    n_once = len({f["id"] for s in skill["steps"] if not s.get("each") for f in s.get("fields", [])} | {s["answerAs"] for s in skill["steps"] if not s.get("each") and s.get("answerAs")})
+    assert 3 * n_per + n_once <= 32, (sid, "the longest record's answers fit the 32-answer cap", 3 * n_per + n_once)
+    # The record's embed reports (`out`, one per whole-screen embed step, per pick on a per-pick one) under its cap of 8.
+    e_per = sum(1 for s in skill["steps"] if s.get("each") and s["kind"] == "embed")
+    e_once = sum(1 for s in skill["steps"] if not s.get("each") and s["kind"] == "embed")
+    assert 3 * e_per + e_once <= 8, (sid, "the longest record's embed reports fit the cap of 8", 3 * e_per + e_once)
 
 
 # Every ActionUrge id the graph has (Do the Opposite's and DT's behaviour urges): an option's `urge` names one.

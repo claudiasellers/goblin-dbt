@@ -230,6 +230,20 @@ export interface StepDef {
    * belongs on every screen, such as *Talk to someone now*, where the screen has no field to hang it on.
    */
   links?: Array<{ exit: string; label: string; when: Cond }>;
+  /**
+   * R16, per-pick repeat: this step runs once per pick of the named field (at most three, in pick order: Do the
+   * Opposite's feelings, loudest first). Its fields' answers are kept per pick (`field@pick`) and its conditions read
+   * that pick's answers, with `$each` the pick. Contiguous per-pick steps form a segment, entered from a step that
+   * isn't per-pick: a transition out of the segment ends this pick's sub-run, and the next pick starts at the step the
+   * segment was entered at; after the last, the run follows the transition.
+   */
+  each?: string;
+  /**
+   * kind 'handoff', on a per-pick step: the step the other picks go on to. While another pick is still on its way,
+   * the card offers *Carry on with the others*: this pick is set aside (its hand-off offered, not taken) and the run
+   * goes on with the next pick, or to this step when none is left.
+   */
+  carryOn?: string;
 }
 
 /**

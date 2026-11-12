@@ -16,7 +16,7 @@
  * `scheduled`), inline runs (`initialRun(skill, enterAt)`, `inlineResult`) and resume (`resumeRun`).
  */
 import type { CrisisSlot, EmbedOutput, EmbedOutputSchema, ExitDef, FollowUpAction, KeepAction, FieldDef, OptionDef, SkillDef, SkillsContent, StepDef } from '../../data/skillTypes';
-import { holds, profileItemId, resolve, type Answer, type Answers, type Scope } from './conditions';
+import { EACH, holds, profileItemId, resolve, type Answer, type Answers, type Scope } from './conditions';
 
 export type { Answer, Answers } from './conditions';
 
@@ -66,6 +66,21 @@ export interface RunState {
   kept: Record<string, { kind: string; id: string }>;
   /** Follow-ups this run scheduled, by step. */
   scheduled: Record<string, { type: string; id: string }>;
+  /**
+   * R16: on a per-pick step (`each`), which pick of its field this sub-run is for (an index, in pick order); null
+   * elsewhere. Path entries of per-pick steps are `stepId:index`.
+   */
+  pick?: number | null;
+  /** R16: picks set aside on a per-pick hand-off (*Carry on with the others*): later segments skip them. */
+  aside?: string[];
+  /**
+   * The screens Back walks through: every forward move pushes its entry, every Back pops one. Kept apart from
+   * `path` (which records Back's screens too) so a loop step that leads to the screen before it is still a forward
+   * move. Absent (a resumed run, an older state), it is read from the path (`backTrail`).
+   */
+  trail?: string[];
+  /** R16: the step the current segment was entered at (where the next pick starts). */
+  eachEntry?: string | null;
 }
 
 export type RunEvent =
@@ -76,6 +91,8 @@ export type RunEvent =
   | { type: 'back' }
   | { type: 'exit'; exitId: string }
   | { type: 'embedDone'; output: EmbedOutput }
+  /** R16: *Carry on with the others* on a per-pick hand-off. */
+  | { type: 'carryOn' }
   /** The player kept the step's item / scheduled its follow-up (after the server said yes). */
   | { type: 'kept'; stepId: string; kind: string; id: string }
   | { type: 'scheduled'; stepId: string; followUpType: string; id: string };
@@ -102,7 +119,105 @@ const EMPTY: Answer = { ids: [], own: null };
 /** A fresh run, at the skill's start, or (inline, R8) at one of the steps it declares it can start at. */
 export function initialRun(skill: SkillDef, enterAt?: string | null): RunState {
   const at = enterAt && skill.inline?.enterAt.includes(enterAt) ? enterAt : skill.start;
-  return { stepId: at, path: [at], answers: {}, shown: [], offered: [], exitId: null, out: {}, kept: {}, scheduled: {} };
+  return { stepId: at, path: [at], answers: {}, shown: [], offered: [], exitId: null, out: {}, kept: {}, scheduled: {}, pick: null, aside: [], eachEntry: null };
+}
+
+// --- R16, per-pick repeat -------------------------------------------------------------------------------------
+
+/** A path entry: the step id, with `:index` for a per-pick step. */
+export const entryOf = (stepId: string, pick: number | null | undefined): string => (pick === null || pick === undefined ? stepId : `${stepId}:${pick}`);
+
+/** A path entry's step id and pick index. */
+export function parseEntry(entry: string): { stepId: string; pick: number | null } {
+  const m = /^(.*):(\d)$/.exec(entry);
+  return m ? { stepId: m[1], pick: Number(m[2]) } : { stepId: entry, pick: null };
+}
+
+const PER_PICK = new WeakMap<SkillDef, Map<string, string>>();
+/** Every per-pick field (the fields and `answerAs` of `each` steps) → the field whose picks it repeats over. */
+export function perPickFields(skill: SkillDef): Map<string, string> {
+  let m = PER_PICK.get(skill);
+  if (!m) {
+    m = new Map();
+    for (const st of skill.steps) {
+      if (!st.each) continue;
+      for (const f of st.fields ?? []) m.set(f.id, st.each);
+      if (st.answerAs) m.set(st.answerAs, st.each);
+    }
+    PER_PICK.set(skill, m);
+  }
+  return m;
+}
+
+type StateLike = Pick<RunState, 'answers'> & Partial<Pick<RunState, 'stepId' | 'pick' | 'aside'>>;
+
+/** The pick the current per-pick step is for (an option or grid id), or null. */
+export function currentPick(ctx: RunContext, s: StateLike): string | null {
+  if (!s.stepId || s.pick === null || s.pick === undefined) return null;
+  const step = ctx.skill.steps.find((x) => x.id === s.stepId);
+  if (!step?.each) return null;
+  return s.answers[step.each]?.ids[s.pick] ?? null;
+}
+
+/**
+ * The answers as the current step sees them: on a per-pick step, its pick's answers under their plain field ids and
+ * the pick as `$each`. Elsewhere, the answers as kept.
+ */
+export function answersOf(ctx: RunContext, s: StateLike): Answers {
+  const pid = currentPick(ctx, s);
+  if (pid === null) return s.answers;
+  const v: Answers = { ...s.answers, [EACH]: { ids: [pid], own: null } };
+  for (const f of perPickFields(ctx.skill).keys()) {
+    const a = s.answers[`${f}@${pid}`];
+    if (a) v[f] = a; else delete v[f];
+  }
+  return v;
+}
+
+/** Where a field's answer is kept for this state: `field@pick` for a per-pick field on its step, else the field id. */
+function keyFor(ctx: RunContext, s: StateLike, fieldId: string): string {
+  const pid = currentPick(ctx, s);
+  return pid !== null && perPickFields(ctx.skill).has(fieldId) ? `${fieldId}@${pid}` : fieldId;
+}
+
+/** The first pick at or after `from` that isn't set aside, or null. */
+function nextPick(s: StateLike, field: string, from: number): number | null {
+  const picks = s.answers[field]?.ids ?? [];
+  for (let j = from; j < picks.length; j++) if (!(s.aside ?? []).includes(picks[j])) return j;
+  return null;
+}
+
+/** The other picks still on their way (for *Carry on with the others*), or none. */
+export function carryOnOthers(ctx: RunContext, s: RunState): string[] {
+  const step = ctx.skill.steps.find((x) => x.id === s.stepId);
+  if (!step?.each || !step.carryOn || step.kind !== 'handoff') return [];
+  const picks = s.answers[step.each]?.ids ?? [];
+  return picks.filter((p, i) => i !== s.pick && !(s.aside ?? []).includes(p));
+}
+
+/**
+ * The screens Back walks through, read from a path alone (a resumed run, which has no `trail`): every Back undone.
+ * Back appends the screen it returns to, so an entry equal to the one before the top is taken as a step back (a
+ * forward move straight back to the previous screen reads the same here; a live run keeps `trail`, so it never does).
+ */
+export function backTrail(path: readonly string[]): string[] {
+  const trail: string[] = [];
+  for (const e of path) {
+    if (trail.length >= 2 && trail[trail.length - 2] === e) trail.pop();
+    else if (trail[trail.length - 1] !== e) trail.push(e);
+  }
+  return trail;
+}
+
+/** The segment's entry step, worked out from the path (Back into a segment): its earliest per-pick entry. */
+function entryFromPath(path: string[], at: number): string | null {
+  let entry: string | null = null;
+  for (let i = at; i >= 0; i--) {
+    const e = parseEntry(path[i]);
+    if (e.pick === null) break;
+    entry = e.stepId;
+  }
+  return entry;
 }
 
 /**
@@ -191,8 +306,9 @@ function scopeOf(ctx: RunContext, answers: Answers, derived: Record<string, unkn
 }
 
 /** The scope conditions are evaluated in for this state. */
-export function scope(ctx: RunContext, s: Pick<RunState, 'answers'>): Scope {
-  return scopeOf(ctx, s.answers, derive(ctx, s.answers));
+export function scope(ctx: RunContext, s: StateLike): Scope {
+  const answers = answersOf(ctx, s);
+  return scopeOf(ctx, answers, derive(ctx, answers));
 }
 
 /**
@@ -277,10 +393,49 @@ function normalize(ctx: RunContext, answers: Answers): Answers {
         next[f.id] = { ...a, ids, ...kept }; changed = true;
       }
     }
-    if (!changed) return cur;
+    if (!changed) return normalizeEach(ctx, cur);
     cur = next;
   }
-  return cur;
+  return normalizeEach(ctx, cur);
+}
+
+/**
+ * R16: per-pick answers. A pick no longer picked loses its answers; each pick's answers are checked against what its
+ * step offers for that pick (its view, with `$each`).
+ */
+function normalizeEach(ctx: RunContext, answers: Answers): Answers {
+  const per = perPickFields(ctx.skill);
+  if (!per.size) return answers;
+  const next: Answers = { ...answers };
+  let changed = false;
+  for (const k of Object.keys(answers)) {
+    const at = k.indexOf('@');
+    if (at < 0) continue;
+    const each = per.get(k.slice(0, at));
+    if (!each || !(answers[each]?.ids ?? []).includes(k.slice(at + 1))) { delete next[k]; changed = true; }
+  }
+  for (const each of new Set(per.values())) {
+    for (const pid of next[each]?.ids ?? []) {
+      const view: Answers = { ...next, [EACH]: { ids: [pid], own: null } };
+      for (const f of per.keys()) { const a = next[`${f}@${pid}`]; if (a) view[f] = a; else delete view[f]; }
+      const sc = scopeOf(ctx, view, derive(ctx, view));
+      for (const [fid, e] of per) {
+        if (e !== each) continue;
+        const a = view[fid];
+        const f = fieldOf(ctx.skill, fid);
+        if (!a?.ids.length || !f) continue;
+        const valid = validValues(ctx, f, view, sc);
+        if (!valid) continue;
+        const ids = a.ids.filter((v) => valid.has(v));
+        if (ids.length !== a.ids.length) {
+          const kept = a.own ? { ownAt: a.ids.slice(0, ownAt(a)).filter((v) => valid.has(v)).length } : {};
+          if (ids.length || a.own) next[`${fid}@${pid}`] = { ...a, ids, ...kept }; else delete next[`${fid}@${pid}`];
+          changed = true;
+        }
+      }
+    }
+  }
+  return changed ? next : answers;
 }
 
 const count = (f: FieldDef, a: Answer) => a.ids.length + (f.own?.countsAsPick && a.own ? 1 : 0);
@@ -342,7 +497,8 @@ export function shownFields(ctx: RunContext, step: StepDef, s: Pick<RunState, 'a
 /** Whether Next is open: every shown required field has an answer. */
 export function canGoOn(ctx: RunContext, s: RunState): boolean {
   const step = stepOf(ctx.skill, s.stepId);
-  return shownFields(ctx, step, s).every((f) => !f.required || count({ ...f, own: f.own && { ...f.own, countsAsPick: true } }, s.answers[f.id] ?? EMPTY) > 0);
+  const answers = answersOf(ctx, s);
+  return shownFields(ctx, step, s).every((f) => !f.required || count({ ...f, own: f.own && { ...f.own, countsAsPick: true } }, answers[f.id] ?? EMPTY) > 0);
 }
 
 /** The exits a hand-off step offers for these answers, in order, each once. */
@@ -357,10 +513,11 @@ export function runNext(ctx: RunContext, s: RunState, e: RunEvent): RunState {
     case 'own': {
       const f = fieldOf(ctx.skill, e.fieldId);
       if (!f) return s;
-      const a = s.answers[f.id] ?? EMPTY;
+      const key = keyFor(ctx, s, f.id);
+      const a = s.answers[key] ?? EMPTY;
       const nextA = e.type === 'pick' ? pick(ctx, f, a, e.value) : own(ctx, f, a, e.text);
       if (nextA === a) return s;
-      return { ...s, answers: normalize(ctx, { ...s.answers, [f.id]: nextA }) };
+      return { ...s, answers: normalize(ctx, { ...s.answers, [key]: nextA }) };
     }
     case 'shown':
       return s.shown.includes(e.record) ? s : { ...s, shown: [...s.shown, e.record] };
@@ -377,12 +534,13 @@ export function runNext(ctx: RunContext, s: RunState, e: RunEvent): RunState {
         const v = o[k];
         return measures.has(k) && typeof v === 'number' && Number.isInteger(v) && v >= 0 ? Math.min(v, max) : undefined;
       };
+      const at = entryOf(step.id, currentPick(ctx, s) === null ? null : s.pick);
       const rec: EmbedRecord = {
-        embed: step.embed, stepId: step.id, ids, own,
+        embed: step.embed, stepId: at, ids, own,
         durationSec: n('durationSec', 3600), doneCount: n('doneCount', 100), earlyCount: n('earlyCount', 100),
       };
-      const answers = step.answerAs ? { ...s.answers, [step.answerAs]: { ids, own: null } } : s.answers;
-      return runNext(ctx, { ...s, answers, out: { ...s.out, [step.id]: rec } }, { type: 'next' });
+      const answers = step.answerAs ? normalize(ctx, { ...s.answers, [keyFor(ctx, s, step.answerAs)]: { ids, own: null } }) : s.answers;
+      return runNext(ctx, { ...s, answers, out: { ...s.out, [at]: rec } }, { type: 'next' });
     }
     case 'kept': {
       const step = ctx.skill.steps.find((x) => x.id === e.stepId);
@@ -400,26 +558,93 @@ export function runNext(ctx: RunContext, s: RunState, e: RunEvent): RunState {
       const sc = scope(ctx, s);
       const visible = new Set(shownFields(ctx, step, s, sc).map((f) => f.id));
       const answers = { ...s.answers };
-      for (const f of step.fields ?? []) if (!visible.has(f.id)) delete answers[f.id];
+      for (const f of step.fields ?? []) if (!visible.has(f.id)) delete answers[keyFor(ctx, s, f.id)];
       const after = { ...s, answers: normalize(ctx, answers) };
       const t = step.next.find((x) => holds(x.when, scope(ctx, after)));
       if (!t) return s;
-      const to = stepOf(ctx.skill, t.to);
-      const arrived = to.clears?.length ? { ...after, answers: normalize(ctx, without(after.answers, to.clears)) } : after;
-      return {
-        ...arrived, stepId: to.id, path: [...arrived.path, to.id].slice(-PATH_MAX),
-        offered: to.kind === 'handoff' ? offersFor(ctx, to, arrived) : arrived.offered,
-      };
+      return moveTo(ctx, after, step, t.to);
+    }
+    case 'carryOn': {
+      const step = stepOf(ctx.skill, s.stepId);
+      const pid = currentPick(ctx, s);
+      if (step.kind !== 'handoff' || !step.each || !step.carryOn || pid === null || !carryOnOthers(ctx, s).length) return s;
+      const set = { ...s, aside: [...(s.aside ?? []), pid] };
+      const j = nextPick(set, step.each, (s.pick ?? 0) + 1);
+      if (j !== null && s.eachEntry) return arrive(ctx, set, stepOf(ctx.skill, s.eachEntry), j, s.eachEntry);
+      return arrive(ctx, set, stepOf(ctx.skill, step.carryOn), null, null);
     }
     case 'back': {
-      const i = s.path.lastIndexOf(s.stepId);
-      const prev = i > 0 ? s.path[i - 1] : null;
-      if (!prev || prev === s.stepId) return s;
-      return { ...s, stepId: prev, path: [...s.path, prev].slice(-PATH_MAX), offered: [] };
+      const trail = s.trail ?? backTrail(s.path);
+      const cur = entryOf(s.stepId, currentPick(ctx, s) === null ? null : s.pick);
+      if (trail.length < 2 || trail[trail.length - 1] !== cur) return s;
+      const prev = trail[trail.length - 2];
+      const p = parseEntry(prev);
+      const prevStep = ctx.skill.steps.find((x) => x.id === p.stepId);
+      if (!prevStep) return s;
+      const pick = prevStep.each ? p.pick : null;
+      const pid = prevStep.each && pick !== null ? s.answers[prevStep.each]?.ids[pick] : undefined;
+      return {
+        ...s, stepId: p.stepId, pick, aside: (s.aside ?? []).filter((x) => x !== pid),
+        eachEntry: prevStep.each ? entryFromPath(trail, trail.length - 2) : null,
+        path: [...s.path, prev].slice(-PATH_MAX), trail: trail.slice(0, -1), offered: [],
+      };
     }
     case 'exit':
       return ctx.skill.exits.some((x) => x.id === e.exitId && !x.planned && !x.safety) ? { ...s, exitId: e.exitId } : s;
   }
+}
+
+/**
+ * A transition from `from` to `toId` (R16 aware). Inside a segment the pick carries on; out of a segment, the next pick
+ * starts at the segment's entry, and after the last one the run follows the transition; into a segment from a step
+ * that isn't per-pick, the first pick not set aside starts it.
+ */
+function moveTo(ctx: RunContext, s: RunState, from: StepDef, toId: string): RunState {
+  const to = stepOf(ctx.skill, toId);
+  if (from.each && to.each === from.each) return arrive(ctx, s, to, s.pick ?? 0, s.eachEntry ?? null);
+  if (from.each && !to.each) {
+    const j = nextPick(s, from.each, (s.pick ?? 0) + 1);
+    if (j !== null && s.eachEntry) return arrive(ctx, s, stepOf(ctx.skill, s.eachEntry), j, s.eachEntry);
+    return arrive(ctx, s, to, null, null);
+  }
+  if (!from.each && to.each) {
+    const j = nextPick(s, to.each, 0);
+    if (j !== null) return arrive(ctx, s, to, j, to.id);
+    // No pick left for the segment (every pick set aside; build.py keeps the field required): its way out.
+    const out = segmentExit(ctx, to);
+    return out ? arrive(ctx, s, out, null, null) : s;
+  }
+  return arrive(ctx, s, to, null, null);
+}
+
+/** The first step outside a segment its transitions reach, nearest first (Next into a segment with no pick left). */
+function segmentExit(ctx: RunContext, entry: StepDef): StepDef | null {
+  const seen = new Set<string>([entry.id]);
+  const queue = [entry];
+  while (queue.length) {
+    const st = queue.shift()!;
+    for (const t of st.next) {
+      const to = ctx.skill.steps.find((x) => x.id === t.to);
+      if (!to || seen.has(to.id)) continue;
+      if (to.each !== entry.each) return to;
+      seen.add(to.id);
+      queue.push(to);
+    }
+  }
+  return null;
+}
+
+function arrive(ctx: RunContext, s: RunState, to: StepDef, pick: number | null, eachEntry: string | null): RunState {
+  const placed: RunState = { ...s, stepId: to.id, pick, eachEntry };
+  const arrived = to.clears?.length
+    ? { ...placed, answers: normalize(ctx, without(placed.answers, to.clears.map((f) => keyFor(ctx, placed, f)))) } : placed;
+  const offers = to.kind === 'handoff' ? offersFor(ctx, to, arrived) : null;
+  return {
+    ...arrived, path: [...arrived.path, entryOf(to.id, pick)].slice(-PATH_MAX),
+    trail: [...(s.trail ?? backTrail(s.path)), entryOf(to.id, pick)].slice(-PATH_MAX),
+    // A per-pick hand-off adds to what earlier picks' hand-offs offered (each feeling's card is part of the visit).
+    offered: offers ? (to.each ? [...new Set([...arrived.offered, ...offers])] : offers) : arrived.offered,
+  };
 }
 
 /**
@@ -431,8 +656,9 @@ export function keepFor(ctx: RunContext, step: StepDef, s: Pick<RunState, 'answe
   if (!k || !holds(k.when, scope(ctx, s))) return null;
   if (persistence(ctx, s) !== 'save') return null;
   const value: Record<string, unknown> = {};
+  const answers = answersOf(ctx, s);
   for (const f of k.from) {
-    const a = s.answers[f];
+    const a = answers[f];
     if (a?.ids.length) value[`${f}Ids`] = a.ids;
     if (a?.own?.trim()) value[`${f}Own`] = a.own.trim();
   }
@@ -462,7 +688,7 @@ export function followUpFor(ctx: RunContext, step: StepDef, s: Pick<RunState, 'a
   // Persist-nothing (R15): a run that writes nothing schedules nothing.
   if (persistence(ctx, s) !== 'save') return null;
   if (!f.whenFrom) return { type: f.type, chip: null };
-  const chip = s.answers[f.whenFrom]?.ids[0] ?? f.whenDefault;
+  const chip = answersOf(ctx, s)[f.whenFrom]?.ids[0] ?? f.whenDefault;
   return chip ? { type: f.type, chip } : null;
 }
 
@@ -493,7 +719,22 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { ke
   if (!rec || typeof rec !== 'object') return null;
   const r = rec as { skillId?: unknown; versionId?: unknown; path?: unknown; answers?: unknown };
   if (r.skillId !== ctx.skill.id || r.versionId !== ctx.skill.version || !Array.isArray(r.path)) return null;
-  const path = (r.path as unknown[]).filter((x): x is string => typeof x === 'string' && ctx.skill.steps.some((st) => st.id === x));
+  // Path entries are step ids, with `:index` for a per-pick step (R16).
+  const base = (x: string) => parseEntry(x).stepId;
+  const path = (r.path as unknown[]).filter((x): x is string => typeof x === 'string' && ctx.skill.steps.some((st) => st.id === base(x)));
+  const lastAt = (id: string) => { for (let i = path.length - 1; i >= 0; i--) if (base(path[i]) === id) return i; return -1; };
+  // The record's answers, by where they are kept: `field`, or `field@pick` for a per-pick field (R16).
+  const per = perPickFields(ctx.skill);
+  const recAnswers: Answers = {};
+  for (const a of Array.isArray(r.answers) ? r.answers as Array<Record<string, unknown>> : []) {
+    const fieldId = a.fieldId;
+    if (typeof fieldId !== 'string' || !fieldOf(ctx.skill, fieldId)) continue;
+    const pk = typeof a.pick === 'string' && ID.test(a.pick) && per.has(fieldId) ? a.pick : null;
+    if (per.has(fieldId) && !pk) continue;
+    const ids = Array.isArray(a.optionIds) ? (a.optionIds as unknown[]).filter((x): x is string => typeof x === 'string' && ID.test(x)) : [];
+    const own = typeof a.valueOwn === 'string' && a.valueOwn.trim() ? a.valueOwn : null;
+    recAnswers[pk ? `${fieldId}@${pk}` : fieldId] = { ids, own };
+  }
   // A `reopens` step (a step only a reopened run starts on, never reached on a first visit, e.g. Problem Solve's
   // *How did it go?*) comes after the whole recorded path, so every answer of that run comes back.
   // It holds only for a run that got as far as its `after` step (the plan it asks about); any other run has nothing to
@@ -506,35 +747,41 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { ke
   // The latest loop decides: the plan must stand after the last time the step was asked, made again at `after` or
   // kept by one of the `again` steps (a reminder booked again on *Not yet*). A run whose last review led to a revised
   // plan that was left half-made has nothing to ask about, so it doesn't reopen.
-  const standsAt = reopensAt ? Math.max(...[reopensAt.reopens!.after, ...(reopensAt.reopens!.again ?? [])].map((x) => path.lastIndexOf(x))) : -1;
-  if (reopensAt && standsAt <= path.lastIndexOf(reopensAt.id)) return null;
+  const standsAt = reopensAt ? Math.max(...[reopensAt.reopens!.after, ...(reopensAt.reopens!.again ?? [])].map(lastAt)) : -1;
+  if (reopensAt && standsAt <= lastAt(reopensAt.id)) return null;
   const reopened = !!reopensAt;
   // A step the skill names as a re-entry point (`resumeAt`: a check-in days later) opens even off the run's path.
-  const reentry = !reopened && !!at && !path.includes(at) && !!ctx.skill.resumeAt?.includes(at) && ctx.skill.steps.some((st) => st.id === at);
-  let stepId = reopensAt?.id ?? (at && (path.includes(at) || reentry) ? at : path[path.length - 1]);
-  if (!stepId) return null;
+  const reentry = !reopened && !!at && lastAt(at) < 0 && !!ctx.skill.resumeAt?.includes(at) && ctx.skill.steps.some((st) => st.id === at);
+  // The entry the run resumes at (a per-pick step's carries its pick).
+  let resumeEntry: string | undefined = reopensAt?.id ?? (at && reentry ? at : at && lastAt(at) >= 0 ? path[lastAt(at)] : path[path.length - 1]);
+  if (!resumeEntry) return null;
   const fresh = new Set(keepFresh ? [] : allFields(ctx.skill).filter((f) => f.askFresh).map((f) => f.id));
   // A re-entry step opened by its check-in asks again: its own answers from an earlier check-in are never restored.
-  if (at && stepId === at && ctx.skill.resumeAt?.includes(at)) for (const f of stepOf(ctx.skill, at).fields ?? []) fresh.add(f.id);
-  const asksFresh = path.findIndex((id) => (stepOf(ctx.skill, id).fields ?? []).some((f) => fresh.has(f.id)));
-  if (!reopened && asksFresh >= 0 && asksFresh < path.lastIndexOf(stepId)) stepId = path[asksFresh];
+  if (at && base(resumeEntry) === at && ctx.skill.resumeAt?.includes(at)) for (const f of stepOf(ctx.skill, at).fields ?? []) fresh.add(f.id);
+  const asksFresh = path.findIndex((x) => (stepOf(ctx.skill, base(x)).fields ?? []).some((f) => fresh.has(f.id)));
+  if (!reopened && asksFresh >= 0 && asksFresh < path.lastIndexOf(resumeEntry)) resumeEntry = path[asksFresh];
+  const stepId = base(resumeEntry);
   // Reopened: the path up to where the plan was last made, so earlier review loops (whose answers the step clears)
   // don't pile up, and the newest steps are the ones kept.
   // A re-entry step opened off the path is reached from the run's last step.
-  const upTo = reopened ? path.slice(0, Math.max(path.lastIndexOf(reopensAt!.reopens!.after), 0) + 1)
-    : reentry && stepId === at ? [...path, at] : path.slice(0, path.lastIndexOf(stepId) + 1);
+  const upTo = reopened ? path.slice(0, Math.max(lastAt(reopensAt!.reopens!.after), 0) + 1)
+    : reentry && stepId === at ? [...path, at] : path.slice(0, path.lastIndexOf(resumeEntry) + 1);
   // A step after the resume point will be asked again, and an answer read back there would be a pre-fill (a reminder
   // chip picked last time would schedule again unasked).
-  const fieldsOf = (id: string) => {
+  // Where an entry's answers are kept: a per-pick entry's are its pick's (R16), so the drop rules stay inside the
+  // sub-run that is asked again and leave the other picks' answers alone.
+  const fieldsOf = (x: string) => {
+    const { stepId: id, pick } = parseEntry(x);
     const st = stepOf(ctx.skill, id);
-    return [...(st.fields ?? []).map((f) => f.id), ...(st.answerAs ? [st.answerAs] : [])];
+    const ids = [...(st.fields ?? []).map((f) => f.id), ...(st.answerAs ? [st.answerAs] : [])];
+    const pid = st.each && pick !== null ? recAnswers[st.each]?.ids[pick] : null;
+    return st.each ? (pid ? ids.map((f) => `${f}@${pid}`) : []) : ids;
   };
   // Dropped: only the fields of steps the path reached after the resume point and nowhere at or before it (they are
   // asked again). A step that fell off the front of the capped path still brings its answers back (the feeling, the
   // problem, a danger answer and its banner). Reopened, nothing on the path is after the step.
   const before = new Set(upTo.flatMap(fieldsOf));
   const after = new Set(reopened ? [] : path.slice(upTo.length).flatMap(fieldsOf).filter((f) => !before.has(f)));
-  const onPath = new Set(ctx.skill.steps.flatMap((st) => fieldsOf(st.id)).filter((f) => !after.has(f)));
   // A reminder's own chip (a followUp's `whenFrom` on the step that books it) is always a fresh tap: read back, it
   // would book again unasked. A `whenFrom` naming an earlier step's field (Cope Ahead's *When is it?*) is a real
   // answer and comes back like any other; the step that books from it stays a fresh Next unless it already booked.
@@ -546,24 +793,34 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { ke
   const bookedTypes = new Set(Array.isArray((rec as { scheduled?: unknown }).scheduled)
     ? ((rec as { scheduled: unknown[] }).scheduled).filter((x): x is string => typeof x === 'string') : []);
   const scheduled: RunState['scheduled'] = {};
-  for (const id of reopened ? [] : upTo.slice(0, -1)) {
+  for (const id of reopened ? [] : upTo.slice(0, -1).map(base)) {
     const f = stepOf(ctx.skill, id).followUp;
     if (f && id !== stepId && bookedTypes.has(f.type)) scheduled[id] = { type: f.type, id: '' };
   }
   const answers: Answers = {};
-  for (const a of Array.isArray(r.answers) ? r.answers as Array<Record<string, unknown>> : []) {
-    const fieldId = a.fieldId;
-    if (typeof fieldId !== 'string' || fresh.has(fieldId) || !onPath.has(fieldId) || books.has(fieldId) || !fieldOf(ctx.skill, fieldId)) continue;
-    const ids = Array.isArray(a.optionIds) ? (a.optionIds as unknown[]).filter((x): x is string => typeof x === 'string' && ID.test(x)) : [];
-    const own = typeof a.valueOwn === 'string' && a.valueOwn.trim() ? a.valueOwn : null;
-    answers[fieldId] = { ids, own };
+  for (const [key, a] of Object.entries(recAnswers)) {
+    const fieldId = key.split('@')[0];
+    if (fresh.has(fieldId) || after.has(key) || books.has(fieldId)) continue;
+    answers[key] = a;
   }
   const step = stepOf(ctx.skill, stepId);
   const kept = normalize(ctx, reopened && step.clears?.length ? without(answers, step.clears) : answers);
-  return {
-    ...initialRun(ctx.skill), stepId, path: (reopened ? [...upTo, stepId] : upTo).slice(-PATH_MAX), answers: kept, scheduled,
-    offered: step.kind === 'handoff' ? offersFor(ctx, step, { answers: kept }) : [],
+  const pick = step.each ? parseEntry(resumeEntry).pick : null;
+  const fullPath = (reopened ? [...upTo, stepId] : upTo).slice(-PATH_MAX);
+  // Picks set aside (*Carry on with the others*): a per-pick hand-off with `carryOn` the path went on from.
+  const trail = backTrail(fullPath);
+  const aside: string[] = [];
+  for (let k = 0; k + 1 < trail.length; k++) {
+    const e = parseEntry(trail[k]);
+    const h = ctx.skill.steps.find((x) => x.id === e.stepId);
+    const pid = h?.each && h.carryOn && e.pick !== null ? kept[h.each]?.ids[e.pick] : undefined;
+    if (pid && !aside.includes(pid)) aside.push(pid);
+  }
+  const st: RunState = {
+    ...initialRun(ctx.skill), stepId, pick, eachEntry: step.each ? entryFromPath(fullPath, fullPath.length - 1) : null,
+    path: fullPath, answers: kept, scheduled, offered: [], aside,
   };
+  return { ...st, offered: step.kind === 'handoff' ? offersFor(ctx, step, st) : [] };
 }
 
 /**
@@ -586,11 +843,15 @@ export function copyText(ctx: RunContext, ref: StepDef['title'], s: Pick<RunStat
 }
 
 /** A step's title slots: `{labelOf: field}` is that field's first pick, as the person sees it. */
-export function titleSlots(ctx: RunContext, step: StepDef, s: Pick<RunState, 'answers'>): Record<string, string> {
+export function titleSlots(ctx: RunContext, step: StepDef, s: StateLike): Record<string, string> {
   const out: Record<string, string> = {};
+  const answers = answersOf(ctx, s);
+  // R16: a per-pick step's `{each}` is its pick, as the person sees it.
+  const pid = currentPick(ctx, s);
+  if (pid !== null && step.each) out.each = labelOfValue(ctx, step.each, pid);
   for (const [name, src] of Object.entries(step.titleSlots ?? {})) {
     const f = fieldOf(ctx.skill, src.labelOf);
-    const a = s.answers[src.labelOf];
+    const a = answers[src.labelOf];
     // The person's own words, when the field has them, are what they said (a starter they changed included).
     if (f && a?.own?.trim()) { out[name] = a.own.trim(); continue; }
     const v = a?.ids[0];
@@ -598,6 +859,13 @@ export function titleSlots(ctx: RunContext, step: StepDef, s: Pick<RunState, 'an
     out[name] = f.options.emotions ? ctx.emotionLabel(v) : (ctx.skill.options[f.options.list ?? '']?.find((o) => o.value === v)?.label ?? v);
   }
   return out;
+}
+
+/** One value of a field as the person sees it: a grid word's name, an option's label. */
+export function labelOfValue(ctx: RunContext, fieldId: string, v: string): string {
+  const f = fieldOf(ctx.skill, fieldId);
+  if (!f || f.options.emotions || f.options.emotionsFrom) return ctx.emotionLabel(v);
+  return ctx.skill.options[f.options.list ?? '']?.find((o) => o.value === v)?.label ?? v;
 }
 
 /** The hand-off line: the first of the step's lines that holds. */
@@ -638,10 +906,11 @@ function linksThatHold(ctx: RunContext, links: FieldDef['links'], s: Pick<RunSta
  * The run's answers as the person saw them, for an embed to read back (`EmbedProps.picked`): each answered
  * field's labels in pick order (grid words as the grid shows them, list options by their label), own words last.
  */
-export function pickedLabels(ctx: RunContext, s: Pick<RunState, 'answers'>): Record<string, string[]> {
+export function pickedLabels(ctx: RunContext, s: StateLike): Record<string, string[]> {
   const out: Record<string, string[]> = {};
-  for (const [fieldId, a] of Object.entries(s.answers)) {
-    const f = fieldOf(ctx.skill, fieldId);
+  for (const [fieldId, a] of Object.entries(answersOf(ctx, s))) {
+    if (fieldId === EACH) continue;
+    const f = fieldOf(ctx.skill, fieldId.split('@')[0]);
     const list = f?.options.list ? ctx.skill.options[f.options.list] ?? [] : [];
     const labels = a.ids.map((id) => (f?.options.emotions ? ctx.emotionLabel(id) : list.find((o) => o.value === id)?.label ?? id));
     if (a.own?.trim()) labels.push(a.own.trim());
@@ -664,7 +933,10 @@ export function runUrgeIds(ctx: RunContext, s: Pick<RunState, 'answers'>): strin
   for (const f of allFields(ctx.skill)) {
     const list = f.options.list;
     if (!list) continue;
-    for (const id of s.answers[f.id]?.ids ?? []) {
+    // A per-pick field's answers are kept per pick (R16): every pick's, in pick order.
+    const keys = perPickFields(ctx.skill).has(f.id)
+      ? (s.answers[perPickFields(ctx.skill).get(f.id)!]?.ids ?? []).map((pid) => `${f.id}@${pid}`) : [f.id];
+    for (const id of keys.flatMap((k) => s.answers[k]?.ids ?? [])) {
       const u = ctx.skill.options[list]?.find((o) => o.value === id)?.urge;
       if (typeof u === 'string' && ID.test(u) && !out.includes(u)) out.push(u);
     }
@@ -684,25 +956,47 @@ export function crisisFor(ctx: RunContext, step: StepDef, s: Pick<RunState, 'ans
 }
 
 /** The ask-fresh answers this run carries (e.g. `fitsFacts`). */
-export function askFresh(ctx: RunContext, s: Pick<RunState, 'answers'>): Partial<Record<NonNullable<FieldDef['askFresh']>, string>> {
+export function askFresh(ctx: RunContext, s: Pick<RunState, 'answers'> & Partial<Pick<RunState, 'path'>>): Partial<Record<NonNullable<FieldDef['askFresh']>, string>> {
   const out: Partial<Record<NonNullable<FieldDef['askFresh']>, string>> = {};
   for (const f of allFields(ctx.skill)) {
     const v = s.answers[f.id]?.ids[0];
     if (f.askFresh && v) out[f.askFresh] = v;
   }
+  // R16: a per-pick check is asked once per pick; the newest one on the path is the session's (newest wins).
+  const per = perPickFields(ctx.skill);
+  const done = new Set<string>();
+  for (const entry of [...(s.path ?? [])].reverse()) {
+    const { stepId, pick } = parseEntry(entry);
+    const st = ctx.skill.steps.find((x) => x.id === stepId);
+    if (!st?.each || pick === null) continue;
+    const pid = s.answers[st.each]?.ids[pick];
+    for (const f of st.fields ?? []) {
+      if (!f.askFresh || done.has(f.askFresh) || !per.has(f.id) || !pid) continue;
+      const v = s.answers[`${f.id}@${pid}`]?.ids[0];
+      if (v) { out[f.askFresh] = v; done.add(f.askFresh); }
+    }
+  }
   return out;
 }
 
 /** What a hand-off carries to the next tool: the exit's `carry` fields' picks (the hand-off's emotions). */
-export function carried(exit: ExitDef, s: Pick<RunState, 'answers'>): string[] {
-  return exit.carry.flatMap((f) => s.answers[f]?.ids ?? []);
+export function carried(exit: ExitDef, s: StateLike, ctx?: RunContext): string[] {
+  // R16: from a per-pick hand-off, only its pick goes along (the feeling this card is about), never the others.
+  const step = ctx && s.stepId ? ctx.skill.steps.find((x) => x.id === s.stepId) : undefined;
+  const pid = ctx ? currentPick(ctx, s) : null;
+  return exit.carry.flatMap((f) => (step?.each === f && pid !== null ? [pid] : s.answers[f]?.ids ?? []));
 }
 
 /** The `ext.run` attempt record (functions/src/spine/extSchemas.ts `run`). Ids only, plus own words. */
 export function runRecord(ctx: RunContext, s: RunState): Record<string, unknown> {
+  // A per-pick answer (R16, `field@pick`) is recorded with its pick.
   const answers = Object.entries(s.answers)
-    .filter(([, a]) => a.ids.length > 0 || a.own)
-    .map(([fieldId, a]) => ({ fieldId, optionIds: a.ids.slice(0, 12), ...(a.own ? { valueOwn: a.own.trim().slice(0, ctx.skill.ownMax) } : {}) }))
+    .filter(([k, a]) => k !== EACH && (a.ids.length > 0 || a.own))
+    .map(([k, a]) => {
+      const at = k.indexOf('@');
+      const fieldId = at < 0 ? k : k.slice(0, at);
+      return { fieldId, optionIds: a.ids.slice(0, 12), ...(at < 0 ? {} : { pick: k.slice(at + 1) }), ...(a.own ? { valueOwn: a.own.trim().slice(0, ctx.skill.ownMax) } : {}) };
+    })
     .filter((a) => a.optionIds.length > 0 || a.valueOwn)
     .slice(0, 32);
   // An exit to a persist-nothing tool is never named in the host's record (offered or taken).

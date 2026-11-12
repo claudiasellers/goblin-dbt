@@ -41,6 +41,8 @@ export interface EmbedProps {
    * out. For an embed that shows something the person kept (Hold to wait's pros & cons replay); read-only.
    */
   profile?: Readonly<Record<string, unknown>> | null;
+  /** The grid words a link or hand-off carried in (ids only, R16): Do the Opposite's doors pre-tick them. */
+  carried?: readonly string[];
   onShown: () => void;
   onDone?: (output: EmbedOutput) => void;
   /**
