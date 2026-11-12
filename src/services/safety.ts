@@ -50,3 +50,21 @@ export async function scheduleSafetyCheckin(): Promise<string | null> {
 export function completeSafetyCheckin(followUpId: string): Promise<unknown> {
   return call('resolveFollowUp', { id: followUpId, status: 'done' });
 }
+
+/** The safety plan saved (CORE-02): the review card a month on (`safety_plan_review`, 10:00 in 30 days). */
+export async function scheduleSafetyPlanReview(): Promise<string | null> {
+  const [{ getSpineContent, scheduleFollowUps }, { dueAtFor }, { newId }] = await Promise.all([
+    import('./spine'), import('../lib/spine/windows'), import('../lib/spine/ids'),
+  ]);
+  const content = await getSpineContent();
+  const type = content.followUpTypes.find((t) => t.id === 'safety_plan_review' && t.enabled);
+  const due = type ? dueAtFor(type.window, new Date(), 'month') : null;
+  if (!type || !due) return null;
+  const ids = await scheduleFollowUps([{ id: newId(), type: 'safety_plan_review', dueAt: due.toISOString(), window: 'month', notify: { inTab: true, push: false } }]);
+  return ids[0] ?? null;
+}
+
+/** The review card answered (keep as is, or changed and saved): the card is done. */
+export function completeFollowUp(followUpId: string): Promise<unknown> {
+  return call('resolveFollowUp', { id: followUpId, status: 'done' });
+}

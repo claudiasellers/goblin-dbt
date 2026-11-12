@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSafetyCountry } from '../../hooks/useSafetyCountry';
 import { getSafetyContent } from '../../services/safety';
-import type { SafetyContent } from '../../data/safetyTypes';
+import type { SafetyContent, SafetyCountry } from '../../data/safetyTypes';
+import { cleanPhone, pinnedPeople, type SafetyPlan } from '../../lib/safetyPlan';
 import { fill, smsHref, telHref } from '../../lib/safetyRoute';
 
 /**
@@ -75,6 +76,53 @@ export function SafetyPeople({ content, country, onCountry, onContact, heading =
         )}
       </div>
       <p className="m-0 text-xs">{content.flow.cantTell}</p>
+    </section>
+  );
+}
+
+/**
+ * The plan's people (CORE-02), pinned: the emergency number (when a country is given) and each person with a number,
+ * Call and Text (with the message they wrote). `full` (use mode's step 4) lists everyone with their message.
+ */
+export function PlanPeopleRow({ content, country, plan, onContact, full = false, standalone = false }: {
+  content: SafetyContent; country: SafetyCountry | null; plan: SafetyPlan | null;
+  onContact?: (how: 'line' | 'person') => void; full?: boolean;
+  /** Use mode on its own (not under the route's lines): always show a way to reach someone. */
+  standalone?: boolean;
+}) {
+  const p = content.flow.people;
+  const u = content.flow.plan.use;
+  const people = full ? (plan?.people ?? []).filter((x) => x.name || x.phone) : pinnedPeople(plan);
+  // Inside the route the lines sit above this (country null, nothing to add); in the plan's own use mode with no
+  // country picked, the emergency line still shows, worded for anywhere, with Find A Helpline.
+  if (!country && people.length === 0 && !standalone) return null;
+  const btn = 'inline-flex items-center justify-center min-h-12 px-4 rounded-lg border border-[var(--color-q-hu-border)] text-[var(--color-q-hu-text)] font-medium';
+  return (
+    <section aria-label={p.fromPlan} data-testid="plan-people"
+      className="p-3 rounded-xl border border-[var(--color-q-hu-border)] bg-[var(--color-q-hu-bg)] text-[var(--color-q-hu-text)] space-y-2">
+      {country && <a href={telHref(country.emergency)} onClick={() => onContact?.('line')} className={`${btn} w-full`}>{fill(p.emergency, { number: country.emergency })}</a>}
+      {!country && standalone && (
+        <>
+          <p className="m-0 font-medium">{p.unknownCountry}</p>
+          <a href={content.flow.findAHelpline.url} target="_blank" rel="noreferrer" onClick={() => onContact?.('line')} className="inline-flex items-center min-h-11 underline text-sm">{content.flow.findAHelpline.label}</a>
+        </>
+      )}
+      {people.length > 0 && <p className="m-0 text-sm font-medium">{p.fromPlan}</p>}
+      {people.map((x, i) => {
+        const phone = cleanPhone(x.phone);
+        return (
+          <div key={i} className="space-y-1">
+            <p className="m-0 font-medium">{x.name || phone}</p>
+            {full && x.text && <p className="m-0 text-sm">{x.text}</p>}
+            {phone && (
+              <div className="flex flex-wrap gap-2">
+                <a href={telHref(phone)} onClick={() => onContact?.('person')} className={btn} aria-label={`${u.call} ${x.name || phone}`}>{u.call}</a>
+                <a href={smsHref(phone, x.text || null)} onClick={() => onContact?.('person')} className={btn} aria-label={`${u.text} ${x.name || phone}`}>{u.text}</a>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </section>
   );
 }

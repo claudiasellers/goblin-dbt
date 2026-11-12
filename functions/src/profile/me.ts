@@ -195,6 +195,9 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
     if (p.valueJson) {
       try { value = JSON.parse(String(p.valueJson)); } catch { value = undefined; }
     }
+    // The safety plan (CORE-02): Me lists it with *Open it*, never its contents (names, numbers, messages). Not read
+    // or decrypted here: Help & safety reads it through the `safetyPlan` slice.
+    if (meta.kind === 'safety_plan') value = undefined;
     // A registered kind's own words are stored encrypted (profile/items.ts): read back for the person only.
     const own = Object.prototype.hasOwnProperty.call(PROFILE_KINDS, meta.kind) ? PROFILE_KINDS[meta.kind].ownFields : [];
     if (value && own.some((f) => typeof value![f] === 'string')) {

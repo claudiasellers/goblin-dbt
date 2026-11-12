@@ -27,13 +27,53 @@ of the darker places people actually go (Claudia, 12 Nov: build to the depths, s
 |---|---|---|
 | 1 (this) | `scripts/safety/` → `schema/safety-route.cypher` and `src/data/content/safety.json`: the question and every screen's copy, countries and crisis lines, `ASKS_SAFETY`, `Emotion.safetyScreen`, the SafetyFlag rewrite, `SafetyPolicy` (off). `getStateAndTools` decides whether to ask (`safetyAsk`) while the policy is on. `SafetyCheck` (log) and `saveSafetyCheck`. The `safety_checkin` follow-up type | No |
 | 2 | The screens (`src/lib/safetyRoute.ts`, the pure step machine; `src/components/safety/SafetyRoute.tsx`; `SafetyPeople.tsx`): the question, passing, rather not say, strong thoughts (means first), a plan or an act (*Have you already done something?* → medical first, first aid only after a known injury), the quick plan (three lines, on the device until PR 3), the exit, the morning check (`/safety?checkin=`). `/safety` is *Help & safety*, linked from the header on every screen; Help me now's *I'm thinking about hurting myself* (`?say=1&from=help_now`); every skill's `safety.open` (`SafetyOpen.tsx`, source `module:<toolId>`). The check-in asks before its result (once per browser session) and saves `safetyCheckId`. Clinical notes show `SafetyFlag.userCopy`. **The switch on** (PR 4 folded in). No `appToolId`: the route is a page, not a tool | Yes |
-| 3 | CORE-02: the `safety_plan` profile kind, build mode (steady / stirred) and use mode (any band), step 2 reading the crisis kit's card ids (`section:optionId`, `docs/design/crisis-kit.md`), the quick plan as a draft plan, `safety_plan_review` at +30 days | Yes |
+| 3 | CORE-02, the safety plan (below) | Yes |
 
 With the switch on the server never returns a crisis flag, so the old auto banner on StateResult / LowEnergyStateResult
 never shows; its code stays as the kill switch's fallback (switching the policy off restores it whole).
 
 CrisisBanner stays the only hand-written file with numbers (its `other_person` and `medical` variants are unchanged);
 the route's lines are generated content. One user-facing switch, in the last PR.
+
+## The safety plan (CORE-02, PR 3)
+
+Stanley & Brown's plan, built in calm and used in one tap. Copy and chips are `FLOW.plan` in `scripts/safety/content.py`
+(shipped in `safety.json`; chip ids are a contract with the kept plan: retire, never rename).
+
+- **Build mode** (`/safety/plan`, `SafetyPlanBuild.tsx`): nine steps, one per screen, each skippable, in Stanley–Brown's
+  order: warning signs (four chip groups, own words), things I can do (step 2 **is the crisis kit**: `kit: true`
+  references it, never copies it; no kit → *Make my crisis kit*, which opens the kit builder and comes back, the build
+  kept in `sessionStorage`; coping chips with a `toolId` open that tool), people and places, people to ask (name,
+  number, the message they'd send, reorderable, five at most), professionals and lines (the country's lines shown,
+  plus therapist / doctor / care team), a safer space (CORE-01's calm wording, the medicine line, the firearm chip and
+  line only where `Country.firearmPrompt`), reasons, what I'd want to hear (one line), and the review card. A carried
+  flooded reading gets a heads-up first (*easier on a calmer day*; start anyway or not now). Changing a kept plan opens
+  it in the same steps.
+- **Use mode** (`?use=1`, `SafetyPlanUse.tsx`): any state, one step per screen, the person's own line first, then each
+  step with something in it (the lines always). The plan's people with a number and the emergency number are pinned
+  above every step; step 4 calls or texts with their message; step 2 opens the kit (`frame=crisis`) or a tool and comes
+  back to the same step. *I did this* and *Next step* both move on; nothing is required.
+- **Kept** as `safety_plan` (`functions/src/profile/kinds.ts`, `ProfileFact`, `my_plans`, one per person: a re-save
+  replaces it). Chip ids and own words per step; the people and the professionals are one own-words field each
+  (`peopleOwn`, `prosOwn`, a JSON list), so names, numbers and messages are encrypted together. Read through the
+  `safetyPlan` slice, which only `PROFILE_NEEDS.safety` reads (Help & safety and the route; the plan isn't browsed from
+  other tools, PRD open question 2; Me lists it without its contents). Signed out it stays on the device
+  (`goblin.safety.plan.v2`, stored with the uid it was made under, null signed out); it still shows after signing in
+  until the account has one, and Help & safety offers *Save this plan to your account?*. A signed-in save that fails
+  stays on the device for that account only, cleared when it signs out.
+- **The quick plan** (CORE-01, three lines on the device) is the plan's draft: build mode starts from it, and Help &
+  safety says *Finish your safety plan* until a plan is saved.
+- **Help & safety** shows *My safety plan* first once there is one, its people under it. In the route, *Open your plan*
+  plays use mode in place, and the plan's people sit under the lines on every screen (*Someone from your plan*).
+- **Review**: saving books `safety_plan_review` a month on (10:00, safety tier, content-free), which opens
+  `/safety/plan?review=<id>`: *Did anything on it help? Anything to change?* *Keep it as is* books the next one a month
+  on; *Change something* opens build mode and the card is done once the change is saved. Edits in between book nothing. The
+  server's follow-up horizon is 32 days now (it was 14, which also refused Ending's *In a month*).
+- **Me** lists *My safety plan* with *Open it* and *Set aside*, never its contents.
+
+Part 2 (not built): `SafetyPlanUse` as a log record, the review after a use or a *strong* answer and its thinning to 90
+days, the Today card after a first *passing* answer, warning signs suggested from the person's own check-ins, the coping
+list seeded from tools with *quieter* closes, the Contact Picker, photos and voice notes on the device, offline caching.
 
 ## When the check-in asks (`functions/src/safety/safetyAsk.ts`)
 

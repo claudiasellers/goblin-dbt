@@ -1,221 +1,53 @@
 {
   "source": {
-    "file": "graph-content-only-2026-11-12.json",
-    "exportedAt": "2026-11-12T23:14:00.343Z"
+    "file": "scripts/safety/fixture.py (from content.py)",
+    "exportedAt": null
   },
   "content": {
     "version": "safety-v1",
     "flow": {
-      "act": {
-        "choices": [
-          {
-            "id": "yes",
-            "label": "Yes"
-          },
-          {
-            "id": "no",
-            "label": "No"
-          },
-          {
-            "id": "not_sure",
-            "label": "Not sure"
-          }
-        ],
-        "firstAid": "Rinse it under cool running water and cover it with something clean. Press firmly on a cut until it stops. If it's deep or gaping, still bleeding after ten minutes of pressure, a burn bigger than your palm, or you feel faint, call the emergency number.",
-        "kindTitle": "Was it something you took, or an injury?",
-        "kinds": [
-          {
-            "id": "took",
-            "label": "Something I took or swallowed"
-          },
-          {
-            "id": "injury",
-            "label": "An injury"
-          },
-          {
-            "id": "not_sure",
-            "label": "Not sure"
-          }
-        ],
-        "medicalChoices": [
-          {
-            "id": "got_help",
-            "label": "I've got help"
-          },
-          {
-            "id": "getting_help",
-            "label": "I'm getting help"
-          },
-          {
-            "id": "not_that_kind",
-            "label": "It's not that kind of hurt",
-            "showWhen": {
-              "act": "yes",
-              "kind": "injury"
-            }
-          }
-        ],
-        "medicalLine": "Don't wait to see if it gets better.",
-        "medicalTitle": "If you're hurt or you've taken something, the emergency number is the right call, even if it feels like too much.",
-        "nextDay": "Tomorrow, when it's quieter, a look at what led up to this can help next time.",
-        "nextDayChoices": [
-          {
-            "id": "yes",
-            "label": "Remind me tomorrow"
-          },
-          {
-            "id": "no",
-            "label": "No thanks"
-          }
-        ],
-        "poison": "Poison information",
-        "title": "Have you already done something to hurt yourself, or taken something?",
-        "tookLine": "Some things you take don't hurt at first and do harm hours later. Call now, even if you feel all right. Keep the packaging or the name of what you took."
+      "version": "safety-v1",
+      "repeat": {
+        "afterNoHours": 12,
+        "afterOtherHours": 72
       },
       "answerRank": {
-        "act": 4,
-        "declined": 1,
         "no": 0,
+        "declined": 1,
         "passing": 1,
+        "strong": 2,
         "plan": 3,
-        "strong": 2
-      },
-      "cantTell": "Goblin can't judge how safe you are right now. The people on these lines are trained to help with that.",
-      "checkin": {
-        "choices": [
-          {
-            "id": "yes",
-            "label": "Yes"
-          },
-          {
-            "id": "no",
-            "label": "No thanks"
-          }
-        ],
-        "title": "Can I check in with you tomorrow morning?"
-      },
-      "declined": {
-        "line": "That's okay. These are here if you want them."
-      },
-      "exit": {
-        "back": "Back to where I was",
-        "button": "I'm okay for now",
-        "choices": [
-          {
-            "id": "plan",
-            "label": "I'll use my plan"
-          },
-          {
-            "id": "contacted",
-            "label": "I've contacted someone"
-          },
-          {
-            "id": "stop",
-            "label": "I need to stop here"
-          }
-        ],
-        "title": "Before you go, which is closest?"
+        "act": 4
       },
       "findAHelpline": {
         "label": "Find A Helpline",
         "url": "https://findahelpline.com"
       },
-      "header": {
-        "label": "Help & safety",
-        "makePlan": "Make a safety plan",
-        "people": "People you can talk to",
-        "plan": "My safety plan",
-        "say": "I'm thinking about hurting myself"
-      },
-      "means": {
-        "actions": [
-          {
-            "id": "other_room",
-            "label": "Put it in another room"
-          },
-          {
-            "id": "give_someone",
-            "label": "Give it to someone"
-          },
-          {
-            "id": "lock_away",
-            "label": "Lock it away"
-          },
-          {
-            "id": "leave_room",
-            "label": "Leave the room myself"
-          },
-          {
-            "id": "cant_now",
-            "label": "I can't right now"
-          }
-        ],
-        "actionsTitle": "Which of these could you do?",
-        "calmTitle": "On a hard night, what would be safer out of reach? Who could keep it for you?",
-        "choices": [
-          {
-            "id": "yes",
-            "label": "Yes"
-          },
-          {
-            "id": "not_sure",
-            "label": "Not sure"
-          },
-          {
-            "id": "no",
-            "label": "No"
-          }
-        ],
-        "did": "I did it",
-        "firearm": "If there's a gun in the home, could someone else hold it for now, or could it be locked with the key kept elsewhere?",
-        "medsLine": "Keeping only a small amount of medicine at home, and the rest with someone you trust, makes a hard night safer.",
-        "title": "Is there anything nearby you might use to hurt yourself?"
-      },
-      "morning": {
-        "choices": [
-          {
-            "id": "okay",
-            "label": "Doing okay"
-          },
-          {
-            "id": "hard",
-            "label": "Still hard"
-          },
-          {
-            "id": "not_safe",
-            "label": "I'm not safe"
-          }
-        ],
-        "hard": "Thanks for saying. Your plan, or something for the next few minutes.",
-        "okay": "Glad you're here.",
-        "title": "How are you this morning?",
-        "twiceHard": "Two hard mornings in a row. A doctor, therapist or a non-crisis support line can help with this, and you don't have to be in crisis to call."
-      },
-      "passing": {
-        "continue": "Carry on",
-        "line": "Thanks for telling me. That's worth taking seriously, even when it's passing.",
-        "makePlan": "Make a safety plan",
-        "makePlanSub": "Five minutes, whenever you're ready",
-        "people": "People you can talk to",
-        "plan": "Your safety plan"
-      },
       "people": {
-        "allDay": "Any time, day or night",
-        "call": "Call",
-        "chat": "Chat",
-        "emergency": "Emergency: {number}",
-        "emergencyOr": "Emergency: {number} or {alt}",
-        "findLine": "Find a line near you",
-        "fromPlan": "Someone from your plan",
         "heading": "People you can talk to",
-        "noLine": "We don't have a checked line for {country} yet. Find A Helpline lists the ones near you.",
+        "emergency": "Emergency: {number}",
+        "call": "Call",
+        "text": "Text",
+        "chat": "Chat",
+        "textBody": "Text {body} to {number}",
+        "allDay": "Any time, day or night",
         "notIn": "Not in {country}?",
         "pickCountry": "Where are you?",
-        "text": "Text",
-        "textBody": "Text {body} to {number}",
-        "unknownCountry": "Your local emergency number"
+        "noLine": "We don't have a checked line for {country} yet. Find A Helpline lists the ones near you.",
+        "findLine": "Find a line near you",
+        "fromPlan": "Someone from your plan",
+        "unknownCountry": "Your local emergency number",
+        "emergencyOr": "Emergency: {number} or {alt}"
+      },
+      "header": {
+        "label": "Help & safety",
+        "plan": "My safety plan",
+        "makePlan": "Make a safety plan",
+        "people": "People you can talk to",
+        "say": "I'm thinking about hurting myself"
       },
       "question": {
+        "title": "Sometimes feelings like this come with thoughts of hurting yourself or not wanting to be alive. Is that part of it right now?",
         "choices": [
           {
             "id": "no",
@@ -239,6 +71,7 @@
           }
         ],
         "helpNowTitle": "Let's get you to people first. Which is closest right now?",
+        "saidTitle": "Thanks for saying it. Which is closest right now?",
         "saidChoices": [
           {
             "id": "passing",
@@ -256,52 +89,556 @@
             "id": "declined",
             "label": "I'd rather not say"
           }
-        ],
-        "saidTitle": "Thanks for saying it. Which is closest right now?",
-        "title": "Sometimes feelings like this come with thoughts of hurting yourself or not wanting to be alive. Is that part of it right now?"
-      },
-      "quickPlan": {
-        "deviceSaved": "It's kept on this device.",
-        "ownMax": 120,
-        "save": "Keep this",
-        "saved": "It's kept. It opens from Help & safety.",
-        "steps": [
-          {
-            "id": "sign",
-            "placeholder": "In your words",
-            "title": "One thing you're noticing right now that tells you it's a hard time"
-          },
-          {
-            "id": "do",
-            "placeholder": "In your words",
-            "title": "One thing you can do for the next ten minutes"
-          },
-          {
-            "id": "contact",
-            "placeholder": "A name, or a line",
-            "title": "One person or line you'll contact"
-          }
         ]
       },
-      "repeat": {
-        "afterNoHours": 12,
-        "afterOtherHours": 72
+      "passing": {
+        "line": "Thanks for telling me. That's worth taking seriously, even when it's passing.",
+        "plan": "Your safety plan",
+        "makePlan": "Make a safety plan",
+        "makePlanSub": "Five minutes, whenever you're ready",
+        "people": "People you can talk to",
+        "continue": "Carry on"
       },
-      "signedOut": {
-        "notNow": "Not now",
-        "save": "Save it",
-        "saveToAccount": "Save this plan to your account so it's there next time?"
+      "declined": {
+        "line": "That's okay. These are here if you want them."
       },
       "strong": {
-        "fromYourPlan": "From your plan",
-        "meansFirst": "First, one thing to make right now a bit safer.",
+        "title": "You don't have to hold this on your own right now.",
         "plan": "Open your plan",
         "quickPlan": "Make a quick plan",
         "quickPlanSub": "Three screens, about a minute",
-        "title": "You don't have to hold this on your own right now.",
-        "whileYouDecide": "While you decide"
+        "meansFirst": "First, one thing to make right now a bit safer.",
+        "whileYouDecide": "While you decide",
+        "fromYourPlan": "From your plan"
       },
-      "version": "safety-v1"
+      "quickPlan": {
+        "steps": [
+          {
+            "id": "sign",
+            "title": "One thing you're noticing right now that tells you it's a hard time",
+            "placeholder": "In your words"
+          },
+          {
+            "id": "do",
+            "title": "One thing you can do for the next ten minutes",
+            "placeholder": "In your words"
+          },
+          {
+            "id": "contact",
+            "title": "One person or line you'll contact",
+            "placeholder": "A name, or a line"
+          }
+        ],
+        "ownMax": 120,
+        "save": "Keep this",
+        "saved": "It's kept. It opens from Help & safety.",
+        "deviceSaved": "It's kept on this device."
+      },
+      "means": {
+        "title": "Is there anything nearby you might use to hurt yourself?",
+        "choices": [
+          {
+            "id": "yes",
+            "label": "Yes"
+          },
+          {
+            "id": "not_sure",
+            "label": "Not sure"
+          },
+          {
+            "id": "no",
+            "label": "No"
+          }
+        ],
+        "actionsTitle": "Which of these could you do?",
+        "actions": [
+          {
+            "id": "other_room",
+            "label": "Put it in another room"
+          },
+          {
+            "id": "give_someone",
+            "label": "Give it to someone"
+          },
+          {
+            "id": "lock_away",
+            "label": "Lock it away"
+          },
+          {
+            "id": "leave_room",
+            "label": "Leave the room myself"
+          },
+          {
+            "id": "cant_now",
+            "label": "I can't right now"
+          }
+        ],
+        "did": "I did it",
+        "calmTitle": "On a hard night, what would be safer out of reach? Who could keep it for you?",
+        "medsLine": "Keeping only a small amount of medicine at home, and the rest with someone you trust, makes a hard night safer.",
+        "firearm": "If there's a gun in the home, could someone else hold it for now, or could it be locked with the key kept elsewhere?"
+      },
+      "act": {
+        "title": "Have you already done something to hurt yourself, or taken something?",
+        "choices": [
+          {
+            "id": "yes",
+            "label": "Yes"
+          },
+          {
+            "id": "no",
+            "label": "No"
+          },
+          {
+            "id": "not_sure",
+            "label": "Not sure"
+          }
+        ],
+        "kindTitle": "Was it something you took, or an injury?",
+        "kinds": [
+          {
+            "id": "took",
+            "label": "Something I took or swallowed"
+          },
+          {
+            "id": "injury",
+            "label": "An injury"
+          },
+          {
+            "id": "not_sure",
+            "label": "Not sure"
+          }
+        ],
+        "medicalTitle": "If you're hurt or you've taken something, the emergency number is the right call, even if it feels like too much.",
+        "medicalLine": "Don't wait to see if it gets better.",
+        "tookLine": "Some things you take don't hurt at first and do harm hours later. Call now, even if you feel all right. Keep the packaging or the name of what you took.",
+        "poison": "Poison information",
+        "medicalChoices": [
+          {
+            "id": "got_help",
+            "label": "I've got help"
+          },
+          {
+            "id": "getting_help",
+            "label": "I'm getting help"
+          },
+          {
+            "id": "not_that_kind",
+            "label": "It's not that kind of hurt",
+            "showWhen": {
+              "act": "yes",
+              "kind": "injury"
+            }
+          }
+        ],
+        "firstAid": "Rinse it under cool running water and cover it with something clean. Press firmly on a cut until it stops. If it's deep or gaping, still bleeding after ten minutes of pressure, a burn bigger than your palm, or you feel faint, call the emergency number.",
+        "nextDay": "Tomorrow, when it's quieter, a look at what led up to this can help next time.",
+        "nextDayChoices": [
+          {
+            "id": "yes",
+            "label": "Remind me tomorrow"
+          },
+          {
+            "id": "no",
+            "label": "No thanks"
+          }
+        ]
+      },
+      "exit": {
+        "button": "I'm okay for now",
+        "title": "Before you go, which is closest?",
+        "choices": [
+          {
+            "id": "plan",
+            "label": "I'll use my plan"
+          },
+          {
+            "id": "contacted",
+            "label": "I've contacted someone"
+          },
+          {
+            "id": "stop",
+            "label": "I need to stop here"
+          }
+        ],
+        "back": "Back to where I was"
+      },
+      "checkin": {
+        "title": "Can I check in with you tomorrow morning?",
+        "choices": [
+          {
+            "id": "yes",
+            "label": "Yes"
+          },
+          {
+            "id": "no",
+            "label": "No thanks"
+          }
+        ]
+      },
+      "morning": {
+        "title": "How are you this morning?",
+        "choices": [
+          {
+            "id": "okay",
+            "label": "Doing okay"
+          },
+          {
+            "id": "hard",
+            "label": "Still hard"
+          },
+          {
+            "id": "not_safe",
+            "label": "I'm not safe"
+          }
+        ],
+        "okay": "Glad you're here.",
+        "hard": "Thanks for saying. Your plan, or something for the next few minutes.",
+        "twiceHard": "Two hard mornings in a row. A doctor, therapist or a non-crisis support line can help with this, and you don't have to be in crisis to call."
+      },
+      "signedOut": {
+        "saveToAccount": "Save this plan to your account so it's there next time?",
+        "save": "Save it",
+        "notNow": "Not now"
+      },
+      "cantTell": "Goblin can't judge how safe you are right now. The people on these lines are trained to help with that.",
+      "plan": {
+        "title": "My safety plan",
+        "intro": "A plan for hard nights, made on a calmer one. About five minutes. Skip anything.",
+        "flooded": "This is easier to make on a calmer day. You can still start, or open what's already here.",
+        "floodedGo": "Start anyway",
+        "floodedLater": "Not now",
+        "next": "Next",
+        "skip": "Skip this one",
+        "back": "Back",
+        "ownLabel": "In your words",
+        "ownMax": 200,
+        "fromDraft": "From the quick plan you made",
+        "steps": [
+          {
+            "id": "signs",
+            "title": "What tells you a hard night is building?",
+            "hint": "Pick any. They're for spotting it earlier."
+          },
+          {
+            "id": "coping",
+            "title": "Things you can do on your own",
+            "hint": "Your crisis kit is part of this step."
+          },
+          {
+            "id": "distract",
+            "title": "People and places that take your mind off it",
+            "hint": "Somewhere to go, or someone to be around. You don't have to talk about it."
+          },
+          {
+            "id": "people",
+            "title": "People you could ask for help",
+            "hint": "A name and a number. The message is yours to change."
+          },
+          {
+            "id": "pros",
+            "title": "Professionals and lines",
+            "hint": "The lines for where you are are already here. Add anyone who helps with your care."
+          },
+          {
+            "id": "safer",
+            "title": "On a hard night, what would be safer out of reach? Who could keep it for you?",
+            "hint": "Skip this if it's too much today."
+          },
+          {
+            "id": "reasons",
+            "title": "What matters to you, even on a hard night?",
+            "hint": "Pick any, or say it your way."
+          },
+          {
+            "id": "hear",
+            "title": "What would you want to hear on a hard night?",
+            "hint": "One line, in your words. It's the first thing your plan shows."
+          },
+          {
+            "id": "review",
+            "title": "Your plan",
+            "hint": "This is what opens on a hard night."
+          }
+        ],
+        "signGroups": [
+          {
+            "id": "thoughts",
+            "label": "Thoughts",
+            "chips": [
+              {
+                "id": "nobody_notice",
+                "label": "Nobody would notice"
+              },
+              {
+                "id": "cant_do_this",
+                "label": "I can't do this anymore"
+              },
+              {
+                "id": "replaying",
+                "label": "Replaying one thing over and over"
+              },
+              {
+                "id": "burden",
+                "label": "I'm a burden"
+              }
+            ]
+          },
+          {
+            "id": "body",
+            "label": "Body",
+            "chips": [
+              {
+                "id": "cant_sleep",
+                "label": "Can't sleep"
+              },
+              {
+                "id": "chest_tight",
+                "label": "Chest tight"
+              },
+              {
+                "id": "numb",
+                "label": "Numb all over"
+              },
+              {
+                "id": "wired",
+                "label": "Wired and restless"
+              }
+            ]
+          },
+          {
+            "id": "situations",
+            "label": "Situations",
+            "chips": [
+              {
+                "id": "after_fight",
+                "label": "After a fight"
+              },
+              {
+                "id": "alone_night",
+                "label": "Alone at night"
+              },
+              {
+                "id": "after_drinking",
+                "label": "After drinking or using"
+              },
+              {
+                "id": "anniversaries",
+                "label": "Anniversaries"
+              }
+            ]
+          },
+          {
+            "id": "actions",
+            "label": "What I do",
+            "chips": [
+              {
+                "id": "stop_replying",
+                "label": "Stop replying to people"
+              },
+              {
+                "id": "stop_eating",
+                "label": "Stop eating"
+              },
+              {
+                "id": "give_away",
+                "label": "Give things away"
+              },
+              {
+                "id": "stay_in_bed",
+                "label": "Stay in bed all day"
+              }
+            ]
+          }
+        ],
+        "kit": {
+          "has": "Your crisis kit: {count} cards",
+          "edit": "Change my kit",
+          "make": "Make my crisis kit",
+          "makeSub": "Cards for body, hands, soothing and reasons. It opens from here on a hard night.",
+          "open": "Open my crisis kit"
+        },
+        "coping": [
+          {
+            "id": "first_body",
+            "label": "Settle my body first",
+            "toolId": "cool-down"
+          },
+          {
+            "id": "hold_wait",
+            "label": "Hold off and wait it out",
+            "toolId": "pause"
+          },
+          {
+            "id": "ride_it_out",
+            "label": "Ride the urge like a wave",
+            "toolId": "urge-surfing"
+          },
+          {
+            "id": "held",
+            "label": "A hand on my heart",
+            "toolId": "soothe"
+          },
+          {
+            "id": "five_senses",
+            "label": "Name what I can see and hear",
+            "toolId": "five-senses"
+          },
+          {
+            "id": "mind_job",
+            "label": "Give my mind a job",
+            "toolId": "mind-job"
+          },
+          {
+            "id": "walk",
+            "label": "Walk around the block"
+          },
+          {
+            "id": "song",
+            "label": "Put on a song I know"
+          },
+          {
+            "id": "shower",
+            "label": "A shower or a bath"
+          }
+        ],
+        "distract": [
+          {
+            "id": "friend_place",
+            "label": "A friend's place"
+          },
+          {
+            "id": "relative_place",
+            "label": "A relative's place"
+          },
+          {
+            "id": "cafe",
+            "label": "A cafe"
+          },
+          {
+            "id": "park",
+            "label": "A park or the library"
+          },
+          {
+            "id": "online_group",
+            "label": "An online group I trust"
+          },
+          {
+            "id": "call_chat",
+            "label": "Calling someone to talk about anything else"
+          }
+        ],
+        "person": {
+          "name": "Name",
+          "phone": "Number",
+          "text": "Message",
+          "textDefault": "Hey, rough night. Can you talk?",
+          "add": "Add someone",
+          "remove": "Remove",
+          "max": 5,
+          "up": "Move up"
+        },
+        "pros": {
+          "roles": [
+            {
+              "id": "therapist",
+              "label": "My therapist"
+            },
+            {
+              "id": "gp",
+              "label": "My doctor"
+            },
+            {
+              "id": "care_team",
+              "label": "My care team"
+            },
+            {
+              "id": "other",
+              "label": "Someone else"
+            }
+          ],
+          "add": "Add someone",
+          "max": 3
+        },
+        "safer": [
+          {
+            "id": "other_room",
+            "label": "Put things in another room"
+          },
+          {
+            "id": "someone_holds",
+            "label": "Give things to someone to hold"
+          },
+          {
+            "id": "lock_away",
+            "label": "Lock things away, with the key somewhere else"
+          },
+          {
+            "id": "meds_small",
+            "label": "Keep only a little medicine at home"
+          },
+          {
+            "id": "leave_place",
+            "label": "Go somewhere safer myself"
+          },
+          {
+            "id": "firearm_hold",
+            "label": "Someone else holds the gun for now, or it's locked with the key elsewhere",
+            "firearm": true
+          }
+        ],
+        "saferOwn": "Who could keep it for you?",
+        "reasons": [
+          {
+            "id": "people_i_care",
+            "label": "People I care about"
+          },
+          {
+            "id": "pet",
+            "label": "A pet"
+          },
+          {
+            "id": "want_to_do",
+            "label": "Something I want to see or do"
+          },
+          {
+            "id": "becoming",
+            "label": "The person I'm becoming"
+          },
+          {
+            "id": "beliefs",
+            "label": "My faith or what I believe"
+          },
+          {
+            "id": "small_things",
+            "label": "Small things I love"
+          }
+        ],
+        "save": "Save my plan",
+        "saved": "Your plan is saved. It opens from Help & safety.",
+        "savedDevice": "Your plan is saved on this device. It opens from Help & safety.",
+        "saveFailed": "It didn't save. It's kept on this device for now.",
+        "edit": "Change my plan",
+        "empty": "Nothing here yet",
+        "use": {
+          "title": "Your plan",
+          "did": "I did this",
+          "next": "Next step",
+          "done": "Done",
+          "openTool": "Open",
+          "call": "Call",
+          "text": "Text",
+          "end": "You got to the end of your plan. People are still here, any time."
+        },
+        "review": {
+          "title": "Your plan, a month on",
+          "line": "Did anything on it help? Anything to change?",
+          "keep": "Keep it as is",
+          "change": "Change something"
+        },
+        "draftHub": "Finish your safety plan",
+        "draftHubSub": "Your quick plan is the start of it"
+      }
     },
     "flags": {
       "clinical_referral_psychosis": "What you're going through sounds hard. A doctor or therapist can help make sense of it with you.",

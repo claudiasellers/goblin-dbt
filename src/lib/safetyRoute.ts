@@ -172,7 +172,10 @@ export function step(s: SafetyRouteState, e: SafetyEvent, signedIn: boolean): Sa
       return go(s, 'morning_answer', { morningAnswer: e.id });
     case 'back': {
       if (!s.trail.length || s.screen === 'done') return s;
-      return { ...s, screen: s.trail[s.trail.length - 1], trail: s.trail.slice(0, -1) };
+      // Back from the morning offer undoes the exit (or *Carry on*) that led there: the exit closes the visit on the
+      // server, so it must never be sent while the person is still on the route.
+      const undo = s.screen === 'checkin' ? { exit: null } : {};
+      return { ...s, ...undo, screen: s.trail[s.trail.length - 1], trail: s.trail.slice(0, -1) };
     }
   }
 }

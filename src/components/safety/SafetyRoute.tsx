@@ -7,7 +7,11 @@ import {
 } from '../../lib/safetyRoute';
 import { newId } from '../../lib/spine/ids';
 import { completeSafetyCheckin, getSafetyContent, saveSafetyCheck, scheduleSafetyCheckin } from '../../services/safety';
-import { PoisonLines, SafetyPeople } from './SafetyPeople';
+import { PlanPeopleRow, PoisonLines, SafetyPeople } from './SafetyPeople';
+import { SafetyPlanUse } from './SafetyPlanUse';
+import { useSafetyPlan } from '../../hooks/useSafetyPlan';
+import { useToday } from '../../hooks/useToday';
+import type { SafetyPlan } from '../../lib/safetyPlan';
 import { useSafetyCountry } from '../../hooks/useSafetyCountry';
 
 export interface SafetyRouteResult {
@@ -51,7 +55,8 @@ function writeJson(key: string, v: unknown): void {
 /**
  * The safety route (CORE-01, docs/design/safety-route.md) over the step machine `src/lib/safetyRoute.ts`.
  * Signed in, each step saves the visit (`saveSafetyCheck`, ids and enums only); signed out, nothing leaves the
- * device. The quick plan and the morning answers stay on the device (the plan moves to the account with CORE-02).
+ * device. The morning answers and the quick plan (the safety plan's draft) stay on the device; a saved plan (CORE-02)
+ * plays in place of the quick plan, and its people show under the lines.
  * People are one tap away on every screen after the question, and *Back to where I was* whenever it opened over
  * something. Focus moves to each screen's heading.
  */
@@ -62,6 +67,10 @@ export function SafetyRoute({ entry, source, sourceSessionId, followUpId, onDone
   const [failed, setFailed] = useState(false);
   const [s, setS] = useState<SafetyRouteState>(() => startState(entry));
   const [country, setCountry] = useSafetyCountry(content);
+  // CORE-02: the person's plan (account or device). Its people sit under the lines on every screen, and *Open your
+  // plan* plays it in place; with none, the quick plan (three lines, the plan's draft).
+  const { plan } = useSafetyPlan();
+  const today = useToday();
   const [visit, setVisit] = useState(() => ({ id: newId(), source }));
   const heading = useRef<HTMLHeadingElement>(null);
   const finished = useRef(false);
@@ -111,7 +120,10 @@ export function SafetyRoute({ entry, source, sourceSessionId, followUpId, onDone
 
   const f = content.flow;
   const people = (
-    <SafetyPeople content={content} country={country} onCountry={setCountry} onContact={() => send({ type: 'contacted', how: 'line' })} />
+    <>
+      <SafetyPeople content={content} country={country} onCountry={setCountry} onContact={() => send({ type: 'contacted', how: 'line' })} />
+      <PlanPeopleRow content={content} country={null} plan={plan} onContact={(how) => send({ type: 'contacted', how })} />
+    </>
   );
   const leave = <button type="button" className={quiet} onClick={() => send({ type: 'leave' })}>{f.exit.button}</button>;
   const back = s.trail.length > 0 && s.screen !== 'done'
@@ -151,7 +163,7 @@ export function SafetyRoute({ entry, source, sourceSessionId, followUpId, onDone
       return frame(<>
         {title(f.passing.line)}
         {people}
-        <QuickPlanLink content={content} onOpen={() => send({ type: 'quick_plan' })} label={f.passing.makePlan} sub={f.passing.makePlanSub} />
+        <QuickPlanLink content={content} onOpen={() => { if (plan) send({ type: 'plan_kept' }); send({ type: 'quick_plan' }); }} label={f.passing.makePlan} sub={f.passing.makePlanSub} plan={plan} />
         <button type="button" className={primary} onClick={() => send({ type: 'carry_on' })}>{f.passing.continue}</button>
       </>);
     case 'act':
@@ -195,10 +207,17 @@ export function SafetyRoute({ entry, source, sourceSessionId, followUpId, onDone
       return frame(<>
         {title(f.strong.title)}
         {people}
-        <QuickPlanLink content={content} onOpen={() => send({ type: 'quick_plan' })} label={f.strong.quickPlan} sub={f.strong.quickPlanSub} />
+        <QuickPlanLink content={content} onOpen={() => { if (plan) send({ type: 'plan_kept' }); send({ type: 'quick_plan' }); }} label={f.strong.quickPlan} sub={f.strong.quickPlanSub} plan={plan} />
       </>, { exit: true });
     case 'quick_plan':
-      return frame(<QuickPlan content={content} heading={(t) => title(t)} onKept={() => send({ type: 'plan_kept' })} onClose={() => send({ type: 'back' })} />, { exit: true });
+      // The plan in place, the route's people (the lines and the plan's people) above every step, the route's own way out.
+      return plan
+        ? frame(<>
+            {people}
+            <SafetyPlanUse content={content} country={content.countries.find((c) => c.id === country) ?? null} onCountry={setCountry} plan={plan} embedded
+              onContact={(how) => send({ type: 'contacted', how })} onDone={() => send({ type: 'back' })} />
+          </>, { exit: true })
+        : frame(<QuickPlan content={content} heading={(t) => title(t)} onKept={() => send({ type: 'plan_kept' })} onClose={() => send({ type: 'back' })} />, { exit: true });
     case 'exit':
       return frame(<>
         {title(f.exit.title)}
@@ -219,7 +238,8 @@ export function SafetyRoute({ entry, source, sourceSessionId, followUpId, onDone
         <Choices choices={f.morning.choices} onPick={(id) => {
           const prev = readJson<{ answer: string; at: number }>(MORNING_KEY);
           writeJson(MORNING_KEY, { answer: id, at: Date.now(), prevHard: twiceHard(prev, Date.now()) });
-          if (followUpId && signedIn) void completeSafetyCheckin(followUpId).catch(() => { /* card stays; it goes stale */ });
+          // Answered: off Today for this visit too once the server has it (kept on Today if the save fails).
+          if (followUpId && signedIn) void completeSafetyCheckin(followUpId).then(() => today.drop(followUpId)).catch(() => { /* card stays; it goes stale */ });
           send({ type: 'morning', id: id as 'okay' | 'hard' | 'not_safe' });
         }} />
       </>);
@@ -230,7 +250,7 @@ export function SafetyRoute({ entry, source, sourceSessionId, followUpId, onDone
         {title(hard ? f.morning.hard : f.morning.okay)}
         {twice && <p className="m-0 text-[var(--color-text-secondary)]">{f.morning.twiceHard}</p>}
         {hard && people}
-        {hard && <QuickPlanLink content={content} onOpen={() => send({ type: 'quick_plan' })} label={f.strong.plan} sub="" onlyIfKept />}
+        {hard && <QuickPlanLink content={content} onOpen={() => { if (plan) send({ type: 'plan_kept' }); send({ type: 'quick_plan' }); }} label={f.strong.plan} sub="" onlyIfKept plan={plan} />}
         <button type="button" className={primary} onClick={() => onDone({ safetyCheckId: null, answer: null })}>Done</button>
       </>);
     }
@@ -262,8 +282,8 @@ function MeansActions({ content, firearm, heading, onDone }: { content: SafetyCo
 
 interface KeptQuickPlan { sign: string; do: string; contact: string; at: number }
 
-function QuickPlanLink({ content, onOpen, label, sub, onlyIfKept }: { content: SafetyContent; onOpen: () => void; label: string; sub: string; onlyIfKept?: boolean }) {
-  const kept = readJson<KeptQuickPlan>(QUICK_PLAN_KEY);
+function QuickPlanLink({ content, onOpen, label, sub, onlyIfKept, plan }: { content: SafetyContent; onOpen: () => void; label: string; sub: string; onlyIfKept?: boolean; plan: SafetyPlan | null }) {
+  const kept = plan ?? readJson<KeptQuickPlan>(QUICK_PLAN_KEY);
   if (onlyIfKept && !kept) return null;
   return (
     <button type="button" onClick={onOpen} className={`${card} w-full text-left hover:border-[var(--color-border-accent)]`}>
@@ -273,7 +293,7 @@ function QuickPlanLink({ content, onOpen, label, sub, onlyIfKept }: { content: S
   );
 }
 
-/** Three screens, about a minute: kept on this device (CORE-02 moves it to the account). */
+/** Three screens, about a minute: kept on this device as the plan's draft (`/safety/plan` starts from it, CORE-02). */
 function QuickPlan({ content, heading, onKept, onClose }: { content: SafetyContent; heading: (t: string) => ReactNode; onKept: () => void; onClose: () => void }) {
   const q = content.flow.quickPlan;
   const [kept] = useState(() => readJson<KeptQuickPlan>(QUICK_PLAN_KEY));

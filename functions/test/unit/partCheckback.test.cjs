@@ -57,7 +57,7 @@ test('schedule: one open check-back per part (a second schedule returns the open
 
 test('validateScheduleCheckback: ids, dueAt in range, nothing else (the type is fixed server-side)', () => {
   assert.equal(scheduleIn().item.type, PART_CHECKBACK_TYPE);
-  for (const bad of [{ type: 'recover_log' }, { dueAt: inH(24 * 15) }, { sessionId: 'x' }, { partId: PID }]) {
+  for (const bad of [{ type: 'recover_log' }, { dueAt: inH(24 * 33) }, { sessionId: 'x' }, { partId: PID }]) {
     assert.throws(() => CB.validateScheduleCheckback({ id: FID, sessionId: SID, dueAt: inH(20), ...bad }, new Date()), JSON.stringify(bad));
   }
 });
