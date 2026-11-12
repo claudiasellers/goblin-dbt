@@ -1,10 +1,13 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { onAuthChange, logIn, logOut, signUp, type User } from '../services/firebase';
 import { ensureUserExists } from '../services/neo4j';
+import { authPhase, lastUidAfter, LAST_UID_KEY, type AuthPhase } from '../lib/authPhase';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  /** `resolving` until Firebase says who is signed in: never render signed-out UI before `signed_out`. */
+  phase: AuthPhase;
   signUp: (email: string, password: string) => Promise<void>;
   logIn: (email: string, password: string) => Promise<void>;
   logOut: () => Promise<void>;
@@ -33,6 +36,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const unsubscribe = onAuthChange((user) => {
       setUser(user);
       setLoading(false);
+      try {
+        const next = lastUidAfter(user ? 'signed_in' : 'signed_out', user?.uid ?? null);
+        if (next) localStorage.setItem(LAST_UID_KEY, next);
+        else localStorage.removeItem(LAST_UID_KEY);
+      } catch { /* storage blocked: the reload just won't seed the cached profile */ }
       // The graph User exists before any write (F4). Once per uid per page load; the onUserCreated
       // trigger covers new accounts and every write MERGEs the user, so a failure here is harmless.
       if (user && ensured.current !== user.uid) {
@@ -60,6 +68,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const value: AuthContextType = {
     user,
     loading,
+    phase: authPhase({ signedIn: Boolean(user), loading }),
     signUp: handleSignUp,
     logIn: handleLogIn,
     logOut: handleLogOut,
