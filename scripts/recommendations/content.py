@@ -280,6 +280,12 @@ WATCHFUL_WORDS = ["persecuted", "critical", "skeptical", "dismissive", "jealous"
 # Per-word rules (Oct 2026 review): when one of the words is picked, this tool ranks above the pattern's
 # own rows. Each row's `why` is the review's reasoning. Planned tools (PLANNED) are written switched off
 # with the priority the review gave them, so they take their place the day the module ships.
+# A word rule may name the leads it was reviewed to sit `beside` (app tool ids): when one of them is the first card,
+# the row fills the second card even where the swap rule (a different skill kind, never two change skills) would
+# drop it (12 Nov 2026, connected by default): both checks, kind and change + change, are skipped. Only on a
+# plain result: a blank result or a co-occurring pattern keeps the rule (and so its orienting backup). A tool's
+# pairs are the union over its rows that fired, so a better-ranked row of the same tool doesn't hide them.
+# Every other row keeps the rule; the hard filters apply to all; build.py checks the ids.
 WORD_RULES = [
     # --- Alarm ---
     {"key": "overwhelm", "pattern": "acute_alarm", "tool": "pause", "priority": WORD_LEAD, "words": ["overwhelmed", "out_of_control"],
@@ -288,7 +294,7 @@ WORD_RULES = [
      "why": "Bridge high agitation: distraction (ACCEPTS, planned) then Problem Solve; until ACCEPTS ships, Problem Solve leads and Cool Down follows."},
     {"key": "stress", "pattern": "acute_alarm", "tool": "accepts", "priority": 0.4, "words": STRESS_WORDS,
      "why": "Planned: ACCEPTS (distract) leads for strain words once built."},
-    {"key": "demand", "pattern": "acute_alarm", "tool": "say-no", "priority": WORD_NEXT, "words": ["pressured"],
+    {"key": "demand", "pattern": "acute_alarm", "tool": "say-no", "priority": WORD_NEXT, "words": ["pressured"], "beside": ["problem-solve"],
      "why": "Pressure from someone's demands: Say no (IE-04) beside Problem Solve, so the person can turn the ask down instead of absorbing it."},
     {"key": "annoyed", "pattern": "acute_alarm", "tool": "opposite-action", "priority": WORD_LEAD, "words": ["annoyed"],
      "why": "Check the Facts on low-grade anger (planned); Do the Opposite's fits-the-facts step until then."},
@@ -301,9 +307,9 @@ WORD_RULES = [
     # --- On guard ---
     {"key": "anticipatory", "pattern": "chronic_vigilance", "tool": "opposite-action", "priority": WORD_LEAD, "words": ["anxious", "nervous"],
      "why": "Anticipatory anxiety needs rehearsal and evaluation: Cope Ahead, then Check the Facts (both planned); Do the Opposite (approach, fits-the-facts step) until then."},
-    {"key": "anticipatory", "pattern": "chronic_vigilance", "tool": "cope-ahead", "priority": 0.4, "words": ["anxious", "nervous"],
+    {"key": "anticipatory", "pattern": "chronic_vigilance", "tool": "cope-ahead", "priority": 0.4, "words": ["anxious", "nervous"], "beside": ["check-the-facts"],
      "why": "Planned: Cope Ahead leads for anticipatory anxiety."},
-    {"key": "anticipatory", "pattern": "chronic_vigilance", "tool": "check-the-facts", "priority": 0.45, "words": ["anxious", "nervous"],
+    {"key": "anticipatory", "pattern": "chronic_vigilance", "tool": "check-the-facts", "priority": 0.45, "words": ["anxious", "nervous"], "beside": ["cope-ahead"],
      "why": "Planned: Check the Facts as the alternative."},
     {"key": "worry", "pattern": "chronic_vigilance", "tool": "opposite-action", "priority": WORD_LEAD, "words": ["worried"] + WATCHFUL_WORDS,
      "why": "Check the Facts first (planned); Do the Opposite's fits-the-facts step until then."},
@@ -391,7 +397,7 @@ def rows():
             "id": id_, "tool": tool, "pattern": pattern, "bands": bands, "priority": priority,
             "direction": spec.get("direction", CONCEPT_TAGS[tool]["direction"]), "requiresPrior": spec.get("requiresPrior"),
             "side": spec.get("side"), "emotionGate": gate, "words": words or [], "active": tool not in INACTIVE_TOOLS,
-            "why": why,
+            "beside": spec.get("beside", []), "why": why,
         })
 
     for pattern, cells in TABLE.items():
@@ -412,7 +418,7 @@ def rows():
             add(f"rf_{pattern}_{g['gate']}_{g['tool']}", g["tool"], pattern, g["bands"], g["priority"], g["why"], gate=g["gate"])
     for w in WORD_RULES:
         add(f"rf_{w['pattern']}_words_{w['key']}_{w['tool']}", w["tool"], w["pattern"], DEFAULT_BANDS, w["priority"], w["why"],
-            gate="words", words=w["words"])
+            gate="words", words=w["words"], spec={"beside": w.get("beside", [])})
     for pr in PLANNED_ROWS:
         add(f"rf_{pr['pattern']}_planned_{pr['tool']}", pr["tool"], pr["pattern"], DEFAULT_BANDS, pr["priority"], pr["why"])
     for r in out:

@@ -2180,6 +2180,7 @@
    "requiresPrior": null,
    "emotionGate": "addresses",
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2203,6 +2204,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2226,6 +2228,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2249,6 +2252,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2271,6 +2275,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2293,6 +2298,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2316,6 +2322,7 @@
    "requiresPrior": null,
    "emotionGate": "none_named",
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2341,6 +2348,7 @@
    "words": [
     "annoyed"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2366,6 +2374,7 @@
    "words": [
     "annoyed"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2391,6 +2400,7 @@
    "words": [
     "annoyed"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2415,6 +2425,9 @@
    "emotionGate": "words",
    "words": [
     "pressured"
+   ],
+   "beside": [
+    "problem-solve"
    ],
    "tier": "quality_of_life",
    "surface": [
@@ -2442,6 +2455,7 @@
     "distant",
     "withdrawn"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2468,6 +2482,7 @@
     "overwhelmed",
     "out_of_control"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2497,6 +2512,7 @@
     "rushed",
     "pressured"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2526,6 +2542,7 @@
     "rushed",
     "pressured"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2549,6 +2566,7 @@
    "requiresPrior": null,
    "emotionGate": "addresses",
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2572,6 +2590,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2595,6 +2614,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2617,6 +2637,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2639,6 +2660,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2662,6 +2684,7 @@
    "requiresPrior": null,
    "emotionGate": "none_named",
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2687,6 +2710,9 @@
    "words": [
     "anxious",
     "nervous"
+   ],
+   "beside": [
+    "cope-ahead"
    ],
    "tier": "quality_of_life",
    "surface": [
@@ -2714,6 +2740,9 @@
     "anxious",
     "nervous"
    ],
+   "beside": [
+    "check-the-facts"
+   ],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2740,6 +2769,7 @@
     "anxious",
     "nervous"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2765,6 +2795,7 @@
    "words": [
     "helpless"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2790,6 +2821,7 @@
    "words": [
     "helpless"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2819,6 +2851,7 @@
     "dismissive",
     "jealous"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2849,6 +2882,7 @@
     "dismissive",
     "jealous"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2879,6 +2913,7 @@
     "dismissive",
     "jealous"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2904,6 +2939,7 @@
    "words": [
     "worried"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2927,6 +2963,7 @@
    "requiresPrior": null,
    "emotionGate": "addresses",
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2950,6 +2987,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2973,6 +3011,7 @@
    "requiresPrior": "up_regulation",
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -2995,6 +3034,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3018,6 +3058,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3041,6 +3082,7 @@
    "requiresPrior": null,
    "emotionGate": "addresses",
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3064,6 +3106,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3086,6 +3129,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3108,6 +3152,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3130,6 +3175,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3153,6 +3199,7 @@
    "requiresPrior": null,
    "emotionGate": "addresses",
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3176,6 +3223,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3199,6 +3247,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3221,6 +3270,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3243,6 +3293,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3269,6 +3320,7 @@
     "bitter",
     "resentful"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3295,6 +3347,7 @@
     "bitter",
     "resentful"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3321,6 +3374,7 @@
     "bitter",
     "resentful"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3347,6 +3401,7 @@
     "provoked",
     "indignant"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3370,6 +3425,7 @@
    "requiresPrior": null,
    "emotionGate": "addresses",
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3393,6 +3449,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3415,6 +3472,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3438,6 +3496,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3464,6 +3523,7 @@
     "lonely",
     "isolated"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3491,6 +3551,7 @@
     "fragile",
     "powerless"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3518,6 +3579,7 @@
     "fragile",
     "powerless"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3541,6 +3603,7 @@
    "requiresPrior": null,
    "emotionGate": "addresses",
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3564,6 +3627,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3587,6 +3651,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3609,6 +3674,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3631,6 +3697,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3654,6 +3721,7 @@
    "requiresPrior": null,
    "emotionGate": "none_named",
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3690,6 +3758,7 @@
     "horrified",
     "hesitant"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3728,6 +3797,7 @@
     "guilty",
     "remorseful"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3755,6 +3825,7 @@
     "remorseful",
     "hesitant"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3781,6 +3852,7 @@
     "embarrassed",
     "ashamed"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3808,6 +3880,7 @@
     "ashamed",
     "victimized"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3831,6 +3904,7 @@
    "requiresPrior": null,
    "emotionGate": "addresses",
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3854,6 +3928,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3877,6 +3952,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3899,6 +3975,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3921,6 +3998,7 @@
    "requiresPrior": null,
    "emotionGate": null,
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3944,6 +4022,7 @@
    "requiresPrior": null,
    "emotionGate": "none_named",
    "words": [],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3970,6 +4049,7 @@
     "exposed",
     "humiliated"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -3995,6 +4075,7 @@
    "words": [
     "let_down"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -4021,6 +4102,7 @@
     "betrayed",
     "disrespected"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
@@ -4051,6 +4133,7 @@
     "weak",
     "worthless"
    ],
+   "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"

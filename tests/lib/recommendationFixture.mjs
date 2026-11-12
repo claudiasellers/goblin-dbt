@@ -124,7 +124,7 @@ export function routingConcept(g, conceptId, { withAddresses = true } = {}) {
 function routingRow(r) {
   return {
     id: r.id, bands: [...r.bands], priority: r.priority, direction: r.direction ?? null, side: r.side ?? null,
-    requiresPrior: r.requiresPrior ?? null, emotionGate: r.emotionGate ?? null, words: [...(r.words || [])], active: r.active !== false,
+    requiresPrior: r.requiresPrior ?? null, emotionGate: r.emotionGate ?? null, words: [...(r.words || [])], beside: [...(r.beside || [])], active: r.active !== false,
   };
 }
 

@@ -111,7 +111,7 @@ export const ROUTING_SLICE_QUERY = `
   OPTIONAL MATCH (tc)-[:CONTRAINDICATED_FOR]->(mf:MedicalFlag)
   RETURN p.id AS patternId, coalesce(p.blank, false) AS blank, patternEmotions,
          tc { .id, .appToolId, .name, .description, .whenToUse, .dbtBasis, .side, .skillKind, .direction } AS concept,
-         CASE WHEN r IS NULL THEN null ELSE r { .id, .bands, .direction, .side, .requiresPrior, .emotionGate, .words, .active, priority: toFloat(r.priority) } END AS edge,
+         CASE WHEN r IS NULL THEN null ELSE r { .id, .bands, .direction, .side, .requiresPrior, .emotionGate, .words, .beside, .active, priority: toFloat(r.priority) } END AS edge,
          addresses, contraPatterns, collect(DISTINCT mf.id) AS contraFlags
 `;
 
@@ -143,6 +143,7 @@ export function toRoutingRow(e: Obj): RoutingRow {
     requiresPrior: str(e.requiresPrior),
     emotionGate: gate === 'addresses' || gate === 'none_named' || gate === 'words' ? gate : null,
     words: strs(e.words),
+    beside: strs(e.beside),
     active: e.active !== false,
   };
 }

@@ -24,6 +24,7 @@ const ans = (...rs) => rs.map((responseId) => ({ questionId: "q", responseId }))
 const grid = parseGrid(readFileSync("src/data/emotions.ts", "utf8"));
 const toolIds = [...readFileSync("src/data/tools.ts", "utf8").matchAll(/^\s+id: '([a-z-]+)',/gm)].map((m) => m[1]);
 const toolComponents = readFileSync("src/pages/ToolPage.tsx", "utf8");
+const playerTools = readFileSync("src/lib/skillRuntime/playerTools.ts", "utf8");
 const PATTERNS = Object.keys(graph.patterns).filter((p) => graph.recommendedFor.some((r) => r.patternId === p));
 const BANDS = ["steady", "stirred", "flooded"];
 
@@ -43,13 +44,13 @@ const pickIds = (sel) => sel.picks.map((p) => p.concept.appToolId);
 
 // ---- Goldens ----
 
-test("#1–3 Anxious → On guard (its reviewed pattern): Cope Ahead + 5-4-3-2-1 whatever the band but flooded (its anticipatory row, live 12 Nov); flooded: Cool Down + 5-4-3-2-1", async () => {
+test("#1–3 Anxious → On guard (its reviewed pattern): Cope Ahead + Check the Facts beside it whatever the band but flooded (live 12 Nov); flooded: Cool Down + 5-4-3-2-1", async () => {
   const r1 = await run(hu({ emotions: ["Anxious"] }));
   assert.equal(r1.pattern.id, "chronic_vigilance");
   assert.deepEqual([r1.routing.band, r1.routing.bandSource, r1.routing.version], ["stirred", "inferred", "rf-v2"]);
-  assert.deepEqual(ids(r1), ["cope-ahead", "five-senses"]);
+  assert.deepEqual(ids(r1), ["cope-ahead", "check-the-facts"], "the review's alternative, beside Cope Ahead");
   assert.equal(r1.tools[0].ruleId, "rf_chronic_vigilance_words_anticipatory_cope-ahead");
-  assert.deepEqual(ids(await run(hu({ emotions: ["Anxious"], band: "steady", bandSource: "probe" }))), ["cope-ahead", "five-senses"], "no capacity split");
+  assert.deepEqual(ids(await run(hu({ emotions: ["Anxious"], band: "steady", bandSource: "probe" }))), ["cope-ahead", "check-the-facts"], "no capacity split");
   const r3 = await run(hu({ emotions: ["Anxious"], band: "flooded" }));
   assert.deepEqual(ids(r3), ["cool-down", "five-senses"]);
   assert.equal(r3.routing.bandSource, "probe");
@@ -220,8 +221,10 @@ test("invariants: 1–2 cards, ≤1 change skill, distinct kinds, no calming whe
         const picks = sel.picks;
         const label = `${pid}/${band}/${JSON.stringify(v)}`;
         assert.ok(picks.length >= 1 && picks.length <= 2, label);
-        assert.ok(picks.filter((p) => p.side === "change").length <= 1, label);
-        assert.equal(new Set(picks.map((p) => p.skillKind)).size, picks.length, label);
+        // Two change skills only when the second was reviewed to sit beside the first (`beside`, 12 Nov 2026).
+        const besidePair = picks.length === 2 && (graph.recommendedFor.find((r) => r.id === picks[1].ruleId)?.beside ?? []).includes(picks[0].concept.appToolId);
+        assert.ok(besidePair || picks.filter((p) => p.side === "change").length <= 1, label);
+        if (!besidePair) assert.equal(new Set(picks.map((p) => p.skillKind)).size, picks.length, label);
         if (v.blank || graph.patterns[pid].blank) assert.ok(picks.every((p) => p.direction !== "down" && p.concept.direction !== "down"), label);
         if (band === "flooded") assert.ok(picks.every((p) => ["body", "orient"].includes(p.skillKind)), label);
         if (pid === "dissociation_overmodulation") assert.ok(!pickIds(sel).includes("opposite-action"), label);
@@ -229,7 +232,7 @@ test("invariants: 1–2 cards, ≤1 change skill, distinct kinds, no calming whe
         assert.equal(picks[0].sequence, undefined, label);
         for (const id of pickIds(sel)) {
           assert.ok(toolIds.includes(id), `${label}: ${id} not in tools.ts`);
-          assert.ok(toolComponents.includes(`'${id}':`) || toolComponents.includes(`'${id}'`), `${label}: ${id} has no component`);
+          assert.ok(toolComponents.includes(`'${id}':`) || toolComponents.includes(`'${id}'`) || playerTools.includes(`'${id}':`), `${label}: ${id} has no component`);
         }
         assert.deepEqual(await cell(pid, band, v), sel, `${label}: deterministic`);
       }
@@ -297,4 +300,30 @@ test("DT-11's row (signed off 10 Nov): Pause leads and Rebel without the wreckag
   // Switched back off, the swap is Cool Down again.
   const off = { ...on, recommendedFor: on.recommendedFor.map((r) => (r.id === id ? { ...r, active: false } : r)) };
   assert.deepEqual(ids(await run(hu({ emotions: ["Provoked"] }), off)), ["pause", "cool-down"]);
+});
+
+test("a row reviewed to sit beside the lead fills the second card past the swap rule (12 Nov): Say no beside Problem Solve, Check the Facts beside Cope Ahead", async () => {
+  assert.deepEqual(pickIds(await cell("acute_alarm", "stirred", { words: ["pressured"] })), ["problem-solve", "say-no"]);
+  assert.deepEqual(pickIds(await cell("chronic_vigilance", "stirred", { words: ["anxious"] })), ["cope-ahead", "check-the-facts"]);
+  // Only beside its named lead: bitter / resentful keep Check the Facts + FAST, never a second change skill.
+  assert.deepEqual(pickIds(await cell("reactive_aggression", "stirred", { words: ["resentful"] })), ["check-the-facts", "fast"]);
+  // Only a word row the person's word fired: Flooded keeps body / orient only.
+  for (const w of ["pressured", "disrespected", "resentful"]) {
+    for (const pid of ["acute_alarm", "social_threat_shame", "reactive_aggression"]) {
+      const sel = await cell(pid, "flooded", { words: [w] });
+      assert.ok(sel.picks.every((p) => ["body", "orient"].includes(p.skillKind)), `${pid}/${w}`);
+    }
+  }
+  const sel = await cell("acute_alarm", "stirred", { words: ["frustrated"] });
+  assert.ok(sel.picks.filter((p) => p.side === "change").length <= 1, "no word row fired: never two change skills");
+  // Both ways round: a second word that puts Check the Facts first still pairs it with Cope Ahead.
+  assert.deepEqual(pickIds(await cell("chronic_vigilance", "stirred", { words: ["anxious", "worried"] })).sort(), ["check-the-facts", "cope-ahead"]);
+  // A pair only on a plain result: blank or a co-occurring pattern keeps the rule and its orienting backup (Gate 2).
+  for (const opts of [{ secondary: "dissociation_overmodulation" }, { blank: true }]) {
+    const alarm = await cell("acute_alarm", "stirred", { words: ["pressured"], ...opts });
+    assert.ok(!pickIds(alarm).includes("say-no"), JSON.stringify(opts));
+    assert.equal(alarm.filtered.find((f) => f.toolId === "say-no")?.reason, "diversity", JSON.stringify(opts));
+    assert.ok(!pickIds(await cell("chronic_vigilance", "stirred", { words: ["anxious"], secondary: "rumination_loop", ...opts })).includes("check-the-facts") ||
+      !pickIds(await cell("chronic_vigilance", "stirred", { words: ["anxious"], secondary: "rumination_loop", ...opts })).includes("cope-ahead"), JSON.stringify(opts));
+  }
 });

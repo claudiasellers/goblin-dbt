@@ -167,3 +167,24 @@ planned rows stay drafts until their tool ships. Switched off, the check-in rout
 
 To revisit a row later: take its id out of `SIGNED_OFF` and change it (or switch the policy off while
 you do; `build.py` won't build an enabled policy with an active draft), rebuild, reload `recommended-for`.
+
+## Addendum, 12 Nov 2026: reviewed pairs fill the second card
+
+Some rows written as "beside X" never showed: the swap rule (a different skill kind, never two change skills)
+dropped them. Check the Facts on *anxious* / *nervous* beside Cope Ahead (this review's own reasoning: rehearse,
+then test the prediction) and Say no on *pressured* beside Problem Solve (signed off 12 Nov, after this review) are
+two. A word rule can now name the leads it sits `beside` (`scripts/recommendations/content.py`,
+`RECOMMENDED_FOR.beside`, both ways round for the anxious pair); when one of them is the first card, `select.ts` lets
+that tool fill the swap past both checks.
+
+- Only on a plain result. A blank result or a co-occurring pattern keeps the rule, so Alarm with dissociation
+  alongside still gets 5-4-3-2-1 as its second card, and On guard with rumination alongside never gets two thinking
+  skills.
+- Every other row keeps the rule, so a fallback row written "until X ships" never becomes a second change card.
+- The hard filters (Flooded → body / orient only, blank, contraindications) apply to every row, and `build.py`
+  refuses `beside` on anything but a word rule, on a flooded band, or naming an unknown tool.
+- What changes in the one-word table above (October's snapshot, left as it was): *Anxious* and *Nervous* show Cope
+  Ahead, Check the Facts (Cope Ahead had already replaced Do the Opposite when it went live); *Pressured* shows Problem
+  Solve, Say no, so Cool Down leaves that result and stays one tap away through *That feels like too much*.
+- FAST got there another way (#90: its own skill kind, `values`). DEAR MAN on *let down* / *left out* beside Recover
+  follows with One message.
