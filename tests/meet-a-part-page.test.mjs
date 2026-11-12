@@ -62,7 +62,7 @@ test("listed only with parts on and its copy shipped (the gate ToolPage opens it
   assert.equal(T.getToolById("two-pulls").listed, false, "Two pulls: by link only, never listed");
   // Lists read only listed tools: Tools.tsx through getToolsByModule, with `parts` from Meet a part's own gate.
   const tools = read("src/pages/Tools.tsx");
-  assert.match(tools, /import \{ getToolsByModule, intents \} from '\.\.\/data\/tools'/);
+  assert.match(tools, /import \{ getToolById, getToolsByModule, intents \} from '\.\.\/data\/tools'/, "getToolById: only the admin official-name line under an intent");
   assert.match(tools, /const parts = useToolGate\('meet-a-part'\) === 'open';/, "false while the gate loads: no flicker");
   assert.match(tools, /getToolsByModule\(mod\.id, \{ parts \}\)/);
   // A visit that starts from the list says so ('tools'); every other card carries no state.

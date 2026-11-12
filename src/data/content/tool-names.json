@@ -1,0 +1,29 @@
+{
+  "source": {
+    "file": "tests/fixtures/recommendation-graph.json (from the schema files)",
+    "exportedAt": null
+  },
+  "content": {
+    "tools": {
+      "alternate-rebellion": "Alternate Rebellion",
+      "check-the-facts": "Check the Facts",
+      "cool-down": "TIPP",
+      "cope-ahead": "Cope Ahead",
+      "dear-man": "DEAR MAN",
+      "ending-relationships": "Ending relationships",
+      "er-troubleshoot": "Troubleshooting Emotion Regulation Skills",
+      "fast": "FAST",
+      "find-the-feeling": "Find the Feeling",
+      "five-senses": "Orienting",
+      "let-it-be": "Radical Acceptance",
+      "nightmare-rescript": "Nightmare Protocol",
+      "opposite-action": "Opposite Action",
+      "pause": "STOP",
+      "problem-solve": "Problem Solving",
+      "pros-cons": "Pros and Cons",
+      "recovering-from-invalidation": "Recovering from Invalidation",
+      "urge-surfing": "Urge Surfing",
+      "wise-mind": "Wise Mind"
+    }
+  }
+}

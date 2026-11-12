@@ -3,6 +3,7 @@ import { useParams, Link, useLocation, Navigate } from 'react-router-dom';
 import { getToolById, toolIdFromUrl, TOOL_URL_SLUGS } from '../data/tools';
 import { ToolSessionProvider } from '../contexts/ToolSessionContext';
 import { useToolGate } from '../hooks/useToolGate';
+import { useOfficialNames } from '../hooks/useOfficialNames';
 import { useStepBackSlot } from '../hooks/useStepBackSlot';
 import { useUserProfile } from '../contexts/UserProfileContext';
 import { ToolLoading } from '../components/tools/ToolLoading';
@@ -83,6 +84,7 @@ export function ToolPage() {
   // Meet a part opens only with parts on and its copy signed off; otherwise it is "not found".
   const gate = useToolGate(tool?.id, location.search);
   const partsOn = useUserProfile().profile.partsEnabled;
+  const { label } = useOfficialNames();
   useEffect(() => {
     if (!partsOn) return;
     if (tool?.id === 'meet-a-part') void loadMeetAPart().catch(() => { /* the render retries */ });
@@ -128,7 +130,7 @@ export function ToolPage() {
             {tool.emoji}
           </span>
           <h1 className="text-2xl sm:text-3xl font-bold text-[var(--color-text-primary)]">
-            {tool.name}
+            {label(tool)}
           </h1>
         </div>
         {!tool.bare && (

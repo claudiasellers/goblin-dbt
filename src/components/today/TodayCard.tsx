@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getToolById } from '../../data/tools';
+import { useOfficialNames } from '../../hooks/useOfficialNames';
 import type { TodayItem } from '../../services/spine';
 import { answerToolOutcome, dismissFollowUp, resolveFollowUp, snoozeFollowUp } from '../../services/spine';
 import { fillToolName, LATER_HOURS, outcomeAnswer } from '../../lib/spine/todayCard';
@@ -14,7 +15,9 @@ import { CopeAheadEntryLink } from '../tools/copeAhead/CopeAheadEntryLink';
 export function TodayCard({ item, onDone, compact = false }: { item: TodayItem; onDone: (id: string) => void; compact?: boolean }) {
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
-  const toolName = item.source?.toolId ? getToolById(item.source.toolId)?.name : null;
+  const { label } = useOfficialNames();
+  const sourceTool = item.source?.toolId ? getToolById(item.source.toolId) : undefined;
+  const toolName = sourceTool ? label(sourceTool) : null;
   const title = fillToolName(item.copy.title, toolName);
   const body = item.copy.body ? fillToolName(item.copy.body, toolName) : null;
 
