@@ -713,6 +713,8 @@ export async function getDearManReflection(
 export interface DearManSessionRecord {
   id: string;
   type: 'prep' | 'debrief';
+  /** `one_message`: a One message prep (docs/design/one-message.md); empty for the full prep and the debrief. */
+  mode?: string;
   relationshipType: string;
   situationType: string;
   priorities: string[];

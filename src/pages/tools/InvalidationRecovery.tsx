@@ -358,7 +358,7 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
               onFinished={endIntensity => {
                 if (handoff?.oneMessageOnly) {
                   // The pull was to chase: One message (IE-01 Mode A), with the word they picked and the band.
-                  navigate(ONE_MESSAGE_PATH, { state: oneMessageState(withBand({ ...handoff, intensity: endIntensity ?? handoff.intensity }, g)) });
+                  navigate(ONE_MESSAGE_PATH, { state: { skillCtx: oneMessageState(withBand({ ...handoff, intensity: endIntensity ?? handoff.intensity }, g)) } });
                   return;
                 }
                 if (handoff) {

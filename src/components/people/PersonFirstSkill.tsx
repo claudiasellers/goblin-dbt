@@ -10,7 +10,7 @@ import { getSkillRun, getSkillsContent } from '../../services/skills';
 import { resumeRun, type RunContext } from '../../lib/skillRuntime/machine';
 import { emotions } from '../../data/emotions';
 import { presetPerson } from '../../lib/dearManDebrief';
-import { personFirstPickerCopy, personFirstSafetyCopy, reopenGate, resumeAfterPicker, RUN_ID } from '../../lib/personFirst';
+import { personFirstPickerCopy, personFirstSafetyCopy, recordedPersonCtx, reopenGate, resumeAfterPicker, RUN_ID } from '../../lib/personFirst';
 import type { KeptPerson, PickedPerson } from '../../lib/people';
 
 /**
@@ -94,7 +94,7 @@ export function PersonFirstSkill({ skillId, toolId, questionKey, headingKey, ctx
   const pickerCopy = personFirstPickerCopy(copy, questionKey);
   const safetyCopy = personFirstSafetyCopy(copy, headingKey);
   if (!pickerCopy || !safetyCopy) return <ToolLoadError onRetry={() => { setCopy(null); setAttempt((n) => n + 1); }} />;
-  if (reopen.kind === 'skill') return <SkillPlayer skillId={skillId} resumeRecord={checked} />;
+  if (reopen.kind === 'skill') return <SkillPlayer skillId={skillId} ctx={recordedPersonCtx(checked)} resumeRecord={checked} />;
   if (reopen.kind === 'safety') {
     return (
       <PersonSafetyRoute copy={safetyCopy} label={reopen.person.label}

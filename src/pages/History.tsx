@@ -388,7 +388,7 @@ function DearManSessionCard({
               : 'bg-[var(--color-tag-purple-bg)] text-[var(--color-text-primary)]'
             }
           `}>
-            {isPrep ? 'Prep' : 'Debrief'}
+            {isPrep ? (session.mode === 'one_message' ? 'One message' : 'Prep') : 'Debrief'}
           </span>
           {session.situationType && (
             <span className="text-xs text-[var(--color-text-secondary)]">

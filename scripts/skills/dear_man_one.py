@@ -71,7 +71,7 @@ COPY = {
     "source_hint": "Any answer is fine. It only changes what comes after the message.",
     "cool_down": "Settle my body first",
     "about_title": "What's the message about?",
-    "about_title_heads_up": "Keep it short, written, and about one thing.",
+    "about_title_heads_up": "Keep it short, written, and about one thing. What's it about?",
     "fact_title": "What happened? Say it the way a camera would see it.",
     "fact_hint": "Pick the closest, or say it your way.",
     "felt_title": "How did it feel?",
@@ -79,13 +79,13 @@ COPY = {
     "give_title": "A warm line can help it land. Want one?",
     "give_hint": "Optional.",
     "ask_title": "What's the one thing you're asking for?",
-    "ask_hint": "One small ask lands better than a list.",
+    "ask_hint": "One small ask is often easier to say yes to.",
     "ask_title_heads_up": "What's the one practical thing you're asking for?",
     "let_go": "I've asked them to hear me before. Look at letting this one go",
     "why_title": "Why it matters (optional)",
     "own_line": "In my own words",
     "message_title": "Here's your message.",
-    "sorry_line": "There's a sorry in there. Asking for something isn't a wrong you need to apologise for.",
+    "sorry_line": "There's a sorry in there. Asking for something isn't a wrong. Keep it only if it's for something you did.",
     "drop_sorry": "Take the sorry out",
     "copy": "Copy",
     "copied": "Copied",
@@ -93,10 +93,10 @@ COPY = {
     "open_messages": "Open messages",
     "next": "Next",
     "done": "Done",
-    "cool_title": "It's ready. Sending it now, or giving it a little time?",
+    "cool_title": "Your message is put together. Send it now, or give it a little time first?",
     "cool_hint": "Sending is up to you. Messages sent from a hot place tend to land harder than we mean.",
     "aloud_title": "Read it out loud once.",
-    "aloud_hint": "If any part sounds sharper than you mean, go back and change it.",
+    "aloud_hint": "If a part sounds sharper than you mean, change it once you've pasted it.",
     "wait_title": "Phone down. The message will keep.",
     "wait_waiting": "Put the phone face down and come back when you're ready. Your message is still here.",
     "wait_short": "Waiting",
@@ -105,7 +105,8 @@ COPY = {
     "wait_back": "I'm back",
     "resend_title": "Your message, ready when you are.",
     "later_label": "When do you want the reminder?",
-    "later_line": "Saved. The reminder won't say who it's for or what it says.",
+    "later_line": "Pick a time and a reminder brings it back. It won't say who it's for or what it says.",
+    "settle_line": "Settle your body first. Pick a time and a reminder brings the message back.",
     "predict_title": "How do you think they'll take it?",
     "sure_label": "How sure are you?",
     "again_label": "Want me to ask how it went?",
@@ -135,13 +136,13 @@ FACTS = [
     ("f_need_help", "I've got a lot on right now", ["ask"]),
     ("f_need_time", "Something's come up that I need time for", ["ask"]),
     ("f_going_through", "I'm going through something hard at the moment", ["ask"]),
-    ("f_how_we_do", "The way we've been doing this isn't working for me", ["ask", "pattern"]),
+    ("f_how_we_do", "We've been doing this the same way for a while", ["ask", "pattern"]),
     ("f_didnt_follow", "You said you'd do something, and it didn't happen", ["address"]),
     ("f_said_hurtful", "Something you said the other day stayed with me", ["address"]),
     ("f_decided", "A decision got made that affects me, without me", ["address"]),
     ("f_told_you", "When I told you how I felt, the conversation moved on", ["address", "pattern"]),
     ("f_keeps", "Something I've asked about before is still happening", ["pattern"]),
-    ("f_one_sided", "Lately it's felt like I'm the one reaching out", ["pattern"]),
+    ("f_one_sided", "Lately I've been the one getting in touch first", ["pattern"]),
 ]
 # Express: "I felt…", one word. Ids are the check-in's word ids where there is one, so a word Recover carried comes
 # first ($ctx.emotionId, R12), never picked for them.
@@ -149,9 +150,10 @@ FELT = [
     ("hurt", "I felt hurt"),
     ("let_down", "I felt let down"),
     ("frustrated", "I felt frustrated"),
-    ("rejected", "I felt pushed away"),
-    ("dismissed", "I felt brushed off"),
-    ("disrespected", "I felt disrespected"),
+    ("excluded", "I felt left out"),
+    # Recover's words, said as feelings, not as what the other person meant (Gate 3).
+    ("dismissed", "I felt unheard"),
+    ("disrespected", "I felt small"),
     ("lonely", "I felt lonely"),
     ("anxious", "I've been anxious about it"),
     ("overwhelmed", "I've been overwhelmed"),
@@ -161,10 +163,11 @@ FELT = [
 ]
 # GIVE in one line (IE-06's default first).
 GIVE = [
-    ("g_not_agree", "I'm not asking you to agree with me"),
-    ("g_matter", "You matter to me, which is why I'm saying this"),
-    ("g_not_mean", "I don't think you meant it that way"),
-    ("g_busy", "I know you've got a lot on too"),
+    ("g_not_agree", "I'm not asking you to agree with me", ["ask", "address", "pattern"]),
+    ("g_matter", "You matter to me, which is why I'm saying this", ["ask", "address", "pattern"]),
+    # Truthful (Handout 7): only for one thing that happened, never offered for a pattern.
+    ("g_not_mean", "I'm not assuming you meant it that way", ["address"]),
+    ("g_busy", "I know you've got a lot on too", ["ask", "address", "pattern"]),
 ]
 # Assert: ONE small ask. `validation` marks an ask to be heard (left out after *it tends to go badly*, PRD IE-01
 # step 0; Let go is offered beside it after a refused one, step 3).
@@ -187,8 +190,9 @@ WHY = [
 ]
 COOL = [
     ("aloud", "Read it out loud first"),
-    ("hold", "Hold it for a few minutes"),
+    ("hold", "Hold it for ten minutes"),
     ("later", "Save it and remind me"),
+    ("settle", "Settle my body first. Keep the message"),
     ("send", "I'm good to send it"),
 ]
 # The ask_delayed card's window chips (scripts/practice-spine/content.py ask_delayed).
@@ -232,7 +236,7 @@ STEPS = [
     },
     {
         "id": "give", "kind": "ask", "title": "give_title", "hint": "give_hint",
-        "fields": [{"id": "give", "options": {"list": "give"}, "max": 1,
+        "fields": [{"id": "give", "options": {"list": "give", "where": ABOUT_WHERE}, "max": 1,
                     "own": {"hint": "own_line", "countsAsPick": True, "max": 60}}],
         "next": [{"to": "ask"}],
     },
@@ -241,27 +245,29 @@ STEPS = [
         "hint": "ask_hint",
         "fields": [{"id": "ask", "options": {"list": "ask", "where": ASK_WHERE}, "max": 1, "required": True,
                     "own": {"hint": "own_line", "countsAsPick": True, "max": 100},
-                    "links": [{"exit": "let_go", "label": "let_go", "when": REFUSED}]}],
+                    "links": [{"exit": "let_go", "label": "let_go",
+                               "when": {"all": [REFUSED, {"in": [a("about"), ["address", "pattern"]]}]}}]}],
         "next": [{"to": "why"}],
     },
     {
         "id": "why", "kind": "ask", "title": "why_title",
         "fields": [{"id": "why", "options": {"list": "why"}, "max": 1,
                     "own": {"hint": "own_line", "countsAsPick": True, "max": 60}}],
-        "next": [{"to": "message"}],
+        # Hot or stirred: the cooling screen comes before the card (and its Copy), never after it.
+        "next": [{"when": HOT, "to": "cool"}, {"to": "message"}],
     },
     {
         "id": "message", "kind": "embed", "embed": "messageComposer", "title": "message_title", "answerAs": "sent_how",
         "props": COMPOSER,
-        "next": [{"when": HOT, "to": "cool"}, {"to": "predict"}],
+        "next": [{"to": "predict"}],
     },
     # --- Cool (Wound PRD §4.3): never a lock; the message stays copyable on every path ---
     {
         "id": "cool", "kind": "ask", "title": "cool_title", "hint": "cool_hint",
-        "fields": [{"id": "cool", "options": {"list": "cool"}, "max": 1, "required": True,
-                    "links": [{"exit": "cool_down", "label": "cool_down", "when": {"all": []}}]}],
+        # Settle my body first keeps the message (saved, with a reminder), so settling never costs the draft.
+        "fields": [{"id": "cool", "options": {"list": "cool"}, "max": 1, "required": True}],
         "next": [{"when": is_("cool", "aloud"), "to": "aloud"}, {"when": is_("cool", "hold"), "to": "wait"},
-                 {"when": is_("cool", "later"), "to": "later"}, {"to": "predict"}],
+                 {"when": {"in": [a("cool"), ["later", "settle"]]}, "to": "later"}, {"to": "message"}],
     },
     {
         "id": "aloud", "kind": "embed", "embed": "messageComposer", "title": "aloud_title", "hint": "aloud_hint",
@@ -281,17 +287,22 @@ STEPS = [
     },
     {
         "id": "later", "kind": "handoff", "complete": True,
-        "lines": [{"when": None, "key": "later_line"}],
+        "lines": [{"when": is_("cool", "settle"), "key": "settle_line"}, {"when": None, "key": "later_line"}],
         "fields": [{"id": "later_when", "label": "later_label", "max": 1, "options": {"list": "later"}}],
         "followUp": {"type": "ask_delayed", "whenFrom": "later_when"},
-        "offers": [], "done": "done",
+        "offers": [{"exit": "cool_down", "when": is_("cool", "settle")}], "done": "done",
     },
     {
         "id": "predict", "kind": "ask", "title": "predict_title",
         "fields": [
             {"id": "predict", "options": {"list": "predict"}, "max": 1, "required": True},
-            {"id": "sure", "label": "sure_label", "options": {"list": "sure"}, "max": 1},
         ],
+        "next": [{"to": "sure"}],
+    },
+    # One question a screen (Gate 2): how sure, on its own, and optional.
+    {
+        "id": "sure", "kind": "ask", "title": "sure_label",
+        "fields": [{"id": "sure", "options": {"list": "sure"}, "max": 1}],
         "next": [{"to": "sent"}],
     },
     {
@@ -328,7 +339,7 @@ def options():
     out += [("about", v, l, {}, None) for v, l in ABOUT]
     out += [("fact", v, l, {"about": ab}, None) for v, l, ab in FACTS]
     out += [("felt", v, l, {}, None) for v, l in FELT]
-    out += [("give", v, l, {}, None) for v, l in GIVE]
+    out += [("give", v, l, {"about": ab}, None) for v, l, ab in GIVE]
     out += [("ask", v, l, {"about": ab, "validation": val}, None) for v, l, ab, val in ASKS]
     out += [("why", v, l, {}, None) for v, l in WHY]
     out += [("cool", v, l, {}, None) for v, l in COOL]

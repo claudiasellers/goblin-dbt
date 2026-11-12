@@ -52,6 +52,20 @@ test('fields: option ids only; own words become own and are never copied', () =>
   assert.equal(O.oneFields(run([ans('about', 'boundary')])).situationType, null, 'only the situations the debrief counts');
 });
 
+test('refusals count by the ask, not by what it was about (Gate 1): heard → address/pattern, practical → ask', () => {
+  const st = (...xs) => O.oneFields(run(xs)).situationType;
+  assert.equal(st(ans('about', 'address'), ans('ask', 'a_follow_through')), 'ask', 'a practical ask about something that happened');
+  assert.equal(st(ans('about', 'ask'), ans('ask', 'a_support')), 'address', 'an ask to be heard about something I need');
+  assert.equal(st(ans('about', 'pattern'), ans('ask', 'a_hear_me')), 'pattern');
+  assert.equal(st(ans('about', 'pattern'), { fieldId: 'ask', optionIds: [], valueOwn: 'x' }), 'pattern', 'own words: what it was about');
+  assert.equal(O.oneFields(run([ans('about', 'address'), ans('ask', 'a_help')])).aboutId, 'address');
+  assert.deepEqual([...D.VALIDATION_SITUATIONS].sort(), ['address', 'pattern']);
+  // The skill's asks to be heard are exactly these.
+  const fx = require(path.resolve(__dirname, '../../../tests/fixtures/skills-content.json'));
+  const asks = fx.skills.find((k) => k.id === 'dear_man_one').options.ask;
+  assert.deepEqual(asks.filter((o) => o.validation).map((o) => o.value).sort(), [...O.VALIDATION_ASKS].sort());
+});
+
 test('a message that reached the prediction: one prep, WITH the person, keyed by the visit', async () => {
   const tx = fakeTx();
   await S.PROJECTIONS['dear-man'](tx, input(run(SENT, { personId: PERSON })));

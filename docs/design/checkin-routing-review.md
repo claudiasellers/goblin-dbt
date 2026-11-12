@@ -186,5 +186,5 @@ that tool fill the swap past both checks.
 - What changes in the one-word table above (October's snapshot, left as it was): *Anxious* and *Nervous* show Cope
   Ahead, Check the Facts (Cope Ahead had already replaced Do the Opposite when it went live); *Pressured* shows Problem
   Solve, Say no, so Cool Down leaves that result and stays one tap away through *That feels like too much*.
-- FAST got there another way (#90: its own skill kind, `values`). DEAR MAN on *let down* / *left out* beside Recover
-  follows with One message.
+- FAST got there another way (#90: its own skill kind, `values`). DEAR MAN on *let down* / *left out* sits beside
+  Recover the same way (One message, `beside: ["recovering-from-invalidation"]`).

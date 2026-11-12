@@ -81,22 +81,32 @@ test("skill: a refused ask to be heard offers Let go beside the asks, never inst
 test("skill: a word Recover carried comes first on *How did it feel?*, never picked for them", () => {
   const s = play([pick("source", "hot"), next, pick("about", "address"), next, pick("fact", "f_said_hurtful"), next]);
   assert.equal(s.stepId, "felt");
-  const c = ctx({ emotionId: "rejected" });
-  assert.equal(values(c, "felt", "felt", s)[0], "rejected");
+  const c = ctx({ emotionId: "dismissed" });
+  assert.equal(values(c, "felt", "felt", s)[0], "dismissed");
+  assert.equal(skill.options.felt.find((o) => o.value === "dismissed").label, "I felt unheard", "a feeling, not what they meant (Gate 3)");
+  assert.ok(!skill.options.felt.some((o) => /pushed away|brushed off|disrespected/.test(o.label)));
   assert.deepEqual(s.answers.felt, undefined);
   assert.equal(values(ctx({ emotionId: "not_a_word" }), "felt", "felt", s)[0], "hurt");
 });
 
-test("skill: calm goes straight to the prediction; hot, not sure or a stirred body gets the cooling screen, never a lock", () => {
+test("skill: calm goes to the card then the prediction; hot, not sure or a stirred body gets the cooling screen BEFORE the card, never a lock", () => {
+  assert.equal(toMessage("calm").stepId, "message");
   assert.deepEqual(play([next], ctx(), toMessage("calm")).stepId, "predict");
-  assert.deepEqual(play([next], ctx(), toMessage("hot")).stepId, "cool");
-  assert.deepEqual(play([next], ctx(), toMessage("unsure")).stepId, "cool");
+  assert.equal(toMessage("hot").stepId, "cool", "the pause comes before Copy (Gate 3)");
+  assert.equal(toMessage("unsure").stepId, "cool");
   const stirred = ctx({ band: "stirred" });
-  assert.deepEqual(play([next], stirred, toMessage("calm", stirred)).stepId, "cool");
-  const cool = play([next], ctx(), toMessage("hot"));
-  assert.deepEqual(skill.options.cool.map((o) => o.value), ["aloud", "hold", "later", "send"]);
-  assert.deepEqual(M.fieldLinks(ctx(), step("cool").fields[0], cool).map((l) => l.exit.toolId), ["cool-down"]);
-  assert.equal(play([pick("cool", "send"), next], ctx(), cool).stepId, "predict");
+  assert.equal(toMessage("calm", stirred).stepId, "cool");
+  const cool = toMessage("hot");
+  assert.ok(!cool.path.includes("message"), "no Copy before the cooling screen");
+  assert.deepEqual(skill.options.cool.map((o) => o.value), ["aloud", "hold", "later", "settle", "send"]);
+  const send = play([pick("cool", "send"), next], ctx(), cool);
+  assert.equal(send.stepId, "message", "sending is never locked: the card, then the prediction");
+  assert.equal(play([next], ctx(), send).stepId, "predict");
+  // Settle my body first keeps the message: saved with a reminder, and the body exit offered there.
+  const settle = play([pick("cool", "settle"), next], ctx(), cool);
+  assert.equal(settle.stepId, "later");
+  assert.deepEqual(step("later").offers, [{ exit: "cool_down", when: { eq: ["$a.cool", "settle"] } }]);
+  assert.equal(M.copyText(ctx(), step("later").lines[0].key, settle), skill.copy.settle_line);
   const aloud = play([pick("cool", "aloud"), next], ctx(), cool);
   assert.equal(aloud.stepId, "aloud");
   assert.equal(step("aloud").embed, "messageComposer", "the message stays copyable");
@@ -116,6 +126,7 @@ test("skill: *Save it and remind me* books ask_delayed; its card reopens at *Sti
   assert.deepEqual(later.followUp, { type: "ask_delayed", whenFrom: "later_when" });
   assert.deepEqual(skill.options.later.map((o) => o.value), ["hour", "today", "tomorrow"]);
   assert.match(skill.copy.later_line, /won't say who it's for or what it says/);
+  assert.match(skill.copy.later_line, /^Pick a time/, "never says a reminder is booked before a time is picked (Gate 1)");
   assert.deepEqual(step("back").reopens, { after: "later" });
   assert.deepEqual(step("back").next.map((n) => n.to), ["later", "dropped", "resend"]);
   const path = [...toMessage("hot").path, "cool", "later"];
@@ -134,8 +145,10 @@ test("skill: the prediction, then *Want me to ask how it went?* books ask_outcom
   assert.deepEqual(skill.options.sure.map((o) => o.value), ["sure", "think_so", "not_sure"]);
   assert.deepEqual(step("sent").followUp, { type: "ask_outcome", whenFrom: "again" });
   assert.deepEqual(skill.options.again.map((o) => o.value), ["today", "tomorrow", "this_week"]);
-  const s = play([next, pick("predict", "badly"), next], ctx(), toMessage("calm"));
-  assert.equal(s.stepId, "sent");
+  const p = play([next, pick("predict", "badly"), next], ctx(), toMessage("calm"));
+  assert.equal(p.stepId, "sure", "one question a screen (Gate 2)");
+  const s = play([next], ctx(), p);
+  assert.equal(s.stepId, "sent", "how sure is optional");
   assert.equal(M.copyText(ctx(), step("sent").lines[0].key, s), skill.copy.sent_line_badly);
 });
 
@@ -143,6 +156,9 @@ test("message card: the parts in the order they're said; *Take the sorry out* wo
   const msg = MC.composeMessage([["You said you'd do something, and it didn't happen"], ["I felt let down"], ["I'm not asking you to agree with me"], ["Could you let me know if plans change?"], undefined]);
   assert.equal(msg, "You said you'd do something, and it didn't happen. I felt let down. I'm not asking you to agree with me. Could you let me know if plans change?");
   assert.equal(MC.dropSorry("I'm sorry, I felt let down. Could you call?"), "I felt let down. Could you call?");
+  assert.equal(MC.dropSorry("Sorry to bring this up, but you cancelled again."), "You cancelled again.", "own words' usual apology (Gate 2)");
+  assert.equal(MC.dropSorry("Sorry to ask, could you call?"), "Could you call?");
+  assert.match(read("src/components/skillPlayer/MessageComposer.tsx"), /sorry > 0 && canDrop && text\('sorryLine'\)/, "the sorry line only with its button");
   const card = read("src/components/skillPlayer/MessageComposer.tsx");
   assert.match(card, /order \? order\.map\(\(f\) => picked\?\.\[f\]\) : \[of\('opener'\), of\('field'\), of\('reason'\), of\('alt'\)\]/);
   assert.match(read("src/components/skillPlayer/embeds.ts"), /parts: \{ type: 'fields', optional: true \}/);
@@ -169,8 +185,31 @@ test("Recover: *Ask them* after the chase pull opens One message with the word a
   assert.deepEqual(ONE.oneMessageState({ ...h, band: undefined }), { emotionId: "rejected" });
   assert.equal(ONE.ONE_MESSAGE_PATH, "/tool/dear-man?mode=one");
   const rec = read("src/pages/tools/InvalidationRecovery.tsx");
-  assert.match(rec, /if \(handoff\?\.oneMessageOnly\) \{\s*\/\/[^\n]*\n\s*navigate\(ONE_MESSAGE_PATH, \{ state: oneMessageState\(withBand\(/);
+  assert.match(rec, /if \(handoff\?\.oneMessageOnly\) \{\s*\/\/[^\n]*\n\s*navigate\(ONE_MESSAGE_PATH, \{ state: \{ skillCtx: oneMessageState\(withBand\(/,
+    "the player reads its context from state.skillCtx (Gate 1)");
   assert.ok(rec.indexOf("handoff?.oneMessageOnly") < rec.indexOf("navigate('/tool/dear-man', { state: { dearManHandoff"), "the chase check comes first");
+});
+
+test("reopened: the person and frame the first visit recorded carry into the reopened visit (Gate 1)", () => {
+  const P = "7a2c9a0e-1b2c-4d5e-8f90-123456789abc";
+  assert.deepEqual(PF.recordedPersonCtx({ ctx: { personId: P, frame: "heads_up", band: "flooded" } }), { personId: P, frame: "heads_up" });
+  assert.deepEqual(PF.recordedPersonCtx({ ctx: { personId: "none" } }), { personId: "none" });
+  assert.deepEqual(PF.recordedPersonCtx({ ctx: { personId: "Sam" } }), {});
+  assert.deepEqual(PF.recordedPersonCtx(null), {});
+  assert.match(read("src/components/people/PersonFirstSkill.tsx"), /reopen\.kind === 'skill'\) return <SkillPlayer skillId=\{skillId\} ctx=\{recordedPersonCtx\(checked\)\} resumeRecord=\{checked\} \/>/);
+});
+
+test("Gate 3 wording: camera facts, Truthful warm line, a hedged hint, Let go only for being heard", () => {
+  const label = (f, v) => skill.options[f].find((o) => o.value === v).label;
+  assert.equal(label("fact", "f_how_we_do"), "We've been doing this the same way for a while");
+  assert.equal(label("give", "g_not_mean"), "I'm not assuming you meant it that way");
+  assert.deepEqual(skill.options.give.find((o) => o.value === "g_not_mean").about, ["address"]);
+  assert.match(skill.copy.sorry_line, /Keep it only if it's for something you did/);
+  assert.equal(skill.copy.ask_hint, "One small ask is often easier to say yes to.");
+  const need = play([pick("source", "calm"), next, pick("about", "ask"), next, pick("fact", "f_need_help"), next, pick("felt", "hurt"), next, next]);
+  assert.equal(need.stepId, "ask");
+  assert.deepEqual(M.fieldLinks(ctx({ refused: "validation" }), step("ask").fields[0], need), [], "no Let go for something I need");
+  assert.ok(!values(ctx(), "give", "give", need).includes("g_not_mean"));
 });
 
 test("wiring: the cards, the projection, the Tools intent and the player's skills", async () => {

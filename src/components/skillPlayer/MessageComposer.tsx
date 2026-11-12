@@ -64,12 +64,13 @@ export function MessageComposer({ props, picked, onShown, onDone }: EmbedProps) 
       <PaperCard label={message}>
         <p ref={lineRef} className={paperLine}>{message}</p>
       </PaperCard>
-      {(sorry > 0 || longReason) && (
+      {/* The sorry line only with something to do about it (Gate 2): the button that takes it out. */}
+      {((sorry > 0 && canDrop) || longReason) && (
         <div className="rounded-xl border border-[var(--color-border)] px-4 py-3 space-y-2" data-testid="fast-strip">
-          {sorry > 0 && text('sorryLine') && (
+          {sorry > 0 && canDrop && text('sorryLine') && (
             <>
               <p className="text-sm text-[var(--color-text-secondary)]">{text('sorryLine')}</p>
-              {text('dropSorry') && canDrop && (
+              {text('dropSorry') && (
                 <button type="button" className={secondaryButton}
                   onClick={() => { done.current.add('dropped_sorry'); setDropped(true); setCopied(false); setStatus(''); }}>
                   {text('dropSorry')}

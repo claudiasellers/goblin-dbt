@@ -302,6 +302,21 @@ test("DT-11's row (signed off 10 Nov): Pause leads and Rebel without the wreckag
   assert.deepEqual(ids(await run(hu({ emotions: ["Provoked"] }), off)), ["pause", "cool-down"]);
 });
 
+test("DEAR MAN's word row (12 Nov, connected by default): let down or left out → Recover, then DEAR MAN; never flooded, never a wound word", async () => {
+  for (const w of ["let_down", "excluded"]) {
+    for (const band of ["steady", "stirred"]) {
+      const sel = await cell("social_threat_shame", band, { words: [w] });
+      assert.equal(pickIds(sel)[0], "recovering-from-invalidation", `${w}/${band}: Recover leads on a hurt word (R7)`);
+      assert.deepEqual(pickIds(sel), ["recovering-from-invalidation", "dear-man"], `${w}/${band}`);
+    }
+    assert.ok(!pickIds(await cell("social_threat_shame", "flooded", { words: [w] })).includes("dear-man"), w);
+  }
+  for (const w of ["rejected", "humiliated", "violated"]) {
+    const sel = await cell("social_threat_shame", "stirred", { words: [w] });
+    assert.equal(sel.filtered.find((f) => f.toolId === "dear-man")?.reason, "emotion_gate", w);
+  }
+});
+
 test("a row reviewed to sit beside the lead fills the second card past the swap rule (12 Nov): Say no beside Problem Solve, Check the Facts beside Cope Ahead", async () => {
   assert.deepEqual(pickIds(await cell("acute_alarm", "stirred", { words: ["pressured"] })), ["problem-solve", "say-no"]);
   assert.deepEqual(pickIds(await cell("chronic_vigilance", "stirred", { words: ["anxious"] })), ["cope-ahead", "check-the-facts"]);

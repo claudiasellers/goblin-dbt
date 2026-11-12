@@ -38,8 +38,24 @@ export const ONE_PREP_WRITE = `
     MERGE (s)-[:WITH_PERSON]->(x))
 `;
 
-/** DEAR MAN's situation types the message can be about (the debrief counts refusals by them). */
+/** DEAR MAN's situation types the message can be about. */
 const SITUATIONS = new Set(['ask', 'address', 'pattern']);
+
+/**
+ * The asks to be heard (`validation` on the skill's ask options, scripts/skills/dear_man_one.py; test-pinned). The
+ * debrief counts a refusal by the prep's `situationType`, so it is set from the ask itself (Gate 1): an ask to be heard
+ * counts as one (`address`, or `pattern` when it was about something that keeps happening), a practical ask as `ask`,
+ * whatever the message was about. Own words fall back to what it was about.
+ */
+export const VALIDATION_ASKS: readonly string[] = ['a_hear_me', 'a_acknowledge', 'a_support'];
+
+function refusalSituation(about: string | null, ask: string | null): string | null {
+  if (ask && ask !== 'own') {
+    if (VALIDATION_ASKS.includes(ask)) return about === 'pattern' ? 'pattern' : 'address';
+    return 'ask';
+  }
+  return about && SITUATIONS.has(about) ? about : null;
+}
 
 /** The prep's fields from a One message run: option ids only (own words become `own`, and are never copied). */
 export function oneFields(run: Record<string, unknown>) {
@@ -51,7 +67,8 @@ export function oneFields(run: Record<string, unknown>) {
   };
   const about = one('about');
   return {
-    situationType: about && SITUATIONS.has(about) ? about : null,
+    situationType: refusalSituation(about, one('ask')),
+    aboutId: about && SITUATIONS.has(about) ? about : null,
     factId: one('fact'),
     feelingId: one('felt'),
     giveId: one('give'),
