@@ -7,7 +7,7 @@ import { callable } from '../shared/callable';
 import { readTx } from '../shared/neo4j';
 import { int } from '../shared/values';
 import { metaFrom } from './meta';
-import { readProfileSlices, readProfileVersion, THING_LABELS, THING_OPTION, VALUE_OPTION } from './slices';
+import { readProfileSlices, readProfileVersion, RUNG_OPTION, THING_LABELS, THING_OPTION, VALUE_OPTION } from './slices';
 import type { ProfileAreaId, ProfileItemMeta } from './types';
 import { statsByPart } from '../parts/stats';
 import { readStatsRows } from '../parts/statsQueries';
@@ -180,7 +180,7 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
   const byArea = new Map<string, MeItem[]>();
   let staleCount = 0;
   let decrypt: ((v: unknown) => string | null) | null = null;
-  // Items named from the graph after the loop: a thing I like (the first label that resolves), values (every kept
+  // Items named from the graph after the loop: a thing I like or an I can step (the first label that resolves), values (every kept
   // one, then their own words, joined).
   const unnamedThings: Array<{ ids: string[]; item: MeItem; all?: boolean; own?: string }> = [];
   for (const r of itemsRes.records) {
@@ -219,6 +219,14 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
         const ids = (['pick', 'kind'] as const).flatMap((f) => (Array.isArray(value![`${f}Ids`]) ? (value![`${f}Ids`] as unknown[]) : [])
           .filter((x): x is string => typeof x === 'string').slice(0, 1).map((id) => THING_OPTION[f] + id));
         if (ids.length) thingIds = ids;
+      }
+    }
+    // An I can step (ER-11): what they called it; a ladder step is named from the graph after the loop.
+    if (meta.kind === 'i_can' && value) {
+      if (typeof value.rungOwn === 'string' && value.rungOwn.trim()) summary = value.rungOwn;
+      else {
+        const ids = (Array.isArray(value.rungIds) ? (value.rungIds as unknown[]) : []).filter((x): x is string => typeof x === 'string').slice(0, 1);
+        if (ids.length) thingIds = ids.map((id) => RUNG_OPTION + id);
       }
     }
     // Values (ER-09): the ones kept for now, named from the graph after the loop, their own words last. None kept

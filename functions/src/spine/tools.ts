@@ -53,6 +53,7 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   // What matters to me (ER-09, docs/design/values.md): no close question; the outcome is the `value_step` card's
   // *Did it happen?*, after the step (a then-vs-now would ask about a sort, which isn't a state change).
   'values-clarification': { module: 'er', closeKind: 'none' },
+  'build-mastery': { module: 'er', closeKind: 'none' },
   // These ask their own questions inside their flows; the spine adds none (PR-S4 wraps them).
   'opposite-action': { module: 'er', closeKind: 'regulation_down' },
   'dear-man': { module: 'ie', closeKind: 'none' },

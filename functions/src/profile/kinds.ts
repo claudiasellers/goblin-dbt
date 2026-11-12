@@ -171,6 +171,23 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
       return out;
     },
   },
+  // Build mastery (ER-11, docs/design/build-mastery.md): one step the person did (done or partly), kept on the done
+  // card's *Yes, add it* to their I can list. The runtime's keep (R4: `rungIds`, the ladder's option id, or `rungOwn`).
+  // No slice: Me names it (own words, else the option's label from the graph).
+  i_can: {
+    kind: 'i_can', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'about_me', slice: null,
+    owner: 'ER', many: true, maxItems: 100, editor: null, ownFields: ['rungOwn'],
+    validate: (v) => {
+      const o = obj(v);
+      const out: Record<string, unknown> = {};
+      if (o.rungIds !== undefined) out.rungIds = strArray(o.rungIds, { max: 1, item: (x) => str(x, { max: 40, pattern: OPTION_ID }) });
+      if (o.rungOwn !== undefined) out.rungOwn = str(o.rungOwn, { max: 60 });
+      for (const k of Object.keys(o)) if (k !== 'rungIds' && k !== 'rungOwn') throw new ValidationError('Unexpected field');
+      const has = ((out.rungIds as string[] | undefined)?.length ?? 0) > 0 || (typeof out.rungOwn === 'string' && out.rungOwn.trim() !== '');
+      if (!has) throw new ValidationError('Nothing to keep');
+      return out;
+    },
+  },
   crisis_kit: {
     // DT-03 My crisis kit (docs/design/crisis-kit.md): one per person (keeping it again replaces it), option ids and own
     // words per section; the kit plays it one card at a time through the `crisisKit` slice.

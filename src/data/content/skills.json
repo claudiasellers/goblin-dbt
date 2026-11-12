@@ -1447,6 +1447,910 @@
         }
       },
       {
+        "id": "build_mastery",
+        "toolId": "build-mastery",
+        "version": "bm-v1",
+        "start": "start",
+        "accepts": [
+          "band"
+        ],
+        "ownMax": 60,
+        "emotionFields": [],
+        "copy": {
+          "start_title": "Get one thing done.",
+          "start_hint": "Something small enough to finish. Done beats done well.",
+          "area_label": "Which part of life?",
+          "area_own": "Something else",
+          "heads_up_title": "Your body's loud right now.",
+          "heads_up_hint": "This works better once it settles a little.",
+          "settle_line": "This will keep. Look after the next few minutes first.",
+          "rung_title": "Pick one that's a stretch you can manage today.",
+          "rung_hint": "They go from easier to harder. Smaller is still mastery.",
+          "rung_own": "My own step",
+          "when_title": "When could you do it?",
+          "remind_label": "Want me to ask how it went?",
+          "set_title": "Your step: {rung}.",
+          "set_line": "Done beats done well. Doing part of it counts.",
+          "set_remind": "I'll ask how it went. Doing part of it counts.",
+          "back_title": "Earlier you picked: {rung}.",
+          "happened_label": "How did it go?",
+          "done_title": "You did it.",
+          "partly_title": "Part of it counts.",
+          "done_hint": "That's evidence you can do hard things.",
+          "ican_label": "Add it to your I can list?",
+          "then_label": "What next?",
+          "not_title": "Not yet is a real answer.",
+          "not_hint": "Smaller is still mastery.",
+          "keep_primary": "Next",
+          "end_kept": "It's on your I can list in Me.",
+          "end_line": "It'll keep. Come back to it any time.",
+          "safety_open": "Talk to someone now",
+          "next": "Next",
+          "done": "Done"
+        },
+        "tables": {},
+        "derive": [],
+        "steps": [
+          {
+            "id": "start",
+            "kind": "ask",
+            "title": "start_title",
+            "fields": [
+              {
+                "id": "area",
+                "options": {
+                  "list": "area"
+                },
+                "max": 1,
+                "required": true,
+                "label": "area_label",
+                "own": {
+                  "hint": "area_own",
+                  "countsAsPick": true,
+                  "max": 60
+                },
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "hint": "start_hint",
+            "next": [
+              {
+                "to": "heads_up",
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "flooded"
+                  ]
+                }
+              },
+              {
+                "to": "rung",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "heads_up",
+            "kind": "ask",
+            "title": "heads_up_title",
+            "fields": [
+              {
+                "id": "heads_up",
+                "options": {
+                  "list": "heads_up"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "hint": "heads_up_hint",
+            "next": [
+              {
+                "to": "settle",
+                "when": {
+                  "eq": [
+                    "$a.heads_up",
+                    "settle"
+                  ]
+                }
+              },
+              {
+                "to": "rung",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "settle",
+            "kind": "handoff",
+            "complete": true,
+            "title": "heads_up_title",
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "settle_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
+            "next": [],
+            "offers": [
+              {
+                "exit": "cool_down",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
+          },
+          {
+            "id": "rung",
+            "kind": "ask",
+            "title": "rung_title",
+            "fields": [
+              {
+                "id": "rung",
+                "options": {
+                  "list": "rung",
+                  "where": {
+                    "any": [
+                      {
+                        "eq": [
+                          "$opt.area",
+                          "$a.area"
+                        ]
+                      },
+                      {
+                        "all": [
+                          {
+                            "eq": [
+                              "$opt.area",
+                              "own"
+                            ]
+                          },
+                          {
+                            "not": {
+                              "set": "$a.area.ids"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "max": 1,
+                "required": true,
+                "own": {
+                  "hint": "rung_own",
+                  "countsAsPick": true,
+                  "max": 60
+                },
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "clears": [
+              "rung",
+              "when",
+              "remind"
+            ],
+            "hint": "rung_hint",
+            "next": [
+              {
+                "to": "when",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "when",
+            "kind": "ask",
+            "title": "when_title",
+            "fields": [
+              {
+                "id": "when",
+                "options": {
+                  "list": "when"
+                },
+                "max": 1,
+                "required": true
+              },
+              {
+                "id": "remind",
+                "options": {
+                  "list": "remind"
+                },
+                "max": 1,
+                "required": false,
+                "label": "remind_label",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "clears": [
+              "when",
+              "remind"
+            ],
+            "followUp": {
+              "type": "mastery_step",
+              "whenFrom": "when",
+              "when": {
+                "eq": [
+                  "$a.remind",
+                  "yes"
+                ]
+              }
+            },
+            "next": [
+              {
+                "to": "set",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "set",
+            "kind": "handoff",
+            "complete": true,
+            "title": "set_title",
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.remind",
+                    "yes"
+                  ]
+                },
+                "key": "set_remind"
+              },
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "set_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "titleSlots": {
+              "rung": {
+                "labelOf": "rung"
+              }
+            },
+            "next": [],
+            "offers": []
+          },
+          {
+            "id": "back",
+            "kind": "ask",
+            "title": "back_title",
+            "fields": [
+              {
+                "id": "happened",
+                "options": {
+                  "list": "happened"
+                },
+                "max": 1,
+                "required": true,
+                "label": "happened_label",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "reopens": {
+              "after": "when"
+            },
+            "clears": [
+              "happened",
+              "ican",
+              "then",
+              "again"
+            ],
+            "titleSlots": {
+              "rung": {
+                "labelOf": "rung"
+              }
+            },
+            "next": [
+              {
+                "to": "back_done",
+                "when": {
+                  "any": [
+                    {
+                      "eq": [
+                        "$a.happened",
+                        "done"
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$a.happened",
+                        "partly"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "back_not",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "back_done",
+            "kind": "ask",
+            "title": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.happened",
+                    "partly"
+                  ]
+                },
+                "key": "partly_title"
+              },
+              {
+                "key": "done_title"
+              }
+            ],
+            "fields": [
+              {
+                "id": "ican",
+                "options": {
+                  "list": "ican"
+                },
+                "max": 1,
+                "required": true,
+                "label": "ican_label"
+              },
+              {
+                "id": "then",
+                "options": {
+                  "list": "then",
+                  "where": {
+                    "not": {
+                      "all": [
+                        {
+                          "eq": [
+                            "$opt.up",
+                            true
+                          ]
+                        },
+                        {
+                          "some": [
+                            "rung",
+                            {
+                              "eq": [
+                                "$opt.rung",
+                                3
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                },
+                "max": 1,
+                "required": true,
+                "label": "then_label",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "keep": {
+              "kind": "i_can",
+              "many": true,
+              "when": {
+                "eq": [
+                  "$a.ican",
+                  "yes"
+                ]
+              },
+              "from": [
+                "rung"
+              ]
+            },
+            "primary": "keep_primary",
+            "hint": "done_hint",
+            "next": [
+              {
+                "to": "rung",
+                "when": {
+                  "eq": [
+                    "$a.then",
+                    "up"
+                  ]
+                }
+              },
+              {
+                "to": "when",
+                "when": {
+                  "eq": [
+                    "$a.then",
+                    "same"
+                  ]
+                }
+              },
+              {
+                "to": "back_end",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "back_not",
+            "kind": "ask",
+            "title": "not_title",
+            "fields": [
+              {
+                "id": "again",
+                "options": {
+                  "list": "again",
+                  "where": {
+                    "not": {
+                      "all": [
+                        {
+                          "eq": [
+                            "$opt.down",
+                            true
+                          ]
+                        },
+                        {
+                          "some": [
+                            "rung",
+                            {
+                              "eq": [
+                                "$opt.rung",
+                                1
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "hint": "not_hint",
+            "next": [
+              {
+                "to": "rung",
+                "when": {
+                  "eq": [
+                    "$a.again",
+                    "smaller"
+                  ]
+                }
+              },
+              {
+                "to": "when",
+                "when": {
+                  "eq": [
+                    "$a.again",
+                    "same"
+                  ]
+                }
+              },
+              {
+                "to": "back_end",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "back_end",
+            "kind": "handoff",
+            "complete": true,
+            "title": null,
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.ican",
+                    "yes"
+                  ]
+                },
+                "key": "end_kept"
+              },
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "end_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
+            "next": [],
+            "offers": []
+          }
+        ],
+        "exits": [
+          {
+            "id": "cool_down",
+            "toolId": "cool-down",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "done",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": true
+          },
+          {
+            "id": "safety_open",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": false,
+            "safety": true
+          }
+        ],
+        "options": {
+          "area": [
+            {
+              "value": "body",
+              "label": "My body"
+            },
+            {
+              "value": "home",
+              "label": "Home"
+            },
+            {
+              "value": "making",
+              "label": "Making something"
+            },
+            {
+              "value": "learning",
+              "label": "Learning"
+            },
+            {
+              "value": "work",
+              "label": "Work or study"
+            },
+            {
+              "value": "caring",
+              "label": "Caring for someone"
+            },
+            {
+              "value": "admin",
+              "label": "Admin and paperwork"
+            }
+          ],
+          "heads_up": [
+            {
+              "value": "settle",
+              "label": "Look after the next few minutes first"
+            },
+            {
+              "value": "try",
+              "label": "Try it anyway"
+            }
+          ],
+          "rung": [
+            {
+              "value": "body_1",
+              "label": "Stretch for two minutes",
+              "area": "body",
+              "rung": 1
+            },
+            {
+              "value": "body_2",
+              "label": "Walk around the block",
+              "area": "body",
+              "rung": 2
+            },
+            {
+              "value": "body_3",
+              "label": "Do twenty minutes of something active",
+              "area": "body",
+              "rung": 3
+            },
+            {
+              "value": "home_1",
+              "label": "Clear one surface",
+              "area": "home",
+              "rung": 1
+            },
+            {
+              "value": "home_2",
+              "label": "Do one load of washing",
+              "area": "home",
+              "rung": 2
+            },
+            {
+              "value": "home_3",
+              "label": "Tidy one whole room",
+              "area": "home",
+              "rung": 3
+            },
+            {
+              "value": "making_1",
+              "label": "Sketch, write or play for five minutes",
+              "area": "making",
+              "rung": 1
+            },
+            {
+              "value": "making_2",
+              "label": "Finish one small thing I've started",
+              "area": "making",
+              "rung": 2
+            },
+            {
+              "value": "making_3",
+              "label": "Make something new from start to end",
+              "area": "making",
+              "rung": 3
+            },
+            {
+              "value": "learning_1",
+              "label": "Read one page about something new",
+              "area": "learning",
+              "rung": 1
+            },
+            {
+              "value": "learning_2",
+              "label": "Watch one short lesson",
+              "area": "learning",
+              "rung": 2
+            },
+            {
+              "value": "learning_3",
+              "label": "Practise a new skill for twenty minutes",
+              "area": "learning",
+              "rung": 3
+            },
+            {
+              "value": "work_1",
+              "label": "Open the file I need",
+              "area": "work",
+              "rung": 1
+            },
+            {
+              "value": "work_2",
+              "label": "Do the first small part of one task",
+              "area": "work",
+              "rung": 2
+            },
+            {
+              "value": "work_3",
+              "label": "Work for twenty-five minutes on one thing",
+              "area": "work",
+              "rung": 3
+            },
+            {
+              "value": "caring_1",
+              "label": "Send one kind message",
+              "area": "caring",
+              "rung": 1
+            },
+            {
+              "value": "caring_2",
+              "label": "Do one small thing for someone I look after",
+              "area": "caring",
+              "rung": 2
+            },
+            {
+              "value": "caring_3",
+              "label": "Plan one thing with or for someone",
+              "area": "caring",
+              "rung": 3
+            },
+            {
+              "value": "admin_1",
+              "label": "Open one letter",
+              "area": "admin",
+              "rung": 1
+            },
+            {
+              "value": "admin_2",
+              "label": "Reply to one email",
+              "area": "admin",
+              "rung": 2
+            },
+            {
+              "value": "admin_3",
+              "label": "Sort one pile",
+              "area": "admin",
+              "rung": 3
+            },
+            {
+              "value": "own_1",
+              "label": "Spend five minutes on it",
+              "area": "own",
+              "rung": 1
+            },
+            {
+              "value": "own_2",
+              "label": "Do the first small part of it",
+              "area": "own",
+              "rung": 2
+            },
+            {
+              "value": "own_3",
+              "label": "Spend twenty minutes on it",
+              "area": "own",
+              "rung": 3
+            }
+          ],
+          "when": [
+            {
+              "value": "today",
+              "label": "Later today"
+            },
+            {
+              "value": "tomorrow",
+              "label": "Tomorrow"
+            },
+            {
+              "value": "few_days",
+              "label": "In a few days"
+            }
+          ],
+          "remind": [
+            {
+              "value": "yes",
+              "label": "Yes, ask me"
+            },
+            {
+              "value": "no",
+              "label": "No thanks"
+            }
+          ],
+          "happened": [
+            {
+              "value": "done",
+              "label": "Done"
+            },
+            {
+              "value": "partly",
+              "label": "Partly"
+            },
+            {
+              "value": "not_yet",
+              "label": "Not yet"
+            }
+          ],
+          "ican": [
+            {
+              "value": "yes",
+              "label": "Yes, add it"
+            },
+            {
+              "value": "no",
+              "label": "Not now"
+            }
+          ],
+          "then": [
+            {
+              "value": "up",
+              "label": "Try the next one up",
+              "up": true
+            },
+            {
+              "value": "same",
+              "label": "The same one again"
+            },
+            {
+              "value": "rest",
+              "label": "That's enough for now"
+            }
+          ],
+          "again": [
+            {
+              "value": "smaller",
+              "label": "Pick a smaller one",
+              "down": true
+            },
+            {
+              "value": "same",
+              "label": "Try the same one again"
+            },
+            {
+              "value": "not_now",
+              "label": "Not now"
+            }
+          ]
+        }
+      },
+      {
         "id": "check_the_facts",
         "toolId": "check-the-facts",
         "version": "cf-v1-2",
@@ -40352,9 +41256,10 @@
             "id": "build_mastery",
             "toolId": "build-mastery",
             "query": {},
-            "carry": [],
-            "done": false,
-            "planned": true
+            "carry": [
+              "feel"
+            ],
+            "done": false
           },
           {
             "id": "chain_analysis",

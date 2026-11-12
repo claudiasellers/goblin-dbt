@@ -105,6 +105,8 @@ export const THING_LABELS = `MATCH (o:SkillOption) WHERE o.id IN $ids RETURN o.i
 export const THING_OPTION: Record<'kind' | 'pick', string> = { kind: 'good_things:kind:', pick: 'good_things:activity:' };
 /** The `SkillOption` id prefix a kept value names (scripts/skills/values.py: the `value` cards). */
 export const VALUE_OPTION = 'values:value:';
+/** The `SkillOption` id prefix a kept I can step names (scripts/skills/build_mastery.py: the `rung` ladders). */
+export const RUNG_OPTION = 'build_mastery:rung:';
 
 /**
  * A stored person's value (profile/kinds.ts `person`), its label decrypted; null when it can't be read (a label that

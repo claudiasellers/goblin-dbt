@@ -1,0 +1,167 @@
+// Build mastery (PRD ER-11, DBT ER Handout 19; docs/design/build-mastery.md) on the skill runtime: an area, one step
+// from its three-rung ladder (a stretch you can manage today), when, and the mastery_step card that reopens the run
+// at *How did it go?*: done or partly → the I can list on a yes and the next one up; not yet → a smaller one. The
+// `i_can` kind. Tested through the pure machine.
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { importTs } from "./lib/importTs.mjs";
+
+const M = await importTs("src/lib/skillRuntime/machine.ts");
+const content = JSON.parse(readFileSync("tests/fixtures/skills-content.json", "utf8"));
+const skill = content.skills.find((s) => s.id === "build_mastery");
+const ctx = (ctxIn = {}) => ({ skill, shared: content, carried: [], gridIds: new Set(), emotionLabel: (x) => x, ctxIn, embedOutputs: {}, profile: null });
+const pick = (fieldId, value) => ({ type: "pick", fieldId, value });
+const own = (fieldId, text) => ({ type: "own", fieldId, text });
+const next = { type: "next" };
+const run = (events, c = ctx(), from = M.initialRun(skill)) => events.reduce((s, e) => M.runNext(c, s, e), from);
+const title = (s, c = ctx()) => M.copyText(c, M.stepOf(skill, s.stepId).title, s, M.titleSlots(c, M.stepOf(skill, s.stepId), s));
+const line = (s, c = ctx()) => M.handoffLine(c, M.stepOf(skill, s.stepId), s);
+const values = (s, fieldId, c = ctx()) => {
+  const f = M.stepOf(skill, s.stepId).fields.find((x) => x.id === fieldId);
+  return M.optionGroups(c, f, s.answers).flatMap((g) => g.options.map((o) => o.value));
+};
+const offers = (s, c = ctx()) => M.offersFor(c, M.stepOf(skill, s.stepId), s);
+const booked = (rung, c = ctx()) => run([pick("area", "admin"), next, pick("rung", rung), next, pick("when", "tomorrow"), pick("remind", "yes"), next], c);
+const reopen = (s, c = ctx()) => M.resumeRun(c, M.runRecord(c, s), "back");
+
+test("the skill: tool build-mastery, concept dbt_build_mastery, no close question, listed under Emotion Regulation", () => {
+  assert.equal(skill.toolId, "build-mastery");
+  assert.match(readFileSync("schema/skills.cypher", "utf8"), /MATCH \(t:TherapyConcept \{id: "dbt_build_mastery"\}\), \(s:Skill \{id: "build_mastery"\}\)/);
+  assert.match(readFileSync("functions/src/spine/tools.ts", "utf8"), /'build-mastery': \{ module: 'er', closeKind: 'none' \}/);
+  assert.match(readFileSync("src/lib/spine/close.ts", "utf8"), /'build-mastery': \{ module: 'er', closeKind: 'none' \}/);
+  const tools = readFileSync("src/data/tools.ts", "utf8");
+  assert.match(tools, /id: 'build-mastery',\n\s+name: 'Build Mastery',[\s\S]*?module: 'emotion-regulation'/);
+  assert.match(tools, /label: 'Get one thing done', toolId: 'build-mastery'/, "the PRD's Tools intent");
+  assert.match(readFileSync("src/lib/skillRuntime/playerTools.ts", "utf8"), /'build-mastery': 'build_mastery'/);
+  assert.match(readFileSync("schema/app-tool-ids.cypher", "utf8"), /\{c: "dbt_build_mastery", t: "build-mastery"\}/);
+  // Problem Solve's links to it (confidence answers, companions, two solution directions) are built now.
+  const ps = content.skills.find((s) => s.id === "problem_solve").exits.find((e) => e.toolId === "build-mastery");
+  assert.ok(ps && !ps.planned, "Problem Solve's build-mastery link resolves");
+});
+
+test("an area, then that area's three rungs, easier to harder; own words always", () => {
+  const s = M.initialRun(skill);
+  assert.equal(title(s), "Get one thing done.");
+  assert.deepEqual(values(s, "area"), ["body", "home", "making", "learning", "work", "caring", "admin"]);
+  const r = run([pick("area", "admin"), next]);
+  assert.equal(r.stepId, "rung");
+  assert.deepEqual(values(r, "rung"), ["admin_1", "admin_2", "admin_3"]);
+  assert.deepEqual(skill.options.rung.filter((o) => o.area === "admin").map((o) => o.label), ["Open one letter", "Reply to one email", "Sort one pile"], "the PRD's admin ladder");
+  assert.match(skill.copy.rung_hint, /Smaller is still mastery/);
+  for (const area of values(s, "area")) assert.deepEqual(skill.options.rung.filter((o) => o.area === area).map((o) => o.rung), [1, 2, 3], area);
+  // An area in their own words: three general rungs, or their own step.
+  const typed = run([own("area", "My garden"), next]);
+  assert.deepEqual(values(typed, "rung"), ["own_1", "own_2", "own_3"]);
+  const set = run([own("rung", "Pull the weeds by the door"), next, pick("when", "today"), next], ctx(), typed);
+  assert.equal(title(set), "Your step: Pull the weeds by the door.");
+});
+
+test("when, and the card: done beats done well; ask me books mastery_step", () => {
+  const w = run([pick("area", "admin"), next, pick("rung", "admin_2"), next]);
+  assert.equal(w.stepId, "when");
+  assert.deepEqual(values(w, "when"), ["today", "tomorrow", "few_days"]);
+  const set = booked("admin_2");
+  assert.equal(set.stepId, "set");
+  assert.equal(title(set), "Your step: Reply to one email.");
+  assert.match(line(set), /^I'll ask how it went/);
+  assert.match(skill.copy.set_line, /Done beats done well/, "perfectionism (PRD risks)");
+  const asked = run([pick("when", "few_days"), pick("remind", "yes")], ctx(), w);
+  assert.deepEqual(M.followUpFor(ctx(), M.stepOf(skill, "when"), asked), { type: "mastery_step", chip: "few_days" });
+  assert.equal(M.followUpFor(ctx(), M.stepOf(skill, "when"), run([pick("when", "few_days"), pick("remind", "no")], ctx(), w)), null);
+});
+
+test("mastery_step: registered, content-free, reopens at back", () => {
+  const spine = JSON.parse(readFileSync("src/data/content/spine.json", "utf8"));
+  const t = spine.content.followUpTypes.find((x) => x.id === "mastery_step");
+  assert.equal(t.deepLinkTemplate, "/tool/build-mastery?run={sourceSessionId}&at=back&followUp={followUpId}");
+  assert.deepEqual(Object.keys(t.window.chips).sort(), skill.options.when.map((o) => o.value).sort(), "each when is a chip");
+  assert.doesNotMatch(JSON.stringify(t.copy), /letter|email|admin|rung/i, "never names the step");
+  assert.match(readFileSync("functions/src/spine/toolSession.ts", "utf8"), /OPEN_RESOLVES = \[[^\]]*'mastery_step'/);
+  assert.match(readFileSync("functions/src/spine/copeAheadAfter.ts", "utf8"), /mastery_step: 'build-mastery'/);
+  assert.match(readFileSync("schema/practice-spine.cypher", "utf8"), /MERGE \(t:FollowUpType \{id: "mastery_step"\}\)/);
+  assert.deepEqual(M.stepOf(skill, "back").reopens, { after: "when" });
+  const r = reopen(booked("admin_2"));
+  assert.equal(title(r), "Earlier you picked: Reply to one email.");
+  assert.deepEqual(values(r, "happened"), ["done", "partly", "not_yet"]);
+});
+
+test("done or partly: the I can list on a yes, then the next one up (never past the top), the same, or enough", () => {
+  const r = reopen(booked("admin_2"));
+  const done = run([pick("happened", "done"), next], ctx(), r);
+  assert.equal(done.stepId, "back_done");
+  assert.equal(title(done), "You did it.");
+  assert.equal(title(run([pick("happened", "partly"), next], ctx(), r)), "Part of it counts.");
+  assert.deepEqual(values(done, "then"), ["up", "same", "rest"]);
+  const step = M.stepOf(skill, "back_done");
+  const yes = run([pick("ican", "yes"), pick("then", "rest")], ctx(), done);
+  assert.deepEqual((({ kind, value }) => ({ kind, value }))(M.keepFor(ctx(), step, yes)), { kind: "i_can", value: { rungIds: ["admin_2"] } });
+  assert.equal(M.keepFor(ctx(), step, run([pick("ican", "no"), pick("then", "rest")], ctx(), done)), null, "kept only on a yes");
+  const end = run([next], ctx(), yes);
+  assert.equal(end.stepId, "back_end");
+  assert.match(line(end), /I can list in Me/);
+  // Up: back to the ladder, last time's rung cleared, so the person picks afresh.
+  const up = run([pick("ican", "no"), pick("then", "up"), next], ctx(), done);
+  assert.equal(up.stepId, "rung");
+  assert.equal(up.answers.rung, undefined);
+  assert.deepEqual(values(up, "rung"), ["admin_1", "admin_2", "admin_3"]);
+  const again = run([pick("rung", "admin_3"), next, pick("when", "tomorrow"), pick("remind", "yes")], ctx(), up);
+  assert.deepEqual(M.followUpFor(ctx(), M.stepOf(skill, "when"), again), { type: "mastery_step", chip: "tomorrow" }, "the next rung books its own card");
+  // The same again: straight to when, the step kept.
+  const same = run([pick("ican", "no"), pick("then", "same"), next], ctx(), done);
+  assert.equal(same.stepId, "when");
+  assert.deepEqual(same.answers.rung.ids, ["admin_2"]);
+  // From the top rung there's no next one up.
+  const top = run([pick("happened", "done"), next], ctx(), reopen(booked("admin_3")));
+  assert.deepEqual(values(top, "then"), ["same", "rest"]);
+});
+
+test("not yet: a real answer; a smaller one (never below the bottom), the same again, or not now", () => {
+  const r = reopen(booked("admin_2"));
+  const no = run([pick("happened", "not_yet"), next], ctx(), r);
+  assert.equal(no.stepId, "back_not");
+  assert.equal(title(no), "Not yet is a real answer.");
+  assert.match(skill.copy.not_hint, /Smaller is still mastery/);
+  assert.deepEqual(values(no, "again"), ["smaller", "same", "not_now"]);
+  assert.deepEqual(offers(no), []);
+  assert.equal(run([pick("again", "smaller"), next], ctx(), no).stepId, "rung");
+  assert.equal(run([pick("again", "same"), next], ctx(), no).stepId, "when");
+  const later = run([pick("again", "not_now"), next], ctx(), no);
+  assert.equal(later.stepId, "back_end");
+  assert.match(line(later), /^It'll keep/);
+  const bottom = run([pick("happened", "not_yet"), next], ctx(), reopen(booked("admin_1")));
+  assert.deepEqual(values(bottom, "again"), ["same", "not_now"]);
+  // No streaks, counts or scores anywhere in the copy.
+  assert.doesNotMatch(JSON.stringify(skill.copy), /streak|score|\d+ (times|days) in a row|failed/i);
+});
+
+test("a carried flooded reading: the body first or try anyway; Talk to someone now on every screen", () => {
+  const c = ctx({ band: "flooded" });
+  const h = run([pick("area", "home"), next], c);
+  assert.equal(h.stepId, "heads_up");
+  assert.deepEqual(offers(run([pick("heads_up", "settle"), next], c, h), c), ["cool_down"]);
+  assert.equal(run([pick("heads_up", "try"), next], c, h).stepId, "rung");
+  for (const st of skill.steps) {
+    const links = st.kind === "ask" ? st.fields.flatMap((f) => f.links ?? []) : st.links ?? [];
+    assert.ok(links.some((l) => l.exit === "safety_open"), st.id);
+  }
+});
+
+test("i_can: a profile kind about me, many, own words encrypted, named in Me from the graph's options", async () => {
+  const { PROFILE_KINDS } = await importTs("functions/src/profile/kinds.ts");
+  const k = PROFILE_KINDS.i_can;
+  assert.equal(k.area, "about_me");
+  assert.equal(k.many, true);
+  assert.equal(k.slice, null);
+  assert.deepEqual(k.ownFields, ["rungOwn"]);
+  assert.deepEqual(k.validate({ rungIds: ["admin_1"] }), { rungIds: ["admin_1"] });
+  assert.deepEqual(k.validate({ rungOwn: "Pull the weeds" }), { rungOwn: "Pull the weeds" });
+  assert.throws(() => k.validate({}), /Nothing to keep/);
+  assert.throws(() => k.validate({ rungIds: ["a", "b"] }));
+  assert.throws(() => k.validate({ rungIds: ["admin_1"], note: "x" }), /Unexpected field/);
+  assert.match(readFileSync("schema/profile-layer.cypher", "utf8"), /ProfileKind \{id: "i_can"\}/);
+  const cy = readFileSync("schema/skills.cypher", "utf8");
+  for (const o of skill.options.rung) assert.match(cy, new RegExp(`MERGE \\(o:SkillOption \\{id: "build_mastery:rung:${o.value}"\\}\\)`), o.value);
+  assert.match(readFileSync("functions/src/profile/slices.ts", "utf8"), /RUNG_OPTION = 'build_mastery:rung:'/);
+  assert.match(readFileSync("functions/src/profile/me.ts", "utf8"), /meta\.kind === 'i_can'/);
+});
