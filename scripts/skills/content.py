@@ -18,12 +18,13 @@ import pros_cons  # noqa: E402
 import first_body  # noqa: E402
 import ride_it_out  # noqa: E402
 import let_it_be  # noqa: E402
+import say_no  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
 SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKILL, *fast.SKILLS, nightmare_rescript.SKILL, problem_solve.SKILL,
           ending_relationships.SKILL, cope_ahead.SKILL, hold_to_wait.SKILL, dear_man_debrief.SKILL, pros_cons.SKILL, first_body.SKILL,
-          ride_it_out.SKILL, let_it_be.SKILL]
+          ride_it_out.SKILL, let_it_be.SKILL, say_no.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -66,6 +67,9 @@ EMBEDS = {
     "urgeWave": {"ids": ["still_here", "fading", "gone", "bigger", "ended_gone", "ended_bigger", "ended_not_now",
                          "ended_left", "ended_long"], "measures": ["durationSec", "doneCount"]},
     "waveTrace": {"ids": ["read"]},
+    # IE-B3's message card (plan C3b `messageComposer`, IE-owned): the picks as one message, with the FAST strip (an
+    # extra sorry, over-explaining) and the line to repeat; Copy and Open messages, never a send. Reports what was done.
+    "messageComposer": {"ids": ["copied", "opened", "dropped_sorry"]},
 }
 # What each embed takes from the skill (embeds.ts EMBED_PROPS; the contract test keeps the two equal). build.py
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
@@ -114,6 +118,21 @@ EMBED_PROPS = {
         "copyLabel": {"type": "copy", "optional": True},
         "copiedLabel": {"type": "copy", "optional": True},
         "selectedLabel": {"type": "copy", "optional": True},
+        "next": {"type": "copy"},
+    },
+    "messageComposer": {
+        "field": {"type": "field"},
+        "opener": {"type": "field", "optional": True},
+        "reason": {"type": "field", "optional": True},
+        "alt": {"type": "field", "optional": True},
+        "repeatLabel": {"type": "copy", "optional": True},
+        "sorryLine": {"type": "copy", "optional": True},
+        "dropSorry": {"type": "copy", "optional": True},
+        "explainLine": {"type": "copy", "optional": True},
+        "copyLabel": {"type": "copy"},
+        "copiedLabel": {"type": "copy"},
+        "selectedLabel": {"type": "copy"},
+        "openLabel": {"type": "copy", "optional": True},
         "next": {"type": "copy"},
     },
     "rescriptCard": {

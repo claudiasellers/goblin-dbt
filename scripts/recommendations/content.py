@@ -107,6 +107,11 @@ SIGNED_OFF = {
     "rf_reward_drive_low_words_fragile_problem-solve": "2026-10-05",
     # Rebel without the wreckage (DT-11), Pause's swap on provoked / indignant: signed off 10 Nov (Claudia).
     "rf_reactive_aggression_words_rebel_alternate-rebellion": "2026-11-10",
+    # Connected by default (Claudia, 12 Nov: "why are we leaving things disconnected and hedging by default at ALL?"):
+    # FAST's two word rows and Say no's row go live with the module.
+    "rf_social_threat_shame_words_self-respect_fast": "2026-11-12",
+    "rf_reactive_aggression_words_grievance_fast": "2026-11-12",
+    "rf_acute_alarm_words_demand_say-no": "2026-11-12",
 }
 BANDS = ["steady", "stirred", "flooded"]
 
@@ -153,6 +158,8 @@ CONCEPT_TAGS["alternate-rebellion"] = {"concept": "dbt_alternate_rebellion", "si
 # rejects it every time (as Rebel's `hold` did). skillKind `values` (the review asks what you stand for, F-A-S-T);
 # side `both` (the review, then Let go when nothing can be done).
 CONCEPT_TAGS["fast"] = {"concept": "dbt_fast", "side": "both", "skillKind": "values", "direction": "neutral"}
+# Say no (IE-04, appToolId 'say-no', docs/design/say-no.md): one word row, live with the module (connected by default).
+CONCEPT_TAGS["say-no"] = {"concept": "dbt_saying_no", "side": "change", "skillKind": "relational", "direction": "neutral"}
 
 # It isn't working (ER-14, appToolId 'er-troubleshoot', docs/design/er-troubleshoot.md) has no RECOMMENDED_FOR rows
 # by design: it answers "I did a skill and it didn't help", which no check-in state names. Its entries are skill
@@ -281,6 +288,8 @@ WORD_RULES = [
      "why": "Bridge high agitation: distraction (ACCEPTS, planned) then Problem Solve; until ACCEPTS ships, Problem Solve leads and Cool Down follows."},
     {"key": "stress", "pattern": "acute_alarm", "tool": "accepts", "priority": 0.4, "words": STRESS_WORDS,
      "why": "Planned: ACCEPTS (distract) leads for strain words once built."},
+    {"key": "demand", "pattern": "acute_alarm", "tool": "say-no", "priority": WORD_NEXT, "words": ["pressured"],
+     "why": "Pressure from someone's demands: Say no (IE-04) beside Problem Solve, so the person can turn the ask down instead of absorbing it."},
     {"key": "annoyed", "pattern": "acute_alarm", "tool": "opposite-action", "priority": WORD_LEAD, "words": ["annoyed"],
      "why": "Check the Facts on low-grade anger (planned); Do the Opposite's fits-the-facts step until then."},
     {"key": "annoyed", "pattern": "acute_alarm", "tool": "check-the-facts", "priority": 0.4, "words": ["annoyed"],

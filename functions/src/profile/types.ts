@@ -156,6 +156,7 @@ export const PROFILE_NEEDS = {
   'alternate-rebellion': ['parts'],          // the tag row on its urge close (DT-11, Held off)
   'check-the-facts': ['parts'],              // the tag row on its close (docs/design/check-the-facts.md, screen 3)
   'fast': ['parts'],                         // the tag row on its close (docs/design/fast.md)
+  'say-no': ['people'],                      // the picker (IE-03), before the skill (docs/design/say-no.md)
   // Wise mind's step back (parts on only): the person's parts in the room, with their names, shapes,
   // tender and safety flags. Empty while parts are off, so the tool shows its two-minds form.
   'wise-mind': ['parts'],

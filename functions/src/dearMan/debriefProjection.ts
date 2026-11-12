@@ -107,7 +107,7 @@ export function refusalChange(situationType: string | null, outcome: string | nu
 /** The page's "the picker was used, nobody kept" (src/lib/dearManDebrief.ts debriefCtx). */
 export const NOBODY = 'none';
 
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+export const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** The prep this debrief is about: via the ask_outcome card that opened it, else the person's latest in 14 days. */
 export const DEBRIEF_PREP_QUERY = `

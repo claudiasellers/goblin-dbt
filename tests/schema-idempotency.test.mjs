@@ -113,7 +113,7 @@ function relKeys(f) {
 
 test("knowledge-graph.cypher is nodes only; count pins for the base files", () => {
   const kg = statements["knowledge-graph.cypher"];
-  assert.equal(kg.length, 311, "316 until Oct 2026; the 8 old BodyRegion nodes moved to body-map.cypher; + dbt_troubleshooting (ER-14, Nov 2026); + dbt_nightmare_protocol (ER-15); + dbt_ending_relationships (IE-08)");
+  assert.equal(kg.length, 312, "316 until Oct 2026; the 8 old BodyRegion nodes moved to body-map.cypher; + dbt_troubleshooting (ER-14, Nov 2026); + dbt_nightmare_protocol (ER-15); + dbt_ending_relationships (IE-08); + dbt_saying_no (IE-04)");
   for (const s of kg) {
     assert.match(s, /^MERGE \(\w+:\w+ \{id: "[^"]+"\}\)\nSET \w+ \+= \{/, s.slice(0, 80));
     assert.doesNotMatch(code(s), /\]->|<-\[/, s.slice(0, 80));
@@ -123,9 +123,9 @@ test("knowledge-graph.cypher is nodes only; count pins for the base files", () =
   assert.equal(opposite.length, 16);
   const nonOpposite = rels.filter((r) => r.type !== "OPPOSITE_OF");
   // 575 until Oct 2026; the 40 FELT_AS edges moved to body-map.cypher (scripts/body-map/content.py).
-  assert.equal(new Set(nonOpposite.map((r) => r.key)).size, 538); // + dbt_troubleshooting PART_OF (ER-14), + dbt_nightmare_protocol PART_OF (ER-15), + dbt_ending_relationships (IE-08)
-  assert.equal(nonOpposite.length, 538, "no relationship declared twice");
-  assert.equal(statements["relationships.cypher"].length, 538 + 16);
+  assert.equal(new Set(nonOpposite.map((r) => r.key)).size, 539); // + dbt_troubleshooting PART_OF (ER-14), + dbt_nightmare_protocol PART_OF (ER-15), + dbt_ending_relationships (IE-08), + dbt_saying_no (IE-04)
+  assert.equal(nonOpposite.length, 539, "no relationship declared twice");
+  assert.equal(statements["relationships.cypher"].length, 539 + 16);
 });
 
 test("FELT_AS region variants survive (the 66 original keys), now all in body-map.cypher", () => {

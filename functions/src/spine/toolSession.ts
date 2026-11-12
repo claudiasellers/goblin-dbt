@@ -29,7 +29,7 @@ import { NOT_WHAT_HELPS } from './tools';
 import { projectRun, runRep } from '../skills/projections';
 
 /** Deep-link follow-ups that opening resolves: the resume link, the nightmare read-through, Ending's check-ins (IE-08), Problem Solve's review (ER-12) and DEAR MAN's "How did it go?" (IE-B2). */
-export const OPEN_RESOLVES = ['resume_skill', 'nightmare_rehearse', 'ending_after', 'ending_again', 'ending_revisit', 'hold_come_back', 'ps_review', 'ask_outcome'] as const;
+export const OPEN_RESOLVES = ['resume_skill', 'nightmare_rehearse', 'ending_after', 'ending_again', 'ending_revisit', 'hold_come_back', 'ps_review', 'ask_outcome', 'no_outcome'] as const;
 
 /** Detail node labels by kind (a whitelist: the label is interpolated into Cypher). */
 export const DETAIL_LABELS: Record<DetailKind, string> = {

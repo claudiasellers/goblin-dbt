@@ -516,6 +516,17 @@
     "rejection"
    ]
   },
+  "dbt_saying_no": {
+   "appToolId": "say-no",
+   "name": "Saying no",
+   "description": "Refusing a request clearly and kindly, sized by the facts, with a line ready for when they push",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": "change",
+   "skillKind": "relational",
+   "direction": "neutral",
+   "addresses": []
+  },
   "dbt_stop": {
    "appToolId": "pause",
    "name": "STOP",
@@ -2388,6 +2399,31 @@
    "version": "rf-v2",
    "reviewStatus": "approved",
    "rationale": "Check the Facts on low-grade anger (planned); Do the Opposite's fits-the-facts step until then."
+  },
+  {
+   "id": "rf_acute_alarm_words_demand_say-no",
+   "conceptId": "dbt_saying_no",
+   "patternId": "acute_alarm",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.6,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "pressured"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "approved",
+   "rationale": "Pressure from someone's demands: Say no (IE-04) beside Problem Solve, so the person can turn the ask down instead of absorbing it."
   },
   {
    "id": "rf_acute_alarm_words_freeze_five-senses",

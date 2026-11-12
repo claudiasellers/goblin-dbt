@@ -491,6 +491,9 @@ SAFETY_COPY = {"id": "dear_man_safety_copy",
     "badlyHeadsUp": "When talks with them tend to go badly, it can help to keep it short, about one thing, and in writing if that suits.",
     # The debrief (IE-B2, docs/design/dear-man-debrief.md): the picker's question, after the conversation.
     "personWhoDebrief": "Who was the conversation with?",
+    # Say no (IE-04, IE-B3; docs/design/say-no.md): the picker's question and the safety screen's heading.
+    "personWhoSayNo": "Who's asking?",
+    "safetyRouteSayNoHeading": "With {who}, your safety comes first. Working out how to say no can wait.",
     # The prep's saved screen: when it is, so "How did it go?" comes after (the ask_outcome follow-up). Names no one.
     "askOutcomeQuestion": "When is the conversation? I can ask how it went, after.",
     "askOutcomeToday": "Later today",

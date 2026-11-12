@@ -130,11 +130,14 @@ test("page: DearMan picks the mode once; the debrief is lazy and the prep keeps 
 });
 
 test("page: picker first; the safety route gets the safety screen, never the skill; one visit, one session", () => {
-  const page = read("src/components/tools/dearMan/DearManDebrief.tsx");
+  const page = read("src/components/people/PersonFirstSkill.tsx");
   assert.match(page, /<PersonPicker key=\{pickerKey\} people=\{profile\.slices\?\.people \?\? null\} copy=\{pickerCopy\}/);
   assert.match(page, /if \(who\.route === 'safety'\) \{\s*return \(\s*<PersonSafetyRoute copy=\{safetyCopy\}/);
-  assert.match(page, /return <SkillPlayer skillId=\{SKILL_ID\} ctx=\{debriefCtx\(who, partId\)\} \/>;/);
+  assert.match(page, /return <SkillPlayer skillId=\{skillId\} ctx=\{ctxFor\(who\)\} \{\.\.\.\(reopening \? \{ resumeRecord: resumeAfterPicker\(checked, who\) \} : \{\}\)\} \/>;/);
+  assert.match(page, /if \(copyFailed\) return <ToolLoadError/, "fails closed without the picker's copy");
   assert.doesNotMatch(page, /navigate\(/, "no navigation between the picker and the skill: the ToolSession (and a card's RESOLVING) stays");
+  const debrief = read("src/components/tools/dearMan/DearManDebrief.tsx");
+  assert.match(debrief, /<PersonFirstSkill skillId=\{SKILL_ID\} toolId="dear-man" questionKey="personWhoDebrief" headingKey="safetyRouteDebriefHeading"\s*ctxFor=\{\(who\) => debriefCtx\(who, partId\)\} \/>/);
   const player = read("src/components/skillPlayer/SkillPlayer.tsx");
   assert.match(player, /\.\.\.st, \.\.\.\(pageCtx \?\? \{\}\) \}\);/, "the page's context over the address's, narrowed by contextIn");
 });
