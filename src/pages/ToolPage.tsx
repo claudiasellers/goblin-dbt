@@ -19,7 +19,7 @@ import { DearMan } from './tools/DearMan';
 import { ProblemSolve } from './tools/ProblemSolve';
 import { InvalidationRecovery } from './tools/InvalidationRecovery';
 import { FindTheFeeling } from './tools/FindTheFeeling';
-import { playerSkillFor } from '../lib/skillRuntime/playerTools';
+import { legacyLink, playerSkillFor } from '../lib/skillRuntime/playerTools';
 
 // Meet a part, loaded on demand: its gate below (parts on, copy signed off) stays eager, so
 // a parts-off person never fetches it. With parts on, the fetch starts with the gate's own.
@@ -112,7 +112,7 @@ export function ToolPage() {
     return <ToolNotFound />;
   }
 
-  const playerSkill = playerSkillFor(tool.id);
+  const playerSkill = legacyLink(tool.id, location.search) ? null : playerSkillFor(tool.id);
   const ToolComponent = playerSkill ? undefined : toolComponents[tool.id];
 
   return (

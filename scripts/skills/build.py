@@ -45,7 +45,9 @@ PRESENTS_LABELS = {"ProblemType", "SolutionDirection", "DecompositionAspect", "B
                    # Cope Ahead's (schema/cope-ahead.cypher) and Find the feeling's pulls (schema/find-the-feeling.cypher).
                    "CopeSituation", "HardMoment", "CopeMove", "FeelingUrge",
                    # DEAR MAN's debrief vocabulary (schema/dear-man-debrief-content.cypher, scripts/dear-man/content.py).
-                   "TurningPoint", "MomentResponse", "BodySignal", "ThoughtPattern", "Underneath", "CopeAhead", "TroubleshootFactor"}
+                   "TurningPoint", "MomentResponse", "BodySignal", "ThoughtPattern", "Underneath", "CopeAhead", "TroubleshootFactor",
+                   # Do the Opposite's urges (schema/opposite-action-data.cypher, oa_graph.py).
+                   "ActionUrge"}
 
 
 def q(s): return json.dumps(s, ensure_ascii=False)

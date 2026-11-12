@@ -1,0 +1,460 @@
+"""Do the Opposite (DBT ER Handouts 9-11, Opposite Action) on the skill runtime: the port of the hand-built page
+(ER-03, batch ER-B3, part 2).
+
+docs/design/opposite-action-v3.md is the design and lists every departure from the hand-built page. The clinical
+content stays in the graph (schema/opposite-action-data.cypher, schema/opposite-action-flow.cypher), read without a
+database by oa_graph.py: each parent's acknowledgment and fit statements, each urge's graduated opposites and body
+cues, the route table. Every urge option keeps a PRESENTS edge to its ActionUrge, every step option to its urge (or its
+parent's EmotionRegulationContent for the defaults). So:
+
+- **Up to three feelings, one sub-run each** (R16, `each: feel`): validation and the urge, *Do I want to change it?*,
+  fits the facts, will the urge help, then the route. On the opposite route, the body cue held, the pull compared with
+  before, and the step. A feeling sent elsewhere (clarify, problem, repair, keep it) offers *Carry on with the others*.
+- **The goal and the safety split once**, before any feeling: danger opens the `other_person` crisis slot (Ending in
+  its careful frame, Hold to wait); a boundary goes to FAST, DEAR MAN or Hold to wait; not sure what's safe gets the
+  slot and Hold to wait. Nothing is practised on an unsafe answer.
+- **No numbers.** The pull is then-vs-now after the body and after trying (`askFresh: thenVsNow`, newest wins: the
+  session's close, `regulation_down`, asked in the flow); what you expect and what happened are named, never scored.
+- **A carried flooded reading**: the body first (a settle hold), then the same flow.
+- **What's saved**: `ext.run`, and the projection (functions/src/oppositeAction/projection.ts) writes one
+  OppositeActionSession v3 per feeling that reached its step, and the oa_plan follow-up for a plan for later.
+
+Regenerate:  python3 scripts/skills/build.py > /tmp/s.cypher && mv /tmp/s.cypher schema/skills.cypher
+             python3 scripts/skills/fixture.py --ship
+"""
+import hashlib
+import importlib.util
+import os
+
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_spec = importlib.util.spec_from_file_location("oa_graph", os.path.join(_HERE, "oa_graph.py"))
+OA = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(OA)
+C = OA.content()
+
+ID = "opposite_action"
+TOOL_ID = "opposite-action"
+CONCEPT = "dbt_opposite_action"
+VERSION = "oa-skill-v1"
+OWN_MAX = 90  # an urge or a step in your own words; three of each must fit ext's 4 KB with the rest of the record
+PARENTS = sorted(C["parents"])
+URGE_IDS = sorted({u["id"] for p in C["parents"].values() for u in p["urges"]})
+# Urges whose own cues replace the parent's (somaticReplace: freeze and bed need up-regulation, not relaxation).
+REPLACE = sorted({u["id"] for p in C["parents"].values() for u in p["urges"] if u["replace"] and u["cues"]})
+CH = C["flow"]["choices"]
+ROUTES = C["flow"]["routes"]  # "facts:effectiveness" → opposite | problem | clarify (safe only)
+
+
+def a(field):
+    return f"$a.{field}"
+
+
+ALWAYS = {"all": []}
+EQ = lambda f, v: {"eq": [a(f), v]}  # noqa: E731
+FLOODED = {"eq": ["$ctx.band", "flooded"]}
+
+COPY = {
+    "next": "Next",
+    "done": "Done",
+    "carry_on": "Carry on with {others}",
+    "safety_open": "Talk to someone now",
+    # Flooded: the body first.
+    "calm_title": "First, let your body settle a little",
+    "calm_label": "Hold",
+    "calm_running": "Breathe out, slowly",
+    "calm_hint": "Press and hold while you breathe out",
+    # Goal and safety, once.
+    "goal_title": "What do you want this moment to help you do?",
+    "safety_label": "Is it safe to try something different?",
+    "safe": "Yes, it's safe to try",
+    "danger": "There's danger",
+    "boundary": "There's a boundary I need to keep",
+    "unsure": "I'm not sure what's safe",
+    "danger_title": "Your safety comes first",
+    "danger_line": "Doing the opposite isn't for a situation that could hurt you. Support is here, on this screen.",
+    "boundary_title": "Keeping a boundary is a different skill",
+    "boundary_line": "Holding your ground can be the effective thing. These can help you do it well.",
+    "unsure_title": "When safety is unclear, slow down first",
+    "unsure_line": "You don't have to act on the urge or against it right now.",
+    # Per feeling.
+    "urge_q": "What is it pushing you to do?",
+    "urge_own": "In my own words",
+    "want_title": "Do you want to turn {each} down?",
+    "want_yes": "Yes, turn it down",
+    "want_not_sure": "Not sure",
+    "want_no": "No, I want to keep it",
+    "keep_title": "Some feelings are worth keeping",
+    "keep_line": "Want help acting on it well?",
+    "fits_title": "Does {each} fit the facts?",
+    "help_title_any": "If you follow this urge, will it help?",
+    "clar_title": "It may be serving a different goal",
+    "clar_line": "The facts are worth a closer look before you act either way.",
+    "clar_not_fit": "The feeling doesn't fit the facts, and acting on it still seems helpful. It may be serving a different goal.",
+    "prob_title": "The feeling fits, and so does acting on it",
+    "prob_line": "Then the situation is the thing to work on.",
+    "prob_excessive": "It fits, and it's bigger than the situation. Bring it down first, then work on the situation.",
+    "repr_title": "When guilt or shame fits, repair is the opposite of hiding",
+    "repr_line": "Owning it and making it right is the skill here.",
+    "cue_title": "Let your body go first",
+    "cue_hint": "Pick one to try now",
+    "hold_label": "Hold",
+    "hold_running": "Stay with it",
+    "hold_hint": "Press and hold while you do it",
+    "after_body_title": "The pull to {urge}, compared with before?",
+    "size_title": "Pick a step for {each}",
+    "size_own": "My own step",
+    # Once, after every feeling.
+    "pred_title": "If you do it, what do you expect?",
+    "when_title": "When will you try it?",
+    "due_label": "Roughly when?",
+    "try_title": "Try it now, then come back",
+    "try_hint": "Take your time. This screen will wait.",
+    "tried": "I tried it",
+    "after_title": "What happened?",
+    "actual_label": "What actually happened?",
+    "tvn_label": "The pull, compared with before?",
+    "read_title": "You did the opposite",
+    "read_part": "You tried part of it. That counts.",
+    "read_unclear": "It's not clear yet what it did. You still did something different.",
+    "read_gap": "You expected it to go badly. It didn't.",
+    "read_worse_gap": "You expected to feel worse. You didn't.",
+    "read_react_gap": "You expected them to react badly. They didn't.",
+    "read_later": "You did something different from what the urge wanted.",
+    "read_down": "The pull is weaker than before.",
+    "read_same": "The pull is still there. It often takes a few goes.",
+    "plan_title": "It's planned",
+    "plan_line": "It'll be on Today when it's time, to ask how it went.",
+    "plan_line_none": "Try it when the moment comes.",
+    "back_title": "Did you get to try it?",
+    "miss_title": "That's useful to know",
+    "miss_line": "A plan that didn't happen tells you something about the moment. You can make another one any time.",
+    "miss_strong": "When the urge is that strong, waiting it out comes first.",
+    "end_line": "Done for now.",
+}
+# The validation line is the parent's own acknowledgment (the graph's words, read at build).
+for pid in PARENTS:
+    COPY[f"ack_{pid}"] = C["parents"][pid]["acknowledgment"] or COPY["urge_q"]
+
+GOALS = [(c["id"], c["label"]) for c in CH["goal"]]
+# How the goal reads inside "will it help you {goal}?".
+GOAL_PHRASE = {"connection": "stay connected", "boundary": "protect a boundary", "progress": "make progress",
+               "repair": "repair harm", "self_respect": "act with self-respect"}
+for _g, _label in GOALS:
+    COPY[f"help_title_{_g}"] = f"If you follow this urge, will it help you {GOAL_PHRASE.get(_g, _label.lower())}?"
+FACTS = [(c["id"], c["label"]) for c in CH["facts"]]
+EFFECT = [(c["id"], c["label"]) for c in CH["effectiveness"]]
+WHEN = [(c["id"], c["label"]) for c in CH["cue"]]
+# The oa_try card's window chips (scripts/practice-spine/content.py oa_try). No chip: no card.
+DUE = [("hour", "Within the hour"), ("evening", "This evening"), ("tomorrow", "Tomorrow"), ("this_week", "Later this week")]
+TRIED = [("yes", "Yes, I tried it"), ("too_strong", "The urge was too strong"), ("no_moment", "The moment didn't come"),
+         ("forgot", "I forgot"), ("chose_not", "I chose not to")]
+OUTCOME = [(c["id"], c["label"]) for c in CH["outcome"] if c["id"] != "unsafe"] + [("unsafe", "It felt unsafe")]
+PREDICT = [("badly", "It'll go badly"), ("worse", "I'll feel worse"), ("react", "They'll react badly"),
+           ("nothing", "Nothing much"), ("not_sure", "Not sure")]
+ACTUAL = [("badly", "It went badly"), ("worse", "I felt worse"), ("react", "They reacted badly"),
+          ("nothing", "Nothing much"), ("better", "It went better than I thought")]
+TVN = [("worse", "Stronger"), ("same", "About the same"), ("better", "A bit weaker"), ("much_better", "Much weaker")]
+
+# The route after *will it help?*, one feeling at a time. Repair first (guilt or shame that fits, goal repair harm: H11),
+# then the graph's table for a safe answer (danger, a boundary and not sure never reach this step).
+ROUTE_STEP = {"opposite": "cue", "clarify": "clar", "problem": "prob"}
+REPAIR = {"all": [{"in": ["$d.parent", ["guilt", "shame"]]}, EQ("fits", "fits"), EQ("goal", "repair")]}
+def _route_to(step):
+    keys = sorted(k for k, r in ROUTES.items() if ROUTE_STEP[r] == step)
+    return {"any": [{"all": [EQ("fits", k.split(":")[0]), EQ("help", k.split(":")[1])]} for k in keys]}
+
+
+# One jump per target (NEXT is one edge per step pair); clarify is the table's rest and the fallback.
+HELP_NEXT = [{"when": REPAIR, "to": "repr"}, {"when": _route_to("prob"), "to": "prob"},
+             {"when": _route_to("cue"), "to": "cue"}, {"to": "clar"}]
+
+URGE_WHERE = {"has": ["$opt.parents", "$d.parent"]}
+# A cue: the urge's own, or the parent's (never with an urge that replaces them).
+CUE_WHERE = {"any": [{"has": ["$opt.urges", a("urge")]},
+                     {"all": [{"has": ["$opt.parents", "$d.parent"]}, {"not": {"in": [a("urge"), REPLACE]}}]}]}
+# A step: the urge's graduated opposites, or the parent's defaults for an urge in your own words.
+SIZE_WHERE = {"any": [{"all": [{"in": [a("urge"), URGE_IDS]}, {"eq": ["$opt.urgeFor", a("urge")]}]},
+                      {"all": [{"not": {"in": [a("urge"), URGE_IDS]}}, {"eq": ["$opt.parent", "$d.parent"]}]}]}
+# *Punish yourself* can mean self-harm (#89's gates): its pick opens safety.open over the next screen (C6.5), and the
+# crisis banner stays on that feeling's screens after it.
+PUNISH = EQ("urge", "guilt-punish")
+PUNISH_CRISIS = [{"variant": "crisis", "when": PUNISH}]
+DANGER_CRISIS = [{"variant": "other_person", "when": {"in": [a("safety"), ["danger", "unsure"]]}}]
+SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
+
+
+def handoff(step_id, title, lines, offers, each=True, crisis=None):
+    s = {"id": step_id, "kind": "handoff", "title": title, "lines": lines, "offers": offers, "done": "done", "next": []}
+    if each:
+        s.update({"each": "feel", "carryOn": "pred"})
+    crisis = crisis or (PUNISH_CRISIS if each else None)
+    if crisis:
+        s["crisis"] = crisis
+    return s
+
+
+STEPS = [
+    {
+        # #48's doors as an embed: one door per DBT parent, three other ways in, up to three, loudest first. Words a
+        # hand-off carried arrive pre-ticked; the person still taps Yes.
+        "id": "door", "kind": "embed", "embed": "doorPicker", "answerAs": "feel",
+        "next": [{"when": FLOODED, "to": "calm"}, {"to": "goal"}],
+    },
+    {
+        "id": "calm", "kind": "embed", "embed": "holdRing", "title": "calm_title",
+        "props": {"variant": "settle", "seconds": 6, "holds": 3, "label": "calm_label", "hint": "calm_hint",
+                  "runningLabel": "calm_running", "next": "next"},
+        "next": [{"to": "goal"}],
+    },
+    {
+        "id": "goal", "kind": "ask", "title": "goal_title", "crisis": DANGER_CRISIS,
+        "fields": [
+            {"id": "goal", "options": {"list": "goal"}, "max": 1, "required": True},
+            {"id": "safety", "label": "safety_label", "options": {"list": "safety"}, "max": 1, "required": True},
+        ],
+        "next": [{"when": EQ("safety", "danger"), "to": "dang"}, {"when": EQ("safety", "boundary"), "to": "bnd"},
+                 {"when": EQ("safety", "unsure"), "to": "uns"}, {"to": "vald"}],
+    },
+    handoff("dang", "danger_title", [{"when": ALWAYS, "key": "danger_line"}],
+            [{"exit": "ending", "when": ALWAYS}, {"exit": "pause", "when": ALWAYS}], each=False, crisis=DANGER_CRISIS),
+    handoff("bnd", "boundary_title", [{"when": ALWAYS, "key": "boundary_line"}],
+            [{"exit": "fast", "when": ALWAYS}, {"exit": "dear_man", "when": ALWAYS}, {"exit": "pause", "when": ALWAYS}],
+            each=False),
+    handoff("uns", "unsure_title", [{"when": ALWAYS, "key": "unsure_line"}],
+            [{"exit": "pause", "when": ALWAYS}, {"exit": "ending", "when": ALWAYS}], each=False, crisis=DANGER_CRISIS),
+    {
+        # Validation first (ER-03 item 1): the parent's acknowledgment is the screen's title, then the urge.
+        "id": "vald", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS,
+        "title": [{"when": {"eq": ["$d.parent", pid]}, "key": f"ack_{pid}"} for pid in PARENTS] + [{"key": "urge_q"}],
+        "fields": [{"id": "urge", "label": "urge_q", "options": {"list": "urge", "where": URGE_WHERE, "firstFrom": "$ctx.urgeId"},
+                    "max": 1, "required": True, "own": {"hint": "urge_own", "countsAsPick": True, "max": OWN_MAX}}],
+        "next": [{"to": "want"}],
+    },
+    {
+        "id": "want", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "safetyFirst": PUNISH, "title": "want_title",
+        "fields": [{"id": "want", "options": {"list": "want"}, "max": 1, "required": True}],
+        "next": [{"when": EQ("want", "no"), "to": "keep"}, {"to": "fits"}],
+    },
+    handoff("keep", "keep_title", [{"when": ALWAYS, "key": "keep_line"}],
+            [{"exit": "problem_solve", "when": ALWAYS}, {"exit": "dear_man", "when": ALWAYS},
+             {"exit": "ride", "when": ALWAYS}]),
+    {
+        # The parent's fit statements above the verdict (Check the Facts' list); the full check is a quiet link.
+        "id": "fits", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "title": "fits_title",
+        "fields": [{"id": "fits", "options": {"list": "fits"}, "max": 1, "required": True,
+                    "list": {"table": "fitsWhen", "key": "$d.fitsParent"},
+                    "links": [{"exit": "check_the_facts", "label": "check_link", "when": ALWAYS}]}],
+        "next": [{"to": "help"}],
+    },
+    {
+        "id": "help", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS,
+        "title": [{"when": EQ("goal", g), "key": f"help_title_{g}"} for g, _ in GOALS] + [{"key": "help_title_any"}],
+        "fields": [{"id": "help", "options": {"list": "help"}, "max": 1, "required": True}],
+        "next": HELP_NEXT,
+    },
+    handoff("clar", "clar_title",
+            [{"when": {"all": [EQ("fits", "not_fit"), EQ("help", "helpful")]}, "key": "clar_not_fit"},
+             {"when": {"not": {"all": [EQ("fits", "not_fit"), EQ("help", "helpful")]}}, "key": "clar_line"}],
+            [{"exit": "check_the_facts", "when": ALWAYS}]),
+    handoff("prob", "prob_title",
+            [{"when": EQ("fits", "excessive"), "key": "prob_excessive"}, {"when": {"not": EQ("fits", "excessive")}, "key": "prob_line"}],
+            [{"exit": "cool_down", "when": EQ("fits", "excessive")}, {"exit": "problem_solve", "when": ALWAYS}]),
+    handoff("repr", "repr_title", [{"when": ALWAYS, "key": "repr_line"}], [{"exit": "problem_solve", "when": ALWAYS}]),
+    {
+        "id": "cue", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "title": "cue_title", "hint": "cue_hint",
+        "fields": [{"id": "cue", "options": {"list": "cue", "where": CUE_WHERE}, "max": 1, "required": True}],
+        "next": [{"to": "hold"}],
+    },
+    {
+        "id": "hold", "kind": "embed", "embed": "holdRing", "each": "feel", "crisis": PUNISH_CRISIS, "title": "hold_title",
+        "titleSlots": {"cue": {"labelOf": "cue"}},
+        "props": {"variant": "press", "seconds": 3, "label": "hold_label", "runningLabel": "hold_running",
+                  "hint": "hold_hint", "next": "next"},
+        "next": [{"to": "aftb"}],
+    },
+    {
+        "id": "aftb", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "title": "after_body_title",
+        "titleSlots": {"urge": {"labelOf": "urge"}},
+        "fields": [{"id": "tvnb", "options": {"list": "tvn"}, "max": 1, "required": True, "askFresh": "thenVsNow"}],
+        "next": [{"to": "size"}],
+    },
+    {
+        "id": "size", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "title": "size_title",
+        "fields": [{"id": "size", "options": {"list": "size", "where": SIZE_WHERE}, "max": 1, "required": True,
+                    "own": {"hint": "size_own", "countsAsPick": True, "max": OWN_MAX}}],
+        "next": [{"to": "pred"}],
+    },
+    {
+        "id": "pred", "kind": "ask", "title": "pred_title",
+        "fields": [{"id": "predict", "options": {"list": "predict"}, "max": 1}],
+        "next": [{"to": "when"}],
+    },
+    {
+        "id": "when", "kind": "ask", "title": "when_title",
+        "fields": [
+            {"id": "when", "options": {"list": "when"}, "max": 1, "required": True},
+            {"id": "due", "label": "due_label", "options": {"list": "due"}, "max": 1,
+             "showWhen": {"all": [{"set": a("when")}, {"not": EQ("when", "now")}]}},
+        ],
+        # A plan for later: a chip schedules oa_try (*Did you get to try it?*), which reopens the run at `back`.
+        "followUp": {"type": "oa_try", "whenFrom": "due", "when": {"all": [{"not": EQ("when", "now")}, {"set": a("due")}]}},
+        "next": [{"when": EQ("when", "now"), "to": "try"}, {"to": "plan"}],
+    },
+    {
+        "id": "try", "kind": "ask", "title": "try_title", "hint": "try_hint", "primary": "tried",
+        "next": [{"to": "aftr"}],
+    },
+    {
+        "id": "aftr", "kind": "ask", "title": "after_title",
+        "fields": [
+            {"id": "outcome", "options": {"list": "outcome"}, "max": 1, "required": True},
+            {"id": "actual", "label": "actual_label", "options": {"list": "actual"}, "max": 1},
+            {"id": "tvna", "label": "tvn_label", "options": {"list": "tvn"}, "max": 1, "required": True, "askFresh": "thenVsNow"},
+        ],
+        "crisis": [{"variant": "other_person", "when": EQ("outcome", "unsafe")}],
+        "next": [{"to": "read"}],
+    },
+    {
+        # Readout v3 (item 10): the behaviour first, then the prediction gap, then the pull. No numbers.
+        "id": "read", "kind": "handoff", "complete": True, "title": "read_title",
+        "crisis": [{"variant": "other_person", "when": EQ("outcome", "unsafe")}],
+        # One line shows (the first that holds): the prediction gap when there is one, then what was tried, then the pull.
+        "lines": [
+            {"when": {"all": [EQ("predict", "badly"), {"not": EQ("actual", "badly")}, {"set": a("actual")}]}, "key": "read_gap"},
+            {"when": {"all": [EQ("predict", "worse"), {"not": EQ("actual", "worse")}, {"set": a("actual")}]}, "key": "read_worse_gap"},
+            {"when": {"all": [EQ("predict", "react"), {"not": EQ("actual", "react")}, {"set": a("actual")}]}, "key": "read_react_gap"},
+            {"when": EQ("outcome", "partial"), "key": "read_part"},
+            {"when": EQ("outcome", "unclear"), "key": "read_unclear"},
+            {"when": {"in": [a("tvna"), ["better", "much_better"]]}, "key": "read_down"},
+            {"when": {"in": [a("tvna"), ["same", "worse"]]}, "key": "read_same"},
+        ],
+        "offers": [{"exit": "pause", "when": EQ("outcome", "unsafe")},
+                   {"exit": "er_troubleshoot", "when": EQ("tvna", "worse")}],
+        "done": "done", "next": [],
+    },
+    {
+        "id": "plan", "kind": "handoff", "complete": True, "title": "plan_title",
+        "lines": [{"when": {"set": a("due")}, "key": "plan_line"}, {"key": "plan_line_none"}],
+        "offers": [], "done": "done", "next": [],
+    },
+    {
+        # The oa_try card's link reopens the run here, on a run that reached the plan card. The plan stays; what
+        # happened is asked fresh (a second reopen doesn't read the last answers back).
+        "id": "back", "kind": "ask", "reopens": {"after": "when"}, "clears": ["tried", "outcome", "actual"],
+        "title": "back_title",
+        "fields": [{"id": "tried", "options": {"list": "tried"}, "max": 1, "required": True}],
+        "next": [{"when": EQ("tried", "yes"), "to": "aft2"}, {"to": "miss"}],
+    },
+    {
+        # What happened, on a later day: the same two questions without the pull (a reopened run reads nothing
+        # ask-fresh; the pull then was another moment's).
+        "id": "aft2", "kind": "ask", "title": "after_title",
+        "fields": [
+            {"id": "outcome", "options": {"list": "outcome"}, "max": 1, "required": True},
+            {"id": "actual", "label": "actual_label", "options": {"list": "actual"}, "max": 1},
+        ],
+        "crisis": [{"variant": "other_person", "when": EQ("outcome", "unsafe")}],
+        "next": [{"to": "read2"}],
+    },
+    {
+        "id": "read2", "kind": "handoff", "complete": True, "noClose": True, "title": "read_title",
+        "crisis": [{"variant": "other_person", "when": EQ("outcome", "unsafe")}],
+        "lines": [
+            {"when": {"all": [EQ("predict", "badly"), {"not": EQ("actual", "badly")}, {"set": a("actual")}]}, "key": "read_gap"},
+            {"when": {"all": [EQ("predict", "worse"), {"not": EQ("actual", "worse")}, {"set": a("actual")}]}, "key": "read_worse_gap"},
+            {"when": {"all": [EQ("predict", "react"), {"not": EQ("actual", "react")}, {"set": a("actual")}]}, "key": "read_react_gap"},
+            {"when": EQ("outcome", "partial"), "key": "read_part"},
+            {"when": EQ("outcome", "unclear"), "key": "read_unclear"},
+            {"key": "read_later"},
+        ],
+        "offers": [{"exit": "pause", "when": EQ("outcome", "unsafe")}],
+        "done": "done", "next": [],
+    },
+    {
+        "id": "miss", "kind": "handoff", "complete": True, "noClose": True, "title": "miss_title",
+        "lines": [{"when": EQ("tried", "too_strong"), "key": "miss_strong"}, {"key": "miss_line"}],
+        "offers": [{"exit": "pause", "when": EQ("tried", "too_strong")}],
+        "done": "done", "next": [],
+    },
+]
+COPY.update({"hold_title": "{cue}", "check_link": "Check the facts properly"})
+
+EXITS = [
+    {"id": "check_the_facts", "toolId": "check-the-facts"},                        # clarify (ER-02)
+    {"id": "problem_solve", "toolId": "problem-solve"},                            # problem, repair, keep it (ER-12)
+    {"id": "cool_down", "toolId": "cool-down"},                                    # too big: down first (DT-01)
+    {"id": "dear_man", "toolId": "dear-man"},                                      # keep it, a boundary (IE-01)
+    {"id": "fast", "toolId": "fast"},                                              # a boundary (IE-05)
+    {"id": "ride", "toolId": "urge-surfing"},                                      # keep it, ride the urge (DT-05)
+    {"id": "pause", "toolId": "pause"},                                            # not safe, not sure (DT-02)
+    {"id": "ending", "toolId": "ending-relationships", "query": {"frame": "careful"}},  # danger from someone (IE-08)
+    {"id": "er_troubleshoot", "toolId": "er-troubleshoot"},                        # the pull got stronger (ER-14)
+    {"id": "safety_open", "toolId": None, "safety": True},                         # safety.open (R6)
+    {"id": "done", "done": True},
+]
+
+
+def cue_id(text):
+    return "c_" + hashlib.sha1(text.encode("utf8")).hexdigest()[:10]
+
+
+def options():
+    out = []
+    # Urges: one option per ActionUrge, listed under every parent it belongs to, in each parent's order.
+    seen = {}
+    for pid in PARENTS:
+        for u in C["parents"][pid]["urges"]:
+            seen.setdefault(u["id"], {"u": u, "parents": []})["parents"].append(pid)
+    for uid, x in sorted(seen.items(), key=lambda kv: (kv[1]["u"]["order"], kv[0])):
+        out.append(("urge", uid, x["u"]["label"], {"parents": x["parents"], "urge": uid, **({"danger": "self"} if uid == "guilt-punish" else {})}, ("ActionUrge", uid)))
+    out += [("goal", g, label, {}, None) for g, label in GOALS]
+    out += [("safety", s, COPY[s], {}, None) for s in ("safe", "danger", "boundary", "unsure")]
+    out += [("want", w, COPY[f"want_{w}"], {}, None) for w in ("yes", "not_sure", "no")]
+    out += [("fits", f, label, {}, None) for f, label in FACTS]
+    out += [("help", e, label, {}, None) for e, label in EFFECT]
+    # Cues: one option per distinct cue, with the urges and parents that list it.
+    cues = {}
+    for pid in PARENTS:
+        p = C["parents"][pid]
+        for text in p["cues"]:
+            cues.setdefault(text, {"urges": [], "parents": []})["parents"].append(pid)
+        for u in p["urges"]:
+            for text in u["cues"]:
+                c = cues.setdefault(text, {"urges": [], "parents": []})
+                if u["id"] not in c["urges"]:
+                    c["urges"].append(u["id"])
+    for text, c in cues.items():
+        out.append(("cue", cue_id(text), text, {"urges": c["urges"], "parents": c["parents"]}, None))
+    out += [("tvn", v, label, {}, None) for v, label in TVN]
+    # Steps: each urge's small, medium and bigger (once per urge), then each parent's defaults.
+    done = set()
+    for pid in PARENTS:
+        p = C["parents"][pid]
+        for u in p["urges"]:
+            if u["id"] in done:
+                continue
+            done.add(u["id"])
+            for size in ("small", "medium", "bigger"):
+                if u[size]:
+                    out.append(("size", f"{u['id']}:{size}", u[size], {"urgeFor": u["id"], "size": size}, ("ActionUrge", u["id"])))
+        for size in ("small", "medium", "bigger"):
+            if p["defaults"][size]:
+                out.append(("size", f"{pid}:{size}", p["defaults"][size], {"parent": pid, "size": size}, "OppositeDefault"))
+    out += [("predict", v, label, {}, None) for v, label in PREDICT]
+    out += [("when", v, label, {}, None) for v, label in WHEN]
+    out += [("due", v, label, {}, None) for v, label in DUE]
+    out += [("tried", v, label, {}, None) for v, label in TRIED]
+    out += [("outcome", v, label, {}, None) for v, label in OUTCOME]
+    out += [("actual", v, label, {}, None) for v, label in ACTUAL]
+    return out
+
+
+SKILL = {
+    "id": ID, "toolId": TOOL_ID, "concept": CONCEPT, "version": VERSION, "start": "door", "ownMax": OWN_MAX,
+    "accepts": ["urgeId", "band"],
+    "copy": COPY, "tables": {},
+    "derive": [{"name": "parent", "from": "$each", "table": "parentOf"},
+               {"name": "fitsParent", "from": "$d.parent", "table": "fitsWhen", "keep": "key"}],
+    "steps": STEPS, "exits": EXITS, "options": options(),
+    "emotionFields": ["feel"],
+}

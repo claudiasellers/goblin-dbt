@@ -184,8 +184,9 @@ test("the profile reads what the debrief wrote: the people slice carries safetyR
   const block = /export const PROJECTIONS[^=]*=\s*\{([\s\S]*?)\};/.exec(src)[1];
   const projected = new Set([...block.matchAll(/'([a-z0-9-]+)'\s*:/g)].map((m) => m[1]));
   for (const t of PROFILE_WRITING_CLOSES) assert.ok(projected.has(t), `${t}: a profile-writing close has a projection`);
-  // Cope Ahead's projection (ext.ca, urgeIds) writes the session's own log fields, never profile data.
-  assert.deepEqual([...projected].filter((t) => !PROFILE_WRITING_CLOSES.has(t)).sort(), ["cope-ahead"], "every other projection writes profile data");
+  // Cope Ahead's projection (ext.ca, urgeIds) writes the session's own log fields, and Do the Opposite's its log records
+  // (OppositeActionSession v3): never profile data.
+  assert.deepEqual([...projected].filter((t) => !PROFILE_WRITING_CLOSES.has(t)).sort(), ["cope-ahead", "opposite-action"], "every other projection writes profile data");
   const ctx = read("src/contexts/ToolSessionContext.tsx");
   assert.match(ctx, /if \(PROFILE_WRITING_CLOSES\.has\(toolId\) && mergedExt\.run\) profileCache\.clear\(\);\s*refreshToday\(\);/, "after the close lands");
   const people = /people: `([\s\S]*?)`/.exec(read("functions/src/profile/slices.ts"))[1];

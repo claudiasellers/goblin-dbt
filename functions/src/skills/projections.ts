@@ -2,6 +2,7 @@ import type { ManagedTransaction } from 'neo4j-driver';
 import { projectCopeAhead } from '../copeAhead/projection';
 import { projectDearManDebrief } from '../dearMan/debriefProjection';
 import { projectSayNo } from '../sayNo/projection';
+import { projectOppositeAction } from '../oppositeAction/projection';
 
 /**
  * The projection hook (docs/design/dbt-modules-plan.md C3a R14, C8.2): for a tool that moved onto the skill
@@ -29,6 +30,9 @@ export const PROJECTIONS: Readonly<Record<string, Projection>> = {
   'dear-man': projectDearManDebrief,
   // Say no (IE-B3): the Interaction {kind: 'no'} once they've said how it went; a re-ask of the safety question.
   'say-no': projectSayNo,
+  // Do the Opposite (ER-B3): one OppositeActionSession v3 per feeling that reached its step, for the parts stats and
+  // trails; a reopened visit (oa_try) moves them on to practiced or missed.
+  'opposite-action': projectOppositeAction,
 };
 
 /**

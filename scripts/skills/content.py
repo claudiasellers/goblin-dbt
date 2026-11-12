@@ -19,12 +19,14 @@ import first_body  # noqa: E402
 import ride_it_out  # noqa: E402
 import let_it_be  # noqa: E402
 import say_no  # noqa: E402
+import opposite_action  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
 SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKILL, *fast.SKILLS, nightmare_rescript.SKILL, problem_solve.SKILL,
           ending_relationships.SKILL, cope_ahead.SKILL, hold_to_wait.SKILL, dear_man_debrief.SKILL, pros_cons.SKILL, first_body.SKILL,
-          ride_it_out.SKILL, let_it_be.SKILL, say_no.SKILL]
+          ride_it_out.SKILL, let_it_be.SKILL, say_no.SKILL,
+          opposite_action.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -70,6 +72,9 @@ EMBEDS = {
     # IE-B3's message card (plan C3b `messageComposer`, IE-owned): the picks as one message, with the FAST strip (an
     # extra sorry, over-explaining) and the line to repeat; Copy and Open messages, never a send. Reports what was done.
     "messageComposer": {"ids": ["copied", "opened", "dropped_sorry"]},
+    # ER-03's doors (#48, src/components/tools/oppositeAction/OppositeActionStart.tsx): up to three grid words, loudest
+    # first. `emotions`: its ids are grid word ids (the machine keeps only words on the grid, at most this many).
+    "doorPicker": {"emotions": 3},
 }
 # What each embed takes from the skill (embeds.ts EMBED_PROPS; the contract test keeps the two equal). build.py
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
@@ -79,6 +84,7 @@ EMBED_PROPS = {
     "partsLine": {"promptId": {"type": "id"}, "as": {"type": "enum", "values": ["line", "heading"], "optional": True}},
     "partLater": {},
     "debriefWho": {},
+    "doorPicker": {},
     "holdRing": {
         "variant": {"type": "enum", "values": ["press", "timed", "settle"]},
         "seconds": {"type": "int", "min": 1, "max": 900},

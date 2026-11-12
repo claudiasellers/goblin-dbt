@@ -17007,6 +17007,3596 @@
    }
   },
   {
+   "id": "opposite_action",
+   "toolId": "opposite-action",
+   "version": "oa-skill-v1",
+   "start": "door",
+   "accepts": [
+    "urgeId",
+    "band"
+   ],
+   "ownMax": 90,
+   "emotionFields": [
+    "feel"
+   ],
+   "copy": {
+    "next": "Next",
+    "done": "Done",
+    "carry_on": "Carry on with {others}",
+    "safety_open": "Talk to someone now",
+    "calm_title": "First, let your body settle a little",
+    "calm_label": "Hold",
+    "calm_running": "Breathe out, slowly",
+    "calm_hint": "Press and hold while you breathe out",
+    "goal_title": "What do you want this moment to help you do?",
+    "safety_label": "Is it safe to try something different?",
+    "safe": "Yes, it's safe to try",
+    "danger": "There's danger",
+    "boundary": "There's a boundary I need to keep",
+    "unsure": "I'm not sure what's safe",
+    "danger_title": "Your safety comes first",
+    "danger_line": "Doing the opposite isn't for a situation that could hurt you. Support is here, on this screen.",
+    "boundary_title": "Keeping a boundary is a different skill",
+    "boundary_line": "Holding your ground can be the effective thing. These can help you do it well.",
+    "unsure_title": "When safety is unclear, slow down first",
+    "unsure_line": "You don't have to act on the urge or against it right now.",
+    "urge_q": "What is it pushing you to do?",
+    "urge_own": "In my own words",
+    "want_title": "Do you want to turn {each} down?",
+    "want_yes": "Yes, turn it down",
+    "want_not_sure": "Not sure",
+    "want_no": "No, I want to keep it",
+    "keep_title": "Some feelings are worth keeping",
+    "keep_line": "Want help acting on it well?",
+    "fits_title": "Does {each} fit the facts?",
+    "help_title_any": "If you follow this urge, will it help?",
+    "clar_title": "It may be serving a different goal",
+    "clar_line": "The facts are worth a closer look before you act either way.",
+    "clar_not_fit": "The feeling doesn't fit the facts, and acting on it still seems helpful. It may be serving a different goal.",
+    "prob_title": "The feeling fits, and so does acting on it",
+    "prob_line": "Then the situation is the thing to work on.",
+    "prob_excessive": "It fits, and it's bigger than the situation. Bring it down first, then work on the situation.",
+    "repr_title": "When guilt or shame fits, repair is the opposite of hiding",
+    "repr_line": "Owning it and making it right is the skill here.",
+    "cue_title": "Let your body go first",
+    "cue_hint": "Pick one to try now",
+    "hold_label": "Hold",
+    "hold_running": "Stay with it",
+    "hold_hint": "Press and hold while you do it",
+    "after_body_title": "The pull to {urge}, compared with before?",
+    "size_title": "Pick a step for {each}",
+    "size_own": "My own step",
+    "pred_title": "If you do it, what do you expect?",
+    "when_title": "When will you try it?",
+    "due_label": "Roughly when?",
+    "try_title": "Try it now, then come back",
+    "try_hint": "Take your time. This screen will wait.",
+    "tried": "I tried it",
+    "after_title": "What happened?",
+    "actual_label": "What actually happened?",
+    "tvn_label": "The pull, compared with before?",
+    "read_title": "You did the opposite",
+    "read_part": "You tried part of it. That counts.",
+    "read_unclear": "It's not clear yet what it did. You still did something different.",
+    "read_gap": "You expected it to go badly. It didn't.",
+    "read_worse_gap": "You expected to feel worse. You didn't.",
+    "read_react_gap": "You expected them to react badly. They didn't.",
+    "read_later": "You did something different from what the urge wanted.",
+    "read_down": "The pull is weaker than before.",
+    "read_same": "The pull is still there. It often takes a few goes.",
+    "plan_title": "It's planned",
+    "plan_line": "It'll be on Today when it's time, to ask how it went.",
+    "plan_line_none": "Try it when the moment comes.",
+    "back_title": "Did you get to try it?",
+    "miss_title": "That's useful to know",
+    "miss_line": "A plan that didn't happen tells you something about the moment. You can make another one any time.",
+    "miss_strong": "When the urge is that strong, waiting it out comes first.",
+    "end_line": "Done for now.",
+    "ack_anger": "Anger is mobilizing you to fight back or push against something that feels wrong. When the situation doesn't call for a fight, that energy needs somewhere else to go.",
+    "ack_disgust": "Disgust is pushing you to reject and distance yourself. When the reaction is stronger than the situation warrants, leaning in — even a little — can change the feeling.",
+    "ack_envy": "Envy is narrowing your focus to what someone else has and what you lack. Shifting toward what you have — and what you can build — opens it back up.",
+    "ack_fear": "Fear is trying to keep you safe by pulling you away from the threat. When the threat isn't real, avoidance keeps the fear alive.",
+    "ack_guilt": "Guilt is urging you to make amends or punish yourself. When you didn't actually violate your values, the self-punishment is suffering without purpose.",
+    "ack_jealousy": "Jealousy is tightening your grip — urging you to monitor, control, and hold on tighter. Loosening that grip is what actually builds the trust you're craving.",
+    "ack_love": "Love is pulling you toward connection. When someone is unavailable, harmful, or gone, each contact resets the clock. Distance is how this attachment fades.",
+    "ack_sadness": "Sadness is pulling you inward, away from the world. When the withdrawal becomes the thing keeping you stuck, small movements outward can shift everything.",
+    "ack_shame": "Shame is telling you to hide — that if people saw the real you, they'd reject you. When shame is lying about your worth, hiding feeds it. Visibility starves it.",
+    "help_title_connection": "If you follow this urge, will it help you stay connected?",
+    "help_title_boundary": "If you follow this urge, will it help you protect a boundary?",
+    "help_title_progress": "If you follow this urge, will it help you make progress?",
+    "help_title_repair": "If you follow this urge, will it help you repair harm?",
+    "help_title_self_respect": "If you follow this urge, will it help you act with self-respect?",
+    "hold_title": "{cue}",
+    "check_link": "Check the facts properly"
+   },
+   "tables": {},
+   "derive": [
+    {
+     "name": "parent",
+     "from": "$each",
+     "table": "parentOf"
+    },
+    {
+     "name": "fitsParent",
+     "from": "$d.parent",
+     "table": "fitsWhen",
+     "keep": "key"
+    }
+   ],
+   "steps": [
+    {
+     "id": "door",
+     "kind": "embed",
+     "embed": "doorPicker",
+     "answerAs": "feel",
+     "next": [
+      {
+       "to": "calm",
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       }
+      },
+      {
+       "to": "goal",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "calm",
+     "kind": "embed",
+     "embed": "holdRing",
+     "title": "calm_title",
+     "props": {
+      "variant": "settle",
+      "seconds": 6,
+      "holds": 3,
+      "label": "calm_label",
+      "hint": "calm_hint",
+      "runningLabel": "calm_running",
+      "next": "next"
+     },
+     "next": [
+      {
+       "to": "goal",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "goal",
+     "kind": "ask",
+     "title": "goal_title",
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "in": [
+         "$a.safety",
+         [
+          "danger",
+          "unsure"
+         ]
+        ]
+       }
+      }
+     ],
+     "fields": [
+      {
+       "id": "goal",
+       "options": {
+        "list": "goal"
+       },
+       "max": 1,
+       "required": true
+      },
+      {
+       "id": "safety",
+       "label": "safety_label",
+       "options": {
+        "list": "safety"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "dang",
+       "when": {
+        "eq": [
+         "$a.safety",
+         "danger"
+        ]
+       }
+      },
+      {
+       "to": "bnd",
+       "when": {
+        "eq": [
+         "$a.safety",
+         "boundary"
+        ]
+       }
+      },
+      {
+       "to": "uns",
+       "when": {
+        "eq": [
+         "$a.safety",
+         "unsure"
+        ]
+       }
+      },
+      {
+       "to": "vald",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "dang",
+     "kind": "handoff",
+     "title": "danger_title",
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "danger_line"
+      }
+     ],
+     "done": "done",
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "in": [
+         "$a.safety",
+         [
+          "danger",
+          "unsure"
+         ]
+        ]
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "ending",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "pause",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "bnd",
+     "kind": "handoff",
+     "title": "boundary_title",
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "boundary_line"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": [
+      {
+       "exit": "fast",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "dear_man",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "pause",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "uns",
+     "kind": "handoff",
+     "title": "unsure_title",
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "unsure_line"
+      }
+     ],
+     "done": "done",
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "in": [
+         "$a.safety",
+         [
+          "danger",
+          "unsure"
+         ]
+        ]
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "pause",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "ending",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "vald",
+     "kind": "ask",
+     "each": "feel",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.urge",
+         "guilt-punish"
+        ]
+       }
+      }
+     ],
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "anger"
+        ]
+       },
+       "key": "ack_anger"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "disgust"
+        ]
+       },
+       "key": "ack_disgust"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "envy"
+        ]
+       },
+       "key": "ack_envy"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "fear"
+        ]
+       },
+       "key": "ack_fear"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "guilt"
+        ]
+       },
+       "key": "ack_guilt"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "jealousy"
+        ]
+       },
+       "key": "ack_jealousy"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "love"
+        ]
+       },
+       "key": "ack_love"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "sadness"
+        ]
+       },
+       "key": "ack_sadness"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "shame"
+        ]
+       },
+       "key": "ack_shame"
+      },
+      {
+       "key": "urge_q"
+      }
+     ],
+     "fields": [
+      {
+       "id": "urge",
+       "label": "urge_q",
+       "options": {
+        "list": "urge",
+        "where": {
+         "has": [
+          "$opt.parents",
+          "$d.parent"
+         ]
+        },
+        "firstFrom": "$ctx.urgeId"
+       },
+       "max": 1,
+       "required": true,
+       "own": {
+        "hint": "urge_own",
+        "countsAsPick": true,
+        "max": 90
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "want",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "want",
+     "kind": "ask",
+     "each": "feel",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.urge",
+         "guilt-punish"
+        ]
+       }
+      }
+     ],
+     "safetyFirst": {
+      "eq": [
+       "$a.urge",
+       "guilt-punish"
+      ]
+     },
+     "title": "want_title",
+     "fields": [
+      {
+       "id": "want",
+       "options": {
+        "list": "want"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "keep",
+       "when": {
+        "eq": [
+         "$a.want",
+         "no"
+        ]
+       }
+      },
+      {
+       "to": "fits",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "keep",
+     "kind": "handoff",
+     "title": "keep_title",
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "keep_line"
+      }
+     ],
+     "done": "done",
+     "each": "feel",
+     "carryOn": "pred",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.urge",
+         "guilt-punish"
+        ]
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "problem_solve",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "dear_man",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "ride",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "fits",
+     "kind": "ask",
+     "each": "feel",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.urge",
+         "guilt-punish"
+        ]
+       }
+      }
+     ],
+     "title": "fits_title",
+     "fields": [
+      {
+       "id": "fits",
+       "options": {
+        "list": "fits"
+       },
+       "max": 1,
+       "required": true,
+       "list": {
+        "table": "fitsWhen",
+        "key": "$d.fitsParent"
+       },
+       "links": [
+        {
+         "exit": "check_the_facts",
+         "label": "check_link",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "help",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "help",
+     "kind": "ask",
+     "each": "feel",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.urge",
+         "guilt-punish"
+        ]
+       }
+      }
+     ],
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$a.goal",
+         "connection"
+        ]
+       },
+       "key": "help_title_connection"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.goal",
+         "boundary"
+        ]
+       },
+       "key": "help_title_boundary"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.goal",
+         "progress"
+        ]
+       },
+       "key": "help_title_progress"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.goal",
+         "repair"
+        ]
+       },
+       "key": "help_title_repair"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.goal",
+         "self_respect"
+        ]
+       },
+       "key": "help_title_self_respect"
+      },
+      {
+       "key": "help_title_any"
+      }
+     ],
+     "fields": [
+      {
+       "id": "help",
+       "options": {
+        "list": "help"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "repr",
+       "when": {
+        "all": [
+         {
+          "in": [
+           "$d.parent",
+           [
+            "guilt",
+            "shame"
+           ]
+          ]
+         },
+         {
+          "eq": [
+           "$a.fits",
+           "fits"
+          ]
+         },
+         {
+          "eq": [
+           "$a.goal",
+           "repair"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "prob",
+       "when": {
+        "any": [
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.fits",
+             "excessive"
+            ]
+           },
+           {
+            "eq": [
+             "$a.help",
+             "helpful"
+            ]
+           }
+          ]
+         },
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.fits",
+             "fits"
+            ]
+           },
+           {
+            "eq": [
+             "$a.help",
+             "helpful"
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "cue",
+       "when": {
+        "any": [
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.fits",
+             "excessive"
+            ]
+           },
+           {
+            "eq": [
+             "$a.help",
+             "unhelpful"
+            ]
+           }
+          ]
+         },
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.fits",
+             "fits"
+            ]
+           },
+           {
+            "eq": [
+             "$a.help",
+             "unhelpful"
+            ]
+           }
+          ]
+         },
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.fits",
+             "not_fit"
+            ]
+           },
+           {
+            "eq": [
+             "$a.help",
+             "unhelpful"
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "clar",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "clar",
+     "kind": "handoff",
+     "title": "clar_title",
+     "lines": [
+      {
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.fits",
+           "not_fit"
+          ]
+         },
+         {
+          "eq": [
+           "$a.help",
+           "helpful"
+          ]
+         }
+        ]
+       },
+       "key": "clar_not_fit"
+      },
+      {
+       "when": {
+        "not": {
+         "all": [
+          {
+           "eq": [
+            "$a.fits",
+            "not_fit"
+           ]
+          },
+          {
+           "eq": [
+            "$a.help",
+            "helpful"
+           ]
+          }
+         ]
+        }
+       },
+       "key": "clar_line"
+      }
+     ],
+     "done": "done",
+     "each": "feel",
+     "carryOn": "pred",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.urge",
+         "guilt-punish"
+        ]
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "check_the_facts",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "prob",
+     "kind": "handoff",
+     "title": "prob_title",
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.fits",
+         "excessive"
+        ]
+       },
+       "key": "prob_excessive"
+      },
+      {
+       "when": {
+        "not": {
+         "eq": [
+          "$a.fits",
+          "excessive"
+         ]
+        }
+       },
+       "key": "prob_line"
+      }
+     ],
+     "done": "done",
+     "each": "feel",
+     "carryOn": "pred",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.urge",
+         "guilt-punish"
+        ]
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "cool_down",
+       "when": {
+        "eq": [
+         "$a.fits",
+         "excessive"
+        ]
+       }
+      },
+      {
+       "exit": "problem_solve",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "repr",
+     "kind": "handoff",
+     "title": "repr_title",
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "repr_line"
+      }
+     ],
+     "done": "done",
+     "each": "feel",
+     "carryOn": "pred",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.urge",
+         "guilt-punish"
+        ]
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "problem_solve",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "cue",
+     "kind": "ask",
+     "each": "feel",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.urge",
+         "guilt-punish"
+        ]
+       }
+      }
+     ],
+     "title": "cue_title",
+     "hint": "cue_hint",
+     "fields": [
+      {
+       "id": "cue",
+       "options": {
+        "list": "cue",
+        "where": {
+         "any": [
+          {
+           "has": [
+            "$opt.urges",
+            "$a.urge"
+           ]
+          },
+          {
+           "all": [
+            {
+             "has": [
+              "$opt.parents",
+              "$d.parent"
+             ]
+            },
+            {
+             "not": {
+              "in": [
+               "$a.urge",
+               [
+                "fear-freeze",
+                "sad-bed"
+               ]
+              ]
+             }
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "hold",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "hold",
+     "kind": "embed",
+     "embed": "holdRing",
+     "each": "feel",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.urge",
+         "guilt-punish"
+        ]
+       }
+      }
+     ],
+     "title": "hold_title",
+     "titleSlots": {
+      "cue": {
+       "labelOf": "cue"
+      }
+     },
+     "props": {
+      "variant": "press",
+      "seconds": 3,
+      "label": "hold_label",
+      "runningLabel": "hold_running",
+      "hint": "hold_hint",
+      "next": "next"
+     },
+     "next": [
+      {
+       "to": "aftb",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "aftb",
+     "kind": "ask",
+     "each": "feel",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.urge",
+         "guilt-punish"
+        ]
+       }
+      }
+     ],
+     "title": "after_body_title",
+     "titleSlots": {
+      "urge": {
+       "labelOf": "urge"
+      }
+     },
+     "fields": [
+      {
+       "id": "tvnb",
+       "options": {
+        "list": "tvn"
+       },
+       "max": 1,
+       "required": true,
+       "askFresh": "thenVsNow"
+      }
+     ],
+     "next": [
+      {
+       "to": "size",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "size",
+     "kind": "ask",
+     "each": "feel",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.urge",
+         "guilt-punish"
+        ]
+       }
+      }
+     ],
+     "title": "size_title",
+     "fields": [
+      {
+       "id": "size",
+       "options": {
+        "list": "size",
+        "where": {
+         "any": [
+          {
+           "all": [
+            {
+             "in": [
+              "$a.urge",
+              [
+               "anger-criticize",
+               "anger-destroy",
+               "anger-lash",
+               "anger-stonewall",
+               "check-profile",
+               "disgust-judge",
+               "disgust-leave",
+               "disgust-push",
+               "envy-compare",
+               "envy-give-up",
+               "envy-tear-down",
+               "fear-avoid",
+               "fear-cancel",
+               "fear-escape",
+               "fear-freeze",
+               "fire-back",
+               "go-quiet",
+               "guilt-apologize",
+               "guilt-avoid",
+               "guilt-punish",
+               "jealousy-check",
+               "jealousy-cling",
+               "jealousy-interrogate",
+               "love-idealize",
+               "love-proximity",
+               "love-reach-out",
+               "love-stalk",
+               "pull-away",
+               "sad-bed",
+               "sad-give-up",
+               "sad-isolate",
+               "sad-scroll",
+               "shame-avoid-people",
+               "shame-hide",
+               "shame-secret",
+               "shame-shrink",
+               "text-again"
+              ]
+             ]
+            },
+            {
+             "eq": [
+              "$opt.urgeFor",
+              "$a.urge"
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "not": {
+              "in": [
+               "$a.urge",
+               [
+                "anger-criticize",
+                "anger-destroy",
+                "anger-lash",
+                "anger-stonewall",
+                "check-profile",
+                "disgust-judge",
+                "disgust-leave",
+                "disgust-push",
+                "envy-compare",
+                "envy-give-up",
+                "envy-tear-down",
+                "fear-avoid",
+                "fear-cancel",
+                "fear-escape",
+                "fear-freeze",
+                "fire-back",
+                "go-quiet",
+                "guilt-apologize",
+                "guilt-avoid",
+                "guilt-punish",
+                "jealousy-check",
+                "jealousy-cling",
+                "jealousy-interrogate",
+                "love-idealize",
+                "love-proximity",
+                "love-reach-out",
+                "love-stalk",
+                "pull-away",
+                "sad-bed",
+                "sad-give-up",
+                "sad-isolate",
+                "sad-scroll",
+                "shame-avoid-people",
+                "shame-hide",
+                "shame-secret",
+                "shame-shrink",
+                "text-again"
+               ]
+              ]
+             }
+            },
+            {
+             "eq": [
+              "$opt.parent",
+              "$d.parent"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "max": 1,
+       "required": true,
+       "own": {
+        "hint": "size_own",
+        "countsAsPick": true,
+        "max": 90
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "pred",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "pred",
+     "kind": "ask",
+     "title": "pred_title",
+     "fields": [
+      {
+       "id": "predict",
+       "options": {
+        "list": "predict"
+       },
+       "max": 1
+      }
+     ],
+     "next": [
+      {
+       "to": "when",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "when",
+     "kind": "ask",
+     "title": "when_title",
+     "fields": [
+      {
+       "id": "when",
+       "options": {
+        "list": "when"
+       },
+       "max": 1,
+       "required": true
+      },
+      {
+       "id": "due",
+       "label": "due_label",
+       "options": {
+        "list": "due"
+       },
+       "max": 1,
+       "showWhen": {
+        "all": [
+         {
+          "set": "$a.when"
+         },
+         {
+          "not": {
+           "eq": [
+            "$a.when",
+            "now"
+           ]
+          }
+         }
+        ]
+       }
+      }
+     ],
+     "followUp": {
+      "type": "oa_try",
+      "whenFrom": "due",
+      "when": {
+       "all": [
+        {
+         "not": {
+          "eq": [
+           "$a.when",
+           "now"
+          ]
+         }
+        },
+        {
+         "set": "$a.due"
+        }
+       ]
+      }
+     },
+     "next": [
+      {
+       "to": "try",
+       "when": {
+        "eq": [
+         "$a.when",
+         "now"
+        ]
+       }
+      },
+      {
+       "to": "plan",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "try",
+     "kind": "ask",
+     "title": "try_title",
+     "hint": "try_hint",
+     "primary": "tried",
+     "next": [
+      {
+       "to": "aftr",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "aftr",
+     "kind": "ask",
+     "title": "after_title",
+     "fields": [
+      {
+       "id": "outcome",
+       "options": {
+        "list": "outcome"
+       },
+       "max": 1,
+       "required": true
+      },
+      {
+       "id": "actual",
+       "label": "actual_label",
+       "options": {
+        "list": "actual"
+       },
+       "max": 1
+      },
+      {
+       "id": "tvna",
+       "label": "tvn_label",
+       "options": {
+        "list": "tvn"
+       },
+       "max": 1,
+       "required": true,
+       "askFresh": "thenVsNow"
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "eq": [
+         "$a.outcome",
+         "unsafe"
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "read",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "read",
+     "kind": "handoff",
+     "complete": true,
+     "title": "read_title",
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "eq": [
+         "$a.outcome",
+         "unsafe"
+        ]
+       }
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.predict",
+           "badly"
+          ]
+         },
+         {
+          "not": {
+           "eq": [
+            "$a.actual",
+            "badly"
+           ]
+          }
+         },
+         {
+          "set": "$a.actual"
+         }
+        ]
+       },
+       "key": "read_gap"
+      },
+      {
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.predict",
+           "worse"
+          ]
+         },
+         {
+          "not": {
+           "eq": [
+            "$a.actual",
+            "worse"
+           ]
+          }
+         },
+         {
+          "set": "$a.actual"
+         }
+        ]
+       },
+       "key": "read_worse_gap"
+      },
+      {
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.predict",
+           "react"
+          ]
+         },
+         {
+          "not": {
+           "eq": [
+            "$a.actual",
+            "react"
+           ]
+          }
+         },
+         {
+          "set": "$a.actual"
+         }
+        ]
+       },
+       "key": "read_react_gap"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.outcome",
+         "partial"
+        ]
+       },
+       "key": "read_part"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.outcome",
+         "unclear"
+        ]
+       },
+       "key": "read_unclear"
+      },
+      {
+       "when": {
+        "in": [
+         "$a.tvna",
+         [
+          "better",
+          "much_better"
+         ]
+        ]
+       },
+       "key": "read_down"
+      },
+      {
+       "when": {
+        "in": [
+         "$a.tvna",
+         [
+          "same",
+          "worse"
+         ]
+        ]
+       },
+       "key": "read_same"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": [
+      {
+       "exit": "pause",
+       "when": {
+        "eq": [
+         "$a.outcome",
+         "unsafe"
+        ]
+       }
+      },
+      {
+       "exit": "er_troubleshoot",
+       "when": {
+        "eq": [
+         "$a.tvna",
+         "worse"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "id": "plan",
+     "kind": "handoff",
+     "complete": true,
+     "title": "plan_title",
+     "lines": [
+      {
+       "when": {
+        "set": "$a.due"
+       },
+       "key": "plan_line"
+      },
+      {
+       "key": "plan_line_none"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": []
+    },
+    {
+     "id": "back",
+     "kind": "ask",
+     "reopens": {
+      "after": "when"
+     },
+     "clears": [
+      "tried",
+      "outcome",
+      "actual"
+     ],
+     "title": "back_title",
+     "fields": [
+      {
+       "id": "tried",
+       "options": {
+        "list": "tried"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "aft2",
+       "when": {
+        "eq": [
+         "$a.tried",
+         "yes"
+        ]
+       }
+      },
+      {
+       "to": "miss",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "aft2",
+     "kind": "ask",
+     "title": "after_title",
+     "fields": [
+      {
+       "id": "outcome",
+       "options": {
+        "list": "outcome"
+       },
+       "max": 1,
+       "required": true
+      },
+      {
+       "id": "actual",
+       "label": "actual_label",
+       "options": {
+        "list": "actual"
+       },
+       "max": 1
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "eq": [
+         "$a.outcome",
+         "unsafe"
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "read2",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "read2",
+     "kind": "handoff",
+     "complete": true,
+     "noClose": true,
+     "title": "read_title",
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "eq": [
+         "$a.outcome",
+         "unsafe"
+        ]
+       }
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.predict",
+           "badly"
+          ]
+         },
+         {
+          "not": {
+           "eq": [
+            "$a.actual",
+            "badly"
+           ]
+          }
+         },
+         {
+          "set": "$a.actual"
+         }
+        ]
+       },
+       "key": "read_gap"
+      },
+      {
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.predict",
+           "worse"
+          ]
+         },
+         {
+          "not": {
+           "eq": [
+            "$a.actual",
+            "worse"
+           ]
+          }
+         },
+         {
+          "set": "$a.actual"
+         }
+        ]
+       },
+       "key": "read_worse_gap"
+      },
+      {
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.predict",
+           "react"
+          ]
+         },
+         {
+          "not": {
+           "eq": [
+            "$a.actual",
+            "react"
+           ]
+          }
+         },
+         {
+          "set": "$a.actual"
+         }
+        ]
+       },
+       "key": "read_react_gap"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.outcome",
+         "partial"
+        ]
+       },
+       "key": "read_part"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.outcome",
+         "unclear"
+        ]
+       },
+       "key": "read_unclear"
+      },
+      {
+       "key": "read_later"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": [
+      {
+       "exit": "pause",
+       "when": {
+        "eq": [
+         "$a.outcome",
+         "unsafe"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "id": "miss",
+     "kind": "handoff",
+     "complete": true,
+     "noClose": true,
+     "title": "miss_title",
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.tried",
+         "too_strong"
+        ]
+       },
+       "key": "miss_strong"
+      },
+      {
+       "key": "miss_line"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": [
+      {
+       "exit": "pause",
+       "when": {
+        "eq": [
+         "$a.tried",
+         "too_strong"
+        ]
+       }
+      }
+     ]
+    }
+   ],
+   "exits": [
+    {
+     "id": "check_the_facts",
+     "toolId": "check-the-facts",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "cool_down",
+     "toolId": "cool-down",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "dear_man",
+     "toolId": "dear-man",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "done",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": true
+    },
+    {
+     "id": "ending",
+     "toolId": "ending-relationships",
+     "query": {
+      "frame": "careful"
+     },
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "er_troubleshoot",
+     "toolId": "er-troubleshoot",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "fast",
+     "toolId": "fast",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "pause",
+     "toolId": "pause",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "problem_solve",
+     "toolId": "problem-solve",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "ride",
+     "toolId": "urge-surfing",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "safety_open",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": false,
+     "safety": true
+    }
+   ],
+   "options": {
+    "urge": [
+     {
+      "value": "anger-lash",
+      "label": "Lash out or say something cutting",
+      "parents": [
+       "anger"
+      ],
+      "urge": "anger-lash"
+     },
+     {
+      "value": "disgust-push",
+      "label": "Push this person or thing away",
+      "parents": [
+       "disgust"
+      ],
+      "urge": "disgust-push"
+     },
+     {
+      "value": "envy-tear-down",
+      "label": "Tear them down (in your head or out loud)",
+      "parents": [
+       "envy"
+      ],
+      "urge": "envy-tear-down"
+     },
+     {
+      "value": "fear-avoid",
+      "label": "Avoid it entirely",
+      "parents": [
+       "fear"
+      ],
+      "urge": "fear-avoid"
+     },
+     {
+      "value": "guilt-apologize",
+      "label": "Apologize again (or excessively)",
+      "parents": [
+       "guilt"
+      ],
+      "urge": "guilt-apologize"
+     },
+     {
+      "value": "jealousy-check",
+      "label": "Check their phone, social media, or whereabouts",
+      "parents": [
+       "jealousy"
+      ],
+      "urge": "jealousy-check"
+     },
+     {
+      "value": "love-reach-out",
+      "label": "Text, call, or reach out to them",
+      "parents": [
+       "love"
+      ],
+      "urge": "love-reach-out"
+     },
+     {
+      "value": "sad-bed",
+      "label": "Stay in bed and do nothing",
+      "parents": [
+       "sadness"
+      ],
+      "urge": "sad-bed"
+     },
+     {
+      "value": "shame-hide",
+      "label": "Hide or disappear",
+      "parents": [
+       "shame"
+      ],
+      "urge": "shame-hide"
+     },
+     {
+      "value": "anger-stonewall",
+      "label": "Shut someone out",
+      "parents": [
+       "anger"
+      ],
+      "urge": "anger-stonewall"
+     },
+     {
+      "value": "disgust-leave",
+      "label": "Leave the situation",
+      "parents": [
+       "disgust"
+      ],
+      "urge": "disgust-leave"
+     },
+     {
+      "value": "envy-compare",
+      "label": "Compare and despair",
+      "parents": [
+       "envy"
+      ],
+      "urge": "envy-compare"
+     },
+     {
+      "value": "fear-escape",
+      "label": "Run away or escape",
+      "parents": [
+       "fear"
+      ],
+      "urge": "fear-escape"
+     },
+     {
+      "value": "guilt-punish",
+      "label": "Punish yourself",
+      "parents": [
+       "guilt"
+      ],
+      "urge": "guilt-punish",
+      "danger": "self"
+     },
+     {
+      "value": "jealousy-interrogate",
+      "label": "Interrogate or ask repeatedly",
+      "parents": [
+       "jealousy"
+      ],
+      "urge": "jealousy-interrogate"
+     },
+     {
+      "value": "love-stalk",
+      "label": "Check their social media",
+      "parents": [
+       "love"
+      ],
+      "urge": "love-stalk"
+     },
+     {
+      "value": "sad-isolate",
+      "label": "Cancel plans and isolate",
+      "parents": [
+       "sadness"
+      ],
+      "urge": "sad-isolate"
+     },
+     {
+      "value": "shame-secret",
+      "label": "Keep it secret",
+      "parents": [
+       "shame"
+      ],
+      "urge": "shame-secret"
+     },
+     {
+      "value": "anger-destroy",
+      "label": "Break or throw something",
+      "parents": [
+       "anger"
+      ],
+      "urge": "anger-destroy"
+     },
+     {
+      "value": "disgust-judge",
+      "label": "Judge or condemn",
+      "parents": [
+       "disgust"
+      ],
+      "urge": "disgust-judge"
+     },
+     {
+      "value": "envy-give-up",
+      "label": "Give up on your own goals",
+      "parents": [
+       "envy"
+      ],
+      "urge": "envy-give-up"
+     },
+     {
+      "value": "fear-cancel",
+      "label": "Cancel plans",
+      "parents": [
+       "fear"
+      ],
+      "urge": "fear-cancel"
+     },
+     {
+      "value": "guilt-avoid",
+      "label": "Avoid the person you think you wronged",
+      "parents": [
+       "guilt"
+      ],
+      "urge": "guilt-avoid"
+     },
+     {
+      "value": "jealousy-cling",
+      "label": "Cling or demand more attention",
+      "parents": [
+       "jealousy"
+      ],
+      "urge": "jealousy-cling"
+     },
+     {
+      "value": "love-proximity",
+      "label": "Go places they might be",
+      "parents": [
+       "love"
+      ],
+      "urge": "love-proximity"
+     },
+     {
+      "value": "sad-give-up",
+      "label": "Give up on something that matters",
+      "parents": [
+       "sadness"
+      ],
+      "urge": "sad-give-up"
+     },
+     {
+      "value": "shame-shrink",
+      "label": "Make yourself small",
+      "parents": [
+       "shame"
+      ],
+      "urge": "shame-shrink"
+     },
+     {
+      "value": "anger-criticize",
+      "label": "Criticize or blame someone",
+      "parents": [
+       "anger"
+      ],
+      "urge": "anger-criticize"
+     },
+     {
+      "value": "fear-freeze",
+      "label": "Freeze and do nothing",
+      "parents": [
+       "fear"
+      ],
+      "urge": "fear-freeze"
+     },
+     {
+      "value": "love-idealize",
+      "label": "Idealize them and ignore red flags",
+      "parents": [
+       "love"
+      ],
+      "urge": "love-idealize"
+     },
+     {
+      "value": "sad-scroll",
+      "label": "Scroll mindlessly or zone out",
+      "parents": [
+       "sadness"
+      ],
+      "urge": "sad-scroll"
+     },
+     {
+      "value": "shame-avoid-people",
+      "label": "Avoid people who might notice",
+      "parents": [
+       "shame"
+      ],
+      "urge": "shame-avoid-people"
+     },
+     {
+      "value": "text-again",
+      "label": "Text them again",
+      "parents": [
+       "love"
+      ],
+      "urge": "text-again"
+     },
+     {
+      "value": "check-profile",
+      "label": "Check their profile",
+      "parents": [
+       "jealousy",
+       "love"
+      ],
+      "urge": "check-profile"
+     },
+     {
+      "value": "pull-away",
+      "label": "Pull away from them",
+      "parents": [
+       "sadness",
+       "shame"
+      ],
+      "urge": "pull-away"
+     },
+     {
+      "value": "fire-back",
+      "label": "Fire back",
+      "parents": [
+       "anger"
+      ],
+      "urge": "fire-back"
+     },
+     {
+      "value": "go-quiet",
+      "label": "Go quiet on them",
+      "parents": [
+       "sadness",
+       "shame"
+      ],
+      "urge": "go-quiet"
+     }
+    ],
+    "goal": [
+     {
+      "value": "connection",
+      "label": "Stay connected"
+     },
+     {
+      "value": "boundary",
+      "label": "Protect a boundary"
+     },
+     {
+      "value": "progress",
+      "label": "Make progress on something"
+     },
+     {
+      "value": "repair",
+      "label": "Repair harm"
+     },
+     {
+      "value": "self_respect",
+      "label": "Act with self-respect"
+     }
+    ],
+    "safety": [
+     {
+      "value": "safe",
+      "label": "Yes, it's safe to try"
+     },
+     {
+      "value": "danger",
+      "label": "There's danger"
+     },
+     {
+      "value": "boundary",
+      "label": "There's a boundary I need to keep"
+     },
+     {
+      "value": "unsure",
+      "label": "I'm not sure what's safe"
+     }
+    ],
+    "want": [
+     {
+      "value": "yes",
+      "label": "Yes, turn it down"
+     },
+     {
+      "value": "not_sure",
+      "label": "Not sure"
+     },
+     {
+      "value": "no",
+      "label": "No, I want to keep it"
+     }
+    ],
+    "fits": [
+     {
+      "value": "fits",
+      "label": "The emotion and its intensity fit"
+     },
+     {
+      "value": "excessive",
+      "label": "The emotion fits, and it's bigger or longer than the situation calls for"
+     },
+     {
+      "value": "not_fit",
+      "label": "The facts do not support this emotion"
+     },
+     {
+      "value": "unsure",
+      "label": "I still do not know"
+     }
+    ],
+    "help": [
+     {
+      "value": "helpful",
+      "label": "Yes, this urge would help my goal"
+     },
+     {
+      "value": "unhelpful",
+      "label": "No, it would make things harder"
+     },
+     {
+      "value": "unsure",
+      "label": "I cannot tell yet"
+     }
+    ],
+    "cue": [
+     {
+      "value": "c_de25d1d700",
+      "label": "Open your hands, palms up",
+      "urges": [
+       "anger-lash",
+       "anger-destroy",
+       "fire-back"
+      ],
+      "parents": [
+       "anger"
+      ]
+     },
+     {
+      "value": "c_b66efffdc2",
+      "label": "Unclench your jaw",
+      "urges": [],
+      "parents": [
+       "anger",
+       "envy"
+      ]
+     },
+     {
+      "value": "c_c60ecae90b",
+      "label": "Try a half-smile: lift the corners of your lips a little",
+      "urges": [],
+      "parents": [
+       "anger",
+       "envy",
+       "sadness"
+      ]
+     },
+     {
+      "value": "c_86176c31da",
+      "label": "Relax your nose and upper lip",
+      "urges": [],
+      "parents": [
+       "disgust"
+      ]
+     },
+     {
+      "value": "c_4045428de8",
+      "label": "Open your hands",
+      "urges": [],
+      "parents": [
+       "disgust"
+      ]
+     },
+     {
+      "value": "c_5060f529af",
+      "label": "Lean in slightly instead of back",
+      "urges": [],
+      "parents": [
+       "disgust"
+      ]
+     },
+     {
+      "value": "c_d42985a30f",
+      "label": "Soften the muscles around your eyes",
+      "urges": [],
+      "parents": [
+       "envy",
+       "jealousy"
+      ]
+     },
+     {
+      "value": "c_92578086cd",
+      "label": "Drop your shoulders away from your ears",
+      "urges": [],
+      "parents": [
+       "fear"
+      ]
+     },
+     {
+      "value": "c_9273be90bb",
+      "label": "Unclench your jaw and let your teeth part",
+      "urges": [],
+      "parents": [
+       "fear"
+      ]
+     },
+     {
+      "value": "c_aff53f33b5",
+      "label": "Breathe out a little longer than you breathe in",
+      "urges": [],
+      "parents": [
+       "fear"
+      ]
+     },
+     {
+      "value": "c_b92489492c",
+      "label": "Plant your feet and soften your knees",
+      "urges": [
+       "fear-escape"
+      ],
+      "parents": []
+     },
+     {
+      "value": "c_15817e10d4",
+      "label": "Press your feet into the floor and stand up",
+      "urges": [
+       "fear-freeze"
+      ],
+      "parents": []
+     },
+     {
+      "value": "c_84496dd341",
+      "label": "Shift your weight from foot to foot",
+      "urges": [
+       "fear-freeze"
+      ],
+      "parents": []
+     },
+     {
+      "value": "c_22dd9dc90b",
+      "label": "Lift your eyes and look around the room",
+      "urges": [
+       "fear-freeze"
+      ],
+      "parents": []
+     },
+     {
+      "value": "c_00b16dd672",
+      "label": "Lift your head",
+      "urges": [],
+      "parents": [
+       "guilt"
+      ]
+     },
+     {
+      "value": "c_39d58fe795",
+      "label": "Let your hands rest still and open",
+      "urges": [],
+      "parents": [
+       "guilt"
+      ]
+     },
+     {
+      "value": "c_c0332af8d9",
+      "label": "Take one steady breath",
+      "urges": [],
+      "parents": [
+       "guilt"
+      ]
+     },
+     {
+      "value": "c_d6f17609a2",
+      "label": "Loosen your grip and open your hands",
+      "urges": [],
+      "parents": [
+       "jealousy"
+      ]
+     },
+     {
+      "value": "c_c46ad3daf1",
+      "label": "Breathe out slowly",
+      "urges": [],
+      "parents": [
+       "jealousy"
+      ]
+     },
+     {
+      "value": "c_09eca8cb4b",
+      "label": "Put your phone face-down and your hands in your lap",
+      "urges": [
+       "jealousy-check",
+       "check-profile",
+       "love-reach-out",
+       "text-again"
+      ],
+      "parents": [
+       "love"
+      ]
+     },
+     {
+      "value": "c_c017068361",
+      "label": "Turn your body away from the phone",
+      "urges": [],
+      "parents": [
+       "love"
+      ]
+     },
+     {
+      "value": "c_82865c08fb",
+      "label": "Take one slow breath",
+      "urges": [],
+      "parents": [
+       "love"
+      ]
+     },
+     {
+      "value": "c_14b2af9eb8",
+      "label": "Sit or stand upright",
+      "urges": [],
+      "parents": [
+       "sadness"
+      ]
+     },
+     {
+      "value": "c_3ad5056b5f",
+      "label": "Lift your eyes to the horizon",
+      "urges": [],
+      "parents": [
+       "sadness"
+      ]
+     },
+     {
+      "value": "c_ce51057f07",
+      "label": "Sit all the way up",
+      "urges": [
+       "sad-bed"
+      ],
+      "parents": []
+     },
+     {
+      "value": "c_2d39a78281",
+      "label": "Put both feet on the floor",
+      "urges": [
+       "sad-bed"
+      ],
+      "parents": []
+     },
+     {
+      "value": "c_6d0e3bfd04",
+      "label": "Lift your eyes toward the light",
+      "urges": [
+       "sad-bed"
+      ],
+      "parents": []
+     },
+     {
+      "value": "c_7651da2e1a",
+      "label": "Turn toward the room and lift your eyes",
+      "urges": [
+       "pull-away"
+      ],
+      "parents": []
+     },
+     {
+      "value": "c_8ee6de87c5",
+      "label": "Unclench your jaw and let your shoulders drop",
+      "urges": [
+       "go-quiet"
+      ],
+      "parents": []
+     },
+     {
+      "value": "c_aa2806eaa8",
+      "label": "Roll your shoulders back and open your chest",
+      "urges": [],
+      "parents": [
+       "shame"
+      ]
+     },
+     {
+      "value": "c_2091adf57b",
+      "label": "Lift your chin and your eyes",
+      "urges": [],
+      "parents": [
+       "shame"
+      ]
+     },
+     {
+      "value": "c_8cd11624e9",
+      "label": "Uncross your arms and take up your space",
+      "urges": [],
+      "parents": [
+       "shame"
+      ]
+     },
+     {
+      "value": "c_d0ff7dc31e",
+      "label": "Roll your shoulders back and lift your chin",
+      "urges": [
+       "shame-hide",
+       "shame-shrink"
+      ],
+      "parents": []
+     }
+    ],
+    "tvn": [
+     {
+      "value": "worse",
+      "label": "Stronger"
+     },
+     {
+      "value": "same",
+      "label": "About the same"
+     },
+     {
+      "value": "better",
+      "label": "A bit weaker"
+     },
+     {
+      "value": "much_better",
+      "label": "Much weaker"
+     }
+    ],
+    "size": [
+     {
+      "value": "anger-lash:small",
+      "label": "Pause and count to 10 before responding",
+      "urgeFor": "anger-lash",
+      "size": "small"
+     },
+     {
+      "value": "anger-lash:medium",
+      "label": "Write down what you want to say, then set it aside for an hour",
+      "urgeFor": "anger-lash",
+      "size": "medium"
+     },
+     {
+      "value": "anger-lash:bigger",
+      "label": "Say something kind to the person instead",
+      "urgeFor": "anger-lash",
+      "size": "bigger"
+     },
+     {
+      "value": "anger-stonewall:small",
+      "label": "Don't block or unfriend yet. Pause",
+      "urgeFor": "anger-stonewall",
+      "size": "small"
+     },
+     {
+      "value": "anger-stonewall:medium",
+      "label": "Send a brief, neutral message acknowledging them",
+      "urgeFor": "anger-stonewall",
+      "size": "medium"
+     },
+     {
+      "value": "anger-stonewall:bigger",
+      "label": "Have an honest, gentle conversation about what happened",
+      "urgeFor": "anger-stonewall",
+      "size": "bigger"
+     },
+     {
+      "value": "anger-destroy:small",
+      "label": "Squeeze ice in your hands for 30 seconds",
+      "urgeFor": "anger-destroy",
+      "size": "small"
+     },
+     {
+      "value": "anger-destroy:medium",
+      "label": "Do 30 jumping jacks or a brisk walk around the block",
+      "urgeFor": "anger-destroy",
+      "size": "medium"
+     },
+     {
+      "value": "anger-destroy:bigger",
+      "label": "Channel the energy into cleaning, building, or creating something",
+      "urgeFor": "anger-destroy",
+      "size": "bigger"
+     },
+     {
+      "value": "anger-criticize:small",
+      "label": "Pause and name one thing they might be going through",
+      "urgeFor": "anger-criticize",
+      "size": "small"
+     },
+     {
+      "value": "anger-criticize:medium",
+      "label": "Ask a genuine question about their perspective",
+      "urgeFor": "anger-criticize",
+      "size": "medium"
+     },
+     {
+      "value": "anger-criticize:bigger",
+      "label": "Offer an honest compliment or acknowledgment",
+      "urgeFor": "anger-criticize",
+      "size": "bigger"
+     },
+     {
+      "value": "fire-back:small",
+      "label": "Wait ten breaths before you answer",
+      "urgeFor": "fire-back",
+      "size": "small"
+     },
+     {
+      "value": "fire-back:medium",
+      "label": "Step away until you can answer gently",
+      "urgeFor": "fire-back",
+      "size": "medium"
+     },
+     {
+      "value": "fire-back:bigger",
+      "label": "Say one fair or kind thing about their side first",
+      "urgeFor": "fire-back",
+      "size": "bigger"
+     },
+     {
+      "value": "anger:small",
+      "label": "Pause for 10 seconds before doing anything",
+      "parent": "anger",
+      "size": "small"
+     },
+     {
+      "value": "anger:medium",
+      "label": "Try to see the situation from the other person's perspective",
+      "parent": "anger",
+      "size": "medium"
+     },
+     {
+      "value": "anger:bigger",
+      "label": "Do something genuinely kind for the person you're angry at",
+      "parent": "anger",
+      "size": "bigger"
+     },
+     {
+      "value": "disgust-push:small",
+      "label": "Stay present for 2 more minutes",
+      "urgeFor": "disgust-push",
+      "size": "small"
+     },
+     {
+      "value": "disgust-push:medium",
+      "label": "Find one small thing to appreciate about the situation",
+      "urgeFor": "disgust-push",
+      "size": "medium"
+     },
+     {
+      "value": "disgust-push:bigger",
+      "label": "Engage fully without the disgust filter",
+      "urgeFor": "disgust-push",
+      "size": "bigger"
+     },
+     {
+      "value": "disgust-leave:small",
+      "label": "Stay, and shift your attention to something neutral",
+      "urgeFor": "disgust-leave",
+      "size": "small"
+     },
+     {
+      "value": "disgust-leave:medium",
+      "label": "Stay and participate, even minimally",
+      "urgeFor": "disgust-leave",
+      "size": "medium"
+     },
+     {
+      "value": "disgust-leave:bigger",
+      "label": "Stay and engage as if the disgust isn't there",
+      "urgeFor": "disgust-leave",
+      "size": "bigger"
+     },
+     {
+      "value": "disgust-judge:small",
+      "label": "Notice the judgment and label it as a judgment, not a fact",
+      "urgeFor": "disgust-judge",
+      "size": "small"
+     },
+     {
+      "value": "disgust-judge:medium",
+      "label": "Consider one reason this makes sense from their perspective",
+      "urgeFor": "disgust-judge",
+      "size": "medium"
+     },
+     {
+      "value": "disgust-judge:bigger",
+      "label": "Actively practice empathy — imagine their full experience",
+      "urgeFor": "disgust-judge",
+      "size": "bigger"
+     },
+     {
+      "value": "disgust:small",
+      "label": "Stay present for 2 more minutes",
+      "parent": "disgust",
+      "size": "small"
+     },
+     {
+      "value": "disgust:medium",
+      "label": "Find one thing to appreciate about the situation",
+      "parent": "disgust",
+      "size": "medium"
+     },
+     {
+      "value": "disgust:bigger",
+      "label": "Engage fully, as if the disgust weren't there",
+      "parent": "disgust",
+      "size": "bigger"
+     },
+     {
+      "value": "envy-tear-down:small",
+      "label": "Catch the thought and label it as envy, not truth",
+      "urgeFor": "envy-tear-down",
+      "size": "small"
+     },
+     {
+      "value": "envy-tear-down:medium",
+      "label": "Say one genuinely kind thing about them",
+      "urgeFor": "envy-tear-down",
+      "size": "medium"
+     },
+     {
+      "value": "envy-tear-down:bigger",
+      "label": "Celebrate their success as if it were your own",
+      "urgeFor": "envy-tear-down",
+      "size": "bigger"
+     },
+     {
+      "value": "envy-compare:small",
+      "label": "Notice the comparison and redirect your attention",
+      "urgeFor": "envy-compare",
+      "size": "small"
+     },
+     {
+      "value": "envy-compare:medium",
+      "label": "List 3 things you have that you're genuinely grateful for",
+      "urgeFor": "envy-compare",
+      "size": "medium"
+     },
+     {
+      "value": "envy-compare:bigger",
+      "label": "Use the envy as information — what does it tell you about what YOU want? Take one step toward that",
+      "urgeFor": "envy-compare",
+      "size": "bigger"
+     },
+     {
+      "value": "envy-give-up:small",
+      "label": "Name one small thing you've accomplished recently",
+      "urgeFor": "envy-give-up",
+      "size": "small"
+     },
+     {
+      "value": "envy-give-up:medium",
+      "label": "Take one tiny step toward something you want",
+      "urgeFor": "envy-give-up",
+      "size": "medium"
+     },
+     {
+      "value": "envy-give-up:bigger",
+      "label": "Make a plan for getting what envy is pointing you toward",
+      "urgeFor": "envy-give-up",
+      "size": "bigger"
+     },
+     {
+      "value": "envy:small",
+      "label": "Catch the comparison and name it as envy",
+      "parent": "envy",
+      "size": "small"
+     },
+     {
+      "value": "envy:medium",
+      "label": "List 3 things you're grateful for right now",
+      "parent": "envy",
+      "size": "medium"
+     },
+     {
+      "value": "envy:bigger",
+      "label": "Celebrate their success genuinely, then take one step toward your own goals",
+      "parent": "envy",
+      "size": "bigger"
+     },
+     {
+      "value": "fear-avoid:small",
+      "label": "Stay in the room 2 more minutes",
+      "urgeFor": "fear-avoid",
+      "size": "small"
+     },
+     {
+      "value": "fear-avoid:medium",
+      "label": "Approach the thing for 10 minutes, then reassess",
+      "urgeFor": "fear-avoid",
+      "size": "medium"
+     },
+     {
+      "value": "fear-avoid:bigger",
+      "label": "Do the thing you've been avoiding, start to finish",
+      "urgeFor": "fear-avoid",
+      "size": "bigger"
+     },
+     {
+      "value": "fear-escape:small",
+      "label": "Plant your feet and take 3 slow breaths",
+      "urgeFor": "fear-escape",
+      "size": "small"
+     },
+     {
+      "value": "fear-escape:medium",
+      "label": "Stay until the fear drops one notch",
+      "urgeFor": "fear-escape",
+      "size": "medium"
+     },
+     {
+      "value": "fear-escape:bigger",
+      "label": "Stay until the fear passes on its own",
+      "urgeFor": "fear-escape",
+      "size": "bigger"
+     },
+     {
+      "value": "fear-cancel:small",
+      "label": "Don't cancel yet — wait 30 minutes and decide then",
+      "urgeFor": "fear-cancel",
+      "size": "small"
+     },
+     {
+      "value": "fear-cancel:medium",
+      "label": "Go, and give yourself permission to leave early",
+      "urgeFor": "fear-cancel",
+      "size": "medium"
+     },
+     {
+      "value": "fear-cancel:bigger",
+      "label": "Go and stay the whole time",
+      "urgeFor": "fear-cancel",
+      "size": "bigger"
+     },
+     {
+      "value": "fear-freeze:small",
+      "label": "Move one part of your body — stand up, stretch",
+      "urgeFor": "fear-freeze",
+      "size": "small"
+     },
+     {
+      "value": "fear-freeze:medium",
+      "label": "Take one small action related to what you're avoiding",
+      "urgeFor": "fear-freeze",
+      "size": "medium"
+     },
+     {
+      "value": "fear-freeze:bigger",
+      "label": "Start the task fully, even imperfectly",
+      "urgeFor": "fear-freeze",
+      "size": "bigger"
+     },
+     {
+      "value": "fear:small",
+      "label": "Stay with the discomfort a little longer — even 2 minutes",
+      "parent": "fear",
+      "size": "small"
+     },
+     {
+      "value": "fear:medium",
+      "label": "Take one step toward what you're avoiding",
+      "parent": "fear",
+      "size": "medium"
+     },
+     {
+      "value": "fear:bigger",
+      "label": "Engage fully with the safe activity you chose while keeping appropriate boundaries",
+      "parent": "fear",
+      "size": "bigger"
+     },
+     {
+      "value": "guilt-apologize:small",
+      "label": "Notice the urge to apologize and don't act on it",
+      "urgeFor": "guilt-apologize",
+      "size": "small"
+     },
+     {
+      "value": "guilt-apologize:medium",
+      "label": "If you've already apologized once, let that be enough",
+      "urgeFor": "guilt-apologize",
+      "size": "medium"
+     },
+     {
+      "value": "guilt-apologize:bigger",
+      "label": "Act freely, without hedging or seeking reassurance",
+      "urgeFor": "guilt-apologize",
+      "size": "bigger"
+     },
+     {
+      "value": "guilt-punish:small",
+      "label": "Notice the self-punishment urge and name it out loud",
+      "urgeFor": "guilt-punish",
+      "size": "small"
+     },
+     {
+      "value": "guilt-punish:medium",
+      "label": "Do something neutral — a walk, a glass of water",
+      "urgeFor": "guilt-punish",
+      "size": "medium"
+     },
+     {
+      "value": "guilt-punish:bigger",
+      "label": "Do something kind for yourself — the direct opposite of punishment",
+      "urgeFor": "guilt-punish",
+      "size": "bigger"
+     },
+     {
+      "value": "guilt-avoid:small",
+      "label": "Don't change your route or routine to avoid them",
+      "urgeFor": "guilt-avoid",
+      "size": "small"
+     },
+     {
+      "value": "guilt-avoid:medium",
+      "label": "Make brief, normal contact — a wave, a hello",
+      "urgeFor": "guilt-avoid",
+      "size": "medium"
+     },
+     {
+      "value": "guilt-avoid:bigger",
+      "label": "Engage with them normally, without excessive guilt or apology",
+      "urgeFor": "guilt-avoid",
+      "size": "bigger"
+     },
+     {
+      "value": "guilt:small",
+      "label": "Notice the self-punishment urge and don't act on it",
+      "parent": "guilt",
+      "size": "small"
+     },
+     {
+      "value": "guilt:medium",
+      "label": "Do something neutral instead of punishing yourself",
+      "parent": "guilt",
+      "size": "medium"
+     },
+     {
+      "value": "guilt:bigger",
+      "label": "Act freely, as if you did nothing wrong — because you didn't",
+      "parent": "guilt",
+      "size": "bigger"
+     },
+     {
+      "value": "jealousy-check:small",
+      "label": "Put your phone down for 10 minutes",
+      "urgeFor": "jealousy-check",
+      "size": "small"
+     },
+     {
+      "value": "jealousy-check:medium",
+      "label": "Delete the checking app from your home screen for today",
+      "urgeFor": "jealousy-check",
+      "size": "medium"
+     },
+     {
+      "value": "jealousy-check:bigger",
+      "label": "Go a full day without checking",
+      "urgeFor": "jealousy-check",
+      "size": "bigger"
+     },
+     {
+      "value": "jealousy-interrogate:small",
+      "label": "Ask once, then accept the answer",
+      "urgeFor": "jealousy-interrogate",
+      "size": "small"
+     },
+     {
+      "value": "jealousy-interrogate:medium",
+      "label": "Notice the urge to ask again and do something else instead",
+      "urgeFor": "jealousy-interrogate",
+      "size": "medium"
+     },
+     {
+      "value": "jealousy-interrogate:bigger",
+      "label": "Say 'have fun' and genuinely mean it",
+      "urgeFor": "jealousy-interrogate",
+      "size": "bigger"
+     },
+     {
+      "value": "jealousy-cling:small",
+      "label": "Give them 30 minutes of uninterrupted space",
+      "urgeFor": "jealousy-cling",
+      "size": "small"
+     },
+     {
+      "value": "jealousy-cling:medium",
+      "label": "Make plans with someone else",
+      "urgeFor": "jealousy-cling",
+      "size": "medium"
+     },
+     {
+      "value": "jealousy-cling:bigger",
+      "label": "Encourage them to spend time with others and enjoy yourself meanwhile",
+      "urgeFor": "jealousy-cling",
+      "size": "bigger"
+     },
+     {
+      "value": "check-profile:small",
+      "label": "Wait ten minutes before you look",
+      "urgeFor": "check-profile",
+      "size": "small"
+     },
+     {
+      "value": "check-profile:medium",
+      "label": "Mute them for today",
+      "urgeFor": "check-profile",
+      "size": "medium"
+     },
+     {
+      "value": "check-profile:bigger",
+      "label": "Take the app off your home screen for the week",
+      "urgeFor": "check-profile",
+      "size": "bigger"
+     },
+     {
+      "value": "jealousy:small",
+      "label": "Put your phone down for 10 minutes",
+      "parent": "jealousy",
+      "size": "small"
+     },
+     {
+      "value": "jealousy:medium",
+      "label": "Ask once, then accept the answer",
+      "parent": "jealousy",
+      "size": "medium"
+     },
+     {
+      "value": "jealousy:bigger",
+      "label": "Give them genuine freedom and space — and mean it",
+      "parent": "jealousy",
+      "size": "bigger"
+     },
+     {
+      "value": "love-reach-out:small",
+      "label": "Write the message and don't send it. Wait 1 hour",
+      "urgeFor": "love-reach-out",
+      "size": "small"
+     },
+     {
+      "value": "love-reach-out:medium",
+      "label": "Put your phone in another room for an hour",
+      "urgeFor": "love-reach-out",
+      "size": "medium"
+     },
+     {
+      "value": "love-reach-out:bigger",
+      "label": "Delete the draft, close the app, do something that demands your full attention",
+      "urgeFor": "love-reach-out",
+      "size": "bigger"
+     },
+     {
+      "value": "love-stalk:small",
+      "label": "Notice the urge and set a 10-minute timer before deciding",
+      "urgeFor": "love-stalk",
+      "size": "small"
+     },
+     {
+      "value": "love-stalk:medium",
+      "label": "Mute or unfollow them",
+      "urgeFor": "love-stalk",
+      "size": "medium"
+     },
+     {
+      "value": "love-stalk:bigger",
+      "label": "Block or remove them from your feed entirely",
+      "urgeFor": "love-stalk",
+      "size": "bigger"
+     },
+     {
+      "value": "love-proximity:small",
+      "label": "Choose a different route or venue today",
+      "urgeFor": "love-proximity",
+      "size": "small"
+     },
+     {
+      "value": "love-proximity:medium",
+      "label": "Make plans that have nothing to do with them",
+      "urgeFor": "love-proximity",
+      "size": "medium"
+     },
+     {
+      "value": "love-proximity:bigger",
+      "label": "Fill the time you'd spend thinking about them with something that builds your life",
+      "urgeFor": "love-proximity",
+      "size": "bigger"
+     },
+     {
+      "value": "love-idealize:small",
+      "label": "Write down one realistic negative",
+      "urgeFor": "love-idealize",
+      "size": "small"
+     },
+     {
+      "value": "love-idealize:medium",
+      "label": "Write the full honest picture — good and bad",
+      "urgeFor": "love-idealize",
+      "size": "medium"
+     },
+     {
+      "value": "love-idealize:bigger",
+      "label": "Talk to a friend about the reality, not the fantasy",
+      "urgeFor": "love-idealize",
+      "size": "bigger"
+     },
+     {
+      "value": "text-again:small",
+      "label": "Write it in your notes, not to them",
+      "urgeFor": "text-again",
+      "size": "small"
+     },
+     {
+      "value": "text-again:medium",
+      "label": "Put the phone in another room for an hour, then decide",
+      "urgeFor": "text-again",
+      "size": "medium"
+     },
+     {
+      "value": "text-again:bigger",
+      "label": "Leave it unsent today and do something that needs your hands",
+      "urgeFor": "text-again",
+      "size": "bigger"
+     },
+     {
+      "value": "love:small",
+      "label": "Write what you want to say, and don't send it",
+      "parent": "love",
+      "size": "small"
+     },
+     {
+      "value": "love:medium",
+      "label": "Put your phone away and do something that requires your full attention",
+      "parent": "love",
+      "size": "medium"
+     },
+     {
+      "value": "love:bigger",
+      "label": "Go no-contact and fill the space with something that builds YOUR life",
+      "parent": "love",
+      "size": "bigger"
+     },
+     {
+      "value": "sad-bed:small",
+      "label": "Sit up and open the blinds",
+      "urgeFor": "sad-bed",
+      "size": "small"
+     },
+     {
+      "value": "sad-bed:medium",
+      "label": "Take a shower and get dressed",
+      "urgeFor": "sad-bed",
+      "size": "medium"
+     },
+     {
+      "value": "sad-bed:bigger",
+      "label": "Go for a 10-minute walk outside",
+      "urgeFor": "sad-bed",
+      "size": "bigger"
+     },
+     {
+      "value": "sad-isolate:small",
+      "label": "Text one person back",
+      "urgeFor": "sad-isolate",
+      "size": "small"
+     },
+     {
+      "value": "sad-isolate:medium",
+      "label": "Keep one plan today",
+      "urgeFor": "sad-isolate",
+      "size": "medium"
+     },
+     {
+      "value": "sad-isolate:bigger",
+      "label": "Call someone and talk for 5 minutes",
+      "urgeFor": "sad-isolate",
+      "size": "bigger"
+     },
+     {
+      "value": "sad-give-up:small",
+      "label": "Do the tiniest next step — open the file, write one sentence",
+      "urgeFor": "sad-give-up",
+      "size": "small"
+     },
+     {
+      "value": "sad-give-up:medium",
+      "label": "Work on it for 10 minutes, then stop if you need to",
+      "urgeFor": "sad-give-up",
+      "size": "medium"
+     },
+     {
+      "value": "sad-give-up:bigger",
+      "label": "Complete one meaningful piece of it",
+      "urgeFor": "sad-give-up",
+      "size": "bigger"
+     },
+     {
+      "value": "sad-scroll:small",
+      "label": "Put the phone in another room for 15 minutes",
+      "urgeFor": "sad-scroll",
+      "size": "small"
+     },
+     {
+      "value": "sad-scroll:medium",
+      "label": "Do one small task you've been putting off",
+      "urgeFor": "sad-scroll",
+      "size": "medium"
+     },
+     {
+      "value": "sad-scroll:bigger",
+      "label": "Spend 30 minutes doing something that requires your full attention",
+      "urgeFor": "sad-scroll",
+      "size": "bigger"
+     },
+     {
+      "value": "pull-away:small",
+      "label": "Send one ordinary message back",
+      "urgeFor": "pull-away",
+      "size": "small"
+     },
+     {
+      "value": "pull-away:medium",
+      "label": "Keep one plan with them",
+      "urgeFor": "pull-away",
+      "size": "medium"
+     },
+     {
+      "value": "pull-away:bigger",
+      "label": "If they are safe to tell, tell them a little of what has been going on",
+      "urgeFor": "pull-away",
+      "size": "bigger"
+     },
+     {
+      "value": "go-quiet:small",
+      "label": "Send one line: I need a minute, I'll come back to this",
+      "urgeFor": "go-quiet",
+      "size": "small"
+     },
+     {
+      "value": "go-quiet:medium",
+      "label": "Come back to it later today, as you said",
+      "urgeFor": "go-quiet",
+      "size": "medium"
+     },
+     {
+      "value": "go-quiet:bigger",
+      "label": "If they are safe to tell, say plainly what upset you",
+      "urgeFor": "go-quiet",
+      "size": "bigger"
+     },
+     {
+      "value": "sadness:small",
+      "label": "Do one tiny thing — sit up, open the blinds, send one text",
+      "parent": "sadness",
+      "size": "small"
+     },
+     {
+      "value": "sadness:medium",
+      "label": "Get up and do something active for 10 minutes",
+      "parent": "sadness",
+      "size": "medium"
+     },
+     {
+      "value": "sadness:bigger",
+      "label": "Go be around people, even if you don't feel like it",
+      "parent": "sadness",
+      "size": "bigger"
+     },
+     {
+      "value": "shame-hide:small",
+      "label": "Stay where you are instead of leaving",
+      "urgeFor": "shame-hide",
+      "size": "small"
+     },
+     {
+      "value": "shame-hide:medium",
+      "label": "Make eye contact with one person",
+      "urgeFor": "shame-hide",
+      "size": "medium"
+     },
+     {
+      "value": "shame-hide:bigger",
+      "label": "Stand tall, shoulders back, and take up space",
+      "urgeFor": "shame-hide",
+      "size": "bigger"
+     },
+     {
+      "value": "shame-secret:small",
+      "label": "Write it down, even if it's only for yourself",
+      "urgeFor": "shame-secret",
+      "size": "small"
+     },
+     {
+      "value": "shame-secret:medium",
+      "label": "Tell one trusted person a small piece of it",
+      "urgeFor": "shame-secret",
+      "size": "medium"
+     },
+     {
+      "value": "shame-secret:bigger",
+      "label": "Share openly with someone you trust, looking them in the eye",
+      "urgeFor": "shame-secret",
+      "size": "bigger"
+     },
+     {
+      "value": "shame-shrink:small",
+      "label": "Uncross your arms and take up your normal space",
+      "urgeFor": "shame-shrink",
+      "size": "small"
+     },
+     {
+      "value": "shame-shrink:medium",
+      "label": "Speak at your normal volume — don't mumble or trail off",
+      "urgeFor": "shame-shrink",
+      "size": "medium"
+     },
+     {
+      "value": "shame-shrink:bigger",
+      "label": "Share your opinion or ask for what you need out loud",
+      "urgeFor": "shame-shrink",
+      "size": "bigger"
+     },
+     {
+      "value": "shame-avoid-people:small",
+      "label": "Don't cancel your next social plan",
+      "urgeFor": "shame-avoid-people",
+      "size": "small"
+     },
+     {
+      "value": "shame-avoid-people:medium",
+      "label": "Go where people are, even briefly",
+      "urgeFor": "shame-avoid-people",
+      "size": "medium"
+     },
+     {
+      "value": "shame-avoid-people:bigger",
+      "label": "Initiate contact with someone — text, call, or show up",
+      "urgeFor": "shame-avoid-people",
+      "size": "bigger"
+     },
+     {
+      "value": "shame:small",
+      "label": "Stay where you are instead of leaving",
+      "parent": "shame",
+      "size": "small"
+     },
+     {
+      "value": "shame:medium",
+      "label": "Make eye contact and speak at your normal volume",
+      "parent": "shame",
+      "size": "medium"
+     },
+     {
+      "value": "shame:bigger",
+      "label": "Tell someone you trust what happened, with your head held high",
+      "parent": "shame",
+      "size": "bigger"
+     }
+    ],
+    "predict": [
+     {
+      "value": "badly",
+      "label": "It'll go badly"
+     },
+     {
+      "value": "worse",
+      "label": "I'll feel worse"
+     },
+     {
+      "value": "react",
+      "label": "They'll react badly"
+     },
+     {
+      "value": "nothing",
+      "label": "Nothing much"
+     },
+     {
+      "value": "not_sure",
+      "label": "Not sure"
+     }
+    ],
+    "when": [
+     {
+      "value": "now",
+      "label": "Now, in this situation"
+     },
+     {
+      "value": "today",
+      "label": "At the next opportunity today"
+     },
+     {
+      "value": "next_time",
+      "label": "When this urge shows up again"
+     }
+    ],
+    "due": [
+     {
+      "value": "hour",
+      "label": "Within the hour"
+     },
+     {
+      "value": "evening",
+      "label": "This evening"
+     },
+     {
+      "value": "tomorrow",
+      "label": "Tomorrow"
+     },
+     {
+      "value": "this_week",
+      "label": "Later this week"
+     }
+    ],
+    "tried": [
+     {
+      "value": "yes",
+      "label": "Yes, I tried it"
+     },
+     {
+      "value": "too_strong",
+      "label": "The urge was too strong"
+     },
+     {
+      "value": "no_moment",
+      "label": "The moment didn't come"
+     },
+     {
+      "value": "forgot",
+      "label": "I forgot"
+     },
+     {
+      "value": "chose_not",
+      "label": "I chose not to"
+     }
+    ],
+    "outcome": [
+     {
+      "value": "toward_goal",
+      "label": "I acted more in line with my goal"
+     },
+     {
+      "value": "partial",
+      "label": "I tried part of the action"
+     },
+     {
+      "value": "unclear",
+      "label": "I cannot tell what helped yet"
+     },
+     {
+      "value": "unsafe",
+      "label": "It felt unsafe"
+     }
+    ],
+    "actual": [
+     {
+      "value": "badly",
+      "label": "It went badly"
+     },
+     {
+      "value": "worse",
+      "label": "I felt worse"
+     },
+     {
+      "value": "react",
+      "label": "They reacted badly"
+     },
+     {
+      "value": "nothing",
+      "label": "Nothing much"
+     },
+     {
+      "value": "better",
+      "label": "It went better than I thought"
+     }
+    ]
+   }
+  },
+  {
    "id": "problem_solve",
    "toolId": "problem-solve",
    "version": "ps-v1",

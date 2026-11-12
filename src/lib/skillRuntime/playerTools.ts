@@ -17,6 +17,7 @@ export const PLAYER_TOOLS: Readonly<Record<string, string>> = {
   'cool-down': 'first_body',
   'urge-surfing': 'ride_it_out',
   'let-it-be': 'let_it_be',
+  'opposite-action': 'opposite_action',
 };
 
 /**
@@ -37,6 +38,18 @@ export const PAGE_SKILLS: Readonly<Record<string, readonly string[]>> = {
  * the next prep reads them fresh.
  */
 export const PROFILE_WRITING_CLOSES: ReadonlySet<string> = new Set(['dear-man', 'say-no']);
+
+/**
+ * Links the old page still answers after its port (C8.4: the old page stays in the tree, unrouted, except for these):
+ * Do the Opposite's `?followUp=<sessionId>` from the oa_plan cards the hand-built page scheduled before the port (they
+ * go stale after a week). A link that also names `run` is the skill's own (oa_try), so the player takes it.
+ * Remove it, and the hand-built page's route with it, 7 days after the port's deploy (docs/design/opposite-action-v3.md).
+ */
+export function legacyLink(toolId: string, search: string): boolean {
+  if (toolId !== 'opposite-action') return false;
+  const q = new URLSearchParams(search);
+  return q.has('followUp') && !q.has('run');
+}
 
 /** The skill a tool's page plays, or null when the tool still has its own page. */
 export function playerSkillFor(toolId: string): string | null {

@@ -1,6 +1,6 @@
 # Do the Opposite v3 on the skill runtime (ER-03, batch ER-B3)
 
-Status: **design, building** (12 Nov 2026). The PRD is `prd-emotion-regulation.md` ER-03 (audit §3.3); D7 and D9 in
+Status: **part 2 built** (12 Nov 2026; *As built* below says where the build departs from the design tables). The PRD is `prd-emotion-regulation.md` ER-03 (audit §3.3); D7 and D9 in
 `dbt-modules-plan.md` decide its scope: PR #48's doors are merged first and kept as an embed, multi-feeling becomes
 per-feeling sub-runs (R16), and every clinical change in ER-03 is in, as the PRD has it. Tool id, URL and
 `OppositeActionSession` stay; the hand-built page stays in the tree, unrouted (C8.4), and rolling back is removing
@@ -16,7 +16,56 @@ Two PRs:
    projection, and the runtime pieces it needs (each its own `runtime:` commit for the plan
    thread).
 
-## The flow
+## As built (part 2)
+
+`scripts/skills/opposite_action.py`, played under the `opposite-action` tool id (`playerTools.ts`). Steps, in order:
+`door` (the `doorPicker` embed: #48's start screen as it is; reports up to three grid words, loudest first) → `calm`
+(a settle hold, only for a carried flooded reading) → `goal` (the goal and the safety split, once) → `dang` / `bnd` /
+`uns` (danger: the `other_person` slot, Ending careful, Hold to wait; a boundary: FAST, DEAR MAN, Hold to wait; not
+sure: the slot and Hold to wait) or, per feeling, `vald` (the parent's acknowledgment as the title, its urges, own
+words) → `want` (*No* → `keep`: Problem Solve, DEAR MAN, Ride it out) → `fits` (the parent's fit statements above the
+verdict; *Check the facts properly* quietly) → `help` → the route: `repr` (guilt or shame, fits, goal repair), `prob`
+(fits or too big + helpful; too big offers First, the body first), `cue` (the graph's `opposite`), else `clar` (Check
+the Facts; its own line for doesn't fit + helpful). Each route hand-off offers *Carry on with the others*. On the
+opposite route: `cue` (the urge's own cues, or the parent's unless the urge replaces them) → `hold` (press and hold the
+cue) → `aftb` (the pull compared with before, `thenVsNow`) → `size` (the urge's three steps, or the parent's defaults
+for an urge in your own words). Then once: `pred` (what you expect, optional) → `when` → `try` → `aftr` (what
+happened, what actually happened, the pull: `thenVsNow`, newest wins) → `read` (one line: the prediction gap first,
+then partial / unclear, then the pull); or `plan`, whose chip books **`oa_try`** (*Did you get to try it?*), which
+reopens the run at `back` → `aft2` / `read2` (no pull asked: a reopened run reads nothing ask-fresh) or `miss` (the
+reason; too strong offers Hold to wait).
+
+Safety: *Punish yourself* (`guilt-punish`, `danger: self`) opens `safety.open` over `want` (`safetyFirst`) and keeps the
+crisis banner on that feeling's screens; the danger and not-sure answers keep the `other_person` slot; *It felt
+unsafe* shows it on the readout and offers Hold to wait.
+
+Saved: `ext.run`; close kind `regulation_down` (the in-flow then-vs-now is the close); `urgeIds` are each feeling's urge
+(option `urge` props); the projection (`functions/src/oppositeAction/projection.ts`) writes one `OppositeActionSession`
+**v3** per feeling that reached `size` (ids only: `emotionId`, `parentId`, `urgeId` or `custom`, `actionSize`, `goal`,
+`facts`, `effectiveness`, `cueId`, `outcome`, `predict`, `actual`, `thenVsNowBody`, `status`), `DETAIL` from the visit,
+after re-checking the word (`oppositeActionApplicable`), the urge (its parent's) and the route (the graph's `opposite`,
+not the repair rule) on the server. A reopened visit moves the first visit's records to `practiced` or `missed`. The
+parts stats read v3 as they read v2 (`actionSize` in `dataJson`, `TARGETED_URGE`); the hand-built page's lists read v2
+only. With parts on, the close's tag row (`TAG_ROW_TOOLS`, `PROFILE_NEEDS['opposite-action'] = ['parts']`).
+
+Old links: `?followUp=<id>` without `run` (the `oa_plan` cards the hand-built page booked) still opens the hand-built
+page (`legacyLink`). **Remove it, and the hand-built page's route, 7 days after this port deploys** (`oa_plan` goes
+stale after 168 h).
+
+Departures from the tables below, each deferred:
+
+- No `elsewhere` step: the doors offer only words Do the Opposite works on (#48 says the rest on screen).
+- `flood`: a settle hold before the goal, then the same flow (no small-first size default or deferred fit check yet).
+- `fits`: the fit statements as a list above the verdict, not the `fitStack` card embed.
+- `readout`: a hand-off with one line, not the `urgeReadout` embed; no then-vs-now bar.
+- Parts lines (the unblend line under the urge, the goal line above `help`): not placed yet (the old page has them).
+- `repr` opens Problem Solve with no frame (Problem Solve doesn't accept `repair` yet).
+- `oa_plan` → `oa_try` (a skill follow-up whose card reopens the run, as `ps_review`); one card per visit, not per
+  feeling. `ext.er.oaFacts / oaEffect / oaRoute` are not written (the run holds them; Reflect reads close answers).
+- `UrgeTrend` stays on the hand-built page; v3 has no numbers to trend.
+- The readout's *Not sure* re-ask and the loop guard (third same/louder in 7 days) need server-side reads.
+
+## The flow (design)
 
 One visit, in order. Steps marked *(per feeling)* run once for each picked feeling, loudest first (R16, below).
 Copy is re-voiced in `COPY`; the clinical content stays in the graph (`schema/opposite-action-data.cypher`,
@@ -60,7 +109,7 @@ and made *Fire back*'s steps the opposite of anger rather than assertiveness.
 dissociation, and the freeze row `requiresPrior: up_regulation`. Inside, `numb`-family words keep their redirect
 (`elsewhere`).
 
-## What's saved
+## What's saved (design)
 
 The run is the `ToolSession` with `ext.run`, as every skill. The projection (`PROJECTIONS['opposite-action']`,
 R14) writes, in the same transaction:

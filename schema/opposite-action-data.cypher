@@ -112,7 +112,7 @@ SET c.fitsFactsGuidance = "If the love is for someone available, mutual, and hea
     c.whyItWorks = "Love that doesn't fit the facts — someone unavailable, harmful, or gone — keeps you stuck through intermittent reinforcement. Each contact resets the clock. Distance lets the attachment fade.",
     c.acknowledgment = "Love is pulling you toward connection. When someone is unavailable, harmful, or gone, each contact resets the clock. Distance is how this attachment fades.",
     c.bodyOpposite = "When you feel the pull to reach out, put your hands in your lap. Turn away from your phone. Take a breath and ground yourself.",
-    c.defaultOppositeSmall = "Write what you want to say, but don't send it",
+    c.defaultOppositeSmall = "Write what you want to say, and don't send it",
     c.defaultOppositeMedium = "Put your phone away and do something that requires your full attention",
     c.defaultOppositeBigger = "Go no-contact and fill the space with something that builds YOUR life";
 
@@ -129,7 +129,7 @@ WITH c
 UNWIND [
   {id: "fear-avoid", label: "Avoid it entirely", small: "Stay in the room 2 more minutes", medium: "Approach the thing for 10 minutes, then reassess", bigger: "Do the thing you've been avoiding, start to finish", order: 1},
   {id: "fear-escape", label: "Run away or escape", small: "Plant your feet and take 3 slow breaths", medium: "Stay until the fear drops one notch", bigger: "Stay until the fear passes on its own", order: 2},
-  {id: "fear-cancel", label: "Cancel plans", small: "Don't cancel yet — wait 30 minutes and decide then", medium: "Go but give yourself permission to leave early", bigger: "Go and stay the whole time", order: 3},
+  {id: "fear-cancel", label: "Cancel plans", small: "Don't cancel yet — wait 30 minutes and decide then", medium: "Go, and give yourself permission to leave early", bigger: "Go and stay the whole time", order: 3},
   {id: "fear-freeze", label: "Freeze and do nothing", small: "Move one part of your body — stand up, stretch", medium: "Take one small action related to what you're avoiding", bigger: "Start the task fully, even imperfectly", order: 4}
 ] AS urge
 MERGE (u:ActionUrge {id: urge.id})
@@ -141,7 +141,7 @@ MATCH (c:EmotionRegulationContent {dbtParent: 'anger'})
 WITH c
 UNWIND [
   {id: "anger-lash", label: "Lash out or say something cutting", small: "Pause and count to 10 before responding", medium: "Write down what you want to say, then set it aside for an hour", bigger: "Say something kind to the person instead", order: 1},
-  {id: "anger-stonewall", label: "Shut someone out", small: "Don't block or unfriend — just pause", medium: "Send a brief, neutral message acknowledging them", bigger: "Have an honest, gentle conversation about what happened", order: 2},
+  {id: "anger-stonewall", label: "Shut someone out", small: "Don't block or unfriend yet. Pause", medium: "Send a brief, neutral message acknowledging them", bigger: "Have an honest, gentle conversation about what happened", order: 2},
   {id: "anger-destroy", label: "Break or throw something", small: "Squeeze ice in your hands for 30 seconds", medium: "Do 30 jumping jacks or a brisk walk around the block", bigger: "Channel the energy into cleaning, building, or creating something", order: 3},
   {id: "anger-criticize", label: "Criticize or blame someone", small: "Pause and name one thing they might be going through", medium: "Ask a genuine question about their perspective", bigger: "Offer an honest compliment or acknowledgment", order: 4}
 ] AS urge
@@ -167,7 +167,7 @@ MATCH (c:EmotionRegulationContent {dbtParent: 'disgust'})
 WITH c
 UNWIND [
   {id: "disgust-push", label: "Push this person or thing away", small: "Stay present for 2 more minutes", medium: "Find one small thing to appreciate about the situation", bigger: "Engage fully without the disgust filter", order: 1},
-  {id: "disgust-leave", label: "Leave the situation", small: "Stay, but shift your attention to something neutral", medium: "Stay and participate, even minimally", bigger: "Stay and engage as if the disgust isn't there", order: 2},
+  {id: "disgust-leave", label: "Leave the situation", small: "Stay, and shift your attention to something neutral", medium: "Stay and participate, even minimally", bigger: "Stay and engage as if the disgust isn't there", order: 2},
   {id: "disgust-judge", label: "Judge or condemn", small: "Notice the judgment and label it as a judgment, not a fact", medium: "Consider one reason this makes sense from their perspective", bigger: "Actively practice empathy — imagine their full experience", order: 3}
 ] AS urge
 MERGE (u:ActionUrge {id: urge.id})
@@ -179,7 +179,7 @@ MATCH (c:EmotionRegulationContent {dbtParent: 'shame'})
 WITH c
 UNWIND [
   {id: "shame-hide", label: "Hide or disappear", small: "Stay where you are instead of leaving", medium: "Make eye contact with one person", bigger: "Stand tall, shoulders back, and take up space", order: 1},
-  {id: "shame-secret", label: "Keep it secret", small: "Write it down, even just for yourself", medium: "Tell one trusted person a small piece of it", bigger: "Share openly with someone you trust, looking them in the eye", order: 2},
+  {id: "shame-secret", label: "Keep it secret", small: "Write it down, even if it's only for yourself", medium: "Tell one trusted person a small piece of it", bigger: "Share openly with someone you trust, looking them in the eye", order: 2},
   {id: "shame-shrink", label: "Make yourself small", small: "Uncross your arms and take up your normal space", medium: "Speak at your normal volume — don't mumble or trail off", bigger: "Share your opinion or ask for what you need out loud", order: 3},
   {id: "shame-avoid-people", label: "Avoid people who might notice", small: "Don't cancel your next social plan", medium: "Go where people are, even briefly", bigger: "Initiate contact with someone — text, call, or show up", order: 4}
 ] AS urge
@@ -227,7 +227,7 @@ MERGE (c)-[:HAS_ACTION_URGE]->(u);
 MATCH (c:EmotionRegulationContent {dbtParent: 'love'})
 WITH c
 UNWIND [
-  {id: "love-reach-out", label: "Text, call, or reach out to them", small: "Write the message but don't send it — wait 1 hour", medium: "Put your phone in another room for an hour", bigger: "Delete the draft, close the app, do something that demands your full attention", order: 1},
+  {id: "love-reach-out", label: "Text, call, or reach out to them", small: "Write the message and don't send it. Wait 1 hour", medium: "Put your phone in another room for an hour", bigger: "Delete the draft, close the app, do something that demands your full attention", order: 1},
   {id: "love-stalk", label: "Check their social media", small: "Notice the urge and set a 10-minute timer before deciding", medium: "Mute or unfollow them", bigger: "Block or remove them from your feed entirely", order: 2},
   {id: "love-proximity", label: "Go places they might be", small: "Choose a different route or venue today", medium: "Make plans that have nothing to do with them", bigger: "Fill the time you'd spend thinking about them with something that builds your life", order: 3},
   {id: "love-idealize", label: "Idealize them and ignore red flags", small: "Write down one realistic negative", medium: "Write the full honest picture — good and bad", bigger: "Talk to a friend about the reality, not the fantasy", order: 4}

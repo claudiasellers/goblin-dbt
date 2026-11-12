@@ -14,6 +14,7 @@ import { WaitLockEmbed } from './WaitLockEmbed';
 import { UrgeWave, WaveTrace } from './UrgeWave';
 import { DebriefWhoEmbed } from './DebriefWhoEmbed';
 import { MessageComposer } from './MessageComposer';
+import { DoorPickerEmbed } from './DoorPickerEmbed';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -76,6 +77,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   urgeWave: UrgeWave,
   waveTrace: WaveTrace,
   messageComposer: MessageComposer,
+  doorPicker: DoorPickerEmbed,
 };
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
@@ -105,6 +107,7 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   },
   waveTrace: { ids: ['read'] },
   messageComposer: { ids: ['copied', 'opened', 'dropped_sorry'] },
+  doorPicker: { emotions: 3 },
 };
 
 /**
@@ -328,4 +331,5 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     heldLine: { type: 'copy' },
     next: { type: 'copy' },
   },
+  doorPicker: {},
 };
