@@ -17,7 +17,7 @@ import { closeQuestion, closeKindFor } from '../../lib/spine/close';
 import { emotionIdsFromLink } from '../../lib/spine/toolLink';
 import {
   askFresh, canGoOn, carried as carriedOf, contextIn, copyText, crisisFor, ctxAfterResume, seededFrom, stepLinks, emotionChoices, fieldLinks, fieldList, followUpFor,
-  handoffLine, initialRun, inlineResult, keepFor, opensSafety, optionGroups, ownMaxOf, persistence, pickedLabels, resumeRun, runEmotionIds, runNext, runRecord,
+  exitQuery, handoffLine, initialRun, inlineResult, keepFor, opensSafety, optionGroups, ownMaxOf, persistence, pickedLabels, resumeRun, runEmotionIds, runNext, runRecord,
   runUrgeIds,
   scope, shownFields, stepOf, titleSlots,
   type Answer, type RunContext, type RunEvent, type RunState,
@@ -263,9 +263,9 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
     const to = PRIVATE_TOOLS.has(exit.toolId)
       ? { pathname: `/tool/${exit.toolId}`, state: { checkinEmotions: carriedOf(exit, st) } }
       : toolSession.linkTo(exit.toolId, { checkinEmotions: carriedOf(exit, st) });
-    const q = new URLSearchParams(exit.query).toString();
+    const q = new URLSearchParams(exitQuery(ctx, exit, st)).toString();
     navigate({ pathname: to.pathname, search: q ? `?${q}` : '' }, { state: to.state });
-  }, [toolSession, navigate, st]);
+  }, [toolSession, navigate, st, ctx]);
 
   /**
    * The step's follow-up (R5), when it has one to schedule now: its time from the type's window and the chip
@@ -476,8 +476,11 @@ function AskStep({ ctx, step, st, send, onExit, onShown, onPrimary, busy }: {
       </div>
     );
   });
+  // An ask step's conditional line (`lines`, as a hand-off's): context the question reads from, above its hint.
+  const askLine = handoffLine(ctx, step, st);
   return (<>
     {title && <Prompt>{title}</Prompt>}
+    {askLine && <Line>{askLine}</Line>}
     {step.hint && c[step.hint] && <Line>{c[step.hint]}</Line>}
     {/* `after: '$title'`: under the title, above the questions (a heading or a line the whole screen reads from). */}
     {slotsAfter(TITLE_SLOT)}
