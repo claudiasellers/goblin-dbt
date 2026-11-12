@@ -126,6 +126,35 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
       return out;
     },
   },
+  // When it's a habit (DT-09, docs/design/habit-plan.md): the plan the person kept on *Keep it in Me*, for one
+  // behaviour (the minimal TargetBehavior until CORE-04 owns one). The runtime's keep (R4: `<field>Ids` / `<field>Own`):
+  // the behaviour (`what`), the stretch committed to (`span`, the habit_renew chip), the lapse plan (`lapse`), bridges
+  // burned (`burn`), what tends to lead back (`risky`), new bridges (`build`) and what not doing it gives (`reinforce`).
+  // No slice yet: the renewal reopens the visit's own run, and Me lists it.
+  abstinence_plan: {
+    kind: 'abstinence_plan', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'my_plans', slice: null,
+    owner: 'DT', many: true, maxItems: 6, editor: null,
+    ownFields: ['whatOwn', 'lapseOwn', 'burnOwn', 'riskyOwn', 'buildOwn', 'reinforceOwn'],
+    validate: (v) => {
+      const o = obj(v);
+      const out: Record<string, unknown> = {};
+      const most = { what: 1, span: 1, lapse: 3, burn: 3, risky: 3, build: 2, reinforce: 3 } as const;
+      for (const f of Object.keys(most) as Array<keyof typeof most>) {
+        const ids = o[`${f}Ids`];
+        const own = o[`${f}Own`];
+        if (ids !== undefined) out[`${f}Ids`] = strArray(ids, { max: most[f], item: (x) => str(x, { max: 40, pattern: OPTION_ID }) });
+        if (own !== undefined) {
+          if (f === 'span') throw new ValidationError('Unexpected field');
+          out[`${f}Own`] = str(own, { max: 60 });
+        }
+      }
+      for (const k of Object.keys(o)) if (!/^(what|span|lapse|burn|risky|build|reinforce)(Ids|Own)$/.test(k)) throw new ValidationError('Unexpected field');
+      if (!out.whatIds && !out.whatOwn) throw new ValidationError('A plan is for one behaviour');
+      if ((out.whatIds as string[] | undefined)?.includes('hurt')) throw new ValidationError('Not a habit plan');
+      if (!out.lapseIds && !out.lapseOwn) throw new ValidationError('A plan has its lapse plan');
+      return out;
+    },
+  },
   // People (IE-03 minimal, docs/design/people.md): someone the person wants help with. `label` is the nickname they
   // gave (own words, encrypted; "no real names needed"), `role` a presentation id (src/data/people.ts). `safe` /
   // `risk` / `safeAskedAt` are the answer to "Is it safe to bring hard things up with them?" (D4: asked in the host

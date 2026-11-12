@@ -405,6 +405,17 @@
    "direction": "neutral",
    "addresses": []
   },
+  "dbt_dialectical_abstinence": {
+   "appToolId": "habit-plan",
+   "name": "Dialectical Abstinence",
+   "description": "Full commitment to not doing a behaviour, for a stretch you can keep, together with a plan for a slip so one slip doesn't become giving up",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": []
+  },
   "dbt_ending_relationships": {
    "appToolId": "ending-relationships",
    "name": "Ending relationships",

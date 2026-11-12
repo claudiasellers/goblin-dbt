@@ -83,7 +83,7 @@ on Hold to wait's sessions (an aggregate, never read back into a flow).
 | The kit (section `pros_cons`) | Not built | DT-03, the safety batch |
 | `ProsConsItem` graph nodes per urge | `SkillOption:ProsConsItem` options with `forUrges` and `cell` | The runtime's options are the graph content; the `FOR_URGE` edges make them queryable |
 | A card can be edited in Me | Set aside or kept; not edited in place | No editor kind yet; make a new one |
-| DT-09 (after a lapse) as an entry point | Not built | DT-09 is parked (D14) |
+| DT-09 (after a lapse) as an entry point | Not built | DT-09 is built (part 1, `habit-plan.md`) and offers this card on its end and *not ready* cards; entering from a lapse waits for DT-09 part 2 |
 | `dt.prosConsReplay {urgeId} → {shown, cardId}` | Keyed on the host's `pull` answer; reports `{}` (the slot's `pros_cons_replay` record says it showed) | The host's pull is the match; which card showed isn't recorded, so "held off after a replay" is per visit, not per card |
 | Fade's other half: "remembered their reasons without the card" on the diary card | Not built | CORE's diary card |
 

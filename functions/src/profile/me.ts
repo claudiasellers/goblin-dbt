@@ -204,6 +204,8 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
       const own = [value.pullOwn, value.longOwn, value.keepsOwn].find((x) => typeof x === 'string' && x.trim());
       if (typeof own === 'string') summary = own;
     }
+    // A habit plan: the behaviour in their words when they wrote it (picked behaviours are ids; the title says enough).
+    if (meta.kind === 'abstinence_plan' && value && typeof value.whatOwn === 'string' && value.whatOwn.trim()) summary = value.whatOwn;
     // A person (IE-03): the name they gave, never the safety answer (Me is not where that's asked or shown).
     if (meta.kind === 'person' && value) {
       summary = typeof value.label === 'string' ? value.label : '';

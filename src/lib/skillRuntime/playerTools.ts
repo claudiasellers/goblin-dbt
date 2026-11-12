@@ -20,6 +20,7 @@ export const PLAYER_TOOLS: Readonly<Record<string, string>> = {
   'mind-job': 'mind_job',
   'soothe': 'held',
   'thoughts-passing': 'thoughts_passing',
+  'habit-plan': 'habit_plan',
 };
 
 /**

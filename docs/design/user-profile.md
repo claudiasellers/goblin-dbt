@@ -201,6 +201,7 @@ moves in the same PR.
 | `country` (`ProfileFact`) | About me | CORE | CORE-01 helplines | `CrisisBanner` |
 | `nightmare_script` (`ProfileFact`, many, own words encrypted) | My plans | ER | **Built:** ER-15 Rewrite the nightmare, on *Keep it in Me* (`docs/design/nightmare-rescript.md`) | Me only (a read-through reopens the visit's run, not the item) |
 | `pros_cons` (`ProfileFact`, many, own words encrypted) | My plans | DT | **Built:** DT-10 Pros & cons card, on *Keep it in Me* (`docs/design/pros-cons.md`) | the `prosCons` slice: Hold to wait (its replay); Me |
+| `abstinence_plan` (`ProfileFact`, many, own words encrypted) | My plans | DT | **Built:** DT-09 When it's a habit, on *Keep it in Me* (`docs/design/habit-plan.md`); the minimal TargetBehavior until CORE-04 | Me only (the renewal reopens the visit's run, not the item) |
 
 **Outside the registry, on purpose:** `Part` / `PartLink` / `DenSnapshot` (parts keep their own writers,
 test-enforced, because a part is built from the stored session, never from client fields) and a

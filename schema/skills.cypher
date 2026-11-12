@@ -6806,6 +6806,12 @@ MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:mind_job"}
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "hold_to_wait:mind_job"}), (t:TherapyConcept {appToolId: "mind-job"})
 MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "hold_to_wait:habit_plan"})
+SET x += {skillId: "hold_to_wait", exit: "habit_plan", toolId: "habit-plan", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:habit_plan"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "hold_to_wait:habit_plan"}), (t:TherapyConcept {appToolId: "habit-plan"})
+MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "hold_to_wait:safety_open"})
 SET x += {skillId: "hold_to_wait", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
 MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:safety_open"})
@@ -6904,6 +6910,9 @@ SET r += {order: 7}, r.rowsJson = "[{\"order\": 7, \"when\": {\"eq\": [\"$a.pull
 MATCH (a:SkillStep {id: "hold_to_wait:next"}), (x:SkillExit {id: "hold_to_wait:mind_job"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 8}, r.rowsJson = "[{\"order\": 8, \"when\": {\"eq\": [\"$a.pull\", \"check\"]}}]";
+MATCH (a:SkillStep {id: "hold_to_wait:next"}), (x:SkillExit {id: "hold_to_wait:habit_plan"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 9}, r.rowsJson = "[{\"order\": 9, \"when\": {\"in\": [\"$a.pull\", [\"use\", \"check\"]]}}]";
 MATCH (a:SkillStep {id: "hold_to_wait:next"}), (x:SkillExit {id: "hold_to_wait:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
@@ -9303,6 +9312,12 @@ MATCH (s:Skill {id: "ride_it_out"}), (x:SkillExit {id: "ride_it_out:pros_cons"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ride_it_out:pros_cons"}), (t:TherapyConcept {appToolId: "pros-cons"})
 MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "ride_it_out:habit_plan"})
+SET x += {skillId: "ride_it_out", exit: "habit_plan", toolId: "habit-plan", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "ride_it_out"}), (x:SkillExit {id: "ride_it_out:habit_plan"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "ride_it_out:habit_plan"}), (t:TherapyConcept {appToolId: "habit-plan"})
+MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "ride_it_out:crisis_kit"})
 SET x += {skillId: "ride_it_out", exit: "crisis_kit", toolId: "crisis-kit", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
 MATCH (s:Skill {id: "ride_it_out"}), (x:SkillExit {id: "ride_it_out:crisis_kit"})
@@ -9473,12 +9488,18 @@ SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []
 MATCH (a:SkillStep {id: "ride_it_out:passed"}), (x:SkillExit {id: "ride_it_out:pros_cons"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "ride_it_out:passed"}), (x:SkillExit {id: "ride_it_out:habit_plan"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"in\": [\"$a.pull\", [\"use\", \"check\"]]}}]";
 MATCH (a:SkillStep {id: "ride_it_out:passed"}), (x:SkillExit {id: "ride_it_out:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "ride_it_out:end"}), (x:SkillExit {id: "ride_it_out:pros_cons"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "ride_it_out:end"}), (x:SkillExit {id: "ride_it_out:habit_plan"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"in\": [\"$a.pull\", [\"use\", \"check\"]]}}]";
 MATCH (a:SkillStep {id: "ride_it_out:end"}), (x:SkillExit {id: "ride_it_out:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
@@ -14340,3 +14361,758 @@ SET o:SkillOption, o += {skillId: "dear_man_prep", list: "when", value: "unsure"
 MATCH (s:Skill {id: "dear_man_prep"}), (o:SkillOption {id: "dear_man_prep:when:unsure"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "when", order: 137};
+
+// --- habit_plan (hp-v1) ---
+MERGE (s:Skill {id: "habit_plan"})
+SET s += {toolId: "habit-plan", version: "hp-v1", contentVersion: "skills-v1", start: "what", ownMax: 60, emotionFields: [], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"after_use_hint\": \"If you've used, try not to be alone, and get emergency help if someone's hard to wake or breathing slowly.\", \"after_use_title\": \"After a break, your body can't take what it used to.\", \"after_use_title_own\": \"If this was alcohol or drugs: after a break, your body can't take what it used to.\", \"again_end_held\": \"You kept the last one. The next one starts now.\", \"again_end_slip\": \"You're choosing it again. A slip is information, not who you are.\", \"again_title\": \"What's the next stretch you can keep?\", \"again_title_slip\": \"What stretch can you keep from here?\", \"build_hint\": \"Pick one or two to have ready.\", \"build_own\": \"Something else\", \"build_title\": \"When a craving comes, what will you turn to?\", \"burn_hint\": \"Small changes that put distance between you and it. Pick what you'd do this week.\", \"burn_own\": \"Something else\", \"burn_title\": \"What could you make harder to get to?\", \"card_next\": \"Next\", \"card_title\": \"If you slip, this is your plan. Read it through once.\", \"done\": \"Done\", \"eating_hint\": \"Regular meals help keep the pull down. A doctor or an eating disorder service can help with the rest.\", \"eating_title\": \"This plan is about not bingeing or purging. It never means not eating.\", \"end_kept\": \"It's in Me. All in on not doing it, and a plan ready if you slip. Both at once.\", \"end_line\": \"All in on not doing it, and a plan ready if you slip. Both at once.\", \"harm_line\": \"Hurting yourself needs more care than a habit plan can give. Someone to talk to comes first.\", \"heads_up_hint\": \"A plan is easier to make once things settle.\", \"heads_up_title\": \"Your body's loud right now.\", \"imagine_done\": \"That's the picture. Coming back to it makes it easier to find.\", \"imagine_running\": \"Picturing\", \"imagine_step1\": \"Picture the thing you'd rather be doing.\", \"imagine_step2\": \"Where are you? What can you see and hear?\", \"imagine_step3\": \"Stay with it. This is the picture you'll reach for.\", \"imagine_title\": \"Practise it now, while it's calm.\", \"keep_primary\": \"Next\", \"keep_title\": \"Keep this plan in Me?\", \"lapse_hint\": \"Planning for a slip isn't planning to slip. It stops one slip turning into giving up.\", \"lapse_own\": \"Something else\", \"lapse_title\": \"If you slip, what will you do first?\", \"me_craving\": \"When a craving comes\", \"me_slip\": \"If I slip\", \"medical_hint\": \"Cutting down with a doctor's plan counts as a commitment too. Shaking, sweating, seeing things or a seizure after stopping: get help now.\", \"medical_title\": \"Stopping alcohol, benzos or opioids all at once can be dangerous. A doctor can help you come off safely.\", \"medical_title_own\": \"If this is alcohol, benzos or opioids: stopping all at once can be dangerous. A doctor can help you come off safely.\", \"next\": \"Next\", \"reinforce_hint\": \"Optional. These are worth remembering on a hard day.\", \"reinforce_own\": \"Something else\", \"reinforce_title\": \"What do you get back when you're not doing it?\", \"remind_hint\": \"It won't say what the plan is about.\", \"remind_title\": \"Want a check-in when the stretch ends?\", \"renew_hint\": \"Whatever happened, there's a next step.\", \"renew_title\": \"Your stretch is up. How did it go?\", \"risky_hint\": \"Small choices that set it up. Naming them makes them easier to spot.\", \"risky_own\": \"Something else\", \"risky_title\": \"What tends to lead you back, without seeming to?\", \"safety_open\": \"Talk to someone now\", \"settle_line\": \"The plan will keep. Look after the next few minutes first.\", \"slipped_next\": \"Next\", \"slipped_title\": \"A slip isn't a relapse. Here's what you planned.\", \"span_hint\": \"Pick a stretch you know you can keep. When it ends, you can choose the next one.\", \"span_title\": \"How long can you fully commit to not doing it?\", \"span_title_sub\": \"How long can you commit to not doing it, or to a doctor's plan for cutting down?\", \"start\": \"Start\", \"stop_line\": \"That's okay. Your plan stays here for when you're ready.\", \"what_hint\": \"Pick one. A plan works best for one thing at a time.\", \"what_own\": \"In my own words\", \"what_title\": \"What do you keep going back to?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+MATCH (t:TherapyConcept {id: "dbt_dialectical_abstinence"}), (s:Skill {id: "habit_plan"})
+MERGE (t)-[:HAS_SKILL]->(s);
+MATCH (:SkillStep {skillId: "habit_plan"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
+MATCH (:Skill {id: "habit_plan"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
+MERGE (n:SkillStep {id: "habit_plan:what"})
+SET n += {skillId: "habit_plan", step: "what", kind: "ask", version: "hp-v1"}, n.specJson = "{\"fields\": [{\"id\": \"what\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"what\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"what_own\"}, \"required\": true}], \"hint\": \"what_hint\", \"title\": \"what_title\"}";
+MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:what"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 0};
+MERGE (n:SkillStep {id: "habit_plan:harm"})
+SET n += {skillId: "habit_plan", step: "harm", kind: "handoff", version: "hp-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"all\": []}}], \"done\": \"done\", \"lines\": [{\"key\": \"harm_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"safetyFirst\": {\"all\": []}}";
+MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:harm"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 1};
+MERGE (n:SkillStep {id: "habit_plan:heads_up"})
+SET n += {skillId: "habit_plan", step: "heads_up", kind: "ask", version: "hp-v1"}, n.specJson = "{\"fields\": [{\"id\": \"heads_up\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"heads_up\"}, \"required\": true}], \"hint\": \"heads_up_hint\", \"title\": \"heads_up_title\"}";
+MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:heads_up"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 2};
+MERGE (n:SkillStep {id: "habit_plan:settle"})
+SET n += {skillId: "habit_plan", step: "settle", kind: "handoff", version: "hp-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"settle_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:settle"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 3};
+MERGE (n:SkillStep {id: "habit_plan:medical"})
+SET n += {skillId: "habit_plan", step: "medical", kind: "ask", version: "hp-v1"}, n.specJson = "{\"fields\": [{\"id\": \"medical\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"support\"}, \"required\": false}], \"hint\": \"medical_hint\", \"title\": [{\"key\": \"medical_title_own\", \"when\": {\"not\": {\"in\": [\"$a.what\", [\"drink\", \"drugs\", \"smoke\", \"binge\", \"gamble\", \"spend\", \"scroll\", \"check\", \"porn\", \"hurt\"]]}}}, {\"key\": \"medical_title\"}]}";
+MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:medical"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 4};
+MERGE (n:SkillStep {id: "habit_plan:eating"})
+SET n += {skillId: "habit_plan", step: "eating", kind: "ask", version: "hp-v1"}, n.specJson = "{\"fields\": [{\"id\": \"eating\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"support\"}, \"required\": false}], \"hint\": \"eating_hint\", \"title\": \"eating_title\"}";
+MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:eating"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 5};
+MERGE (n:SkillStep {id: "habit_plan:span"})
+SET n += {skillId: "habit_plan", step: "span", kind: "ask", version: "hp-v1"}, n.specJson = "{\"fields\": [{\"id\": \"span\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"span\"}, \"required\": true}], \"hint\": \"span_hint\", \"title\": [{\"key\": \"span_title_sub\", \"when\": {\"in\": [\"$a.what\", [\"drink\", \"drugs\"]]}}, {\"key\": \"span_title\"}]}";
+MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:span"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 6};
+MERGE (n:SkillStep {id: "habit_plan:lapse"})
+SET n += {skillId: "habit_plan", step: "lapse", kind: "ask", version: "hp-v1"}, n.specJson = "{\"fields\": [{\"id\": \"lapse\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 3, \"options\": {\"list\": \"lapse\", \"where\": {\"any\": [{\"all\": [{\"eq\": [\"$a.what\", \"drink\"]}, {\"eq\": [\"$opt.drink\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"drugs\"]}, {\"eq\": [\"$opt.drugs\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"smoke\"]}, {\"eq\": [\"$opt.smoke\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"binge\"]}, {\"eq\": [\"$opt.binge\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"gamble\"]}, {\"eq\": [\"$opt.gamble\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"spend\"]}, {\"eq\": [\"$opt.spend\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"scroll\"]}, {\"eq\": [\"$opt.scroll\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"check\"]}, {\"eq\": [\"$opt.check\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"porn\"]}, {\"eq\": [\"$opt.porn\", true]}]}, {\"all\": [{\"not\": {\"in\": [\"$a.what\", [\"drink\", \"drugs\", \"smoke\", \"binge\", \"gamble\", \"spend\", \"scroll\", \"check\", \"porn\", \"hurt\"]]}}, {\"eq\": [\"$opt.other\", true]}]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"lapse_own\"}, \"required\": true}], \"hint\": \"lapse_hint\", \"title\": \"lapse_title\"}";
+MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:lapse"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 7};
+MERGE (n:SkillStep {id: "habit_plan:burn"})
+SET n += {skillId: "habit_plan", step: "burn", kind: "ask", version: "hp-v1"}, n.specJson = "{\"fields\": [{\"id\": \"burn\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 3, \"options\": {\"list\": \"burn\", \"where\": {\"any\": [{\"all\": [{\"eq\": [\"$a.what\", \"drink\"]}, {\"eq\": [\"$opt.drink\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"drugs\"]}, {\"eq\": [\"$opt.drugs\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"smoke\"]}, {\"eq\": [\"$opt.smoke\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"binge\"]}, {\"eq\": [\"$opt.binge\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"gamble\"]}, {\"eq\": [\"$opt.gamble\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"spend\"]}, {\"eq\": [\"$opt.spend\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"scroll\"]}, {\"eq\": [\"$opt.scroll\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"check\"]}, {\"eq\": [\"$opt.check\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"porn\"]}, {\"eq\": [\"$opt.porn\", true]}]}, {\"all\": [{\"not\": {\"in\": [\"$a.what\", [\"drink\", \"drugs\", \"smoke\", \"binge\", \"gamble\", \"spend\", \"scroll\", \"check\", \"porn\", \"hurt\"]]}}, {\"eq\": [\"$opt.other\", true]}]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"burn_own\"}, \"required\": false}], \"hint\": \"burn_hint\", \"title\": \"burn_title\"}";
+MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:burn"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 8};
+MERGE (n:SkillStep {id: "habit_plan:risky"})
+SET n += {skillId: "habit_plan", step: "risky", kind: "ask", version: "hp-v1"}, n.specJson = "{\"fields\": [{\"id\": \"risky\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 3, \"options\": {\"list\": \"risky\", \"where\": {\"any\": [{\"all\": [{\"eq\": [\"$a.what\", \"drink\"]}, {\"eq\": [\"$opt.drink\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"drugs\"]}, {\"eq\": [\"$opt.drugs\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"smoke\"]}, {\"eq\": [\"$opt.smoke\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"binge\"]}, {\"eq\": [\"$opt.binge\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"gamble\"]}, {\"eq\": [\"$opt.gamble\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"spend\"]}, {\"eq\": [\"$opt.spend\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"scroll\"]}, {\"eq\": [\"$opt.scroll\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"check\"]}, {\"eq\": [\"$opt.check\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"porn\"]}, {\"eq\": [\"$opt.porn\", true]}]}, {\"all\": [{\"not\": {\"in\": [\"$a.what\", [\"drink\", \"drugs\", \"smoke\", \"binge\", \"gamble\", \"spend\", \"scroll\", \"check\", \"porn\", \"hurt\"]]}}, {\"eq\": [\"$opt.other\", true]}]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"risky_own\"}, \"required\": false}], \"hint\": \"risky_hint\", \"title\": \"risky_title\"}";
+MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:risky"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 9};
+MERGE (n:SkillStep {id: "habit_plan:build"})
+SET n += {skillId: "habit_plan", step: "build", kind: "ask", version: "hp-v1"}, n.specJson = "{\"fields\": [{\"id\": \"build\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 2, \"options\": {\"list\": \"build\", \"where\": {\"any\": [{\"all\": [{\"eq\": [\"$a.what\", \"drink\"]}, {\"eq\": [\"$opt.drink\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"drugs\"]}, {\"eq\": [\"$opt.drugs\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"smoke\"]}, {\"eq\": [\"$opt.smoke\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"binge\"]}, {\"eq\": [\"$opt.binge\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"gamble\"]}, {\"eq\": [\"$opt.gamble\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"spend\"]}, {\"eq\": [\"$opt.spend\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"scroll\"]}, {\"eq\": [\"$opt.scroll\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"check\"]}, {\"eq\": [\"$opt.check\", true]}]}, {\"all\": [{\"eq\": [\"$a.what\", \"porn\"]}, {\"eq\": [\"$opt.porn\", true]}]}, {\"all\": [{\"not\": {\"in\": [\"$a.what\", [\"drink\", \"drugs\", \"smoke\", \"binge\", \"gamble\", \"spend\", \"scroll\", \"check\", \"porn\", \"hurt\"]]}}, {\"eq\": [\"$opt.other\", true]}]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"build_own\"}, \"required\": true}], \"hint\": \"build_hint\", \"title\": \"build_title\"}";
+MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:build"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 10};
+MERGE (n:SkillStep {id: "habit_plan:imagine"})
+SET n += {skillId: "habit_plan", step: "imagine", kind: "embed", version: "hp-v1"}, n.specJson = "{\"answerAs\": \"imagine\", \"embed\": \"doseTimer\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"done\": \"imagine_done\", \"next\": \"next\", \"running\": \"imagine_running\", \"seconds\": 30, \"start\": \"start\", \"step1\": \"imagine_step1\", \"step2\": \"imagine_step2\", \"step3\": \"imagine_step3\"}, \"title\": \"imagine_title\"}";
+MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:imagine"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 11};
+MERGE (n:SkillStep {id: "habit_plan:reinforce"})
+SET n += {skillId: "habit_plan", step: "reinforce", kind: "ask", version: "hp-v1"}, n.specJson = "{\"fields\": [{\"id\": \"reinforce\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 3, \"options\": {\"list\": \"reinforce\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"reinforce_own\"}, \"required\": false}], \"hint\": \"reinforce_hint\", \"title\": \"reinforce_title\"}";
+MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:reinforce"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 12};
+MERGE (n:SkillStep {id: "habit_plan:card"})
+SET n += {skillId: "habit_plan", step: "card", kind: "embed", version: "hp-v1"}, n.specJson = "{\"answerAs\": \"card\", \"embed\": \"boundaryLine\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"field\": \"lapse\", \"next\": \"card_next\", \"shape\": \"list\"}, \"title\": \"card_title\"}";
+MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:card"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 13};
+MERGE (n:SkillStep {id: "habit_plan:remind"})
+SET n += {skillId: "habit_plan", step: "remind", kind: "ask", version: "hp-v1"}, n.specJson = "{\"fields\": [{\"id\": \"remind\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"remind\"}, \"required\": true}], \"followUp\": {\"type\": \"habit_renew\", \"when\": {\"eq\": [\"$a.remind\", \"yes\"]}, \"whenFrom\": \"span\"}, \"hint\": \"remind_hint\", \"title\": \"remind_title\"}";
+MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:remind"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 14};
+MERGE (n:SkillStep {id: "habit_plan:keep"})
+SET n += {skillId: "habit_plan", step: "keep", kind: "ask", version: "hp-v1"}, n.specJson = "{\"fields\": [{\"id\": \"keepit\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"keepit\"}, \"required\": true}], \"keep\": {\"from\": [\"what\", \"span\", \"lapse\", \"burn\", \"risky\", \"build\", \"reinforce\"], \"kind\": \"abstinence_plan\", \"many\": true, \"when\": {\"eq\": [\"$a.keepit\", \"keep\"]}}, \"primary\": \"keep_primary\", \"title\": \"keep_title\"}";
+MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:keep"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 15};
+MERGE (n:SkillStep {id: "habit_plan:end"})
+SET n += {skillId: "habit_plan", step: "end", kind: "handoff", version: "hp-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"end_kept\", \"when\": {\"eq\": [\"$a.keepit\", \"keep\"]}}, {\"key\": \"end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 16};
+MERGE (n:SkillStep {id: "habit_plan:renew"})
+SET n += {skillId: "habit_plan", step: "renew", kind: "ask", version: "hp-v1"}, n.specJson = "{\"clears\": [\"renew\", \"after_use\", \"slipped\", \"again_span\"], \"fields\": [{\"id\": \"renew\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"renew\"}, \"required\": true}], \"hint\": \"renew_hint\", \"reopens\": {\"after\": \"remind\", \"again\": [\"again\"]}, \"title\": \"renew_title\"}";
+MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:renew"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 17};
+MERGE (n:SkillStep {id: "habit_plan:after_use"})
+SET n += {skillId: "habit_plan", step: "after_use", kind: "ask", version: "hp-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"medical\", \"when\": {\"all\": []}}], \"fields\": [{\"id\": \"after_use\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"ok_now\"}, \"required\": false}], \"hint\": \"after_use_hint\", \"title\": [{\"key\": \"after_use_title_own\", \"when\": {\"not\": {\"in\": [\"$a.what\", [\"drink\", \"drugs\", \"smoke\", \"binge\", \"gamble\", \"spend\", \"scroll\", \"check\", \"porn\", \"hurt\"]]}}}, {\"key\": \"after_use_title\"}]}";
+MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:after_use"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 18};
+MERGE (n:SkillStep {id: "habit_plan:slipped"})
+SET n += {skillId: "habit_plan", step: "slipped", kind: "embed", version: "hp-v1"}, n.specJson = "{\"answerAs\": \"slipped\", \"embed\": \"boundaryLine\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"field\": \"lapse\", \"next\": \"slipped_next\", \"shape\": \"list\"}, \"title\": \"slipped_title\"}";
+MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:slipped"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 19};
+MERGE (n:SkillStep {id: "habit_plan:again"})
+SET n += {skillId: "habit_plan", step: "again", kind: "ask", version: "hp-v1"}, n.specJson = "{\"fields\": [{\"id\": \"again_span\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"span\"}, \"required\": true}], \"followUp\": {\"type\": \"habit_renew\", \"whenFrom\": \"again_span\"}, \"hint\": \"span_hint\", \"title\": [{\"key\": \"again_title_slip\", \"when\": {\"eq\": [\"$a.renew\", \"slip\"]}}, {\"key\": \"again_title\"}]}";
+MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:again"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 20};
+MERGE (n:SkillStep {id: "habit_plan:again_end"})
+SET n += {skillId: "habit_plan", step: "again_end", kind: "handoff", version: "hp-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"again_end_slip\", \"when\": {\"eq\": [\"$a.renew\", \"slip\"]}}, {\"key\": \"again_end_held\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:again_end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 21};
+MERGE (n:SkillStep {id: "habit_plan:stop"})
+SET n += {skillId: "habit_plan", step: "stop", kind: "handoff", version: "hp-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"stop_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:stop"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 22};
+MERGE (x:SkillExit {id: "habit_plan:urge_surfing"})
+SET x += {skillId: "habit_plan", exit: "urge_surfing", toolId: "urge-surfing", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (x:SkillExit {id: "habit_plan:urge_surfing"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "habit_plan:urge_surfing"}), (t:TherapyConcept {appToolId: "urge-surfing"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "habit_plan:pros_cons"})
+SET x += {skillId: "habit_plan", exit: "pros_cons", toolId: "pros-cons", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (x:SkillExit {id: "habit_plan:pros_cons"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "habit_plan:pros_cons"}), (t:TherapyConcept {appToolId: "pros-cons"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "habit_plan:cool_down"})
+SET x += {skillId: "habit_plan", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (x:SkillExit {id: "habit_plan:cool_down"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "habit_plan:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "habit_plan:crisis_kit"})
+SET x += {skillId: "habit_plan", exit: "crisis_kit", toolId: "crisis-kit", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (x:SkillExit {id: "habit_plan:crisis_kit"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "habit_plan:crisis_kit"}), (t:TherapyConcept {appToolId: "crisis-kit"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "habit_plan:safety_open"})
+SET x += {skillId: "habit_plan", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MERGE (x:SkillExit {id: "habit_plan:done"})
+SET x += {skillId: "habit_plan", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (x:SkillExit {id: "habit_plan:done"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (a:SkillStep {id: "habit_plan:what"}), (b:SkillStep {id: "habit_plan:harm"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.what\", \"hurt\"]}";
+MATCH (a:SkillStep {id: "habit_plan:what"}), (b:SkillStep {id: "habit_plan:heads_up"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
+MATCH (a:SkillStep {id: "habit_plan:what"}), (b:SkillStep {id: "habit_plan:medical"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "{\"any\": [{\"in\": [\"$a.what\", [\"drink\", \"drugs\"]]}, {\"not\": {\"in\": [\"$a.what\", [\"drink\", \"drugs\", \"smoke\", \"binge\", \"gamble\", \"spend\", \"scroll\", \"check\", \"porn\", \"hurt\"]]}}]}";
+MATCH (a:SkillStep {id: "habit_plan:what"}), (b:SkillStep {id: "habit_plan:eating"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 3}, r.whenJson = "{\"eq\": [\"$a.what\", \"binge\"]}";
+MATCH (a:SkillStep {id: "habit_plan:what"}), (b:SkillStep {id: "habit_plan:span"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 4}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "habit_plan:what"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "what", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "habit_plan:harm"}), (x:SkillExit {id: "habit_plan:crisis_kit"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "habit_plan:harm"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "habit_plan:heads_up"}), (b:SkillStep {id: "habit_plan:settle"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.heads_up\", \"settle\"]}";
+MATCH (a:SkillStep {id: "habit_plan:heads_up"}), (b:SkillStep {id: "habit_plan:medical"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"any\": [{\"in\": [\"$a.what\", [\"drink\", \"drugs\"]]}, {\"not\": {\"in\": [\"$a.what\", [\"drink\", \"drugs\", \"smoke\", \"binge\", \"gamble\", \"spend\", \"scroll\", \"check\", \"porn\", \"hurt\"]]}}]}";
+MATCH (a:SkillStep {id: "habit_plan:heads_up"}), (b:SkillStep {id: "habit_plan:eating"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "{\"eq\": [\"$a.what\", \"binge\"]}";
+MATCH (a:SkillStep {id: "habit_plan:heads_up"}), (b:SkillStep {id: "habit_plan:span"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 3}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "habit_plan:heads_up"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "heads_up", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "habit_plan:settle"}), (x:SkillExit {id: "habit_plan:cool_down"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "habit_plan:settle"}), (x:SkillExit {id: "habit_plan:urge_surfing"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "habit_plan:settle"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "habit_plan:medical"}), (b:SkillStep {id: "habit_plan:span"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "habit_plan:medical"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "medical", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "habit_plan:eating"}), (b:SkillStep {id: "habit_plan:span"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "habit_plan:eating"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "eating", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "habit_plan:span"}), (b:SkillStep {id: "habit_plan:lapse"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "habit_plan:span"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "span", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "habit_plan:lapse"}), (b:SkillStep {id: "habit_plan:burn"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "habit_plan:lapse"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "lapse", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "habit_plan:burn"}), (b:SkillStep {id: "habit_plan:risky"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "habit_plan:burn"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "burn", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "habit_plan:risky"}), (b:SkillStep {id: "habit_plan:build"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "habit_plan:risky"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "risky", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "habit_plan:build"}), (b:SkillStep {id: "habit_plan:imagine"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"has\": [\"$a.build.ids\", \"image\"]}";
+MATCH (a:SkillStep {id: "habit_plan:build"}), (b:SkillStep {id: "habit_plan:reinforce"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "habit_plan:build"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "build", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "habit_plan:imagine"}), (b:SkillStep {id: "habit_plan:reinforce"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "habit_plan:imagine"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "habit_plan:reinforce"}), (b:SkillStep {id: "habit_plan:card"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "habit_plan:reinforce"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "reinforce", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "habit_plan:card"}), (b:SkillStep {id: "habit_plan:remind"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "habit_plan:card"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "habit_plan:remind"}), (b:SkillStep {id: "habit_plan:keep"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "habit_plan:remind"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "remind", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "habit_plan:keep"}), (b:SkillStep {id: "habit_plan:end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "habit_plan:keep"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "keepit", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "habit_plan:end"}), (x:SkillExit {id: "habit_plan:urge_surfing"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "habit_plan:end"}), (x:SkillExit {id: "habit_plan:pros_cons"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "habit_plan:end"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "habit_plan:renew"}), (b:SkillStep {id: "habit_plan:after_use"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"all\": [{\"eq\": [\"$a.renew\", \"slip\"]}, {\"any\": [{\"in\": [\"$a.what\", [\"drink\", \"drugs\"]]}, {\"not\": {\"in\": [\"$a.what\", [\"drink\", \"drugs\", \"smoke\", \"binge\", \"gamble\", \"spend\", \"scroll\", \"check\", \"porn\", \"hurt\"]]}}]}]}";
+MATCH (a:SkillStep {id: "habit_plan:renew"}), (b:SkillStep {id: "habit_plan:slipped"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.renew\", \"slip\"]}";
+MATCH (a:SkillStep {id: "habit_plan:renew"}), (b:SkillStep {id: "habit_plan:stop"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "{\"eq\": [\"$a.renew\", \"stop\"]}";
+MATCH (a:SkillStep {id: "habit_plan:renew"}), (b:SkillStep {id: "habit_plan:again"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 3}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "habit_plan:renew"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "renew", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "habit_plan:after_use"}), (b:SkillStep {id: "habit_plan:slipped"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "habit_plan:after_use"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "after_use", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "habit_plan:slipped"}), (b:SkillStep {id: "habit_plan:again"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "habit_plan:slipped"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "habit_plan:again"}), (b:SkillStep {id: "habit_plan:again_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "habit_plan:again"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "again_span", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "habit_plan:again_end"}), (x:SkillExit {id: "habit_plan:urge_surfing"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"eq\": [\"$a.renew\", \"slip\"]}}]";
+MATCH (a:SkillStep {id: "habit_plan:again_end"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "habit_plan:stop"}), (x:SkillExit {id: "habit_plan:urge_surfing"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "habit_plan:stop"}), (x:SkillExit {id: "habit_plan:pros_cons"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "habit_plan:stop"}), (x:SkillExit {id: "habit_plan:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MERGE (o:SkillOption {id: "habit_plan:what:drink"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "what", value: "drink", label: "Drinking", version: "hp-v1"}, o.propsJson = "{\"urge\": \"use\"}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:what:drink"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 0};
+MERGE (o:SkillOption {id: "habit_plan:what:drugs"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "what", value: "drugs", label: "Using drugs", version: "hp-v1"}, o.propsJson = "{\"urge\": \"use\"}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:what:drugs"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 1};
+MERGE (o:SkillOption {id: "habit_plan:what:smoke"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "what", value: "smoke", label: "Smoking or vaping", version: "hp-v1"}, o.propsJson = "{\"urge\": \"use\"}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:what:smoke"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 2};
+MERGE (o:SkillOption {id: "habit_plan:what:binge"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "what", value: "binge", label: "Bingeing or purging", version: "hp-v1"}, o.propsJson = "{\"urge\": \"use\"}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:what:binge"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 3};
+MERGE (o:SkillOption {id: "habit_plan:what:gamble"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "what", value: "gamble", label: "Gambling or betting", version: "hp-v1"}, o.propsJson = "{\"urge\": \"use\"}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:what:gamble"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 4};
+MERGE (o:SkillOption {id: "habit_plan:what:spend"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "what", value: "spend", label: "Spending or buying", version: "hp-v1"}, o.propsJson = "{\"urge\": \"use\"}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:what:spend"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 5};
+MERGE (o:SkillOption {id: "habit_plan:what:scroll"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "what", value: "scroll", label: "Scrolling or gaming for hours", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:what:scroll"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 6};
+MERGE (o:SkillOption {id: "habit_plan:what:check"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "what", value: "check", label: "Checking someone's page", version: "hp-v1"}, o.propsJson = "{\"urge\": \"check\"}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:what:check"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 7};
+MERGE (o:SkillOption {id: "habit_plan:what:porn"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "what", value: "porn", label: "Porn, more than I want to", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:what:porn"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 8};
+MERGE (o:SkillOption {id: "habit_plan:what:hurt"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "what", value: "hurt", label: "Hurting myself", version: "hp-v1"}, o.propsJson = "{\"urge\": \"self_harm\"}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:what:hurt"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 9};
+MERGE (o:SkillOption {id: "habit_plan:heads_up:settle"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "heads_up", value: "settle", label: "Look after the next few minutes first", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:heads_up:settle"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up", order: 10};
+MERGE (o:SkillOption {id: "habit_plan:heads_up:plan"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "heads_up", value: "plan", label: "Make the plan anyway", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:heads_up:plan"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up", order: 11};
+MERGE (o:SkillOption {id: "habit_plan:ok_now:ok"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "ok_now", value: "ok", label: "I'm okay right now", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:ok_now:ok"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "ok_now", order: 12};
+MERGE (o:SkillOption {id: "habit_plan:ok_now:with"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "ok_now", value: "with", label: "Someone's with me", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:ok_now:with"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "ok_now", order: 13};
+MERGE (o:SkillOption {id: "habit_plan:support:have"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "support", value: "have", label: "I've got support with this", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:support:have"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "support", order: 14};
+MERGE (o:SkillOption {id: "habit_plan:support:will"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "support", value: "will", label: "I'll talk to someone about it", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:support:will"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "support", order: 15};
+MERGE (o:SkillOption {id: "habit_plan:span:hour"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "span", value: "hour", label: "The next hour", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:span:hour"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "span", order: 16};
+MERGE (o:SkillOption {id: "habit_plan:span:tonight"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "span", value: "tonight", label: "The rest of today", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:span:tonight"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "span", order: 17};
+MERGE (o:SkillOption {id: "habit_plan:span:few_days"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "span", value: "few_days", label: "Three days", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:span:few_days"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "span", order: 18};
+MERGE (o:SkillOption {id: "habit_plan:span:this_week"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "span", value: "this_week", label: "A week", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:span:this_week"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "span", order: 19};
+MERGE (o:SkillOption {id: "habit_plan:lapse:tell"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "lapse", value: "tell", label: "Tell someone I trust", version: "hp-v1"}, o.propsJson = "{\"binge\": true, \"check\": true, \"drink\": true, \"drugs\": true, \"gamble\": true, \"other\": true, \"porn\": true, \"scroll\": true, \"smoke\": true, \"spend\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:lapse:tell"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "lapse", order: 20};
+MERGE (o:SkillOption {id: "habit_plan:lapse:body"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "lapse", value: "body", label: "Look after my body: water, food, rest", version: "hp-v1"}, o.propsJson = "{\"binge\": true, \"check\": true, \"drink\": true, \"drugs\": true, \"gamble\": true, \"other\": true, \"porn\": true, \"scroll\": true, \"smoke\": true, \"spend\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:lapse:body"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "lapse", order: 21};
+MERGE (o:SkillOption {id: "habit_plan:lapse:next_meal"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "lapse", value: "next_meal", label: "Eat my next meal at the usual time", version: "hp-v1"}, o.propsJson = "{\"binge\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:lapse:next_meal"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "lapse", order: 22};
+MERGE (o:SkillOption {id: "habit_plan:lapse:recommit"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "lapse", value: "recommit", label: "Recommit straight away", version: "hp-v1"}, o.propsJson = "{\"check\": true, \"drink\": true, \"drugs\": true, \"gamble\": true, \"other\": true, \"porn\": true, \"scroll\": true, \"smoke\": true, \"spend\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:lapse:recommit"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "lapse", order: 23};
+MERGE (o:SkillOption {id: "habit_plan:lapse:chain"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "lapse", value: "chain", label: "Look at what led to it, the next day", version: "hp-v1"}, o.propsJson = "{\"binge\": true, \"check\": true, \"drink\": true, \"drugs\": true, \"gamble\": true, \"other\": true, \"porn\": true, \"scroll\": true, \"smoke\": true, \"spend\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:lapse:chain"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "lapse", order: 24};
+MERGE (o:SkillOption {id: "habit_plan:lapse:rid"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "lapse", value: "rid", label: "Get rid of what's left", version: "hp-v1"}, o.propsJson = "{\"check\": true, \"drink\": true, \"drugs\": true, \"gamble\": true, \"other\": true, \"porn\": true, \"scroll\": true, \"smoke\": true, \"spend\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:lapse:rid"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "lapse", order: 25};
+MERGE (o:SkillOption {id: "habit_plan:lapse:kind"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "lapse", value: "kind", label: "Talk to myself like a friend would", version: "hp-v1"}, o.propsJson = "{\"binge\": true, \"check\": true, \"drink\": true, \"drugs\": true, \"gamble\": true, \"other\": true, \"porn\": true, \"scroll\": true, \"smoke\": true, \"spend\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:lapse:kind"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "lapse", order: 26};
+MERGE (o:SkillOption {id: "habit_plan:burn:no_stock"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "no_stock", label: "Stop keeping it in the house", version: "hp-v1"}, o.propsJson = "{\"drink\": true, \"smoke\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:no_stock"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 27};
+MERGE (o:SkillOption {id: "habit_plan:burn:pour"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "pour", label: "Pour away what's here, once it's safe to stop", version: "hp-v1"}, o.propsJson = "{\"drink\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:pour"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 28};
+MERGE (o:SkillOption {id: "habit_plan:burn:route"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "route", label: "Take a way home that doesn't pass the shop", version: "hp-v1"}, o.propsJson = "{\"drink\": true, \"smoke\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:route"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 29};
+MERGE (o:SkillOption {id: "habit_plan:burn:order"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "order", label: "Decide what I'll order instead when I'm out", version: "hp-v1"}, o.propsJson = "{\"drink\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:order"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 30};
+MERGE (o:SkillOption {id: "habit_plan:burn:dealer"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "dealer", label: "Delete my dealer's number", version: "hp-v1"}, o.propsJson = "{\"drugs\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:dealer"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 31};
+MERGE (o:SkillOption {id: "habit_plan:burn:stash"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "stash", label: "Get rid of the stash", version: "hp-v1"}, o.propsJson = "{\"drugs\": true, \"other\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:stash"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 32};
+MERGE (o:SkillOption {id: "habit_plan:burn:people"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "people", label: "Step back from people I use with", version: "hp-v1"}, o.propsJson = "{\"drink\": true, \"drugs\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:people"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 33};
+MERGE (o:SkillOption {id: "habit_plan:burn:cash"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "cash", label: "Stop carrying spare cash", version: "hp-v1"}, o.propsJson = "{\"drugs\": true, \"gamble\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:cash"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 34};
+MERGE (o:SkillOption {id: "habit_plan:burn:lighters"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "lighters", label: "Bin the lighters and spares", version: "hp-v1"}, o.propsJson = "{\"smoke\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:lighters"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 35};
+MERGE (o:SkillOption {id: "habit_plan:burn:list"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "list", label: "Shop with a list, after eating", version: "hp-v1"}, o.propsJson = "{\"binge\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:list"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 36};
+MERGE (o:SkillOption {id: "habit_plan:burn:bulk"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "bulk", label: "Buy single portions of the foods I binge on", version: "hp-v1"}, o.propsJson = "{\"binge\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:bulk"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 37};
+MERGE (o:SkillOption {id: "habit_plan:burn:meals"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "meals", label: "Eat regular meals so I'm not starving", version: "hp-v1"}, o.propsJson = "{\"binge\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:meals"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 38};
+MERGE (o:SkillOption {id: "habit_plan:burn:bank_block"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "bank_block", label: "Turn on gambling blocks with my bank", version: "hp-v1"}, o.propsJson = "{\"gamble\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:bank_block"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 39};
+MERGE (o:SkillOption {id: "habit_plan:burn:exclude"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "exclude", label: "Self-exclude from betting sites and venues", version: "hp-v1"}, o.propsJson = "{\"gamble\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:exclude"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 40};
+MERGE (o:SkillOption {id: "habit_plan:burn:cards"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "cards", label: "Remove saved cards", version: "hp-v1"}, o.propsJson = "{\"gamble\": true, \"spend\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:cards"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 41};
+MERGE (o:SkillOption {id: "habit_plan:burn:unsub"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "unsub", label: "Unsubscribe from shop emails", version: "hp-v1"}, o.propsJson = "{\"spend\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:unsub"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 42};
+MERGE (o:SkillOption {id: "habit_plan:burn:shop_apps"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "shop_apps", label: "Delete the shopping apps", version: "hp-v1"}, o.propsJson = "{\"spend\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:shop_apps"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 43};
+MERGE (o:SkillOption {id: "habit_plan:burn:wait"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "wait", label: "Wait two days before buying anything I don't need today", version: "hp-v1"}, o.propsJson = "{\"spend\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:wait"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 44};
+MERGE (o:SkillOption {id: "habit_plan:burn:hide_app"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "hide_app", label: "Delete or hide the app", version: "hp-v1"}, o.propsJson = "{\"scroll\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:hide_app"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 45};
+MERGE (o:SkillOption {id: "habit_plan:burn:limit"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "limit", label: "Set a time limit on my phone", version: "hp-v1"}, o.propsJson = "{\"scroll\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:limit"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 46};
+MERGE (o:SkillOption {id: "habit_plan:burn:bedroom"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "bedroom", label: "Charge my phone outside the bedroom", version: "hp-v1"}, o.propsJson = "{\"check\": true, \"porn\": true, \"scroll\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:bedroom"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 47};
+MERGE (o:SkillOption {id: "habit_plan:burn:mute"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "mute", label: "Mute or block their profile", version: "hp-v1"}, o.propsJson = "{\"check\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:mute"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 48};
+MERGE (o:SkillOption {id: "habit_plan:burn:logout"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "logout", label: "Log out of the app", version: "hp-v1"}, o.propsJson = "{\"check\": true, \"scroll\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:logout"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 49};
+MERGE (o:SkillOption {id: "habit_plan:burn:history"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "history", label: "Delete the bookmark and search history", version: "hp-v1"}, o.propsJson = "{\"check\": true, \"porn\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:history"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 50};
+MERGE (o:SkillOption {id: "habit_plan:burn:blocker"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "blocker", label: "Install a content blocker", version: "hp-v1"}, o.propsJson = "{\"porn\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:blocker"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 51};
+MERGE (o:SkillOption {id: "habit_plan:burn:easy"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "easy", label: "Block or delete what makes it easy", version: "hp-v1"}, o.propsJson = "{\"other\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:easy"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 52};
+MERGE (o:SkillOption {id: "habit_plan:burn:routine"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "routine", label: "Change the routine that leads there", version: "hp-v1"}, o.propsJson = "{\"binge\": true, \"other\": true, \"porn\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:routine"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 53};
+MERGE (o:SkillOption {id: "habit_plan:burn:tell"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "burn", value: "tell", label: "Tell someone what I'm doing", version: "hp-v1"}, o.propsJson = "{\"drink\": true, \"drugs\": true, \"gamble\": true, \"other\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:burn:tell"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "burn", order: 54};
+MERGE (o:SkillOption {id: "habit_plan:risky:spare"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "risky", value: "spare", label: "Keeping some spare, in case", version: "hp-v1"}, o.propsJson = "{\"drink\": true, \"drugs\": true, \"other\": true, \"smoke\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:risky:spare"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "risky", order: 55};
+MERGE (o:SkillOption {id: "habit_plan:risky:near"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "risky", value: "near", label: "Going near the place, only to look", version: "hp-v1"}, o.propsJson = "{\"drink\": true, \"drugs\": true, \"gamble\": true, \"other\": true, \"spend\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:risky:near"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "risky", order: 56};
+MERGE (o:SkillOption {id: "habit_plan:risky:one"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "risky", value: "one", label: "Telling myself one won't hurt", version: "hp-v1"}, o.propsJson = "{\"check\": true, \"drink\": true, \"drugs\": true, \"gamble\": true, \"other\": true, \"porn\": true, \"scroll\": true, \"smoke\": true, \"spend\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:risky:one"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "risky", order: 57};
+MERGE (o:SkillOption {id: "habit_plan:risky:people"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "risky", value: "people", label: "Seeing people I do it with", version: "hp-v1"}, o.propsJson = "{\"drink\": true, \"drugs\": true, \"gamble\": true, \"other\": true, \"smoke\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:risky:people"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "risky", order: 58};
+MERGE (o:SkillOption {id: "habit_plan:risky:halt"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "risky", value: "halt", label: "Being alone, tired or hungry", version: "hp-v1"}, o.propsJson = "{\"binge\": true, \"check\": true, \"drink\": true, \"drugs\": true, \"gamble\": true, \"other\": true, \"porn\": true, \"scroll\": true, \"smoke\": true, \"spend\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:risky:halt"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "risky", order: 59};
+MERGE (o:SkillOption {id: "habit_plan:risky:payday"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "risky", value: "payday", label: "Payday, or having money spare", version: "hp-v1"}, o.propsJson = "{\"drink\": true, \"drugs\": true, \"gamble\": true, \"other\": true, \"spend\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:risky:payday"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "risky", order: 60};
+MERGE (o:SkillOption {id: "habit_plan:risky:late"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "risky", value: "late", label: "Staying up late", version: "hp-v1"}, o.propsJson = "{\"binge\": true, \"check\": true, \"drink\": true, \"other\": true, \"porn\": true, \"scroll\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:risky:late"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "risky", order: 61};
+MERGE (o:SkillOption {id: "habit_plan:risky:bad_news"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "risky", value: "bad_news", label: "After an argument or bad news", version: "hp-v1"}, o.propsJson = "{\"binge\": true, \"check\": true, \"drink\": true, \"drugs\": true, \"gamble\": true, \"other\": true, \"porn\": true, \"scroll\": true, \"smoke\": true, \"spend\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:risky:bad_news"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "risky", order: 62};
+MERGE (o:SkillOption {id: "habit_plan:risky:phone_bed"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "risky", value: "phone_bed", label: "Taking my phone to bed", version: "hp-v1"}, o.propsJson = "{\"check\": true, \"porn\": true, \"scroll\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:risky:phone_bed"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "risky", order: 63};
+MERGE (o:SkillOption {id: "habit_plan:build:image"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "build", value: "image", label: "Picture something I'd rather be doing", version: "hp-v1"}, o.propsJson = "{\"binge\": true, \"check\": true, \"drink\": true, \"drugs\": true, \"gamble\": true, \"other\": true, \"porn\": true, \"scroll\": true, \"smoke\": true, \"spend\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:build:image"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "build", order: 64};
+MERGE (o:SkillOption {id: "habit_plan:build:cold"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "build", value: "cold", label: "Cold water, or hold something cold", version: "hp-v1"}, o.propsJson = "{\"binge\": true, \"check\": true, \"drink\": true, \"drugs\": true, \"gamble\": true, \"other\": true, \"porn\": true, \"scroll\": true, \"smoke\": true, \"spend\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:build:cold"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "build", order: 65};
+MERGE (o:SkillOption {id: "habit_plan:build:ride"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "build", value: "ride", label: "Ride it out: watch it rise and fall", version: "hp-v1"}, o.propsJson = "{\"binge\": true, \"check\": true, \"drink\": true, \"drugs\": true, \"gamble\": true, \"other\": true, \"porn\": true, \"scroll\": true, \"smoke\": true, \"spend\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:build:ride"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "build", order: 66};
+MERGE (o:SkillOption {id: "habit_plan:build:puzzle"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "build", value: "puzzle", label: "Give my mind a job: a puzzle, counting", version: "hp-v1"}, o.propsJson = "{\"binge\": true, \"check\": true, \"drink\": true, \"drugs\": true, \"gamble\": true, \"other\": true, \"porn\": true, \"scroll\": true, \"smoke\": true, \"spend\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:build:puzzle"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "build", order: 67};
+MERGE (o:SkillOption {id: "habit_plan:build:move"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "build", value: "move", label: "Get moving: a walk round the block", version: "hp-v1"}, o.propsJson = "{\"check\": true, \"drink\": true, \"drugs\": true, \"gamble\": true, \"other\": true, \"porn\": true, \"scroll\": true, \"smoke\": true, \"spend\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:build:move"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "build", order: 68};
+MERGE (o:SkillOption {id: "habit_plan:build:text"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "build", value: "text", label: "Text someone I trust", version: "hp-v1"}, o.propsJson = "{\"binge\": true, \"check\": true, \"drink\": true, \"drugs\": true, \"gamble\": true, \"other\": true, \"porn\": true, \"scroll\": true, \"smoke\": true, \"spend\": true}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:build:text"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "build", order: 69};
+MERGE (o:SkillOption {id: "habit_plan:reinforce:money"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "reinforce", value: "money", label: "Money", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:reinforce:money"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "reinforce", order: 70};
+MERGE (o:SkillOption {id: "habit_plan:reinforce:sleep"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "reinforce", value: "sleep", label: "Better sleep", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:reinforce:sleep"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "reinforce", order: 71};
+MERGE (o:SkillOption {id: "habit_plan:reinforce:mornings"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "reinforce", value: "mornings", label: "Clear mornings", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:reinforce:mornings"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "reinforce", order: 72};
+MERGE (o:SkillOption {id: "habit_plan:reinforce:trust"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "reinforce", value: "trust", label: "People trusting me", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:reinforce:trust"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "reinforce", order: 73};
+MERGE (o:SkillOption {id: "habit_plan:reinforce:time"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "reinforce", value: "time", label: "Time for things I like", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:reinforce:time"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "reinforce", order: 74};
+MERGE (o:SkillOption {id: "habit_plan:reinforce:health"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "reinforce", value: "health", label: "Feeling better in my body", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:reinforce:health"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "reinforce", order: 75};
+MERGE (o:SkillOption {id: "habit_plan:reinforce:respect"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "reinforce", value: "respect", label: "Respecting myself", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:reinforce:respect"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "reinforce", order: 76};
+MERGE (o:SkillOption {id: "habit_plan:remind:yes"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "remind", value: "yes", label: "Yes, check in with me", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:remind:yes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "remind", order: 77};
+MERGE (o:SkillOption {id: "habit_plan:remind:no"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "remind", value: "no", label: "No thanks", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:remind:no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "remind", order: 78};
+MERGE (o:SkillOption {id: "habit_plan:keepit:keep"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "keepit", value: "keep", label: "Keep it in Me", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:keepit:keep"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "keepit", order: 79};
+MERGE (o:SkillOption {id: "habit_plan:keepit:not_now"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "keepit", value: "not_now", label: "Not this time", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:keepit:not_now"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "keepit", order: 80};
+MERGE (o:SkillOption {id: "habit_plan:renew:held"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "renew", value: "held", label: "I kept to it", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:renew:held"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "renew", order: 81};
+MERGE (o:SkillOption {id: "habit_plan:renew:slip"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "renew", value: "slip", label: "I slipped", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:renew:slip"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "renew", order: 82};
+MERGE (o:SkillOption {id: "habit_plan:renew:stop"})
+SET o:SkillOption, o += {skillId: "habit_plan", list: "renew", value: "stop", label: "I'm not ready to go again", version: "hp-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "habit_plan"}), (o:SkillOption {id: "habit_plan:renew:stop"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "renew", order: 83};
