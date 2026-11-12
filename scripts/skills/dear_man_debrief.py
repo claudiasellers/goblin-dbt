@@ -407,7 +407,7 @@ EXITS = [
     {"id": "ending_careful", "toolId": "ending-relationships", "query": {"frame": "careful"}},
     {"id": "safety_open", "toolId": None, "safety": True},
     {"id": "let_it_be", "toolId": "let-it-be"},
-    {"id": "finding_connection", "toolId": "finding-connection", "planned": True},
+    {"id": "finding_connection", "toolId": "finding-connection"},  # IE-09 Find your people (built 12 Nov)
     # IE-06 Keep it warm (built 12 Nov): the repair way in, with the person this debrief was about.
     {"id": "give", "toolId": "give", "query": {"situationId": "repair", "person": "$ctx.personId"}},
     {"id": "done", "done": True},

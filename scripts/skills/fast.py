@@ -332,7 +332,7 @@ LET_GO_STEPS = [
         ],
         # Meet the need elsewhere: Recover, from its start until IE-B4 gives it `enterAt` (then its need step, WMP's
         # need-restoration picker; the Witness deck waits on WMP); acceptance (DT-04)
-        # and finding your people (IE-09) once they ship.
+        # and finding your people (IE-09, built 12 Nov).
         "offers": [
             {"exit": "let_it_be", "when": None},
             {"exit": "recover", "when": None},
@@ -348,7 +348,7 @@ LET_GO_EXITS = [
     {"id": "cool_down", "toolId": "cool-down"},
     {"id": "safety_open", "toolId": None, "safety": True},
     {"id": "recover", "toolId": "recovering-from-invalidation"},
-    {"id": "finding_connection", "toolId": "finding-connection", "planned": True},
+    {"id": "finding_connection", "toolId": "finding-connection"},  # IE-09 Find your people (built 12 Nov)
     {"id": "done", "done": True},
 ]
 

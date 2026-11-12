@@ -39,7 +39,8 @@ UNWIND [
   {c: "dbt_please", t: "please-skill"},
   {c: "dbt_accumulate_positives", t: "good-things"},
   {c: "dbt_values_priorities", t: "values-clarification"},
-  {c: "dbt_crisis_survival_kit", t: "crisis-kit"}
+  {c: "dbt_crisis_survival_kit", t: "crisis-kit"},
+  {c: "dbt_building_relationships", t: "finding-connection"}
 ] AS row
 MATCH (c:TherapyConcept {id: row.c})
 SET c.appToolId = row.t;

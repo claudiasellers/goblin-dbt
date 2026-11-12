@@ -339,6 +339,18 @@ export const tools: Tool[] = [
     bare: true,
   },
   {
+    // IE-09 on the skill runtime (docs/design/find-your-people.md): one small step towards people, with a guess and a check.
+    id: 'finding-connection',
+    name: 'Find your people',
+    tagline: 'One small step towards people, with a guess first and a check after',
+    description: 'Pick where to start: being around people, finding people like you, a conversation, a friendship, or joining something. Then one small step, a guess at how it\'ll go, and a check afterwards against what actually happened.',
+    whenToUse: 'When you feel cut off, or you\'re sure nobody would want to hear from you.',
+    module: 'interpersonal-effectiveness',
+    dbtBasis: 'DBT IE Handouts 10–11 (finding and keeping friends)',
+    emoji: '🌱',
+    bare: true,
+  },
+  {
     // On the skill runtime (docs/design/ending-relationships.md). Safety first: nothing is saved before the
     // safety answer, and nothing at all in the safety branch unless the person saves it.
     id: 'ending-relationships',
@@ -432,6 +444,7 @@ export const allIntents: Intent[] = [
   { id: 'torn', label: 'I\'m torn about what to do', toolId: 'wise-mind', emoji: '🪨' },
   { id: 'say-no', label: 'Say no to someone', toolId: 'say-no', emoji: '🙅' },
   { id: 'give', label: 'Repair things after a fight, or keep it warm', toolId: 'give', emoji: '🤝' },
+  { id: 'less-alone', label: 'Feel less alone', toolId: 'finding-connection', emoji: '🌱' },
   { id: 'overreacting', label: 'I can\'t tell if I\'m overreacting', toolId: 'check-the-facts', emoji: '🔍' },
   { id: 'not-working', label: 'My skills aren\'t working', toolId: 'er-troubleshoot', emoji: '🧩' },
   { id: 'running-low', label: 'Everything feels like too much today', toolId: 'please-skill', emoji: '🔋' },

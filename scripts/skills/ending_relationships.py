@@ -335,7 +335,7 @@ STEPS = [
             {"when": IS("after", "not_yet"), "key": "after_line_not_yet"},
             {"when": None, "key": "after_line"},
         ],
-        # Opposite action for love that doesn't fit the facts (Arch #35); Find your people (IE-09, planned; #37);
+        # Opposite action for love that doesn't fit the facts (Arch #35); Find your people (IE-09, built 12 Nov; #37);
         # Let it be (DT-04, built 11 Nov 2026) for the grief.
         "offers": [
             {"exit": "opposite_action", "when": IS("after", "pull")},
@@ -369,7 +369,7 @@ EXITS = [
     {"id": "cope_ahead", "toolId": "cope-ahead", "query": {"situationId": "conversation"}},
     {"id": "rehearse", "toolId": "rehearse", "planned": True},
     {"id": "opposite_action", "toolId": "opposite-action"},
-    {"id": "finding_connection", "toolId": "finding-connection", "planned": True},
+    {"id": "finding_connection", "toolId": "finding-connection"},  # IE-09 Find your people (built 12 Nov)
     {"id": "let_it_be", "toolId": "let-it-be"},
     {"id": "safety_open", "toolId": None, "safety": True},
     {"id": "done", "done": True},

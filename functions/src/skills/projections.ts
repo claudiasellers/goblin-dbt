@@ -6,6 +6,7 @@ import { projectDearManPrep } from '../dearMan/prepProjection';
 import { projectSayNo } from '../sayNo/projection';
 import { projectOppositeAction } from '../oppositeAction/projection';
 import { projectGive } from '../give/projection';
+import { projectFindingConnection } from '../findingConnection/projection';
 
 /**
  * The projection hook (docs/design/dbt-modules-plan.md C3a R14, C8.2): for a tool that moved onto the skill
@@ -46,6 +47,8 @@ export const PROJECTIONS: Readonly<Record<string, Projection>> = {
   'opposite-action': projectOppositeAction,
   // Keep it warm (IE-B4): the Interaction {kind: 'repair' | 'break_return'} once its card's visit says how it went.
   'give': projectGive,
+  // Find your people (IE-B5): the Interaction {kind: 'reach_out'} once its card's visit says it was done (or decided not to).
+  'finding-connection': projectFindingConnection,
 };
 
 /**
@@ -63,6 +66,9 @@ export const OFF_PHONE_SKILLS: Readonly<Record<string, { toolId: string; happene
   // Keep it warm's afterwards: *Did you get to say it?* (repair) or *Did you go back?* (break and return), whichever the
   // card's visit asked. A first visit asks neither and keeps the close's own rep.
   give: { toolId: 'give', happenedField: ['repaired', 'back'], yes: 'yes', unansweredKeepsOwn: true },
+  // Find your people's afterwards (the reach_out_outcome card reopens the run at *Did you do it?*): *I did it* is the rep
+  // (the PRD's `reached_out`); not yet or decided not to log none. The first visit keeps the close's own.
+  finding_connection: { toolId: 'finding-connection', happenedField: 'happened', yes: 'did', unansweredKeepsOwn: true },
 };
 
 /** The rep a run's close logs: off the phone (it happened), none (it didn't), or the close's own (null). */

@@ -115,7 +115,7 @@ test("tags (WMP-04 v0 side, skillKind, direction) on the 13 app-tool concepts; D
     "check-the-facts": ["change", "change", "neutral"], "alternate-rebellion": ["acceptance", "redirect", "neutral"], fast: ["both", "values", "neutral"],
     "say-no": ["change", "relational", "neutral"], "let-it-be": ["acceptance", "hold", "neutral"], "mind-job": ["acceptance", "redirect", "neutral"],
     soothe: ["acceptance", "body", "down"], "thoughts-passing": ["acceptance", "hold", "neutral"], "please-skill": ["both", "body", "neutral"], "good-things": ["change", "redirect", "up"],
-    give: ["change", "relational", "neutral"],
+    give: ["change", "relational", "neutral"], "finding-connection": ["change", "relational", "up"],
   });
   for (const id of Object.keys(tags)) assert.ok(toolIds.includes(id), id);
 });

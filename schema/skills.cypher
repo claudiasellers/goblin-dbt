@@ -2174,7 +2174,7 @@ MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "fast_let_go:recover"}), (t:TherapyConcept {appToolId: "recovering-from-invalidation"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "fast_let_go:finding_connection"})
-SET x += {skillId: "fast_let_go", exit: "finding_connection", toolId: "finding-connection", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
+SET x += {skillId: "fast_let_go", exit: "finding_connection", toolId: "finding-connection", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "fast_let_go"}), (x:SkillExit {id: "fast_let_go:finding_connection"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "fast_let_go:finding_connection"}), (t:TherapyConcept {appToolId: "finding-connection"})
@@ -2822,7 +2822,7 @@ MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:find_the_feeling"}), (t:TherapyConcept {appToolId: "find-the-feeling"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:finding_connection"})
-SET x += {skillId: "problem_solve", exit: "finding_connection", toolId: "finding-connection", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
+SET x += {skillId: "problem_solve", exit: "finding_connection", toolId: "finding-connection", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:finding_connection"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:finding_connection"}), (t:TherapyConcept {appToolId: "finding-connection"})
@@ -5482,7 +5482,7 @@ MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ending_relationships:opposite_action"}), (t:TherapyConcept {appToolId: "opposite-action"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "ending_relationships:finding_connection"})
-SET x += {skillId: "ending_relationships", exit: "finding_connection", toolId: "finding-connection", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
+SET x += {skillId: "ending_relationships", exit: "finding_connection", toolId: "finding-connection", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "ending_relationships"}), (x:SkillExit {id: "ending_relationships:finding_connection"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ending_relationships:finding_connection"}), (t:TherapyConcept {appToolId: "finding-connection"})
@@ -7480,7 +7480,7 @@ MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_debrief:let_it_be"}), (t:TherapyConcept {appToolId: "let-it-be"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_debrief:finding_connection"})
-SET x += {skillId: "dear_man_debrief", exit: "finding_connection", toolId: "finding-connection", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
+SET x += {skillId: "dear_man_debrief", exit: "finding_connection", toolId: "finding-connection", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "dear_man_debrief"}), (x:SkillExit {id: "dear_man_debrief:finding_connection"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_debrief:finding_connection"}), (t:TherapyConcept {appToolId: "finding-connection"})
@@ -20264,3 +20264,474 @@ SET o:SkillOption, o += {skillId: "values", list: "again", value: "not_now", lab
 MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:again:not_now"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "again", order: 113};
+
+// --- finding_connection (fc-v1) ---
+MERGE (s:Skill {id: "finding_connection"})
+SET s += {toolId: "finding-connection", version: "fc-v1", contentVersion: "skills-v1", start: "start", ownMax: 60, emotionFields: [], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"again_hint\": \"The step is still here.\", \"again_title\": \"Not yet is fine.\", \"back_title\": \"Earlier you picked: {step}.\", \"done\": \"Done\", \"gap_better\": \"That gap is worth noticing.\", \"gap_better_title\": \"It went better than you predicted.\", \"gap_liked\": \"They seemed to like you more than you guessed. Most people guess low on that.\", \"gap_line\": \"Each try tells you a bit more about how people actually respond.\", \"gap_no_answer\": \"People miss messages, get busy, forget. It says little about you.\", \"gap_no_answer_title\": \"No response yet.\", \"gap_same_title\": \"It went about how you predicted.\", \"gap_title\": \"You did it.\", \"gap_worse\": \"One try is information, not a verdict about you.\", \"gap_worse_title\": \"It went worse than you predicted.\", \"happened_label\": \"Did you do it?\", \"heads_up_hint\": \"Reaching out lands better once it settles a little.\", \"heads_up_title\": \"Your body's loud right now.\", \"leave_line\": \"It'll keep. Come back to it any time.\", \"liked_label\": \"How much did they seem to like you?\", \"liking_label\": \"If you talk to someone, how much do you think they'll like you?\", \"next\": \"Next\", \"not_doing_line\": \"Deciding not to is allowed. Your step is here when you want it.\", \"not_doing_title\": \"That's a real answer.\", \"picture_done\": \"Pictured. That's a rehearsal.\", \"picture_hint\": \"Where you are, the first thing you do or say, and you doing it anyway if it feels awkward.\", \"picture_label\": \"Start\", \"picture_running\": \"Picturing it\", \"picture_title\": \"Picture doing it, for a few seconds.\", \"predict_hint\": \"A guess is enough. You'll check it afterwards.\", \"predict_title\": \"Before you do it: how do you think it'll go?\", \"remind_label\": \"Want me to ask how it went?\", \"safety_open\": \"Talk to someone now\", \"set_line\": \"Doing it is the experiment. How it goes is information, not a verdict about you.\", \"set_remind\": \"I'll ask how it went. Doing it is the experiment; how it goes is information, not a verdict about you.\", \"set_title\": \"Your step: {step}.\", \"settle_line\": \"This will keep. Look after the next few minutes first.\", \"start_hint\": \"Feeling cut off from people is common, and it can shift in small steps. Pick the one that feels most possible.\", \"start_title\": \"Where do you want to start?\", \"step_hint\": \"Smallest first. A small one done counts for more than a big one planned.\", \"step_low\": \"The smallest ones for now. Bigger ones are here on a steadier day.\", \"step_own\": \"Something else\", \"step_title\": \"Pick one small step.\", \"went_title\": \"How did it go?\", \"when_title\": \"When will you do it?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+MATCH (t:TherapyConcept {id: "dbt_building_relationships"}), (s:Skill {id: "finding_connection"})
+MERGE (t)-[:HAS_SKILL]->(s);
+MATCH (:SkillStep {skillId: "finding_connection"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
+MATCH (:Skill {id: "finding_connection"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
+MERGE (n:SkillStep {id: "finding_connection:start"})
+SET n += {skillId: "finding_connection", step: "start", kind: "ask", version: "fc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"area\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"area\"}, \"required\": true}], \"hint\": \"start_hint\", \"title\": \"start_title\"}";
+MATCH (s:Skill {id: "finding_connection"}), (n:SkillStep {id: "finding_connection:start"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 0};
+MERGE (n:SkillStep {id: "finding_connection:heads_up"})
+SET n += {skillId: "finding_connection", step: "heads_up", kind: "ask", version: "fc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"heads_up\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"heads_up\"}, \"required\": true}], \"hint\": \"heads_up_hint\", \"title\": \"heads_up_title\"}";
+MATCH (s:Skill {id: "finding_connection"}), (n:SkillStep {id: "finding_connection:heads_up"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 1};
+MERGE (n:SkillStep {id: "finding_connection:settle"})
+SET n += {skillId: "finding_connection", step: "settle", kind: "handoff", version: "fc-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"settle_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"heads_up_title\"}";
+MATCH (s:Skill {id: "finding_connection"}), (n:SkillStep {id: "finding_connection:settle"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 2};
+MERGE (n:SkillStep {id: "finding_connection:step"})
+SET n += {skillId: "finding_connection", step: "step", kind: "ask", version: "fc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"step\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"step\", \"where\": {\"all\": [{\"eq\": [\"$opt.area\", \"$a.area\"]}, {\"any\": [{\"not\": {\"in\": [\"$ctx.band\", [\"stirred\", \"flooded\"]]}}, {\"eq\": [\"$opt.small\", true]}]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"step_own\", \"max\": 60}, \"required\": true}], \"hint\": \"step_hint\", \"lines\": [{\"key\": \"step_low\", \"when\": {\"in\": [\"$ctx.band\", [\"stirred\", \"flooded\"]]}}], \"title\": \"step_title\"}";
+MATCH (s:Skill {id: "finding_connection"}), (n:SkillStep {id: "finding_connection:step"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 3};
+MERGE (n:SkillStep {id: "finding_connection:predict"})
+SET n += {skillId: "finding_connection", step: "predict", kind: "ask", version: "fc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"predict\", \"max\": 1, \"options\": {\"list\": \"how\"}, \"required\": true}, {\"id\": \"liking\", \"label\": \"liking_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"liking\"}, \"required\": false}], \"hint\": \"predict_hint\", \"title\": \"predict_title\"}";
+MATCH (s:Skill {id: "finding_connection"}), (n:SkillStep {id: "finding_connection:predict"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 4};
+MERGE (n:SkillStep {id: "finding_connection:picture"})
+SET n += {skillId: "finding_connection", step: "picture", kind: "embed", version: "fc-v1"}, n.specJson = "{\"answerAs\": \"picture\", \"embed\": \"holdRing\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"doneLabel\": \"picture_done\", \"hint\": \"picture_hint\", \"label\": \"picture_label\", \"next\": \"next\", \"runningLabel\": \"picture_running\", \"seconds\": 15, \"variant\": \"timed\"}, \"title\": \"picture_title\"}";
+MATCH (s:Skill {id: "finding_connection"}), (n:SkillStep {id: "finding_connection:picture"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 5};
+MERGE (n:SkillStep {id: "finding_connection:when"})
+SET n += {skillId: "finding_connection", step: "when", kind: "ask", version: "fc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"when\", \"max\": 1, \"options\": {\"list\": \"when\"}, \"required\": true}, {\"id\": \"remind\", \"label\": \"remind_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"remind\"}, \"required\": false}], \"followUp\": {\"type\": \"reach_out_outcome\", \"when\": {\"eq\": [\"$a.remind\", \"yes\"]}, \"whenFrom\": \"when\"}, \"title\": \"when_title\"}";
+MATCH (s:Skill {id: "finding_connection"}), (n:SkillStep {id: "finding_connection:when"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 6};
+MERGE (n:SkillStep {id: "finding_connection:set"})
+SET n += {skillId: "finding_connection", step: "set", kind: "handoff", version: "fc-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"set_remind\", \"when\": {\"eq\": [\"$a.remind\", \"yes\"]}}, {\"key\": \"set_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"title\": \"set_title\", \"titleSlots\": {\"step\": {\"labelOf\": \"step\"}}}";
+MATCH (s:Skill {id: "finding_connection"}), (n:SkillStep {id: "finding_connection:set"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 7};
+MERGE (n:SkillStep {id: "finding_connection:back"})
+SET n += {skillId: "finding_connection", step: "back", kind: "ask", version: "fc-v1"}, n.specJson = "{\"clears\": [\"happened\", \"went\", \"liked\", \"again\"], \"fields\": [{\"id\": \"happened\", \"label\": \"happened_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"happened\"}, \"required\": true}], \"reopens\": {\"after\": \"when\"}, \"title\": \"back_title\", \"titleSlots\": {\"step\": {\"labelOf\": \"step\"}}}";
+MATCH (s:Skill {id: "finding_connection"}), (n:SkillStep {id: "finding_connection:back"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 8};
+MERGE (n:SkillStep {id: "finding_connection:went"})
+SET n += {skillId: "finding_connection", step: "went", kind: "ask", version: "fc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"went\", \"max\": 1, \"options\": {\"list\": \"went\"}, \"required\": true}, {\"id\": \"liked\", \"label\": \"liked_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"liked\"}, \"required\": false}], \"title\": \"went_title\"}";
+MATCH (s:Skill {id: "finding_connection"}), (n:SkillStep {id: "finding_connection:went"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 9};
+MERGE (n:SkillStep {id: "finding_connection:gap"})
+SET n += {skillId: "finding_connection", step: "gap", kind: "handoff", version: "fc-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"gap_no_answer\", \"when\": {\"eq\": [\"$a.went\", \"no_answer\"]}}, {\"key\": \"gap_worse\", \"when\": {\"any\": [{\"all\": [{\"eq\": [\"$a.predict\", \"mixed\"]}, {\"eq\": [\"$a.went\", \"badly\"]}]}, {\"all\": [{\"eq\": [\"$a.predict\", \"well\"]}, {\"eq\": [\"$a.went\", \"badly\"]}]}, {\"all\": [{\"eq\": [\"$a.predict\", \"well\"]}, {\"eq\": [\"$a.went\", \"mixed\"]}]}]}}, {\"key\": \"gap_liked\", \"when\": {\"any\": [{\"all\": [{\"eq\": [\"$a.liking\", \"not_much\"]}, {\"eq\": [\"$a.liked\", \"some\"]}]}, {\"all\": [{\"eq\": [\"$a.liking\", \"not_much\"]}, {\"eq\": [\"$a.liked\", \"a_lot\"]}]}, {\"all\": [{\"eq\": [\"$a.liking\", \"some\"]}, {\"eq\": [\"$a.liked\", \"a_lot\"]}]}]}}, {\"key\": \"gap_better\", \"when\": {\"any\": [{\"all\": [{\"eq\": [\"$a.predict\", \"badly\"]}, {\"eq\": [\"$a.went\", \"mixed\"]}]}, {\"all\": [{\"eq\": [\"$a.predict\", \"badly\"]}, {\"eq\": [\"$a.went\", \"well\"]}]}, {\"all\": [{\"eq\": [\"$a.predict\", \"mixed\"]}, {\"eq\": [\"$a.went\", \"well\"]}]}, {\"all\": [{\"eq\": [\"$a.predict\", \"no_answer\"]}, {\"eq\": [\"$a.went\", \"badly\"]}]}, {\"all\": [{\"eq\": [\"$a.predict\", \"no_answer\"]}, {\"eq\": [\"$a.went\", \"mixed\"]}]}, {\"all\": [{\"eq\": [\"$a.predict\", \"no_answer\"]}, {\"eq\": [\"$a.went\", \"well\"]}]}]}}, {\"key\": \"gap_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": [{\"key\": \"gap_no_answer_title\", \"when\": {\"eq\": [\"$a.went\", \"no_answer\"]}}, {\"key\": \"gap_better_title\", \"when\": {\"any\": [{\"all\": [{\"eq\": [\"$a.predict\", \"badly\"]}, {\"eq\": [\"$a.went\", \"mixed\"]}]}, {\"all\": [{\"eq\": [\"$a.predict\", \"badly\"]}, {\"eq\": [\"$a.went\", \"well\"]}]}, {\"all\": [{\"eq\": [\"$a.predict\", \"mixed\"]}, {\"eq\": [\"$a.went\", \"well\"]}]}, {\"all\": [{\"eq\": [\"$a.predict\", \"no_answer\"]}, {\"eq\": [\"$a.went\", \"badly\"]}]}, {\"all\": [{\"eq\": [\"$a.predict\", \"no_answer\"]}, {\"eq\": [\"$a.went\", \"mixed\"]}]}, {\"all\": [{\"eq\": [\"$a.predict\", \"no_answer\"]}, {\"eq\": [\"$a.went\", \"well\"]}]}]}}, {\"key\": \"gap_same_title\", \"when\": {\"any\": [{\"all\": [{\"eq\": [\"$a.predict\", \"badly\"]}, {\"eq\": [\"$a.went\", \"badly\"]}]}, {\"all\": [{\"eq\": [\"$a.predict\", \"mixed\"]}, {\"eq\": [\"$a.went\", \"mixed\"]}]}, {\"all\": [{\"eq\": [\"$a.predict\", \"well\"]}, {\"eq\": [\"$a.went\", \"well\"]}]}]}}, {\"key\": \"gap_worse_title\", \"when\": {\"any\": [{\"all\": [{\"eq\": [\"$a.predict\", \"mixed\"]}, {\"eq\": [\"$a.went\", \"badly\"]}]}, {\"all\": [{\"eq\": [\"$a.predict\", \"well\"]}, {\"eq\": [\"$a.went\", \"badly\"]}]}, {\"all\": [{\"eq\": [\"$a.predict\", \"well\"]}, {\"eq\": [\"$a.went\", \"mixed\"]}]}]}}, {\"key\": \"gap_title\"}]}";
+MATCH (s:Skill {id: "finding_connection"}), (n:SkillStep {id: "finding_connection:gap"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 10};
+MERGE (n:SkillStep {id: "finding_connection:again"})
+SET n += {skillId: "finding_connection", step: "again", kind: "ask", version: "fc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"again\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"again\"}, \"required\": true}], \"hint\": \"again_hint\", \"title\": \"again_title\"}";
+MATCH (s:Skill {id: "finding_connection"}), (n:SkillStep {id: "finding_connection:again"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 11};
+MERGE (n:SkillStep {id: "finding_connection:leave"})
+SET n += {skillId: "finding_connection", step: "leave", kind: "handoff", version: "fc-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"leave_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"again_title\"}";
+MATCH (s:Skill {id: "finding_connection"}), (n:SkillStep {id: "finding_connection:leave"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 12};
+MERGE (n:SkillStep {id: "finding_connection:not_doing"})
+SET n += {skillId: "finding_connection", step: "not_doing", kind: "handoff", version: "fc-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"not_doing_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"not_doing_title\"}";
+MATCH (s:Skill {id: "finding_connection"}), (n:SkillStep {id: "finding_connection:not_doing"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 13};
+MERGE (x:SkillExit {id: "finding_connection:cool_down"})
+SET x += {skillId: "finding_connection", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "finding_connection"}), (x:SkillExit {id: "finding_connection:cool_down"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "finding_connection:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "finding_connection:recover"})
+SET x += {skillId: "finding_connection", exit: "recover", toolId: "recovering-from-invalidation", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "finding_connection"}), (x:SkillExit {id: "finding_connection:recover"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "finding_connection:recover"}), (t:TherapyConcept {appToolId: "recovering-from-invalidation"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "finding_connection:safety_open"})
+SET x += {skillId: "finding_connection", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "finding_connection"}), (x:SkillExit {id: "finding_connection:safety_open"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MERGE (x:SkillExit {id: "finding_connection:done"})
+SET x += {skillId: "finding_connection", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "finding_connection"}), (x:SkillExit {id: "finding_connection:done"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (a:SkillStep {id: "finding_connection:start"}), (b:SkillStep {id: "finding_connection:heads_up"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
+MATCH (a:SkillStep {id: "finding_connection:start"}), (b:SkillStep {id: "finding_connection:step"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "finding_connection:start"}), (x:SkillExit {id: "finding_connection:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "area", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "finding_connection:heads_up"}), (b:SkillStep {id: "finding_connection:settle"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.heads_up\", \"settle\"]}";
+MATCH (a:SkillStep {id: "finding_connection:heads_up"}), (b:SkillStep {id: "finding_connection:step"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "finding_connection:heads_up"}), (x:SkillExit {id: "finding_connection:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "heads_up", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "finding_connection:settle"}), (x:SkillExit {id: "finding_connection:cool_down"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "finding_connection:settle"}), (x:SkillExit {id: "finding_connection:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "finding_connection:step"}), (b:SkillStep {id: "finding_connection:predict"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "finding_connection:step"}), (x:SkillExit {id: "finding_connection:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "step", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "finding_connection:predict"}), (b:SkillStep {id: "finding_connection:picture"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "finding_connection:predict"}), (x:SkillExit {id: "finding_connection:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "liking", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "finding_connection:picture"}), (b:SkillStep {id: "finding_connection:when"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "finding_connection:picture"}), (x:SkillExit {id: "finding_connection:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "finding_connection:when"}), (b:SkillStep {id: "finding_connection:set"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "finding_connection:when"}), (x:SkillExit {id: "finding_connection:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "remind", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "finding_connection:set"}), (x:SkillExit {id: "finding_connection:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "finding_connection:back"}), (b:SkillStep {id: "finding_connection:again"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.happened\", \"not_yet\"]}";
+MATCH (a:SkillStep {id: "finding_connection:back"}), (b:SkillStep {id: "finding_connection:not_doing"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.happened\", \"decided_not\"]}";
+MATCH (a:SkillStep {id: "finding_connection:back"}), (b:SkillStep {id: "finding_connection:went"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "finding_connection:back"}), (x:SkillExit {id: "finding_connection:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "happened", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "finding_connection:went"}), (b:SkillStep {id: "finding_connection:gap"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "finding_connection:went"}), (x:SkillExit {id: "finding_connection:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "liked", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "finding_connection:gap"}), (x:SkillExit {id: "finding_connection:recover"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"eq\": [\"$a.went\", \"badly\"]}}]";
+MATCH (a:SkillStep {id: "finding_connection:gap"}), (x:SkillExit {id: "finding_connection:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "finding_connection:again"}), (b:SkillStep {id: "finding_connection:when"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.again\", \"new_time\"]}";
+MATCH (a:SkillStep {id: "finding_connection:again"}), (b:SkillStep {id: "finding_connection:step"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.again\", \"smaller\"]}";
+MATCH (a:SkillStep {id: "finding_connection:again"}), (b:SkillStep {id: "finding_connection:leave"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "finding_connection:again"}), (x:SkillExit {id: "finding_connection:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "again", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "finding_connection:leave"}), (x:SkillExit {id: "finding_connection:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "finding_connection:not_doing"}), (x:SkillExit {id: "finding_connection:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MERGE (o:SkillOption {id: "finding_connection:area:around"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "area", value: "around", label: "Being around people", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:area:around"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "area", order: 0};
+MERGE (o:SkillOption {id: "finding_connection:area:like_me"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "area", value: "like_me", label: "Finding people like me", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:area:like_me"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "area", order: 1};
+MERGE (o:SkillOption {id: "finding_connection:area:talk"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "area", value: "talk", label: "Starting or keeping a conversation going", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:area:talk"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "area", order: 2};
+MERGE (o:SkillOption {id: "finding_connection:area:friend"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "area", value: "friend", label: "Keeping a friendship going", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:area:friend"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "area", order: 3};
+MERGE (o:SkillOption {id: "finding_connection:area:join"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "area", value: "join", label: "Joining something", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:area:join"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "area", order: 4};
+MERGE (o:SkillOption {id: "finding_connection:heads_up:settle"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "heads_up", value: "settle", label: "Look after the next few minutes first", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:heads_up:settle"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up", order: 5};
+MERGE (o:SkillOption {id: "finding_connection:heads_up:try"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "heads_up", value: "try", label: "Try a small one anyway", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:heads_up:try"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up", order: 6};
+MERGE (o:SkillOption {id: "finding_connection:step:around_cafe"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "step", value: "around_cafe", label: "Sit somewhere with people around for ten minutes: a café, a library, a park", version: "fc-v1"}, o.propsJson = "{\"area\": \"around\", \"small\": true, \"tier\": 1}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:step:around_cafe"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 7};
+MERGE (o:SkillOption {id: "finding_connection:step:around_hello"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "step", value: "around_hello", label: "Say hello to one person you see anyway", version: "fc-v1"}, o.propsJson = "{\"area\": \"around\", \"small\": true, \"tier\": 1}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:step:around_hello"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 8};
+MERGE (o:SkillOption {id: "finding_connection:step:around_twice"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "step", value: "around_twice", label: "Go to the same place at the same time twice this week", version: "fc-v1"}, o.propsJson = "{\"area\": \"around\", \"tier\": 2}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:step:around_twice"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 9};
+MERGE (o:SkillOption {id: "finding_connection:step:around_together"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "step", value: "around_together", label: "Go somewhere people do a thing together, and stay twenty minutes", version: "fc-v1"}, o.propsJson = "{\"area\": \"around\", \"tier\": 3}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:step:around_together"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 10};
+MERGE (o:SkillOption {id: "finding_connection:step:like_read"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "step", value: "like_read", label: "Look up one group or class for something you like", version: "fc-v1"}, o.propsJson = "{\"area\": \"like_me\", \"small\": true, \"tier\": 1}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:step:like_read"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 11};
+MERGE (o:SkillOption {id: "finding_connection:step:like_reply"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "step", value: "like_reply", label: "Reply to one post in a group for something you're into", version: "fc-v1"}, o.propsJson = "{\"area\": \"like_me\", \"small\": true, \"tier\": 1}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:step:like_reply"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 12};
+MERGE (o:SkillOption {id: "finding_connection:step:like_online"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "step", value: "like_online", label: "Go to one online meetup for something you like. Camera off is fine", version: "fc-v1"}, o.propsJson = "{\"area\": \"like_me\", \"tier\": 2}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:step:like_online"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 13};
+MERGE (o:SkillOption {id: "finding_connection:step:like_go"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "step", value: "like_go", label: "Go once to a group or class for something you like", version: "fc-v1"}, o.propsJson = "{\"area\": \"like_me\", \"tier\": 3}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:step:like_go"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 14};
+MERGE (o:SkillOption {id: "finding_connection:step:talk_reply"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "step", value: "talk_reply", label: "Reply to one message", version: "fc-v1"}, o.propsJson = "{\"area\": \"talk\", \"small\": true, \"tier\": 1}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:step:talk_reply"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 15};
+MERGE (o:SkillOption {id: "finding_connection:step:talk_question"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "step", value: "talk_question", label: "Ask one question back in a conversation", version: "fc-v1"}, o.propsJson = "{\"area\": \"talk\", \"small\": true, \"tier\": 1}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:step:talk_question"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 16};
+MERGE (o:SkillOption {id: "finding_connection:step:talk_extra"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "step", value: "talk_extra", label: "Say one extra sentence to someone you see anyway", version: "fc-v1"}, o.propsJson = "{\"area\": \"talk\", \"tier\": 2}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:step:talk_extra"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 17};
+MERGE (o:SkillOption {id: "finding_connection:step:talk_true"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "step", value: "talk_true", label: "Tell someone one small true thing about your day", version: "fc-v1"}, o.propsJson = "{\"area\": \"talk\", \"tier\": 2}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:step:talk_true"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 18};
+MERGE (o:SkillOption {id: "finding_connection:step:talk_start"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "step", value: "talk_start", label: "Start a conversation with someone you half-know", version: "fc-v1"}, o.propsJson = "{\"area\": \"talk\", \"tier\": 3}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:step:talk_start"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 19};
+MERGE (o:SkillOption {id: "finding_connection:step:friend_thought"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "step", value: "friend_thought", label: "Send someone a message that says you thought of them", version: "fc-v1"}, o.propsJson = "{\"area\": \"friend\", \"small\": true, \"tier\": 1}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:step:friend_thought"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 20};
+MERGE (o:SkillOption {id: "finding_connection:step:friend_owe"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "step", value: "friend_owe", label: "Reply to someone you owe a message", version: "fc-v1"}, o.propsJson = "{\"area\": \"friend\", \"small\": true, \"tier\": 1}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:step:friend_owe"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 21};
+MERGE (o:SkillOption {id: "finding_connection:step:friend_follow"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "step", value: "friend_follow", label: "Ask someone how something they told you about went", version: "fc-v1"}, o.propsJson = "{\"area\": \"friend\", \"tier\": 2}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:step:friend_follow"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 22};
+MERGE (o:SkillOption {id: "finding_connection:step:friend_invite"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "step", value: "friend_invite", label: "Invite someone to something low-key", version: "fc-v1"}, o.propsJson = "{\"area\": \"friend\", \"tier\": 3}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:step:friend_invite"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 23};
+MERGE (o:SkillOption {id: "finding_connection:step:join_find"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "step", value: "join_find", label: "Find one thing that meets regularly, near you or online", version: "fc-v1"}, o.propsJson = "{\"area\": \"join\", \"small\": true, \"tier\": 1}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:step:join_find"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 24};
+MERGE (o:SkillOption {id: "finding_connection:step:join_sign"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "step", value: "join_sign", label: "Sign up for one thing", version: "fc-v1"}, o.propsJson = "{\"area\": \"join\", \"tier\": 2}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:step:join_sign"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 25};
+MERGE (o:SkillOption {id: "finding_connection:step:join_help"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "step", value: "join_help", label: "Offer to help once with something local", version: "fc-v1"}, o.propsJson = "{\"area\": \"join\", \"tier\": 2}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:step:join_help"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 26};
+MERGE (o:SkillOption {id: "finding_connection:step:join_go"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "step", value: "join_go", label: "Go once, and stay to the end", version: "fc-v1"}, o.propsJson = "{\"area\": \"join\", \"tier\": 3}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:step:join_go"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 27};
+MERGE (o:SkillOption {id: "finding_connection:how:well"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "how", value: "well", label: "Well", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:how:well"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "how", order: 28};
+MERGE (o:SkillOption {id: "finding_connection:how:mixed"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "how", value: "mixed", label: "Mixed", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:how:mixed"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "how", order: 29};
+MERGE (o:SkillOption {id: "finding_connection:how:badly"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "how", value: "badly", label: "Badly", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:how:badly"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "how", order: 30};
+MERGE (o:SkillOption {id: "finding_connection:how:no_answer"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "how", value: "no_answer", label: "No one will respond", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:how:no_answer"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "how", order: 31};
+MERGE (o:SkillOption {id: "finding_connection:went:well"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "went", value: "well", label: "Well", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:went:well"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "went", order: 32};
+MERGE (o:SkillOption {id: "finding_connection:went:mixed"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "went", value: "mixed", label: "Mixed", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:went:mixed"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "went", order: 33};
+MERGE (o:SkillOption {id: "finding_connection:went:badly"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "went", value: "badly", label: "Badly", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:went:badly"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "went", order: 34};
+MERGE (o:SkillOption {id: "finding_connection:went:no_answer"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "went", value: "no_answer", label: "No one responded", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:went:no_answer"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "went", order: 35};
+MERGE (o:SkillOption {id: "finding_connection:liking:not_much"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "liking", value: "not_much", label: "Not much", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:liking:not_much"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "liking", order: 36};
+MERGE (o:SkillOption {id: "finding_connection:liking:some"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "liking", value: "some", label: "Some", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:liking:some"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "liking", order: 37};
+MERGE (o:SkillOption {id: "finding_connection:liking:a_lot"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "liking", value: "a_lot", label: "A lot", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:liking:a_lot"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "liking", order: 38};
+MERGE (o:SkillOption {id: "finding_connection:liked:not_much"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "liked", value: "not_much", label: "Not much", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:liked:not_much"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "liked", order: 39};
+MERGE (o:SkillOption {id: "finding_connection:liked:some"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "liked", value: "some", label: "Some", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:liked:some"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "liked", order: 40};
+MERGE (o:SkillOption {id: "finding_connection:liked:a_lot"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "liked", value: "a_lot", label: "A lot", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:liked:a_lot"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "liked", order: 41};
+MERGE (o:SkillOption {id: "finding_connection:liked:cant_tell"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "liked", value: "cant_tell", label: "Can't tell", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:liked:cant_tell"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "liked", order: 42};
+MERGE (o:SkillOption {id: "finding_connection:when:today"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "when", value: "today", label: "Later today", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:when:today"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "when", order: 43};
+MERGE (o:SkillOption {id: "finding_connection:when:evening"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "when", value: "evening", label: "This evening", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:when:evening"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "when", order: 44};
+MERGE (o:SkillOption {id: "finding_connection:when:tomorrow"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "when", value: "tomorrow", label: "Tomorrow", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:when:tomorrow"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "when", order: 45};
+MERGE (o:SkillOption {id: "finding_connection:when:few_days"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "when", value: "few_days", label: "In a few days", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:when:few_days"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "when", order: 46};
+MERGE (o:SkillOption {id: "finding_connection:when:this_week"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "when", value: "this_week", label: "Sometime this week", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:when:this_week"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "when", order: 47};
+MERGE (o:SkillOption {id: "finding_connection:remind:yes"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "remind", value: "yes", label: "Yes, ask me", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:remind:yes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "remind", order: 48};
+MERGE (o:SkillOption {id: "finding_connection:remind:no"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "remind", value: "no", label: "No thanks", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:remind:no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "remind", order: 49};
+MERGE (o:SkillOption {id: "finding_connection:happened:did"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "happened", value: "did", label: "I did it", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:happened:did"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "happened", order: 50};
+MERGE (o:SkillOption {id: "finding_connection:happened:not_yet"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "happened", value: "not_yet", label: "Not yet", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:happened:not_yet"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "happened", order: 51};
+MERGE (o:SkillOption {id: "finding_connection:happened:decided_not"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "happened", value: "decided_not", label: "I decided not to", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:happened:decided_not"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "happened", order: 52};
+MERGE (o:SkillOption {id: "finding_connection:again:new_time"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "again", value: "new_time", label: "Pick a new time", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:again:new_time"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "again", order: 53};
+MERGE (o:SkillOption {id: "finding_connection:again:smaller"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "again", value: "smaller", label: "Pick a smaller step", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:again:smaller"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "again", order: 54};
+MERGE (o:SkillOption {id: "finding_connection:again:leave"})
+SET o:SkillOption, o += {skillId: "finding_connection", list: "again", value: "leave", label: "Leave it for now", version: "fc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "finding_connection"}), (o:SkillOption {id: "finding_connection:again:leave"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "again", order: 55};
