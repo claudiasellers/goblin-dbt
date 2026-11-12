@@ -195,9 +195,14 @@ export function scope(ctx: RunContext, s: Pick<RunState, 'answers'>): Scope {
   return scopeOf(ctx, s.answers, derive(ctx, s.answers));
 }
 
-/** The emotion words a field offers: carried first, then its own list, then any pick from the full list. */
+/**
+ * The emotion words a field offers: carried first, then its own list (`emotionsFrom`'s derived list when it
+ * resolves to one, else `emotions`), then any pick from the full list.
+ */
 export function emotionChoices(ctx: RunContext, field: FieldDef, answers: Answers): string[] {
-  const own = field.options.emotions ?? [];
+  const from = field.options.emotionsFrom ? resolve(field.options.emotionsFrom, scope(ctx, { answers })) : null;
+  const derived = Array.isArray(from) ? from.filter((x): x is string => typeof x === 'string') : [];
+  const own = derived.length ? derived : field.options.emotions ?? [];
   const carried = field.options.carriedFirst ? ctx.carried.filter((id) => ctx.gridIds.has(id)) : [];
   const picked = answers[field.id]?.ids ?? [];
   return [...new Set([...carried, ...own, ...picked])];
@@ -457,7 +462,7 @@ export function followUpFor(ctx: RunContext, step: StepDef, s: Pick<RunState, 'a
   // Persist-nothing (R15): a run that writes nothing schedules nothing.
   if (persistence(ctx, s) !== 'save') return null;
   if (!f.whenFrom) return { type: f.type, chip: null };
-  const chip = s.answers[f.whenFrom]?.ids[0];
+  const chip = s.answers[f.whenFrom]?.ids[0] ?? f.whenDefault;
   return chip ? { type: f.type, chip } : null;
 }
 
@@ -530,9 +535,21 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { ke
   const before = new Set(upTo.flatMap(fieldsOf));
   const after = new Set(reopened ? [] : path.slice(upTo.length).flatMap(fieldsOf).filter((f) => !before.has(f)));
   const onPath = new Set(ctx.skill.steps.flatMap((st) => fieldsOf(st.id)).filter((f) => !after.has(f)));
-  // A chip that books a reminder (a followUp's `whenFrom`) is always a fresh tap: `scheduled` isn't restored, so a
-  // pick read back would book it a second time unasked.
-  const books = new Set(ctx.skill.steps.flatMap((st) => (st.followUp?.whenFrom ? [st.followUp.whenFrom] : [])));
+  // A reminder's own chip (a followUp's `whenFrom` on the step that books it) is always a fresh tap: read back, it
+  // would book again unasked. A `whenFrom` naming an earlier step's field (Cope Ahead's *When is it?*) is a real
+  // answer and comes back like any other; the step that books from it stays a fresh Next unless it already booked.
+  const books = new Set(ctx.skill.steps.flatMap((st) =>
+    st.followUp?.whenFrom && (st.fields ?? []).some((f) => f.id === st.followUp!.whenFrom) ? [st.followUp.whenFrom] : []));
+  // Steps before the resume point that booked their follow-up (the record's `scheduled` types) stay booked, so
+  // going on from there (or Back into one) never books a second one. The resume step itself and every step after
+  // it are unbooked. A reopened run is a new round: its reminder was the one that reopened it, so nothing is restored.
+  const bookedTypes = new Set(Array.isArray((rec as { scheduled?: unknown }).scheduled)
+    ? ((rec as { scheduled: unknown[] }).scheduled).filter((x): x is string => typeof x === 'string') : []);
+  const scheduled: RunState['scheduled'] = {};
+  for (const id of reopened ? [] : upTo.slice(0, -1)) {
+    const f = stepOf(ctx.skill, id).followUp;
+    if (f && id !== stepId && bookedTypes.has(f.type)) scheduled[id] = { type: f.type, id: '' };
+  }
   const answers: Answers = {};
   for (const a of Array.isArray(r.answers) ? r.answers as Array<Record<string, unknown>> : []) {
     const fieldId = a.fieldId;
@@ -544,7 +561,7 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { ke
   const step = stepOf(ctx.skill, stepId);
   const kept = normalize(ctx, reopened && step.clears?.length ? without(answers, step.clears) : answers);
   return {
-    ...initialRun(ctx.skill), stepId, path: (reopened ? [...upTo, stepId] : upTo).slice(-PATH_MAX), answers: kept,
+    ...initialRun(ctx.skill), stepId, path: (reopened ? [...upTo, stepId] : upTo).slice(-PATH_MAX), answers: kept, scheduled,
     offered: step.kind === 'handoff' ? offersFor(ctx, step, { answers: kept }) : [],
   };
 }

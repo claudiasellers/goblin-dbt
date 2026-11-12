@@ -22,8 +22,8 @@ test('getCopeAheadContent: flow copy, situations, moments, moves and beats off d
     }];
     if (/HardMoment/.test(q)) return [{ id: 'go_blank', label: 'I go blank', ifText: 'I go blank', order: 1 }];
     if (/CopeMove/.test(q)) return [
-      { id: 'leave_safe', kind: 'action', label: 'Leave and get somewhere safe', line: 'leave and get somewhere safe', forPulls: [], general: false, appToolId: null, forMoments: ['might_hurt'], order: 12 },
-      { id: 'pause', kind: 'tool', label: 'Pause', line: 'open Pause', forPulls: ['fight'], general: null, appToolId: 'pause', forMoments: null, order: 14 },
+      { id: 'leave_safe', kind: 'action', label: 'Leave and get somewhere safe', line: 'leave and get somewhere safe', forPulls: [], general: false, appToolId: null, forMoments: ['might_hurt'], forSituations: [], order: 12 },
+      { id: 'pause', kind: 'tool', label: 'Pause', line: 'open Pause', forPulls: ['fight'], general: null, appToolId: 'pause', forMoments: null, forSituations: null, order: 14 },
     ];
     if (/RehearsalBeat/.test(q)) return [{ id: 'arrive', text: "You're arriving.", order: 1 }];
     return [];
@@ -39,7 +39,7 @@ test('getCopeAheadContent: flow copy, situations, moments, moves and beats off d
   assert.ok(!('sourceIds' in out), 'the served shape: no sources');
   assert.deepEqual(out.situations[0].dangerMomentIds, ['might_hurt']);
   assert.deepEqual(out.hardMoments, [{ id: 'go_blank', label: 'I go blank', ifText: 'I go blank', order: 1 }]);
-  assert.deepEqual(out.moves[1], { id: 'pause', kind: 'tool', label: 'Pause', line: 'open Pause', forPulls: ['fight'], general: false, appToolId: 'pause', forMoments: [], order: 14 });
+  assert.deepEqual(out.moves[1], { id: 'pause', kind: 'tool', label: 'Pause', line: 'open Pause', forPulls: ['fight'], general: false, appToolId: 'pause', forMoments: [], forSituations: [], order: 14 });
   assert.equal(out.moves[0].appToolId, null);
   assert.deepEqual(out.beats, [{ id: 'arrive', text: "You're arriving.", order: 1 }]);
   assert.equal(f.sessions[0].config.defaultAccessMode, 'READ');

@@ -396,7 +396,7 @@ STEPS = [
 EXITS = [
     {"id": "cool_down", "toolId": "cool-down"},
     {"id": "dear_man", "toolId": "dear-man"},
-    {"id": "cope_ahead", "toolId": "cope-ahead", "query": {"first": "conversation"}},
+    {"id": "cope_ahead", "toolId": "cope-ahead", "query": {"situationId": "conversation"}},
     {"id": "rehearse", "toolId": "rehearse", "planned": True},
     {"id": "check_the_facts", "toolId": "check-the-facts"},
     {"id": "fast", "toolId": "fast"},

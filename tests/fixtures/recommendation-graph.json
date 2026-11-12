@@ -2359,9 +2359,9 @@
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
+   "reviewStatus": "approved",
    "rationale": "Planned: Check the Facts leads for low-grade anger."
   },
   {
@@ -2656,9 +2656,9 @@
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
+   "reviewStatus": "approved",
    "rationale": "Planned: Check the Facts as the alternative."
   },
   {
@@ -2682,9 +2682,9 @@
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
+   "reviewStatus": "approved",
    "rationale": "Planned: Cope Ahead leads for anticipatory anxiety."
   },
   {
@@ -2817,9 +2817,9 @@
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
+   "reviewStatus": "approved",
    "rationale": "Planned: Check the Facts leads."
   },
   {
@@ -3237,9 +3237,9 @@
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
+   "reviewStatus": "approved",
    "rationale": "Planned: Check the Facts leads for resentment."
   },
   {
@@ -3723,9 +3723,9 @@
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
+   "reviewStatus": "approved",
    "rationale": "Planned: Check the Facts leads for guilt (is it justified?) and hesitation."
   },
   {
@@ -4019,9 +4019,9 @@
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
+   "reviewStatus": "approved",
    "rationale": "Planned: Check the Facts beside Do the Opposite (unhiding) for shame about the self."
   }
  ],

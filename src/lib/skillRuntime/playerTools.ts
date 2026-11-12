@@ -12,6 +12,7 @@ export const PLAYER_TOOLS: Readonly<Record<string, string>> = {
   'nightmare-rescript': 'nightmare_rescript',
   'pause': 'hold_to_wait',
   'problem-solve': 'problem_solve',
+  'cope-ahead': 'cope_ahead',
   'pros-cons': 'pros_cons',
   'cool-down': 'first_body',
   'urge-surfing': 'ride_it_out',
@@ -29,9 +30,10 @@ export const PAGE_SKILLS: Readonly<Record<string, readonly string[]>> = {
 };
 
 /**
- * Tools whose close writes profile data through a projection (functions/src/skills/projections.ts `PROJECTIONS`,
- * test-pinned to the same keys): DEAR MAN's debrief sets the person's refusal counts and `safetyRecheckAt`. The
- * profile cache is cleared once such a close lands, so the next prep reads them fresh.
+ * Tools whose close writes profile data through a projection (functions/src/skills/projections.ts `PROJECTIONS`;
+ * test-pinned: every one has a projection, and Cope Ahead's projection writes log fields only): DEAR MAN's debrief
+ * sets the person's refusal counts and `safetyRecheckAt`. The profile cache is cleared once such a close lands, so
+ * the next prep reads them fresh.
  */
 export const PROFILE_WRITING_CLOSES: ReadonlySet<string> = new Set(['dear-man']);
 

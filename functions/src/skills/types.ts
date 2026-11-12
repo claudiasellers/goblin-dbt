@@ -34,6 +34,8 @@ export interface KeepAction {
   many: boolean;
   from: string[];
   when?: Cond;
+  /** A copy key: the confirmation shown on the next screen once the keep saved (*Your plan is in Me…*). */
+  done?: string;
 }
 
 /**
@@ -41,7 +43,11 @@ export interface KeepAction {
  * registry). Its time: the type's window, from the `whenFrom` field's pick when the window is a choice of chips
  * (the field's options are the chip ids). Once per step per run.
  */
-export interface FollowUpAction { type: string; whenFrom?: string; when?: Cond }
+/**
+ * `whenFrom` may name a field of an earlier step on an ask step (Cope Ahead's *When is it?* on screen 1 times the
+ * keep step's *Want me to ask how it went?*); `whenDefault` is the chip used when that field wasn't answered.
+ */
+export interface FollowUpAction { type: string; whenFrom?: string; whenDefault?: string; when?: Cond }
 
 /**
  * Inline (plan C3a R8, C1 rule 5): a skill another screen can run inside itself, from one of `enterAt`, giving
@@ -70,6 +76,11 @@ export interface OptionsSource {
   profile?: ProfileOptionSlice;
   /** Grid words (src/data/emotions.ts ids), in order; carried emotions first; `moreKey` opens the full list. */
   emotions?: string[];
+  /**
+   * A `$d.<name>` ref to a derived list of grid words (a lookup through a table, e.g. Cope Ahead's feelings by
+   * situation), offered in place of `emotions` once it resolves to a non-empty list; `emotions` is the fallback.
+   */
+  emotionsFrom?: string;
   carriedFirst?: boolean;
   moreKey?: string;
 }
@@ -108,6 +119,10 @@ export interface FieldDef {
   links?: Array<{ exit: string; label: string; when: Cond }>;
 }
 
+/**
+ * An embed placed in an ask step: under the field `after` names, or under the title (`'$title'`, above every field:
+ * a heading that comes from elsewhere, or a line the whole screen builds, like Cope Ahead's plan sentence).
+ */
 export interface SlotDef { after: string; embed: string; props?: Record<string, unknown>; showWhen: Cond; record: string }
 
 /**
@@ -172,6 +187,11 @@ export interface StepDef {
   followUp?: FollowUpAction;
   /** The primary button's copy key (default `next`). A keep step's says what the tap keeps: the tap is the yes. */
   primary?: string;
+  /**
+   * kind 'ask': a quiet button under the primary (a copy key) that goes on without the step's keep or follow-up,
+   * e.g. Cope Ahead's *Not now* under *Keep this*.
+   */
+  secondary?: string;
   next: Array<{ to: string; when: Cond | null }>;
   /** kind 'handoff'. */
   lines?: Array<{ when: Cond; key: string }>;

@@ -85,7 +85,7 @@ MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "check_the_facts:wise_mind"}), (t:TherapyConcept {appToolId: "wise-mind"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "check_the_facts:cope_ahead"})
-SET x += {skillId: "check_the_facts", exit: "cope_ahead", toolId: "cope-ahead", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"first\": \"other\"}";
+SET x += {skillId: "check_the_facts", exit: "cope_ahead", toolId: "cope-ahead", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"situationId\": \"other\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (x:SkillExit {id: "check_the_facts:cope_ahead"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "check_the_facts:cope_ahead"}), (t:TherapyConcept {appToolId: "cope-ahead"})
@@ -5374,7 +5374,7 @@ MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ending_relationships:problem_solve"}), (t:TherapyConcept {appToolId: "problem-solve"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "ending_relationships:cope_ahead"})
-SET x += {skillId: "ending_relationships", exit: "cope_ahead", toolId: "cope-ahead", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"first\": \"conversation\"}";
+SET x += {skillId: "ending_relationships", exit: "cope_ahead", toolId: "cope-ahead", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"situationId\": \"conversation\"}";
 MATCH (s:Skill {id: "ending_relationships"}), (x:SkillExit {id: "ending_relationships:cope_ahead"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ending_relationships:cope_ahead"}), (t:TherapyConcept {appToolId: "cope-ahead"})
@@ -5777,6 +5777,924 @@ SET o:SkillOption, o += {skillId: "ending_relationships", list: "again", value: 
 MATCH (s:Skill {id: "ending_relationships"}), (o:SkillOption {id: "ending_relationships:again:month"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "again", order: 47};
+
+// --- cope_ahead (ca-skill-v1) ---
+MERGE (s:Skill {id: "cope_ahead"})
+SET s += {toolId: "cope-ahead", version: "ca-skill-v1", contentVersion: "skills-v1", start: "what", ownMax: 140, emotionFields: ["feel"], accepts: ["situationId", "partId"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"ask_after_no\": \"No thanks\", \"ask_after_q\": \"Want me to ask how it went?\", \"ask_after_yes\": \"Yes\", \"done\": \"Done\", \"done_kept\": \"Your plan is in Me, under My plans.\", \"done_line\": \"You've walked through it, start to finish.\", \"feel_hint\": \"Pick up to two.\", \"feel_more\": \"Something else\", \"feel_title\": \"What might you feel there?\", \"hold_label\": \"Hold\", \"hold_running\": \"Breathe out, slowly\", \"keep_no\": \"Not now\", \"keep_title\": \"Here's your plan.\", \"keep_yes\": \"Keep this\", \"moment_own_hint\": \"Say it your way\", \"moment_title\": \"What's the moment you're most worried about?\", \"next\": \"Next\", \"not_sure\": \"Not sure\", \"plan_own_hint\": \"Say it your way\", \"plan_title\": \"If it happens, I'll…\", \"plan_use_pull\": \"Plan for the pull instead\", \"profile_unnamed\": \"One you haven't named\", \"pull_title\": \"What might you want to do?\", \"rehearse_again_no\": \"That's enough\", \"rehearse_again_q\": \"Once more, with something you didn't expect?\", \"rehearse_again_yes\": \"Yes\", \"rehearse_change_move\": \"Change what I'll do\", \"rehearse_keep_move\": \"Keep the same plan\", \"rehearse_new_problem\": \"Something you didn't plan for happens.\", \"safety_open\": \"Talk to someone now\", \"settle_breath\": \"Three long breaths out\", \"settle_five\": \"5-4-3-2-1\", \"settle_hold\": \"Hold while you breathe out, slowly.\", \"settle_hold_hint\": \"Three times. Let go between them.\", \"settle_ok\": \"I'm OK\", \"settle_title\": \"Let your body come back to now.\", \"what_own_hint\": \"Say it your way\", \"what_title\": \"What's coming up?\", \"when_later\": \"Later, or not sure\", \"when_title\": \"When is it?\", \"when_today\": \"Today\", \"when_tomorrow\": \"Tomorrow\", \"when_week\": \"This week\"}", s.tablesJson = "{\"feelBySituation\": {\"alone\": [\"lonely\", \"empty\", \"anxious\", \"bored\"], \"conversation\": [\"anxious\", \"nervous\", \"angry\", \"hurt\"], \"hard_day\": [\"sad\", \"grief\", \"lonely\", \"numb\"], \"other\": [\"anxious\", \"nervous\", \"sad\", \"angry\"], \"place_event\": [\"nervous\", \"excluded\", \"overwhelmed\", \"embarrassed\"], \"someone\": [\"nervous\", \"hurt\", \"angry\", \"embarrassed\"], \"work_school\": [\"anxious\", \"pressured\", \"inadequate\", \"exposed\"]}}", s.deriveJson = "[{\"default\": [\"anxious\", \"nervous\", \"sad\", \"angry\"], \"from\": \"$a.situation\", \"name\": \"feelFor\", \"table\": \"feelBySituation\"}]";
+MATCH (t:TherapyConcept {id: "dbt_cope_ahead"}), (s:Skill {id: "cope_ahead"})
+MERGE (t)-[:HAS_SKILL]->(s);
+MATCH (:SkillStep {skillId: "cope_ahead"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
+MATCH (:Skill {id: "cope_ahead"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
+MERGE (n:SkillStep {id: "cope_ahead:what"})
+SET n += {skillId: "cope_ahead", step: "what", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"fields\": [{\"id\": \"situation\", \"max\": 1, \"options\": {\"firstFrom\": \"$ctx.situationId\", \"list\": \"situation\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"what_own_hint\"}, \"required\": true}, {\"id\": \"when\", \"label\": \"when_title\", \"max\": 1, \"options\": {\"list\": \"when\"}}], \"title\": \"what_title\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:what"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 0};
+MERGE (n:SkillStep {id: "cope_ahead:feel"})
+SET n += {skillId: "cope_ahead", step: "feel", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"fields\": [{\"id\": \"feel\", \"max\": 2, \"options\": {\"emotions\": [\"anxious\", \"nervous\", \"sad\", \"angry\"], \"emotionsFrom\": \"$d.feelFor\", \"moreKey\": \"feel_more\"}, \"swap\": true}, {\"id\": \"pull\", \"label\": \"pull_title\", \"max\": 1, \"options\": {\"list\": \"pull\"}}], \"hint\": \"feel_hint\", \"title\": \"feel_title\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:feel"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 1};
+MERGE (n:SkillStep {id: "cope_ahead:who"})
+SET n += {skillId: "cope_ahead", step: "who", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"fields\": [{\"id\": \"part\", \"max\": 1, \"options\": {\"firstFrom\": \"$ctx.partId\", \"profile\": \"parts\"}}], \"slots\": [{\"after\": \"$title\", \"embed\": \"partsLine\", \"props\": {\"as\": \"heading\", \"promptId\": \"cope_title_any\"}, \"record\": \"parts_title\", \"showWhen\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:who"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 2};
+MERGE (n:SkillStep {id: "cope_ahead:hard"})
+SET n += {skillId: "cope_ahead", step: "hard", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt\"]}}, {\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt_self\"]}}], \"fields\": [{\"id\": \"moment\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt_self\"]}}], \"max\": 1, \"options\": {\"list\": \"moment\", \"where\": {\"any\": [{\"has\": [\"$opt.sits\", \"$a.situation\"]}, {\"all\": [{\"not\": {\"in\": [\"$a.situation\", [\"conversation\", \"someone\", \"work_school\", \"place_event\", \"hard_day\", \"alone\"]]}}, {\"has\": [\"$opt.sits\", \"other\"]}]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"moment_own_hint\"}, \"required\": true}], \"title\": \"moment_title\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:hard"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 3};
+MERGE (n:SkillStep {id: "cope_ahead:plan"})
+SET n += {skillId: "cope_ahead", step: "plan", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt\"]}}, {\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt_self\"]}}], \"fields\": [{\"id\": \"forpull\", \"max\": 1, \"options\": {\"list\": \"forpull\"}, \"showWhen\": {\"all\": [{\"in\": [\"$a.pull\", [\"fight\", \"chase\", \"hide\", \"blank\"]]}, {\"not\": {\"in\": [\"$a.moment\", [\"might_hurt\", \"might_hurt_self\"]]}}]}}, {\"id\": \"moves\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt_self\"]}}], \"max\": 2, \"options\": {\"list\": \"move\", \"where\": {\"any\": [{\"has\": [\"$opt.forMoments\", \"$a.moment\"]}, {\"all\": [{\"not\": {\"set\": \"$opt.forMoments\"}}, {\"all\": [{\"any\": [{\"not\": {\"set\": \"$opt.sits\"}}, {\"has\": [\"$opt.sits\", \"$a.situation\"]}]}, {\"any\": [{\"all\": [{\"in\": [\"$a.pull\", [\"fight\", \"chase\", \"hide\", \"blank\"]]}, {\"has\": [\"$opt.pulls\", \"$a.pull\"]}]}, {\"all\": [{\"not\": {\"in\": [\"$a.pull\", [\"fight\", \"chase\", \"hide\", \"blank\"]]}}, {\"eq\": [\"$opt.general\", true]}]}]}]}, {\"any\": [{\"not\": {\"in\": [\"$a.moment\", [\"might_hurt\", \"might_hurt_self\"]]}}, {\"has\": [\"$opt.safeIn\", \"$a.moment\"]}]}]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"plan_own_hint\", \"max\": 90}, \"required\": true, \"swap\": true}], \"slots\": [{\"after\": \"$title\", \"embed\": \"planSentence\", \"props\": {\"forpullField\": \"forpull\", \"momentField\": \"moment\", \"movesField\": \"moves\", \"pullField\": \"pull\"}, \"record\": \"plan_line\", \"showWhen\": {\"all\": []}}, {\"after\": \"moves\", \"embed\": \"partAnchor\", \"props\": {\"partField\": \"part\"}, \"record\": \"part_anchor\", \"showWhen\": {\"set\": \"$a.part\"}}], \"title\": \"plan_title\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:plan"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 4};
+MERGE (n:SkillStep {id: "cope_ahead:walk"})
+SET n += {skillId: "cope_ahead", step: "walk", kind: "embed", version: "ca-skill-v1"}, n.specJson = "{\"answerAs\": \"rehearsed\", \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt\"]}}, {\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt_self\"]}}], \"embed\": \"rehearsal\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt_self\"]}}], \"props\": {\"forpullField\": \"forpull\", \"momentField\": \"moment\", \"movesField\": \"moves\", \"pass\": 1, \"pullField\": \"pull\"}}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:walk"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 5};
+MERGE (n:SkillStep {id: "cope_ahead:more"})
+SET n += {skillId: "cope_ahead", step: "more", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"fields\": [{\"id\": \"again\", \"max\": 1, \"options\": {\"list\": \"again\"}, \"required\": true}], \"title\": \"rehearse_again_q\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:more"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 6};
+MERGE (n:SkillStep {id: "cope_ahead:new"})
+SET n += {skillId: "cope_ahead", step: "new", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"fields\": [{\"id\": \"new_moment\", \"max\": 1, \"options\": {\"list\": \"new_moment\", \"where\": {\"all\": [{\"any\": [{\"has\": [\"$opt.sits\", \"$a.situation\"]}, {\"all\": [{\"not\": {\"in\": [\"$a.situation\", [\"conversation\", \"someone\", \"work_school\", \"place_event\", \"hard_day\", \"alone\"]]}}, {\"has\": [\"$opt.sits\", \"other\"]}]}]}, {\"not\": {\"eq\": [\"$opt.value\", \"$a.moment\"]}}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"moment_own_hint\", \"max\": 90}, \"required\": true}, {\"id\": \"change_move\", \"max\": 1, \"options\": {\"list\": \"change_move\"}, \"required\": true, \"showWhen\": {\"set\": \"$a.new_moment\"}}, {\"id\": \"new_moves\", \"max\": 2, \"options\": {\"list\": \"new_move\", \"where\": {\"all\": [{\"any\": [{\"not\": {\"set\": \"$opt.sits\"}}, {\"has\": [\"$opt.sits\", \"$a.situation\"]}]}, {\"any\": [{\"all\": [{\"in\": [\"$a.pull\", [\"fight\", \"chase\", \"hide\", \"blank\"]]}, {\"has\": [\"$opt.pulls\", \"$a.pull\"]}]}, {\"all\": [{\"not\": {\"in\": [\"$a.pull\", [\"fight\", \"chase\", \"hide\", \"blank\"]]}}, {\"eq\": [\"$opt.general\", true]}]}]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"plan_own_hint\", \"max\": 60}, \"required\": true, \"showWhen\": {\"eq\": [\"$a.change_move\", \"change\"]}, \"swap\": true}], \"title\": \"rehearse_new_problem\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:new"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 7};
+MERGE (n:SkillStep {id: "cope_ahead:redo"})
+SET n += {skillId: "cope_ahead", step: "redo", kind: "embed", version: "ca-skill-v1"}, n.specJson = "{\"answerAs\": \"rehearsed2\", \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt\"]}}, {\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt_self\"]}}], \"embed\": \"rehearsal\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt_self\"]}}], \"props\": {\"changeField\": \"change_move\", \"changedMovesField\": \"new_moves\", \"momentField\": \"new_moment\", \"movesField\": \"moves\", \"pass\": 2, \"pullField\": \"pull\"}}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:redo"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 8};
+MERGE (n:SkillStep {id: "cope_ahead:calm"})
+SET n += {skillId: "cope_ahead", step: "calm", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"complete\": true, \"fields\": [{\"id\": \"settle\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"settle_five\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"settle\"}, \"required\": true}], \"title\": \"settle_title\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:calm"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 9};
+MERGE (n:SkillStep {id: "cope_ahead:hold"})
+SET n += {skillId: "cope_ahead", step: "hold", kind: "embed", version: "ca-skill-v1"}, n.specJson = "{\"answerAs\": \"breath\", \"embed\": \"holdRing\", \"props\": {\"hint\": \"settle_hold_hint\", \"holds\": 3, \"label\": \"hold_label\", \"next\": \"next\", \"runningLabel\": \"hold_running\", \"seconds\": 6, \"variant\": \"settle\"}, \"title\": \"settle_hold\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:hold"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 10};
+MERGE (n:SkillStep {id: "cope_ahead:keep"})
+SET n += {skillId: "cope_ahead", step: "keep", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt\"]}}, {\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt_self\"]}}], \"keep\": {\"done\": \"done_kept\", \"from\": [\"situation\", \"moment\", \"forpull\", \"pull\", \"moves\"], \"kind\": \"cope_ahead_plan\", \"many\": true}, \"primary\": \"keep_yes\", \"secondary\": \"keep_no\", \"slots\": [{\"after\": \"$title\", \"embed\": \"keepCard\", \"props\": {\"forpullField\": \"forpull\", \"momentField\": \"moment\", \"movesField\": \"moves\", \"partField\": \"part\", \"pullField\": \"pull\"}, \"record\": \"plan_card\", \"showWhen\": {\"all\": []}}], \"title\": \"keep_title\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:keep"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 11};
+MERGE (n:SkillStep {id: "cope_ahead:ask"})
+SET n += {skillId: "cope_ahead", step: "ask", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt\"]}}, {\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt_self\"]}}], \"fields\": [{\"id\": \"ask\", \"max\": 1, \"options\": {\"list\": \"ask\"}, \"required\": true}], \"followUp\": {\"type\": \"cope_ahead_after\", \"when\": {\"eq\": [\"$a.ask\", \"yes\"]}, \"whenDefault\": \"later\", \"whenFrom\": \"when\"}, \"primary\": \"done\", \"title\": \"ask_after_q\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:ask"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 12};
+MERGE (n:SkillStep {id: "cope_ahead:end"})
+SET n += {skillId: "cope_ahead", step: "end", kind: "handoff", version: "ca-skill-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"done_line\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 13};
+MERGE (x:SkillExit {id: "cope_ahead:five_senses"})
+SET x += {skillId: "cope_ahead", exit: "five_senses", toolId: "five-senses", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (x:SkillExit {id: "cope_ahead:five_senses"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "cope_ahead:five_senses"}), (t:TherapyConcept {appToolId: "five-senses"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "cope_ahead:safety_open"})
+SET x += {skillId: "cope_ahead", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (x:SkillExit {id: "cope_ahead:safety_open"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MERGE (x:SkillExit {id: "cope_ahead:done"})
+SET x += {skillId: "cope_ahead", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (x:SkillExit {id: "cope_ahead:done"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (a:SkillStep {id: "cope_ahead:what"}), (b:SkillStep {id: "cope_ahead:feel"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "cope_ahead:feel"}), (b:SkillStep {id: "cope_ahead:who"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"set\": \"$p.parts\"}";
+MATCH (a:SkillStep {id: "cope_ahead:feel"}), (b:SkillStep {id: "cope_ahead:hard"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "cope_ahead:who"}), (b:SkillStep {id: "cope_ahead:hard"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "cope_ahead:hard"}), (b:SkillStep {id: "cope_ahead:plan"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "cope_ahead:hard"}), (x:SkillExit {id: "cope_ahead:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "moment", label: "safety_open"}, r.whenJson = "{\"eq\": [\"$a.moment\", \"might_hurt_self\"]}";
+MATCH (a:SkillStep {id: "cope_ahead:plan"}), (b:SkillStep {id: "cope_ahead:walk"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "cope_ahead:plan"}), (x:SkillExit {id: "cope_ahead:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "moves", label: "safety_open"}, r.whenJson = "{\"eq\": [\"$a.moment\", \"might_hurt_self\"]}";
+MATCH (a:SkillStep {id: "cope_ahead:walk"}), (b:SkillStep {id: "cope_ahead:more"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "cope_ahead:walk"}), (x:SkillExit {id: "cope_ahead:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"eq\": [\"$a.moment\", \"might_hurt_self\"]}";
+MATCH (a:SkillStep {id: "cope_ahead:more"}), (b:SkillStep {id: "cope_ahead:new"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.again\", \"yes\"]}";
+MATCH (a:SkillStep {id: "cope_ahead:more"}), (b:SkillStep {id: "cope_ahead:calm"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "cope_ahead:new"}), (b:SkillStep {id: "cope_ahead:redo"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "cope_ahead:redo"}), (b:SkillStep {id: "cope_ahead:calm"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "cope_ahead:redo"}), (x:SkillExit {id: "cope_ahead:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"eq\": [\"$a.moment\", \"might_hurt_self\"]}";
+MATCH (a:SkillStep {id: "cope_ahead:calm"}), (b:SkillStep {id: "cope_ahead:hold"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.settle\", \"breath\"]}";
+MATCH (a:SkillStep {id: "cope_ahead:calm"}), (b:SkillStep {id: "cope_ahead:keep"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "cope_ahead:calm"}), (x:SkillExit {id: "cope_ahead:five_senses"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "settle", label: "settle_five"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "cope_ahead:hold"}), (b:SkillStep {id: "cope_ahead:keep"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "cope_ahead:keep"}), (b:SkillStep {id: "cope_ahead:ask"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "cope_ahead:ask"}), (b:SkillStep {id: "cope_ahead:end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MERGE (o:SkillOption {id: "cope_ahead:situation:conversation"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "situation", value: "conversation", label: "A conversation I'm dreading", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:situation:conversation"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "situation", order: 0};
+MATCH (o:SkillOption {id: "cope_ahead:situation:conversation"}), (c:CopeSituation {id: "conversation"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:situation:someone"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "situation", value: "someone", label: "Seeing someone in particular", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:situation:someone"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "situation", order: 1};
+MATCH (o:SkillOption {id: "cope_ahead:situation:someone"}), (c:CopeSituation {id: "someone"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:situation:work_school"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "situation", value: "work_school", label: "Something at work or school", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:situation:work_school"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "situation", order: 2};
+MATCH (o:SkillOption {id: "cope_ahead:situation:work_school"}), (c:CopeSituation {id: "work_school"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:situation:place_event"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "situation", value: "place_event", label: "A place or an event", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:situation:place_event"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "situation", order: 3};
+MATCH (o:SkillOption {id: "cope_ahead:situation:place_event"}), (c:CopeSituation {id: "place_event"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:situation:hard_day"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "situation", value: "hard_day", label: "A day that's hard every year", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:situation:hard_day"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "situation", order: 4};
+MATCH (o:SkillOption {id: "cope_ahead:situation:hard_day"}), (c:CopeSituation {id: "hard_day"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:situation:alone"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "situation", value: "alone", label: "Being on my own", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:situation:alone"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "situation", order: 5};
+MATCH (o:SkillOption {id: "cope_ahead:situation:alone"}), (c:CopeSituation {id: "alone"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:situation:other"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "situation", value: "other", label: "Something else", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:situation:other"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "situation", order: 6};
+MATCH (o:SkillOption {id: "cope_ahead:situation:other"}), (c:CopeSituation {id: "other"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:when:today"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "when", value: "today", label: "Today", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:when:today"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "when", order: 7};
+MERGE (o:SkillOption {id: "cope_ahead:when:tomorrow"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "when", value: "tomorrow", label: "Tomorrow", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:when:tomorrow"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "when", order: 8};
+MERGE (o:SkillOption {id: "cope_ahead:when:this_week"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "when", value: "this_week", label: "This week", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:when:this_week"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "when", order: 9};
+MERGE (o:SkillOption {id: "cope_ahead:when:later"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "when", value: "later", label: "Later, or not sure", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:when:later"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "when", order: 10};
+MERGE (o:SkillOption {id: "cope_ahead:pull:fight"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "pull", value: "fight", label: "Say something sharp", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:pull:fight"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "pull", order: 11};
+MATCH (o:SkillOption {id: "cope_ahead:pull:fight"}), (c:FeelingUrge {id: "fight"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:pull:chase"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "pull", value: "chase", label: "Text someone a lot", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:pull:chase"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "pull", order: 12};
+MATCH (o:SkillOption {id: "cope_ahead:pull:chase"}), (c:FeelingUrge {id: "chase"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:pull:hide"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "pull", value: "hide", label: "Disappear", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:pull:hide"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "pull", order: 13};
+MATCH (o:SkillOption {id: "cope_ahead:pull:hide"}), (c:FeelingUrge {id: "hide"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:pull:blank"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "pull", value: "blank", label: "Nothing. I'm blank", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:pull:blank"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "pull", order: 14};
+MATCH (o:SkillOption {id: "cope_ahead:pull:blank"}), (c:FeelingUrge {id: "blank"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:pull:not_sure"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "pull", value: "not_sure", label: "Not sure", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:pull:not_sure"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "pull", order: 15};
+MERGE (o:SkillOption {id: "cope_ahead:moment:voice_raised"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "moment", value: "voice_raised", label: "They raise their voice", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"conversation\", \"other\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:moment:voice_raised"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moment", order: 16};
+MATCH (o:SkillOption {id: "cope_ahead:moment:voice_raised"}), (c:HardMoment {id: "voice_raised"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_moment:voice_raised"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_moment", value: "voice_raised", label: "They raise their voice", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"conversation\", \"other\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_moment:voice_raised"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_moment", order: 17};
+MATCH (o:SkillOption {id: "cope_ahead:new_moment:voice_raised"}), (c:HardMoment {id: "voice_raised"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:moment:go_blank"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "moment", value: "go_blank", label: "I go blank", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"conversation\", \"someone\", \"work_school\", \"other\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:moment:go_blank"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moment", order: 18};
+MATCH (o:SkillOption {id: "cope_ahead:moment:go_blank"}), (c:HardMoment {id: "go_blank"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_moment:go_blank"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_moment", value: "go_blank", label: "I go blank", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"conversation\", \"someone\", \"work_school\", \"other\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_moment:go_blank"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_moment", order: 19};
+MATCH (o:SkillOption {id: "cope_ahead:new_moment:go_blank"}), (c:HardMoment {id: "go_blank"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:moment:not_heard"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "moment", value: "not_heard", label: "They don't listen", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"conversation\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:moment:not_heard"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moment", order: 20};
+MATCH (o:SkillOption {id: "cope_ahead:moment:not_heard"}), (c:HardMoment {id: "not_heard"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_moment:not_heard"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_moment", value: "not_heard", label: "They don't listen", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"conversation\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_moment:not_heard"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_moment", order: 21};
+MATCH (o:SkillOption {id: "cope_ahead:new_moment:not_heard"}), (c:HardMoment {id: "not_heard"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:moment:start_crying"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "moment", value: "start_crying", label: "I start crying", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"conversation\", \"hard_day\", \"other\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:moment:start_crying"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moment", order: 22};
+MATCH (o:SkillOption {id: "cope_ahead:moment:start_crying"}), (c:HardMoment {id: "start_crying"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_moment:start_crying"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_moment", value: "start_crying", label: "I start crying", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"conversation\", \"hard_day\", \"other\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_moment:start_crying"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_moment", order: 23};
+MATCH (o:SkillOption {id: "cope_ahead:new_moment:start_crying"}), (c:HardMoment {id: "start_crying"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:moment:bring_up_past"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "moment", value: "bring_up_past", label: "They bring up the past", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"someone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:moment:bring_up_past"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moment", order: 24};
+MATCH (o:SkillOption {id: "cope_ahead:moment:bring_up_past"}), (c:HardMoment {id: "bring_up_past"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_moment:bring_up_past"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_moment", value: "bring_up_past", label: "They bring up the past", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"someone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_moment:bring_up_past"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_moment", order: 25};
+MATCH (o:SkillOption {id: "cope_ahead:new_moment:bring_up_past"}), (c:HardMoment {id: "bring_up_past"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:moment:cold_with_me"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "moment", value: "cold_with_me", label: "They're cold with me", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"someone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:moment:cold_with_me"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moment", order: 26};
+MATCH (o:SkillOption {id: "cope_ahead:moment:cold_with_me"}), (c:HardMoment {id: "cold_with_me"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_moment:cold_with_me"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_moment", value: "cold_with_me", label: "They're cold with me", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"someone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_moment:cold_with_me"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_moment", order: 27};
+MATCH (o:SkillOption {id: "cope_ahead:new_moment:cold_with_me"}), (c:HardMoment {id: "cold_with_me"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:moment:old_role"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "moment", value: "old_role", label: "I slip into an old role", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"someone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:moment:old_role"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moment", order: 28};
+MATCH (o:SkillOption {id: "cope_ahead:moment:old_role"}), (c:HardMoment {id: "old_role"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_moment:old_role"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_moment", value: "old_role", label: "I slip into an old role", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"someone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_moment:old_role"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_moment", order: 29};
+MATCH (o:SkillOption {id: "cope_ahead:new_moment:old_role"}), (c:HardMoment {id: "old_role"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:moment:criticised"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "moment", value: "criticised", label: "Someone criticises me", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"work_school\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:moment:criticised"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moment", order: 30};
+MATCH (o:SkillOption {id: "cope_ahead:moment:criticised"}), (c:HardMoment {id: "criticised"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_moment:criticised"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_moment", value: "criticised", label: "Someone criticises me", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"work_school\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_moment:criticised"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_moment", order: 31};
+MATCH (o:SkillOption {id: "cope_ahead:new_moment:criticised"}), (c:HardMoment {id: "criticised"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:moment:mistake_seen"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "moment", value: "mistake_seen", label: "I make a mistake in front of people", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"work_school\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:moment:mistake_seen"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moment", order: 32};
+MATCH (o:SkillOption {id: "cope_ahead:moment:mistake_seen"}), (c:HardMoment {id: "mistake_seen"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_moment:mistake_seen"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_moment", value: "mistake_seen", label: "I make a mistake in front of people", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"work_school\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_moment:mistake_seen"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_moment", order: 33};
+MATCH (o:SkillOption {id: "cope_ahead:new_moment:mistake_seen"}), (c:HardMoment {id: "mistake_seen"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:moment:cant_answer"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "moment", value: "cant_answer", label: "I'm asked something I can't answer", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"work_school\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:moment:cant_answer"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moment", order: 34};
+MATCH (o:SkillOption {id: "cope_ahead:moment:cant_answer"}), (c:HardMoment {id: "cant_answer"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_moment:cant_answer"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_moment", value: "cant_answer", label: "I'm asked something I can't answer", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"work_school\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_moment:cant_answer"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_moment", order: 35};
+MATCH (o:SkillOption {id: "cope_ahead:new_moment:cant_answer"}), (c:HardMoment {id: "cant_answer"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:moment:nobody_talks"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "moment", value: "nobody_talks", label: "Nobody talks to me", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"place_event\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:moment:nobody_talks"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moment", order: 36};
+MATCH (o:SkillOption {id: "cope_ahead:moment:nobody_talks"}), (c:HardMoment {id: "nobody_talks"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_moment:nobody_talks"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_moment", value: "nobody_talks", label: "Nobody talks to me", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"place_event\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_moment:nobody_talks"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_moment", order: 37};
+MATCH (o:SkillOption {id: "cope_ahead:new_moment:nobody_talks"}), (c:HardMoment {id: "nobody_talks"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:moment:too_much"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "moment", value: "too_much", label: "It gets too loud or too much", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"place_event\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:moment:too_much"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moment", order: 38};
+MATCH (o:SkillOption {id: "cope_ahead:moment:too_much"}), (c:HardMoment {id: "too_much"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_moment:too_much"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_moment", value: "too_much", label: "It gets too loud or too much", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"place_event\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_moment:too_much"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_moment", order: 39};
+MATCH (o:SkillOption {id: "cope_ahead:new_moment:too_much"}), (c:HardMoment {id: "too_much"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:moment:want_leave"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "moment", value: "want_leave", label: "I want to leave straight away", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"place_event\", \"other\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:moment:want_leave"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moment", order: 40};
+MATCH (o:SkillOption {id: "cope_ahead:moment:want_leave"}), (c:HardMoment {id: "want_leave"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_moment:want_leave"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_moment", value: "want_leave", label: "I want to leave straight away", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"place_event\", \"other\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_moment:want_leave"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_moment", order: 41};
+MATCH (o:SkillOption {id: "cope_ahead:new_moment:want_leave"}), (c:HardMoment {id: "want_leave"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:moment:see_someone"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "moment", value: "see_someone", label: "I see someone I'd rather not", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"place_event\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:moment:see_someone"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moment", order: 42};
+MATCH (o:SkillOption {id: "cope_ahead:moment:see_someone"}), (c:HardMoment {id: "see_someone"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_moment:see_someone"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_moment", value: "see_someone", label: "I see someone I'd rather not", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"place_event\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_moment:see_someone"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_moment", order: 43};
+MATCH (o:SkillOption {id: "cope_ahead:new_moment:see_someone"}), (c:HardMoment {id: "see_someone"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:moment:wave_hits"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "moment", value: "wave_hits", label: "A wave of it hits", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"hard_day\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:moment:wave_hits"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moment", order: 44};
+MATCH (o:SkillOption {id: "cope_ahead:moment:wave_hits"}), (c:HardMoment {id: "wave_hits"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_moment:wave_hits"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_moment", value: "wave_hits", label: "A wave of it hits", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"hard_day\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_moment:wave_hits"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_moment", order: 45};
+MATCH (o:SkillOption {id: "cope_ahead:new_moment:wave_hits"}), (c:HardMoment {id: "wave_hits"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:moment:others_normal"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "moment", value: "others_normal", label: "Everyone acts like it's a normal day", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"hard_day\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:moment:others_normal"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moment", order: 46};
+MATCH (o:SkillOption {id: "cope_ahead:moment:others_normal"}), (c:HardMoment {id: "others_normal"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_moment:others_normal"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_moment", value: "others_normal", label: "Everyone acts like it's a normal day", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"hard_day\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_moment:others_normal"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_moment", order: 47};
+MATCH (o:SkillOption {id: "cope_ahead:new_moment:others_normal"}), (c:HardMoment {id: "others_normal"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:moment:reminder"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "moment", value: "reminder", label: "Something reminds me out of nowhere", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"hard_day\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:moment:reminder"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moment", order: 48};
+MATCH (o:SkillOption {id: "cope_ahead:moment:reminder"}), (c:HardMoment {id: "reminder"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_moment:reminder"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_moment", value: "reminder", label: "Something reminds me out of nowhere", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"hard_day\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_moment:reminder"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_moment", order: 49};
+MATCH (o:SkillOption {id: "cope_ahead:new_moment:reminder"}), (c:HardMoment {id: "reminder"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:moment:evening_stretches"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "moment", value: "evening_stretches", label: "The evening stretches out", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"alone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:moment:evening_stretches"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moment", order: 50};
+MATCH (o:SkillOption {id: "cope_ahead:moment:evening_stretches"}), (c:HardMoment {id: "evening_stretches"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_moment:evening_stretches"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_moment", value: "evening_stretches", label: "The evening stretches out", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"alone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_moment:evening_stretches"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_moment", order: 51};
+MATCH (o:SkillOption {id: "cope_ahead:new_moment:evening_stretches"}), (c:HardMoment {id: "evening_stretches"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:moment:cant_stop_checking"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "moment", value: "cant_stop_checking", label: "I can't stop scrolling or checking", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"alone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:moment:cant_stop_checking"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moment", order: 52};
+MATCH (o:SkillOption {id: "cope_ahead:moment:cant_stop_checking"}), (c:HardMoment {id: "cant_stop_checking"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_moment:cant_stop_checking"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_moment", value: "cant_stop_checking", label: "I can't stop scrolling or checking", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"alone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_moment:cant_stop_checking"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_moment", order: 53};
+MATCH (o:SkillOption {id: "cope_ahead:new_moment:cant_stop_checking"}), (c:HardMoment {id: "cant_stop_checking"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:moment:thoughts_loop"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "moment", value: "thoughts_loop", label: "The same thoughts go round", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"alone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:moment:thoughts_loop"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moment", order: 54};
+MATCH (o:SkillOption {id: "cope_ahead:moment:thoughts_loop"}), (c:HardMoment {id: "thoughts_loop"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_moment:thoughts_loop"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_moment", value: "thoughts_loop", label: "The same thoughts go round", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"alone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_moment:thoughts_loop"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_moment", order: 55};
+MATCH (o:SkillOption {id: "cope_ahead:new_moment:thoughts_loop"}), (c:HardMoment {id: "thoughts_loop"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:moment:old_habit"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "moment", value: "old_habit", label: "I want to do the thing I'm trying not to", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"alone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:moment:old_habit"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moment", order: 56};
+MATCH (o:SkillOption {id: "cope_ahead:moment:old_habit"}), (c:HardMoment {id: "old_habit"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_moment:old_habit"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_moment", value: "old_habit", label: "I want to do the thing I'm trying not to", version: "ca-skill-v1"}, o.propsJson = "{\"sits\": [\"alone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_moment:old_habit"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_moment", order: 57};
+MATCH (o:SkillOption {id: "cope_ahead:new_moment:old_habit"}), (c:HardMoment {id: "old_habit"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:moment:might_hurt"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "moment", value: "might_hurt", label: "They might hurt me", version: "ca-skill-v1"}, o.propsJson = "{\"danger\": \"other\", \"sits\": [\"conversation\", \"someone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:moment:might_hurt"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moment", order: 58};
+MATCH (o:SkillOption {id: "cope_ahead:moment:might_hurt"}), (c:HardMoment {id: "might_hurt"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:moment:might_hurt_self"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "moment", value: "might_hurt_self", label: "I might hurt myself", version: "ca-skill-v1"}, o.propsJson = "{\"danger\": \"self\", \"sits\": [\"hard_day\", \"alone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:moment:might_hurt_self"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "moment", order: 59};
+MATCH (o:SkillOption {id: "cope_ahead:moment:might_hurt_self"}), (c:HardMoment {id: "might_hurt_self"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:forpull:pull"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "forpull", value: "pull", label: "Plan for the pull instead", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:forpull:pull"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "forpull", order: 60};
+MERGE (o:SkillOption {id: "cope_ahead:move:leave_safe"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "move", value: "leave_safe", label: "Leave and get somewhere safe", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [\"might_hurt\"], \"general\": false, \"kind\": \"action\", \"pulls\": [], \"safeIn\": [], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:move:leave_safe"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 61};
+MATCH (o:SkillOption {id: "cope_ahead:move:leave_safe"}), (c:CopeMove {id: "leave_safe"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:move:reach_help"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "move", value: "reach_help", label: "Call or text someone who can help, now", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [\"might_hurt_self\"], \"general\": false, \"kind\": \"action\", \"pulls\": [], \"safeIn\": [], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:move:reach_help"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 62};
+MATCH (o:SkillOption {id: "cope_ahead:move:reach_help"}), (c:CopeMove {id: "reach_help"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:move:long_out"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "move", value: "long_out", label: "Breathe out longer than in", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": true, \"kind\": \"body\", \"pulls\": [\"fight\", \"chase\", \"hide\"], \"safeIn\": [\"might_hurt\", \"might_hurt_self\"], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:move:long_out"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 63};
+MATCH (o:SkillOption {id: "cope_ahead:move:long_out"}), (c:CopeMove {id: "long_out"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_move:long_out"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_move", value: "long_out", label: "Breathe out longer than in", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": true, \"kind\": \"body\", \"pulls\": [\"fight\", \"chase\", \"hide\"], \"safeIn\": [\"might_hurt\", \"might_hurt_self\"], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_move:long_out"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_move", order: 64};
+MATCH (o:SkillOption {id: "cope_ahead:new_move:long_out"}), (c:CopeMove {id: "long_out"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:move:feet"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "move", value: "feet", label: "Feel my feet on the floor", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": true, \"kind\": \"body\", \"pulls\": [\"hide\", \"blank\", \"fight\"], \"safeIn\": [\"might_hurt\", \"might_hurt_self\"], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:move:feet"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 65};
+MATCH (o:SkillOption {id: "cope_ahead:move:feet"}), (c:CopeMove {id: "feet"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_move:feet"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_move", value: "feet", label: "Feel my feet on the floor", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": true, \"kind\": \"body\", \"pulls\": [\"hide\", \"blank\", \"fight\"], \"safeIn\": [\"might_hurt\", \"might_hurt_self\"], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_move:feet"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_move", order: 66};
+MATCH (o:SkillOption {id: "cope_ahead:new_move:feet"}), (c:CopeMove {id: "feet"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:move:cold_water"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "move", value: "cold_water", label: "Cold water on my hands", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"body\", \"pulls\": [\"fight\", \"chase\", \"blank\"], \"safeIn\": [\"might_hurt\", \"might_hurt_self\"], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:move:cold_water"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 67};
+MATCH (o:SkillOption {id: "cope_ahead:move:cold_water"}), (c:CopeMove {id: "cold_water"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_move:cold_water"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_move", value: "cold_water", label: "Cold water on my hands", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"body\", \"pulls\": [\"fight\", \"chase\", \"blank\"], \"safeIn\": [\"might_hurt\", \"might_hurt_self\"], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_move:cold_water"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_move", order: 68};
+MATCH (o:SkillOption {id: "cope_ahead:new_move:cold_water"}), (c:CopeMove {id: "cold_water"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:move:hold_something"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "move", value: "hold_something", label: "Hold something in my pocket", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"body\", \"pulls\": [\"blank\", \"hide\"], \"safeIn\": [\"might_hurt\", \"might_hurt_self\"], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:move:hold_something"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 69};
+MATCH (o:SkillOption {id: "cope_ahead:move:hold_something"}), (c:CopeMove {id: "hold_something"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_move:hold_something"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_move", value: "hold_something", label: "Hold something in my pocket", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"body\", \"pulls\": [\"blank\", \"hide\"], \"safeIn\": [\"might_hurt\", \"might_hurt_self\"], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_move:hold_something"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_move", order: 70};
+MATCH (o:SkillOption {id: "cope_ahead:new_move:hold_something"}), (c:CopeMove {id: "hold_something"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:move:give_minute"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "move", value: "give_minute", label: "Say “Give me a minute”", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": true, \"kind\": \"words\", \"pulls\": [\"fight\", \"blank\", \"chase\"], \"safeIn\": [\"might_hurt_self\"], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:move:give_minute"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 71};
+MATCH (o:SkillOption {id: "cope_ahead:move:give_minute"}), (c:CopeMove {id: "give_minute"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_move:give_minute"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_move", value: "give_minute", label: "Say “Give me a minute”", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": true, \"kind\": \"words\", \"pulls\": [\"fight\", \"blank\", \"chase\"], \"safeIn\": [\"might_hurt_self\"], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_move:give_minute"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_move", order: 72};
+MATCH (o:SkillOption {id: "cope_ahead:new_move:give_minute"}), (c:CopeMove {id: "give_minute"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:move:come_back"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "move", value: "come_back", label: "Say “I'll come back to you on that”", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"words\", \"pulls\": [\"fight\", \"chase\"], \"safeIn\": [], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:move:come_back"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 73};
+MATCH (o:SkillOption {id: "cope_ahead:move:come_back"}), (c:CopeMove {id: "come_back"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_move:come_back"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_move", value: "come_back", label: "Say “I'll come back to you on that”", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"words\", \"pulls\": [\"fight\", \"chase\"], \"safeIn\": [], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_move:come_back"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_move", order: 74};
+MATCH (o:SkillOption {id: "cope_ahead:new_move:come_back"}), (c:CopeMove {id: "come_back"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:move:say_hard"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "move", value: "say_hard", label: "Say “This is hard for me”", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": true, \"kind\": \"words\", \"pulls\": [\"hide\", \"blank\"], \"safeIn\": [], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:move:say_hard"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 75};
+MATCH (o:SkillOption {id: "cope_ahead:move:say_hard"}), (c:CopeMove {id: "say_hard"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_move:say_hard"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_move", value: "say_hard", label: "Say “This is hard for me”", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": true, \"kind\": \"words\", \"pulls\": [\"hide\", \"blank\"], \"safeIn\": [], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_move:say_hard"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_move", order: 76};
+MATCH (o:SkillOption {id: "cope_ahead:new_move:say_hard"}), (c:CopeMove {id: "say_hard"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:move:one_thing"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "move", value: "one_thing", label: "Say the one thing I came to say", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"words\", \"pulls\": [\"hide\", \"chase\"], \"safeIn\": [], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:move:one_thing"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 77};
+MATCH (o:SkillOption {id: "cope_ahead:move:one_thing"}), (c:CopeMove {id: "one_thing"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_move:one_thing"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_move", value: "one_thing", label: "Say the one thing I came to say", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"words\", \"pulls\": [\"hide\", \"chase\"], \"safeIn\": [], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_move:one_thing"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_move", order: 78};
+MATCH (o:SkillOption {id: "cope_ahead:new_move:one_thing"}), (c:CopeMove {id: "one_thing"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:move:step_out"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "move", value: "step_out", label: "Step out for five minutes", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": true, \"kind\": \"action\", \"pulls\": [\"fight\", \"chase\", \"hide\"], \"safeIn\": [\"might_hurt_self\"], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:move:step_out"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 79};
+MATCH (o:SkillOption {id: "cope_ahead:move:step_out"}), (c:CopeMove {id: "step_out"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_move:step_out"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_move", value: "step_out", label: "Step out for five minutes", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": true, \"kind\": \"action\", \"pulls\": [\"fight\", \"chase\", \"hide\"], \"safeIn\": [\"might_hurt_self\"], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_move:step_out"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_move", order: 80};
+MATCH (o:SkillOption {id: "cope_ahead:new_move:step_out"}), (c:CopeMove {id: "step_out"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:move:stay_ten"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "move", value: "stay_ten", label: "Stay ten more minutes, then decide", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"action\", \"pulls\": [\"hide\"], \"safeIn\": [], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:move:stay_ten"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 81};
+MATCH (o:SkillOption {id: "cope_ahead:move:stay_ten"}), (c:CopeMove {id: "stay_ten"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_move:stay_ten"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_move", value: "stay_ten", label: "Stay ten more minutes, then decide", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"action\", \"pulls\": [\"hide\"], \"safeIn\": [], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_move:stay_ten"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_move", order: 82};
+MATCH (o:SkillOption {id: "cope_ahead:new_move:stay_ten"}), (c:CopeMove {id: "stay_ten"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:move:text_trust"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "move", value: "text_trust", label: "Text someone I trust", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": true, \"kind\": \"action\", \"pulls\": [\"hide\", \"blank\"], \"safeIn\": [\"might_hurt\", \"might_hurt_self\"], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:move:text_trust"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 83};
+MATCH (o:SkillOption {id: "cope_ahead:move:text_trust"}), (c:CopeMove {id: "text_trust"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_move:text_trust"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_move", value: "text_trust", label: "Text someone I trust", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": true, \"kind\": \"action\", \"pulls\": [\"hide\", \"blank\"], \"safeIn\": [\"might_hurt\", \"might_hurt_self\"], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_move:text_trust"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_move", order: 84};
+MATCH (o:SkillOption {id: "cope_ahead:new_move:text_trust"}), (c:CopeMove {id: "text_trust"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:move:phone_away"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "move", value: "phone_away", label: "Put my phone in another room", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"action\", \"pulls\": [\"chase\"], \"safeIn\": [], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:move:phone_away"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 85};
+MATCH (o:SkillOption {id: "cope_ahead:move:phone_away"}), (c:CopeMove {id: "phone_away"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_move:phone_away"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_move", value: "phone_away", label: "Put my phone in another room", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"action\", \"pulls\": [\"chase\"], \"safeIn\": [], \"sits\": []}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_move:phone_away"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_move", order: 86};
+MATCH (o:SkillOption {id: "cope_ahead:new_move:phone_away"}), (c:CopeMove {id: "phone_away"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:move:name_it"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "move", value: "name_it", label: "Name what's happening", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"words\", \"pulls\": [\"fight\"], \"safeIn\": [], \"sits\": [\"conversation\", \"someone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:move:name_it"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 87};
+MATCH (o:SkillOption {id: "cope_ahead:move:name_it"}), (c:CopeMove {id: "name_it"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_move:name_it"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_move", value: "name_it", label: "Name what's happening", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"words\", \"pulls\": [\"fight\"], \"safeIn\": [], \"sits\": [\"conversation\", \"someone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_move:name_it"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_move", order: 88};
+MATCH (o:SkillOption {id: "cope_ahead:new_move:name_it"}), (c:CopeMove {id: "name_it"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:move:validate_first"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "move", value: "validate_first", label: "Say “I can see this is hard for you too”", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"words\", \"pulls\": [\"fight\", \"hide\"], \"safeIn\": [], \"sits\": [\"conversation\", \"someone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:move:validate_first"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 89};
+MATCH (o:SkillOption {id: "cope_ahead:move:validate_first"}), (c:CopeMove {id: "validate_first"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_move:validate_first"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_move", value: "validate_first", label: "Say “I can see this is hard for you too”", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"words\", \"pulls\": [\"fight\", \"hide\"], \"safeIn\": [], \"sits\": [\"conversation\", \"someone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_move:validate_first"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_move", order: 90};
+MATCH (o:SkillOption {id: "cope_ahead:new_move:validate_first"}), (c:CopeMove {id: "validate_first"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:move:tears_ok"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "move", value: "tears_ok", label: "Say “I might cry, and I want to keep going”", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"words\", \"pulls\": [\"hide\", \"blank\"], \"safeIn\": [], \"sits\": [\"conversation\", \"someone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:move:tears_ok"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 91};
+MATCH (o:SkillOption {id: "cope_ahead:move:tears_ok"}), (c:CopeMove {id: "tears_ok"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_move:tears_ok"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_move", value: "tears_ok", label: "Say “I might cry, and I want to keep going”", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"words\", \"pulls\": [\"hide\", \"blank\"], \"safeIn\": [], \"sits\": [\"conversation\", \"someone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_move:tears_ok"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_move", order: 92};
+MATCH (o:SkillOption {id: "cope_ahead:new_move:tears_ok"}), (c:CopeMove {id: "tears_ok"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:move:no_sorry"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "move", value: "no_sorry", label: "Say “I understand” instead of an extra sorry", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"words\", \"pulls\": [\"hide\"], \"safeIn\": [], \"sits\": [\"conversation\", \"someone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:move:no_sorry"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 93};
+MATCH (o:SkillOption {id: "cope_ahead:move:no_sorry"}), (c:CopeMove {id: "no_sorry"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_move:no_sorry"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_move", value: "no_sorry", label: "Say “I understand” instead of an extra sorry", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"words\", \"pulls\": [\"hide\"], \"safeIn\": [], \"sits\": [\"conversation\", \"someone\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_move:no_sorry"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_move", order: 94};
+MATCH (o:SkillOption {id: "cope_ahead:new_move:no_sorry"}), (c:CopeMove {id: "no_sorry"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:move:notes"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "move", value: "notes", label: "Look at the points I wrote down", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"action\", \"pulls\": [\"blank\", \"hide\"], \"safeIn\": [], \"sits\": [\"conversation\", \"work_school\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:move:notes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 95};
+MATCH (o:SkillOption {id: "cope_ahead:move:notes"}), (c:CopeMove {id: "notes"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_move:notes"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_move", value: "notes", label: "Look at the points I wrote down", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"action\", \"pulls\": [\"blank\", \"hide\"], \"safeIn\": [], \"sits\": [\"conversation\", \"work_school\"]}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_move:notes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_move", order: 96};
+MATCH (o:SkillOption {id: "cope_ahead:new_move:notes"}), (c:CopeMove {id: "notes"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:move:pause"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "move", value: "pause", label: "Hold to wait", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"tool\", \"pulls\": [\"fight\", \"chase\"], \"safeIn\": [\"might_hurt_self\"], \"sits\": [], \"tool\": \"pause\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:move:pause"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 97};
+MATCH (o:SkillOption {id: "cope_ahead:move:pause"}), (c:CopeMove {id: "pause"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_move:pause"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_move", value: "pause", label: "Hold to wait", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"tool\", \"pulls\": [\"fight\", \"chase\"], \"safeIn\": [\"might_hurt_self\"], \"sits\": [], \"tool\": \"pause\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_move:pause"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_move", order: 98};
+MATCH (o:SkillOption {id: "cope_ahead:new_move:pause"}), (c:CopeMove {id: "pause"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:move:five_senses"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "move", value: "five_senses", label: "5-4-3-2-1", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": true, \"kind\": \"tool\", \"pulls\": [\"blank\", \"hide\", \"fight\"], \"safeIn\": [\"might_hurt\", \"might_hurt_self\"], \"sits\": [], \"tool\": \"five-senses\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:move:five_senses"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 99};
+MATCH (o:SkillOption {id: "cope_ahead:move:five_senses"}), (c:CopeMove {id: "five_senses"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_move:five_senses"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_move", value: "five_senses", label: "5-4-3-2-1", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": true, \"kind\": \"tool\", \"pulls\": [\"blank\", \"hide\", \"fight\"], \"safeIn\": [\"might_hurt\", \"might_hurt_self\"], \"sits\": [], \"tool\": \"five-senses\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_move:five_senses"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_move", order: 100};
+MATCH (o:SkillOption {id: "cope_ahead:new_move:five_senses"}), (c:CopeMove {id: "five_senses"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:move:cool_down"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "move", value: "cool_down", label: "First, the body", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"tool\", \"pulls\": [\"fight\", \"chase\"], \"safeIn\": [\"might_hurt\", \"might_hurt_self\"], \"sits\": [], \"tool\": \"cool-down\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:move:cool_down"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 101};
+MATCH (o:SkillOption {id: "cope_ahead:move:cool_down"}), (c:CopeMove {id: "cool_down"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_move:cool_down"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_move", value: "cool_down", label: "First, the body", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"tool\", \"pulls\": [\"fight\", \"chase\"], \"safeIn\": [\"might_hurt\", \"might_hurt_self\"], \"sits\": [], \"tool\": \"cool-down\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_move:cool_down"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_move", order: 102};
+MATCH (o:SkillOption {id: "cope_ahead:new_move:cool_down"}), (c:CopeMove {id: "cool_down"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:move:urge_surfing"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "move", value: "urge_surfing", label: "Ride it out", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"tool\", \"pulls\": [\"chase\", \"fight\"], \"safeIn\": [\"might_hurt_self\"], \"sits\": [], \"tool\": \"urge-surfing\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:move:urge_surfing"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 103};
+MATCH (o:SkillOption {id: "cope_ahead:move:urge_surfing"}), (c:CopeMove {id: "urge_surfing"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:new_move:urge_surfing"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "new_move", value: "urge_surfing", label: "Ride it out", version: "ca-skill-v1"}, o.propsJson = "{\"forMoments\": [], \"general\": false, \"kind\": \"tool\", \"pulls\": [\"chase\", \"fight\"], \"safeIn\": [\"might_hurt_self\"], \"sits\": [], \"tool\": \"urge-surfing\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:new_move:urge_surfing"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "new_move", order: 104};
+MATCH (o:SkillOption {id: "cope_ahead:new_move:urge_surfing"}), (c:CopeMove {id: "urge_surfing"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "cope_ahead:again:yes"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "again", value: "yes", label: "Yes", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:again:yes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "again", order: 105};
+MERGE (o:SkillOption {id: "cope_ahead:again:no"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "again", value: "no", label: "That's enough", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:again:no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "again", order: 106};
+MERGE (o:SkillOption {id: "cope_ahead:change_move:keep"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "change_move", value: "keep", label: "Keep the same plan", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:change_move:keep"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "change_move", order: 107};
+MERGE (o:SkillOption {id: "cope_ahead:change_move:change"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "change_move", value: "change", label: "Change what I'll do", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:change_move:change"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "change_move", order: 108};
+MERGE (o:SkillOption {id: "cope_ahead:settle:breath"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "settle", value: "breath", label: "Three long breaths out", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:settle:breath"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "settle", order: 109};
+MERGE (o:SkillOption {id: "cope_ahead:settle:ok"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "settle", value: "ok", label: "I'm OK", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:settle:ok"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "settle", order: 110};
+MERGE (o:SkillOption {id: "cope_ahead:ask:yes"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "ask", value: "yes", label: "Yes", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:ask:yes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "ask", order: 111};
+MERGE (o:SkillOption {id: "cope_ahead:ask:no"})
+SET o:SkillOption, o += {skillId: "cope_ahead", list: "ask", value: "no", label: "No thanks", version: "ca-skill-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "cope_ahead"}), (o:SkillOption {id: "cope_ahead:ask:no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "ask", order: 112};
 
 // --- hold_to_wait (hw-v1) ---
 MERGE (s:Skill {id: "hold_to_wait"})
@@ -6386,7 +7304,7 @@ MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_debrief:dear_man"}), (t:TherapyConcept {appToolId: "dear-man"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_debrief:cope_ahead"})
-SET x += {skillId: "dear_man_debrief", exit: "cope_ahead", toolId: "cope-ahead", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"first\": \"conversation\"}";
+SET x += {skillId: "dear_man_debrief", exit: "cope_ahead", toolId: "cope-ahead", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"situationId\": \"conversation\"}";
 MATCH (s:Skill {id: "dear_man_debrief"}), (x:SkillExit {id: "dear_man_debrief:cope_ahead"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_debrief:cope_ahead"}), (t:TherapyConcept {appToolId: "cope-ahead"})

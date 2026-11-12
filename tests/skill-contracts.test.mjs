@@ -89,7 +89,11 @@ for (const sk of fixture.skills) {
         assert.ok(embeds.includes(st.embed), `${st.id}: ${st.embed}`);
         assert.ok(!st.fields?.length, `${st.id}: an embed step has no fields`);
       }
-      for (const sl of st.slots ?? []) assert.ok(embeds.includes(sl.embed), `${st.id}: ${sl.embed}`);
+      for (const sl of st.slots ?? []) {
+        assert.ok(embeds.includes(sl.embed), `${st.id}: ${sl.embed}`);
+        // Under the title ($title: above every field) or under one of this step's own fields.
+        assert.ok(sl.after === "$title" || (st.fields ?? []).some((f) => f.id === sl.after), `${st.id}: ${sl.embed} after ${sl.after}`);
+      }
     }
   });
 
@@ -237,6 +241,8 @@ test("embed props in the player: only what is declared, copy keys as the skill's
   assert.deepEqual(embedProps.resolveEmbedProps(undefined, { a: 1 }, copy), {});
   const player = read("src/components/skillPlayer/SkillPlayer.tsx");
   assert.equal((player.match(/props=\{embedProps\(ctx, /g) ?? []).length, 2, "slots and whole-screen embeds both get resolved props");
+  // A slot under `$title` renders between the title and the first field; every other slot under its field.
+  assert.match(player, /slotsAfter\(TITLE_SLOT\)[\s\S]*fields\.map[\s\S]*slotsAfter\(f\.id\)/);
   assert.equal((player.match(/answerIds=\{answerIds\(st\)\}/g) ?? []).length, 2);
 });
 
@@ -486,6 +492,55 @@ test("follow-up: the chip picked on the step, once per run", () => {
   s = m.runNext(ctx, s, { type: "scheduled", stepId: "when", followUpType: "resume_skill", id: "44444444-4444-4444-8444-444444444444" });
   assert.equal(m.followUpFor(ctx, step, s), null, "scheduled already");
   assert.deepEqual(m.runRecord(ctx, s).scheduled, ["resume_skill"]);
+});
+
+test("follow-up timed by an earlier answer: whenFrom's pick, else whenDefault (Cope Ahead's *When is it?*)", () => {
+  const ctx = f2Ctx(null);
+  const step = { ...F2.steps[1], id: "later_step", fields: [], followUp: { type: "resume_skill", whenFrom: "chip", whenDefault: "tomorrow" } };
+  const base = { answers: {}, scheduled: {}, path: [], stepId: "later_step" };
+  assert.deepEqual(m.followUpFor(ctx, step, base), { type: "resume_skill", chip: "tomorrow" }, "not answered: the default");
+  const picked = { ...base, answers: { chip: { ids: ["1h"], own: null } } };
+  assert.deepEqual(m.followUpFor(ctx, step, picked), { type: "resume_skill", chip: "1h" }, "answered: the pick");
+});
+
+test("build.py: one non-hand-off step books each follow-up type (resume restores bookings by type)", () => {
+  const out = execFileSync("python3", ["-c", `import sys,json,copy; sys.path.insert(0,'scripts/skills'); import build
+from content import SKILLS
+sk = copy.deepcopy(next(s for s in SKILLS if s["id"] == "cope_ahead"))
+keep = next(s for s in sk["steps"] if s["id"] == "ask")
+calm = next(s for s in sk["steps"] if s["id"] == "calm")
+calm["followUp"] = dict(keep["followUp"])
+try:
+    build.check(sk); print("passed")
+except AssertionError as e:
+    print("refused" if "one step books" in str(e) else "other: " + str(e))`], { encoding: "utf8" }).trim();
+  assert.equal(out, "refused");
+});
+
+test("build.py: secondary is an ask step's quiet way past a keep or follow-up; keep.done is a copy key", () => {
+  const probe = (mut) => execFileSync("python3", ["-c", `import sys,copy; sys.path.insert(0,'scripts/skills'); import build
+from content import SKILLS
+sk = copy.deepcopy(next(s for s in SKILLS if s["id"] == "cope_ahead"))
+st = {s["id"]: s for s in sk["steps"]}
+${mut}
+try:
+    build.check(sk); print("passed")
+except AssertionError as e:
+    print("refused")`], { encoding: "utf8" }).trim();
+  assert.equal(probe("pass"), "passed");
+  assert.equal(probe("st['plan']['secondary'] = 'keep_no'"), "refused", "nothing to skip");
+  assert.equal(probe("st['keep']['secondary'] = 'nope'"), "refused", "not a copy key");
+  assert.equal(probe("st['keep']['keep']['done'] = 'nope'"), "refused");
+  assert.equal(probe("st['keep']['fields'] = [{'id': 'kq', 'options': {'list': 'ask'}, 'max': 1, 'required': True}]"), "refused", "a required field: Not now would skip its answer");
+});
+
+test("emotionsFrom: a derived list of words in place of emotions; emotions when it resolves to nothing", () => {
+  const ctx = { ...f2Ctx(null), skill: { ...F2, tables: { ...F2.tables, feelBy: { a: ["anxious", "hurt"] } },
+    derive: [...F2.derive, { name: "feelFor", from: "$a.chip", table: "feelBy" }] } };
+  const field = { id: "feel", options: { emotions: ["sad"], emotionsFrom: "$d.feelFor" }, max: 2 };
+  assert.deepEqual(m.emotionChoices(ctx, field, { chip: { ids: ["a"], own: null } }), ["anxious", "hurt"]);
+  assert.deepEqual(m.emotionChoices(ctx, field, { chip: { ids: ["b"], own: null } }), ["sad"], "no row: the fallback");
+  assert.deepEqual(m.emotionChoices(ctx, field, { chip: { ids: ["a"], own: null }, feel: { ids: ["calm"], own: null } }), ["anxious", "hurt", "calm"], "a pick from the full list stays");
 });
 
 test("inline: starts only at a step it declares; returns its returns fields and the change check as then-vs-now", () => {

@@ -157,7 +157,7 @@ Then the regulation close: *"How strong is it now, compared to when you started?
 - **Do the Opposite:** its fits step gains a quiet link under the detail, *"Go through it slowly with
   Check the Facts"*, which carries the emotion. The step itself is unchanged.
 - **The check-in result:** the planned rows (*annoyed*, *worried* and the watchful words, the anticipatory
-  alternative) go live only on Claudia's sign-off, row by row. The tool lands with them switched off.
+  alternative) are live since 12 Nov (Claudia: default to connected).
 
 ## Content and data
 
@@ -176,7 +176,7 @@ Then the regulation close: *"How strong is it now, compared to when you started?
   - The copy is voice-linted. It isn't gated on sign-off, the same as Wise mind and Cope Ahead. The one
     parts line (`cf_unblend`) is a draft until it's signed off (every other parts line was, 17 Oct).
 - **The concept:** `dbt_check_facts.appToolId = 'check-the-facts'`, taken out of `PLANNED`. Its routing
-  rows stay off and drafts.
+  rows are live (12 Nov).
 - **The visit:** a `ToolSession` with `ext.cf`:
   - `emotionId`;
   - `eventKind`, `eventOwn`;

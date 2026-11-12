@@ -38,6 +38,14 @@ RETIRED_VERSIONS = ["rf-v1"]
 # fix it or set POLICY["enabled"] back to False (build.py won't enable with a draft active row).
 SIGNED_OFF = {
     "checkin_result": "2026-10-05",
+    # Claudia, 12 Nov 2026: default to connected, so built tools' rows go live (Cope Ahead, Check the Facts).
+    "rf_acute_alarm_words_annoyed_check-the-facts": "2026-11-12",
+    "rf_chronic_vigilance_words_anticipatory_cope-ahead": "2026-11-12",
+    "rf_chronic_vigilance_words_anticipatory_check-the-facts": "2026-11-12",
+    "rf_chronic_vigilance_words_worry_check-the-facts": "2026-11-12",
+    "rf_social_threat_shame_words_self-worth_check-the-facts": "2026-11-12",
+    "rf_reactive_aggression_words_grievance_check-the-facts": "2026-11-12",
+    "rf_rumination_loop_words_guilt_check-the-facts": "2026-11-12",
     "rf_acute_alarm_backup_five-senses": "2026-10-05",
     "rf_acute_alarm_default_cool-down": "2026-10-05",
     "rf_acute_alarm_default_opposite-action": "2026-10-05",
@@ -124,11 +132,10 @@ NO_ROWS = {"dear-man": "IE-01's 'is it safe with them?' question ships with the 
 # concept has appToolId 'wise-mind') but it stays here until Claudia signs off the watchful row: its row
 # is written switched off and stays a draft until then.
 # Cope Ahead's module has shipped too (appToolId 'cope-ahead', docs/design/cope-ahead.md): it is out of
-# PLANNED, and its anticipatory row stays switched off (BUILT_NOT_SIGNED_OFF) and a draft until Claudia
-# signs it off.
+# PLANNED, and its anticipatory row is live (Claudia, 12 Nov: default to connected).
 CONCEPT_TAGS["cope-ahead"] = {"concept": "dbt_cope_ahead", "side": "change", "skillKind": "change", "direction": "neutral"}
 # Check the Facts has shipped on the skill runtime (appToolId 'check-the-facts', docs/design/skill-runtime.md):
-# out of PLANNED; its six rows stay switched off and drafts until Claudia signs them off, row by row.
+# out of PLANNED; its six rows are live (Claudia, 12 Nov: default to connected).
 CONCEPT_TAGS["check-the-facts"] = {"concept": "dbt_check_facts", "side": "change", "skillKind": "change", "direction": "neutral"}
 # Rebel without the wreckage (DT-11) has shipped on the skill runtime (appToolId 'alternate-rebellion'): its one
 # row was signed off on 10 Nov (plan D15) and is live. Its skillKind is `redirect` (the
@@ -158,8 +165,6 @@ CONCEPT_TAGS["fast"] = {"concept": "dbt_fast", "side": "change", "skillKind": "r
 CONCEPT_TAGS["let-it-be"] = {"concept": "dbt_radical_acceptance", "side": "acceptance", "skillKind": "hold", "direction": "neutral"}
 BUILT_NOT_SIGNED_OFF = {
     "fast": "built on the skill runtime; its word rows go live on Claudia's sign-off, row by row (docs/design/fast.md)",
-    "cope-ahead": "built; its anticipatory row goes live on Claudia's sign-off (docs/design/cope-ahead.md)",
-    "check-the-facts": "built on the skill runtime; its rows go live on Claudia's sign-off, row by row (docs/design/check-the-facts.md)",
     # DT-05: the slider is gone (rebuilt as Ride it out on the skill runtime, DT-B3); its rows stay off and drafts.
     "let-it-be": "built on the skill runtime; its rows go live on Claudia's sign-off, row by row (docs/design/let-it-be.md)",
     "urge-surfing": "rebuilt on the skill runtime as Ride it out; its rows go live on Claudia's sign-off (docs/design/ride-it-out.md)",

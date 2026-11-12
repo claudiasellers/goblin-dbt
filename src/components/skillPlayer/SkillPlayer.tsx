@@ -112,6 +112,8 @@ export function SkillPlayer({ skillId, mode = 'page', enterAt, hostSessionId, on
 
 const needsProfile = (toolId: string) => ((PROFILE_NEEDS as Record<string, readonly string[]>)[toolId]?.length ?? 0) > 0;
 const UUID = /^[0-9a-f-]{36}$/i;
+/** A slot's `after` that puts it under the step's title, above its fields. */
+const TITLE_SLOT = '$title';
 
 const GRID = new Set(emotions.map((e) => e.id));
 /** Tools that write nothing until the person saves (R15): exits to them are never named or linked back. */
@@ -194,6 +196,11 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx }: {
   }, [profileSettled]);
   const [busy, setBusy] = useState(false);
   const [saveNote, setSaveNote] = useState(false);
+  // A keep's confirmation (`keep.done`), shown on the screen the keep moved on to, then gone.
+  const [keptLine, setKeptLine] = useState<{ text: string; at: string | null } | null>(null);
+  useEffect(() => {
+    setKeptLine((k) => (!k ? k : k.at === null ? { ...k, at: st.stepId } : k.at === st.stepId ? k : null));
+  }, [st.stepId]);
   const [leaving, setLeaving] = useState<ExitDef | null>(null);
   const [quietLeave, setQuietLeave] = useState(false);
   // Answered: stay on the close so its tag row ("Was this a part you know?") can show, then go on a tap.
@@ -350,6 +357,8 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx }: {
           const r = await keepProfileItem({ kind: k.kind, ...(id ? { id } : {}), value: k.value, sourceSessionId: toolSession.id });
           profileCache.clear();
           send({ type: 'kept', stepId: step.id, kind: k.kind, id: r.id });
+          const done = step.keep?.done ? skill.copy[step.keep.done] : null;
+          if (done) setKeptLine({ text: done, at: null });
         } catch { failed = true; }
       }
       if (f && !(await scheduleStep())) failed = true;
@@ -357,7 +366,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx }: {
       setBusy(false);
     }
     send({ type: 'next' });
-  }, [ctx, step, st, send, toolSession, scheduleStep]);
+  }, [ctx, step, st, send, toolSession, scheduleStep, skill]);
 
   // Inline: the hand-off is the way back to the host (R8). The sub-run asks no close of its own; its change
   // check, if it has one, is its then-vs-now (C1 rule 5).
@@ -411,6 +420,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx }: {
           modal too: under it the step is inert, so a step that moves on underneath can't take focus from the dialog. */}
       {safetyOpen && <SafetyOpen onBack={() => setSafetyOpen(false)} />}
       <div key={leaving ? 'leaving' : st.stepId} hidden={safetyOpen} inert={safetyOpen || p2Open} className="space-y-4 motion-safe:animate-[stepEnter_300ms_ease-out]">{body}</div>
+      {keptLine && keptLine.at === st.stepId && <p role="status" className={`${secondaryText} text-center`} data-testid="skill-kept">{keptLine.text}</p>}
       {saveNote && <p role="status" className={`${secondaryText} text-center`}>{skill.copy.save_failed ?? "That didn't save just now. You can carry on."}</p>}
       {inline && !safetyOpen && (
         <div className="flex justify-center">
@@ -447,32 +457,43 @@ function AskStep({ ctx, step, st, send, onExit, onShown, onPrimary, busy }: {
     );
   }
   const crisis = crisisFor(ctx, step, st);
+  // A crisis raised on an earlier screen (it holds without this step's own answers) shows under the title, never
+  // pushed below the fold by this step's chips; one raised here shows under the question, where the chip was tapped.
+  const own = new Set((step.fields ?? []).map((f) => f.id));
+  const carried = crisis && crisisFor(ctx, step, { answers: Object.fromEntries(Object.entries(st.answers).filter(([k]) => !own.has(k))) });
+  const slotsAfter = (after: string) => (step.slots ?? []).filter((s) => s.after === after).map((s) => {
+    const Embed = EMBEDS[s.embed];
+    const show = holds(s.showWhen, sc);
+    return (
+      <div key={`${s.embed}:${s.record}`} className="min-h-6">
+        {Embed && show ? <Embed props={embedProps(ctx, s.embed, s.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(st)} profile={ctx.profile ?? null} onShown={() => onShown(s.record)} /> : null}
+      </div>
+    );
+  });
   return (<>
     {title && <Prompt>{title}</Prompt>}
     {step.hint && c[step.hint] && <Line>{c[step.hint]}</Line>}
-    {fields.map((f, i) => {
-      const slots = (step.slots ?? []).filter((s) => s.after === f.id);
-      return (
-        <div key={f.id} className="space-y-3" aria-live={i > 0 ? 'polite' : undefined}>
-          <FieldView ctx={ctx} field={f} st={st} send={send} onMore={() => setPicker(f.id)} onExit={onExit} />
-          {slots.map((s) => {
-            const Embed = EMBEDS[s.embed];
-            const show = holds(s.showWhen, sc);
-            return (
-              <div key={`${s.embed}:${s.record}`} className="min-h-6">
-                {Embed && show ? <Embed props={embedProps(ctx, s.embed, s.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(st)} profile={ctx.profile ?? null} onShown={() => onShown(s.record)} /> : null}
-              </div>
-            );
-          })}
-        </div>
-      );
-    })}
+    {/* `after: '$title'`: under the title, above the questions (a heading or a line the whole screen reads from). */}
+    {slotsAfter(TITLE_SLOT)}
+    {carried && <div aria-live="polite"><CrisisBanner compact variant={carried.variant} /></div>}
+    {fields.map((f, i) => (
+      <div key={f.id} className="space-y-3" aria-live={i > 0 ? 'polite' : undefined}>
+        <FieldView ctx={ctx} field={f} st={st} send={send} onMore={() => setPicker(f.id)} onExit={onExit} />
+        {slotsAfter(f.id)}
+      </div>
+    ))}
     {/* Under the question, so the chip that raised it stays where it was tapped. */}
-    {crisis && <div aria-live="polite"><CrisisBanner compact variant={crisis.variant} /></div>}
+    {crisis && !carried && <div aria-live="polite"><CrisisBanner compact variant={crisis.variant} /></div>}
     {step.note && c[step.note] && <p className={secondaryText}>{c[step.note]}</p>}
     <button type="button" className={primaryButton} disabled={busy || !canGoOn(ctx, st)} aria-busy={busy} onClick={onPrimary}>
       {(step.primary && c[step.primary]) || c.next || 'Next'}
     </button>
+    {/* `secondary`: a quiet way on that skips the step's keep and follow-up (the primary tap is the yes). */}
+    {step.secondary && c[step.secondary] && (
+      <div className="flex justify-center">
+        <button type="button" className={linkButton} disabled={busy || !canGoOn(ctx, st)} onClick={() => send({ type: 'next' })}>{c[step.secondary]}</button>
+      </div>
+    )}
   </>);
 }
 

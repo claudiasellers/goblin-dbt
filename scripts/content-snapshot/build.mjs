@@ -477,7 +477,7 @@ export function buildCopeAhead(g) {
   const hardMoments = off('HAS_HARD_MOMENT', 'HardMoment').map((m) => ({ id: m.id, label: m.label, ifText: m.ifText, order: intOrNull(m.order) }));
   const moves = off('HAS_MOVE', 'CopeMove').map((m) => ({
     id: m.id, kind: m.kind, label: m.label, line: m.line, forPulls: m.forPulls ?? [], general: m.general === true,
-    appToolId: m.appToolId ?? null, forMoments: m.forMoments ?? [], order: intOrNull(m.order) }));
+    appToolId: m.appToolId ?? null, forMoments: m.forMoments ?? [], forSituations: m.forSituations ?? [], order: intOrNull(m.order) }));
   const beats = off('HAS_BEAT', 'RehearsalBeat').map((b) => ({ id: b.id, text: b.text, order: intOrNull(b.order) }));
   return { version: COPE_AHEAD_VERSION, ownMax: doc.ownMax, moveOwnMax: doc.moveOwnMax, when: doc.when, copy: doc.copy,
     pullIf: doc.pullIf, after: doc.after, situations, hardMoments, moves, beats };

@@ -146,7 +146,7 @@ test("screen 5's parts appear in turn; Nothing like that hides them; the Cope Ah
   const through = step.fields[2];
   assert.deepEqual(M.fieldLinks(ctx(), through, run([...base, pick("threat", "left"), pick("likely", "very")])), []);
   const [link] = M.fieldLinks(ctx(), through, run([...base, pick("threat", "left"), pick("likely", "very"), pick("through", "unsure")]));
-  assert.deepEqual([link.exit.toolId, link.exit.query, link.label], ["cope-ahead", { first: "other" }, "Plan for it with Cope Ahead"]);
+  assert.deepEqual([link.exit.toolId, link.exit.query, link.label], ["cope-ahead", { situationId: "other" }, "Plan for it with Cope Ahead"]);
   assert.equal(M.canGoOn(ctx(), run(base)), true, "Next works from any point");
 });
 
