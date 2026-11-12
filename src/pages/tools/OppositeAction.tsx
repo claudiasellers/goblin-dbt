@@ -550,13 +550,22 @@ export function OppositeAction() {
    */
   const supportLinks = () => (
     <div key="support" className="space-y-3" data-testid="oa-support">
-      <CrisisBanner variant="other_person" compact />
+      {/* Never left below the fold (Gate 2, #89): the banner scrolls into view when it appears, clear of the nav. */}
+      <div ref={showBanner} className="scroll-mb-28 scroll-mt-4">
+        <CrisisBanner variant="other_person" compact />
+      </div>
       <Link className={`${choiceButton} block`} to="/tool/ending-relationships?frame=careful">
         This is about someone who might hurt me →
       </Link>
       {toolLink("pause")}
     </div>
   );
+
+  function showBanner(el: HTMLDivElement | null) {
+    if (!el) return;
+    const reduce = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    el.scrollIntoView?.({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
+  }
 
   const toolLink = (id: string, label?: string) => {
     const normalized = id.replace(/^dbt_/, "").replace(/_/g, "-");
@@ -1205,8 +1214,8 @@ export function OppositeAction() {
           after={
             blocked && (
               <div className={`space-y-3 ${enterAnimation}`} role="alert">
-                <p>{c.support}</p>
                 {supportLinks()}
+                <p>{c.support}</p>
               </div>
             )
           }
@@ -1306,6 +1315,7 @@ export function OppositeAction() {
       const keep = drafts.filter((_, i) => routes[i] === "opposite");
       card = (
         <div className={`space-y-3 ${enterAnimation}`} key="result">
+          {routes.includes("support") && supportLinks()}
           {drafts.map((d, i) => {
             const info = infoOf(d);
             return (
@@ -1336,7 +1346,6 @@ export function OppositeAction() {
           </button>
           {/* ER-03 item 6: clarify is a facts question (Check the Facts); Pause stays for support. */}
           {routes.includes("clarify") && toolLink("check-the-facts")}
-          {routes.includes("support") && supportLinks()}
           <button type="button" className={linkButton} onClick={() => setCheckStep(CHECK_STEPS.length - 1)}>
             ← Previous
           </button>
@@ -1432,6 +1441,7 @@ export function OppositeAction() {
     } else {
       card = (
         <div className={`space-y-3 ${enterAnimation}`} key="result">
+          {route === "support" && supportLinks()}
           <Card>
             <h3 className="font-semibold text-lg">{c[ROUTE_HEADING[route]]}</h3>
             <p>{c[route]}</p>
@@ -1457,7 +1467,6 @@ export function OppositeAction() {
             </button>
           )}
           {route === "clarify" && toolLink("check-the-facts")}
-          {route === "support" && supportLinks()}
           <button
             type="button"
             className={linkButton}
@@ -1975,8 +1984,8 @@ export function OppositeAction() {
         />
         {draft.outcome === "unsafe" && (
           <Card>
-            <p role="alert">{c.readoutUnsafe}</p>
             {supportLinks()}
+            <p role="alert">{c.readoutUnsafe}</p>
           </Card>
         )}
         <details className="p-4 rounded-xl border border-[var(--color-border)]">
@@ -2286,6 +2295,7 @@ export function OppositeAction() {
               : c.saveReflection;
     content = (
       <>
+        {unsafe && supportLinks()}
         {multi && !unsafe ? (
           drafts.map((d, i) => {
             const info = infoOf(d);
@@ -2298,7 +2308,6 @@ export function OppositeAction() {
         ) : (
           <Card className={enterAnimation}>{readoutOf(draft)}</Card>
         )}
-        {unsafe && supportLinks()}
         {practiced && !unsafe && louder && (
           <div className="space-y-2">
             <p className={secondaryText}>{c.readoutHigherTools}</p>

@@ -108,8 +108,20 @@ export function OppositeActionStart({
     if (shownView.current === view) return;
     shownView.current = view;
     if (heading.current) { heading.current.focus(); return; }
-    const h = borrowed.current?.querySelector<HTMLElement>('h1, h2');
-    if (h) { if (!h.hasAttribute('tabindex')) h.setAttribute('tabindex', '-1'); h.focus(); }
+    const root = borrowed.current;
+    if (!root) return;
+    const focusHeading = () => {
+      const h = root.querySelector<HTMLElement>('h1, h2');
+      if (!h) return false;
+      if (!h.hasAttribute('tabindex')) h.setAttribute('tabindex', '-1');
+      h.focus();
+      return true;
+    };
+    if (focusHeading()) return;
+    // The suggestions load first, then render their heading: focus it when it arrives.
+    const watch = new MutationObserver(() => { if (focusHeading()) watch.disconnect(); });
+    watch.observe(root, { childList: true, subtree: true });
+    return () => watch.disconnect();
   }, [view]);
 
   const go = (next: View) => setView(next);

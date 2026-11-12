@@ -29,7 +29,7 @@ FOR (u:ActionUrge) REQUIRE u.id IS UNIQUE;
 // --- FEAR ---
 MATCH (c:EmotionRegulationContent {dbtParent: 'fear'})
 SET c.fitsFactsGuidance = "If there's a real threat, listen to the fear. Remove yourself from danger, problem-solve, or ask for help. Fear that fits the facts is protecting you.",
-    c.whyItWorks = "Fear tells you something is dangerous when it may not be. By approaching instead of avoiding, your brain learns the situation is actually safe. The fear has to come down — it always does.",
+    c.whyItWorks = "Fear tells you something is dangerous when it may not be. By approaching instead of avoiding, your brain learns the situation is actually safe. Given time, the fear can come down on its own.",
     c.acknowledgment = "Fear is trying to keep you safe by pulling you away from the threat. When the threat isn't real, avoidance keeps the fear alive.",
     c.bodyOpposite = "Relax your jaw and hands. Open your posture. Breathe slowly and deeply. Speak in a steady voice.",
     c.defaultOppositeSmall = "Stay with the discomfort a little longer — even 2 minutes",
@@ -245,7 +245,7 @@ UNWIND [
   {id: "check-profile", label: "Check their profile", small: "Wait ten minutes before you look", medium: "Mute them for today", bigger: "Take the app off your home screen for the week", order: 11, parents: ["jealousy", "love"]},
   {id: "pull-away", label: "Pull away from them", small: "Send one ordinary message back", medium: "Keep one plan with them", bigger: "If they are safe to tell, tell them a little of what has been going on", order: 12, parents: ["shame", "sadness"]},
   {id: "fire-back", label: "Fire back", small: "Wait ten breaths before you answer", medium: "Step away until you can answer gently", bigger: "Say one fair or kind thing about their side first", order: 13, parents: ["anger"]},
-  {id: "go-quiet", label: "Go quiet on them", small: "Send one line: I need a minute, I'll come back to this", medium: "Come back to it later today, as you said", bigger: "Say plainly what upset you", order: 14, parents: ["shame", "sadness"]}
+  {id: "go-quiet", label: "Go quiet on them", small: "Send one line: I need a minute, I'll come back to this", medium: "Come back to it later today, as you said", bigger: "If they are safe to tell, say plainly what upset you", order: 14, parents: ["shame", "sadness"]}
 ] AS urge
 MERGE (u:ActionUrge {id: urge.id})
 SET u.label = urge.label, u.small = urge.small, u.medium = urge.medium, u.bigger = urge.bigger, u.order = urge.order, u.interpersonal = true

@@ -13,7 +13,7 @@ Two PRs:
    urges, and the support route's `other_person` resources with Ending careful before Pause (plan C6 rules 4 and 8).
    Everything else in ER-03 is part 2, below, with the batch ER-B3.
 2. **The port** (this design): `scripts/skills/opposite_action.py`, its embeds, the `OppositeActionSession` v3
-   projection, the interpersonal urges, and the runtime pieces it needs (each its own `runtime:` commit for the plan
+   projection, and the runtime pieces it needs (each its own `runtime:` commit for the plan
    thread).
 
 ## The flow
@@ -36,7 +36,7 @@ as Problem Solve's `ps_graph.py` does), and every option keeps a `PRESENTS` edge
 | `goal` *(once)* | ask | *What do you want this moment to help you do?* and the **safety split**: *Safe to try something different · There's danger · There's a boundary I need to keep · I'm not sure what's safe* | Danger → `other_person` crisis slot from here on; boundary and not sure → `support`. Asked once for every feeling (as #48) |
 | `help` *(per feeling)* | ask | *If you follow this urge, will it help that?* | The goal line (parts on) above it |
 | route | handoffs | **Route table v3** (item 5), graph-owned (`OppositeActionFlow.routes`, read into transitions at build): | |
-| | `clarify` | doesn't fit + helpful, or can't tell: "It may be serving a different goal." **Check the Facts** (item 6) | The inline mini-card waits for ER-02's inline mode in a host; the exit is a hand-off now |
+| | `clarify` | doesn't fit + helpful, or can't tell: "It may be serving a different goal." **Check the Facts** (item 6) | A hand-off in ER-B3; the inline mini-card (ER-02's inline mode) is ER-B5, with `ActionUrge` moving to a `content.py` |
 | | `problem` | fits + helpful; fits-but-too-big + helpful gets the **down-regulation offer first** (First, the body), then Problem Solve | |
 | | `repair` | guilt or shame, fits, goal *repair harm* (H11): Problem Solve opened on repair | `?frame=repair` (planned exit until Problem Solve accepts the frame; until then Problem Solve with no frame) |
 | | `support` | not safe, boundary, not sure | Pause (Hold to wait); danger keeps the `other_person` slot |
@@ -103,6 +103,15 @@ the server's `ext.run` schema and a contract test for the longest record (3 × 7
 and 32 answers, since `runRecord` would otherwise truncate silently); R9 resume keeps the pick in each path entry and
 drops only within the sub-run it resumes; a set-aside pick's hand-off carries only that pick's emotion, and *Carry on
 with the others* records the offer, not the exit; the grid check on an embed's emotion answer runs on the server too.
+
+## Also in part 2 (from #89's gates)
+
+- *Punish yourself* (`guilt-punish`) can mean self-harm: on the port its pick opens `safety.open` first (C6.5), as Hold
+  to wait's *Hurt myself* does, with the crisis slot after.
+- The `not_fit:helpful` clarify card gets its own line: "The feeling doesn't fit the facts, and acting on it still seems
+  helpful. It may be serving a different goal."
+- The readout's *It felt unsafe* shows the `other_person` slot today (988 is on it); the danger / boundary / not-sure
+  split decides whose danger it is and which variant shows.
 
 ## Departures from the hand-built page (for sign-off)
 
