@@ -26,7 +26,8 @@ const next = { type: "next" };
 const read = { type: "embedDone", output: { ids: ["read"] } };
 const run = (events, c = ctx()) => events.reduce((s, e) => M.runNext(c, s, e), M.initialRun(skill));
 const title = (s, c = ctx()) => M.copyText(c, M.stepOf(skill, s.stepId).title, s, M.titleSlots(c, M.stepOf(skill, s.stepId), s));
-const lines = (s, c = ctx()) => M.stepOf(skill, s.stepId).lines.filter((l) => M.handoffLine(c, { ...M.stepOf(skill, s.stepId), lines: [l] }, s)).map((l) => skill.copy[l.key]);
+// What the player shows: one line, the first that holds (handoffLine; Codex, #123).
+const lines = (s, c = ctx()) => [M.handoffLine(c, M.stepOf(skill, s.stepId), s)].filter(Boolean);
 const offers = (s, c = ctx()) => M.offersFor(c, M.stepOf(skill, s.stepId), s);
 const field = (stepId, id) => M.stepOf(skill, stepId).fields.find((f) => f.id === id);
 const py = (...args) => execFileSync("python3", args, { encoding: "utf8" });
@@ -148,20 +149,23 @@ test("a word, its card (the guide's row through the `row` prop), its ladder, the
   assert.deepEqual(offers(end), ["check_the_facts_closest", "opposite_action_closest"]);
   // The closer word goes on, not the one they came with (Codex, #120).
   for (const id of offers(end)) assert.deepEqual(M.carried(skill.exits.find((e) => e.id === id), end, ctx()), ["scared"], id);
-  assert.ok(lines(end).includes(skill.copy.end_fits));
-  assert.ok(lines(end).includes(skill.copy.end_line), "a closer word was put to it");
-  assert.ok(!lines(end).includes(skill.copy.end_heavy));
+  assert.equal(lines(end).length, 1);
+  assert.ok(lines(end)[0].includes(skill.copy.end_fits));
+  assert.ok(lines(end)[0].includes(skill.copy.end_line), "a closer word was put to it");
+  assert.ok(!lines(end)[0].includes(skill.copy.end_heavy));
   // None of them is an answer too.
   const none = M.runNext(ctx(), s, next);
   assert.equal(none.stepId, "end");
   assert.equal(title(none), skill.copy.end_title);
-  assert.ok(lines(none).includes(skill.copy.end_known) && !lines(none).includes(skill.copy.end_line), "no closer word, no claim it was put");
+  assert.ok(lines(none)[0].includes(skill.copy.end_known) && !lines(none)[0].includes(skill.copy.end_line), "no closer word, no claim it was put");
+  assert.ok(lines(none)[0].includes(skill.copy.end_fits));
   assert.deepEqual(offers(none), ["check_the_facts", "opposite_action"]);
   for (const id of offers(none)) assert.deepEqual(M.carried(skill.exits.find((e) => e.id === id), none, ctx()), ["worried"], id);
   // A safety-screen word named: said plainly, never a gate (gate 3).
   const sad = [read].reduce((x, e) => M.runNext(ctx(), x, e), run([pick("feel", "sad"), next]));
   const heavy = [pick("closest", "despair"), next].reduce((x, e) => M.runNext(ctx(), x, e), sad);
-  assert.equal(lines(heavy)[0], skill.copy.end_heavy);
+  assert.ok(lines(heavy)[0].startsWith(skill.copy.end_heavy), "the heavy line first");
+  assert.ok(lines(heavy)[0].includes(skill.copy.end_line) && lines(heavy)[0].includes(skill.copy.end_fits), "and the rest of the card");
   assert.deepEqual(offers(heavy), ["check_the_facts_closest", "opposite_action_closest"]);
   assert.ok(M.stepOf(skill, "end").noClose && M.stepOf(skill, "end").complete);
 });

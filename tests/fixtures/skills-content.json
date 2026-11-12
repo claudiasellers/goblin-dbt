@@ -13716,7 +13716,15 @@
     "none_line": "Find the feeling can help put more words to it.",
     "safety_open": "Talk to someone now",
     "next": "Next",
-    "done": "Done"
+    "done": "Done",
+    "end_hpf": "Heavy feelings can come with thoughts of not being here. If they do, talk to someone now. Putting a closer word to a feeling can take some of the edge off. Check the Facts looks at whether it fits. Do the Opposite helps when acting on it won't.",
+    "end_hp": "Heavy feelings can come with thoughts of not being here. If they do, talk to someone now. Putting a closer word to a feeling can take some of the edge off.",
+    "end_hkf": "Heavy feelings can come with thoughts of not being here. If they do, talk to someone now. Knowing what a feeling is for can make it easier to be with. Check the Facts looks at whether it fits. Do the Opposite helps when acting on it won't.",
+    "end_hk": "Heavy feelings can come with thoughts of not being here. If they do, talk to someone now. Knowing what a feeling is for can make it easier to be with.",
+    "end_pf": "Putting a closer word to a feeling can take some of the edge off. Check the Facts looks at whether it fits. Do the Opposite helps when acting on it won't.",
+    "end_p": "Putting a closer word to a feeling can take some of the edge off.",
+    "end_kf": "Knowing what a feeling is for can make it easier to be with. Check the Facts looks at whether it fits. Do the Opposite helps when acting on it won't.",
+    "end_k": "Knowing what a feeling is for can make it easier to be with."
    },
    "tables": {},
    "derive": [
@@ -13991,41 +13999,42 @@
      ],
      "lines": [
       {
-       "when": {
-        "any": [
-         {
-          "in": [
-           "$a.feel",
-           [
-            "worthless",
-            "empty",
-            "despair",
-            "helpless",
-            "powerless"
-           ]
-          ]
-         },
-         {
-          "in": [
-           "$a.closest",
-           [
-            "worthless",
-            "empty",
-            "despair",
-            "helpless",
-            "powerless"
-           ]
-          ]
-         }
-        ]
-       },
-       "key": "end_heavy"
-      },
-      {
+       "key": "end_hpf",
        "when": {
         "all": [
          {
+          "any": [
+           {
+            "in": [
+             "$a.feel",
+             [
+              "worthless",
+              "empty",
+              "despair",
+              "helpless",
+              "powerless"
+             ]
+            ]
+           },
+           {
+            "in": [
+             "$a.closest",
+             [
+              "worthless",
+              "empty",
+              "despair",
+              "helpless",
+              "powerless"
+             ]
+            ]
+           }
+          ]
+         },
+         {
           "set": "$a.closest"
+         },
+         {
+          "set": "$d.fitsParent"
          },
          {
           "not": {
@@ -14036,12 +14045,142 @@
           }
          }
         ]
-       },
-       "key": "end_line"
+       }
       },
       {
+       "key": "end_hp",
        "when": {
         "all": [
+         {
+          "any": [
+           {
+            "in": [
+             "$a.feel",
+             [
+              "worthless",
+              "empty",
+              "despair",
+              "helpless",
+              "powerless"
+             ]
+            ]
+           },
+           {
+            "in": [
+             "$a.closest",
+             [
+              "worthless",
+              "empty",
+              "despair",
+              "helpless",
+              "powerless"
+             ]
+            ]
+           }
+          ]
+         },
+         {
+          "set": "$a.closest"
+         },
+         {
+          "not": {
+           "set": "$d.fitsParent"
+          }
+         },
+         {
+          "not": {
+           "eq": [
+            "$d.guide",
+            "happiness"
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "key": "end_hkf",
+       "when": {
+        "all": [
+         {
+          "any": [
+           {
+            "in": [
+             "$a.feel",
+             [
+              "worthless",
+              "empty",
+              "despair",
+              "helpless",
+              "powerless"
+             ]
+            ]
+           },
+           {
+            "in": [
+             "$a.closest",
+             [
+              "worthless",
+              "empty",
+              "despair",
+              "helpless",
+              "powerless"
+             ]
+            ]
+           }
+          ]
+         },
+         {
+          "not": {
+           "set": "$a.closest"
+          }
+         },
+         {
+          "set": "$d.fitsParent"
+         },
+         {
+          "not": {
+           "eq": [
+            "$d.guide",
+            "happiness"
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "key": "end_hk",
+       "when": {
+        "all": [
+         {
+          "any": [
+           {
+            "in": [
+             "$a.feel",
+             [
+              "worthless",
+              "empty",
+              "despair",
+              "helpless",
+              "powerless"
+             ]
+            ]
+           },
+           {
+            "in": [
+             "$a.closest",
+             [
+              "worthless",
+              "empty",
+              "despair",
+              "helpless",
+              "powerless"
+             ]
+            ]
+           }
+          ]
+         },
          {
           "not": {
            "set": "$a.closest"
@@ -14049,6 +14188,11 @@
          },
          {
           "not": {
+           "set": "$d.fitsParent"
+          }
+         },
+         {
+          "not": {
            "eq": [
             "$d.guide",
             "happiness"
@@ -14056,14 +14200,219 @@
           }
          }
         ]
-       },
-       "key": "end_known"
+       }
       },
       {
+       "key": "end_pf",
        "when": {
-        "set": "$d.fitsParent"
-       },
-       "key": "end_fits"
+        "all": [
+         {
+          "not": {
+           "any": [
+            {
+             "in": [
+              "$a.feel",
+              [
+               "worthless",
+               "empty",
+               "despair",
+               "helpless",
+               "powerless"
+              ]
+             ]
+            },
+            {
+             "in": [
+              "$a.closest",
+              [
+               "worthless",
+               "empty",
+               "despair",
+               "helpless",
+               "powerless"
+              ]
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "set": "$a.closest"
+         },
+         {
+          "set": "$d.fitsParent"
+         },
+         {
+          "not": {
+           "eq": [
+            "$d.guide",
+            "happiness"
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "key": "end_p",
+       "when": {
+        "all": [
+         {
+          "not": {
+           "any": [
+            {
+             "in": [
+              "$a.feel",
+              [
+               "worthless",
+               "empty",
+               "despair",
+               "helpless",
+               "powerless"
+              ]
+             ]
+            },
+            {
+             "in": [
+              "$a.closest",
+              [
+               "worthless",
+               "empty",
+               "despair",
+               "helpless",
+               "powerless"
+              ]
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "set": "$a.closest"
+         },
+         {
+          "not": {
+           "set": "$d.fitsParent"
+          }
+         },
+         {
+          "not": {
+           "eq": [
+            "$d.guide",
+            "happiness"
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "key": "end_kf",
+       "when": {
+        "all": [
+         {
+          "not": {
+           "any": [
+            {
+             "in": [
+              "$a.feel",
+              [
+               "worthless",
+               "empty",
+               "despair",
+               "helpless",
+               "powerless"
+              ]
+             ]
+            },
+            {
+             "in": [
+              "$a.closest",
+              [
+               "worthless",
+               "empty",
+               "despair",
+               "helpless",
+               "powerless"
+              ]
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "not": {
+           "set": "$a.closest"
+          }
+         },
+         {
+          "set": "$d.fitsParent"
+         },
+         {
+          "not": {
+           "eq": [
+            "$d.guide",
+            "happiness"
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "key": "end_k",
+       "when": {
+        "all": [
+         {
+          "not": {
+           "any": [
+            {
+             "in": [
+              "$a.feel",
+              [
+               "worthless",
+               "empty",
+               "despair",
+               "helpless",
+               "powerless"
+              ]
+             ]
+            },
+            {
+             "in": [
+              "$a.closest",
+              [
+               "worthless",
+               "empty",
+               "despair",
+               "helpless",
+               "powerless"
+              ]
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "not": {
+           "set": "$a.closest"
+          }
+         },
+         {
+          "not": {
+           "set": "$d.fitsParent"
+          }
+         },
+         {
+          "not": {
+           "eq": [
+            "$d.guide",
+            "happiness"
+           ]
+          }
+         }
+        ]
+       }
       },
       {
        "when": {
@@ -14309,12 +14658,10 @@
     "myth_hint": "Pick the closest. You can put it your own way too.",
     "own_hint": "In your own words",
     "look_title": "A belief can feel like a fact.",
-    "look_own": "A belief like this often makes sense given where it came from. You can look at whether it still fits.",
-    "own_safety": "If it's about hurting yourself or not wanting to be here, talk to someone now.",
+    "look_own": "A belief like this often makes sense given where it came from. You can look at whether it still fits. If it's about hurting yourself or not wanting to be here, talk to someone now.",
     "sits_label": "How does that sit with you?",
     "end_title_some": "Some of it fits. That's worth noticing.",
     "end_title_not_yet": "Not yet is fine.",
-    "end_not_yet": "A belief that's been around a while takes more than one look.",
     "end_title_unsure": "You don't have to decide now.",
     "end_own": "This week, notice one time the belief shows up, and what you were feeling right then.",
     "offer_guide": "What a feeling is for",
@@ -14341,7 +14688,18 @@
     "try_myth_no_reason": "When one seems to come from nowhere, try asking what happened right before.",
     "try_myth_ignore": "Today, try noticing one feeling for a few breaths. You can stop whenever you want.",
     "try_myth_approval": "Next time, try telling yourself: it makes sense that I feel this.",
-    "try_myth_big": "This week, try saying what you need in one clear sentence, once."
+    "try_myth_big": "This week, try saying what you need in one clear sentence, once.",
+    "try_not_yet_myth_failing": "A belief that's been around a while takes more than one look. This week, notice the feeling and the effort you're making, side by side.",
+    "try_not_yet_myth_past_it": "A belief that's been around a while takes more than one look. This week, try saying to yourself: it's still here, and that makes sense.",
+    "try_not_yet_myth_true": "A belief that's been around a while takes more than one look. Next time it's strong, ask: what are the facts, apart from the feeling?",
+    "try_not_yet_myth_right_way": "A belief that's been around a while takes more than one look. Next time a feeling seems wrong, try naming it without grading it.",
+    "try_not_yet_myth_weak": "A belief that's been around a while takes more than one look. This week, if there's someone safe, try letting them see one small feeling. If there isn't, try naming it to yourself.",
+    "try_not_yet_myth_bad": "A belief that's been around a while takes more than one look. Next time one shows up, try asking what it's telling you.",
+    "try_not_yet_myth_out_of_control": "A belief that's been around a while takes more than one look. This week, notice one time you felt a lot and still chose what to do.",
+    "try_not_yet_myth_no_reason": "A belief that's been around a while takes more than one look. When one seems to come from nowhere, try asking what happened right before.",
+    "try_not_yet_myth_ignore": "A belief that's been around a while takes more than one look. Today, try noticing one feeling for a few breaths. You can stop whenever you want.",
+    "try_not_yet_myth_approval": "A belief that's been around a while takes more than one look. Next time, try telling yourself: it makes sense that I feel this.",
+    "try_not_yet_myth_big": "A belief that's been around a while takes more than one look. This week, try saying what you need in one clear sentence, once."
    },
    "tables": {},
    "derive": [],
@@ -14576,12 +14934,6 @@
        "when": {
         "own": "myth"
        }
-      },
-      {
-       "key": "own_safety",
-       "when": {
-        "own": "myth"
-       }
       }
      ],
      "fields": [
@@ -14642,11 +14994,211 @@
      ],
      "lines": [
       {
-       "key": "end_not_yet",
+       "key": "try_not_yet_myth_failing",
        "when": {
-        "eq": [
-         "$a.sits",
-         "not_yet"
+        "all": [
+         {
+          "eq": [
+           "$a.myth",
+           "myth_failing"
+          ]
+         },
+         {
+          "eq": [
+           "$a.sits",
+           "not_yet"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "key": "try_not_yet_myth_past_it",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.myth",
+           "myth_past_it"
+          ]
+         },
+         {
+          "eq": [
+           "$a.sits",
+           "not_yet"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "key": "try_not_yet_myth_true",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.myth",
+           "myth_true"
+          ]
+         },
+         {
+          "eq": [
+           "$a.sits",
+           "not_yet"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "key": "try_not_yet_myth_right_way",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.myth",
+           "myth_right_way"
+          ]
+         },
+         {
+          "eq": [
+           "$a.sits",
+           "not_yet"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "key": "try_not_yet_myth_weak",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.myth",
+           "myth_weak"
+          ]
+         },
+         {
+          "eq": [
+           "$a.sits",
+           "not_yet"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "key": "try_not_yet_myth_bad",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.myth",
+           "myth_bad"
+          ]
+         },
+         {
+          "eq": [
+           "$a.sits",
+           "not_yet"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "key": "try_not_yet_myth_out_of_control",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.myth",
+           "myth_out_of_control"
+          ]
+         },
+         {
+          "eq": [
+           "$a.sits",
+           "not_yet"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "key": "try_not_yet_myth_no_reason",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.myth",
+           "myth_no_reason"
+          ]
+         },
+         {
+          "eq": [
+           "$a.sits",
+           "not_yet"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "key": "try_not_yet_myth_ignore",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.myth",
+           "myth_ignore"
+          ]
+         },
+         {
+          "eq": [
+           "$a.sits",
+           "not_yet"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "key": "try_not_yet_myth_approval",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.myth",
+           "myth_approval"
+          ]
+         },
+         {
+          "eq": [
+           "$a.sits",
+           "not_yet"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "key": "try_not_yet_myth_big",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.myth",
+           "myth_big"
+          ]
+         },
+         {
+          "eq": [
+           "$a.sits",
+           "not_yet"
+          ]
+         }
         ]
        }
       },
@@ -16716,7 +17268,7 @@
     "belief_hint": "Beliefs about feelings can make a skill feel pointless before it starts.",
     "safety_open": "Talk to someone now",
     "fix_belief": "Beliefs like that can feel like facts. They're beliefs, and you can look at them.",
-    "fix_belief_own": "If it's about hurting yourself or not wanting to be here, talk to someone now.",
+    "fix_belief_own": "Beliefs like that can feel like facts. They're beliefs, and you can look at them. If it's about hurting yourself or not wanting to be here, talk to someone now.",
     "fix_belief_heavy": "That sounds heavy to carry. After trying this much, it makes sense to feel it. You don't have to hold it alone.",
     "none": "Nothing stood out this time. That's information too. Skills can take a few goes, and that isn't on you.",
     "again_q": "Want a nudge to try it again?",
@@ -17254,15 +17806,15 @@
       },
       {
        "when": {
-        "all": []
-       },
-       "key": "fix_belief"
-      },
-      {
-       "when": {
         "own": "belief"
        },
        "key": "fix_belief_own"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "fix_belief"
       }
      ],
      "done": "done",

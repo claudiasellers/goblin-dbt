@@ -75,12 +75,12 @@ COPY = {
     "myth_hint": "Pick the closest. You can put it your own way too.",
     "own_hint": "In your own words",
     "look_title": "A belief can feel like a fact.",
-    "look_own": "A belief like this often makes sense given where it came from. You can look at whether it still fits.",
-    "own_safety": "If it's about hurting yourself or not wanting to be here, talk to someone now.",
+    # One line per screen (handoffLine shows the first that holds), so own words' safety sentence is part of look_own.
+    "look_own": "A belief like this often makes sense given where it came from. You can look at whether it still fits. "
+                "If it's about hurting yourself or not wanting to be here, talk to someone now.",
     "sits_label": "How does that sit with you?",
     "end_title_some": "Some of it fits. That's worth noticing.",
     "end_title_not_yet": "Not yet is fine.",
-    "end_not_yet": "A belief that's been around a while takes more than one look.",
     "end_title_unsure": "You don't have to decide now.",
     "end_own": "This week, notice one time the belief shows up, and what you were feeling right then.",
     "offer_guide": "What a feeling is for",
@@ -88,6 +88,8 @@ COPY = {
     "done": "Done",
     **{f"look_{k}": counter for k, _l, counter, _t, _x in MYTHS},
     **{f"try_{k}": tried for k, _l, _c, tried, _x in MYTHS},
+    # Not yet: its line and the belief's test as one (one line per screen).
+    **{f"try_not_yet_{k}": "A belief that's been around a while takes more than one look. " + tried for k, _l, _c, tried, _x in MYTHS},
 }
 
 ALWAYS = {"all": []}
@@ -130,15 +132,14 @@ STEPS = [
     handoff("settle", "heads_up_title", [{"when": ALWAYS, "key": "settle_line"}], [{"exit": "cool_down", "when": ALWAYS}]),
     {
         "id": "look", "kind": "ask", "title": "look_title",
-        # Own words aren't read, so they can't raise the crisis slot: the line names the way to someone to talk to.
-        "lines": [{"key": f"look_{k}", "when": is_("myth", k)} for k in MYTH_IDS]
-        + [{"key": "look_own", "when": {"own": "myth"}}, {"key": "own_safety", "when": {"own": "myth"}}],
+        # Own words aren't read, so they can't raise the crisis slot: look_own names the way to someone to talk to.
+        "lines": [{"key": f"look_{k}", "when": is_("myth", k)} for k in MYTH_IDS] + [{"key": "look_own", "when": {"own": "myth"}}],
         "fields": [{"id": "sits", "label": "sits_label", "options": {"list": "sits"}, "max": 1, "required": True,
                     "links": [SAFETY_LINK]}],
         "next": [{"to": "end"}],
     },
     handoff("end", [{"when": is_("sits", k), "key": f"end_title_{k}"} for k, _ in SITS[:-1]] + [{"key": "end_title_unsure"}],
-            [{"key": "end_not_yet", "when": is_("sits", "not_yet")}]
+            [{"key": f"try_not_yet_{k}", "when": {"all": [is_("myth", k), is_("sits", "not_yet")]}} for k in MYTH_IDS]
             + [{"key": f"try_{k}", "when": is_("myth", k)} for k in MYTH_IDS] + [{"key": "end_own", "when": {"own": "myth"}}],
             [{"exit": x, "when": going(x)} for x in ONWARD] + [{"exit": "safety_open", "when": {"own": "myth"}}]),
 ]

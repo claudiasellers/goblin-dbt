@@ -19,7 +19,8 @@ const next = { type: "next" };
 const run = (events, c = ctx()) => events.reduce((s, e) => M.runNext(c, s, e), M.initialRun(skill));
 const step = (s) => M.stepOf(skill, s.stepId);
 const titleOf = (s, c = ctx()) => M.copyText(c, step(s).title, s, M.titleSlots(c, step(s), s));
-const lines = (s, c = ctx()) => (step(s).lines ?? []).filter((l) => M.handoffLine(c, { ...step(s), lines: [l] }, s)).map((l) => skill.copy[l.key]);
+// What the player shows: one line, the first that holds (handoffLine; Codex, #123).
+const lines = (s, c = ctx()) => [M.handoffLine(c, step(s), s)].filter(Boolean);
 const offers = (s, c = ctx()) => M.offersFor(c, step(s), s);
 const myths = skill.options.myth;
 const goesTo = { myth_failing: "emotion_guide", myth_past_it: "let_it_be", myth_true: "check_the_facts", myth_right_way: "emotion_guide",
@@ -87,7 +88,9 @@ test("every answer to how it sits is an answer, each with its own end title", ()
     const end = [pick("sits", v), next].reduce((x, e) => M.runNext(ctx(), x, e), look);
     assert.equal(end.stepId, "end", v);
     assert.equal(titleOf(end), t, v);
-    assert.equal(lines(end).includes(skill.copy.end_not_yet), v === "not_yet", v);
+    assert.equal(lines(end).length, 1, v);
+    assert.equal(lines(end)[0].includes("more than one look"), v === "not_yet", v);
+    assert.ok(lines(end)[0].endsWith(skill.copy.try_myth_true), `${v}: the belief's test is always there`);
     assert.deepEqual(offers(end), ["check_the_facts"], `${v}: the next step doesn't depend on agreeing`);
   }
 });
@@ -95,7 +98,8 @@ test("every answer to how it sits is an answer, each with its own end title", ()
 test("own words: a general other side, a general test, and someone to talk to (own words aren't read)", () => {
   const look = run([own("myth", "Being angry makes me a bad person"), next]);
   assert.equal(look.stepId, "look");
-  assert.deepEqual(lines(look), [skill.copy.look_own, skill.copy.own_safety]);
+  assert.deepEqual(lines(look), [skill.copy.look_own]);
+  assert.match(lines(look)[0], /talk to someone now\.$/, "own words aren't read: the way to someone to talk to is said");
   const end = [pick("sits", "unsure"), next].reduce((x, e) => M.runNext(ctx(), x, e), look);
   assert.deepEqual(lines(end), [skill.copy.end_own]);
   assert.deepEqual(offers(end), ["safety_open"]);

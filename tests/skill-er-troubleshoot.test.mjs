@@ -94,6 +94,8 @@ test("each fix offers its PRD move: planned tools are written and never shown", 
   const ownFix = run([...upTo("belief"), { type: "own", fieldId: "belief", text: "words" }, next]);
   assert.equal(ownFix.stepId, "fix_belief");
   assert.deepEqual(M.offersFor(ctx(), M.stepOf(skill, "fix_belief"), ownFix), ["safety_open", "emotion_guide"]);
+  assert.match(M.handoffLine(ctx(), M.stepOf(skill, "fix_belief"), ownFix), /talk to someone now\.$/);
+  assert.equal(M.handoffLine(ctx(), M.stepOf(skill, "fix_belief"), run([...upTo("belief"), pick("belief", "myth_past_it"), next])), skill.copy.fix_belief);
   const planned = skill.exits.filter((x) => x.planned).map((x) => x.toolId).sort();
   assert.deepEqual(planned, ["mindfulness-emotions", "missing-links"]);
   // It fits: the situation, or making room for it (the wave planned, Let it be built), as Check the Facts' verdict table does.

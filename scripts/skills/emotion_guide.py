@@ -95,6 +95,20 @@ DERIVE = [
 ]
 
 
+# A hand-off shows one line, the first that holds (`handoffLine`), so the end card's parts are composed into one key
+# per case (Codex, #123): the heavy line first when it applies, then the closer-word or knowing line, then what
+# Check the Facts and Do the Opposite are for.
+END_LINES = []
+for heavy in (True, False):
+    for picked in (True, False):
+        for fits in (True, False):
+            key = f"end_{'h' if heavy else ''}{'p' if picked else 'k'}{'f' if fits else ''}"
+            COPY[key] = " ".join(COPY[k] for k in (["end_heavy"] if heavy else []) + ["end_line" if picked else "end_known"]
+                                 + (["end_fits"] if fits else []))
+            END_LINES.append({"key": key, "when": {"all": [HEAVY if heavy else {"not": HEAVY}, PICKED if picked else {"not": PICKED},
+                                                         FITS if fits else {"not": FITS}, {"not": HAPPY}]}})
+
+
 def handoff(sid, title, lines, offers, *, no_close=True, **extra):
     s = {"id": sid, "kind": "handoff", "complete": True, "title": title, "lines": lines, "offers": offers,
          "done": "done", "next": [], "links": [SAFETY_LINK], **extra}
@@ -131,10 +145,7 @@ STEPS = [
         "next": [{"to": "end"}],
     },
     handoff("end", [{"when": {"set": a("closest")}, "key": "end_title_picked"}, {"key": "end_title"}],
-            [{"when": HEAVY, "key": "end_heavy"},
-             {"when": {"all": [PICKED, {"not": HAPPY}]}, "key": "end_line"},
-             {"when": {"all": [{"not": PICKED}, {"not": HAPPY}]}, "key": "end_known"},
-             {"when": FITS, "key": "end_fits"}, {"when": HAPPY, "key": "end_happy"}],
+            END_LINES + [{"when": HAPPY, "key": "end_happy"}],
             # The closer word goes on when one was picked, else the word they came with (Codex, #120).
             [{"exit": "check_the_facts_closest", "when": {"all": [FITS, PICKED]}},
              {"exit": "check_the_facts", "when": {"all": [FITS, {"not": PICKED}]}},
