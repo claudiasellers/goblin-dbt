@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { getMicroStep, type MicroStep } from '../../data/microSteps';
 import { getToolById } from '../../data/tools';
+import { useOfficialNames } from '../../hooks/useOfficialNames';
 import { recordToolSession } from '../../services/spine';
 import { newId } from '../../lib/spine/ids';
 import { HELP_NOW_MICRO_STEP_SET, HELP_NOW_TOOL_IDS, helpNowLinkState } from '../../lib/spine/helpNow';
@@ -13,6 +14,7 @@ import { HELP_NOW_MICRO_STEP_SET, HELP_NOW_TOOL_IDS, helpNowLinkState } from '..
  * Records one `help-now` ToolSession when signed in; never a check-in, never a routing call.
  */
 export function HelpNowInterim({ onDone }: { onDone: () => void }) {
+  const { label } = useOfficialNames();
   const { user } = useAuth();
   const [pick, setPick] = useState<{ step: MicroStep; index: number }>(() => getMicroStep(HELP_NOW_MICRO_STEP_SET));
   const [sessionId] = useState(() => newId());
@@ -64,7 +66,7 @@ export function HelpNowInterim({ onDone }: { onDone: () => void }) {
             <Link key={id} to={`/tool/${id}`} state={helpNowLinkState(user ? sessionId : null)}
               onClick={() => record('exited_early')}
               className="min-h-11 inline-flex items-center gap-1 text-sm text-[var(--color-text-secondary)] underline underline-offset-2 hover:text-[var(--color-text-primary)]">
-              <span aria-hidden="true">{tool.emoji}</span> {tool.name}
+              <span aria-hidden="true">{tool.emoji}</span> {label(tool)}
             </Link>
           );
         })}

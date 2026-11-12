@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { fromCheckIn } from '../../lib/spine/toolLink';
 import type { RecommendationCard } from '../../lib/recommendation';
 import { familyForTool } from '../../data/skillFamilies';
+import { useOfficialNames } from '../../hooks/useOfficialNames';
 
 const Chevron = ({ className }: { className: string }) => (
   <svg className={className} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
@@ -27,6 +28,8 @@ interface RecommendationCardsProps {
  * with other people).
  */
 export function RecommendationCards({ cards, variant = 'standard', checkInId, checkinEmotions, activationPatternId, onOpen }: RecommendationCardsProps) {
+  // The admin "Official DBT names" switch is the one exception to "nothing from the graph": off, it is tool.name.
+  const { label } = useOfficialNames();
   if (cards.length === 0) return null;
   const compact = variant === 'compact';
   return (
@@ -55,7 +58,7 @@ export function RecommendationCards({ cards, variant = 'standard', checkInId, ch
                 <div className="flex items-center gap-3">
                   <span className="text-lg flex-shrink-0" aria-hidden="true">{tool.emoji}</span>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-medium text-[var(--color-text-primary)]">{tool.name}</h3>
+                    <h3 className="text-sm font-medium text-[var(--color-text-primary)]">{label(tool)}</h3>
                     <p className="text-xs text-[var(--color-text-tertiary)] line-clamp-1">{tool.tagline}</p>
                   </div>
                   <Chevron className="text-[var(--color-text-muted)] flex-shrink-0" />
@@ -64,7 +67,7 @@ export function RecommendationCards({ cards, variant = 'standard', checkInId, ch
                 <>
                   <span className="flex-1 min-w-0 flex flex-col gap-0.5">
                     {family && <span className="tool-card__family">{family.label}</span>}
-                    <span className={`font-semibold text-[var(--color-text-primary)] ${isPrimary ? 'text-lg' : 'text-base'}`}>{tool.name}</span>
+                    <span className={`font-semibold text-[var(--color-text-primary)] ${isPrimary ? 'text-lg' : 'text-base'}`}>{label(tool)}</span>
                     <span className="text-[15px] leading-snug text-[var(--color-text-secondary)] line-clamp-2">{tool.tagline}</span>
                   </span>
                   <Chevron className="tool-card__chevron" />
