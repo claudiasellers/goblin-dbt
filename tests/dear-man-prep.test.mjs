@@ -287,6 +287,16 @@ test("skill: how hard to push (IE-07, Handout 8's ask column): five questions co
     assert.equal(s.stepId, "middle");
     assert.equal(M.handoffLine(ctx(), step("middle"), s), skill.copy[`ask_middle_${key}`], `${v} + ${nudge}: ${key}, as a bridge to the middle ground`);
   }
+  // The nudge moves the named level one step, never the raw total (Codex on #125): two yes and three no is gentle, a
+  // level wider than one point, and each nudge still moves it.
+  const mixed = play([pick("assert", "addr_follow_through"), next, pick("s_able", "yes"), pick("s_matters", "yes"),
+    pick("s_right", "no"), pick("s_timing", "no"), pick("s_ready", "no"), next], ctx(), toAssert());
+  assert.equal(M.copyText(ctx(), step("level").title, mixed), skill.copy.ask_level_gentle);
+  for (const [nudge, key] of [["firmer", "plain"], ["softer", "hint"], ["right", "gentle"]]) {
+    const s = play([pick("nudge", nudge), next, pick("reinforce", "reinf_more_trust"), next, pick("need", "need_reaction"), next,
+      pick("phrase", "anchor_their_feelings"), next, pick("confident", "cue_feet"), next], ctx(), mixed);
+    assert.equal(M.handoffLine(ctx(), step("middle"), s), skill.copy[`ask_middle_${key}`], `gentle + ${nudge}: ${key}`);
+  }
   const nudges = (v) => values(ctx(), "level", "nudge", toLevel(v));
   assert.deepEqual(nudges("yes"), ["right", "softer"], "no firmer than the top");
   assert.deepEqual(nudges("no"), ["right", "firmer"], "no softer than the bottom");

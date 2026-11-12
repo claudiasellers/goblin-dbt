@@ -99,10 +99,11 @@ you this (capability), does it matter a lot to you right now (priorities), is it
 relationship and give and take in one plain question), is this a good time (timing), do you know what you want and have
 the facts straight (homework). The same counting method as Say no's "no" column (R10), with the ask column's own
 factors: yes counts 1, not sure half, no nothing, and the total is looked up in `tables.ask_level` (`$d.ask_level`):
-*hint* (below 1: a light first mention may fit, or waiting; asking is still okay), *gentle* (from 1), *plain*, *firm*,
+*hint* (below 1.5: a light first mention may fit, or waiting; asking is still okay), *gentle*, *plain*, *firm*,
 *firm_hold* (4.5 and up: ask firmly and keep coming back to it, which still negotiates). The level screen shows the named
 level as its title (never a number; *plain* if nothing matched), and a nudge (*That fits · A bit softer · A bit firmer*)
-moves it one step (`$d.ask_final`, the five fields plus the nudge); neither end offers the direction that can't move.
+moves the named level one step (`ask_softer` / `ask_firmer`, lookups through `tables.ask_down` / `ask_up`, never the raw
+total, so a nudge always moves it); neither end offers the direction that can't move.
 With someone it tends to go badly with (`heads_up`) the two firm levels read *Ask firmly once, and say it again calmly if
 you need to. With them, you don't have to keep pushing.* (Handout 8: a shaky relationship is a reason to ask less hard).
 The middle-ground screen bridges from the final level (`ask_middle_*`) rather than repeating it. A carried flooded

@@ -257,9 +257,20 @@ ASK_FACTORS = [
     ("s_timing", "s_timing_q", "Is this a good time to ask?"),
     ("s_ready", "s_ready_q", "Do you know what you want, and have the facts straight?"),
 ]
-ASK_WEIGHTS = {"yes": 1, "not_sure": 0.5, "no": 0, "softer": -1, "right": 0, "firmer": 1}
-# -1 catches *A bit softer* on a total of 0. Gentle starts at 1 (Gate 2), so *A bit firmer* from 0 or 0.5 moves a level.
-ASK_TABLE = {"-1": "hint", "1": "gentle", "2.5": "plain", "3.5": "firm", "4.5": "firm_hold"}
+ASK_WEIGHTS = {"yes": 1, "not_sure": 0.5, "no": 0}
+ASK_TABLE = {"0": "hint", "1.5": "gentle", "2.5": "plain", "3.5": "firm", "4.5": "firm_hold"}
+# The nudge moves the named level one step, never the raw total (Codex on #125: a level wider than one point
+# swallowed a nudge). Neither end offers the direction that can't move, so these tables never clamp in use.
+ASK_DOWN = {k: ASK_LEVELS[max(i - 1, 0)] for i, k in enumerate(ASK_LEVELS)}
+ASK_UP = {k: ASK_LEVELS[min(i + 1, len(ASK_LEVELS) - 1)] for i, k in enumerate(ASK_LEVELS)}
+
+
+def final_is(k, levels=None):
+    """The final level (after the nudge) is k, or one of `levels`."""
+    ks = levels or [k]
+    return {"any": [{"all": [is_("nudge", "right"), {"in": ["$d.ask_level", ks]}]},
+                    {"all": [is_("nudge", "softer"), {"in": ["$d.ask_softer", ks]}]},
+                    {"all": [is_("nudge", "firmer"), {"in": ["$d.ask_firmer", ks]}]}]}
 SIZE_ANSWERS = [("yes", "Yes"), ("not_sure", "Not sure"), ("no", "No")]
 NUDGE = [("right", "That fits"), ("softer", "A bit softer"), ("firmer", "A bit firmer")]
 ASK_SIZED = {"set": "$a.s_able"}
@@ -488,8 +499,8 @@ STEPS = [
         "id": "middle", "kind": "ask",
         "title": [{"key": f"middle_title_{k}", "when": is_("matters", k)} for k, _ in MATTERS] + [{"key": "middle_title"}],
         # The level they sized (after the nudge), as a reminder above the middle ground.
-        "lines": [{"key": "ask_middle_firm_heads_up", "when": {"all": [ASK_SIZED, HEADS_UP, {"in": ["$d.ask_final", FIRM]}]}}]
-                 + [{"key": f"ask_middle_{k}", "when": {"all": [ASK_SIZED, {"eq": ["$d.ask_final", k]}]}} for k in reversed(ASK_LEVELS)],
+        "lines": [{"key": "ask_middle_firm_heads_up", "when": {"all": [ASK_SIZED, HEADS_UP, final_is(None, FIRM)]}}]
+                 + [{"key": f"ask_middle_{k}", "when": {"all": [ASK_SIZED, final_is(k)]}} for k in reversed(ASK_LEVELS)],
         "fields": [{"id": "middle", "options": {"list": "middle"}, "max": 1,
                     "own": {"hint": "own_line", "countsAsPick": True, "max": 35}}],
         "next": [{"to": "walk"}],
@@ -581,11 +592,11 @@ def options():
 SKILL = {
     "id": ID, "toolId": TOOL_ID, "concept": CONCEPT, "version": VERSION, "start": "situation", "ownMax": OWN_MAX,
     "accepts": ["personId", "frame", "band", "refused", "situationId", "feelingId"], "copy": COPY,
-    "tables": {"ask_level": ASK_TABLE},
+    "tables": {"ask_level": ASK_TABLE, "ask_down": ASK_DOWN, "ask_up": ASK_UP},
     "derive": [
         {"name": "ask_level", "kind": "count", "fields": [f for f, _, _ in ASK_FACTORS], "weights": ASK_WEIGHTS, "table": "ask_level"},
-        {"name": "ask_final", "kind": "count", "fields": [f for f, _, _ in ASK_FACTORS] + ["nudge"], "weights": ASK_WEIGHTS,
-         "table": "ask_level"},
+        {"name": "ask_softer", "from": "$d.ask_level", "table": "ask_down"},
+        {"name": "ask_firmer", "from": "$d.ask_level", "table": "ask_up"},
     ],
     "steps": STEPS, "exits": EXITS, "options": options(), "emotionFields": ["express"],
 }

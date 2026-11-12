@@ -11594,11 +11594,25 @@
    },
    "tables": {
     "ask_level": {
-     "-1": "hint",
-     "1": "gentle",
+     "0": "hint",
+     "1.5": "gentle",
      "2.5": "plain",
      "3.5": "firm",
      "4.5": "firm_hold"
+    },
+    "ask_down": {
+     "hint": "hint",
+     "gentle": "hint",
+     "plain": "gentle",
+     "firm": "plain",
+     "firm_hold": "firm"
+    },
+    "ask_up": {
+     "hint": "gentle",
+     "gentle": "plain",
+     "plain": "firm",
+     "firm": "firm_hold",
+     "firm_hold": "firm_hold"
     }
    },
    "derive": [
@@ -11615,33 +11629,19 @@
      "weights": {
       "yes": 1,
       "not_sure": 0.5,
-      "no": 0,
-      "softer": -1,
-      "right": 0,
-      "firmer": 1
+      "no": 0
      },
      "table": "ask_level"
     },
     {
-     "name": "ask_final",
-     "kind": "count",
-     "fields": [
-      "s_able",
-      "s_matters",
-      "s_right",
-      "s_timing",
-      "s_ready",
-      "nudge"
-     ],
-     "weights": {
-      "yes": 1,
-      "not_sure": 0.5,
-      "no": 0,
-      "softer": -1,
-      "right": 0,
-      "firmer": 1
-     },
-     "table": "ask_level"
+     "name": "ask_softer",
+     "from": "$d.ask_level",
+     "table": "ask_down"
+    },
+    {
+     "name": "ask_firmer",
+     "from": "$d.ask_level",
+     "table": "ask_up"
     }
    ],
    "steps": [
@@ -12842,12 +12842,64 @@
           ]
          },
          {
-          "in": [
-           "$d.ask_final",
-           [
-            "firm",
-            "firm_hold"
-           ]
+          "any": [
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.nudge",
+               "right"
+              ]
+             },
+             {
+              "in": [
+               "$d.ask_level",
+               [
+                "firm",
+                "firm_hold"
+               ]
+              ]
+             }
+            ]
+           },
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.nudge",
+               "softer"
+              ]
+             },
+             {
+              "in": [
+               "$d.ask_softer",
+               [
+                "firm",
+                "firm_hold"
+               ]
+              ]
+             }
+            ]
+           },
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.nudge",
+               "firmer"
+              ]
+             },
+             {
+              "in": [
+               "$d.ask_firmer",
+               [
+                "firm",
+                "firm_hold"
+               ]
+              ]
+             }
+            ]
+           }
           ]
          }
         ]
@@ -12861,9 +12913,61 @@
           "set": "$a.s_able"
          },
          {
-          "eq": [
-           "$d.ask_final",
-           "firm_hold"
+          "any": [
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.nudge",
+               "right"
+              ]
+             },
+             {
+              "in": [
+               "$d.ask_level",
+               [
+                "firm_hold"
+               ]
+              ]
+             }
+            ]
+           },
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.nudge",
+               "softer"
+              ]
+             },
+             {
+              "in": [
+               "$d.ask_softer",
+               [
+                "firm_hold"
+               ]
+              ]
+             }
+            ]
+           },
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.nudge",
+               "firmer"
+              ]
+             },
+             {
+              "in": [
+               "$d.ask_firmer",
+               [
+                "firm_hold"
+               ]
+              ]
+             }
+            ]
+           }
           ]
          }
         ]
@@ -12877,9 +12981,61 @@
           "set": "$a.s_able"
          },
          {
-          "eq": [
-           "$d.ask_final",
-           "firm"
+          "any": [
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.nudge",
+               "right"
+              ]
+             },
+             {
+              "in": [
+               "$d.ask_level",
+               [
+                "firm"
+               ]
+              ]
+             }
+            ]
+           },
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.nudge",
+               "softer"
+              ]
+             },
+             {
+              "in": [
+               "$d.ask_softer",
+               [
+                "firm"
+               ]
+              ]
+             }
+            ]
+           },
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.nudge",
+               "firmer"
+              ]
+             },
+             {
+              "in": [
+               "$d.ask_firmer",
+               [
+                "firm"
+               ]
+              ]
+             }
+            ]
+           }
           ]
          }
         ]
@@ -12893,9 +13049,61 @@
           "set": "$a.s_able"
          },
          {
-          "eq": [
-           "$d.ask_final",
-           "plain"
+          "any": [
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.nudge",
+               "right"
+              ]
+             },
+             {
+              "in": [
+               "$d.ask_level",
+               [
+                "plain"
+               ]
+              ]
+             }
+            ]
+           },
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.nudge",
+               "softer"
+              ]
+             },
+             {
+              "in": [
+               "$d.ask_softer",
+               [
+                "plain"
+               ]
+              ]
+             }
+            ]
+           },
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.nudge",
+               "firmer"
+              ]
+             },
+             {
+              "in": [
+               "$d.ask_firmer",
+               [
+                "plain"
+               ]
+              ]
+             }
+            ]
+           }
           ]
          }
         ]
@@ -12909,9 +13117,61 @@
           "set": "$a.s_able"
          },
          {
-          "eq": [
-           "$d.ask_final",
-           "gentle"
+          "any": [
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.nudge",
+               "right"
+              ]
+             },
+             {
+              "in": [
+               "$d.ask_level",
+               [
+                "gentle"
+               ]
+              ]
+             }
+            ]
+           },
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.nudge",
+               "softer"
+              ]
+             },
+             {
+              "in": [
+               "$d.ask_softer",
+               [
+                "gentle"
+               ]
+              ]
+             }
+            ]
+           },
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.nudge",
+               "firmer"
+              ]
+             },
+             {
+              "in": [
+               "$d.ask_firmer",
+               [
+                "gentle"
+               ]
+              ]
+             }
+            ]
+           }
           ]
          }
         ]
@@ -12925,9 +13185,61 @@
           "set": "$a.s_able"
          },
          {
-          "eq": [
-           "$d.ask_final",
-           "hint"
+          "any": [
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.nudge",
+               "right"
+              ]
+             },
+             {
+              "in": [
+               "$d.ask_level",
+               [
+                "hint"
+               ]
+              ]
+             }
+            ]
+           },
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.nudge",
+               "softer"
+              ]
+             },
+             {
+              "in": [
+               "$d.ask_softer",
+               [
+                "hint"
+               ]
+              ]
+             }
+            ]
+           },
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.nudge",
+               "firmer"
+              ]
+             },
+             {
+              "in": [
+               "$d.ask_firmer",
+               [
+                "hint"
+               ]
+              ]
+             }
+            ]
+           }
           ]
          }
         ]
