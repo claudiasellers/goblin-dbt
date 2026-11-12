@@ -244,6 +244,18 @@ export const tools: Tool[] = [
     emoji: '🔋',
     bare: true,
   },
+  {
+    // ER-04 on the skill runtime (docs/design/good-things.md): accumulating positives, and the things I like list.
+    id: 'good-things',
+    name: 'Good Things',
+    tagline: 'Find one okay thing, or plan one good thing for today',
+    description: 'Notice one thing that\'s even a little okay and stay with it for a moment, or pick one small good thing to do today. Keep what helped in Things I like.',
+    whenToUse: 'When nothing sounds good, or when something is good and you want to keep it.',
+    module: 'emotion-regulation',
+    dbtBasis: 'DBT ER Handouts 15–16 (accumulating positives)',
+    emoji: '🌼',
+    bare: true,
+  },
   // Interpersonal Effectiveness
   {
     id: 'dear-man',
@@ -383,6 +395,7 @@ export const allIntents: Intent[] = [
   { id: 'overreacting', label: 'I can\'t tell if I\'m overreacting', toolId: 'check-the-facts', emoji: '🔍' },
   { id: 'not-working', label: 'My skills aren\'t working', toolId: 'er-troubleshoot', emoji: '🧩' },
   { id: 'running-low', label: 'Everything feels like too much today', toolId: 'please-skill', emoji: '🔋' },
+  { id: 'find-good', label: 'Find something good', toolId: 'good-things', emoji: '🌼' },
   { id: 'nightmares', label: 'The same nightmare keeps coming back', toolId: 'nightmare-rescript', emoji: '🌙' },
 ];
 

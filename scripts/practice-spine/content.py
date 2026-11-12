@@ -186,6 +186,22 @@ FOLLOW_UP_TYPES = [
         "notification": "Your check from Running low is ready.",
     },
     {
+        # Good things (ER-04, docs/design/good-things.md): the one good thing the person picked for today, at the time
+        # they picked (now → an hour from now). The card reopens that visit at `back` (R9 `reopens`: *Did it happen?*,
+        # then lighter / same / heavier and where the mind was). Opening it is the resolution. Content-free (PRD).
+        "id": "good_thing", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/good-things?run={sourceSessionId}&at=back&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"hour": {"kind": "after", "minutes": 60},
+                                             "afternoon": {"kind": "at_local", "days": 0, "time": "16:00"},
+                                             "evening": {"kind": "at_local", "days": 0, "time": "20:00"},
+                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"}}},
+        "staleAfterHours": 24, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Your good thing", "body": "Something good you picked earlier. Did it happen?"},
+        "choices": [{"id": "dismiss", "label": "Not today", "status": "dismissed"}],
+        "notification": "Your good thing is ready to check.",
+    },
+    {
         # Cope Ahead (docs/design/cope-ahead.md, "Today, afterwards"): on the keep screen's "Want me to ask how
         # it went?" Yes, for the time from screen 1 (the chip is ext.ca.when). Scheduled only on the caller's
         # own cope-ahead ToolSession. Its Today card is the tool's own (cope-ahead.json's after_* lines, the

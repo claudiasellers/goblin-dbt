@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { getMicroStep, type MicroStep } from '../../data/microSteps';
 import type { StateResult } from '../../services/neo4j';
 import { CrisisBanner } from '../safety/CrisisBanner';
 import { bailoutSections, resultSections, type ResultSection } from '../../lib/crisisBanner';
 import { recommendationCards } from '../../lib/recommendation';
 import { RecommendationCards } from './RecommendationCards';
+import { fromCheckIn } from '../../lib/spine/toolLink';
 import type { CheckInNextAction } from '../../lib/spine/checkInPayload';
 import type { Band } from '../../data/capacityTypes';
 import { WitnessBeat } from '../witness/WitnessBeat';
@@ -173,12 +175,21 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions, 
         <h2 className="mt-5 mb-0 text-[2rem] leading-[1.08] text-[var(--color-text-primary)] [text-wrap:balance]">
           {pattern.userFacingLabel}
         </h2>
+        {/* ER-04 (docs/design/good-things.md): a good moment is worth staying with and keeping, never a dead end. */}
         <p className="mt-3 text-[16.5px] leading-relaxed text-[var(--color-text-secondary)]">
-          No action needed right now. Enjoy this moment.
+          Want to stay with it a moment, and keep it?
         </p>
+        <Link
+          to="/tool/good-things?frame=savour"
+          state={fromCheckIn(checkInId, checkinEmotions, pattern.id)}
+          onClick={() => onToolOpen?.('good-things')}
+          className="mt-8 flex items-center justify-center w-full min-h-[56px] px-4 rounded-[18px] bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] text-[17px] font-bold lift-primary"
+        >
+          Keep this one
+        </Link>
         <button
           onClick={() => onDone({ kind: 'done' })}
-          className="mt-8 w-full min-h-[56px] px-4 rounded-[18px] bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] text-[17px] font-bold lift-primary"
+          className="mt-3 w-full min-h-11 text-[16px] text-[var(--color-text-secondary)] underline underline-offset-2"
         >
           Done
         </button>

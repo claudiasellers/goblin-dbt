@@ -189,7 +189,7 @@ moves in the same PR.
 | `person` (`Person`) | My people | IE | IE-03 picker; Recover's "is this person safe?" if unset | IE, Recover, router hard filter `personSafe`, kit / trusted voice |
 | `boundary_line` (`BoundaryLine`) | My plans | IE | FAST / DEAR MAN | IE, Recover's *let it land* |
 | `cope_ahead_plan` (`ProfileFact`, many, own words encrypted) | My plans | ER | **Built (ER-B2, 11 Nov):** Cope Ahead on the skill runtime, on *Keep this*: the plan's ids and own words (situation, hardest moment, the If from the pull, the pull, one or two moves), never a sentence or a part; Me composes it with `planLine`. Plans kept before stay `OwnLine`s | Me only for now; DEAR MAN, follow-ups and CORE-08 can read it once they declare a slice |
-| `thing_i_like` (`ThingILike`) | My words | ER | ER-04 accumulate positives; DT-06 / DT-04 sources | DT-06, WMP-05, diary |
+| `thing_i_like` (`ProfileFact`, many, own words encrypted) | My words | ER | **Built:** ER-04 Good things part 1, on *Keep it* (a found thing) and *Add it* (a good thing that left them lighter) (`docs/design/good-things.md`); DT-06 / DT-04 sources later | the `thingsILike` slice: Good things' pick step (own things first); Me. Later DT-06, WMP-05, diary |
 | `value` / `goal` (`Goal`, `kind` field, `SERVES` edge) | About me | ER (value), CORE (goal) | ER-09, CORE-06 | OA, IE FAST, safety plan reasons |
 | `kit_card` (`KitCard` under `CrisisKit`) | My plans | DT | DT-03 | CORE-02, CORE-01 |
 | `pros_cons` (`ProsConsCard`) | My plans | DT | DT-10 | CORE-04/10 |

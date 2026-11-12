@@ -100,10 +100,18 @@ test("#7 dissociation (any band): 5-4-3-2-1 only, never OA, no flag", async () =
 });
 
 test("#8 Low drive: Running low (PLEASE) + Do the Opposite ('get active'), never 5-4-3-2-1 for vegetative states, never Cool Down or Pause", async () => {
-  const r = await run(lu({ emotions: ["Bored"], discriminatingAnswers: ans("lu_body_flat") }));
+  const r = await run(lu({ emotions: ["Sad"], discriminatingAnswers: ans("lu_body_flat") }));
   assert.equal(r.pattern.id, "reward_drive_low");
   assert.deepEqual(ids(r), ["please-skill", "opposite-action"]);
   assert.equal(r.guidedActivity.activityId, "micro-win");
+});
+
+test("#8b Low drive, nothing sounds good (bored, apathetic, indifferent): Running low + Good things (ER-04)", async () => {
+  for (const w of ["Bored", "Apathetic", "Indifferent"]) {
+    const r = await run(lu({ emotions: [w], discriminatingAnswers: ans("lu_body_flat") }));
+    assert.equal(r.pattern.id, "reward_drive_low", w);
+    assert.deepEqual(ids(r), ["please-skill", "good-things"], w);
+  }
 });
 
 test("#9 rumination steady: Problem Solve + 5-4-3-2-1", async () => {

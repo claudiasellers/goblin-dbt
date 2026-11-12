@@ -151,7 +151,7 @@ test("what's still in my hands routes; the close on the fight, then the end card
   assert.equal(at("need").stepId, "end");
   assert.deepEqual(offers(at("need")), ["recover"]);
   assert.deepEqual(offers(at("boundary")), ["fast"]);
-  assert.deepEqual(offers(at("small")), [], "ER-04 is planned");
+  assert.deepEqual(offers(at("small")), ["good_things"], "one small thing: Good things (ER-04, built)");
   assert.equal(M.handoffLine(ctx(), M.stepOf(skill, "end"), at("nothing")), "Doing nothing more today is okay. Letting it be was enough.");
   assert.deepEqual(M.askFresh(ctx(), at("need")), { thenVsNow: "better" });
   const louder = run([pick("hands_still", "need"), next, pick("close", "worse"), next], ctx(), hs);

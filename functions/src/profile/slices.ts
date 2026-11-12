@@ -81,7 +81,17 @@ export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
     WITH p ORDER BY p.confirmedAt DESC, p.id LIMIT 12
     RETURN p {.id, .kind, .area, .status, .source, .valueJson,
               confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p`,
+  // Things I like (ER-04), active only, newest first; own words decrypted and ids named in the resolver.
+  thingsILike: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'thing_i_like', status: 'active'})
+    WITH p ORDER BY p.confirmedAt DESC, p.id LIMIT 60
+    RETURN p {.id, .kind, .area, .status, .source, .valueJson,
+              confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p`,
 };
+
+/** A kept thing's picked ids, named by Good things' own options (graph content: `SkillOption`, never a copy). */
+export const THING_LABELS = `MATCH (o:SkillOption) WHERE o.id IN $ids RETURN o.id AS id, o.label AS label`;
+/** The `SkillOption` id a kept thing's field names (scripts/skills/good_things.py: `kind` chips, `pick` → `activity`). */
+export const THING_OPTION: Record<'kind' | 'pick', string> = { kind: 'good_things:kind:', pick: 'good_things:activity:' };
 
 /**
  * A stored person's value (profile/kinds.ts `person`), its label decrypted; null when it can't be read (a label that
@@ -122,7 +132,7 @@ type Resolver<K extends SliceId> = (tx: ManagedTransaction, uid: string, now: nu
 const EMPTY: { [K in SliceId]?: () => ProfileSlices[K] } = {
   bodyFlags: () => null, values: () => [], goals: () => [], copeAheadPlans: () => [],
   boundaryLines: () => [], practicePrefs: () => null, fadeLevels: () => ({}), ownWords: () => [],
-  thingsILike: () => [], crisisKit: () => null, safetyPlan: () => null, country: () => null,
+  crisisKit: () => null, safetyPlan: () => null, country: () => null,
 };
 
 const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
@@ -238,6 +248,27 @@ const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
         .filter((x) => typeof x.id === 'string' && typeof x.takenAt === 'string')
         .map((x) => ({ id: x.id as string, takenAt: x.takenAt as string })),
     };
+  },
+  thingsILike: async (tx, uid, now) => {
+    const r = await tx.run(SLICE_QUERIES.thingsILike!, { uid });
+    if (!r.records.length) return [];
+    const decrypt = await ownDecrypter(tx, uid);
+    const rows = r.records.flatMap((rec) => {
+      const p = rec.get('p') as Record<string, unknown>;
+      try { return [{ p, v: JSON.parse(String(p.valueJson)) as Record<string, unknown> }]; } catch { return []; }
+    });
+    // Own words first (what the person called it), then the good thing they did, then the kind of thing it was.
+    const optionIds = (v: Record<string, unknown>) => (['pick', 'kind'] as const).flatMap((f) => strings(v[`${f}Ids`]).slice(0, 1).map((id) => THING_OPTION[f] + id));
+    const ids = [...new Set(rows.flatMap(({ v }) => optionIds(v)))];
+    const labels = new Map<string, string>();
+    if (ids.length) for (const rec of (await tx.run(THING_LABELS, { ids })).records) labels.set(String(rec.get('id')), String(rec.get('label')));
+    const out: ProfileSlices['thingsILike'] = [];
+    for (const { p, v } of rows) {
+      const own = (['kindOwn', 'pickOwn'] as const).map((k) => (typeof v[k] === 'string' ? decrypt(v[k]) : null)).find((x) => x && x.trim());
+      const label = own?.trim() || optionIds(v).map((id) => labels.get(id)).find((x) => !!x);
+      if (label) out.push({ id: String(p.id), label, meta: metaFrom(p, now) });
+    }
+    return out;
   },
   prosCons: async (tx, uid, now) => {
     const r = await tx.run(SLICE_QUERIES.prosCons!, { uid });

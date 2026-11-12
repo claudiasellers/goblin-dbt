@@ -40,6 +40,7 @@ export const FOLLOW_UP_SESSION_TOOL: Readonly<Record<string, string>> = {
   habit_renew: 'habit-plan',
   // Running low's evening check (ER-B4): only from a Running low visit.
   please_fix: 'please-skill',
+  good_thing: 'good-things',
 };
 
 /** The plan's ids, as the after card needs them. Own words are the visit's (its Today card may show them). */

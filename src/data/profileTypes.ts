@@ -70,7 +70,11 @@ export interface ProfileSlices {
   practicePrefs: null;
   fadeLevels: Record<string, 0 | 1 | 2 | 3>;
   ownWords: never[];
-  thingsILike: never[];
+  /**
+   * Things I like (ER-04, kind `thing_i_like`), active only, newest first: the id and what to call it (the person's own
+   * words, else the chip or catalogue option's label from the graph). Good things offers them first on its pick step.
+   */
+  thingsILike: Array<{ id: string; label: string; meta: ProfileItemMeta }>;
   crisisKit: null;
   safetyPlan: null;
   country: null;
@@ -160,6 +164,7 @@ export const PROFILE_NEEDS = {
   'check-the-facts': ['parts'],              // the tag row on its close (docs/design/check-the-facts.md, screen 3)
   'fast': ['parts'],                         // the tag row on its close (docs/design/fast.md)
   'say-no': ['people'],                      // the picker (IE-03), before the skill (docs/design/say-no.md)
+  'good-things': ['thingsILike'],             // its pick step: the person's own things first (docs/design/good-things.md)
   // Wise mind's step back (parts on only): the person's parts in the room, with their names, shapes,
   // tender and safety flags. Empty while parts are off, so the tool shows its two-minds form.
   'wise-mind': ['parts'],
