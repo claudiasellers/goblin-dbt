@@ -96,6 +96,8 @@ EMBEDS = {
     "batteryRead": {"ids": ["read"]},
     # DT-03's deck (plan C3b `cardDeck`, DT-owned): the kit one card at a time; reports which kinds of card it showed.
     "kitDeck": {"ids": ["body", "hands", "soothe", "words", "place", "reasons", "pros_cons", "starter"], "measures": ["durationSec", "doneCount"]},
+    # R8: another skill run inline (runtime-owned); its `inline.ends` / `flags` give these ids.
+    "inlineSkill": {"ids": ["finished", "left", "stopped", "body", "unsafe"]},
 }
 # What each embed takes from the skill (embeds.ts EMBED_PROPS; the contract test keeps the two equal). build.py
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
@@ -145,6 +147,8 @@ EMBED_PROPS = {
     },
     "batteryRead": {"fields": {"type": "fields"}, "low": {"type": "field"}, "names": {"type": "copy"},
                     "line": {"type": "copy", "optional": True}, "next": {"type": "copy"}},
+    # R8: another skill run inline; `skill` names it (it must declare `inline`), `enterAt` one of its `inline.enterAt`.
+    "inlineSkill": {"skill": {"type": "id"}, "enterAt": {"type": "id", "optional": True}},
     "holdRing": {
         "variant": {"type": "enum", "values": ["press", "timed", "settle"]},
         "seconds": {"type": "int", "min": 1, "max": 900},

@@ -555,8 +555,20 @@ test("inline: starts only at a step it declares; returns its returns fields and 
   assert.equal(m.initialRun({ ...F2, inline: undefined }, "when").stepId, "who");
   const ctx = f2Ctx(null);
   const s = f2(ctx, [{ type: "pick", fieldId: "chip", value: "1h" }, { type: "next" }, { type: "pick", fieldId: "change", value: "better" }], m.initialRun(F2, "when"));
-  assert.deepEqual(m.inlineResult(ctx, s), { answers: { chip: { ids: ["1h"], own: null } }, thenVsNow: "better" });
+  assert.deepEqual(m.inlineResult(ctx, s), { answers: { chip: { ids: ["1h"], own: null } }, thenVsNow: "better", ids: ["finished"] });
   assert.equal(m.inlineResult({ ...ctx, skill: SKILL }, s), null, "not an inline skill");
+  assert.deepEqual(m.inlineResult(ctx, s, false).ids, ["left"], "went back early");
+});
+
+test("inline (IE-B4): the host hears where the sub-run ended (`ends`) and each flag that held, as the inlineSkill embed's ids", () => {
+  const ends = { ...F2, inline: { ...F2.inline, ends: { [F2.steps.at(-1).id]: "stopped" }, flags: [{ id: "unsafe", when: { eq: ["$a.change", "better"] } }, { id: "body", when: { eq: ["$a.change", "worse"] } }] } };
+  const ctx = { ...f2Ctx(null), skill: ends };
+  const s = f2(ctx, [{ type: "pick", fieldId: "chip", value: "1h" }, { type: "next" }, { type: "pick", fieldId: "change", value: "better" }], m.initialRun(ends, "when"));
+  assert.deepEqual(m.inlineResult(ctx, s).ids, ["finished", "unsafe"], "a step not named is finished; the flag that holds follows");
+  assert.deepEqual(m.inlineResult(ctx, { ...s, stepId: F2.steps.at(-1).id }).ids, ["stopped", "unsafe"]);
+  assert.deepEqual(m.inlineResult(ctx, s, false).ids, ["left", "unsafe"], "a flag still holds on the way back early");
+  // The registry: what the embed may report, both sides.
+  assert.deepEqual(EMBEDS_PY.inlineSkill.ids, ["finished", "left", "stopped", "body", "unsafe"]);
 });
 
 test("resume: the run's own answers read back at a step it reached; ask-fresh answers are asked again; another skill's record is ignored", () => {

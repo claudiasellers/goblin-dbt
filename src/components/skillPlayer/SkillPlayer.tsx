@@ -65,6 +65,8 @@ export interface InlineReturn {
   answers: Record<string, Answer>;
   /** Reached its end (true) or the person went back early (false). */
   finished: boolean;
+  /** The outcome and flags the skill's `inline.ends` / `flags` give (the `inlineSkill` embed's output ids). */
+  ids: string[];
 }
 
 export function SkillPlayer({ skillId, mode = 'page', enterAt, hostSessionId, onReturn, resumeKeepsFresh, ctx, resumeRecord }: {
@@ -387,10 +389,10 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
   const giveBack = useCallback((finished: boolean) => {
     if (!inline || returned.current) return;
     returned.current = true;
-    const r = inlineResult(ctx, st);
+    const r = inlineResult(ctx, st, finished);
     const tvn = r?.thenVsNow as ThenVsNow | null | undefined;
     void toolSession.close({ status: finished ? 'completed' : 'exited_early', ...(tvn ? { thenVsNow: tvn } : {}) });
-    inline.onReturn?.({ answers: r?.answers ?? {}, finished });
+    inline.onReturn?.({ answers: r?.answers ?? {}, finished, ids: r?.ids ?? [finished ? 'finished' : 'left'] });
   }, [inline, ctx, st, toolSession]);
   useEffect(() => { if (inline && step.kind === 'handoff') giveBack(true); }, [inline, step.kind, giveBack]);
 

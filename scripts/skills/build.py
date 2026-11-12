@@ -410,6 +410,14 @@ def check(skill):
             f = next((f for s in skill["steps"] for f in s.get("fields", []) if f["id"] == inl["thenVsNowFrom"]), None)
             values = {x[1] for x in skill["options"] if f and x[0] == f["options"].get("list")}
             assert f and values and values <= THEN_VS_NOW, (sid, "the change check's options are then-vs-now answers", values)
+        outs = set(EMBEDS["inlineSkill"]["ids"])
+        handoffs = {s["id"] for s in skill["steps"] if s["kind"] == "handoff"}
+        for st_id, out in (inl.get("ends") or {}).items():
+            assert st_id in handoffs, (sid, "inline ends name hand-off steps", st_id)
+            assert out in outs - {"left", "unsafe"}, (sid, "inline ends give an outcome id", out)
+        for fl in inl.get("flags") or []:
+            assert fl["id"] in outs - {"finished", "left"}, (sid, "inline flags are output ids", fl)
+            check_cond(fl["when"], fields, derived, sid, accepts)
     per = skill.get("persist")
     if per:
         # R15: the session waits until the run leaves `after`, then writes nothing while `nothingWhen` holds.
@@ -498,6 +506,17 @@ ACTION_URGES = set(re.findall(r'\{id: "([a-z0-9_-]+)", label:', open(os.path.joi
 
 for sk in SKILLS:
     check(sk)
+
+# R8: an inline host's `inlineSkill` names a skill that declares `inline`, at one of its entries, under another tool.
+_by_id = {sk["id"]: sk for sk in SKILLS}
+for sk in SKILLS:
+    for st in sk["steps"]:
+        if st.get("embed") == "inlineSkill":
+            sub = _by_id.get(st["props"]["skill"])
+            w = (sk["id"], st["id"])
+            assert sub and sub.get("inline"), (w, "inlineSkill names a skill that runs inline", st["props"])
+            assert sub["id"] != sk["id"], (w, "a skill never runs itself inline")
+            assert st["props"].get("enterAt", sub["start"]) in sub["inline"]["enterAt"] + [sub["start"]], (w, "inlineSkill enters where the skill lets it", st["props"])
 
 
 def spec_of(step):

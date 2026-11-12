@@ -711,12 +711,18 @@ export function followUpFor(ctx: RunContext, step: StepDef, s: Pick<RunState, 'a
  * An inline run's result for its host (R8): each `returns` field's answer, and the then-vs-now its change check
  * gave (written as the sub-run's close). Null when the skill isn't inline.
  */
-export function inlineResult(ctx: RunContext, s: Pick<RunState, 'answers'>): { answers: Record<string, Answer>; thenVsNow: string | null } | null {
+export function inlineResult(
+  ctx: RunContext, s: StateLike, finished = true,
+): { answers: Record<string, Answer>; thenVsNow: string | null; ids: string[] } | null {
   const inl = ctx.skill.inline;
   if (!inl) return null;
   const answers = Object.fromEntries(inl.returns.filter((f) => s.answers[f]).map((f) => [f, s.answers[f]]));
   const tvn = inl.thenVsNowFrom ? s.answers[inl.thenVsNowFrom]?.ids[0] ?? null : null;
-  return { answers, thenVsNow: tvn };
+  // The outcome first (where it ended), then each flag that holds; the host's transitions read them as one answer.
+  const end = !finished ? 'left' : (s.stepId && inl.ends?.[s.stepId]) || 'finished';
+  const sc = scope(ctx, s);
+  const flags = (inl.flags ?? []).filter((f) => holds(f.when, sc)).map((f) => f.id);
+  return { answers, thenVsNow: tvn, ids: [end, ...flags.filter((f) => f !== end)] };
 }
 
 /**
