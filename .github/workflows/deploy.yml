@@ -118,12 +118,16 @@ jobs:
           NEO4J_URI: ${{ secrets.NEO4J_URI }}
           NEO4J_USER: ${{ secrets.NEO4J_USER }}
           NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
+        # A merge can land on main while this run loads (the load takes ~10 min), so the snapshot commit
+        # is put on top of main's tip, not pushed from here: the working tree stays at what was built and
+        # tested, and the deploy/* tags point at that commit (the tag push keeps it reachable), so the
+        # run for the newer merge diffs from it and does whatever that merge needs.
         run: |
           node scripts/load-graph.mjs --verify
           if [ -n "$(git status --porcelain -- src/data/content)" ]; then
             git add src/data/content
             git commit -m "Content snapshots from the live graph"
-            git push origin HEAD:main
+            node scripts/ci/push-snapshot.mjs HEAD
           fi
           git tag -f deploy/graph HEAD && git push -f origin refs/tags/deploy/graph
 
