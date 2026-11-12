@@ -4,7 +4,8 @@ import type { SafetyContent } from '../data/safetyTypes';
 import { QUICK_PLAN_KEY } from '../lib/safetyRoute';
 import { getSafetyContent } from '../services/safety';
 import { SafetyRoute } from '../components/safety/SafetyRoute';
-import { SafetyPeople, useSafetyCountry } from '../components/safety/SafetyPeople';
+import { SafetyPeople } from '../components/safety/SafetyPeople';
+import { useSafetyCountry } from '../hooks/useSafetyCountry';
 
 /**
  * Help & safety (`/safety`, CORE-01): reached from the header on every screen, Help me now and Today.

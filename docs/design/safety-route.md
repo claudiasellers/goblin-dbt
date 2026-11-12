@@ -62,7 +62,10 @@ The next-morning check is a FollowUp `safety_checkin` (09:30 the next day, conte
 `safety` tier so it sorts first), scheduled by the route after the person's yes through `scheduleFollowUp`.
 
 The question's answer never goes on the saved check-in (PR #47's rule, kept). The check-in carries only the visit's id,
-`CheckIn.safetyCheckId` (CORE-05; set once, never cleared), saved after the question is answered.
+`CheckIn.safetyCheckId` (CORE-05; set once, never cleared). The check-in is saved as its result is decided, so leaving
+mid-route keeps it, and saved again with the id when the route ends. A second check-in in the same browser session that
+would ask again shows the people and *Help & safety* above its result instead (the old banner never shows while the
+switch is on). The exit is sent with the morning question's answer in one save, since the exit closes the record.
 
 ## Helplines
 

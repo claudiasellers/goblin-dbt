@@ -161,7 +161,8 @@ export function step(s: SafetyRouteState, e: SafetyEvent, signedIn: boolean): Sa
         ...(e.id === 'contacted' && !s.contacted ? { contacted: 'person' as const } : {}),
       });
     case 'carry_on':
-      return s.screen === 'passing' || s.screen === 'declined' ? afterExit(s, signedIn, {}) : s;
+      // *Carry on* is a way out too: it closes the visit like *I'm okay for now · stop*.
+      return s.screen === 'passing' || s.screen === 'declined' ? afterExit(s, signedIn, { exit: 'stop' }) : s;
     case 'checkin':
       return s.screen === 'checkin' ? go(s, 'done', { morningCheck: e.id }) : s;
     case 'morning':
@@ -198,7 +199,8 @@ export function recordFor(s: SafetyRouteState, base: { id: string; source: strin
   return {
     id: base.id, source: base.source, sourceSessionId: base.sourceSessionId ?? null, answer,
     medical: s.act, meansAsked: s.meansAsked, meansActions: s.meansActions, contacted: s.contacted,
-    usedPlan: s.usedPlan, exit: s.exit, morningCheck: s.morningCheck, country: base.country,
+    // The exit closes the record on the server, so it waits for the morning question's answer and both go in one save.
+    usedPlan: s.usedPlan, exit: s.screen === 'checkin' ? null : s.exit, morningCheck: s.morningCheck, country: base.country,
   };
 }
 

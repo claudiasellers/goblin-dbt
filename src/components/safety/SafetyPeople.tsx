@@ -1,23 +1,9 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useSafetyCountry } from '../../hooks/useSafetyCountry';
+import { getSafetyContent } from '../../services/safety';
 import type { SafetyContent } from '../../data/safetyTypes';
-import { COUNTRY_KEY, countryFromLanguages, fill, smsHref, telHref } from '../../lib/safetyRoute';
-
-/** The country the lines are for: the person's pick on this device, else the browser's region, else unknown. */
-export function useSafetyCountry(content: SafetyContent | null): [string | null, (id: string) => void] {
-  const [country, setCountry] = useState<string | null>(null);
-  useEffect(() => {
-    if (!content) return;
-    let saved: string | null = null;
-    try { saved = localStorage.getItem(COUNTRY_KEY); } catch { /* private mode */ }
-    const known = new Set(content.countries.map((c) => c.id));
-    setCountry(saved && known.has(saved) ? saved : countryFromLanguages(navigator.languages ?? [navigator.language], content.countries));
-  }, [content]);
-  const pick = (id: string) => {
-    setCountry(id);
-    try { localStorage.setItem(COUNTRY_KEY, id); } catch { /* private mode */ }
-  };
-  return [country, pick];
-}
+import { fill, smsHref, telHref } from '../../lib/safetyRoute';
 
 /**
  * People you can talk to (CORE-01): the emergency number, then the country's checked lines (call · text · chat),
@@ -105,6 +91,26 @@ export function PoisonLines({ content, country, onContact }: { content: SafetyCo
         <a key={l.id} href={telHref(l.phone as string)} onClick={onContact}
           className="inline-flex items-center min-h-11 underline mr-4">{l.name} · {l.phone}</a>
       ))}
+    </div>
+  );
+}
+
+/**
+ * People above a check-in result whose safety question was already asked earlier in this browser session
+ * (CORE-01): the route is on, so the old crisis banner never shows, and the people and *Help & safety* do instead.
+ */
+export function SafetyPeopleCard() {
+  const [content, setContent] = useState<SafetyContent | null>(null);
+  const [country, setCountry] = useSafetyCountry(content);
+  useEffect(() => { void getSafetyContent().then(setContent).catch(() => { /* the fallback line below */ }); }, []);
+  const box = 'mb-6 p-4 rounded-xl border border-[var(--color-q-hu-border)] bg-[var(--color-bg-card)] space-y-3';
+  if (!content) return <div className={box}><p className="m-0">If you're in danger, call your local emergency number now.</p></div>;
+  return (
+    <div className={box} data-testid="safety-people-card">
+      <SafetyPeople content={content} country={country} onCountry={setCountry} />
+      <Link to="/safety" className="inline-flex min-h-11 items-center text-sm underline underline-offset-2 text-[var(--color-text-secondary)]">
+        {content.flow.header.label}
+      </Link>
     </div>
   );
 }

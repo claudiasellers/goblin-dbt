@@ -71,6 +71,13 @@ test("the exit offers the morning check only signed in and above no", () => {
   const done = play("checkin", [...passing, { type: "checkin", id: "yes" }]);
   assert.equal(done.screen, "done");
   assert.equal(done.morningCheck, "yes");
+  // The exit closes the visit server-side, so it is held back until the morning answer goes with it.
+  const base = { id: "x", source: "checkin", country: null };
+  assert.equal(R.recordFor(play("checkin", passing), base).exit, null);
+  assert.deepEqual([R.recordFor(done, base).exit, R.recordFor(done, base).morningCheck], ["stop", "yes"]);
+  assert.equal(R.recordFor(play("checkin", passing, false), base).exit, "stop");
+  // Carry on closes the visit too.
+  assert.equal(R.recordFor(play("checkin", [{ type: "answer", id: "passing" }, { type: "carry_on" }, { type: "checkin", id: "no" }]), base).exit, "stop");
 });
 
 test("the morning's I'm not safe starts the said route fresh; Back retraces", () => {
@@ -114,9 +121,12 @@ test("the route is reachable from every place it should be", () => {
   assert.match(read("src/components/skillPlayer/SkillPlayer.tsx"), /<SafetyOpen toolId=\{skill\.toolId\}/);
   const checkIn = read("src/pages/CheckIn.tsx");
   assert.match(checkIn, /<SafetyRoute\s+entry="checkin"\s+source="checkin"\s+sourceSessionId=\{checkInId\}/);
-  // The result never renders while the question is open, and the save waits for it.
+  // The result never renders while the question is open; asked already, the people go above it instead.
   assert.match(checkIn, /step === 'result' && stateResult && !safetyAsking && \(/);
-  assert.match(checkIn, /safetyAsking\) return;/);
+  assert.match(checkIn, /setSafetyPeople\(!!result\.safetyAsk\?\.ask\)/);
+  assert.match(checkIn, /safetyPeople && <SafetyPeopleCard \/>/);
+  // Saved as the result is decided (leaving mid-route keeps the check-in), then again with the visit's id.
+  assert.match(checkIn, /\}, \[user, step, stateResult, safetyCheckId\]\);/);
   const page = read("src/pages/Safety.tsx");
   assert.match(page, /entry="morning" source="followup" followUpId=\{checkin\}/);
   assert.match(page, /entry=\{fromHelpNow \? 'help_now' : 'said'\}/);

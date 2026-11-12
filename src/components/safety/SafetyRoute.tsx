@@ -7,7 +7,8 @@ import {
 } from '../../lib/safetyRoute';
 import { newId } from '../../lib/spine/ids';
 import { completeSafetyCheckin, getSafetyContent, saveSafetyCheck, scheduleSafetyCheckin } from '../../services/safety';
-import { PoisonLines, SafetyPeople, useSafetyCountry } from './SafetyPeople';
+import { PoisonLines, SafetyPeople } from './SafetyPeople';
+import { useSafetyCountry } from '../../hooks/useSafetyCountry';
 
 export interface SafetyRouteResult {
   /** The SafetyCheck id, once an answer was given (the check-in stores it as `safetyCheckId`). */
