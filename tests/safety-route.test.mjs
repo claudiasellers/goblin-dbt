@@ -39,6 +39,9 @@ test("loads after the graph it touches and before routing; MERGE-only; constrain
     assert.match(constraints, new RegExp(`FOR \\(\\w+:${label}\\) REQUIRE \\w+\\.id IS UNIQUE`), label);
   }
   assert.match(constraints, /FOR \(n:SafetyCheck\) REQUIRE n\.key IS UNIQUE/);
+  // A country or line dropped from content.py leaves the graph, so a refresh never ships it again.
+  assert.ok(stmts.some((x) => /^MATCH \(c:Country\) WHERE NOT c\.id IN \[.*"US".*\]\nDETACH DELETE c$/s.test(x)));
+  assert.ok(stmts.some((x) => /^MATCH \(l:CrisisLine\) WHERE NOT l\.id IN \[.*"us_988".*\]\nDETACH DELETE l$/s.test(x)));
 });
 
 test("the switch is off, and the content says so in one place", () => {

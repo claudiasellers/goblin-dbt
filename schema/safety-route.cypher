@@ -64,6 +64,10 @@ SET f.userCopy = "If feeling far away keeps happening, a doctor or therapist can
 
 // --- Countries and crisis lines (hand-curated; verifiedAt is the audit, never shown) ---
 MATCH (:CrisisLine)-[r:COVERS]->(:Country) DELETE r;
+MATCH (c:Country) WHERE NOT c.id IN ["US", "CA", "GB", "IE", "AU", "NZ", "FR", "DE", "ES", "NL", "SE", "IN", "IT"]
+DETACH DELETE c;
+MATCH (l:CrisisLine) WHERE NOT l.id IN ["us_988", "us_crisis_text", "us_poison", "ca_988", "gb_samaritans", "gb_shout", "gb_nhs111", "gb_lifeline_ni", "ie_samaritans", "ie_text_about_it", "au_lifeline", "au_lifeline_text", "au_poisons", "nz_1737", "nz_lifeline", "nz_poisons", "fr_3114", "es_024", "nl_113", "se_90101", "in_tele_manas", "de_telefonseelsorge"]
+DETACH DELETE l;
 MERGE (c:Country {id: "US"})
 SET c.name = "the United States", c.emergency = "911", c.emergencyAlt = null, c.firearmPrompt = true, c.lineIds = ["us_988", "us_crisis_text", "us_poison"];
 MERGE (c:Country {id: "CA"})

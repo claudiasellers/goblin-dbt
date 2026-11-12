@@ -92,6 +92,9 @@ for fid, props in FLAGS.items():
 
 A("\n// --- Countries and crisis lines (hand-curated; verifiedAt is the audit, never shown) ---")
 A("MATCH (:CrisisLine)-[r:COVERS]->(:Country) DELETE r;")
+# A country or line dropped from content.py leaves the graph (else a content refresh would ship it again).
+A(f"MATCH (c:Country) WHERE NOT c.id IN {q([c[0] for c in COUNTRIES])}\nDETACH DELETE c;")
+A(f"MATCH (l:CrisisLine) WHERE NOT l.id IN {q([l[0] for l in LINES])}\nDETACH DELETE l;")
 for code, name, emergency, firearm, lines in COUNTRIES:
     A(f"MERGE (c:Country {{id: {q(code)}}})\nSET c.name = {q(name)}, c.emergency = {q(emergency)}, c.emergencyAlt = {q(EMERGENCY_ALT.get(code))}, c.firearmPrompt = {'true' if firearm else 'false'}, c.lineIds = {q(lines)};")
 for lid, country, name, kind, phone, sms, body, chat, hours, langs, source in LINES:
