@@ -383,6 +383,17 @@
     "irritation"
    ]
   },
+  "dbt_build_mastery": {
+   "appToolId": "build-mastery",
+   "name": "Build Mastery",
+   "description": "Doing things that make you feel competent and effective",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": []
+  },
   "dbt_check_facts": {
    "appToolId": "check-the-facts",
    "name": "Check the Facts",

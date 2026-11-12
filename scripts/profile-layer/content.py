@@ -50,6 +50,9 @@ KINDS = [
     # Good things (ER-04): something the person likes, kept from a good moment or a good thing that helped. Never stale.
     ("thing_i_like", "my_words", "A thing I like", None,
      "", "Set aside. Good things won't offer it until you bring it back."),
+    # Build mastery (ER-11): a step the person did, kept on their yes to their I can list. Never stale: it happened.
+    ("i_can", "about_me", "I can", None,
+     "", "Set aside. It stays out of the way until you bring it back."),
     # When it's a habit (DT-09): a plan the person kept for one behaviour. Never stale: theirs until they set it aside.
     ("abstinence_plan", "my_plans", "A habit plan", None,
      "", "Set aside. It stays out of the way until you bring it back."),
