@@ -6,13 +6,14 @@ import type { EmbedProps } from './embeds';
 /**
  * The boundary line card (docs/design/fast.md; plan C3b `boundaryLine`, IE-owned): the line the person picked or
  * wrote, on the keepsake paper, with Copy. Never locked: the line is usable at any band, including flooded (PRD
- * IE-05; removing Recover's `boundaryLocked` is IE-B4's). Reports `copied` when the copy went through.
+ * IE-05; Recover's *Let it land* uses it too since IE-B4 dropped its `boundaryLocked`). Reports `copied` when the copy went through.
  *
  * Props (EMBED_PROPS): `field`, the field whose picks make the card (labels, own words last); optional `field2` and
  * `field3`, whose picks follow in that order (Ending's opening, decision and practical lines, IE-08), so a line card
  * can be a short paragraph built from more than one pick; `shape` `line` (one line or paragraph, copyable) or
  * `list` (e.g. the values to keep, not a sentence, no Copy); the words as resolved copy: `copyLabel`, `copiedLabel`, `selectedLabel` (said when there's no clipboard and the line is selected instead),
- * `next`.
+ * `next`, and optional `skipLabel`, the way on until the line is copied (Recover's *I don't need to say anything*;
+ * `next` once it is).
  */
 export function BoundaryLine({ props, picked, onShown, onDone }: EmbedProps) {
   const fields = (['field', 'field2', 'field3'] as const)
@@ -27,7 +28,7 @@ export function BoundaryLine({ props, picked, onShown, onDone }: EmbedProps) {
   const lineRef = useRef<HTMLParagraphElement>(null);
   useEffect(() => { if (lines.length) onShown(); }, [lines.length, onShown]);
   const next = <button type="button" className={copyable && lines.length ? linkButton : primaryButton}
-    onClick={() => onDone?.({ ids: copied ? ['copied'] : [] })}>{text('next')}</button>;
+    onClick={() => onDone?.({ ids: copied ? ['copied'] : [] })}>{!copied && text('skipLabel') ? text('skipLabel') : text('next')}</button>;
   // Nothing picked to show (content drift): never strand the person on a whole-screen embed.
   if (!lines.length) return <div className="flex justify-center">{next}</div>;
 
