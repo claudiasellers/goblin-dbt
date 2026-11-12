@@ -538,6 +538,17 @@
    "direction": "neutral",
    "addresses": []
   },
+  "dbt_self_soothe": {
+   "appToolId": "soothe",
+   "name": "Self-Soothe",
+   "description": "Comforting yourself through the five senses and kind touch, so a hard moment is met with care",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": []
+  },
   "dbt_stop": {
    "appToolId": "pause",
    "name": "STOP",

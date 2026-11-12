@@ -141,7 +141,7 @@ test("grief is allowed; hand on heart; too much goes to the body, with no close"
   const much = run([pick("grief", "much"), next], ctx(), g);
   assert.equal(much.stepId, "too_much");
   assert.ok(M.stepOf(skill, "too_much").noClose);
-  assert.deepEqual(offers(much), ["cool_down"], "Held is planned (DT-07)");
+  assert.deepEqual(offers(much), ["cool_down", "soothe"], "the body first, or Held (DT-07, built)");
 });
 
 test("what's still in my hands routes; the close on the fight, then the end card", () => {

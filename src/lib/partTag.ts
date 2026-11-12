@@ -27,7 +27,7 @@ export const TAG_ROW_REQUIRED: SurfaceIds = { prompts: [...TAG_PROMPTS, ...UNNAM
  * guided activities and the plan / no-question closes have no better answer. Each declares `parts` in
  * PROFILE_NEEDS (tests/part-tag.test.mjs derives the list from both close kinds).
  */
-export const TAG_ROW_TOOLS = ['cool-down', 'five-senses', 'pause', 'urge-surfing', 'let-it-be', 'mind-job', 'alternate-rebellion', 'find-the-feeling', 'check-the-facts', 'fast'] as const;
+export const TAG_ROW_TOOLS = ['cool-down', 'five-senses', 'pause', 'urge-surfing', 'let-it-be', 'mind-job', 'soothe', 'alternate-rebellion', 'find-the-feeling', 'check-the-facts', 'fast'] as const;
 export type TagRowTool = (typeof TAG_ROW_TOOLS)[number];
 
 /** The closes that count as "it helped" (the server refuses any other: functions/src/parts/tag.ts). */

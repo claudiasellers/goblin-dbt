@@ -157,8 +157,8 @@ GOALS = [
 ]
 # PRD step 5's urge-specific moves (ProceedOption, FOR_URGE → ActionUrge). `urges`: which pulls offer it (`other`:
 # own words, so no pull to match). `exit`: the move hands on to that tool on the end card; a move without one is
-# the person's own step, with its own line. Moves into tools not built yet (the kit, Held, Give your mind a job)
-# wait as planned exits and aren't offered as chips until their tools ship.
+# the person's own step, with its own line. Moves into tools not built yet (the kit) wait as planned exits and
+# aren't offered as chips until their tools ship.
 MOVES = [
     ("later", "Save it, and look again when I'm steadier", ["send"], None),
     ("tell", "Tell it to someone safe first", ["send"], None),
@@ -171,6 +171,7 @@ MOVES = [
     ("ride", "Ride it out", ["use", "other"], "urge_surfing"),
     ("not_now", "Tell it: not now", ["use"], None),
     ("rebel", "Rebel, without the wreckage", ["hit", "leave"], "alternate_rebellion"),
+    ("heart", "A hand on my heart", ["hurt"], "held"),               # DT-07 Held (PRD DT-02 step 5)
     ("call", "Call or text someone", ["hurt"], "safety_open"),
 ]
 URGES = ["send", "check", "hurt", "hit", "leave", "use"]
@@ -275,9 +276,9 @@ STEPS = [
         "offers": [
             {"exit": "cool_down", "when": {"any": [MOVE("cool"), FLOODED]}},
             {"exit": "safety_open", "when": MOVE("call")},
-            # Planned (not shown until built): the kit and Held.
+            {"exit": "held", "when": MOVE("heart")},
+            # Planned (not shown until built): the kit.
             {"exit": "crisis_kit", "when": ALWAYS},
-            {"exit": "held", "when": ALWAYS},
         ],
         "done": "done", "links": [SAFETY_LINK],
     },
@@ -298,7 +299,7 @@ EXITS = [
     {"id": "urge_surfing", "toolId": "urge-surfing"},                   # DT-05 Ride it out
     {"id": "alternate_rebellion", "toolId": "alternate-rebellion"},     # DT-11 (the *blow it up* chip)
     {"id": "crisis_kit", "toolId": "crisis-kit", "planned": True},      # DT-03 My crisis kit (safety batch)
-    {"id": "held", "toolId": "soothe", "planned": True},                # DT-07 Held (hand on heart)
+    {"id": "held", "toolId": "soothe"},                                  # DT-07 Held (hand on heart)
     {"id": "mind_job", "toolId": "mind-job"},          # DT-06 Give your mind a job: park it, look once
     {"id": "safety_open", "toolId": None, "safety": True},              # safety.open (R6)
     {"id": "done", "done": True},
