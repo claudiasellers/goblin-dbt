@@ -18,7 +18,7 @@ const waitsForFrame = (x) => {
 };
 const CTX_KEYS = new Set(["urgeId", "personId", "frame", "enterAt", "situationId", "partId", "band", "returnTo", "emotionId", "refused", "feelingId"]);
 /** Tools whose page is PersonFirstSkill (the picker, then the skill): they read `?person=` themselves. */
-const PERSON_FIRST_TOOLS = new Set(["dear-man", "say-no", "give"]);
+const PERSON_FIRST_TOOLS = new Set(["dear-man", "say-no", "give", "mindfulness-of-others"]);
 
 const m = await importTs("src/lib/skillRuntime/machine.ts");
 const { validateExt, EXT_SCHEMAS, RUN_OWN_MAX, EXT_MAX_BYTES } = await importTs("functions/src/spine/extSchemas.ts");

@@ -69,6 +69,9 @@ export const OFF_PHONE_SKILLS: Readonly<Record<string, { toolId: string; happene
   // Find your people's afterwards (the reach_out_outcome card reopens the run at *Did you do it?*): *I did it* is the rep
   // (the PRD's `reached_out`); not yet or decided not to log none. The first visit keeps the close's own.
   finding_connection: { toolId: 'finding-connection', happenedField: 'happened', yes: 'did', unansweredKeepsOwn: true },
+  // Notice them's afterwards (the notice_back card reopens the run at *Did you get to notice them?*): yes is the rep (the
+  // PRD's `mindfulness_of_others`); forgot, couldn't or not seen log none. The first visit keeps the close's own.
+  notice_them: { toolId: 'mindfulness-of-others', happenedField: 'back', yes: 'yes', unansweredKeepsOwn: true },
 };
 
 /** The rep a run's close logs: off the phone (it happened), none (it didn't), or the close's own (null). */

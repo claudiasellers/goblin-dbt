@@ -135,8 +135,8 @@ Added by F1 (docs/design/dbt-modules-plan.md §4, 10 Nov 2026):
 - **Context in.** A skill declares `accepts` (`urgeId`, `personId`, `frame`, `enterAt`, `situationId`, `partId`,
   `band`, `returnTo`). `contextIn` keeps only those keys, ids only; `returnTo` must be an in-app path and is
   never recorded; `band` must be one of the three bands, never comes from a link (the player strips it from the
-  query) and is never recorded (it is ask-fresh). `options.firstFrom: '$ctx.<key>'` puts that option first,
-  never selected.
+  query) and is never recorded (it is ask-fresh). `options.firstFrom: '$ctx.<key>'` (or a derived
+  `'$d.<name>'`, e.g. a frame looked up through a table) puts that option first, never selected.
 - **Whole-screen embeds.** A step of kind `embed` hands the screen to a registered embed (props, `ctx`, and the
   run's answers as labels, `picked`). Its `onDone` output is cut to what its `EMBED_OUTPUTS` entry declares
   (ids, `ownText`, measures; content.py `EMBEDS` mirrors it), its ids become the `answerAs` answer (ids only),

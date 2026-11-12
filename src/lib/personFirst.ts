@@ -42,6 +42,15 @@ export function giveCtx(p: PickedPerson, people: readonly KeptPerson[] | null): 
 }
 
 /**
+ * Notice them's context (docs/design/notice-them.md): the kept person's id, or `none`, and *it tends to go badly* as
+ * the `heads_up` frame (what was added is asked more lightly, *They meant to hurt me* comes first, and Recover leads
+ * on `harm_seen`). The safety route never gets here.
+ */
+export function noticeCtx(p: PickedPerson): Record<string, string> {
+  return { personId: p.personId ?? 'none', ...(p.route === 'heads_up' ? { frame: 'heads_up' } : {}) };
+}
+
+/**
  * A reopened visit (`?run=`, R9: a card asking how it went) skips the picker only when the player will really reopen
  * the run, and never for someone now on the safety route (Gates 1 and 3). `reopens` is the player's own test
  * (`resumeRun(ctx, run, at) !== null`), so the two can't disagree. `skill` plays it; `safety` shows the safety screen

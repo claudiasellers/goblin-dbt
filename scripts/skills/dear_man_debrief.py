@@ -57,6 +57,10 @@ BAD = {"in": [a("outcome"), ["partly", "no"]]}
 LOUD = {"any": [has("feel", "shaky"), has("feel", "wound_up")]}
 LOW = {"any": [has("feel", "hurt"), has("feel", "defeated")]}
 UNSAFE = is_("between", "unsafe")
+# Notice them's *look again* after *They got defensive*, unless it escalated, they gave in, or it isn't okay between
+# them now (Gate 3: looking again is for a misunderstanding, not for a conversation that went somewhere unsafe).
+NOTICE_OFFER = {"all": [has("moment", "tp_defensive"), {"not": has("moment", "tp_escalated")},
+                        {"not": has("moment", "tp_gave_in")}, {"not": {"in": [a("between"), ["no", "unsafe"]]}}]}
 OTHER_PERSON = [{"variant": "other_person", "when": UNSAFE}]
 
 # --- The person picker's words, from the one source (DearManSafetyCopy): the page shows the picker before the run
@@ -372,7 +376,8 @@ STEPS = [
         ],
         # Keeping it warm (IE-06, GIVE) when things feel unsettled between you.
         "offers": [{"exit": "give", "when": {"in": [a("between"), ["shaky", "no"]]}},
-                   {"exit": "fast", "when": {"all": [is_("outcome", "got_it"), is_("proud", "no")]}}],
+                   {"exit": "fast", "when": {"all": [is_("outcome", "got_it"), is_("proud", "no")]}},
+                   {"exit": "notice_them", "when": NOTICE_OFFER}],
         "done": "done",
     },
     {
@@ -389,6 +394,8 @@ STEPS = [
             {"exit": "fast_let_go", "when": {"in": [a("factor"), ["cant_give", "not_willing"]]}},
             {"exit": "finding_connection", "when": is_("factor", "cant_give")},
             {"exit": "dear_man", "when": RETRY},
+            # IE-10 (PRD: the turning point *they got defensive*): what might have been going on for them.
+            {"exit": "notice_them", "when": NOTICE_OFFER},
         ],
         "done": "done",
     },
@@ -396,6 +403,7 @@ STEPS = [
 
 EXITS = [
     {"id": "cool_down", "toolId": "cool-down"},
+    {"id": "notice_them", "toolId": "mindfulness-of-others", "query": {"situationId": "look_again", "person": "$ctx.personId"}},
     {"id": "thoughts", "toolId": "thoughts-passing"},                     # DT-08 Thoughts passing through
     {"id": "dear_man", "toolId": "dear-man"},
     {"id": "cope_ahead", "toolId": "cope-ahead", "query": {"situationId": "conversation"}},

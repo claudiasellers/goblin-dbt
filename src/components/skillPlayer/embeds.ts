@@ -21,6 +21,7 @@ import { PocketCard } from './PocketCard';
 import { BatteryRead } from './BatteryRead';
 import { KitDeck } from './KitDeck';
 import { InlineSkillEmbed } from './InlineSkillEmbed';
+import { TwoColumns } from './TwoColumns';
 import { FeelingCard } from './FeelingCard';
 
 /**
@@ -89,6 +90,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   oaSteps: OaStepsEmbed,
   pocketCard: PocketCard,
   batteryRead: BatteryRead,
+  twoColumns: TwoColumns,
   feelingCard: FeelingCard,
   kitDeck: KitDeck,
   inlineSkill: InlineSkillEmbed,
@@ -126,6 +128,7 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   oaSteps: {},
   pocketCard: { ids: ['seen_all', 'copied'] },
   batteryRead: { ids: ['read'] },
+  twoColumns: { ids: ['read'] },
   // ER-10's feeling card: read, then on.
   feelingCard: { ids: ['read'] },
   kitDeck: { ids: ['body', 'hands', 'soothe', 'words', 'place', 'reasons', 'pros_cons', 'starter'], measures: ['durationSec', 'doneCount'] },
@@ -188,6 +191,15 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     now: { type: 'copy' },
     today: { type: 'copy' },
     week: { type: 'copy' },
+  },
+  twoColumns: {
+    left: { type: 'field' },
+    right: { type: 'field' },
+    leftLabel: { type: 'copy' },
+    rightLabel: { type: 'copy' },
+    foot: { type: 'field', optional: true },
+    footLabel: { type: 'copy', optional: true },
+    next: { type: 'copy' },
   },
   boundaryLine: {
     field: { type: 'field' },

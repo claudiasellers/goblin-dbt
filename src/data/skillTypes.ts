@@ -92,7 +92,7 @@ export interface OptionsSource {
   /** One group per pick of this field (an option's `for` names the pick); `ownGroup` for that field's own words. */
   groupBy?: string;
   ownGroup?: string;
-  /** Put this option first (never selected): a `$ctx.<key>` ref, e.g. Cope Ahead's `?first=`. */
+  /** Put this option first (never selected): a `$ctx.<key>` ref, e.g. Cope Ahead's `?first=`, or a derived `$d.<name>`. */
   firstFrom?: string;
   /**
    * The person's own kept items from a profile slice (plan C3a R3), listed before `list`'s options, never

@@ -233,6 +233,7 @@ COPY = {
     "situation_title": "What kind of conversation is this?",
     "situation_title_heads_up": DM.SAFETY_COPY["badlyHeadsUp"] + " What kind of conversation is this?",
     "debrief_link": "I've already had the conversation",
+    "notice_them_offer": "Notice them next time, with curiosity",
     "cool_down": "Settle my body first",
     "scared_line": "Your safety comes first. You don't have to plan this conversation. The people below can help, any time.",
     "matters_title": "What matters most to you here?",
@@ -461,8 +462,9 @@ STEPS = [
         "lines": [{"when": HEADS_UP, "key": "when_line_badly"}, {"when": None, "key": "when_line"}],
         "fields": [{"id": "when", "label": "when_label", "max": 1, "options": {"list": "when"}}],
         "followUp": {"type": "ask_outcome", "whenFrom": "when"},
-        # The old summary's *Rehearse it*: Cope Ahead for a conversation, with the part picked in `who`.
-        "offers": [{"exit": "cope_ahead", "when": None}], "done": "done",
+        # The old summary's *Rehearse it*: Cope Ahead for a conversation, with the part picked in `who`. Notice them
+        # (IE-10): the PRD's optional *their side*, as an offer here, not a step inside the plan.
+        "offers": [{"exit": "cope_ahead", "when": None}, {"exit": "notice_them", "when": None}], "done": "done",
     },
 ]
 
@@ -471,6 +473,8 @@ EXITS = [
     {"id": "let_go", "toolId": "fast", "query": {"frame": "let_go"}},
     {"id": "cool_down", "toolId": "cool-down"},
     {"id": "cope_ahead", "toolId": "cope-ahead", "query": {"situationId": "conversation", "partId": "$a.part"}},
+    {"id": "notice_them", "toolId": "mindfulness-of-others", "query": {"situationId": "notice", "person": "$ctx.personId"},
+     "label": "notice_them_offer"},
     {"id": "ending_careful", "toolId": "ending-relationships", "query": {"frame": "careful"}},
     {"id": "safety_open", "toolId": None, "safety": True},
     {"id": "done", "done": True},

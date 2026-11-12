@@ -47,6 +47,7 @@ export const FOLLOW_UP_SESSION_TOOL: Readonly<Record<string, string>> = {
   value_step: 'values-clarification',
   mastery_step: 'build-mastery',
   reach_out_outcome: 'finding-connection',
+  notice_back: 'mindfulness-of-others',
 };
 
 /** The plan's ids, as the after card needs them. Own words are the visit's (its Today card may show them). */

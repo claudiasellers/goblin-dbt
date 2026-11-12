@@ -233,6 +233,23 @@ FOLLOW_UP_TYPES = [
         "notification": "Your small step is ready to check.",
     },
     {
+        # Notice them (IE-10, docs/design/notice-them.md): the off-phone practice (notice one thing about them with
+        # curiosity, or do one thing with them fully), checked when the person said they'd see them. The card reopens
+        # that visit at `back` (R9 `reopens`: *Did you get to notice them?*). Opening it is the resolution.
+        # Content-free: never names the person or the practice.
+        "id": "notice_back", "ownerModule": "ie", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/mindfulness-of-others?run={sourceSessionId}&at=back&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"today": {"kind": "at_local", "days": 0, "time": "21:00"},
+                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "20:00"},
+                                             "few_days": {"kind": "at_local", "days": 3, "time": "20:00"},
+                                             "this_week": {"kind": "at_local", "days": 6, "time": "20:00"}}},
+        "staleAfterHours": 72, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Your practice", "body": "A practice in noticing someone you picked. How did it go?"},
+        "choices": [{"id": "dismiss", "label": "Not this time", "status": "dismissed"}],
+        "notification": "Your practice is ready to check.",
+    },
+    {
         # Good things (ER-04, docs/design/good-things.md): the one good thing the person picked for today, at the time
         # they picked (now → an hour from now). The card reopens that visit at `back` (R9 `reopens`: *Did it happen?*,
         # then lighter / same / heavier and where the mind was). Opening it is the resolution. Content-free (PRD).
