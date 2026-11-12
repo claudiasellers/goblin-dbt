@@ -407,7 +407,7 @@ EXITS = [
     {"id": "thoughts", "toolId": "thoughts-passing"},                     # DT-08 Thoughts passing through
     {"id": "dear_man", "toolId": "dear-man"},
     {"id": "cope_ahead", "toolId": "cope-ahead", "query": {"situationId": "conversation"}},
-    {"id": "rehearse", "toolId": "rehearse", "planned": True},
+    {"id": "rehearse", "toolId": "rehearse", "query": {"situationId": "ask", "person": "$ctx.personId"}},  # IE-02
     {"id": "check_the_facts", "toolId": "check-the-facts"},
     {"id": "fast", "toolId": "fast"},
     {"id": "fast_let_go", "toolId": "fast", "query": {"frame": "let_go"}},

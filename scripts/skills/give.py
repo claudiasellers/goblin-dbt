@@ -583,7 +583,7 @@ EXITS = [
     {"id": "check_the_facts", "toolId": "check-the-facts"},
     {"id": "one_message", "toolId": "dear-man", "query": {"mode": "one", "person": "$ctx.personId"}},
     {"id": "give_repair", "toolId": "give", "query": {"situationId": "repair", "person": "$ctx.personId"}},
-    {"id": "rehearse", "toolId": "rehearse", "planned": True},
+    {"id": "rehearse", "toolId": "rehearse", "query": {"situationId": "repair", "person": "$ctx.personId"}},  # IE-02
     {"id": "ending_careful", "toolId": "ending-relationships", "query": {"frame": "careful"}},
     {"id": "safety_open", "toolId": None, "safety": True},
     {"id": "done", "done": True},

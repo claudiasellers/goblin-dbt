@@ -60,6 +60,7 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   // Notice them (IE-10, docs/design/notice-them.md): no close question; the practice is checked by the `notice_back`
   // card (*Did you get to notice them?*), and the two columns have no then-vs-now.
   'mindfulness-of-others': { module: 'ie', closeKind: 'none' },
+  'rehearse': { module: 'ie', closeKind: 'regulation_down' },
   // These ask their own questions inside their flows; the spine adds none (PR-S4 wraps them).
   'opposite-action': { module: 'er', closeKind: 'regulation_down' },
   'dear-man': { module: 'ie', closeKind: 'none' },

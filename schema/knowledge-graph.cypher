@@ -1431,6 +1431,16 @@ SET building_relationships += {
   skill_type: "relationship_building"
 };
 
+// IE Handouts 5, 6 and 8 (PRD IE-02): behavioural rehearsal of a hard conversation; Rehearse it (docs/design/rehearse.md).
+MERGE (behavioral_rehearsal:TherapyConcept {id: "dbt_behavioral_rehearsal"})
+SET behavioral_rehearsal += {
+  name: "Behavioural Rehearsal",
+  description: "Practising a hard conversation before it happens: saying the line out loud, meeting the pushback you choose, and trying a move that keeps you on track",
+  modality: "DBT",
+  module: "Interpersonal Effectiveness",
+  skill_type: "interpersonal_practice"
+};
+
 // IE Handout 12 (PRD IE-10): mindfulness of others; Notice them (docs/design/notice-them.md).
 MERGE (mindfulness_of_others:TherapyConcept {id: "dbt_mindfulness_of_others"})
 SET mindfulness_of_others += {

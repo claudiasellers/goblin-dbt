@@ -1874,7 +1874,7 @@ MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "fast_review:check_the_facts"}), (t:TherapyConcept {appToolId: "check-the-facts"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "fast_review:rehearse"})
-SET x += {skillId: "fast_review", exit: "rehearse", toolId: "rehearse", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
+SET x += {skillId: "fast_review", exit: "rehearse", toolId: "rehearse", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"situationId\": \"boundary\"}", x.label = null;
 MATCH (s:Skill {id: "fast_review"}), (x:SkillExit {id: "fast_review:rehearse"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "fast_review:rehearse"}), (t:TherapyConcept {appToolId: "rehearse"})
@@ -5470,7 +5470,7 @@ MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ending_relationships:cope_ahead"}), (t:TherapyConcept {appToolId: "cope-ahead"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "ending_relationships:rehearse"})
-SET x += {skillId: "ending_relationships", exit: "rehearse", toolId: "rehearse", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
+SET x += {skillId: "ending_relationships", exit: "rehearse", toolId: "rehearse", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"situationId\": \"boundary\"}", x.label = null;
 MATCH (s:Skill {id: "ending_relationships"}), (x:SkillExit {id: "ending_relationships:rehearse"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ending_relationships:rehearse"}), (t:TherapyConcept {appToolId: "rehearse"})
@@ -7440,7 +7440,7 @@ MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_debrief:cope_ahead"}), (t:TherapyConcept {appToolId: "cope-ahead"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_debrief:rehearse"})
-SET x += {skillId: "dear_man_debrief", exit: "rehearse", toolId: "rehearse", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
+SET x += {skillId: "dear_man_debrief", exit: "rehearse", toolId: "rehearse", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"person\": \"$ctx.personId\", \"situationId\": \"ask\"}", x.label = null;
 MATCH (s:Skill {id: "dear_man_debrief"}), (x:SkillExit {id: "dear_man_debrief:rehearse"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_debrief:rehearse"}), (t:TherapyConcept {appToolId: "rehearse"})
@@ -11431,7 +11431,7 @@ MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "say_no:check_the_facts"}), (t:TherapyConcept {appToolId: "check-the-facts"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "say_no:rehearse"})
-SET x += {skillId: "say_no", exit: "rehearse", toolId: "rehearse", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
+SET x += {skillId: "say_no", exit: "rehearse", toolId: "rehearse", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"person\": \"$ctx.personId\", \"situationId\": \"say_no\"}", x.label = null;
 MATCH (s:Skill {id: "say_no"}), (x:SkillExit {id: "say_no:rehearse"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "say_no:rehearse"}), (t:TherapyConcept {appToolId: "rehearse"})
@@ -13337,7 +13337,7 @@ SET r += {list: "tvn", order: 27};
 
 // --- dear_man_prep (dm-prep-v1) ---
 MERGE (s:Skill {id: "dear_man_prep"})
-SET s += {toolId: "dear-man", version: "dm-prep-v1", contentVersion: "skills-v1", start: "situation", ownMax: 140, emotionFields: ["express"], accepts: ["personId", "frame", "band", "refused", "situationId", "feelingId"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"again_title\": \"Your plan, once more.\", \"assert_hint\": \"A clear ask is easier to say yes to.\", \"assert_title\": \"What are you asking for?\", \"assert_title_heads_up\": \"What's the one practical thing you're asking for?\", \"card_attack\": \"If they attack: you don't have to answer it. Come back to the ask.\", \"card_drift\": \"If it drifts: say the ask again, same words.\", \"card_felt\": \"I felt\", \"card_middle\": \"Middle ground I could live with\", \"card_next_card\": \"Next card\", \"card_prev\": \"Previous card\", \"card_push\": \"If they push back\", \"card_say\": \"Say it\", \"card_skip\": \"Done with the cards\", \"card_steady\": \"Stay steady\", \"card_title\": \"Your plan, on three cards.\", \"card_walk\": \"I won't accept\", \"coach_barrier_angry\": \"If they get defensive: that's their feeling, not proof you're wrong. You can name it and come back to what you need.\", \"coach_barrier_dont_know\": \"If you blank: you've built your plan, and it's fine to glance at it. You can say you wrote it down because it matters.\", \"coach_barrier_emotional\": \"If tears or a shaky voice come, take a breath. You can say this is hard to say and you want to get through it.\", \"coach_barrier_guilty\": \"If guilt shows up, it may tell you to back down or apologise for having needs. Notice it, and stay with your ask.\", \"coach_barrier_no_right\": \"If you start doubting yourself: you don't have to earn the right to need things. Asking clearly is respectful.\", \"coach_barrier_tried_before\": \"If your mind pulls you to the last five times, come back to this conversation, this ask, now.\", \"coach_default\": \"The hard part is staying with it when it gets uncomfortable. When your mind races or shuts down, come back to one line.\", \"coach_myth_alone\": \"Needing someone for this doesn't make you less.\", \"coach_myth_deserve\": \"Feeling undeserving makes sense. You can feel it and still ask, if you choose to.\", \"coach_myth_know\": \"Wanting them to know without asking is so human. People can care and still not guess.\", \"coach_myth_last\": \"Your needs can sit next to theirs. Asking is how they get a place.\", \"coach_myth_matter\": \"A no can be about this ask, on this day. It doesn't decide what you're worth.\", \"coach_myth_sure\": \"Nobody gets to know the answer first. You can ask and find out.\", \"coach_myth_weak\": \"Needing things is human. Saying it plainly takes steadiness.\", \"confident_hint\": \"Even when you don't feel confident.\", \"confident_title\": \"Your body can help. One thing to do before you start?\", \"cool_down\": \"Settle my body first\", \"copied\": \"Copied\", \"copy\": \"Copy\", \"debrief_link\": \"I've already had the conversation\", \"describe_hint\": \"Facts are harder to argue with than judgements.\", \"describe_title\": \"What happened? Say it the way a camera would see it.\", \"edge_dizzy\": \"Feeling dizzy? Stop and breathe normally.\", \"edge_done\": \"That's the edge off. Read your plan once more, out loud if you can.\", \"edge_in\": \"In\", \"edge_next\": \"Back to my plan\", \"edge_out\": \"Out, longer\", \"edge_start\": \"Start\", \"edge_step1\": \"Unclench your jaw and drop your shoulders while you read it through.\", \"express_hint\": \"Naming it helps them see this matters.\", \"express_title\": \"How does it feel?\", \"fill_ask_change_how\": \"What would you like to be different?\", \"fill_ask_flexibility\": \"What would that look like in practice?\", \"fill_ask_specific_help\": \"What kind of help, and by when?\", \"fill_bound_cant_do\": \"What aren't you able to do?\", \"fill_bound_need_space\": \"When do you need the space?\", \"fill_bound_respect_no\": \"Which decision?\", \"fill_bound_stop_behavior\": \"What do you need them to stop?\", \"fill_patt_more_effort\": \"What would more effort look like, plainly?\", \"fill_title\": \"Say it plainly.\", \"hard_hint\": \"Pick any that fit.\", \"hard_title\": \"What makes this hard?\", \"hot_hint\": \"When it's loud inside, even a good plan can come out sharper than you mean. Taking the edge off first can help it land.\", \"hot_title\": \"Your plan is ready. Heads up: it's still loud in there.\", \"let_go\": \"I've asked them to hear me before. Look at letting this one go\", \"matters_hint\": \"If it gets tough, this is what you'll protect.\", \"matters_title\": \"What matters most to you here?\", \"middle_title\": \"If they push back, what middle ground could you live with?\", \"middle_title_objective\": \"Getting what you need comes first, so know the part you won't give on. If they push back, what middle ground could you live with?\", \"middle_title_relationship\": \"Keeping things good comes first, so you can give on details, as long as you feel heard. What middle ground could you live with?\", \"middle_title_self_respect\": \"Your self-respect comes first, so notice any pressure to agree to what doesn't sit right. What middle ground could you live with?\", \"mindful_title\": \"What do you need to hear in that moment?\", \"mirror_addr_broke_promise\": \"When someone doesn't follow through, disappointment often comes first, then frustration, sometimes hurt. Only keep what fits.\", \"mirror_addr_dismissed\": \"Opening up and being brushed aside often leaves people feeling unheard, hurt, then angry. Only keep what fits.\", \"mirror_addr_hurtful\": \"When a hurt goes unnoticed, the hurt is right there, often with feeling invisible, sometimes anger. Only keep what fits.\", \"mirror_addr_no_consult\": \"A decision made without you often leaves people feeling disrespected, invisible, a bit helpless. Only keep what fits.\", \"mirror_ask_need_help\": \"Needing help you haven't asked for often brings overwhelm, a worry about being a burden, and sometimes quiet resentment. Only keep what fits.\", \"mirror_ask_not_working\": \"When how you do things isn't working, people often feel frustrated, unheard, a bit trapped. Only keep what fits.\", \"mirror_ask_support\": \"Needing support through something hard often comes with loneliness, sadness, and a fear of pushing them away. Only keep what fits.\", \"mirror_ask_time_space\": \"Needing time or space you don't have tends to leave people worn out, often with some guilt about wanting it. Only keep what fits.\", \"mirror_bound_new_thing\": \"When something new isn't okay with you, hurt or feeling disrespected is common, and nerves about what to say. Only keep what fits.\", \"mirror_bound_overcommit\": \"Taking back a yes often brings guilt, worry about letting them down, and tiredness from carrying it. Only keep what fits.\", \"mirror_bound_pressure\": \"Being pressed to do something you don't want to do can feel like being cornered: frustrated, anxious, resentful. Only keep what fits.\", \"mirror_bound_unnamed_line\": \"When a line you haven't named keeps getting crossed, resentment tends to build quietly, along with feeling disrespected. Only keep what fits.\", \"mirror_patt_avoids\": \"When the conversation keeps getting avoided, people often feel unheard, invisible, lonely in it. Only keep what fits.\", \"mirror_patt_keeps_doing\": \"When it keeps happening after you've asked, frustration and resentment are very common. Only keep what fits.\", \"mirror_patt_one_sided\": \"When effort feels one-sided, resentment and tiredness tend to build, and sadness underneath. Only keep what fits.\", \"mirror_patt_shuts_down\": \"When it ends badly every time, people often feel helpless and worn out before they start. Only keep what fits.\", \"mirror_sit_address\": \"Bringing something up often has some hurt underneath, some frustration, and nerves about reopening it. Only keep what fits.\", \"mirror_sit_ask\": \"Asking for something often brings worry about how it'll land, and sometimes guilt for needing it. Only keep what fits.\", \"mirror_sit_boundary\": \"Setting a limit often comes with guilt and worry about their reaction, on top of what made it necessary. Only keep what fits.\", \"mirror_sit_pattern\": \"A pattern that keeps repeating often leaves people worn out, unheard, with resentment built up. Only keep what fits.\", \"next\": \"Next\", \"notice_them_offer\": \"Notice them next time, with curiosity\", \"own_line\": \"In my own words\", \"phrase_hint\": \"Short enough to fit in one breath.\", \"phrase_title\": \"Pick the line you'll say to yourself, or make it yours.\", \"picker_personChanged\": \"Things changed with someone?\", \"picker_personChangedHint\": \"Pick who it is, and you'll be asked about them again.\", \"picker_personGoOn\": \"Go on\", \"picker_personKeepLine\": \"The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.\", \"picker_personNameHint\": \"A nickname is fine. No real names needed.\", \"picker_personNameLabel\": \"What do you call them?\", \"picker_personNew\": \"Someone new\", \"picker_personNoNameLine\": \"Without a name, nothing about them is kept.\", \"picker_personRoleLabel\": \"Who are they to you?\", \"picker_personSignedOutLine\": \"This stays on this screen only.\", \"picker_personWho\": \"Who is this conversation with?\", \"picker_riskBadly\": \"It tends to go badly\", \"picker_riskHarm\": \"They might hurt or control me\", \"picker_riskQuestion\": \"Is it more that they might hurt or control you, or that it tends to go badly?\", \"picker_riskUnsaid\": \"I'd rather not say\", \"picker_safeNo\": \"No\", \"picker_safeQuestion\": \"Is it safe to bring hard things up with {who}?\", \"picker_safeUnsure\": \"Not sure\", \"picker_safeYes\": \"Yes, mostly\", \"picker_safetyRouteBack\": \"This is about someone else\", \"picker_safetyRouteBody\": \"The people below can help you think it through, any time, and you don't have to be sure.\", \"picker_safetyRouteEnding\": \"Thinking about ending the relationship\", \"picker_safetyRouteHeading\": \"Planning a hard talk with {who} can wait. Your safety comes first.\", \"reinforce_hint\": \"This is the step most people skip. It helps them listen.\", \"reinforce_title\": \"What would be better for them, or for you both, if they said yes?\", \"scared_line\": \"Your safety comes first. You don't have to plan this conversation. The people below can help, any time.\", \"selected\": \"Selected. Copy it from here.\", \"situation_title\": \"What kind of conversation is this?\", \"situation_title_heads_up\": \"When talks with them tend to go badly, it can help to keep it short, about one thing, and in writing if that suits. What kind of conversation is this?\", \"thought_hint\": \"Pick up to two, or none.\", \"thought_title\": \"Do any of these thoughts show up too?\", \"walk_hint\": \"Knowing this ahead makes it easier to stop or step away.\", \"walk_title\": \"What won't you accept?\", \"when_label\": \"When is the conversation? I can ask how it went, after.\", \"when_line\": \"You've planned what to say, what matters most, and what you'll do if it gets hard.\", \"when_line_badly\": \"You're going in knowing it might not go well. Keep it short, about one thing, and look after yourself after.\", \"who_title\": \"Who might show up in this conversation?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "dear-man", version: "dm-prep-v1", contentVersion: "skills-v1", start: "situation", ownMax: 140, emotionFields: ["express"], accepts: ["personId", "frame", "band", "refused", "situationId", "feelingId"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"again_title\": \"Your plan, once more.\", \"assert_hint\": \"A clear ask is easier to say yes to.\", \"assert_title\": \"What are you asking for?\", \"assert_title_heads_up\": \"What's the one practical thing you're asking for?\", \"card_attack\": \"If they attack: you don't have to answer it. Come back to the ask.\", \"card_drift\": \"If it drifts: say the ask again, same words.\", \"card_felt\": \"I felt\", \"card_middle\": \"Middle ground I could live with\", \"card_next_card\": \"Next card\", \"card_prev\": \"Previous card\", \"card_push\": \"If they push back\", \"card_say\": \"Say it\", \"card_skip\": \"Done with the cards\", \"card_steady\": \"Stay steady\", \"card_title\": \"Your plan, on three cards.\", \"card_walk\": \"I won't accept\", \"coach_barrier_angry\": \"If they get defensive: that's their feeling, not proof you're wrong. You can name it and come back to what you need.\", \"coach_barrier_dont_know\": \"If you blank: you've built your plan, and it's fine to glance at it. You can say you wrote it down because it matters.\", \"coach_barrier_emotional\": \"If tears or a shaky voice come, take a breath. You can say this is hard to say and you want to get through it.\", \"coach_barrier_guilty\": \"If guilt shows up, it may tell you to back down or apologise for having needs. Notice it, and stay with your ask.\", \"coach_barrier_no_right\": \"If you start doubting yourself: you don't have to earn the right to need things. Asking clearly is respectful.\", \"coach_barrier_tried_before\": \"If your mind pulls you to the last five times, come back to this conversation, this ask, now.\", \"coach_default\": \"The hard part is staying with it when it gets uncomfortable. When your mind races or shuts down, come back to one line.\", \"coach_myth_alone\": \"Needing someone for this doesn't make you less.\", \"coach_myth_deserve\": \"Feeling undeserving makes sense. You can feel it and still ask, if you choose to.\", \"coach_myth_know\": \"Wanting them to know without asking is so human. People can care and still not guess.\", \"coach_myth_last\": \"Your needs can sit next to theirs. Asking is how they get a place.\", \"coach_myth_matter\": \"A no can be about this ask, on this day. It doesn't decide what you're worth.\", \"coach_myth_sure\": \"Nobody gets to know the answer first. You can ask and find out.\", \"coach_myth_weak\": \"Needing things is human. Saying it plainly takes steadiness.\", \"confident_hint\": \"Even when you don't feel confident.\", \"confident_title\": \"Your body can help. One thing to do before you start?\", \"cool_down\": \"Settle my body first\", \"copied\": \"Copied\", \"copy\": \"Copy\", \"debrief_link\": \"I've already had the conversation\", \"describe_hint\": \"Facts are harder to argue with than judgements.\", \"describe_title\": \"What happened? Say it the way a camera would see it.\", \"edge_dizzy\": \"Feeling dizzy? Stop and breathe normally.\", \"edge_done\": \"That's the edge off. Read your plan once more, out loud if you can.\", \"edge_in\": \"In\", \"edge_next\": \"Back to my plan\", \"edge_out\": \"Out, longer\", \"edge_start\": \"Start\", \"edge_step1\": \"Unclench your jaw and drop your shoulders while you read it through.\", \"express_hint\": \"Naming it helps them see this matters.\", \"express_title\": \"How does it feel?\", \"fill_ask_change_how\": \"What would you like to be different?\", \"fill_ask_flexibility\": \"What would that look like in practice?\", \"fill_ask_specific_help\": \"What kind of help, and by when?\", \"fill_bound_cant_do\": \"What aren't you able to do?\", \"fill_bound_need_space\": \"When do you need the space?\", \"fill_bound_respect_no\": \"Which decision?\", \"fill_bound_stop_behavior\": \"What do you need them to stop?\", \"fill_patt_more_effort\": \"What would more effort look like, plainly?\", \"fill_title\": \"Say it plainly.\", \"hard_hint\": \"Pick any that fit.\", \"hard_title\": \"What makes this hard?\", \"hot_hint\": \"When it's loud inside, even a good plan can come out sharper than you mean. Taking the edge off first can help it land.\", \"hot_title\": \"Your plan is ready. Heads up: it's still loud in there.\", \"let_go\": \"I've asked them to hear me before. Look at letting this one go\", \"matters_hint\": \"If it gets tough, this is what you'll protect.\", \"matters_title\": \"What matters most to you here?\", \"middle_title\": \"If they push back, what middle ground could you live with?\", \"middle_title_objective\": \"Getting what you need comes first, so know the part you won't give on. If they push back, what middle ground could you live with?\", \"middle_title_relationship\": \"Keeping things good comes first, so you can give on details, as long as you feel heard. What middle ground could you live with?\", \"middle_title_self_respect\": \"Your self-respect comes first, so notice any pressure to agree to what doesn't sit right. What middle ground could you live with?\", \"mindful_title\": \"What do you need to hear in that moment?\", \"mirror_addr_broke_promise\": \"When someone doesn't follow through, disappointment often comes first, then frustration, sometimes hurt. Only keep what fits.\", \"mirror_addr_dismissed\": \"Opening up and being brushed aside often leaves people feeling unheard, hurt, then angry. Only keep what fits.\", \"mirror_addr_hurtful\": \"When a hurt goes unnoticed, the hurt is right there, often with feeling invisible, sometimes anger. Only keep what fits.\", \"mirror_addr_no_consult\": \"A decision made without you often leaves people feeling disrespected, invisible, a bit helpless. Only keep what fits.\", \"mirror_ask_need_help\": \"Needing help you haven't asked for often brings overwhelm, a worry about being a burden, and sometimes quiet resentment. Only keep what fits.\", \"mirror_ask_not_working\": \"When how you do things isn't working, people often feel frustrated, unheard, a bit trapped. Only keep what fits.\", \"mirror_ask_support\": \"Needing support through something hard often comes with loneliness, sadness, and a fear of pushing them away. Only keep what fits.\", \"mirror_ask_time_space\": \"Needing time or space you don't have tends to leave people worn out, often with some guilt about wanting it. Only keep what fits.\", \"mirror_bound_new_thing\": \"When something new isn't okay with you, hurt or feeling disrespected is common, and nerves about what to say. Only keep what fits.\", \"mirror_bound_overcommit\": \"Taking back a yes often brings guilt, worry about letting them down, and tiredness from carrying it. Only keep what fits.\", \"mirror_bound_pressure\": \"Being pressed to do something you don't want to do can feel like being cornered: frustrated, anxious, resentful. Only keep what fits.\", \"mirror_bound_unnamed_line\": \"When a line you haven't named keeps getting crossed, resentment tends to build quietly, along with feeling disrespected. Only keep what fits.\", \"mirror_patt_avoids\": \"When the conversation keeps getting avoided, people often feel unheard, invisible, lonely in it. Only keep what fits.\", \"mirror_patt_keeps_doing\": \"When it keeps happening after you've asked, frustration and resentment are very common. Only keep what fits.\", \"mirror_patt_one_sided\": \"When effort feels one-sided, resentment and tiredness tend to build, and sadness underneath. Only keep what fits.\", \"mirror_patt_shuts_down\": \"When it ends badly every time, people often feel helpless and worn out before they start. Only keep what fits.\", \"mirror_sit_address\": \"Bringing something up often has some hurt underneath, some frustration, and nerves about reopening it. Only keep what fits.\", \"mirror_sit_ask\": \"Asking for something often brings worry about how it'll land, and sometimes guilt for needing it. Only keep what fits.\", \"mirror_sit_boundary\": \"Setting a limit often comes with guilt and worry about their reaction, on top of what made it necessary. Only keep what fits.\", \"mirror_sit_pattern\": \"A pattern that keeps repeating often leaves people worn out, unheard, with resentment built up. Only keep what fits.\", \"next\": \"Next\", \"notice_them_offer\": \"Notice them next time, with curiosity\", \"own_line\": \"In my own words\", \"phrase_hint\": \"Short enough to fit in one breath.\", \"phrase_title\": \"Pick the line you'll say to yourself, or make it yours.\", \"picker_personChanged\": \"Things changed with someone?\", \"picker_personChangedHint\": \"Pick who it is, and you'll be asked about them again.\", \"picker_personGoOn\": \"Go on\", \"picker_personKeepLine\": \"The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.\", \"picker_personNameHint\": \"A nickname is fine. No real names needed.\", \"picker_personNameLabel\": \"What do you call them?\", \"picker_personNew\": \"Someone new\", \"picker_personNoNameLine\": \"Without a name, nothing about them is kept.\", \"picker_personRoleLabel\": \"Who are they to you?\", \"picker_personSignedOutLine\": \"This stays on this screen only.\", \"picker_personWho\": \"Who is this conversation with?\", \"picker_riskBadly\": \"It tends to go badly\", \"picker_riskHarm\": \"They might hurt or control me\", \"picker_riskQuestion\": \"Is it more that they might hurt or control you, or that it tends to go badly?\", \"picker_riskUnsaid\": \"I'd rather not say\", \"picker_safeNo\": \"No\", \"picker_safeQuestion\": \"Is it safe to bring hard things up with {who}?\", \"picker_safeUnsure\": \"Not sure\", \"picker_safeYes\": \"Yes, mostly\", \"picker_safetyRouteBack\": \"This is about someone else\", \"picker_safetyRouteBody\": \"The people below can help you think it through, any time, and you don't have to be sure.\", \"picker_safetyRouteEnding\": \"Thinking about ending the relationship\", \"picker_safetyRouteHeading\": \"Planning a hard talk with {who} can wait. Your safety comes first.\", \"rehearse_offer\": \"Practise it out loud\", \"reinforce_hint\": \"This is the step most people skip. It helps them listen.\", \"reinforce_title\": \"What would be better for them, or for you both, if they said yes?\", \"scared_line\": \"Your safety comes first. You don't have to plan this conversation. The people below can help, any time.\", \"selected\": \"Selected. Copy it from here.\", \"situation_title\": \"What kind of conversation is this?\", \"situation_title_heads_up\": \"When talks with them tend to go badly, it can help to keep it short, about one thing, and in writing if that suits. What kind of conversation is this?\", \"thought_hint\": \"Pick up to two, or none.\", \"thought_title\": \"Do any of these thoughts show up too?\", \"walk_hint\": \"Knowing this ahead makes it easier to stop or step away.\", \"walk_title\": \"What won't you accept?\", \"when_label\": \"When is the conversation? I can ask how it went, after.\", \"when_line\": \"You've planned what to say, what matters most, and what you'll do if it gets hard.\", \"when_line_badly\": \"You're going in knowing it might not go well. Keep it short, about one thing, and look after yourself after.\", \"who_title\": \"Who might show up in this conversation?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "dbt_dear_man"}), (s:Skill {id: "dear_man_prep"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "dear_man_prep"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
@@ -13471,6 +13471,12 @@ MATCH (s:Skill {id: "dear_man_prep"}), (x:SkillExit {id: "dear_man_prep:cope_ahe
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_prep:cope_ahead"}), (t:TherapyConcept {appToolId: "cope-ahead"})
 MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "dear_man_prep:rehearse"})
+SET x += {skillId: "dear_man_prep", exit: "rehearse", toolId: "rehearse", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"person\": \"$ctx.personId\", \"situationId\": \"ask\"}", x.label = "rehearse_offer";
+MATCH (s:Skill {id: "dear_man_prep"}), (x:SkillExit {id: "dear_man_prep:rehearse"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "dear_man_prep:rehearse"}), (t:TherapyConcept {appToolId: "rehearse"})
+MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_prep:notice_them"})
 SET x += {skillId: "dear_man_prep", exit: "notice_them", toolId: "mindfulness-of-others", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"person\": \"$ctx.personId\", \"situationId\": \"notice\"}", x.label = "notice_them_offer";
 MATCH (s:Skill {id: "dear_man_prep"}), (x:SkillExit {id: "dear_man_prep:notice_them"})
@@ -13581,12 +13587,15 @@ SET r += {order: 0}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "dear_man_prep:again"}), (b:SkillStep {id: "dear_man_prep:when"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
-MATCH (a:SkillStep {id: "dear_man_prep:when"}), (x:SkillExit {id: "dear_man_prep:cope_ahead"})
+MATCH (a:SkillStep {id: "dear_man_prep:when"}), (x:SkillExit {id: "dear_man_prep:rehearse"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": null}]";
-MATCH (a:SkillStep {id: "dear_man_prep:when"}), (x:SkillExit {id: "dear_man_prep:notice_them"})
+MATCH (a:SkillStep {id: "dear_man_prep:when"}), (x:SkillExit {id: "dear_man_prep:cope_ahead"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": null}]";
+MATCH (a:SkillStep {id: "dear_man_prep:when"}), (x:SkillExit {id: "dear_man_prep:notice_them"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": null}]";
 MERGE (o:SkillOption {id: "dear_man_prep:situation:ask"})
 SET o:SkillOption, o += {skillId: "dear_man_prep", list: "situation", value: "ask", label: "I need to ask for something", version: "dm-prep-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "dear_man_prep"}), (o:SkillOption {id: "dear_man_prep:situation:ask"})
@@ -17943,7 +17952,7 @@ MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "give:give_repair"}), (t:TherapyConcept {appToolId: "give"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "give:rehearse"})
-SET x += {skillId: "give", exit: "rehearse", toolId: "rehearse", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
+SET x += {skillId: "give", exit: "rehearse", toolId: "rehearse", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"person\": \"$ctx.personId\", \"situationId\": \"repair\"}", x.label = null;
 MATCH (s:Skill {id: "give"}), (x:SkillExit {id: "give:rehearse"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "give:rehearse"}), (t:TherapyConcept {appToolId: "rehearse"})
@@ -21910,3 +21919,606 @@ SET o:SkillOption, o += {skillId: "notice_them", list: "not_knowing", value: "do
 MATCH (s:Skill {id: "notice_them"}), (o:SkillOption {id: "notice_them:not_knowing:dont_know"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "not_knowing", order: 58};
+
+// --- rehearse (rh-v1) ---
+MERGE (s:Skill {id: "rehearse"})
+SET s += {toolId: "rehearse", version: "rh-v1", contentVersion: "skills-v1", start: "kind", ownMax: 90, emotionFields: [], accepts: ["personId", "band", "situationId", "frame"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"again_offer\": \"Practise again\", \"aloud\": \"I said it out loud\", \"close_done\": \"You practised it. That counts.\", \"close_stopped\": \"You stopped. That counts too.\", \"close_title\": \"Saying it for real feels…\", \"cool_down\": \"Settle my body first\", \"cope_offer\": \"Plan for the hardest moment\", \"done\": \"Done\", \"end_harder\": \"Saying it for real feels harder right now. Settle your body first, or leave it for today.\", \"end_line\": \"That's the conversation.\", \"end_not_sure\": \"Another practice can help. Pick a harder version when you're ready.\", \"end_plan_title\": \"For the hard moment: {plan}.\", \"end_ready\": \"The real conversation is yours to choose. Planning it can help.\", \"end_title\": \"That's the practice.\", \"ifthen_hint\": \"One thing you can do in the moment.\", \"ifthen_title\": \"If it goes that way for real, what will you do?\", \"in_head\": \"I said it in my head\", \"kind_flooded\": \"Practising works better once your body settles. The easy version is here if you want it now.\", \"kind_title\": \"What's the conversation?\", \"line_hint\": \"Your words. You can change them any time.\", \"line_title\": \"What's the first thing you'll say?\", \"next\": \"Next\", \"own_words\": \"Something else\", \"picker_personChanged\": \"Things changed with someone?\", \"picker_personChangedHint\": \"Pick who it is, and you'll be asked about them again.\", \"picker_personGoOn\": \"Go on\", \"picker_personKeepLine\": \"The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.\", \"picker_personNameHint\": \"A nickname is fine. No real names needed.\", \"picker_personNameLabel\": \"What do you call them?\", \"picker_personNew\": \"Someone new\", \"picker_personNoNameLine\": \"Without a name, nothing about them is kept.\", \"picker_personRoleLabel\": \"Who are they to you?\", \"picker_personSignedOutLine\": \"This stays on this screen only.\", \"picker_personWhoRehearse\": \"Who's the conversation with?\", \"picker_riskBadly\": \"It tends to go badly\", \"picker_riskHarm\": \"They might hurt or control me\", \"picker_riskQuestion\": \"Is it more that they might hurt or control you, or that it tends to go badly?\", \"picker_riskUnsaid\": \"I'd rather not say\", \"picker_safeNo\": \"No\", \"picker_safeQuestion\": \"Is it safe to bring hard things up with {who}?\", \"picker_safeUnsure\": \"Not sure\", \"picker_safeYes\": \"Yes, mostly\", \"picker_safetyRouteBack\": \"This is about someone else\", \"picker_safetyRouteBody\": \"The people below can help you think it through, any time, and you don't have to be sure.\", \"picker_safetyRouteEnding\": \"Thinking about ending the relationship\", \"picker_safetyRouteRehearseHeading\": \"With {who}, your safety comes before any practice conversation.\", \"plan_offer\": \"Plan the conversation\", \"ready_title\": \"Could you say it for real?\", \"safety_open\": \"Talk to someone now\", \"stage_hint\": \"Out loud if you can. Nobody's listening.\", \"stage_title\": \"Say it.\", \"stop\": \"Stop\", \"them\": \"Them\", \"tier_flooded\": \"The easy version, or practising a way out, for now.\", \"tier_heads_up\": \"With them, practising a calm way out can help too.\", \"tier_hint\": \"You choose how hard. Stopping always counts.\", \"tier_title\": \"How will they respond?\", \"you\": \"You\", \"your_move\": \"What do you do?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+MATCH (t:TherapyConcept {id: "dbt_behavioral_rehearsal"}), (s:Skill {id: "rehearse"})
+MERGE (t)-[:HAS_SKILL]->(s);
+MATCH (:SkillStep {skillId: "rehearse"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
+MATCH (:Skill {id: "rehearse"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
+MERGE (n:SkillStep {id: "rehearse:kind"})
+SET n += {skillId: "rehearse", step: "kind", kind: "ask", version: "rh-v1"}, n.specJson = "{\"fields\": [{\"id\": \"kind\", \"links\": [{\"exit\": \"cool_down\", \"label\": \"cool_down\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"firstFrom\": \"$ctx.situationId\", \"list\": \"kind\"}, \"required\": true}], \"lines\": [{\"key\": \"kind_flooded\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}], \"title\": \"kind_title\"}";
+MATCH (s:Skill {id: "rehearse"}), (n:SkillStep {id: "rehearse:kind"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 0};
+MERGE (n:SkillStep {id: "rehearse:line"})
+SET n += {skillId: "rehearse", step: "line", kind: "ask", version: "rh-v1"}, n.specJson = "{\"fields\": [{\"id\": \"line\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"line\", \"where\": {\"eq\": [\"$opt.kind\", \"$a.kind\"]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"own_words\", \"max\": 90}, \"required\": true}], \"hint\": \"line_hint\", \"title\": \"line_title\"}";
+MATCH (s:Skill {id: "rehearse"}), (n:SkillStep {id: "rehearse:line"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 1};
+MERGE (n:SkillStep {id: "rehearse:tier"})
+SET n += {skillId: "rehearse", step: "tier", kind: "ask", version: "rh-v1"}, n.specJson = "{\"fields\": [{\"id\": \"tier\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"tier\", \"where\": {\"all\": [{\"any\": [{\"not\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"eq\": [\"$opt.flooded\", true]}]}, {\"any\": [{\"not\": {\"eq\": [\"$ctx.band\", \"stirred\"]}}, {\"eq\": [\"$opt.stirred\", true]}]}]}}, \"required\": true}], \"hint\": \"tier_hint\", \"lines\": [{\"key\": \"tier_flooded\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"tier_heads_up\", \"when\": {\"eq\": [\"$ctx.frame\", \"heads_up\"]}}], \"title\": \"tier_title\"}";
+MATCH (s:Skill {id: "rehearse"}), (n:SkillStep {id: "rehearse:tier"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 2};
+MERGE (n:SkillStep {id: "rehearse:stage"})
+SET n += {skillId: "rehearse", step: "stage", kind: "embed", version: "rh-v1"}, n.specJson = "{\"answerAs\": \"stage\", \"embed\": \"rehearsalStage\", \"hint\": \"stage_hint\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"aloud\": \"aloud\", \"endLine\": \"end_line\", \"fromSkill\": \"rehearse\", \"inHead\": \"in_head\", \"kind\": \"kind\", \"line\": \"line\", \"next\": \"next\", \"stop\": \"stop\", \"them\": \"them\", \"tier\": \"tier\", \"you\": \"you\", \"yourMove\": \"your_move\"}, \"title\": \"stage_title\"}";
+MATCH (s:Skill {id: "rehearse"}), (n:SkillStep {id: "rehearse:stage"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 3};
+MERGE (n:SkillStep {id: "rehearse:ifthen"})
+SET n += {skillId: "rehearse", step: "ifthen", kind: "ask", version: "rh-v1"}, n.specJson = "{\"fields\": [{\"id\": \"ifthen\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"ifthen\"}, \"required\": true}], \"hint\": \"ifthen_hint\", \"title\": \"ifthen_title\"}";
+MATCH (s:Skill {id: "rehearse"}), (n:SkillStep {id: "rehearse:ifthen"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 4};
+MERGE (n:SkillStep {id: "rehearse:close"})
+SET n += {skillId: "rehearse", step: "close", kind: "ask", version: "rh-v1"}, n.specJson = "{\"fields\": [{\"askFresh\": \"thenVsNow\", \"id\": \"close\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"tvn\"}, \"required\": true}], \"lines\": [{\"key\": \"close_stopped\", \"when\": {\"has\": [\"$a.stage.ids\", \"stopped\"]}}, {\"key\": \"close_done\", \"when\": {\"all\": []}}], \"title\": \"close_title\"}";
+MATCH (s:Skill {id: "rehearse"}), (n:SkillStep {id: "rehearse:close"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 5};
+MERGE (n:SkillStep {id: "rehearse:ready"})
+SET n += {skillId: "rehearse", step: "ready", kind: "ask", version: "rh-v1"}, n.specJson = "{\"fields\": [{\"id\": \"ready\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"ready\"}, \"required\": true}], \"title\": \"ready_title\"}";
+MATCH (s:Skill {id: "rehearse"}), (n:SkillStep {id: "rehearse:ready"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 6};
+MERGE (n:SkillStep {id: "rehearse:end"})
+SET n += {skillId: "rehearse", step: "end", kind: "handoff", version: "rh-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"end_harder\", \"when\": {\"eq\": [\"$a.close\", \"worse\"]}}, {\"key\": \"end_not_sure\", \"when\": {\"eq\": [\"$a.ready\", \"not_sure\"]}}, {\"key\": \"end_ready\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"title\": [{\"key\": \"end_plan_title\", \"when\": {\"set\": \"$a.ifthen\"}}, {\"key\": \"end_title\"}], \"titleSlots\": {\"plan\": {\"labelOf\": \"ifthen\"}}}";
+MATCH (s:Skill {id: "rehearse"}), (n:SkillStep {id: "rehearse:end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 7};
+MERGE (x:SkillExit {id: "rehearse:cool_down"})
+SET x += {skillId: "rehearse", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "rehearse"}), (x:SkillExit {id: "rehearse:cool_down"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "rehearse:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "rehearse:plan"})
+SET x += {skillId: "rehearse", exit: "plan", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"person\": \"$ctx.personId\"}", x.label = "plan_offer";
+MATCH (s:Skill {id: "rehearse"}), (x:SkillExit {id: "rehearse:plan"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "rehearse:plan"}), (t:TherapyConcept {appToolId: "dear-man"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "rehearse:again"})
+SET x += {skillId: "rehearse", exit: "again", toolId: "rehearse", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"person\": \"$ctx.personId\", \"situationId\": \"$a.kind\"}", x.label = "again_offer";
+MATCH (s:Skill {id: "rehearse"}), (x:SkillExit {id: "rehearse:again"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "rehearse:again"}), (t:TherapyConcept {appToolId: "rehearse"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "rehearse:cope_ahead"})
+SET x += {skillId: "rehearse", exit: "cope_ahead", toolId: "cope-ahead", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"situationId\": \"conversation\"}", x.label = "cope_offer";
+MATCH (s:Skill {id: "rehearse"}), (x:SkillExit {id: "rehearse:cope_ahead"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "rehearse:cope_ahead"}), (t:TherapyConcept {appToolId: "cope-ahead"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "rehearse:safety_open"})
+SET x += {skillId: "rehearse", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "rehearse"}), (x:SkillExit {id: "rehearse:safety_open"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MERGE (x:SkillExit {id: "rehearse:done"})
+SET x += {skillId: "rehearse", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "rehearse"}), (x:SkillExit {id: "rehearse:done"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (a:SkillStep {id: "rehearse:kind"}), (b:SkillStep {id: "rehearse:line"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "rehearse:kind"}), (x:SkillExit {id: "rehearse:cool_down"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "kind", label: "cool_down"}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
+MATCH (a:SkillStep {id: "rehearse:kind"}), (x:SkillExit {id: "rehearse:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 1, field: "kind", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "rehearse:line"}), (b:SkillStep {id: "rehearse:tier"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "rehearse:line"}), (x:SkillExit {id: "rehearse:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "line", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "rehearse:tier"}), (b:SkillStep {id: "rehearse:stage"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "rehearse:tier"}), (x:SkillExit {id: "rehearse:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "tier", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "rehearse:stage"}), (b:SkillStep {id: "rehearse:ifthen"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"any\": [{\"has\": [\"$a.stage.ids\", \"lost_it\"]}, {\"all\": [{\"eq\": [\"$a.tier\", \"hardest\"]}, {\"not\": {\"has\": [\"$a.stage.ids\", \"stopped\"]}}]}]}";
+MATCH (a:SkillStep {id: "rehearse:stage"}), (b:SkillStep {id: "rehearse:close"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "rehearse:stage"}), (x:SkillExit {id: "rehearse:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "rehearse:ifthen"}), (b:SkillStep {id: "rehearse:close"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "rehearse:ifthen"}), (x:SkillExit {id: "rehearse:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "ifthen", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "rehearse:close"}), (b:SkillStep {id: "rehearse:ready"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "rehearse:close"}), (x:SkillExit {id: "rehearse:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "close", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "rehearse:ready"}), (b:SkillStep {id: "rehearse:end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "rehearse:ready"}), (x:SkillExit {id: "rehearse:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "ready", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "rehearse:end"}), (x:SkillExit {id: "rehearse:cool_down"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"eq\": [\"$a.close\", \"worse\"]}}]";
+MATCH (a:SkillStep {id: "rehearse:end"}), (x:SkillExit {id: "rehearse:plan"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"not\": {\"eq\": [\"$a.close\", \"worse\"]}}}]";
+MATCH (a:SkillStep {id: "rehearse:end"}), (x:SkillExit {id: "rehearse:cope_ahead"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"set\": \"$a.ifthen\"}}]";
+MATCH (a:SkillStep {id: "rehearse:end"}), (x:SkillExit {id: "rehearse:again"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 3}, r.rowsJson = "[{\"order\": 3, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "rehearse:end"}), (x:SkillExit {id: "rehearse:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MERGE (o:SkillOption {id: "rehearse:kind:ask"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "kind", value: "ask", label: "Asking for something", version: "rh-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:kind:ask"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "kind", order: 0};
+MERGE (o:SkillOption {id: "rehearse:kind:say_no"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "kind", value: "say_no", label: "Saying no", version: "rh-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:kind:say_no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "kind", order: 1};
+MERGE (o:SkillOption {id: "rehearse:kind:boundary"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "kind", value: "boundary", label: "Setting a limit", version: "rh-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:kind:boundary"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "kind", order: 2};
+MERGE (o:SkillOption {id: "rehearse:kind:address"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "kind", value: "address", label: "Bringing up a problem", version: "rh-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:kind:address"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "kind", order: 3};
+MERGE (o:SkillOption {id: "rehearse:kind:repair"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "kind", value: "repair", label: "Making a repair", version: "rh-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:kind:repair"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "kind", order: 4};
+MERGE (o:SkillOption {id: "rehearse:line:ask_1"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "line", value: "ask_1", label: "Could you help me with something?", version: "rh-v1"}, o.propsJson = "{\"kind\": \"ask\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:line:ask_1"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "line", order: 5};
+MERGE (o:SkillOption {id: "rehearse:line:ask_2"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "line", value: "ask_2", label: "I need to ask you for something.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"ask\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:line:ask_2"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "line", order: 6};
+MERGE (o:SkillOption {id: "rehearse:line:ask_3"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "line", value: "ask_3", label: "Would you be willing to help this week?", version: "rh-v1"}, o.propsJson = "{\"kind\": \"ask\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:line:ask_3"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "line", order: 7};
+MERGE (o:SkillOption {id: "rehearse:line:say_no_1"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "line", value: "say_no_1", label: "No, I can't do that.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"say_no\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:line:say_no_1"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "line", order: 8};
+MERGE (o:SkillOption {id: "rehearse:line:say_no_2"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "line", value: "say_no_2", label: "I'm going to say no this time.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"say_no\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:line:say_no_2"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "line", order: 9};
+MERGE (o:SkillOption {id: "rehearse:line:say_no_3"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "line", value: "say_no_3", label: "That doesn't work for me.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"say_no\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:line:say_no_3"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "line", order: 10};
+MERGE (o:SkillOption {id: "rehearse:line:boundary_1"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "line", value: "boundary_1", label: "I need this to stop.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"boundary\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:line:boundary_1"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "line", order: 11};
+MERGE (o:SkillOption {id: "rehearse:line:boundary_2"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "line", value: "boundary_2", label: "I'm not okay with that.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"boundary\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:line:boundary_2"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "line", order: 12};
+MERGE (o:SkillOption {id: "rehearse:line:boundary_3"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "line", value: "boundary_3", label: "Please don't do that again.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"boundary\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:line:boundary_3"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "line", order: 13};
+MERGE (o:SkillOption {id: "rehearse:line:address_1"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "line", value: "address_1", label: "Can we talk about what happened?", version: "rh-v1"}, o.propsJson = "{\"kind\": \"address\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:line:address_1"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "line", order: 14};
+MERGE (o:SkillOption {id: "rehearse:line:address_2"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "line", value: "address_2", label: "Something's been bothering me.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"address\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:line:address_2"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "line", order: 15};
+MERGE (o:SkillOption {id: "rehearse:line:address_3"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "line", value: "address_3", label: "I want to bring something up.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"address\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:line:address_3"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "line", order: 16};
+MERGE (o:SkillOption {id: "rehearse:line:repair_1"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "line", value: "repair_1", label: "I'm sorry for what I said.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:line:repair_1"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "line", order: 17};
+MERGE (o:SkillOption {id: "rehearse:line:repair_2"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "line", value: "repair_2", label: "I got that wrong, and I'm sorry.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:line:repair_2"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "line", order: 18};
+MERGE (o:SkillOption {id: "rehearse:line:repair_3"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "line", value: "repair_3", label: "I'd like to make things right.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:line:repair_3"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "line", order: 19};
+MERGE (o:SkillOption {id: "rehearse:tier:easy"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "tier", value: "easy", label: "The easy version: they listen", version: "rh-v1"}, o.propsJson = "{\"flooded\": true, \"stirred\": true}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:tier:easy"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "tier", order: 20};
+MERGE (o:SkillOption {id: "rehearse:tier:realistic"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "tier", value: "realistic", label: "Realistic: they push back, then partly", version: "rh-v1"}, o.propsJson = "{\"flooded\": false, \"stirred\": true}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:tier:realistic"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "tier", order: 21};
+MERGE (o:SkillOption {id: "rehearse:tier:hardest"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "tier", value: "hardest", label: "The hardest likely: they say no or turn it on you", version: "rh-v1"}, o.propsJson = "{\"flooded\": false, \"stirred\": false}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:tier:hardest"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "tier", order: 22};
+MERGE (o:SkillOption {id: "rehearse:tier:leave"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "tier", value: "leave", label: "Practise leaving: a calm way out", version: "rh-v1"}, o.propsJson = "{\"flooded\": true, \"stirred\": true}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:tier:leave"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "tier", order: 23};
+MERGE (o:SkillOption {id: "rehearse:move:again"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "move", value: "again", label: "Say it again", version: "rh-v1"}, o.propsJson = "{\"letter\": \"M\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:move:again"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 24};
+MERGE (o:SkillOption {id: "rehearse:move:acknowledge"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "move", value: "acknowledge", label: "Acknowledge, then come back", version: "rh-v1"}, o.propsJson = "{\"letter\": \"V+M\", \"says\": \"I hear you. And this still matters to me.\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:move:acknowledge"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 25};
+MERGE (o:SkillOption {id: "rehearse:move:name"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "move", value: "name", label: "Name what's happening", version: "rh-v1"}, o.propsJson = "{\"letter\": \"H5a\", \"says\": \"I notice we keep moving away from it.\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:move:name"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 26};
+MERGE (o:SkillOption {id: "rehearse:move:middle"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "move", value: "middle", label: "Offer a middle", version: "rh-v1"}, o.propsJson = "{\"letter\": \"N\", \"says\": \"Could we find something in between?\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:move:middle"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 27};
+MERGE (o:SkillOption {id: "rehearse:move:turn"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "move", value: "turn", label: "Ask what would work for them", version: "rh-v1"}, o.propsJson = "{\"letter\": \"N\", \"says\": \"What would work for you?\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:move:turn"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 28};
+MERGE (o:SkillOption {id: "rehearse:move:break"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "move", value: "break", label: "Step out, come back later", version: "rh-v1"}, o.propsJson = "{\"letter\": \"FAST\", \"says\": \"I'm going to take a break and come back to this.\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:move:break"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 29};
+MERGE (o:SkillOption {id: "rehearse:move:done"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "move", value: "done", label: "End the conversation", version: "rh-v1"}, o.propsJson = "{\"letter\": \"FAST\", \"says\": \"I'm done with this conversation for now.\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:move:done"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 30};
+MERGE (o:SkillOption {id: "rehearse:move:lost_it"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "move", value: "lost_it", label: "I'd lose it here", version: "rh-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:move:lost_it"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 31};
+MERGE (o:SkillOption {id: "rehearse:turn:ask_easy_1"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "ask_easy_1", label: "What do you need?", version: "rh-v1"}, o.propsJson = "{\"kind\": \"ask\", \"moves\": \"again,acknowledge,turn,done\", \"n\": 1, \"pose\": \"open\", \"tier\": \"easy\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:ask_easy_1"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 32};
+MERGE (o:SkillOption {id: "rehearse:turn:ask_easy_2"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "ask_easy_2", label: "Okay, that makes sense.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"ask\", \"moves\": \"again,acknowledge,turn,done\", \"n\": 2, \"pose\": \"open\", \"tier\": \"easy\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:ask_easy_2"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 33};
+MERGE (o:SkillOption {id: "rehearse:turn:ask_easy_3"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "ask_easy_3", label: "Sure, I can do that.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"ask\", \"moves\": \"again,acknowledge,turn,done\", \"n\": 3, \"pose\": \"open\", \"tier\": \"easy\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:ask_easy_3"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 34};
+MERGE (o:SkillOption {id: "rehearse:turn:ask_realistic_1"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "ask_realistic_1", label: "Can we talk about this later?", version: "rh-v1"}, o.propsJson = "{\"kind\": \"ask\", \"moves\": \"again,acknowledge,middle,turn,break\", \"n\": 1, \"pose\": \"turn_away\", \"tier\": \"realistic\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:ask_realistic_1"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 35};
+MERGE (o:SkillOption {id: "rehearse:turn:ask_realistic_2"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "ask_realistic_2", label: "I don't know if I can do all of that.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"ask\", \"moves\": \"again,acknowledge,middle,turn,break\", \"n\": 2, \"pose\": \"neutral\", \"tier\": \"realistic\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:ask_realistic_2"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 36};
+MERGE (o:SkillOption {id: "rehearse:turn:ask_realistic_3"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "ask_realistic_3", label: "I could do part of it.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"ask\", \"moves\": \"again,acknowledge,middle,turn,break\", \"n\": 3, \"pose\": \"open\", \"tier\": \"realistic\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:ask_realistic_3"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 37};
+MERGE (o:SkillOption {id: "rehearse:turn:ask_hardest_1"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "ask_hardest_1", label: "No. That's not happening.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"ask\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 1, \"pose\": \"arms\", \"tier\": \"hardest\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:ask_hardest_1"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 38};
+MERGE (o:SkillOption {id: "rehearse:turn:ask_hardest_2"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "ask_hardest_2", label: "You always want something from me.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"ask\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 2, \"pose\": \"closer\", \"tier\": \"hardest\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:ask_hardest_2"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 39};
+MERGE (o:SkillOption {id: "rehearse:turn:ask_hardest_3"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "ask_hardest_3", label: "(They go quiet and look away.)", version: "rh-v1"}, o.propsJson = "{\"kind\": \"ask\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 3, \"pose\": \"still\", \"tier\": \"hardest\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:ask_hardest_3"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 40};
+MERGE (o:SkillOption {id: "rehearse:turn:say_no_easy_1"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "say_no_easy_1", label: "Oh. Is there a reason?", version: "rh-v1"}, o.propsJson = "{\"kind\": \"say_no\", \"moves\": \"again,acknowledge,turn,done\", \"n\": 1, \"pose\": \"neutral\", \"tier\": \"easy\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:say_no_easy_1"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 41};
+MERGE (o:SkillOption {id: "rehearse:turn:say_no_easy_2"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "say_no_easy_2", label: "Okay, I'll ask someone else.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"say_no\", \"moves\": \"again,acknowledge,turn,done\", \"n\": 2, \"pose\": \"open\", \"tier\": \"easy\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:say_no_easy_2"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 42};
+MERGE (o:SkillOption {id: "rehearse:turn:say_no_easy_3"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "say_no_easy_3", label: "Fair enough.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"say_no\", \"moves\": \"again,acknowledge,turn,done\", \"n\": 3, \"pose\": \"open\", \"tier\": \"easy\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:say_no_easy_3"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 43};
+MERGE (o:SkillOption {id: "rehearse:turn:say_no_realistic_1"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "say_no_realistic_1", label: "Come on, it's only this once.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"say_no\", \"moves\": \"again,acknowledge,middle,turn,break\", \"n\": 1, \"pose\": \"closer\", \"tier\": \"realistic\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:say_no_realistic_1"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 44};
+MERGE (o:SkillOption {id: "rehearse:turn:say_no_realistic_2"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "say_no_realistic_2", label: "I really thought I could count on you.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"say_no\", \"moves\": \"again,acknowledge,middle,turn,break\", \"n\": 2, \"pose\": \"neutral\", \"tier\": \"realistic\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:say_no_realistic_2"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 45};
+MERGE (o:SkillOption {id: "rehearse:turn:say_no_realistic_3"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "say_no_realistic_3", label: "Fine. Maybe next time?", version: "rh-v1"}, o.propsJson = "{\"kind\": \"say_no\", \"moves\": \"again,acknowledge,middle,turn,break\", \"n\": 3, \"pose\": \"open\", \"tier\": \"realistic\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:say_no_realistic_3"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 46};
+MERGE (o:SkillOption {id: "rehearse:turn:say_no_hardest_1"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "say_no_hardest_1", label: "You can't be serious.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"say_no\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 1, \"pose\": \"arms\", \"tier\": \"hardest\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:say_no_hardest_1"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 47};
+MERGE (o:SkillOption {id: "rehearse:turn:say_no_hardest_2"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "say_no_hardest_2", label: "After everything I've done for you?", version: "rh-v1"}, o.propsJson = "{\"kind\": \"say_no\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 2, \"pose\": \"closer\", \"tier\": \"hardest\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:say_no_hardest_2"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 48};
+MERGE (o:SkillOption {id: "rehearse:turn:say_no_hardest_3"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "say_no_hardest_3", label: "(They turn away and go quiet.)", version: "rh-v1"}, o.propsJson = "{\"kind\": \"say_no\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 3, \"pose\": \"turn_away\", \"tier\": \"hardest\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:say_no_hardest_3"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 49};
+MERGE (o:SkillOption {id: "rehearse:turn:boundary_easy_1"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "boundary_easy_1", label: "I didn't know it bothered you.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"boundary\", \"moves\": \"again,acknowledge,turn,done\", \"n\": 1, \"pose\": \"neutral\", \"tier\": \"easy\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:boundary_easy_1"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 50};
+MERGE (o:SkillOption {id: "rehearse:turn:boundary_easy_2"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "boundary_easy_2", label: "Okay. I'll try.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"boundary\", \"moves\": \"again,acknowledge,turn,done\", \"n\": 2, \"pose\": \"open\", \"tier\": \"easy\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:boundary_easy_2"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 51};
+MERGE (o:SkillOption {id: "rehearse:turn:boundary_easy_3"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "boundary_easy_3", label: "Thanks for telling me.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"boundary\", \"moves\": \"again,acknowledge,turn,done\", \"n\": 3, \"pose\": \"open\", \"tier\": \"easy\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:boundary_easy_3"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 52};
+MERGE (o:SkillOption {id: "rehearse:turn:boundary_realistic_1"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "boundary_realistic_1", label: "You're making a big deal out of nothing.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"boundary\", \"moves\": \"again,acknowledge,middle,turn,break\", \"n\": 1, \"pose\": \"arms\", \"tier\": \"realistic\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:boundary_realistic_1"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 53};
+MERGE (o:SkillOption {id: "rehearse:turn:boundary_realistic_2"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "boundary_realistic_2", label: "I'll think about it.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"boundary\", \"moves\": \"again,acknowledge,middle,turn,break\", \"n\": 2, \"pose\": \"neutral\", \"tier\": \"realistic\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:boundary_realistic_2"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 54};
+MERGE (o:SkillOption {id: "rehearse:turn:boundary_realistic_3"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "boundary_realistic_3", label: "I can try, sometimes.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"boundary\", \"moves\": \"again,acknowledge,middle,turn,break\", \"n\": 3, \"pose\": \"open\", \"tier\": \"realistic\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:boundary_realistic_3"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 55};
+MERGE (o:SkillOption {id: "rehearse:turn:boundary_hardest_1"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "boundary_hardest_1", label: "Who are you to tell me what to do?", version: "rh-v1"}, o.propsJson = "{\"kind\": \"boundary\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 1, \"pose\": \"closer\", \"tier\": \"hardest\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:boundary_hardest_1"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 56};
+MERGE (o:SkillOption {id: "rehearse:turn:boundary_hardest_2"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "boundary_hardest_2", label: "You're too sensitive.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"boundary\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 2, \"pose\": \"arms\", \"tier\": \"hardest\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:boundary_hardest_2"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 57};
+MERGE (o:SkillOption {id: "rehearse:turn:boundary_hardest_3"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "boundary_hardest_3", label: "(They fold their arms and say nothing.)", version: "rh-v1"}, o.propsJson = "{\"kind\": \"boundary\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 3, \"pose\": \"still\", \"tier\": \"hardest\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:boundary_hardest_3"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 58};
+MERGE (o:SkillOption {id: "rehearse:turn:address_easy_1"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "address_easy_1", label: "Oh, what happened?", version: "rh-v1"}, o.propsJson = "{\"kind\": \"address\", \"moves\": \"again,acknowledge,turn,done\", \"n\": 1, \"pose\": \"open\", \"tier\": \"easy\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:address_easy_1"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 59};
+MERGE (o:SkillOption {id: "rehearse:turn:address_easy_2"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "address_easy_2", label: "I didn't realise. I'm sorry.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"address\", \"moves\": \"again,acknowledge,turn,done\", \"n\": 2, \"pose\": \"neutral\", \"tier\": \"easy\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:address_easy_2"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 60};
+MERGE (o:SkillOption {id: "rehearse:turn:address_easy_3"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "address_easy_3", label: "Let's sort it out.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"address\", \"moves\": \"again,acknowledge,turn,done\", \"n\": 3, \"pose\": \"open\", \"tier\": \"easy\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:address_easy_3"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 61};
+MERGE (o:SkillOption {id: "rehearse:turn:address_realistic_1"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "address_realistic_1", label: "This isn't a good time.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"address\", \"moves\": \"again,acknowledge,middle,turn,break\", \"n\": 1, \"pose\": \"turn_away\", \"tier\": \"realistic\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:address_realistic_1"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 62};
+MERGE (o:SkillOption {id: "rehearse:turn:address_realistic_2"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "address_realistic_2", label: "That's not how I remember it.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"address\", \"moves\": \"again,acknowledge,middle,turn,break\", \"n\": 2, \"pose\": \"arms\", \"tier\": \"realistic\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:address_realistic_2"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 63};
+MERGE (o:SkillOption {id: "rehearse:turn:address_realistic_3"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "address_realistic_3", label: "Okay, maybe I could have handled it better.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"address\", \"moves\": \"again,acknowledge,middle,turn,break\", \"n\": 3, \"pose\": \"neutral\", \"tier\": \"realistic\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:address_realistic_3"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 64};
+MERGE (o:SkillOption {id: "rehearse:turn:address_hardest_1"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "address_hardest_1", label: "Here we go again.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"address\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 1, \"pose\": \"arms\", \"tier\": \"hardest\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:address_hardest_1"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 65};
+MERGE (o:SkillOption {id: "rehearse:turn:address_hardest_2"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "address_hardest_2", label: "What about what you did?", version: "rh-v1"}, o.propsJson = "{\"kind\": \"address\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 2, \"pose\": \"closer\", \"tier\": \"hardest\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:address_hardest_2"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 66};
+MERGE (o:SkillOption {id: "rehearse:turn:address_hardest_3"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "address_hardest_3", label: "(They look at their phone and don't answer.)", version: "rh-v1"}, o.propsJson = "{\"kind\": \"address\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 3, \"pose\": \"turn_away\", \"tier\": \"hardest\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:address_hardest_3"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 67};
+MERGE (o:SkillOption {id: "rehearse:turn:repair_easy_1"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_easy_1", label: "Thanks for saying that.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"again,acknowledge,turn,done\", \"n\": 1, \"pose\": \"open\", \"tier\": \"easy\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:repair_easy_1"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 68};
+MERGE (o:SkillOption {id: "rehearse:turn:repair_easy_2"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_easy_2", label: "I was upset, yes.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"again,acknowledge,turn,done\", \"n\": 2, \"pose\": \"neutral\", \"tier\": \"easy\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:repair_easy_2"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 69};
+MERGE (o:SkillOption {id: "rehearse:turn:repair_easy_3"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_easy_3", label: "Okay. I appreciate it.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"again,acknowledge,turn,done\", \"n\": 3, \"pose\": \"open\", \"tier\": \"easy\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:repair_easy_3"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 70};
+MERGE (o:SkillOption {id: "rehearse:turn:repair_realistic_1"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_realistic_1", label: "Sorry doesn't really fix it.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"again,acknowledge,middle,turn,break\", \"n\": 1, \"pose\": \"arms\", \"tier\": \"realistic\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:repair_realistic_1"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 71};
+MERGE (o:SkillOption {id: "rehearse:turn:repair_realistic_2"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_realistic_2", label: "I need a bit of time.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"again,acknowledge,middle,turn,break\", \"n\": 2, \"pose\": \"turn_away\", \"tier\": \"realistic\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:repair_realistic_2"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 72};
+MERGE (o:SkillOption {id: "rehearse:turn:repair_realistic_3"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_realistic_3", label: "Okay. Let's see how it goes.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"again,acknowledge,middle,turn,break\", \"n\": 3, \"pose\": \"neutral\", \"tier\": \"realistic\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:repair_realistic_3"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 73};
+MERGE (o:SkillOption {id: "rehearse:turn:repair_hardest_1"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_hardest_1", label: "It's too late for that.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 1, \"pose\": \"arms\", \"tier\": \"hardest\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:repair_hardest_1"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 74};
+MERGE (o:SkillOption {id: "rehearse:turn:repair_hardest_2"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_hardest_2", label: "You always say that.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 2, \"pose\": \"closer\", \"tier\": \"hardest\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:repair_hardest_2"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 75};
+MERGE (o:SkillOption {id: "rehearse:turn:repair_hardest_3"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_hardest_3", label: "(They walk away.)", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 3, \"pose\": \"turn_away\", \"tier\": \"hardest\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:repair_hardest_3"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 76};
+MERGE (o:SkillOption {id: "rehearse:turn:any_leave_1"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "any_leave_1", label: "Wait, we're not finished.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"any\", \"moves\": \"break,done\", \"n\": 1, \"pose\": \"closer\", \"tier\": \"leave\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:any_leave_1"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 77};
+MERGE (o:SkillOption {id: "rehearse:turn:any_leave_2"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "any_leave_2", label: "Come on, sit back down.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"any\", \"moves\": \"break,done\", \"n\": 2, \"pose\": \"arms\", \"tier\": \"leave\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:any_leave_2"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 78};
+MERGE (o:SkillOption {id: "rehearse:turn:any_leave_3"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "any_leave_3", label: "(They keep talking.)", version: "rh-v1"}, o.propsJson = "{\"kind\": \"any\", \"moves\": \"break,done\", \"n\": 3, \"pose\": \"neutral\", \"tier\": \"leave\"}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:any_leave_3"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 79};
+MERGE (o:SkillOption {id: "rehearse:ifthen:again"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "ifthen", value: "again", label: "Say my line again, calmly", version: "rh-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:ifthen:again"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "ifthen", order: 80};
+MERGE (o:SkillOption {id: "rehearse:ifthen:acknowledge"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "ifthen", value: "acknowledge", label: "Acknowledge them, then come back to it", version: "rh-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:ifthen:acknowledge"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "ifthen", order: 81};
+MERGE (o:SkillOption {id: "rehearse:ifthen:name"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "ifthen", value: "name", label: "Name what's happening", version: "rh-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:ifthen:name"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "ifthen", order: 82};
+MERGE (o:SkillOption {id: "rehearse:ifthen:break"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "ifthen", value: "break", label: "Step out and come back later", version: "rh-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:ifthen:break"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "ifthen", order: 83};
+MERGE (o:SkillOption {id: "rehearse:ifthen:done"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "ifthen", value: "done", label: "End the conversation", version: "rh-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:ifthen:done"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "ifthen", order: 84};
+MERGE (o:SkillOption {id: "rehearse:tvn:worse"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "tvn", value: "worse", label: "Harder", version: "rh-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:tvn:worse"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "tvn", order: 85};
+MERGE (o:SkillOption {id: "rehearse:tvn:same"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "tvn", value: "same", label: "About the same", version: "rh-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:tvn:same"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "tvn", order: 86};
+MERGE (o:SkillOption {id: "rehearse:tvn:better"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "tvn", value: "better", label: "Easier", version: "rh-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:tvn:better"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "tvn", order: 87};
+MERGE (o:SkillOption {id: "rehearse:tvn:much_better"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "tvn", value: "much_better", label: "Much easier", version: "rh-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:tvn:much_better"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "tvn", order: 88};
+MERGE (o:SkillOption {id: "rehearse:ready:sure"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "ready", value: "sure", label: "Sure", version: "rh-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:ready:sure"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "ready", order: 89};
+MERGE (o:SkillOption {id: "rehearse:ready:think_so"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "ready", value: "think_so", label: "I think so", version: "rh-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:ready:think_so"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "ready", order: 90};
+MERGE (o:SkillOption {id: "rehearse:ready:not_sure"})
+SET o:SkillOption, o += {skillId: "rehearse", list: "ready", value: "not_sure", label: "Not sure", version: "rh-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:ready:not_sure"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "ready", order: 91};

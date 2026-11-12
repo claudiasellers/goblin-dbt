@@ -591,6 +591,9 @@ MERGE (c)-[:PART_OF]->(mod);
 MATCH (c:TherapyConcept {id: "dbt_mindfulness_of_others"}), (mod:TherapyConcept {id: "dbt_interpersonal_effectiveness"})
 MERGE (c)-[:PART_OF]->(mod);
 
+MATCH (c:TherapyConcept {id: "dbt_behavioral_rehearsal"}), (mod:TherapyConcept {id: "dbt_interpersonal_effectiveness"})
+MERGE (c)-[:PART_OF]->(mod);
+
 // CBT
 MATCH (c:TherapyConcept {id: "cbt_cognitive_distortion"}), (m:TherapyModality {id: "cbt"})
 MERGE (c)-[:BELONGS_TO]->(m);

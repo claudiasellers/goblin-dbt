@@ -128,6 +128,7 @@ SIGNED_OFF = {
     "rf_rumination_loop_words_repair_give": "2026-11-12",
     "rf_reward_drive_low_words_cut-off_finding-connection": "2026-11-12",
     "rf_chronic_vigilance_words_others_mindfulness-of-others": "2026-11-12",
+    "rf_rumination_loop_words_say-it_rehearse": "2026-11-12",
 }
 BANDS = ["steady", "stirred", "flooded"]
 
@@ -242,6 +243,10 @@ CONCEPT_TAGS["finding-connection"] = {"concept": "dbt_building_relationships", "
 # both sides (noticing is acceptance, looking again can change the reading); neutral direction. No ADDRESSES edges (the
 # legacy ranker counts any dbt_* concept that reaches a pattern's emotions): the word row routes it.
 CONCEPT_TAGS["mindfulness-of-others"] = {"concept": "dbt_mindfulness_of_others", "side": "both", "skillKind": "relational", "direction": "neutral"}
+# Rehearse it (IE-02, appToolId 'rehearse' on the new concept dbt_behavioral_rehearsal, docs/design/rehearse.md):
+# practising a hard conversation. Relational, so the diversity rule lets it beside Check the Facts; change side (it
+# builds the skill to act); neutral direction. No ADDRESSES edges (as Notice them): the word row routes it.
+CONCEPT_TAGS["rehearse"] = {"concept": "dbt_behavioral_rehearsal", "side": "change", "skillKind": "relational", "direction": "neutral"}
 BUILT_NOT_SIGNED_OFF = {
 }
 # Ride it out (urge-surfing), Let it be and Give your mind a job are live (Claudia, 12 Nov 2026: default to connected).
@@ -411,6 +416,8 @@ WORD_RULES = [
      "why": "Give your mind a job (ACCEPTS) as the alternative."},
     {"key": "guilt", "pattern": "rumination_loop", "tool": "check-the-facts", "priority": 0.4, "words": ["guilty", "remorseful", "hesitant"],
      "why": "Planned: Check the Facts leads for guilt (is it justified?) and hesitation."},
+    {"key": "say-it", "pattern": "rumination_loop", "tool": "rehearse", "priority": 0.55, "words": ["hesitant"], "beside": ["check-the-facts"],
+     "why": "Rehearse it (IE-02) beside Check the Facts for hesitation: holding back from saying something is often a skill gap as much as a worry, and practising the line with the pushback you choose is the approach move. Not guilty or remorseful (Check the Facts, then Keep it warm's repair)."},
     {"key": "repair", "pattern": "rumination_loop", "tool": "give", "priority": WORD_NEXT, "words": ["remorseful"], "beside": ["check-the-facts"],
      "why": "Keep it warm's repair (IE-06) beside Check the Facts for remorse: is the guilt justified, then repair with the person (one acknowledgement, one sorry). Its repair route asks whether some of it was yours first. Not guilty: guilt is often about the self, not someone to repair with."},
     {"key": "low-shame", "pattern": "rumination_loop", "tool": "recovering-from-invalidation", "priority": WORD_LEAD, "words": ["embarrassed", "ashamed", "victimized"],

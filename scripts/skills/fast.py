@@ -196,7 +196,7 @@ REVIEW_STEPS = [
 
 REVIEW_EXITS = [
     {"id": "check_the_facts", "toolId": "check-the-facts"},
-    {"id": "rehearse", "toolId": "rehearse", "planned": True},
+    {"id": "rehearse", "toolId": "rehearse", "query": {"situationId": "boundary"}},           # IE-02: practise the line
     {"id": "dear_man", "toolId": "dear-man"},
     {"id": "done", "done": True},
 ]

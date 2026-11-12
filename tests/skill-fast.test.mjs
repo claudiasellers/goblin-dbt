@@ -29,7 +29,8 @@ test("both skills are the one fast tool; nothing in either is a planned exit off
   for (const s of [review, letGo]) {
     assert.equal(s.toolId, "fast");
   }
-  assert.deepEqual(review.exits.filter((x) => x.planned).map((x) => x.toolId), ["rehearse"]);
+  assert.deepEqual(review.exits.filter((x) => x.planned).map((x) => x.toolId), [], "Rehearse it is built (IE-02)");
+  assert.deepEqual(review.exits.find((x) => x.id === "rehearse").query, { situationId: "boundary" });
   assert.deepEqual(letGo.exits.filter((x) => x.planned).map((x) => x.toolId).sort(), [], "Find your people is built (IE-09)");
 });
 
@@ -39,7 +40,7 @@ test("A: a sorry for a real wrong is kept to one; the card shows the instead lin
   const done = M.runNext(ctx(review), s, copied);
   assert.equal(done.stepId, "next");
   assert.deepEqual(done.answers.card_a_copied.ids, ["copied"]);
-  assert.deepEqual(done.offered, ["check_the_facts"], "rehearse is planned and hidden; DEAR MAN only for a dropped ask");
+  assert.deepEqual(done.offered, ["check_the_facts", "rehearse"], "DEAR MAN only for a dropped ask");
   assert.equal(M.handoffLine(ctx(review), M.stepOf(review, "next"), done), review.copy.next_line_wrong);
 });
 
