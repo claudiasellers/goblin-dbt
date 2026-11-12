@@ -56,7 +56,6 @@ FLOODED = {"eq": ["$ctx.band", "flooded"]}
 COPY = {
     "next": "Next",
     "done": "Done",
-    "carry_on": "Carry on with {others}",
     "safety_open": "Talk to someone now",
     # Flooded: the body first.
     "calm_title": "First, let your body settle a little",
@@ -118,6 +117,9 @@ COPY = {
     "actual_label": "What actually happened?",
     "tvn_label": "The pull, compared with before?",
     "read_title": "You did the opposite",
+    # *It felt unsafe*: never a line that says it went fine (Gate 3 r2).
+    "read_unsafe_title": "Your safety comes first",
+    "read_unsafe": "It felt unsafe. That matters more than the step.",
     "read_part": "You tried part of it. That counts.",
     "read_unclear": "It's not clear yet what it did. You still did something different.",
     "read_gap": "You expected it to go badly. It didn't.",
@@ -187,7 +189,9 @@ TVN = [("worse", "Stronger"), ("same", "About the same"), ("better", "A bit weak
 # crisis banner stays on that feeling's screens after it.
 PUNISH = EQ("urge", "guilt-punish")
 # The prediction gap reads only when it went well: "It didn't" never answers "It went badly" (Gate 3).
-WENT_WELL = {"in": [a("actual"), ["nothing", "better"]]}
+UNSAFE = EQ("outcome", "unsafe")
+WENT_WELL = {"all": [{"in": [a("actual"), ["nothing", "better"]]}, {"not": UNSAFE}]}
+READ_TITLE = [{"when": UNSAFE, "key": "read_unsafe_title"}, {"key": "read_title"}]
 ROUTE_STEP = {"opposite": "cue", "clarify": "clar", "problem": "prob"}
 REPAIR = {"all": [{"in": ["$d.parent", ["guilt", "shame"]]}, EQ("fits", "fits"), EQ("goal", "repair")]}
 def _route_to(step):
@@ -196,7 +200,8 @@ def _route_to(step):
 
 
 # One jump per target (NEXT is one edge per step pair); clarify is the table's rest and the fallback.
-HELP_NEXT = [{"when": REPAIR, "to": "repr"}, {"when": {"all": [PUNISH, _route_to("prob")]}, "to": "pun"},
+# Punish yourself that seems helpful goes to its own hand-off, whatever the fit (never "acting on it fits" or clarify).
+HELP_NEXT = [{"when": REPAIR, "to": "repr"}, {"when": {"all": [PUNISH, EQ("help", "helpful")]}, "to": "pun"},
              {"when": _route_to("prob"), "to": "prob"},
              {"when": _route_to("cue"), "to": "cue"}, {"to": "clar"}]
 
@@ -364,10 +369,11 @@ STEPS = [
     },
     {
         # Readout v3 (item 10): the behaviour first, then the prediction gap, then the pull. No numbers.
-        "id": "read", "kind": "handoff", "complete": True, "title": "read_title",
+        "id": "read", "kind": "handoff", "complete": True, "title": READ_TITLE,
         "crisis": [{"variant": "other_person", "when": EQ("outcome", "unsafe")}],
         # One line shows (the first that holds): the prediction gap when there is one, then what was tried, then the pull.
         "lines": [
+            {"when": UNSAFE, "key": "read_unsafe"},
             {"when": {"all": [EQ("predict", "badly"), WENT_WELL]}, "key": "read_gap"},
             {"when": {"all": [EQ("predict", "worse"), WENT_WELL]}, "key": "read_worse_gap"},
             {"when": {"all": [EQ("predict", "react"), WENT_WELL]}, "key": "read_react_gap"},
@@ -408,9 +414,10 @@ STEPS = [
         "next": [{"to": "read2"}],
     },
     {
-        "id": "read2", "kind": "handoff", "complete": True, "noClose": True, "title": "read_title",
+        "id": "read2", "kind": "handoff", "complete": True, "noClose": True, "title": READ_TITLE,
         "crisis": [{"variant": "other_person", "when": EQ("outcome", "unsafe")}],
         "lines": [
+            {"when": UNSAFE, "key": "read_unsafe"},
             {"when": {"all": [EQ("predict", "badly"), WENT_WELL]}, "key": "read_gap"},
             {"when": {"all": [EQ("predict", "worse"), WENT_WELL]}, "key": "read_worse_gap"},
             {"when": {"all": [EQ("predict", "react"), WENT_WELL]}, "key": "read_react_gap"},
@@ -459,7 +466,7 @@ def options():
     for uid, x in sorted(seen.items(), key=lambda kv: (kv[1]["u"]["order"], kv[0])):
         out.append(("urge", uid, x["u"]["label"], {"parents": x["parents"], "urge": uid, **({"danger": "self"} if uid == "guilt-punish" else {})}, ("ActionUrge", uid)))
     out += [("goal", g, label, {}, None) for g, label in GOALS]
-    out += [("safety", s, COPY[s], {}, None) for s in ("safe", "danger", "boundary", "unsure")]
+    out += [("safety", s, COPY[s], {"danger": "other"} if s == "danger" else {}, None) for s in ("safe", "danger", "boundary", "unsure")]
     out += [("want", w, COPY[f"want_{w}"], {}, None) for w in ("yes", "not_sure", "no")]
     out += [("fits", f, label, {}, None) for f, label in FACTS]
     out += [("help", e, label, {}, None) for e, label in EFFECT]

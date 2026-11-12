@@ -17027,7 +17027,6 @@
         "copy": {
           "next": "Next",
           "done": "Done",
-          "carry_on": "Carry on with the next feeling",
           "safety_open": "Talk to someone now",
           "calm_title": "First, let your body settle a little",
           "calm_label": "Hold",
@@ -17047,6 +17046,7 @@
           "unsure_line": "You don't have to act on the urge or against it right now.",
           "urge_q": "What is it pushing you to do?",
           "urge_own": "In my own words",
+          "carry_on": "Carry on with the next feeling",
           "pick_of": "{n} of {count}",
           "want_yes": "Yes, turn it down",
           "want_not_sure": "Not sure",
@@ -17081,6 +17081,8 @@
           "actual_label": "What actually happened?",
           "tvn_label": "The pull, compared with before?",
           "read_title": "You did the opposite",
+          "read_unsafe_title": "Your safety comes first",
+          "read_unsafe": "It felt unsafe. That matters more than the step.",
           "read_part": "You tried part of it. That counts.",
           "read_unclear": "It's not clear yet what it did. You still did something different.",
           "read_gap": "You expected it to go badly. It didn't.",
@@ -17995,39 +17997,9 @@
                       ]
                     },
                     {
-                      "any": [
-                        {
-                          "all": [
-                            {
-                              "eq": [
-                                "$a.fits",
-                                "excessive"
-                              ]
-                            },
-                            {
-                              "eq": [
-                                "$a.help",
-                                "helpful"
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "all": [
-                            {
-                              "eq": [
-                                "$a.fits",
-                                "fits"
-                              ]
-                            },
-                            {
-                              "eq": [
-                                "$a.help",
-                                "helpful"
-                              ]
-                            }
-                          ]
-                        }
+                      "eq": [
+                        "$a.help",
+                        "helpful"
                       ]
                     }
                   ]
@@ -18954,7 +18926,20 @@
             "id": "read",
             "kind": "handoff",
             "complete": true,
-            "title": "read_title",
+            "title": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.outcome",
+                    "unsafe"
+                  ]
+                },
+                "key": "read_unsafe_title"
+              },
+              {
+                "key": "read_title"
+              }
+            ],
             "crisis": [
               {
                 "variant": "other_person",
@@ -18969,6 +18954,15 @@
             "lines": [
               {
                 "when": {
+                  "eq": [
+                    "$a.outcome",
+                    "unsafe"
+                  ]
+                },
+                "key": "read_unsafe"
+              },
+              {
+                "when": {
                   "all": [
                     {
                       "eq": [
@@ -18977,12 +18971,24 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.actual",
-                        [
-                          "nothing",
-                          "better"
-                        ]
+                      "all": [
+                        {
+                          "in": [
+                            "$a.actual",
+                            [
+                              "nothing",
+                              "better"
+                            ]
+                          ]
+                        },
+                        {
+                          "not": {
+                            "eq": [
+                              "$a.outcome",
+                              "unsafe"
+                            ]
+                          }
+                        }
                       ]
                     }
                   ]
@@ -18999,12 +19005,24 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.actual",
-                        [
-                          "nothing",
-                          "better"
-                        ]
+                      "all": [
+                        {
+                          "in": [
+                            "$a.actual",
+                            [
+                              "nothing",
+                              "better"
+                            ]
+                          ]
+                        },
+                        {
+                          "not": {
+                            "eq": [
+                              "$a.outcome",
+                              "unsafe"
+                            ]
+                          }
+                        }
                       ]
                     }
                   ]
@@ -19021,12 +19039,24 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.actual",
-                        [
-                          "nothing",
-                          "better"
-                        ]
+                      "all": [
+                        {
+                          "in": [
+                            "$a.actual",
+                            [
+                              "nothing",
+                              "better"
+                            ]
+                          ]
+                        },
+                        {
+                          "not": {
+                            "eq": [
+                              "$a.outcome",
+                              "unsafe"
+                            ]
+                          }
+                        }
                       ]
                     }
                   ]
@@ -19238,7 +19268,20 @@
             "kind": "handoff",
             "complete": true,
             "noClose": true,
-            "title": "read_title",
+            "title": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.outcome",
+                    "unsafe"
+                  ]
+                },
+                "key": "read_unsafe_title"
+              },
+              {
+                "key": "read_title"
+              }
+            ],
             "crisis": [
               {
                 "variant": "other_person",
@@ -19253,6 +19296,15 @@
             "lines": [
               {
                 "when": {
+                  "eq": [
+                    "$a.outcome",
+                    "unsafe"
+                  ]
+                },
+                "key": "read_unsafe"
+              },
+              {
+                "when": {
                   "all": [
                     {
                       "eq": [
@@ -19261,12 +19313,24 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.actual",
-                        [
-                          "nothing",
-                          "better"
-                        ]
+                      "all": [
+                        {
+                          "in": [
+                            "$a.actual",
+                            [
+                              "nothing",
+                              "better"
+                            ]
+                          ]
+                        },
+                        {
+                          "not": {
+                            "eq": [
+                              "$a.outcome",
+                              "unsafe"
+                            ]
+                          }
+                        }
                       ]
                     }
                   ]
@@ -19283,12 +19347,24 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.actual",
-                        [
-                          "nothing",
-                          "better"
-                        ]
+                      "all": [
+                        {
+                          "in": [
+                            "$a.actual",
+                            [
+                              "nothing",
+                              "better"
+                            ]
+                          ]
+                        },
+                        {
+                          "not": {
+                            "eq": [
+                              "$a.outcome",
+                              "unsafe"
+                            ]
+                          }
+                        }
                       ]
                     }
                   ]
@@ -19305,12 +19381,24 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.actual",
-                        [
-                          "nothing",
-                          "better"
-                        ]
+                      "all": [
+                        {
+                          "in": [
+                            "$a.actual",
+                            [
+                              "nothing",
+                              "better"
+                            ]
+                          ]
+                        },
+                        {
+                          "not": {
+                            "eq": [
+                              "$a.outcome",
+                              "unsafe"
+                            ]
+                          }
+                        }
                       ]
                     }
                   ]
@@ -19802,7 +19890,8 @@
             },
             {
               "value": "danger",
-              "label": "There's danger"
+              "label": "There's danger",
+              "danger": "other"
             },
             {
               "value": "boundary",

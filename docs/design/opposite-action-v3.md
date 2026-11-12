@@ -37,10 +37,10 @@ reopens the run at `back` → `aft2` → `act2` → `read2` (no pull asked: a re
 reason; too strong offers Hold to wait).
 
 Safety: *Punish yourself* (`guilt-punish`, `danger: self`) opens `safety.open` over `want` (`safetyFirst`) and keeps the
-crisis banner on that feeling's screens. Kept (*No, I want to keep it*) or on the `prob` route (fits + helpful), it
+crisis banner on that feeling's screens. Kept (*No, I want to keep it*) or answered helpful (whatever the fit), it
 goes to `pun` instead (*The pull to punish yourself deserves care*: Problem Solve or Ride it out, never "worth
 keeping" or a plan to act on it; the banner stays). The danger and not-sure answers keep the `other_person` slot; *It felt
-unsafe* shows it on the readout and offers Hold to wait.
+unsafe* shows it on the readout, which then says *Your safety comes first* and never a prediction-gap line, and offers Hold to wait.
 
 Saved: `ext.run`; close kind `regulation_down` (the in-flow then-vs-now is the close); `urgeIds` are each feeling's urge
 (option `urge` props); the projection (`functions/src/oppositeAction/projection.ts`) writes one `OppositeActionSession`
@@ -77,6 +77,8 @@ polish batch, with Check the Facts' inline mini-card; "none" means it stays this
 - `readout`: a hand-off with one line, not the `urgeReadout` embed; no then-vs-now bar. *ER-B5.*
 - Parts lines (the unblend line under the urge, the goal line above `help`): not placed yet (the old page has them).
   *ER-B5*, with the parts lane.
+- H10 step 5's "all the way" opposite thoughts and words: only the body is worked (the cue and its hold); the
+  steps carry the action. *ER-B5* (a line on the cue or step screen).
 - `repr` opens Problem Solve with no frame (Problem Solve doesn't accept `repair` yet). *ER-B5.*
 - `oa_plan` → `oa_try` (a skill follow-up whose card reopens the run, as `ps_review`; `followUpResume` is the runtime's
   R9 reopen); one card per visit, not per feeling. `ext.er.oaFacts / oaEffect / oaRoute` are not written (the run

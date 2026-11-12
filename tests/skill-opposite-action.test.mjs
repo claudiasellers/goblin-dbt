@@ -139,6 +139,8 @@ test("Punish yourself opens safety.open over the next screen and keeps the crisi
   const helps = run([doors("guilty"), ...SAFE, pick("urge", "guilt-punish"), next, pick("want", "yes"), next, pick("fits", "fits"), next, pick("help", "helpful"), next]);
   assert.equal(helps.stepId, "pun");
   assert.ok(!/keep|acting on it/i.test(skill.copy.pun_title + skill.copy.pun_line));
+  const clarHelps = run([doors("guilty"), ...SAFE, pick("urge", "guilt-punish"), next, pick("want", "yes"), next, pick("fits", "not_fit"), next, pick("help", "helpful"), next]);
+  assert.equal(clarHelps.stepId, "pun", "punish that seems helpful never reaches clarify");
 });
 
 test("three feelings in turn: a kept feeling offers Carry on, the next runs its own sub-run, then once after all", () => {
@@ -188,6 +190,12 @@ test("try it now: what happened, then one readout line (the prediction gap first
   assert.equal(line(badly), skill.copy.read_part, "\"It didn't\" never answers \"It went badly\"");
   const worseGap = run([pick("predict", "worse"), next, pick("when", "now"), next, next, pick("outcome", "toward_goal"), next, pick("actual", "badly"), next, pick("tvna", "same"), next], ctx(), TO_PRED());
   assert.notEqual(line(worseGap), skill.copy.read_worse_gap);
+  // *It felt unsafe* never gets a line that says it went fine, and the title isn't "You did the opposite".
+  for (const actual of ["nothing", "better"]) for (const predict of ["badly", "worse", "react"]) {
+    const unsafe = run([pick("predict", predict), next, pick("when", "now"), next, next, pick("outcome", "unsafe"), next, pick("actual", actual), next, pick("tvna", "same"), next], ctx(), TO_PRED());
+    assert.equal(line(unsafe), skill.copy.read_unsafe, `${predict} / unsafe / ${actual}`);
+    assert.equal(M.copyText(ctx(), M.stepOf(skill, "read").title, { answers: M.answersOf(ctx(), unsafe) }), skill.copy.read_unsafe_title);
+  }
   assert.equal(M.askFresh(ctx(), s).thenVsNow, "better", "the pull after trying is the session's then-vs-now");
   // The body's check (per feeling, "better") comes first on the path; after trying ("worse") is newer, so it wins.
   const worse = run([pick("predict", "badly"), next, pick("when", "now"), next, next, pick("outcome", "partial"), next, next, pick("tvna", "worse"), next], ctx(), TO_PRED());
