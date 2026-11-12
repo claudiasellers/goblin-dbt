@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Suspense, lazy, useCallback, useEffect, useState, type ComponentProps } from 'react';
 import { getToolById } from '../../data/tools';
 import type { ProfileAreaId } from '../../data/profileTypes';
@@ -126,6 +127,8 @@ export function MeSection() {
               ? <KeptHabitPlan value={i.value} />
               : i.meta.kind === 'crisis_kit' && i.value
               ? <KeptCrisisKit value={i.value as Record<string, unknown>} />
+              : i.meta.kind === 'safety_plan'
+              ? <Link to="/safety/plan?use=1" className="inline-flex min-h-11 items-center text-sm underline underline-offset-2 text-[var(--color-text-secondary)]">Open it</Link>
               : <p className="text-sm text-[var(--color-text-secondary)]">{i.meta.kind === 'cope_ahead_plan'
                 ? (cope ? planLine(cope, planCaFromKept(i.value as Record<string, unknown> | undefined)).text : '')
                 : fillToolName(i.summary, toolName)}</p>}
@@ -140,7 +143,7 @@ export function MeSection() {
           {i.label === 'Person' && (
             <ForgetPerson itemRef={ref(i)} after={after} />
           )}
-          {(i.label === 'OwnLine' || i.meta.kind === 'nightmare_script' || i.meta.kind === 'cope_ahead_plan' || i.meta.kind === 'pros_cons' || i.meta.kind === 'abstinence_plan' || i.meta.kind === 'thing_i_like' || i.meta.kind === 'crisis_kit' || i.meta.kind === 'values' || i.meta.kind === 'i_can' || i.label === 'Person') && i.meta.status === 'active' && (
+          {(i.label === 'OwnLine' || i.meta.kind === 'nightmare_script' || i.meta.kind === 'cope_ahead_plan' || i.meta.kind === 'pros_cons' || i.meta.kind === 'abstinence_plan' || i.meta.kind === 'thing_i_like' || i.meta.kind === 'crisis_kit' || i.meta.kind === 'safety_plan' || i.meta.kind === 'values' || i.meta.kind === 'i_can' || i.label === 'Person') && i.meta.status === 'active' && (
             <button type="button" onClick={() => { after(setAsideProfileItem(ref(i))).catch(() => { /* stays */ }); }}
               className="min-h-11 text-sm text-[var(--color-text-tertiary)] underline underline-offset-2">
               Set aside

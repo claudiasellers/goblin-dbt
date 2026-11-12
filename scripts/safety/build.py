@@ -10,6 +10,10 @@ import json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from content import *  # noqa: E402,F403
 
+PLAN_STEPS = ["signs", "coping", "distract", "people", "pros", "safer", "reasons", "hear", "review"]
+# Tools a coping chip may open (each listed in src/data/tools.ts; tests/safety-plan.test.mjs checks).
+PLAN_TOOLS = {"cool-down", "pause", "urge-surfing", "soothe", "five-senses", "mind-job"}
+
 
 def q(s): return json.dumps(s, ensure_ascii=False)  # Cypher accepts JSON-style double-quoted strings
 def js(o): return q(json.dumps(o, ensure_ascii=False, sort_keys=True))
@@ -40,6 +44,15 @@ def check():
     assert POLICY["enabled"] is False, "`enabled` is the pre-PR-2 servers' field; the switch is routeOn"
     if POLICY["routeOn"]:
         assert REVIEW_STATUS != "draft" or APPROVED_TO_SHIP, "the switch is on while the copy is a draft"
+    plan = FLOW["plan"]
+    assert [st["id"] for st in plan["steps"]] == PLAN_STEPS, "the plan's nine steps, in Stanley-Brown order"
+    sign_ids = [c["id"] for g in plan["signGroups"] for c in g["chips"]]
+    for name, ids in (("signs", sign_ids), ("coping", [c["id"] for c in plan["coping"]]), ("distract", [c["id"] for c in plan["distract"]]),
+                      ("safer", [c["id"] for c in plan["safer"]]), ("reasons", [c["id"] for c in plan["reasons"]])):
+        assert len(ids) == len(set(ids)), f"duplicate {name} chip"
+        assert all(i.replace("_", "").isalnum() and i == i.lower() for i in ids), name
+    assert {c["toolId"] for c in plan["coping"] if "toolId" in c} <= PLAN_TOOLS, "a coping chip opens a tool the plan doesn't know"
+    assert sum(1 for c in plan["safer"] if c.get("firearm")) == 1, "one firearm chip, shown only where Country.firearmPrompt"
     text = json.dumps(FLOW, ensure_ascii=False)
     assert "!" not in text, "no exclamation marks"
     for word in ("promise", "should", " just ", "family", "calm down"):

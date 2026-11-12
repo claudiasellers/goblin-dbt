@@ -59,6 +59,10 @@ KINDS = [
     # My crisis kit (DT-03): one per person, kept on *Keep it*. Never stale: theirs until they set it aside or change it.
     ("crisis_kit", "my_plans", "My crisis kit", None,
      "", "Set aside. The kit opens with the starter cards until you bring it back."),
+    # The safety plan (CORE-02): one per person, built in calm. Revisited by its own `safety_plan_review` card a month on,
+    # not Me's generic "still true?", so it isn't browsed casually (PRD open question 2).
+    ("safety_plan", "my_plans", "My safety plan", None,
+     "", "Set aside. Help & safety won't open it until you bring it back."),
     # People (IE-03): someone the person named in DEAR MAN's picker. Never stale here: the safety question has its
     # own re-ask (90 days, or *Things changed*), asked in the flow, never as a Me "still true?".
     ("person", "my_people", "Someone in my life", None,

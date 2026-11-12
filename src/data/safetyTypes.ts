@@ -65,6 +65,32 @@ export interface SafetyFlow {
   morning: { title: string; choices: SafetyChoice[]; okay: string; hard: string; twiceHard: string };
   signedOut: Record<string, string>;
   cantTell: string;
+  plan: SafetyPlanCopy;
+}
+
+/** A chip in the plan builder. `toolId`: a coping chip that opens that tool; `firearm`: only where the country asks. */
+export interface PlanChip { id: string; label: string; toolId?: string; firearm?: boolean }
+
+export type PlanStepId = 'signs' | 'coping' | 'distract' | 'people' | 'pros' | 'safer' | 'reasons' | 'hear' | 'review';
+
+/** CORE-02's copy and chip catalogues (FLOW.plan in scripts/safety/content.py). */
+export interface SafetyPlanCopy {
+  title: string; intro: string; flooded: string; floodedGo: string; floodedLater: string;
+  next: string; skip: string; back: string; ownLabel: string; ownMax: number; fromDraft: string;
+  steps: Array<{ id: PlanStepId; title: string; hint: string }>;
+  signGroups: Array<{ id: string; label: string; chips: PlanChip[] }>;
+  kit: { has: string; edit: string; make: string; makeSub: string; open: string };
+  coping: PlanChip[];
+  distract: PlanChip[];
+  person: { name: string; phone: string; text: string; textDefault: string; add: string; remove: string; max: number; up: string };
+  pros: { roles: PlanChip[]; add: string; max: number };
+  safer: PlanChip[];
+  saferOwn: string;
+  reasons: PlanChip[];
+  save: string; saved: string; savedDevice: string; saveFailed: string; edit: string; empty: string;
+  use: { title: string; did: string; next: string; done: string; openTool: string; call: string; text: string; end: string };
+  review: { title: string; line: string; keep: string; change: string };
+  draftHub: string; draftHubSub: string;
 }
 
 export interface SafetyContent {

@@ -214,6 +214,38 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
       return out;
     },
   },
+  safety_plan: {
+    // CORE-02 the safety plan (Stanley & Brown; docs/design/safety-route.md): one per person (keeping it again replaces
+    // it). Chip ids and own words per step; step 2's crisis kit is referenced (`kit`), never copied. The people to ask
+    // and the professionals are one own-words field each (`peopleOwn`, `prosOwn`: a JSON list, so names, numbers and
+    // the message are encrypted together). Read through the `safetyPlan` slice (Help & safety, the safety route).
+    kind: 'safety_plan', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'my_plans', slice: 'safetyPlan',
+    owner: 'CORE', many: false, maxItems: 1, editor: null,
+    ownFields: ['signsOwn', 'copingOwn', 'distractOwn', 'peopleOwn', 'prosOwn', 'saferOwn', 'reasonsOwn', 'hearOwn'],
+    validate: (v) => {
+      const o = obj(v);
+      const out: Record<string, unknown> = {};
+      const most = { signs: 16, coping: 9, distract: 6, safer: 6, reasons: 6 } as const;
+      for (const f of Object.keys(most) as Array<keyof typeof most>) {
+        if (o[`${f}Ids`] !== undefined) out[`${f}Ids`] = strArray(o[`${f}Ids`], { max: most[f], item: (x) => str(x, { max: 40, pattern: OPTION_ID }) });
+        if (o[`${f}Own`] !== undefined) out[`${f}Own`] = str(o[`${f}Own`], { max: 200 });
+      }
+      if (o.hearOwn !== undefined) out.hearOwn = str(o.hearOwn, { max: 200 });
+      if (o.kit !== undefined) {
+        if (typeof o.kit !== 'boolean') throw new ValidationError('Expected a boolean');
+        out.kit = o.kit;
+      }
+      if (o.peopleOwn !== undefined) out.peopleOwn = JSON.stringify(planContacts(o.peopleOwn, 'people'));
+      if (o.prosOwn !== undefined) out.prosOwn = JSON.stringify(planContacts(o.prosOwn, 'pros'));
+      for (const k of Object.keys(o)) {
+        if (!/^(signs|coping|distract|safer|reasons)(Ids|Own)$/.test(k) && !['hearOwn', 'kit', 'peopleOwn', 'prosOwn'].includes(k)) throw new ValidationError('Unexpected field');
+      }
+      const has = (Object.keys(most) as string[]).some((f) => ((out[`${f}Ids`] as string[] | undefined)?.length ?? 0) > 0 || !!out[`${f}Own`])
+        || !!out.hearOwn || out.kit === true || (out.peopleOwn !== undefined && out.peopleOwn !== '[]') || (out.prosOwn !== undefined && out.prosOwn !== '[]');
+      if (!has) throw new ValidationError('A plan has at least one thing in it');
+      return out;
+    },
+  },
   // When it's a habit (DT-09, docs/design/habit-plan.md): the plan the person kept on *Keep it in Me*, for one
   // behaviour (the minimal TargetBehavior until CORE-04 owns one). The runtime's keep (R4: `<field>Ids` / `<field>Own`):
   // the behaviour (`what`), the stretch committed to (`span`, the habit_renew chip), the lapse plan (`lapse`), bridges
@@ -298,5 +330,41 @@ export function checkValue(def: ProfileKindDef, value: unknown): Record<string, 
 export function itemLabels(): Record<string, string> {
   const out: Record<string, string> = { ProfileFact: 'HAS_PROFILE_FACT', MyPattern: 'HAS_PATTERN', OwnLine: 'HAS_OWN_LINE' };
   for (const d of Object.values(PROFILE_KINDS)) out[d.label] = d.rel;
+  return out;
+}
+
+const PHONE = /^[0-9+()\-\s.#*]{0,30}$/;
+const PRO_ROLES = ['therapist', 'gp', 'care_team', 'other'] as const;
+export interface PlanPerson { name: string; phone: string; text: string }
+export interface PlanPro { role: (typeof PRO_ROLES)[number]; name: string; phone: string }
+
+/**
+ * The safety plan's people to ask (step 4: name, number, the message they'd send) or professionals (step 5: role,
+ * name, number), from a list or its JSON string (the stored form). Empty rows are dropped; the order is the person's.
+ */
+export function planContacts(v: unknown, which: 'people'): PlanPerson[];
+export function planContacts(v: unknown, which: 'pros'): PlanPro[];
+export function planContacts(v: unknown, which: 'people' | 'pros'): Array<PlanPerson | PlanPro> {
+  let list: unknown = v;
+  if (typeof v === 'string') {
+    if (v.length > 4000) throw new ValidationError('Too long');
+    try { list = JSON.parse(v); } catch { throw new ValidationError('Expected a list'); }
+  }
+  if (!Array.isArray(list) || list.length > (which === 'people' ? 5 : 3)) throw new ValidationError('Expected a short list');
+  const out: Array<PlanPerson | PlanPro> = [];
+  for (const row of list) {
+    const r = obj(row);
+    const name = typeof r.name === 'string' ? str(r.name, { min: 0, max: 40 }).trim() : '';
+    const phone = typeof r.phone === 'string' ? str(r.phone, { min: 0, max: 30, pattern: PHONE }).trim() : '';
+    if (which === 'people') {
+      for (const k of Object.keys(r)) if (!['name', 'phone', 'text'].includes(k)) throw new ValidationError('Unexpected field');
+      const text = typeof r.text === 'string' ? str(r.text, { min: 0, max: 160 }).trim() : '';
+      if (name || phone) out.push({ name, phone, text });
+    } else {
+      for (const k of Object.keys(r)) if (!['role', 'name', 'phone'].includes(k)) throw new ValidationError('Unexpected field');
+      const role = oneOf(r.role, PRO_ROLES);
+      if (name || phone) out.push({ role, name, phone });
+    }
+  }
   return out;
 }

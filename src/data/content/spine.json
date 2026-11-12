@@ -1691,6 +1691,43 @@
         "notification": "Checking in"
       },
       {
+        "id": "safety_plan_review",
+        "ownerModule": "core",
+        "tier": "safety",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/safety/plan?review={followUpId}",
+        "staleAfterHours": 336,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "A month on: still right for you?",
+          "title": "Your plan"
+        },
+        "choices": [
+          {
+            "id": "not_now",
+            "label": "Not now",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "chips": {
+            "month": {
+              "days": 30,
+              "kind": "at_local",
+              "time": "10:00"
+            }
+          },
+          "kind": "chip"
+        },
+        "notification": "A month on: a look at your plan"
+      },
+      {
         "id": "tool_outcome",
         "ownerModule": "core",
         "tier": "skills",

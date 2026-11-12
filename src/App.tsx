@@ -9,6 +9,7 @@ import { Signup } from './pages/Signup';
 import { ToolPage } from './pages/ToolPage';
 import { Profile } from './pages/Profile';
 import { Safety } from './pages/Safety';
+import { SafetyPlan } from './pages/SafetyPlan';
 
 /** The den (Me → Parts of me → See them together): its own chunk, fetched only on its route. */
 const LazyPartsDenPage = lazy(() => import('./components/parts/den/PartsDenPage').then((m) => ({ default: m.PartsDenPage })));
@@ -30,6 +31,7 @@ function App() {
         <Route path="/me/parts/den" element={<Suspense fallback={null}><LazyPartsDenPage /></Suspense>} />
         <Route path="/tool/:toolId" element={<ToolPage />} />
         <Route path="/safety" element={<Safety />} />
+        <Route path="/safety/plan" element={<SafetyPlan />} />
       </Route>
     </Routes>
   );

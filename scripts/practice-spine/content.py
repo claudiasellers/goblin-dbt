@@ -455,6 +455,19 @@ FOLLOW_UP_TYPES = [
         "notification": "Checking in",
     },
     {
+        # The safety plan's review (CORE-02, docs/design/safety-route.md): a month after the plan is saved, *Did anything
+        # on it help? Anything to change?* (keep as is · change something). Content-free on Today and in notifications,
+        # like the morning check. Scheduled on save, signed in only; a re-save books a new one.
+        "id": "safety_plan_review", "ownerModule": "core", "tier": "safety", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/safety/plan?review={followUpId}",
+        "window": {"kind": "chip", "chips": {"month": {"kind": "at_local", "days": 30, "time": "10:00"}}},
+        "staleAfterHours": 336, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Your plan", "body": "A month on: still right for you?"},
+        "choices": [{"id": "not_now", "label": "Not now", "status": "dismissed"}],
+        "notification": "A month on: a look at your plan",
+    },
+    {
         # E3 §A4.2.6: "Come back to this later" from the breakdown hand-off (A4-2 schedules it).
         "id": "resume_skill", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
         "deepLinkTemplate": "/tool/{sourceToolId}?resume={sourceSessionId}&followUp={followUpId}",

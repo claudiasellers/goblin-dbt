@@ -89,7 +89,17 @@ export interface ProfileSlices {
     sootheIds: string[]; sootheOwn: string | null; wordsIds: string[]; wordsOwn: string | null;
     placeIds: string[]; placeOwn: string | null; reasonsIds: string[]; reasonsOwn: string | null; meta: ProfileItemMeta;
   } | null;
-  safetyPlan: null;
+  /**
+   * The kept safety plan (CORE-02, kind `safety_plan`, one per person), active only, or null: chip ids and own words per
+   * step (decrypted for them), the people to ask and the professionals as lists, `kit` when step 2 is their crisis kit.
+   */
+  safetyPlan: {
+    id: string; signsIds: string[]; signsOwn: string | null; copingIds: string[]; copingOwn: string | null; kit: boolean;
+    distractIds: string[]; distractOwn: string | null; people: Array<{ name: string; phone: string; text: string }>;
+    pros: Array<{ role: 'therapist' | 'gp' | 'care_team' | 'other'; name: string; phone: string }>;
+    saferIds: string[]; saferOwn: string | null; reasonsIds: string[]; reasonsOwn: string | null; hearOwn: string | null;
+    meta: ProfileItemMeta;
+  } | null;
   country: null;
   /**
    * Kept parts (Phase 2), active and resting only; nothing at all while parts are off
@@ -169,6 +179,7 @@ export const PROFILE_NEEDS = {
   'five-senses': ['parts'],
   'pause': ['parts', 'prosCons'],              // prosCons: the kept card for the pull (DT-10's replay, on proceed)
   'crisis-kit': ['crisisKit', 'prosCons'],     // the kept kit and pros & cons cards, one card at a time (DT-03)
+  'safety': ['safetyPlan', 'crisisKit'],        // Help & safety and the safety route: the plan, and its step 2's kit (CORE-02)
   'urge-surfing': ['parts'],
   'let-it-be': ['parts'],                    // the tag row on its in-flow close (docs/design/let-it-be.md)
   'mind-job': ['parts'],                     // the tag row on its in-flow close (docs/design/mind-job.md)

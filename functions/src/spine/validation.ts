@@ -154,12 +154,12 @@ export interface ScheduleInput {
   notify: { push: boolean | null; inTab: boolean | null; ics: boolean | null };
 }
 
-/** One follow-up to schedule: dueAt within [now − 5 min, now + 14 d]. */
+/** One follow-up to schedule: dueAt within [now − 5 min, now + 32 d] (a month's chip: the safety plan's review, Ending's *In a month*). */
 export function validateScheduleItem(raw: unknown, now: Date): ScheduleInput {
   const d = obj(raw);
   const dueAt = isoDateTime(d.dueAt);
   const t = Date.parse(dueAt);
-  if (t < now.getTime() - 5 * MINUTE || t > now.getTime() + 14 * 24 * 60 * MINUTE) throw new ValidationError('dueAt out of range');
+  if (t < now.getTime() - 5 * MINUTE || t > now.getTime() + 32 * 24 * 60 * MINUTE) throw new ValidationError('dueAt out of range');
   const n = d.notify === undefined || d.notify === null ? {} : obj(d.notify);
   const flag = (v: unknown) => (typeof v === 'boolean' ? v : null);
   return {
