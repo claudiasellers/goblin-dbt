@@ -195,6 +195,8 @@ export interface SafetyFlag {
   type: string;
   trigger: string;
   action: string;
+  /** CORE-01: what the person sees (the clinician `action` is never shown). */
+  userCopy?: string | null;
 }
 
 export interface CoOccurrence {
@@ -218,6 +220,8 @@ export interface StateResult {
   coOccurrence?: CoOccurrence;
   guidedActivity?: GuidedActivityRecommendation;
   routing?: Routing;
+  /** CORE-01: present while the safety route is on; `ask` means the check-in asks before the result. */
+  safetyAsk?: { ask: boolean; reasons: string[] } | null;
 }
 
 export interface DiscriminatingQuestion {
@@ -257,6 +261,7 @@ const getStateAndToolsFn = httpsCallable<
     bandSource?: 'probe' | 'ftf' | 'carried';
     blank?: boolean;
     surface?: 'checkin' | 'dear_man_debrief';
+    safetyRoute?: boolean;
   },
   StateResult
 >(functions, 'getStateAndTools');
@@ -296,6 +301,8 @@ export async function getStateAndTools(input: {
   /** Find the feeling's pull was `blank`: never calm this state. */
   blank?: boolean;
   surface?: 'checkin' | 'dear_man_debrief';
+  /** CORE-01: this client can show the safety route (else the server keeps the old crisis flag). */
+  safetyRoute?: boolean;
 }): Promise<StateResult> {
   const result = await getStateAndToolsFn(input);
   return result.data;

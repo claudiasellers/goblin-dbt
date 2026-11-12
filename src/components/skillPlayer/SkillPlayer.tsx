@@ -451,7 +451,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
       {skill.quickExit && !inline && <QuickExit />}
       {/* safety.open sits over the step, which stays mounted (a hold keeps its time) and comes back as it was. P2 is
           modal too: under it the step is inert, so a step that moves on underneath can't take focus from the dialog. */}
-      {safetyOpen && <SafetyOpen onBack={() => setSafetyOpen(false)} />}
+      {safetyOpen && <SafetyOpen toolId={skill.toolId} onBack={() => setSafetyOpen(false)} />}
       <div key={leaving ? 'leaving' : st.stepId} hidden={safetyOpen} inert={safetyOpen || p2Open} className="space-y-4 motion-safe:animate-[stepEnter_300ms_ease-out]">
         {track && (
           <p className={`${secondaryText} first-letter:uppercase`} data-testid="pick-track" aria-live="off">

@@ -40,7 +40,8 @@ export const getStateAndTools = callable<unknown, StateResult | { warm: true }>(
     const input = parseOrInvalid(() => parseStateRequest(data), 'Invalid check-in');
     let result: StateResult;
     try {
-      result = await readTx((tx) => getStateAndToolsHandler(input, graphDeps(tx, uid as string)));
+      // The safety route applies only for a client that can show it (CORE-01): any other keeps the old crisis flag.
+      result = await readTx((tx) => getStateAndToolsHandler(input, graphDeps(tx, input.safetyRoute ? (uid as string) : undefined)));
     } catch (error) {
       if (error instanceof PatternNotFoundError) throw new HttpsError('not-found', error.message);
       throw error;

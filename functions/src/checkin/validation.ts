@@ -70,6 +70,8 @@ export interface SaveCheckInInput {
   coOccurrenceLabel: string | null;
   guidedActivityId: string | null;
   safetyFlagId: string | null;
+  /** CORE-01: the safety route's visit this check-in asked (`SafetyCheck.id`); kept once set. */
+  safetyCheckId: string | null;
   resultShown: boolean;
   nextAction: CheckInNextAction | null;
   embeddedToolSessionIds: string[];
@@ -235,6 +237,7 @@ export function validateSaveCheckIn(raw: unknown, now: Date): SaveCheckInInput {
     coOccurrenceLabel: typeof raw.coOccurrenceLabel === 'string' && raw.coOccurrenceLabel ? raw.coOccurrenceLabel.slice(0, 200) : null,
     guidedActivityId: id(raw.guidedActivityId, STEP_ID),
     safetyFlagId: id(raw.safetyFlagId, GRAPH_ID),
+    safetyCheckId: typeof raw.safetyCheckId === 'string' && UUID.test(raw.safetyCheckId) ? raw.safetyCheckId : null,
     resultShown: raw.resultShown === true,
     nextAction: parseNextAction(raw.nextAction),
     embeddedToolSessionIds: ids(raw.embeddedToolSessionIds, UUID, 3),

@@ -34,6 +34,11 @@ export interface CheckInInput {
   blank?: boolean;
   /** E4-3: which screen asked (logged; rows are filtered to `checkin_result` either way). */
   surface?: Surface;
+  /**
+   * CORE-01: the client can show the safety route. Only then does SafetyPolicy apply; a client without it
+   * (an older build, mid-deploy) keeps the old crisis flag, so nobody gets neither the question nor the banner.
+   */
+  safetyRoute?: boolean;
 }
 
 export interface ActivationPatternResult {

@@ -44,9 +44,12 @@ test("loads after the graph it touches and before routing; MERGE-only; constrain
   assert.ok(stmts.some((x) => /^MATCH \(l:CrisisLine\) WHERE NOT l\.id IN \[.*"us_988".*\]\nDETACH DELETE l$/s.test(x)));
 });
 
-test("the switch is off, and the content says so in one place", () => {
-  assert.match(cypher, /MERGE \(p:SafetyPolicy \{id: "safety_route"\}\)\nSET p\.enabled = false/);
-  assert.match(read("scripts/safety/content.py"), /POLICY = \{"id": "safety_route", "enabled": False/);
+test("the switch is on, with its reason named in one place; the old servers' field stays off", () => {
+  // `enabled` is what servers before PR 2 read: false for good, so a load before the functions deploy drops nothing.
+  assert.match(cypher, /MERGE \(p:SafetyPolicy \{id: "safety_route"\}\)\nSET p\.enabled = false, p\.routeOn = true/);
+  const content = read("scripts/safety/content.py");
+  assert.match(content, /POLICY = \{"id": "safety_route", "enabled": False, "routeOn": True/);
+  assert.match(content, /APPROVED_TO_SHIP = "Claudia, 12 Nov 2026: [^"]+"/);
 });
 
 // The schema replayed in memory (scripts/recommendations/schema_graph.py), as a content-only export.
@@ -190,7 +193,7 @@ test("the switch on: the question decides, the result carries a referral flag at
 });
 
 test("queries: ids and enums only; the policy defaults off; referrals only on the route", async () => {
-  assert.match(ask.SAFETY_POLICY_QUERY, /coalesce\(p\.enabled, false\)/);
+  assert.match(ask.SAFETY_POLICY_QUERY, /coalesce\(p\.routeOn, false\)/);
   assert.match(ask.SAFETY_HISTORY_QUERY, /\(:User \{id: \$uid\}\)-\[:HAS_SAFETY_CHECK\]->\(s:SafetyCheck\)/);
   // `all`, `any`, `none`, `single` are Cypher keywords: never a variable name in these queries.
   for (const q of [ask.SAFETY_HISTORY_QUERY, ask.SAFETY_ASK_GRAPH_QUERY, ask.SAFETY_POLICY_QUERY, rec.SAVE_SAFETY_CHECK_QUERY]) {
