@@ -28,7 +28,7 @@ PROFILE_OPTION_SLICES = {"parts", "ownLines", "savedLines", "people", "values", 
 THEN_VS_NOW = {"worse", "same", "better", "much_better"}
 FOLLOW_UPS = {t["id"]: t for t in FOLLOW_UP_TYPES}
 # Context keys a skill may accept (src/data/skillTypes.ts CtxKey).
-CTX_KEYS = {"urgeId", "personId", "frame", "enterAt", "situationId", "partId", "band", "returnTo", "emotionId", "refused"}
+CTX_KEYS = {"urgeId", "personId", "frame", "enterAt", "situationId", "partId", "band", "returnTo", "emotionId", "refused", "feelingId"}
 CRISIS_VARIANTS = {"crisis", "other_person", "medical"}
 # An option's `danger` → the crisis slot variant its step must declare (plan C6.4). `medical`: DT-01's chest pain or
 # fainting (call the emergency number, not a crisis line).
@@ -45,7 +45,11 @@ PRESENTS_LABELS = {"ProblemType", "SolutionDirection", "DecompositionAspect", "B
                    # Cope Ahead's (schema/cope-ahead.cypher) and Find the feeling's pulls (schema/find-the-feeling.cypher).
                    "CopeSituation", "HardMoment", "CopeMove", "FeelingUrge",
                    # DEAR MAN's debrief vocabulary (schema/dear-man-debrief-content.cypher, scripts/dear-man/content.py).
-                   "TurningPoint", "MomentResponse", "BodySignal", "ThoughtPattern", "Underneath", "CopeAhead", "TroubleshootFactor"}
+                   "TurningPoint", "MomentResponse", "BodySignal", "ThoughtPattern", "Underneath", "CopeAhead", "TroubleshootFactor",
+                   # DEAR MAN's prep vocabulary (schema/dear-man-content*.cypher, scripts/dear-man/content.py).
+                   "DearManSituationType", "DearManBarrier", "DearManDescribeOption", "DearManFeelingChip",
+                   "DearManAssertOption", "DearManReinforceOption", "DearManAnchorNeed", "DearManAnchorPhrase",
+                   "ConfidenceCue", "DearManNegotiateOption"}
 
 
 def q(s): return json.dumps(s, ensure_ascii=False)
@@ -181,6 +185,11 @@ def check(skill):
                 assert e.get("done") or e.get("toolId") in tools, (sid, e)
         for f in e.get("carry", []):
             assert f in fields, (sid, e)
+        # A query value starting with `$` is read from the run when the exit is taken: `$a.<field>` (its first pick) or
+        # `$ctx.<key>` (context in). A missing or non-id value is left out of the link.
+        for k, v in e.get("query", {}).items():
+            if isinstance(v, str) and v.startswith("$"):
+                assert (v.startswith("$a.") and v[3:] in fields) or (v.startswith("$ctx.") and v[5:] in skill.get("accepts", [])), (sid, e["id"], k, v)
     for s in skill["steps"]:
         w = f"{sid}.{s['id']}"
         assert s["kind"] in STEP_KINDS, w

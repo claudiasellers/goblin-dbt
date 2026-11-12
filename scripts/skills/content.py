@@ -23,12 +23,13 @@ import say_no  # noqa: E402
 import dear_man_one  # noqa: E402
 import held  # noqa: E402
 import thoughts_passing  # noqa: E402
+import dear_man_prep  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
 SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKILL, *fast.SKILLS, nightmare_rescript.SKILL, problem_solve.SKILL,
           ending_relationships.SKILL, cope_ahead.SKILL, hold_to_wait.SKILL, dear_man_debrief.SKILL, pros_cons.SKILL, first_body.SKILL,
-          ride_it_out.SKILL, let_it_be.SKILL, mind_job.SKILL, say_no.SKILL, dear_man_one.SKILL, held.SKILL, thoughts_passing.SKILL]
+          ride_it_out.SKILL, let_it_be.SKILL, mind_job.SKILL, say_no.SKILL, dear_man_one.SKILL, held.SKILL, thoughts_passing.SKILL, dear_man_prep.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -77,6 +78,9 @@ EMBEDS = {
     # IE-B3's message card (plan C3b `messageComposer`, IE-owned): the picks as one message, with the FAST strip (an
     # extra sorry, over-explaining) and the line to repeat; Copy and Open messages, never a send. Reports what was done.
     "messageComposer": {"ids": ["copied", "opened", "dropped_sorry"]},
+    # IE-B4's pocket card (plan C3b `pocketCard`, IE-01 Mode C): the plan on three cards (say it, stay steady, if they
+    # push back), read through one at a time, no input. Reports whether every card was seen and whether it was copied.
+    "pocketCard": {"ids": ["seen_all", "copied"]},
 }
 # What each embed takes from the skill (embeds.ts EMBED_PROPS; the contract test keeps the two equal). build.py
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
@@ -86,6 +90,25 @@ EMBED_PROPS = {
     "partsLine": {"promptId": {"type": "id"}, "as": {"type": "enum", "values": ["line", "heading"], "optional": True}},
     "partLater": {},
     "debriefWho": {},
+    # The card's three cards each list their fields' picks in order; `fill` / `detail`: a pick of `fill` with a
+    # [blank] reads `detail`'s words in its place (DEAR MAN's asks).
+    "pocketCard": {
+        "say": {"type": "fields"}, "steady": {"type": "fields"}, "push": {"type": "fields"},
+        "fill": {"type": "field", "optional": True}, "detail": {"type": "field", "optional": True},
+        "sayLabel": {"type": "copy"}, "steadyLabel": {"type": "copy"}, "pushLabel": {"type": "copy"},
+        "prevLabel": {"type": "copy"}, "nextCardLabel": {"type": "copy"},
+        "copyLabel": {"type": "copy"}, "copiedLabel": {"type": "copy"}, "selectedLabel": {"type": "copy"},
+        "next": {"type": "copy"},
+        # The quiet way on before the last card (`next` once every card is in view).
+        "skipLabel": {"type": "copy", "optional": True},
+        # `joinField`'s picks join into one sentence after `joinLead` ("I felt hurt and unheard.").
+        "joinField": {"type": "field", "optional": True}, "joinLead": {"type": "copy", "optional": True},
+        # Up to two fields whose lines carry a small label ("I won't accept").
+        "labelAField": {"type": "field", "optional": True}, "labelA": {"type": "copy", "optional": True},
+        "labelBField": {"type": "field", "optional": True}, "labelB": {"type": "copy", "optional": True},
+        # Fixed lines at the end of the steady card (only when it has the person's own picks).
+        "steadyNoteA": {"type": "copy", "optional": True}, "steadyNoteB": {"type": "copy", "optional": True},
+    },
     "holdRing": {
         "variant": {"type": "enum", "values": ["press", "timed", "settle"]},
         "seconds": {"type": "int", "min": 1, "max": 900},
