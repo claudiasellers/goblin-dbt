@@ -140,9 +140,9 @@ test("skill: the no_outcome card reopens the run at *Did you say no?*, asked fre
   assert.deepEqual(step("said").clears, ["said", "held", "proud"]);
   assert.deepEqual(step("said").next.map((n) => n.to), ["not_said", "partly", "held"]);
   assert.deepEqual(step("held").next.map((n) => n.to), ["gave_in", "proud"]);
-  // *I gave in* is met flatly, then a rehearsal (planned) and Check the Facts for the guilt; not proud → FAST.
+  // *I gave in* is met flatly, then a rehearsal (IE-02) and Check the Facts for the guilt; not proud → FAST.
   assert.deepEqual(step("gave_in").offers.map((o) => o.exit), ["rehearse", "check_the_facts"]);
-  assert.equal(exitTool("rehearse").planned, true);
+  assert.deepEqual(exitTool("rehearse").query, { situationId: "say_no", person: "$ctx.personId" });
   assert.deepEqual(step("held_end").offers.map((o) => o.exit), ["fast"]);
   assert.equal(M.offersFor(ctx(), step("held_end"), { answers: { proud: { ids: ["yes"], own: null } } }).length, 0);
 });

@@ -234,6 +234,7 @@ COPY = {
     "situation_title_heads_up": DM.SAFETY_COPY["badlyHeadsUp"] + " What kind of conversation is this?",
     "debrief_link": "I've already had the conversation",
     "notice_them_offer": "Notice them next time, with curiosity",
+    "rehearse_offer": "Practise it out loud",
     "cool_down": "Settle my body first",
     "scared_line": "Your safety comes first. You don't have to plan this conversation. The people below can help, any time.",
     "matters_title": "What matters most to you here?",
@@ -464,7 +465,8 @@ STEPS = [
         "followUp": {"type": "ask_outcome", "whenFrom": "when"},
         # The old summary's *Rehearse it*: Cope Ahead for a conversation, with the part picked in `who`. Notice them
         # (IE-10): the PRD's optional *their side*, as an offer here, not a step inside the plan.
-        "offers": [{"exit": "cope_ahead", "when": None}, {"exit": "notice_them", "when": None}], "done": "done",
+        "offers": [{"exit": "rehearse", "when": None}, {"exit": "cope_ahead", "when": None}, {"exit": "notice_them", "when": None}],
+        "done": "done",
     },
 ]
 
@@ -473,6 +475,7 @@ EXITS = [
     {"id": "let_go", "toolId": "fast", "query": {"frame": "let_go"}},
     {"id": "cool_down", "toolId": "cool-down"},
     {"id": "cope_ahead", "toolId": "cope-ahead", "query": {"situationId": "conversation", "partId": "$a.part"}},
+    {"id": "rehearse", "toolId": "rehearse", "query": {"situationId": "ask", "person": "$ctx.personId"}, "label": "rehearse_offer"},
     {"id": "notice_them", "toolId": "mindfulness-of-others", "query": {"situationId": "notice", "person": "$ctx.personId"},
      "label": "notice_them_offer"},
     {"id": "ending_careful", "toolId": "ending-relationships", "query": {"frame": "careful"}},

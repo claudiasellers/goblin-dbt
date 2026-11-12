@@ -383,6 +383,17 @@
     "irritation"
    ]
   },
+  "dbt_behavioral_rehearsal": {
+   "appToolId": "rehearse",
+   "name": "Behavioural Rehearsal",
+   "description": "Practising a hard conversation before it happens: saying the line out loud, meeting the pushback you choose, and trying a move that keeps you on track",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": "change",
+   "skillKind": "relational",
+   "direction": "neutral",
+   "addresses": []
+  },
   "dbt_build_mastery": {
    "appToolId": "build-mastery",
    "name": "Build Mastery",
@@ -4147,6 +4158,34 @@
    "version": "rf-v2",
    "reviewStatus": "approved",
    "rationale": "Keep it warm's repair (IE-06) beside Check the Facts for remorse: is the guilt justified, then repair with the person (one acknowledgement, one sorry). Its repair route asks whether some of it was yours first. Not guilty: guilt is often about the self, not someone to repair with."
+  },
+  {
+   "id": "rf_rumination_loop_words_say-it_rehearse",
+   "conceptId": "dbt_behavioral_rehearsal",
+   "patternId": "rumination_loop",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.55,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "hesitant"
+   ],
+   "beside": [
+    "check-the-facts"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "approved",
+   "rationale": "Rehearse it (IE-02) beside Check the Facts for hesitation: holding back from saying something is often a skill gap as much as a worry, and practising the line with the pushback you choose is the approach move. Not guilty or remorseful (Check the Facts, then Keep it warm's repair)."
   },
   {
    "id": "rf_social_threat_shame_addresses_recovering-from-invalidation",
