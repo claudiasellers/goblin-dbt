@@ -370,7 +370,7 @@ STEPS = [
         "fields": [{
             "id": "problem", "label": "problem_q", "max": 1, "swap": True, "required": True,
             "options": {"list": "problem", "where": {"any": [eq("$opt.parent", "$d.parent"), eq("$opt.all", True)]}},
-            # 80, like the step below: the longest record (every field, both own-words boxes full) stays under ext's 4 KB.
+            # 80, like the step below: the longest record (every field, both own-words boxes full) stays under ext's 6 KB.
             "own": {"hint": "own_hint", "countsAsPick": True, "max": 80},
             # Own words are never read, so danger told in them can't raise the banner: someone to talk to is one tap away.
             "links": [{"exit": "safety_open", "label": "safety_open", "when": {"any": [{"own": "problem"}, {"in": [a("feel"), HOPELESS]}]}}],

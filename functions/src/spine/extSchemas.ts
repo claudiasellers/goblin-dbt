@@ -4,7 +4,8 @@
  * Each namespace has a registered schema. Values are ids / enums / booleans; integers are allowed
  * only on keys ending `Sec` or `Count` (durations and counts are not scales), or as one of a closed set
  * a key registers as `one` (Cope Ahead's `rehearsed`: 1 or 2 passes, never a scale); the whole object is
- * ≤ 4 KB serialised. No numeric scale ever reaches a session record, and no free text except the
+ * ≤ 6 KB serialised (4 KB until ER-B5: Do the Opposite's longest real record through the inline check, own words at
+ * the cap, is 4.3 KB; tests/skill-opposite-action.test.mjs). No numeric scale ever reaches a session record, and no free text except the
  * person's own words on a key a tool registers as `text` (Wise mind's and Cope Ahead's `*Own`):
  * length-checked only, never linted or interpreted, never shown back outside that visit and My words.
  */
@@ -21,7 +22,7 @@ type Field =
   | { t: 'objs'; max: number; of: Record<string, Field> };
 
 const ID = /^[a-z0-9][a-z0-9_:-]{0,63}$/i;
-export const EXT_MAX_BYTES = 4096;
+export const EXT_MAX_BYTES = 6144;
 /** Wise mind's own words (scripts/wise-mind/content.py OWN_MAX). */
 export const WM_OWN_MAX = 140;
 /** Cope Ahead's own words (scripts/cope-ahead/content.py OWN_MAX, MOVE_OWN_MAX). */
@@ -124,7 +125,7 @@ export const EXT_SCHEMAS: Record<string, Record<string, Field>> = {
     versionId: { t: 'id' },                                                        // its version (cf-v1)
     path: { t: 'ids', max: 48 },                                                   // step ids, in the order shown
     answers: {                                                                     // what was chosen, per question
-      t: 'objs', max: 32,
+      t: 'objs', max: 40,
       // `pick`: a per-pick step's answer (R16, Do the Opposite's feelings): the pick it is for.
       of: { fieldId: { t: 'id' }, pick: { t: 'id' }, optionIds: { t: 'ids', max: 12 }, valueOwn: { t: 'text', max: RUN_OWN_MAX } },
     },
@@ -220,7 +221,7 @@ export function checkExtField(ns: string, key: string, v: unknown): unknown {
 /**
  * Validate `ext` ({namespace: {...}}). Returns the JSON string stored on the session, or null when
  * empty. Throws ValidationError for an unknown namespace or key, a number outside *Sec/*Count, free
- * text, or more than 4 KB.
+ * text, or more than 6 KB.
  */
 export function validateExt(raw: unknown): string | null {
   if (raw === undefined || raw === null) return null;
@@ -234,6 +235,6 @@ export function validateExt(raw: unknown): string | null {
   }
   if (!Object.keys(out).length) return null;
   const s = JSON.stringify(out);
-  if (Buffer.byteLength(s, 'utf8') > EXT_MAX_BYTES) throw new ValidationError('ext: over 4 KB');
+  if (Buffer.byteLength(s, 'utf8') > EXT_MAX_BYTES) throw new ValidationError('ext: over 6 KB');
   return s;
 }

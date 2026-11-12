@@ -9,13 +9,13 @@ import { readFileSync } from "node:fs";
 import { importTs } from "./lib/importTs.mjs";
 
 const M = await importTs("src/lib/skillRuntime/machine.ts");
-const { validateExt } = await importTs("functions/src/spine/extSchemas.ts");
+const { validateExt, EXT_MAX_BYTES } = await importTs("functions/src/spine/extSchemas.ts");
 const { oaFromRun, repairRule } = await importTs("functions/src/oppositeAction/projection.ts");
 const { legacyLink } = await importTs("src/lib/skillRuntime/playerTools.ts");
 const content = JSON.parse(readFileSync("tests/fixtures/skills-content.json", "utf8"));
 const spine = JSON.parse(readFileSync("src/data/content/spine.json", "utf8")).content;
 const skill = content.skills.find((s) => s.id === "opposite_action");
-const embedOutputs = { holdRing: { ids: ["held", "partly", "skipped"], measures: ["durationSec", "doneCount", "earlyCount"] }, doorPicker: { emotions: 3 } };
+const embedOutputs = { holdRing: { ids: ["held", "partly", "skipped"], measures: ["durationSec", "doneCount", "earlyCount"] }, doorPicker: { emotions: 3 }, inlineSkill: { ids: ["finished", "left", "stopped", "body", "unsafe"] } };
 const GRID = new Set(["anxious", "angry", "guilty", "sad", "ashamed", "happy", "lonely"]);
 const ctx = (ctxIn = {}) => ({ skill, shared: content, carried: [], gridIds: GRID, emotionLabel: (x) => x, ctxIn, embedOutputs });
 const pick = (fieldId, value) => ({ type: "pick", fieldId, value });
@@ -27,6 +27,7 @@ const run = (events, c = ctx(), from = M.initialRun(skill)) => events.reduce((s,
 const chips = (c, s, stepId, fieldId) => M.optionGroups(c, M.stepOf(skill, stepId).fields.find((f) => f.id === fieldId), M.answersOf(c, s)).flatMap((g) => g.options.map((o) => o.value));
 const line = (s) => M.handoffLine(ctx(), M.stepOf(skill, s.stepId), { answers: M.answersOf(ctx(), s) });
 const offers = (s) => M.offersFor(ctx(), M.stepOf(skill, s.stepId), { answers: M.answersOf(ctx(), s) });
+const title = (s) => M.copyText(ctx(), M.stepOf(skill, s.stepId).title, { answers: M.answersOf(ctx(), s) });
 
 const SAFE = [pick("goal", "connection"), next, pick("safety", "safe"), next];
 /** One feeling from its validation screen to the step, on the opposite route. */
@@ -92,11 +93,13 @@ test("the route, per feeling: opposite, clarify (its own line for not fit + help
   const to = (feel, fits, help, goal = "connection") => run([doors(feel), pick("goal", goal), next, pick("safety", "safe"), next,
     pick("urge", chips(ctx(), run([doors(feel), ...SAFE]), "vald", "urge")[0]), next, pick("want", "yes"), next, pick("fits", fits), next, pick("help", help), next]);
   assert.equal(to("anxious", "not_fit", "unhelpful").stepId, "cue");
+  // Only *I still do not know* checks the facts inline (ER-B5, Gate 2); the other clarify rows keep the clarify card.
   const clar = to("anxious", "not_fit", "helpful");
   assert.equal(clar.stepId, "clar");
   assert.equal(line(clar), skill.copy.clar_not_fit);
   assert.deepEqual(offers(clar), ["check_the_facts"]);
-  assert.equal(line(to("anxious", "unsure", "unhelpful")), skill.copy.clar_line);
+  assert.equal(line(to("anxious", "fits", "unsure")), skill.copy.clar_line);
+  for (const help of ["helpful", "unhelpful", "unsure"]) assert.equal(to("anxious", "unsure", help).stepId, "ctf", help);
   const prob = to("angry", "fits", "helpful");
   assert.equal(prob.stepId, "prob");
   assert.deepEqual(offers(prob), ["problem_solve"]);
@@ -104,6 +107,93 @@ test("the route, per feeling: opposite, clarify (its own line for not fit + help
   assert.equal(to("guilty", "fits", "unhelpful", "repair").stepId, "repr");
   assert.equal(to("guilty", "fits", "unhelpful", "connection").stepId, "cue", "repair only with the repair goal");
   assert.equal(to("sad", "fits", "unhelpful", "repair").stepId, "cue", "repair only for guilt or shame");
+});
+
+const toCheck = (feel, help, { goal = "connection", urge = null } = {}) => run([doors(feel), pick("goal", goal), next,
+  pick("safety", "safe"), next, pick("urge", urge ?? chips(ctx(), run([doors(feel), ...SAFE]), "vald", "urge").find((u) => u !== "guilt-punish")), next,
+  pick("want", "yes"), next, pick("fits", "unsure"), next, pick("help", help), next]);
+const back = (from, ...ids) => run([{ type: "embedDone", output: { ids } }], ctx(), from);
+
+test("Check the Facts inline on I still do not know (ER-B5): the verdict joins will it help? in the table, unsafe wins", () => {
+  const ctf = toCheck("anxious", "unsure");
+  assert.equal(ctf.stepId, "ctf");
+  const step = M.stepOf(skill, "ctf");
+  assert.equal(step.props.skill, "check_the_facts");
+  assert.deepEqual(step.props.outcomes, ["fits", "partly", "doesnt_fit", "unsure"], "build.py writes the sub-skill's outcomes on the step");
+  assert.deepEqual(M.inlineCtxFor(ctx(), ctf, step.props), { feelingId: "anxious" }, "the feeling it's on goes in");
+  assert.equal(title(ctf), "A closer look at the fear", "the parent's noun, never the grid word");
+  // The graph's table on the verdict (fits → fits, partly → excessive, doesnt_fit → not_fit) and the help answer.
+  const flow = readFileSync("schema/opposite-action-flow.cypher", "utf8").match(/p\.contentJson = "((?:[^"\\]|\\.)*)"/)[1];
+  const routes = JSON.parse(JSON.parse(`"${flow}"`)).routes;
+  const STEP = { opposite: "cue", problem: "prob", clarify: "clar" };
+  for (const help of ["helpful", "unhelpful", "unsure"]) {
+    const from = toCheck("anxious", help);
+    for (const [v, f] of [["fits", "fits"], ["partly", "excessive"], ["doesnt_fit", "not_fit"]]) {
+      assert.equal(back(from, v).stepId, STEP[routes[`${f}:${help}`]], `${v}:${help}`);
+    }
+    assert.equal(back(from, "unsure").stepId, "clar", `unsure:${help}`);
+  }
+  const prob = back(toCheck("anxious", "helpful"), "fits");
+  assert.equal(title(prob), skill.copy.prob_title_checked);
+  const partly = back(toCheck("anxious", "helpful"), "partly");
+  assert.equal(title(partly), skill.copy.prob_title_partly);
+  assert.equal(line(partly), skill.copy.prob_partly);
+  assert.deepEqual(offers(partly), ["cool_down", "problem_solve"]);
+  // Doesn't fit, and acting on it seems useful: another goal? Wise mind, no second check.
+  const other = back(toCheck("anxious", "helpful"), "doesnt_fit");
+  assert.equal(other.stepId, "clar");
+  assert.equal(line(other), skill.copy.clar_checked_helpful);
+  assert.deepEqual(offers(other), ["wise_mind"]);
+  const open = back(toCheck("anxious", "unsure"), "fits");
+  assert.equal(title(open), skill.copy.clar_title_open);
+  assert.equal(line(open), skill.copy.clar_checked_open);
+  const notFitOpen = back(toCheck("anxious", "unsure"), "doesnt_fit");
+  assert.equal(line(notFitOpen), skill.copy.clar_checked_notfit_open);
+  const unsure = back(ctf, "unsure");
+  assert.equal(title(unsure), skill.copy.clar_title_unsure);
+  assert.equal(line(unsure), skill.copy.clar_unsure);
+  assert.deepEqual(offers(unsure), ["wise_mind"]);
+  // Leaving the check early: the facts will keep, the full check as a link.
+  const left = back(ctf, "left");
+  assert.equal(left.stepId, "clar");
+  assert.equal(title(left), skill.copy.clar_title_left);
+  assert.equal(line(left), skill.copy.clar_left);
+  assert.deepEqual(offers(left), ["check_the_facts"]);
+  // A danger chip, then a verdict: the danger card wins, the other-person resources, no close, no carrying on.
+  const cdng = M.stepOf(skill, "cdng");
+  assert.equal(cdng.noClose, true);
+  assert.equal(cdng.carryOn, undefined, "nothing is practised after a danger card");
+  for (const ids of [["fits", "unsafe"], ["doesnt_fit", "unsafe"], ["stopped", "unsafe"], ["stopped"]]) {
+    const d = back(ctf, ...ids);
+    assert.equal(d.stepId, "cdng", ids.join("+"));
+    assert.equal(M.crisisFor(ctx(), cdng, d)?.variant, "other_person");
+  }
+  // An id the sub-skill can't give is dropped (the machine keeps only the declared ones).
+  assert.equal(back(ctf, "made_up").stepId, "clar");
+});
+
+test("the inline check keeps the safety rules (Gate 3): Punish yourself, repair, a flooded reading", () => {
+  // Punish yourself that fits is never "work on the situation": its own hand-off, the banner still on.
+  for (const v of ["fits", "partly"]) {
+    const s = back(toCheck("guilty", "helpful", { urge: "guilt-punish" }), v);
+    assert.equal(s.stepId, "pun", v);
+    assert.equal(M.crisisFor(ctx(), M.stepOf(skill, "pun"), s)?.variant, "crisis");
+  }
+  assert.equal(back(toCheck("guilty", "unhelpful", { urge: "guilt-punish" }), "unsafe", "fits").stepId, "cdng");
+  assert.ok(M.stepOf(skill, "cdng").crisis.some((c) => c.variant === "crisis"), "the Punish banner stays on the danger card");
+  // Fits, but acting on it won't help: the opposite.
+  assert.equal(back(toCheck("anxious", "unhelpful"), "fits").stepId, "cue");
+  assert.equal(back(toCheck("anxious", "unhelpful"), "partly").stepId, "cue");
+  // Guilt that fits with the repair goal: repair (H11).
+  assert.equal(back(toCheck("guilty", "unhelpful", { goal: "repair" }), "fits").stepId, "repr");
+  // A flooded reading never opens the check: the clarify card, the body first.
+  const fc = ctx({ band: "flooded" });
+  let f = run([doors("anxious"), held], fc);
+  const urge = chips(fc, run([...SAFE], fc, f), "vald", "urge")[0];
+  f = run([...SAFE, pick("urge", urge), next, pick("want", "yes"), next, pick("fits", "unsure"), next, pick("help", "unsure"), next], fc, f);
+  assert.equal(f.stepId, "clar");
+  assert.equal(M.handoffLine(fc, M.stepOf(skill, "clar"), { answers: M.answersOf(fc, f) }), skill.copy.clar_flooded);
+  assert.equal(M.offersFor(fc, M.stepOf(skill, "clar"), { answers: M.answersOf(fc, f) })[0], "cool_down");
 });
 
 test("the projection's re-check is the skill's route: opposite exactly where the skill reaches the cue (every fit, help, goal)", () => {
@@ -233,7 +323,7 @@ test("a plan for later: a chip schedules oa_try, whose card reopens the run at D
   assert.deepEqual(offers(miss), ["pause"]);
 });
 
-test("the longest record fits ext: three feelings, own words everywhere, ≤ 32 answers", () => {
+test("the longest record fits ext: three feelings, own words everywhere, ≤ 40 answers", () => {
   let s = run([doors("sad", "angry", "anxious"), ...SAFE]);
   for (let i = 0; i < 3; i++) {
     s = run([own("urge", "x".repeat(90)), next, pick("want", "yes"), next, pick("fits", "not_fit"), next, pick("help", "unhelpful"), next], ctx(), s);
@@ -243,9 +333,32 @@ test("the longest record fits ext: three feelings, own words everywhere, ≤ 32 
   s = run([pick("predict", "worse"), next, pick("when", "now"), next, next, pick("outcome", "toward_goal"), next, pick("actual", "better"), next, pick("tvna", "much_better"), next], ctx(), s);
   assert.equal(s.stepId, "read");
   const rec = M.runRecord(ctx(), s);
-  assert.ok(rec.answers.length <= 32, String(rec.answers.length));
+  assert.ok(rec.answers.length <= 40, String(rec.answers.length));
   const ext = validateExt({ run: rec });
   assert.ok(ext && JSON.stringify(ext).length <= 4096, String(JSON.stringify(ext ?? {}).length));
+});
+
+test("the longest real record through the inline check fits ext: three feelings, own words at the cap, ≤ 40 answers, ≤ EXT_MAX_BYTES", () => {
+  // Every feeling goes the longest way: urge in own words, the clarify route, Check the Facts inline (it doesn't fit),
+  // then a cue, the hold, the change check and a step in own words. Own words at the skill's cap in 3-byte characters.
+  const W = (c) => c.repeat(skill.ownMax);
+  let s = run([doors("sad", "angry", "anxious"), ...SAFE]);
+  for (let i = 0; i < 3; i++) {
+    s = run([own("urge", W("愛")), next, pick("want", "yes"), next, pick("fits", "unsure"), next, pick("help", "unhelpful"), next], ctx(), s);
+    assert.equal(s.stepId, "ctf");
+    s = run([{ type: "embedDone", output: { ids: ["doesnt_fit"] } }], ctx(), s);
+    assert.equal(s.stepId, "cue");
+    s = run([pick("cue", chips(ctx(), s, "cue", "cue")[0]), next, held, pick("tvnb", "same"), next, own("size", W("愛")), next], ctx(), s);
+  }
+  assert.equal(s.stepId, "pred");
+  s = run([pick("predict", "worse"), next, pick("when", "now"), next, next, pick("outcome", "toward_goal"), next, pick("actual", "better"), next, pick("tvna", "much_better"), next], ctx(), s);
+  const rec = M.runRecord(ctx(), s);
+  assert.equal(rec.answers.filter((x) => x.fieldId === "checked").length, 3);
+  assert.ok(rec.answers.length <= 40, String(rec.answers.length));
+  const ext = validateExt({ run: rec });
+  assert.ok(ext, "the server's schema takes it");
+  // 4.3 KB: over the old 4 KB, the reason EXT_MAX_BYTES is 6 KB (ER-B5).
+  assert.ok(Buffer.byteLength(JSON.stringify(ext), "utf8") <= EXT_MAX_BYTES, String(Buffer.byteLength(JSON.stringify(ext), "utf8")));
 });
 
 test("the projection's reading: one record per feeling that reached its step, the size from the option id, own words custom", () => {
@@ -259,6 +372,14 @@ test("the projection's reading: one record per feeling that reached its step, th
   assert.deepEqual(oa.picks.map((p) => [p.emotionId, p.urgeId, p.actionSize]), [["sad", "sad-bed", "medium"], ["angry", "custom", "custom"]]);
   assert.equal(oa.safety, "safe");
   assert.equal(oa.outcome, "toward_goal");
+  const viaCheck = oaFromRun({ answers: [{ fieldId: "feel", optionIds: ["sad"] }, { fieldId: "urge", pick: "sad", optionIds: ["sad-bed"] },
+    { fieldId: "fits", pick: "sad", optionIds: ["unsure"] }, { fieldId: "help", pick: "sad", optionIds: ["unsure"] },
+    { fieldId: "checked", pick: "sad", optionIds: ["doesnt_fit"] }, { fieldId: "size", pick: "sad", optionIds: ["sad-bed:small"] }], path: ["read"] });
+  assert.equal(viaCheck.picks[0].checked, "doesnt_fit");
+  const unsafeCheck = oaFromRun({ answers: [{ fieldId: "feel", optionIds: ["sad"] }, { fieldId: "urge", pick: "sad", optionIds: ["sad-bed"] },
+    { fieldId: "fits", pick: "sad", optionIds: ["unsure"] }, { fieldId: "help", pick: "sad", optionIds: ["unsure"] },
+    { fieldId: "checked", pick: "sad", optionIds: ["doesnt_fit", "unsafe"] }, { fieldId: "size", pick: "sad", optionIds: ["sad-bed:small"] }], path: ["read"] });
+  assert.equal(unsafeCheck.picks[0].checked, null);
   // A kept feeling never reached its step: no record.
   const kept = run([doors("sad"), ...SAFE, pick("urge", "sad-bed"), next, pick("want", "no"), next]);
   assert.deepEqual(oaFromRun(M.runRecord(ctx(), kept)).picks, []);

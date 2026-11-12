@@ -30,6 +30,9 @@ COPY = {
     "through_cope_ahead": "Plan for it with Cope Ahead",
     "fits_title": "Here's when feeling {feeling} fits the facts. Does one of these match what happened?",
     "fits_title_general": "Does feeling {feeling} fit what happened?",
+    # Inline in Do the Opposite (ER-B5), which asked *does it fit?* already: this is the closer look, not the same question.
+    "fits_title_inline": "Now, with what happened in mind, does one of these match?",
+    "inline_back": "Leave the check here",
     "next_fits": "When a feeling fits, the move is to work on the situation.",
     "next_partly": "The feeling makes sense, and it's turned up loud. Bring the volume down, then work on what's left.",
     "next_no": "The feeling is bigger than the facts. Acting opposite to its urge helps it settle.",
@@ -227,7 +230,8 @@ STEPS = [
     },
     {
         "id": "fits", "kind": "ask",
-        "title": [{"when": {"set": "$d.fitsParent"}, "key": "fits_title"}, {"key": "fits_title_general"}],
+        "title": [{"when": {"all": [{"set": "$ctx.feelingId"}, {"set": "$d.fitsParent"}]}, "key": "fits_title_inline"},
+                  {"when": {"set": "$d.fitsParent"}, "key": "fits_title"}, {"key": "fits_title_general"}],
         "titleSlots": {"feeling": {"labelOf": "feel"}},
         "fields": [{
             "id": "fits", "options": {"list": "fits"}, "max": 1, "required": True, "askFresh": "fitsFacts",
@@ -241,7 +245,7 @@ STEPS = [
         "id": "missing", "kind": "ask", "title": "missing_title", "hint": "missing_hint",
         "fields": [
             {"id": "fact", "options": {"list": "fact"}, "max": 1,
-             # One fact is short; 60 keeps the worst-case record under ext's 4 KB (tests/skill-contracts.test.mjs).
+             # One fact is short; 60 keeps the worst-case record under ext's 6 KB (tests/skill-contracts.test.mjs).
              "own": {"hint": "own_hint", "countsAsPick": True, "max": 60},
              # Own words aren't read, so someone to talk to stays one quiet tap away, as on the camera screen.
              "links": [{"exit": "safety_open", "label": "safety_open", "when": {"own": "fact"}}]},
@@ -322,4 +326,19 @@ SKILL = {
     "options": options(),
     # Answers that become the session's emotions (setEmotionIds).
     "emotionFields": ["feel"],
+    # Inline (R8, ER-B5): the mini-card inside another skill (first host: Do the Opposite's clarify). The host hands it
+    # the feeling it's on; with one this skill has fit statements for it starts at what happened, else it asks for the
+    # feeling first (carried, never pre-selected). It gives back the verdict (`fits` · `partly` · `doesnt_fit` ·
+    # `unsure`), `unsafe` when a person hurt or threatened them (the host's own danger card, whatever the verdict) and
+    # `stopped` on the safe card. The verdict's ask-fresh `fitsFacts` stays on this run's own session (skill-runtime.md).
+    "accepts": ["feelingId"],
+    "inline": {
+        "enterAt": ["event"],
+        "returns": [],
+        "seed": {"feel": "$ctx.feelingId"},
+        "enterWhen": {"event": {"set": "$d.fitsParent"}},
+        "outcomes": ["fits", "partly", "doesnt_fit", "unsure"],
+        "ends": {"safe": "stopped"},
+        "flags": [{"id": "unsafe", "when": DANGER}, *({"id": v, "when": FITS_IS(v)} for v, _ in FITS)],
+    },
 }

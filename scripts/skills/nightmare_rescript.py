@@ -32,7 +32,7 @@ TOOL_ID = "nightmare-rescript"
 CONCEPT = "dbt_nightmare_protocol"
 VERSION = "nr-v1"
 # Own words: one short line each (where it starts, what changes, how it ends). Kept to one breath, like the
-# witness lines and Cope Ahead's moves, and so the worst-case record stays under the 4 KB contract.
+# witness lines and Cope Ahead's moves, and so the worst-case record stays under the 6 KB contract.
 OWN_MAX = 90
 SETTING_OWN_MAX = 60
 

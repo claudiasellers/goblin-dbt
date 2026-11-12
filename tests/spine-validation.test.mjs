@@ -62,7 +62,7 @@ test("closeToolSession: canonical answers only; the answer must be one the tool 
   assert.deepEqual(v.validateClose({ id: ID, status: "completed", detail: { kind: "dear_man", id: ID } }, now).detail, { kind: "dear_man", id: ID });
 });
 
-test("ext (R18): namespaced, ids/enums only, integers only on *Sec / *Count, ≤ 4 KB", () => {
+test("ext (R18): namespaced, ids/enums only, integers only on *Sec / *Count, ≤ 6 KB", () => {
   assert.equal(ext.validateExt(undefined), null);
   assert.equal(ext.validateExt({ dt: {} }), null);
   assert.deepEqual(JSON.parse(ext.validateExt({ dt: { techniqueId: "cold-water" } })), { dt: { techniqueId: "cold-water" } });
