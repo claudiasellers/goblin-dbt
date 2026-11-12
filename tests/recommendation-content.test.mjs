@@ -51,7 +51,7 @@ test("rows are drafts until signed off; the policy can only be enabled once ever
 });
 
 test("D-02 defaults kept: Urge Surfing switched off, no DEAR MAN rows, Pause active; planned tools are written switched off", () => {
-  const planned = ["dbt_accepts", "dbt_check_facts", "dbt_cope_ahead", "dbt_fast", "dbt_give", "dbt_please", "dbt_radical_acceptance", "dbt_wise_mind"];
+  const planned = ["dbt_accepts", "dbt_fast", "dbt_give", "dbt_please", "dbt_radical_acceptance", "dbt_wise_mind"];
   for (const r of rows) {
     assert.notEqual(r.conceptId, "dbt_dear_man", r.id);
     const off = r.conceptId === "urge_surfing" || planned.includes(r.conceptId);
@@ -64,15 +64,14 @@ test("D-02 defaults kept: Urge Surfing switched off, no DEAR MAN rows, Pause act
   assert.equal(graph.concepts.dbt_wise_mind.appToolId, "wise-mind");
   const wise = rows.filter((r) => r.conceptId === "dbt_wise_mind");
   assert.deepEqual(wise.map((r) => [r.id, r.active, r.reviewStatus]), [["rf_chronic_vigilance_words_watchful_wise-mind", false, "draft"]]);
-  // Cope Ahead (docs/design/cope-ahead.md) the same way: built, out of PLANNED, its anticipatory row off and a draft.
+  // Cope Ahead and Check the Facts: built and live (Claudia, 12 Nov: default to connected), every row approved.
   assert.equal(graph.concepts.dbt_cope_ahead.appToolId, "cope-ahead");
   const cope = rows.filter((r) => r.conceptId === "dbt_cope_ahead");
-  assert.deepEqual(cope.map((r) => [r.id, r.active, r.reviewStatus]), [["rf_chronic_vigilance_words_anticipatory_cope-ahead", false, "draft"]]);
-  // Check the Facts (docs/design/skill-runtime.md) the same way: built on the skill runtime, its six rows off and drafts.
+  assert.deepEqual(cope.map((r) => [r.id, r.active, r.reviewStatus]), [["rf_chronic_vigilance_words_anticipatory_cope-ahead", true, "approved"]]);
+  const facts = rows.filter((r) => r.conceptId === "dbt_check_facts");
+  assert.equal(facts.length, 6);
+  assert.ok(facts.every((r) => r.active && r.reviewStatus === "approved"), "Check the Facts' rows are live");
   assert.equal(graph.concepts.dbt_check_facts.appToolId, "check-the-facts");
-  const cf = rows.filter((r) => r.conceptId === "dbt_check_facts");
-  assert.equal(cf.length, 6);
-  assert.ok(cf.every((r) => r.active === false && r.reviewStatus === "draft"), "Check the Facts rows stay off and drafts");
   // Rebel without the wreckage (DT-11): built on the skill runtime, its one row signed off (10 Nov) and live.
   assert.equal(graph.concepts.dbt_alternate_rebellion.appToolId, "alternate-rebellion");
   const ar = rows.filter((r) => r.conceptId === "dbt_alternate_rebellion");

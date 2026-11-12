@@ -204,7 +204,7 @@ makes.
   - The parts step and the anchor line are parts copy (`COPE_REQUIRED`), and they wait for the parts
     sign-off.
 - **The concept:** `dbt_cope_ahead.appToolId = 'cope-ahead'`, taken out of `PLANNED`. Its routing row
-  stays off and a draft.
+  (anxious / nervous on On guard) is live since 12 Nov (Claudia: default to connected).
 - **The visit:** a `ToolSession` (`closeKind: 'none'`, module `er`) with `ext.ca`:
   - `situationId`, `situationOwn`, `when`;
   - `feelIds`, `pullIds`, `partId`;
