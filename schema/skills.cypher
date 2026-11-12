@@ -61,53 +61,53 @@ MATCH (s:Skill {id: "check_the_facts"}), (n:SkillStep {id: "check_the_facts:safe
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 8};
 MERGE (x:SkillExit {id: "check_the_facts:problem_solve"})
-SET x += {skillId: "check_the_facts", exit: "problem_solve", toolId: "problem-solve", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "check_the_facts", exit: "problem_solve", toolId: "problem-solve", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "check_the_facts"}), (x:SkillExit {id: "check_the_facts:problem_solve"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "check_the_facts:problem_solve"}), (t:TherapyConcept {appToolId: "problem-solve"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "check_the_facts:dear_man"})
-SET x += {skillId: "check_the_facts", exit: "dear_man", toolId: "dear-man", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "check_the_facts", exit: "dear_man", toolId: "dear-man", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "check_the_facts"}), (x:SkillExit {id: "check_the_facts:dear_man"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "check_the_facts:dear_man"}), (t:TherapyConcept {appToolId: "dear-man"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "check_the_facts:opposite_action"})
-SET x += {skillId: "check_the_facts", exit: "opposite_action", toolId: "opposite-action", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "check_the_facts", exit: "opposite_action", toolId: "opposite-action", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "check_the_facts"}), (x:SkillExit {id: "check_the_facts:opposite_action"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "check_the_facts:opposite_action"}), (t:TherapyConcept {appToolId: "opposite-action"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "check_the_facts:wise_mind"})
-SET x += {skillId: "check_the_facts", exit: "wise_mind", toolId: "wise-mind", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"first\": \"wm_q_next\"}";
+SET x += {skillId: "check_the_facts", exit: "wise_mind", toolId: "wise-mind", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"first\": \"wm_q_next\"}", x.label = null;
 MATCH (s:Skill {id: "check_the_facts"}), (x:SkillExit {id: "check_the_facts:wise_mind"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "check_the_facts:wise_mind"}), (t:TherapyConcept {appToolId: "wise-mind"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "check_the_facts:cope_ahead"})
-SET x += {skillId: "check_the_facts", exit: "cope_ahead", toolId: "cope-ahead", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"situationId\": \"other\"}";
+SET x += {skillId: "check_the_facts", exit: "cope_ahead", toolId: "cope-ahead", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"situationId\": \"other\"}", x.label = null;
 MATCH (s:Skill {id: "check_the_facts"}), (x:SkillExit {id: "check_the_facts:cope_ahead"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "check_the_facts:cope_ahead"}), (t:TherapyConcept {appToolId: "cope-ahead"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "check_the_facts:mindfulness_emotions"})
-SET x += {skillId: "check_the_facts", exit: "mindfulness_emotions", toolId: "mindfulness-emotions", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "check_the_facts", exit: "mindfulness_emotions", toolId: "mindfulness-emotions", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "check_the_facts"}), (x:SkillExit {id: "check_the_facts:mindfulness_emotions"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "check_the_facts:mindfulness_emotions"}), (t:TherapyConcept {appToolId: "mindfulness-emotions"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "check_the_facts:let_it_be"})
-SET x += {skillId: "check_the_facts", exit: "let_it_be", toolId: "let-it-be", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "check_the_facts", exit: "let_it_be", toolId: "let-it-be", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "check_the_facts"}), (x:SkillExit {id: "check_the_facts:let_it_be"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "check_the_facts:let_it_be"}), (t:TherapyConcept {appToolId: "let-it-be"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "check_the_facts:safety_open"})
-SET x += {skillId: "check_the_facts", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+SET x += {skillId: "check_the_facts", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "check_the_facts"}), (x:SkillExit {id: "check_the_facts:safety_open"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MERGE (x:SkillExit {id: "check_the_facts:done"})
-SET x += {skillId: "check_the_facts", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "check_the_facts", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "check_the_facts"}), (x:SkillExit {id: "check_the_facts:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "check_the_facts:feel"}), (b:SkillStep {id: "check_the_facts:event"})
@@ -956,53 +956,53 @@ MATCH (s:Skill {id: "alternate_rebellion"}), (n:SkillStep {id: "alternate_rebell
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 8};
 MERGE (x:SkillExit {id: "alternate_rebellion:problem_solve"})
-SET x += {skillId: "alternate_rebellion", exit: "problem_solve", toolId: "problem-solve", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "alternate_rebellion", exit: "problem_solve", toolId: "problem-solve", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "alternate_rebellion"}), (x:SkillExit {id: "alternate_rebellion:problem_solve"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "alternate_rebellion:problem_solve"}), (t:TherapyConcept {appToolId: "problem-solve"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "alternate_rebellion:dear_man"})
-SET x += {skillId: "alternate_rebellion", exit: "dear_man", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "alternate_rebellion", exit: "dear_man", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "alternate_rebellion"}), (x:SkillExit {id: "alternate_rebellion:dear_man"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "alternate_rebellion:dear_man"}), (t:TherapyConcept {appToolId: "dear-man"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "alternate_rebellion:fast"})
-SET x += {skillId: "alternate_rebellion", exit: "fast", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "alternate_rebellion", exit: "fast", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "alternate_rebellion"}), (x:SkillExit {id: "alternate_rebellion:fast"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "alternate_rebellion:fast"}), (t:TherapyConcept {appToolId: "fast"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "alternate_rebellion:let_it_be"})
-SET x += {skillId: "alternate_rebellion", exit: "let_it_be", toolId: "let-it-be", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "alternate_rebellion", exit: "let_it_be", toolId: "let-it-be", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "alternate_rebellion"}), (x:SkillExit {id: "alternate_rebellion:let_it_be"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "alternate_rebellion:let_it_be"}), (t:TherapyConcept {appToolId: "let-it-be"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "alternate_rebellion:ending"})
-SET x += {skillId: "alternate_rebellion", exit: "ending", toolId: "ending-relationships", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"careful\"}";
+SET x += {skillId: "alternate_rebellion", exit: "ending", toolId: "ending-relationships", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"careful\"}", x.label = null;
 MATCH (s:Skill {id: "alternate_rebellion"}), (x:SkillExit {id: "alternate_rebellion:ending"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "alternate_rebellion:ending"}), (t:TherapyConcept {appToolId: "ending-relationships"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "alternate_rebellion:cool_down"})
-SET x += {skillId: "alternate_rebellion", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "alternate_rebellion", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "alternate_rebellion"}), (x:SkillExit {id: "alternate_rebellion:cool_down"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "alternate_rebellion:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "alternate_rebellion:pause"})
-SET x += {skillId: "alternate_rebellion", exit: "pause", toolId: "pause", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "alternate_rebellion", exit: "pause", toolId: "pause", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "alternate_rebellion"}), (x:SkillExit {id: "alternate_rebellion:pause"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "alternate_rebellion:pause"}), (t:TherapyConcept {appToolId: "pause"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "alternate_rebellion:safety_open"})
-SET x += {skillId: "alternate_rebellion", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+SET x += {skillId: "alternate_rebellion", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "alternate_rebellion"}), (x:SkillExit {id: "alternate_rebellion:safety_open"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MERGE (x:SkillExit {id: "alternate_rebellion:done"})
-SET x += {skillId: "alternate_rebellion", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "alternate_rebellion", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "alternate_rebellion"}), (x:SkillExit {id: "alternate_rebellion:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "alternate_rebellion:open"}), (b:SkillStep {id: "alternate_rebellion:squeeze"})
@@ -1507,59 +1507,59 @@ MATCH (s:Skill {id: "er_troubleshoot"}), (n:SkillStep {id: "er_troubleshoot:none
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 15};
 MERGE (x:SkillExit {id: "er_troubleshoot:please"})
-SET x += {skillId: "er_troubleshoot", exit: "please", toolId: "please-skill", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "er_troubleshoot", exit: "please", toolId: "please-skill", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "er_troubleshoot"}), (x:SkillExit {id: "er_troubleshoot:please"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "er_troubleshoot:please"}), (t:TherapyConcept {appToolId: "please-skill"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "er_troubleshoot:problem_solve"})
-SET x += {skillId: "er_troubleshoot", exit: "problem_solve", toolId: "problem-solve", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "er_troubleshoot", exit: "problem_solve", toolId: "problem-solve", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "er_troubleshoot"}), (x:SkillExit {id: "er_troubleshoot:problem_solve"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "er_troubleshoot:problem_solve"}), (t:TherapyConcept {appToolId: "problem-solve"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "er_troubleshoot:check_the_facts"})
-SET x += {skillId: "er_troubleshoot", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "er_troubleshoot", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "er_troubleshoot"}), (x:SkillExit {id: "er_troubleshoot:check_the_facts"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "er_troubleshoot:check_the_facts"}), (t:TherapyConcept {appToolId: "check-the-facts"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "er_troubleshoot:let_it_be"})
-SET x += {skillId: "er_troubleshoot", exit: "let_it_be", toolId: "let-it-be", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "er_troubleshoot", exit: "let_it_be", toolId: "let-it-be", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "er_troubleshoot"}), (x:SkillExit {id: "er_troubleshoot:let_it_be"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "er_troubleshoot:let_it_be"}), (t:TherapyConcept {appToolId: "let-it-be"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "er_troubleshoot:mindfulness_emotions"})
-SET x += {skillId: "er_troubleshoot", exit: "mindfulness_emotions", toolId: "mindfulness-emotions", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "er_troubleshoot", exit: "mindfulness_emotions", toolId: "mindfulness-emotions", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "er_troubleshoot"}), (x:SkillExit {id: "er_troubleshoot:mindfulness_emotions"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "er_troubleshoot:mindfulness_emotions"}), (t:TherapyConcept {appToolId: "mindfulness-emotions"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "er_troubleshoot:five_senses"})
-SET x += {skillId: "er_troubleshoot", exit: "five_senses", toolId: "five-senses", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "er_troubleshoot", exit: "five_senses", toolId: "five-senses", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "er_troubleshoot"}), (x:SkillExit {id: "er_troubleshoot:five_senses"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "er_troubleshoot:five_senses"}), (t:TherapyConcept {appToolId: "five-senses"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "er_troubleshoot:emotion_guide"})
-SET x += {skillId: "er_troubleshoot", exit: "emotion_guide", toolId: "emotion-guide", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "er_troubleshoot", exit: "emotion_guide", toolId: "emotion-guide", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "er_troubleshoot"}), (x:SkillExit {id: "er_troubleshoot:emotion_guide"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "er_troubleshoot:emotion_guide"}), (t:TherapyConcept {appToolId: "emotion-guide"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "er_troubleshoot:missing_links"})
-SET x += {skillId: "er_troubleshoot", exit: "missing_links", toolId: "missing-links", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "er_troubleshoot", exit: "missing_links", toolId: "missing-links", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "er_troubleshoot"}), (x:SkillExit {id: "er_troubleshoot:missing_links"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "er_troubleshoot:missing_links"}), (t:TherapyConcept {appToolId: "missing-links"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "er_troubleshoot:safety_open"})
-SET x += {skillId: "er_troubleshoot", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+SET x += {skillId: "er_troubleshoot", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "er_troubleshoot"}), (x:SkillExit {id: "er_troubleshoot:safety_open"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MERGE (x:SkillExit {id: "er_troubleshoot:done"})
-SET x += {skillId: "er_troubleshoot", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "er_troubleshoot", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "er_troubleshoot"}), (x:SkillExit {id: "er_troubleshoot:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "er_troubleshoot:body"}), (b:SkillStep {id: "er_troubleshoot:fix_body"})
@@ -1868,25 +1868,25 @@ MATCH (s:Skill {id: "fast_review"}), (n:SkillStep {id: "fast_review:next"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 10};
 MERGE (x:SkillExit {id: "fast_review:check_the_facts"})
-SET x += {skillId: "fast_review", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "fast_review", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "fast_review"}), (x:SkillExit {id: "fast_review:check_the_facts"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "fast_review:check_the_facts"}), (t:TherapyConcept {appToolId: "check-the-facts"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "fast_review:rehearse"})
-SET x += {skillId: "fast_review", exit: "rehearse", toolId: "rehearse", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "fast_review", exit: "rehearse", toolId: "rehearse", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "fast_review"}), (x:SkillExit {id: "fast_review:rehearse"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "fast_review:rehearse"}), (t:TherapyConcept {appToolId: "rehearse"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "fast_review:dear_man"})
-SET x += {skillId: "fast_review", exit: "dear_man", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "fast_review", exit: "dear_man", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "fast_review"}), (x:SkillExit {id: "fast_review:dear_man"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "fast_review:dear_man"}), (t:TherapyConcept {appToolId: "dear-man"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "fast_review:done"})
-SET x += {skillId: "fast_review", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "fast_review", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "fast_review"}), (x:SkillExit {id: "fast_review:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "fast_review:what"}), (b:SkillStep {id: "fast_review:sorry"})
@@ -2121,25 +2121,25 @@ MATCH (s:Skill {id: "fast_let_go"}), (n:SkillStep {id: "fast_let_go:elsewhere"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 2};
 MERGE (x:SkillExit {id: "fast_let_go:let_it_be"})
-SET x += {skillId: "fast_let_go", exit: "let_it_be", toolId: "let-it-be", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "fast_let_go", exit: "let_it_be", toolId: "let-it-be", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "fast_let_go"}), (x:SkillExit {id: "fast_let_go:let_it_be"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "fast_let_go:let_it_be"}), (t:TherapyConcept {appToolId: "let-it-be"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "fast_let_go:recover"})
-SET x += {skillId: "fast_let_go", exit: "recover", toolId: "recovering-from-invalidation", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "fast_let_go", exit: "recover", toolId: "recovering-from-invalidation", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "fast_let_go"}), (x:SkillExit {id: "fast_let_go:recover"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "fast_let_go:recover"}), (t:TherapyConcept {appToolId: "recovering-from-invalidation"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "fast_let_go:finding_connection"})
-SET x += {skillId: "fast_let_go", exit: "finding_connection", toolId: "finding-connection", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "fast_let_go", exit: "finding_connection", toolId: "finding-connection", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "fast_let_go"}), (x:SkillExit {id: "fast_let_go:finding_connection"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "fast_let_go:finding_connection"}), (t:TherapyConcept {appToolId: "finding-connection"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "fast_let_go:done"})
-SET x += {skillId: "fast_let_go", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "fast_let_go", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "fast_let_go"}), (x:SkillExit {id: "fast_let_go:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "fast_let_go:line"}), (b:SkillStep {id: "fast_let_go:elsewhere"})
@@ -2264,23 +2264,23 @@ MATCH (s:Skill {id: "nightmare_rescript"}), (n:SkillStep {id: "nightmare_rescrip
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 12};
 MERGE (x:SkillExit {id: "nightmare_rescript:five_senses"})
-SET x += {skillId: "nightmare_rescript", exit: "five_senses", toolId: "five-senses", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "nightmare_rescript", exit: "five_senses", toolId: "five-senses", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "nightmare_rescript"}), (x:SkillExit {id: "nightmare_rescript:five_senses"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "nightmare_rescript:five_senses"}), (t:TherapyConcept {appToolId: "five-senses"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "nightmare_rescript:sleep_reset"})
-SET x += {skillId: "nightmare_rescript", exit: "sleep_reset", toolId: "sleep-reset", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "nightmare_rescript", exit: "sleep_reset", toolId: "sleep-reset", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "nightmare_rescript"}), (x:SkillExit {id: "nightmare_rescript:sleep_reset"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "nightmare_rescript:sleep_reset"}), (t:TherapyConcept {appToolId: "sleep-reset"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "nightmare_rescript:safety_open"})
-SET x += {skillId: "nightmare_rescript", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+SET x += {skillId: "nightmare_rescript", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "nightmare_rescript"}), (x:SkillExit {id: "nightmare_rescript:safety_open"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MERGE (x:SkillExit {id: "nightmare_rescript:done"})
-SET x += {skillId: "nightmare_rescript", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "nightmare_rescript", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "nightmare_rescript"}), (x:SkillExit {id: "nightmare_rescript:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "nightmare_rescript:replay"}), (b:SkillStep {id: "nightmare_rescript:clinician"})
@@ -2660,161 +2660,161 @@ MATCH (s:Skill {id: "problem_solve"}), (n:SkillStep {id: "problem_solve:rest"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 25};
 MERGE (x:SkillExit {id: "problem_solve:body_scan"})
-SET x += {skillId: "problem_solve", exit: "body_scan", toolId: "body-scan", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "body_scan", toolId: "body-scan", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:body_scan"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:body_scan"}), (t:TherapyConcept {appToolId: "body-scan"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:build_mastery"})
-SET x += {skillId: "problem_solve", exit: "build_mastery", toolId: "build-mastery", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "build_mastery", toolId: "build-mastery", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:build_mastery"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:build_mastery"}), (t:TherapyConcept {appToolId: "build-mastery"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:chain_analysis"})
-SET x += {skillId: "problem_solve", exit: "chain_analysis", toolId: "chain-analysis", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "chain_analysis", toolId: "chain-analysis", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:chain_analysis"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:chain_analysis"}), (t:TherapyConcept {appToolId: "chain-analysis"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:check_the_facts"})
-SET x += {skillId: "problem_solve", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:check_the_facts"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:check_the_facts"}), (t:TherapyConcept {appToolId: "check-the-facts"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:cool_down"})
-SET x += {skillId: "problem_solve", exit: "cool_down", toolId: "cool-down", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "cool_down", toolId: "cool-down", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:cool_down"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:cope_ahead"})
-SET x += {skillId: "problem_solve", exit: "cope_ahead", toolId: "cope-ahead", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "cope_ahead", toolId: "cope-ahead", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:cope_ahead"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:cope_ahead"}), (t:TherapyConcept {appToolId: "cope-ahead"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:dear_man"})
-SET x += {skillId: "problem_solve", exit: "dear_man", toolId: "dear-man", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "dear_man", toolId: "dear-man", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:dear_man"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:dear_man"}), (t:TherapyConcept {appToolId: "dear-man"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:dialectics"})
-SET x += {skillId: "problem_solve", exit: "dialectics", toolId: "dialectics", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "dialectics", toolId: "dialectics", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:dialectics"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:dialectics"}), (t:TherapyConcept {appToolId: "dialectics"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:effectiveness"})
-SET x += {skillId: "problem_solve", exit: "effectiveness", toolId: "effectiveness", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "effectiveness", toolId: "effectiveness", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:effectiveness"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:effectiveness"}), (t:TherapyConcept {appToolId: "effectiveness"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:ending_relationships"})
-SET x += {skillId: "problem_solve", exit: "ending_relationships", toolId: "ending-relationships", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "ending_relationships", toolId: "ending-relationships", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:ending_relationships"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:ending_relationships"}), (t:TherapyConcept {appToolId: "ending-relationships"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:fast"})
-SET x += {skillId: "problem_solve", exit: "fast", toolId: "fast", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "fast", toolId: "fast", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:fast"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:fast"}), (t:TherapyConcept {appToolId: "fast"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:find_the_feeling"})
-SET x += {skillId: "problem_solve", exit: "find_the_feeling", toolId: "find-the-feeling", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "find_the_feeling", toolId: "find-the-feeling", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:find_the_feeling"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:find_the_feeling"}), (t:TherapyConcept {appToolId: "find-the-feeling"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:finding_connection"})
-SET x += {skillId: "problem_solve", exit: "finding_connection", toolId: "finding-connection", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "finding_connection", toolId: "finding-connection", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:finding_connection"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:finding_connection"}), (t:TherapyConcept {appToolId: "finding-connection"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:five_senses"})
-SET x += {skillId: "problem_solve", exit: "five_senses", toolId: "five-senses", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "five_senses", toolId: "five-senses", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:five_senses"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:five_senses"}), (t:TherapyConcept {appToolId: "five-senses"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:give"})
-SET x += {skillId: "problem_solve", exit: "give", toolId: "give", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "give", toolId: "give", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:give"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:give"}), (t:TherapyConcept {appToolId: "give"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:let_it_be"})
-SET x += {skillId: "problem_solve", exit: "let_it_be", toolId: "let-it-be", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "let_it_be", toolId: "let-it-be", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:let_it_be"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:let_it_be"}), (t:TherapyConcept {appToolId: "let-it-be"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:mindfulness_emotions"})
-SET x += {skillId: "problem_solve", exit: "mindfulness_emotions", toolId: "mindfulness-emotions", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "mindfulness_emotions", toolId: "mindfulness-emotions", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:mindfulness_emotions"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:mindfulness_emotions"}), (t:TherapyConcept {appToolId: "mindfulness-emotions"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:missing_links"})
-SET x += {skillId: "problem_solve", exit: "missing_links", toolId: "missing-links", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "missing_links", toolId: "missing-links", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:missing_links"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:missing_links"}), (t:TherapyConcept {appToolId: "missing-links"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:opposite_action"})
-SET x += {skillId: "problem_solve", exit: "opposite_action", toolId: "opposite-action", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "opposite_action", toolId: "opposite-action", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:opposite_action"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:opposite_action"}), (t:TherapyConcept {appToolId: "opposite-action"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:pause"})
-SET x += {skillId: "problem_solve", exit: "pause", toolId: "pause", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "pause", toolId: "pause", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:pause"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:pause"}), (t:TherapyConcept {appToolId: "pause"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:please_skill"})
-SET x += {skillId: "problem_solve", exit: "please_skill", toolId: "please-skill", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "please_skill", toolId: "please-skill", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:please_skill"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:please_skill"}), (t:TherapyConcept {appToolId: "please-skill"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:self_validate"})
-SET x += {skillId: "problem_solve", exit: "self_validate", toolId: "self-validate", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "self_validate", toolId: "self-validate", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:self_validate"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:self_validate"}), (t:TherapyConcept {appToolId: "self-validate"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:turning_the_mind"})
-SET x += {skillId: "problem_solve", exit: "turning_the_mind", toolId: "turning-the-mind", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "turning_the_mind", toolId: "turning-the-mind", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:turning_the_mind"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:turning_the_mind"}), (t:TherapyConcept {appToolId: "turning-the-mind"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:values_clarification"})
-SET x += {skillId: "problem_solve", exit: "values_clarification", toolId: "values-clarification", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "values_clarification", toolId: "values-clarification", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:values_clarification"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:values_clarification"}), (t:TherapyConcept {appToolId: "values-clarification"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:willingness"})
-SET x += {skillId: "problem_solve", exit: "willingness", toolId: "willingness", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "willingness", toolId: "willingness", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:willingness"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:willingness"}), (t:TherapyConcept {appToolId: "willingness"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:safety_open"})
-SET x += {skillId: "problem_solve", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:safety_open"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MERGE (x:SkillExit {id: "problem_solve:done"})
-SET x += {skillId: "problem_solve", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "problem_solve", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "problem_solve:feel"}), (b:SkillStep {id: "problem_solve:not_now"})
@@ -5332,83 +5332,83 @@ MATCH (s:Skill {id: "ending_relationships"}), (n:SkillStep {id: "ending_relation
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 23};
 MERGE (x:SkillExit {id: "ending_relationships:wise_mind"})
-SET x += {skillId: "ending_relationships", exit: "wise_mind", toolId: "wise-mind", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "ending_relationships", exit: "wise_mind", toolId: "wise-mind", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "ending_relationships"}), (x:SkillExit {id: "ending_relationships:wise_mind"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ending_relationships:wise_mind"}), (t:TherapyConcept {appToolId: "wise-mind"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "ending_relationships:pros_cons"})
-SET x += {skillId: "ending_relationships", exit: "pros_cons", toolId: "pros-cons", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{\"frame\": \"stay_or_end\"}";
+SET x += {skillId: "ending_relationships", exit: "pros_cons", toolId: "pros-cons", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{\"frame\": \"stay_or_end\"}", x.label = null;
 MATCH (s:Skill {id: "ending_relationships"}), (x:SkillExit {id: "ending_relationships:pros_cons"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ending_relationships:pros_cons"}), (t:TherapyConcept {appToolId: "pros-cons"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "ending_relationships:cool_down"})
-SET x += {skillId: "ending_relationships", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "ending_relationships", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "ending_relationships"}), (x:SkillExit {id: "ending_relationships:cool_down"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ending_relationships:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "ending_relationships:pause"})
-SET x += {skillId: "ending_relationships", exit: "pause", toolId: "pause", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "ending_relationships", exit: "pause", toolId: "pause", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "ending_relationships"}), (x:SkillExit {id: "ending_relationships:pause"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ending_relationships:pause"}), (t:TherapyConcept {appToolId: "pause"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "ending_relationships:dear_man"})
-SET x += {skillId: "ending_relationships", exit: "dear_man", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "ending_relationships", exit: "dear_man", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "ending_relationships"}), (x:SkillExit {id: "ending_relationships:dear_man"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ending_relationships:dear_man"}), (t:TherapyConcept {appToolId: "dear-man"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "ending_relationships:give"})
-SET x += {skillId: "ending_relationships", exit: "give", toolId: "give", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "ending_relationships", exit: "give", toolId: "give", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "ending_relationships"}), (x:SkillExit {id: "ending_relationships:give"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ending_relationships:give"}), (t:TherapyConcept {appToolId: "give"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "ending_relationships:problem_solve"})
-SET x += {skillId: "ending_relationships", exit: "problem_solve", toolId: "problem-solve", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "ending_relationships", exit: "problem_solve", toolId: "problem-solve", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "ending_relationships"}), (x:SkillExit {id: "ending_relationships:problem_solve"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ending_relationships:problem_solve"}), (t:TherapyConcept {appToolId: "problem-solve"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "ending_relationships:cope_ahead"})
-SET x += {skillId: "ending_relationships", exit: "cope_ahead", toolId: "cope-ahead", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"situationId\": \"conversation\"}";
+SET x += {skillId: "ending_relationships", exit: "cope_ahead", toolId: "cope-ahead", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"situationId\": \"conversation\"}", x.label = null;
 MATCH (s:Skill {id: "ending_relationships"}), (x:SkillExit {id: "ending_relationships:cope_ahead"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ending_relationships:cope_ahead"}), (t:TherapyConcept {appToolId: "cope-ahead"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "ending_relationships:rehearse"})
-SET x += {skillId: "ending_relationships", exit: "rehearse", toolId: "rehearse", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "ending_relationships", exit: "rehearse", toolId: "rehearse", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "ending_relationships"}), (x:SkillExit {id: "ending_relationships:rehearse"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ending_relationships:rehearse"}), (t:TherapyConcept {appToolId: "rehearse"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "ending_relationships:opposite_action"})
-SET x += {skillId: "ending_relationships", exit: "opposite_action", toolId: "opposite-action", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "ending_relationships", exit: "opposite_action", toolId: "opposite-action", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "ending_relationships"}), (x:SkillExit {id: "ending_relationships:opposite_action"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ending_relationships:opposite_action"}), (t:TherapyConcept {appToolId: "opposite-action"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "ending_relationships:finding_connection"})
-SET x += {skillId: "ending_relationships", exit: "finding_connection", toolId: "finding-connection", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "ending_relationships", exit: "finding_connection", toolId: "finding-connection", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "ending_relationships"}), (x:SkillExit {id: "ending_relationships:finding_connection"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ending_relationships:finding_connection"}), (t:TherapyConcept {appToolId: "finding-connection"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "ending_relationships:let_it_be"})
-SET x += {skillId: "ending_relationships", exit: "let_it_be", toolId: "let-it-be", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "ending_relationships", exit: "let_it_be", toolId: "let-it-be", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "ending_relationships"}), (x:SkillExit {id: "ending_relationships:let_it_be"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ending_relationships:let_it_be"}), (t:TherapyConcept {appToolId: "let-it-be"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "ending_relationships:safety_open"})
-SET x += {skillId: "ending_relationships", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+SET x += {skillId: "ending_relationships", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "ending_relationships"}), (x:SkillExit {id: "ending_relationships:safety_open"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MERGE (x:SkillExit {id: "ending_relationships:done"})
-SET x += {skillId: "ending_relationships", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "ending_relationships", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "ending_relationships"}), (x:SkillExit {id: "ending_relationships:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "ending_relationships:safety"}), (b:SkillStep {id: "ending_relationships:safe_first"})
@@ -5856,17 +5856,17 @@ MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:end"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 13};
 MERGE (x:SkillExit {id: "cope_ahead:five_senses"})
-SET x += {skillId: "cope_ahead", exit: "five_senses", toolId: "five-senses", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "cope_ahead", exit: "five_senses", toolId: "five-senses", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "cope_ahead"}), (x:SkillExit {id: "cope_ahead:five_senses"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "cope_ahead:five_senses"}), (t:TherapyConcept {appToolId: "five-senses"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "cope_ahead:safety_open"})
-SET x += {skillId: "cope_ahead", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+SET x += {skillId: "cope_ahead", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "cope_ahead"}), (x:SkillExit {id: "cope_ahead:safety_open"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MERGE (x:SkillExit {id: "cope_ahead:done"})
-SET x += {skillId: "cope_ahead", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "cope_ahead", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "cope_ahead"}), (x:SkillExit {id: "cope_ahead:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "cope_ahead:what"}), (b:SkillStep {id: "cope_ahead:feel"})
@@ -6759,65 +6759,71 @@ MATCH (s:Skill {id: "hold_to_wait"}), (n:SkillStep {id: "hold_to_wait:reach"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 10};
 MERGE (x:SkillExit {id: "hold_to_wait:dear_man"})
-SET x += {skillId: "hold_to_wait", exit: "dear_man", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "hold_to_wait", exit: "dear_man", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:dear_man"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "hold_to_wait:dear_man"}), (t:TherapyConcept {appToolId: "dear-man"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "hold_to_wait:cool_down"})
-SET x += {skillId: "hold_to_wait", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "hold_to_wait", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:cool_down"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "hold_to_wait:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "hold_to_wait:fast"})
-SET x += {skillId: "hold_to_wait", exit: "fast", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "hold_to_wait", exit: "fast", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:fast"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "hold_to_wait:fast"}), (t:TherapyConcept {appToolId: "fast"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "hold_to_wait:urge_surfing"})
-SET x += {skillId: "hold_to_wait", exit: "urge_surfing", toolId: "urge-surfing", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "hold_to_wait", exit: "urge_surfing", toolId: "urge-surfing", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:urge_surfing"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "hold_to_wait:urge_surfing"}), (t:TherapyConcept {appToolId: "urge-surfing"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "hold_to_wait:alternate_rebellion"})
-SET x += {skillId: "hold_to_wait", exit: "alternate_rebellion", toolId: "alternate-rebellion", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "hold_to_wait", exit: "alternate_rebellion", toolId: "alternate-rebellion", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:alternate_rebellion"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "hold_to_wait:alternate_rebellion"}), (t:TherapyConcept {appToolId: "alternate-rebellion"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "hold_to_wait:crisis_kit"})
-SET x += {skillId: "hold_to_wait", exit: "crisis_kit", toolId: "crisis-kit", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "hold_to_wait", exit: "crisis_kit", toolId: "crisis-kit", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"crisis\"}", x.label = null;
 MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:crisis_kit"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "hold_to_wait:crisis_kit"}), (t:TherapyConcept {appToolId: "crisis-kit"})
 MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "hold_to_wait:kit"})
+SET x += {skillId: "hold_to_wait", exit: "kit", toolId: "crisis-kit", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:kit"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "hold_to_wait:kit"}), (t:TherapyConcept {appToolId: "crisis-kit"})
+MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "hold_to_wait:held"})
-SET x += {skillId: "hold_to_wait", exit: "held", toolId: "soothe", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"hurt\"}";
+SET x += {skillId: "hold_to_wait", exit: "held", toolId: "soothe", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"hurt\"}", x.label = null;
 MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:held"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "hold_to_wait:held"}), (t:TherapyConcept {appToolId: "soothe"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "hold_to_wait:mind_job"})
-SET x += {skillId: "hold_to_wait", exit: "mind_job", toolId: "mind-job", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "hold_to_wait", exit: "mind_job", toolId: "mind-job", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:mind_job"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "hold_to_wait:mind_job"}), (t:TherapyConcept {appToolId: "mind-job"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "hold_to_wait:habit_plan"})
-SET x += {skillId: "hold_to_wait", exit: "habit_plan", toolId: "habit-plan", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "hold_to_wait", exit: "habit_plan", toolId: "habit-plan", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:habit_plan"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "hold_to_wait:habit_plan"}), (t:TherapyConcept {appToolId: "habit-plan"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "hold_to_wait:safety_open"})
-SET x += {skillId: "hold_to_wait", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+SET x += {skillId: "hold_to_wait", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:safety_open"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MERGE (x:SkillExit {id: "hold_to_wait:done"})
-SET x += {skillId: "hold_to_wait", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "hold_to_wait", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "hold_to_wait:pull"}), (b:SkillStep {id: "hold_to_wait:safe"})
@@ -6904,7 +6910,7 @@ SET r += {order: 5}, r.rowsJson = "[{\"order\": 5, \"when\": {\"eq\": [\"$a.move
 MATCH (a:SkillStep {id: "hold_to_wait:next"}), (x:SkillExit {id: "hold_to_wait:safety_open"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 6}, r.rowsJson = "[{\"order\": 6, \"when\": {\"eq\": [\"$a.move\", \"call\"]}}]";
-MATCH (a:SkillStep {id: "hold_to_wait:next"}), (x:SkillExit {id: "hold_to_wait:crisis_kit"})
+MATCH (a:SkillStep {id: "hold_to_wait:next"}), (x:SkillExit {id: "hold_to_wait:kit"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 7}, r.rowsJson = "[{\"order\": 7, \"when\": {\"eq\": [\"$a.pull\", \"use\"]}}]";
 MATCH (a:SkillStep {id: "hold_to_wait:next"}), (x:SkillExit {id: "hold_to_wait:mind_job"})
@@ -6922,12 +6928,12 @@ SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
 MATCH (a:SkillStep {id: "hold_to_wait:settle"}), (x:SkillExit {id: "hold_to_wait:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
-MATCH (a:SkillStep {id: "hold_to_wait:hurt_end"}), (x:SkillExit {id: "hold_to_wait:cool_down"})
-MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"any\": [{\"eq\": [\"$a.move\", \"cool\"]}, {\"eq\": [\"$ctx.band\", \"flooded\"]}]}}]";
 MATCH (a:SkillStep {id: "hold_to_wait:hurt_end"}), (x:SkillExit {id: "hold_to_wait:safety_open"})
 MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"eq\": [\"$a.move\", \"call\"]}}]";
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "hold_to_wait:hurt_end"}), (x:SkillExit {id: "hold_to_wait:cool_down"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"any\": [{\"eq\": [\"$a.move\", \"cool\"]}, {\"eq\": [\"$ctx.band\", \"flooded\"]}]}}]";
 MATCH (a:SkillStep {id: "hold_to_wait:hurt_end"}), (x:SkillExit {id: "hold_to_wait:held"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"eq\": [\"$a.move\", \"heart\"]}}]";
@@ -6937,9 +6943,12 @@ SET r += {order: 3}, r.rowsJson = "[{\"order\": 3, \"when\": {\"all\": []}}]";
 MATCH (a:SkillStep {id: "hold_to_wait:hurt_end"}), (x:SkillExit {id: "hold_to_wait:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
-MATCH (a:SkillStep {id: "hold_to_wait:reach"}), (x:SkillExit {id: "hold_to_wait:crisis_kit"})
+MATCH (a:SkillStep {id: "hold_to_wait:reach"}), (x:SkillExit {id: "hold_to_wait:safety_open"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "hold_to_wait:reach"}), (x:SkillExit {id: "hold_to_wait:crisis_kit"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
 MERGE (o:SkillOption {id: "hold_to_wait:pull:send"})
 SET o:SkillOption, o += {skillId: "hold_to_wait", list: "pull", value: "send", label: "Send or say something", version: "hw-v1"}, o.propsJson = "{\"urge\": \"send\"}";
 MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:pull:send"})
@@ -7311,89 +7320,89 @@ MATCH (s:Skill {id: "dear_man_debrief"}), (n:SkillStep {id: "dear_man_debrief:fi
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 24};
 MERGE (x:SkillExit {id: "dear_man_debrief:cool_down"})
-SET x += {skillId: "dear_man_debrief", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "dear_man_debrief", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "dear_man_debrief"}), (x:SkillExit {id: "dear_man_debrief:cool_down"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_debrief:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_debrief:thoughts"})
-SET x += {skillId: "dear_man_debrief", exit: "thoughts", toolId: "thoughts-passing", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "dear_man_debrief", exit: "thoughts", toolId: "thoughts-passing", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "dear_man_debrief"}), (x:SkillExit {id: "dear_man_debrief:thoughts"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_debrief:thoughts"}), (t:TherapyConcept {appToolId: "thoughts-passing"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_debrief:dear_man"})
-SET x += {skillId: "dear_man_debrief", exit: "dear_man", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "dear_man_debrief", exit: "dear_man", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "dear_man_debrief"}), (x:SkillExit {id: "dear_man_debrief:dear_man"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_debrief:dear_man"}), (t:TherapyConcept {appToolId: "dear-man"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_debrief:cope_ahead"})
-SET x += {skillId: "dear_man_debrief", exit: "cope_ahead", toolId: "cope-ahead", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"situationId\": \"conversation\"}";
+SET x += {skillId: "dear_man_debrief", exit: "cope_ahead", toolId: "cope-ahead", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"situationId\": \"conversation\"}", x.label = null;
 MATCH (s:Skill {id: "dear_man_debrief"}), (x:SkillExit {id: "dear_man_debrief:cope_ahead"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_debrief:cope_ahead"}), (t:TherapyConcept {appToolId: "cope-ahead"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_debrief:rehearse"})
-SET x += {skillId: "dear_man_debrief", exit: "rehearse", toolId: "rehearse", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "dear_man_debrief", exit: "rehearse", toolId: "rehearse", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "dear_man_debrief"}), (x:SkillExit {id: "dear_man_debrief:rehearse"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_debrief:rehearse"}), (t:TherapyConcept {appToolId: "rehearse"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_debrief:check_the_facts"})
-SET x += {skillId: "dear_man_debrief", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "dear_man_debrief", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "dear_man_debrief"}), (x:SkillExit {id: "dear_man_debrief:check_the_facts"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_debrief:check_the_facts"}), (t:TherapyConcept {appToolId: "check-the-facts"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_debrief:fast"})
-SET x += {skillId: "dear_man_debrief", exit: "fast", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "dear_man_debrief", exit: "fast", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "dear_man_debrief"}), (x:SkillExit {id: "dear_man_debrief:fast"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_debrief:fast"}), (t:TherapyConcept {appToolId: "fast"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_debrief:fast_let_go"})
-SET x += {skillId: "dear_man_debrief", exit: "fast_let_go", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"let_go\"}";
+SET x += {skillId: "dear_man_debrief", exit: "fast_let_go", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"let_go\"}", x.label = null;
 MATCH (s:Skill {id: "dear_man_debrief"}), (x:SkillExit {id: "dear_man_debrief:fast_let_go"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_debrief:fast_let_go"}), (t:TherapyConcept {appToolId: "fast"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_debrief:ending_relationships"})
-SET x += {skillId: "dear_man_debrief", exit: "ending_relationships", toolId: "ending-relationships", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "dear_man_debrief", exit: "ending_relationships", toolId: "ending-relationships", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "dear_man_debrief"}), (x:SkillExit {id: "dear_man_debrief:ending_relationships"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_debrief:ending_relationships"}), (t:TherapyConcept {appToolId: "ending-relationships"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_debrief:ending_careful"})
-SET x += {skillId: "dear_man_debrief", exit: "ending_careful", toolId: "ending-relationships", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"careful\"}";
+SET x += {skillId: "dear_man_debrief", exit: "ending_careful", toolId: "ending-relationships", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"careful\"}", x.label = null;
 MATCH (s:Skill {id: "dear_man_debrief"}), (x:SkillExit {id: "dear_man_debrief:ending_careful"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_debrief:ending_careful"}), (t:TherapyConcept {appToolId: "ending-relationships"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_debrief:safety_open"})
-SET x += {skillId: "dear_man_debrief", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+SET x += {skillId: "dear_man_debrief", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "dear_man_debrief"}), (x:SkillExit {id: "dear_man_debrief:safety_open"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MERGE (x:SkillExit {id: "dear_man_debrief:let_it_be"})
-SET x += {skillId: "dear_man_debrief", exit: "let_it_be", toolId: "let-it-be", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "dear_man_debrief", exit: "let_it_be", toolId: "let-it-be", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "dear_man_debrief"}), (x:SkillExit {id: "dear_man_debrief:let_it_be"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_debrief:let_it_be"}), (t:TherapyConcept {appToolId: "let-it-be"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_debrief:finding_connection"})
-SET x += {skillId: "dear_man_debrief", exit: "finding_connection", toolId: "finding-connection", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "dear_man_debrief", exit: "finding_connection", toolId: "finding-connection", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "dear_man_debrief"}), (x:SkillExit {id: "dear_man_debrief:finding_connection"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_debrief:finding_connection"}), (t:TherapyConcept {appToolId: "finding-connection"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_debrief:give"})
-SET x += {skillId: "dear_man_debrief", exit: "give", toolId: "give", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"person\": \"$ctx.personId\", \"situationId\": \"repair\"}";
+SET x += {skillId: "dear_man_debrief", exit: "give", toolId: "give", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"person\": \"$ctx.personId\", \"situationId\": \"repair\"}", x.label = null;
 MATCH (s:Skill {id: "dear_man_debrief"}), (x:SkillExit {id: "dear_man_debrief:give"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_debrief:give"}), (t:TherapyConcept {appToolId: "give"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_debrief:done"})
-SET x += {skillId: "dear_man_debrief", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "dear_man_debrief", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "dear_man_debrief"}), (x:SkillExit {id: "dear_man_debrief:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "dear_man_debrief:feel"}), (b:SkillStep {id: "dear_man_debrief:happened"})
@@ -8197,35 +8206,35 @@ MATCH (s:Skill {id: "pros_cons"}), (n:SkillStep {id: "pros_cons:reach"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 12};
 MERGE (x:SkillExit {id: "pros_cons:wise_mind"})
-SET x += {skillId: "pros_cons", exit: "wise_mind", toolId: "wise-mind", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "pros_cons", exit: "wise_mind", toolId: "wise-mind", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "pros_cons"}), (x:SkillExit {id: "pros_cons:wise_mind"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "pros_cons:wise_mind"}), (t:TherapyConcept {appToolId: "wise-mind"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "pros_cons:pause"})
-SET x += {skillId: "pros_cons", exit: "pause", toolId: "pause", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "pros_cons", exit: "pause", toolId: "pause", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "pros_cons"}), (x:SkillExit {id: "pros_cons:pause"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "pros_cons:pause"}), (t:TherapyConcept {appToolId: "pause"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "pros_cons:cool_down"})
-SET x += {skillId: "pros_cons", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "pros_cons", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "pros_cons"}), (x:SkillExit {id: "pros_cons:cool_down"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "pros_cons:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "pros_cons:crisis_kit"})
-SET x += {skillId: "pros_cons", exit: "crisis_kit", toolId: "crisis-kit", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "pros_cons", exit: "crisis_kit", toolId: "crisis-kit", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"crisis\"}", x.label = null;
 MATCH (s:Skill {id: "pros_cons"}), (x:SkillExit {id: "pros_cons:crisis_kit"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "pros_cons:crisis_kit"}), (t:TherapyConcept {appToolId: "crisis-kit"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "pros_cons:safety_open"})
-SET x += {skillId: "pros_cons", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+SET x += {skillId: "pros_cons", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "pros_cons"}), (x:SkillExit {id: "pros_cons:safety_open"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MERGE (x:SkillExit {id: "pros_cons:done"})
-SET x += {skillId: "pros_cons", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "pros_cons", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "pros_cons"}), (x:SkillExit {id: "pros_cons:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "pros_cons:pull"}), (b:SkillStep {id: "pros_cons:safe"})
@@ -8321,9 +8330,12 @@ SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
 MATCH (a:SkillStep {id: "pros_cons:settle"}), (x:SkillExit {id: "pros_cons:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
-MATCH (a:SkillStep {id: "pros_cons:reach"}), (x:SkillExit {id: "pros_cons:crisis_kit"})
+MATCH (a:SkillStep {id: "pros_cons:reach"}), (x:SkillExit {id: "pros_cons:safety_open"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "pros_cons:reach"}), (x:SkillExit {id: "pros_cons:crisis_kit"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
 MERGE (o:SkillOption {id: "pros_cons:pull:send"})
 SET o:SkillOption, o += {skillId: "pros_cons", list: "pull", value: "send", label: "Send or say something", version: "pc-v1"}, o.propsJson = "{\"urge\": \"send\"}";
 MATCH (s:Skill {id: "pros_cons"}), (o:SkillOption {id: "pros_cons:pull:send"})
@@ -8728,53 +8740,53 @@ MATCH (s:Skill {id: "first_body"}), (n:SkillStep {id: "first_body:end"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 24};
 MERGE (x:SkillExit {id: "first_body:pause"})
-SET x += {skillId: "first_body", exit: "pause", toolId: "pause", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "first_body", exit: "pause", toolId: "pause", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "first_body"}), (x:SkillExit {id: "first_body:pause"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "first_body:pause"}), (t:TherapyConcept {appToolId: "pause"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "first_body:problem_solve"})
-SET x += {skillId: "first_body", exit: "problem_solve", toolId: "problem-solve", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "first_body", exit: "problem_solve", toolId: "problem-solve", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "first_body"}), (x:SkillExit {id: "first_body:problem_solve"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "first_body:problem_solve"}), (t:TherapyConcept {appToolId: "problem-solve"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "first_body:dear_man"})
-SET x += {skillId: "first_body", exit: "dear_man", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "first_body", exit: "dear_man", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "first_body"}), (x:SkillExit {id: "first_body:dear_man"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "first_body:dear_man"}), (t:TherapyConcept {appToolId: "dear-man"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "first_body:opposite_action"})
-SET x += {skillId: "first_body", exit: "opposite_action", toolId: "opposite-action", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "first_body", exit: "opposite_action", toolId: "opposite-action", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "first_body"}), (x:SkillExit {id: "first_body:opposite_action"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "first_body:opposite_action"}), (t:TherapyConcept {appToolId: "opposite-action"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "first_body:let_it_be"})
-SET x += {skillId: "first_body", exit: "let_it_be", toolId: "let-it-be", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "first_body", exit: "let_it_be", toolId: "let-it-be", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "first_body"}), (x:SkillExit {id: "first_body:let_it_be"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "first_body:let_it_be"}), (t:TherapyConcept {appToolId: "let-it-be"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "first_body:mind_job"})
-SET x += {skillId: "first_body", exit: "mind_job", toolId: "mind-job", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "first_body", exit: "mind_job", toolId: "mind-job", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "first_body"}), (x:SkillExit {id: "first_body:mind_job"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "first_body:mind_job"}), (t:TherapyConcept {appToolId: "mind-job"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "first_body:crisis_kit"})
-SET x += {skillId: "first_body", exit: "crisis_kit", toolId: "crisis-kit", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "first_body", exit: "crisis_kit", toolId: "crisis-kit", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"crisis\"}", x.label = null;
 MATCH (s:Skill {id: "first_body"}), (x:SkillExit {id: "first_body:crisis_kit"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "first_body:crisis_kit"}), (t:TherapyConcept {appToolId: "crisis-kit"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "first_body:safety_open"})
-SET x += {skillId: "first_body", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+SET x += {skillId: "first_body", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "first_body"}), (x:SkillExit {id: "first_body:safety_open"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MERGE (x:SkillExit {id: "first_body:done"})
-SET x += {skillId: "first_body", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "first_body", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "first_body"}), (x:SkillExit {id: "first_body:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "first_body:state"}), (b:SkillStep {id: "first_body:medical"})
@@ -9044,9 +9056,12 @@ SET r += {order: 0}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "first_body:lower_here"}), (x:SkillExit {id: "first_body:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
-MATCH (a:SkillStep {id: "first_body:someone"}), (x:SkillExit {id: "first_body:crisis_kit"})
+MATCH (a:SkillStep {id: "first_body:someone"}), (x:SkillExit {id: "first_body:safety_open"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "first_body:someone"}), (x:SkillExit {id: "first_body:crisis_kit"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
 MATCH (a:SkillStep {id: "first_body:fork"}), (b:SkillStep {id: "first_body:end"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
@@ -9295,41 +9310,41 @@ MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:reach"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 18};
 MERGE (x:SkillExit {id: "ride_it_out:cool_down"})
-SET x += {skillId: "ride_it_out", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "ride_it_out", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "ride_it_out"}), (x:SkillExit {id: "ride_it_out:cool_down"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ride_it_out:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "ride_it_out:pause"})
-SET x += {skillId: "ride_it_out", exit: "pause", toolId: "pause", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "ride_it_out", exit: "pause", toolId: "pause", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "ride_it_out"}), (x:SkillExit {id: "ride_it_out:pause"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ride_it_out:pause"}), (t:TherapyConcept {appToolId: "pause"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "ride_it_out:pros_cons"})
-SET x += {skillId: "ride_it_out", exit: "pros_cons", toolId: "pros-cons", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "ride_it_out", exit: "pros_cons", toolId: "pros-cons", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "ride_it_out"}), (x:SkillExit {id: "ride_it_out:pros_cons"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ride_it_out:pros_cons"}), (t:TherapyConcept {appToolId: "pros-cons"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "ride_it_out:habit_plan"})
-SET x += {skillId: "ride_it_out", exit: "habit_plan", toolId: "habit-plan", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "ride_it_out", exit: "habit_plan", toolId: "habit-plan", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "ride_it_out"}), (x:SkillExit {id: "ride_it_out:habit_plan"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ride_it_out:habit_plan"}), (t:TherapyConcept {appToolId: "habit-plan"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "ride_it_out:crisis_kit"})
-SET x += {skillId: "ride_it_out", exit: "crisis_kit", toolId: "crisis-kit", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "ride_it_out", exit: "crisis_kit", toolId: "crisis-kit", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"crisis\"}", x.label = null;
 MATCH (s:Skill {id: "ride_it_out"}), (x:SkillExit {id: "ride_it_out:crisis_kit"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ride_it_out:crisis_kit"}), (t:TherapyConcept {appToolId: "crisis-kit"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "ride_it_out:safety_open"})
-SET x += {skillId: "ride_it_out", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+SET x += {skillId: "ride_it_out", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "ride_it_out"}), (x:SkillExit {id: "ride_it_out:safety_open"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MERGE (x:SkillExit {id: "ride_it_out:done"})
-SET x += {skillId: "ride_it_out", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "ride_it_out", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "ride_it_out"}), (x:SkillExit {id: "ride_it_out:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "ride_it_out:pull"}), (b:SkillStep {id: "ride_it_out:safe"})
@@ -9521,18 +9536,24 @@ SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"not\": {\"eq\": 
 MATCH (a:SkillStep {id: "ride_it_out:settle"}), (x:SkillExit {id: "ride_it_out:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
-MATCH (a:SkillStep {id: "ride_it_out:hurt_end"}), (x:SkillExit {id: "ride_it_out:cool_down"})
+MATCH (a:SkillStep {id: "ride_it_out:hurt_end"}), (x:SkillExit {id: "ride_it_out:safety_open"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
-MATCH (a:SkillStep {id: "ride_it_out:hurt_end"}), (x:SkillExit {id: "ride_it_out:crisis_kit"})
+MATCH (a:SkillStep {id: "ride_it_out:hurt_end"}), (x:SkillExit {id: "ride_it_out:cool_down"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "ride_it_out:hurt_end"}), (x:SkillExit {id: "ride_it_out:crisis_kit"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"all\": []}}]";
 MATCH (a:SkillStep {id: "ride_it_out:hurt_end"}), (x:SkillExit {id: "ride_it_out:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
-MATCH (a:SkillStep {id: "ride_it_out:reach"}), (x:SkillExit {id: "ride_it_out:crisis_kit"})
+MATCH (a:SkillStep {id: "ride_it_out:reach"}), (x:SkillExit {id: "ride_it_out:safety_open"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "ride_it_out:reach"}), (x:SkillExit {id: "ride_it_out:crisis_kit"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
 MERGE (o:SkillOption {id: "ride_it_out:pull:send"})
 SET o:SkillOption, o += {skillId: "ride_it_out", list: "pull", value: "send", label: "Send or say something", version: "ro-v1"}, o.propsJson = "{\"urge\": \"send\"}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:pull:send"})
@@ -9772,65 +9793,65 @@ MATCH (s:Skill {id: "let_it_be"}), (n:SkillStep {id: "let_it_be:settle"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 20};
 MERGE (x:SkillExit {id: "let_it_be:problem_solve"})
-SET x += {skillId: "let_it_be", exit: "problem_solve", toolId: "problem-solve", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "let_it_be", exit: "problem_solve", toolId: "problem-solve", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "let_it_be"}), (x:SkillExit {id: "let_it_be:problem_solve"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "let_it_be:problem_solve"}), (t:TherapyConcept {appToolId: "problem-solve"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "let_it_be:thoughts"})
-SET x += {skillId: "let_it_be", exit: "thoughts", toolId: "thoughts-passing", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "let_it_be", exit: "thoughts", toolId: "thoughts-passing", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "let_it_be"}), (x:SkillExit {id: "let_it_be:thoughts"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "let_it_be:thoughts"}), (t:TherapyConcept {appToolId: "thoughts-passing"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "let_it_be:ending"})
-SET x += {skillId: "let_it_be", exit: "ending", toolId: "ending-relationships", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"careful\"}";
+SET x += {skillId: "let_it_be", exit: "ending", toolId: "ending-relationships", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"careful\"}", x.label = null;
 MATCH (s:Skill {id: "let_it_be"}), (x:SkillExit {id: "let_it_be:ending"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "let_it_be:ending"}), (t:TherapyConcept {appToolId: "ending-relationships"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "let_it_be:recover"})
-SET x += {skillId: "let_it_be", exit: "recover", toolId: "recovering-from-invalidation", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "let_it_be", exit: "recover", toolId: "recovering-from-invalidation", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "let_it_be"}), (x:SkillExit {id: "let_it_be:recover"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "let_it_be:recover"}), (t:TherapyConcept {appToolId: "recovering-from-invalidation"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "let_it_be:fast"})
-SET x += {skillId: "let_it_be", exit: "fast", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "let_it_be", exit: "fast", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "let_it_be"}), (x:SkillExit {id: "let_it_be:fast"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "let_it_be:fast"}), (t:TherapyConcept {appToolId: "fast"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "let_it_be:cool_down"})
-SET x += {skillId: "let_it_be", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "let_it_be", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "let_it_be"}), (x:SkillExit {id: "let_it_be:cool_down"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "let_it_be:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "let_it_be:good_things"})
-SET x += {skillId: "let_it_be", exit: "good_things", toolId: "good-things", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "let_it_be", exit: "good_things", toolId: "good-things", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "let_it_be"}), (x:SkillExit {id: "let_it_be:good_things"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "let_it_be:good_things"}), (t:TherapyConcept {appToolId: "good-things"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "let_it_be:please_skill"})
-SET x += {skillId: "let_it_be", exit: "please_skill", toolId: "please-skill", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "let_it_be", exit: "please_skill", toolId: "please-skill", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "let_it_be"}), (x:SkillExit {id: "let_it_be:please_skill"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "let_it_be:please_skill"}), (t:TherapyConcept {appToolId: "please-skill"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "let_it_be:soothe"})
-SET x += {skillId: "let_it_be", exit: "soothe", toolId: "soothe", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "let_it_be", exit: "soothe", toolId: "soothe", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "let_it_be"}), (x:SkillExit {id: "let_it_be:soothe"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "let_it_be:soothe"}), (t:TherapyConcept {appToolId: "soothe"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "let_it_be:safety_open"})
-SET x += {skillId: "let_it_be", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+SET x += {skillId: "let_it_be", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "let_it_be"}), (x:SkillExit {id: "let_it_be:safety_open"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MERGE (x:SkillExit {id: "let_it_be:done"})
-SET x += {skillId: "let_it_be", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "let_it_be", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "let_it_be"}), (x:SkillExit {id: "let_it_be:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "let_it_be:checked"}), (b:SkillStep {id: "let_it_be:check_first"})
@@ -10524,41 +10545,41 @@ MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:lid_off"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 39};
 MERGE (x:SkillExit {id: "mind_job:problem_solve"})
-SET x += {skillId: "mind_job", exit: "problem_solve", toolId: "problem-solve", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "mind_job", exit: "problem_solve", toolId: "problem-solve", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "mind_job"}), (x:SkillExit {id: "mind_job:problem_solve"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "mind_job:problem_solve"}), (t:TherapyConcept {appToolId: "problem-solve"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "mind_job:dear_man"})
-SET x += {skillId: "mind_job", exit: "dear_man", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "mind_job", exit: "dear_man", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "mind_job"}), (x:SkillExit {id: "mind_job:dear_man"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "mind_job:dear_man"}), (t:TherapyConcept {appToolId: "dear-man"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "mind_job:check_the_facts"})
-SET x += {skillId: "mind_job", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "mind_job", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "mind_job"}), (x:SkillExit {id: "mind_job:check_the_facts"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "mind_job:check_the_facts"}), (t:TherapyConcept {appToolId: "check-the-facts"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "mind_job:let_it_be"})
-SET x += {skillId: "mind_job", exit: "let_it_be", toolId: "let-it-be", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "mind_job", exit: "let_it_be", toolId: "let-it-be", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "mind_job"}), (x:SkillExit {id: "mind_job:let_it_be"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "mind_job:let_it_be"}), (t:TherapyConcept {appToolId: "let-it-be"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "mind_job:cool_down"})
-SET x += {skillId: "mind_job", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "mind_job", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "mind_job"}), (x:SkillExit {id: "mind_job:cool_down"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "mind_job:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "mind_job:safety_open"})
-SET x += {skillId: "mind_job", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+SET x += {skillId: "mind_job", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "mind_job"}), (x:SkillExit {id: "mind_job:safety_open"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MERGE (x:SkillExit {id: "mind_job:done"})
-SET x += {skillId: "mind_job", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "mind_job", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "mind_job"}), (x:SkillExit {id: "mind_job:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "mind_job:what"}), (b:SkillStep {id: "mind_job:lid_pick"})
@@ -11290,41 +11311,41 @@ MATCH (s:Skill {id: "say_no"}), (n:SkillStep {id: "say_no:partly"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 18};
 MERGE (x:SkillExit {id: "say_no:cool_down"})
-SET x += {skillId: "say_no", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "say_no", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "say_no"}), (x:SkillExit {id: "say_no:cool_down"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "say_no:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "say_no:fast"})
-SET x += {skillId: "say_no", exit: "fast", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "say_no", exit: "fast", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "say_no"}), (x:SkillExit {id: "say_no:fast"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "say_no:fast"}), (t:TherapyConcept {appToolId: "fast"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "say_no:check_the_facts"})
-SET x += {skillId: "say_no", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "say_no", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "say_no"}), (x:SkillExit {id: "say_no:check_the_facts"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "say_no:check_the_facts"}), (t:TherapyConcept {appToolId: "check-the-facts"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "say_no:rehearse"})
-SET x += {skillId: "say_no", exit: "rehearse", toolId: "rehearse", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "say_no", exit: "rehearse", toolId: "rehearse", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "say_no"}), (x:SkillExit {id: "say_no:rehearse"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "say_no:rehearse"}), (t:TherapyConcept {appToolId: "rehearse"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "say_no:ending_careful"})
-SET x += {skillId: "say_no", exit: "ending_careful", toolId: "ending-relationships", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"careful\"}";
+SET x += {skillId: "say_no", exit: "ending_careful", toolId: "ending-relationships", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"careful\"}", x.label = null;
 MATCH (s:Skill {id: "say_no"}), (x:SkillExit {id: "say_no:ending_careful"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "say_no:ending_careful"}), (t:TherapyConcept {appToolId: "ending-relationships"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "say_no:safety_open"})
-SET x += {skillId: "say_no", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+SET x += {skillId: "say_no", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "say_no"}), (x:SkillExit {id: "say_no:safety_open"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MERGE (x:SkillExit {id: "say_no:done"})
-SET x += {skillId: "say_no", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "say_no", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "say_no"}), (x:SkillExit {id: "say_no:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "say_no:ask"}), (b:SkillStep {id: "say_no:pressure"})
@@ -11821,19 +11842,19 @@ MATCH (s:Skill {id: "dear_man_one"}), (n:SkillStep {id: "dear_man_one:dropped"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 17};
 MERGE (x:SkillExit {id: "dear_man_one:cool_down"})
-SET x += {skillId: "dear_man_one", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "dear_man_one", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "dear_man_one"}), (x:SkillExit {id: "dear_man_one:cool_down"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_one:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_one:let_go"})
-SET x += {skillId: "dear_man_one", exit: "let_go", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"let_go\"}";
+SET x += {skillId: "dear_man_one", exit: "let_go", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"let_go\"}", x.label = null;
 MATCH (s:Skill {id: "dear_man_one"}), (x:SkillExit {id: "dear_man_one:let_go"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_one:let_go"}), (t:TherapyConcept {appToolId: "fast"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_one:done"})
-SET x += {skillId: "dear_man_one", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "dear_man_one", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "dear_man_one"}), (x:SkillExit {id: "dear_man_one:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "dear_man_one:source"}), (b:SkillStep {id: "dear_man_one:about"})
@@ -12377,17 +12398,17 @@ MATCH (s:Skill {id: "held"}), (n:SkillStep {id: "held:end"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 25};
 MERGE (x:SkillExit {id: "held:cool_down"})
-SET x += {skillId: "held", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "held", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "held"}), (x:SkillExit {id: "held:cool_down"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "held:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "held:safety_open"})
-SET x += {skillId: "held", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+SET x += {skillId: "held", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "held"}), (x:SkillExit {id: "held:safety_open"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MERGE (x:SkillExit {id: "held:done"})
-SET x += {skillId: "held", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "held", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "held"}), (x:SkillExit {id: "held:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "held:pick"}), (b:SkillStep {id: "held:warm"})
@@ -12901,29 +12922,29 @@ MATCH (s:Skill {id: "thoughts_passing"}), (n:SkillStep {id: "thoughts_passing:en
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 16};
 MERGE (x:SkillExit {id: "thoughts_passing:cool_down"})
-SET x += {skillId: "thoughts_passing", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "thoughts_passing", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "thoughts_passing"}), (x:SkillExit {id: "thoughts_passing:cool_down"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "thoughts_passing:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "thoughts_passing:five_senses"})
-SET x += {skillId: "thoughts_passing", exit: "five_senses", toolId: "five-senses", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "thoughts_passing", exit: "five_senses", toolId: "five-senses", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "thoughts_passing"}), (x:SkillExit {id: "thoughts_passing:five_senses"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "thoughts_passing:five_senses"}), (t:TherapyConcept {appToolId: "five-senses"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "thoughts_passing:check_the_facts"})
-SET x += {skillId: "thoughts_passing", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "thoughts_passing", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "thoughts_passing"}), (x:SkillExit {id: "thoughts_passing:check_the_facts"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "thoughts_passing:check_the_facts"}), (t:TherapyConcept {appToolId: "check-the-facts"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "thoughts_passing:safety_open"})
-SET x += {skillId: "thoughts_passing", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+SET x += {skillId: "thoughts_passing", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "thoughts_passing"}), (x:SkillExit {id: "thoughts_passing:safety_open"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MERGE (x:SkillExit {id: "thoughts_passing:done"})
-SET x += {skillId: "thoughts_passing", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "thoughts_passing", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "thoughts_passing"}), (x:SkillExit {id: "thoughts_passing:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "thoughts_passing:catch"}), (b:SkillStep {id: "thoughts_passing:heads_up"})
@@ -13320,41 +13341,41 @@ MATCH (s:Skill {id: "dear_man_prep"}), (n:SkillStep {id: "dear_man_prep:when"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 19};
 MERGE (x:SkillExit {id: "dear_man_prep:debrief"})
-SET x += {skillId: "dear_man_prep", exit: "debrief", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"mode\": \"debrief\"}";
+SET x += {skillId: "dear_man_prep", exit: "debrief", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"mode\": \"debrief\"}", x.label = null;
 MATCH (s:Skill {id: "dear_man_prep"}), (x:SkillExit {id: "dear_man_prep:debrief"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_prep:debrief"}), (t:TherapyConcept {appToolId: "dear-man"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_prep:let_go"})
-SET x += {skillId: "dear_man_prep", exit: "let_go", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"let_go\"}";
+SET x += {skillId: "dear_man_prep", exit: "let_go", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"let_go\"}", x.label = null;
 MATCH (s:Skill {id: "dear_man_prep"}), (x:SkillExit {id: "dear_man_prep:let_go"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_prep:let_go"}), (t:TherapyConcept {appToolId: "fast"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_prep:cool_down"})
-SET x += {skillId: "dear_man_prep", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "dear_man_prep", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "dear_man_prep"}), (x:SkillExit {id: "dear_man_prep:cool_down"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_prep:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_prep:cope_ahead"})
-SET x += {skillId: "dear_man_prep", exit: "cope_ahead", toolId: "cope-ahead", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"partId\": \"$a.part\", \"situationId\": \"conversation\"}";
+SET x += {skillId: "dear_man_prep", exit: "cope_ahead", toolId: "cope-ahead", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"partId\": \"$a.part\", \"situationId\": \"conversation\"}", x.label = null;
 MATCH (s:Skill {id: "dear_man_prep"}), (x:SkillExit {id: "dear_man_prep:cope_ahead"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_prep:cope_ahead"}), (t:TherapyConcept {appToolId: "cope-ahead"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_prep:ending_careful"})
-SET x += {skillId: "dear_man_prep", exit: "ending_careful", toolId: "ending-relationships", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"careful\"}";
+SET x += {skillId: "dear_man_prep", exit: "ending_careful", toolId: "ending-relationships", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"careful\"}", x.label = null;
 MATCH (s:Skill {id: "dear_man_prep"}), (x:SkillExit {id: "dear_man_prep:ending_careful"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "dear_man_prep:ending_careful"}), (t:TherapyConcept {appToolId: "ending-relationships"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "dear_man_prep:safety_open"})
-SET x += {skillId: "dear_man_prep", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+SET x += {skillId: "dear_man_prep", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "dear_man_prep"}), (x:SkillExit {id: "dear_man_prep:safety_open"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MERGE (x:SkillExit {id: "dear_man_prep:done"})
-SET x += {skillId: "dear_man_prep", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "dear_man_prep", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "dear_man_prep"}), (x:SkillExit {id: "dear_man_prep:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "dear_man_prep:situation"}), (b:SkillStep {id: "dear_man_prep:matters"})
@@ -14535,65 +14556,65 @@ MATCH (s:Skill {id: "opposite_action"}), (n:SkillStep {id: "opposite_action:miss
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 32};
 MERGE (x:SkillExit {id: "opposite_action:check_the_facts"})
-SET x += {skillId: "opposite_action", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "opposite_action", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "opposite_action"}), (x:SkillExit {id: "opposite_action:check_the_facts"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "opposite_action:check_the_facts"}), (t:TherapyConcept {appToolId: "check-the-facts"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "opposite_action:problem_solve"})
-SET x += {skillId: "opposite_action", exit: "problem_solve", toolId: "problem-solve", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "opposite_action", exit: "problem_solve", toolId: "problem-solve", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "opposite_action"}), (x:SkillExit {id: "opposite_action:problem_solve"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "opposite_action:problem_solve"}), (t:TherapyConcept {appToolId: "problem-solve"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "opposite_action:cool_down"})
-SET x += {skillId: "opposite_action", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "opposite_action", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "opposite_action"}), (x:SkillExit {id: "opposite_action:cool_down"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "opposite_action:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "opposite_action:dear_man"})
-SET x += {skillId: "opposite_action", exit: "dear_man", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "opposite_action", exit: "dear_man", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "opposite_action"}), (x:SkillExit {id: "opposite_action:dear_man"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "opposite_action:dear_man"}), (t:TherapyConcept {appToolId: "dear-man"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "opposite_action:fast"})
-SET x += {skillId: "opposite_action", exit: "fast", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "opposite_action", exit: "fast", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "opposite_action"}), (x:SkillExit {id: "opposite_action:fast"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "opposite_action:fast"}), (t:TherapyConcept {appToolId: "fast"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "opposite_action:ride"})
-SET x += {skillId: "opposite_action", exit: "ride", toolId: "urge-surfing", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "opposite_action", exit: "ride", toolId: "urge-surfing", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "opposite_action"}), (x:SkillExit {id: "opposite_action:ride"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "opposite_action:ride"}), (t:TherapyConcept {appToolId: "urge-surfing"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "opposite_action:pause"})
-SET x += {skillId: "opposite_action", exit: "pause", toolId: "pause", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "opposite_action", exit: "pause", toolId: "pause", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "opposite_action"}), (x:SkillExit {id: "opposite_action:pause"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "opposite_action:pause"}), (t:TherapyConcept {appToolId: "pause"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "opposite_action:ending"})
-SET x += {skillId: "opposite_action", exit: "ending", toolId: "ending-relationships", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"careful\"}";
+SET x += {skillId: "opposite_action", exit: "ending", toolId: "ending-relationships", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"careful\"}", x.label = null;
 MATCH (s:Skill {id: "opposite_action"}), (x:SkillExit {id: "opposite_action:ending"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "opposite_action:ending"}), (t:TherapyConcept {appToolId: "ending-relationships"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "opposite_action:er_troubleshoot"})
-SET x += {skillId: "opposite_action", exit: "er_troubleshoot", toolId: "er-troubleshoot", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "opposite_action", exit: "er_troubleshoot", toolId: "er-troubleshoot", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "opposite_action"}), (x:SkillExit {id: "opposite_action:er_troubleshoot"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "opposite_action:er_troubleshoot"}), (t:TherapyConcept {appToolId: "er-troubleshoot"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "opposite_action:safety_open"})
-SET x += {skillId: "opposite_action", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+SET x += {skillId: "opposite_action", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "opposite_action"}), (x:SkillExit {id: "opposite_action:safety_open"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MERGE (x:SkillExit {id: "opposite_action:done"})
-SET x += {skillId: "opposite_action", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "opposite_action", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "opposite_action"}), (x:SkillExit {id: "opposite_action:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "opposite_action:door"}), (b:SkillStep {id: "opposite_action:calm"})
@@ -16466,35 +16487,35 @@ MATCH (s:Skill {id: "habit_plan"}), (n:SkillStep {id: "habit_plan:stop"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 22};
 MERGE (x:SkillExit {id: "habit_plan:urge_surfing"})
-SET x += {skillId: "habit_plan", exit: "urge_surfing", toolId: "urge-surfing", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "habit_plan", exit: "urge_surfing", toolId: "urge-surfing", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "habit_plan"}), (x:SkillExit {id: "habit_plan:urge_surfing"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "habit_plan:urge_surfing"}), (t:TherapyConcept {appToolId: "urge-surfing"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "habit_plan:pros_cons"})
-SET x += {skillId: "habit_plan", exit: "pros_cons", toolId: "pros-cons", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "habit_plan", exit: "pros_cons", toolId: "pros-cons", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "habit_plan"}), (x:SkillExit {id: "habit_plan:pros_cons"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "habit_plan:pros_cons"}), (t:TherapyConcept {appToolId: "pros-cons"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "habit_plan:cool_down"})
-SET x += {skillId: "habit_plan", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "habit_plan", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "habit_plan"}), (x:SkillExit {id: "habit_plan:cool_down"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "habit_plan:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "habit_plan:crisis_kit"})
-SET x += {skillId: "habit_plan", exit: "crisis_kit", toolId: "crisis-kit", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "habit_plan", exit: "crisis_kit", toolId: "crisis-kit", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"crisis\"}", x.label = null;
 MATCH (s:Skill {id: "habit_plan"}), (x:SkillExit {id: "habit_plan:crisis_kit"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "habit_plan:crisis_kit"}), (t:TherapyConcept {appToolId: "crisis-kit"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "habit_plan:safety_open"})
-SET x += {skillId: "habit_plan", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+SET x += {skillId: "habit_plan", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "habit_plan"}), (x:SkillExit {id: "habit_plan:safety_open"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MERGE (x:SkillExit {id: "habit_plan:done"})
-SET x += {skillId: "habit_plan", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "habit_plan", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "habit_plan"}), (x:SkillExit {id: "habit_plan:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "habit_plan:what"}), (b:SkillStep {id: "habit_plan:harm"})
@@ -16515,9 +16536,12 @@ SET r += {order: 4}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "habit_plan:what"}), (x:SkillExit {id: "habit_plan:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "what", label: "safety_open"}, r.whenJson = "{\"all\": []}";
-MATCH (a:SkillStep {id: "habit_plan:harm"}), (x:SkillExit {id: "habit_plan:crisis_kit"})
+MATCH (a:SkillStep {id: "habit_plan:harm"}), (x:SkillExit {id: "habit_plan:safety_open"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "habit_plan:harm"}), (x:SkillExit {id: "habit_plan:crisis_kit"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
 MATCH (a:SkillStep {id: "habit_plan:harm"}), (x:SkillExit {id: "habit_plan:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
@@ -17186,25 +17210,25 @@ MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:back_end"}
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 15};
 MERGE (x:SkillExit {id: "please_skill:cool_down"})
-SET x += {skillId: "please_skill", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "please_skill", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "please_skill"}), (x:SkillExit {id: "please_skill:cool_down"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "please_skill:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "please_skill:find_the_feeling"})
-SET x += {skillId: "please_skill", exit: "find_the_feeling", toolId: "find-the-feeling", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "please_skill", exit: "find_the_feeling", toolId: "find-the-feeling", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "please_skill"}), (x:SkillExit {id: "please_skill:find_the_feeling"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "please_skill:find_the_feeling"}), (t:TherapyConcept {appToolId: "find-the-feeling"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "please_skill:sleep_reset"})
-SET x += {skillId: "please_skill", exit: "sleep_reset", toolId: "sleep-reset", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "please_skill", exit: "sleep_reset", toolId: "sleep-reset", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "please_skill"}), (x:SkillExit {id: "please_skill:sleep_reset"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "please_skill:sleep_reset"}), (t:TherapyConcept {appToolId: "sleep-reset"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "please_skill:done"})
-SET x += {skillId: "please_skill", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "please_skill", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "please_skill"}), (x:SkillExit {id: "please_skill:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "please_skill:sleep"}), (b:SkillStep {id: "please_skill:food"})
@@ -17642,59 +17666,59 @@ MATCH (s:Skill {id: "give"}), (n:SkillStep {id: "give:g_end"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 34};
 MERGE (x:SkillExit {id: "give:cool_down"})
-SET x += {skillId: "give", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "give", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "give"}), (x:SkillExit {id: "give:cool_down"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "give:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "give:fast"})
-SET x += {skillId: "give", exit: "fast", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "give", exit: "fast", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "give"}), (x:SkillExit {id: "give:fast"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "give:fast"}), (t:TherapyConcept {appToolId: "fast"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "give:fast_let_go"})
-SET x += {skillId: "give", exit: "fast_let_go", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"let_go\"}";
+SET x += {skillId: "give", exit: "fast_let_go", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"let_go\"}", x.label = null;
 MATCH (s:Skill {id: "give"}), (x:SkillExit {id: "give:fast_let_go"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "give:fast_let_go"}), (t:TherapyConcept {appToolId: "fast"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "give:check_the_facts"})
-SET x += {skillId: "give", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "give", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "give"}), (x:SkillExit {id: "give:check_the_facts"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "give:check_the_facts"}), (t:TherapyConcept {appToolId: "check-the-facts"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "give:one_message"})
-SET x += {skillId: "give", exit: "one_message", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"mode\": \"one\", \"person\": \"$ctx.personId\"}";
+SET x += {skillId: "give", exit: "one_message", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"mode\": \"one\", \"person\": \"$ctx.personId\"}", x.label = null;
 MATCH (s:Skill {id: "give"}), (x:SkillExit {id: "give:one_message"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "give:one_message"}), (t:TherapyConcept {appToolId: "dear-man"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "give:give_repair"})
-SET x += {skillId: "give", exit: "give_repair", toolId: "give", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"person\": \"$ctx.personId\", \"situationId\": \"repair\"}";
+SET x += {skillId: "give", exit: "give_repair", toolId: "give", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"person\": \"$ctx.personId\", \"situationId\": \"repair\"}", x.label = null;
 MATCH (s:Skill {id: "give"}), (x:SkillExit {id: "give:give_repair"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "give:give_repair"}), (t:TherapyConcept {appToolId: "give"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "give:rehearse"})
-SET x += {skillId: "give", exit: "rehearse", toolId: "rehearse", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "give", exit: "rehearse", toolId: "rehearse", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "give"}), (x:SkillExit {id: "give:rehearse"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "give:rehearse"}), (t:TherapyConcept {appToolId: "rehearse"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "give:ending_careful"})
-SET x += {skillId: "give", exit: "ending_careful", toolId: "ending-relationships", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"careful\"}";
+SET x += {skillId: "give", exit: "ending_careful", toolId: "ending-relationships", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"careful\"}", x.label = null;
 MATCH (s:Skill {id: "give"}), (x:SkillExit {id: "give:ending_careful"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "give:ending_careful"}), (t:TherapyConcept {appToolId: "ending-relationships"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "give:safety_open"})
-SET x += {skillId: "give", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+SET x += {skillId: "give", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "give"}), (x:SkillExit {id: "give:safety_open"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MERGE (x:SkillExit {id: "give:done"})
-SET x += {skillId: "give", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "give", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "give"}), (x:SkillExit {id: "give:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "give:what"}), (b:SkillStep {id: "give:break"})
@@ -18422,23 +18446,23 @@ MATCH (s:Skill {id: "good_things"}), (n:SkillStep {id: "good_things:not_today"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 15};
 MERGE (x:SkillExit {id: "good_things:cool_down"})
-SET x += {skillId: "good_things", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "good_things", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "good_things"}), (x:SkillExit {id: "good_things:cool_down"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "good_things:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "good_things:please_skill"})
-SET x += {skillId: "good_things", exit: "please_skill", toolId: "please-skill", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "good_things", exit: "please_skill", toolId: "please-skill", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "good_things"}), (x:SkillExit {id: "good_things:please_skill"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "good_things:please_skill"}), (t:TherapyConcept {appToolId: "please-skill"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "good_things:safety_open"})
-SET x += {skillId: "good_things", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+SET x += {skillId: "good_things", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "good_things"}), (x:SkillExit {id: "good_things:safety_open"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MERGE (x:SkillExit {id: "good_things:done"})
-SET x += {skillId: "good_things", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "good_things", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "good_things"}), (x:SkillExit {id: "good_things:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "good_things:start"}), (b:SkillStep {id: "good_things:heads_up"})
@@ -18818,3 +18842,454 @@ SET o:SkillOption, o += {skillId: "good_things", list: "keep_more", value: "not_
 MATCH (s:Skill {id: "good_things"}), (o:SkillOption {id: "good_things:keep_more:not_now"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "keep_more", order: 51};
+
+// --- crisis_kit_use (kit-v1) ---
+MERGE (s:Skill {id: "crisis_kit_use"})
+SET s += {toolId: "crisis-kit", version: "kit-v1", contentVersion: "skills-v1", start: "deck", ownMax: 80, emotionFields: [], accepts: ["band", "frame"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"close_title\": \"Compared with when you opened it?\", \"cold_caution\": \"Skip this with heart trouble, fainting, an eating disorder, pregnancy, a cold allergy, or after drinking or using today. Never in a shower or a bath. Cold, not ice-cold.\", \"deck_another\": \"Another card\", \"deck_done\": \"That's enough for now\", \"deck_starter\": \"A few to start with. You can make the kit yours later.\", \"deck_title\": \"One card at a time.\", \"done\": \"Done\", \"harder_line\": \"That happens, and it's worth saying. Someone to talk to, or something for your body, could come next.\", \"make_kit\": \"Make it yours\", \"place_how\": \"Picture it. What can you see there? What can you hear? You can come back from it whenever you like.\", \"reach_line\": \"You don't have to explain everything. Hearing a voice can help.\", \"reach_make\": \"When things are calmer, you can make the kit your own.\", \"reach_title\": \"Is there anyone you could call or text, even for a few minutes?\", \"reasons_label\": \"You wrote these on a calmer day.\", \"safety_open\": \"Talk to someone now\", \"sec_body\": \"For your body\", \"sec_hands\": \"Keep your hands busy\", \"sec_place\": \"Your safe place\", \"sec_pros_cons\": \"Your pros & cons card\", \"sec_reasons\": \"Your reasons to get through tonight\", \"sec_soothe\": \"Something soothing\", \"sec_words\": \"Words for you\", \"words_how\": \"Read it slowly, twice.\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+MATCH (t:TherapyConcept {id: "dbt_crisis_survival_kit"}), (s:Skill {id: "crisis_kit_use"})
+MERGE (t)-[:HAS_SKILL]->(s);
+MATCH (:SkillStep {skillId: "crisis_kit_use"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
+MATCH (:Skill {id: "crisis_kit_use"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
+MERGE (n:SkillStep {id: "crisis_kit_use:deck"})
+SET n += {skillId: "crisis_kit_use", step: "deck", kind: "embed", version: "kit-v1"}, n.specJson = "{\"answerAs\": \"deck\", \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$ctx.frame\", \"crisis\"]}}], \"embed\": \"kitDeck\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"another\": \"deck_another\", \"enough\": \"deck_done\", \"fromSkill\": \"crisis_kit_build\", \"placeHow\": \"place_how\", \"prosSkill\": \"pros_cons\", \"reasonsLabel\": \"reasons_label\", \"secBody\": \"sec_body\", \"secHands\": \"sec_hands\", \"secPlace\": \"sec_place\", \"secProsCons\": \"sec_pros_cons\", \"secReasons\": \"sec_reasons\", \"secSoothe\": \"sec_soothe\", \"secWords\": \"sec_words\", \"starter\": \"deck_starter\", \"wordsHow\": \"words_how\"}, \"title\": \"deck_title\"}";
+MATCH (s:Skill {id: "crisis_kit_use"}), (n:SkillStep {id: "crisis_kit_use:deck"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 0};
+MERGE (n:SkillStep {id: "crisis_kit_use:close"})
+SET n += {skillId: "crisis_kit_use", step: "close", kind: "ask", version: "kit-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$ctx.frame\", \"crisis\"]}}], \"fields\": [{\"askFresh\": \"thenVsNow\", \"id\": \"close\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"tvn\"}, \"required\": true}], \"title\": \"close_title\"}";
+MATCH (s:Skill {id: "crisis_kit_use"}), (n:SkillStep {id: "crisis_kit_use:close"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 1};
+MERGE (n:SkillStep {id: "crisis_kit_use:harder"})
+SET n += {skillId: "crisis_kit_use", step: "harder", kind: "handoff", version: "kit-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$ctx.frame\", \"crisis\"]}}], \"done\": \"done\", \"lines\": [{\"key\": \"harder_line\", \"when\": {\"all\": []}}, {\"key\": \"reach_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"reach_title\"}";
+MATCH (s:Skill {id: "crisis_kit_use"}), (n:SkillStep {id: "crisis_kit_use:harder"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 2};
+MERGE (n:SkillStep {id: "crisis_kit_use:reach"})
+SET n += {skillId: "crisis_kit_use", step: "reach", kind: "handoff", version: "kit-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$ctx.frame\", \"crisis\"]}}], \"done\": \"done\", \"lines\": [{\"key\": \"reach_line\", \"when\": {\"all\": []}}, {\"key\": \"reach_make\", \"when\": {\"all\": [{\"not\": {\"set\": \"$p.crisisKit\"}}, {\"not\": {\"set\": \"$ctx.frame\"}}]}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"reach_title\"}";
+MATCH (s:Skill {id: "crisis_kit_use"}), (n:SkillStep {id: "crisis_kit_use:reach"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 3};
+MERGE (x:SkillExit {id: "crisis_kit_use:make_kit"})
+SET x += {skillId: "crisis_kit_use", exit: "make_kit", toolId: "crisis-kit", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"build\"}", x.label = "make_kit";
+MATCH (s:Skill {id: "crisis_kit_use"}), (x:SkillExit {id: "crisis_kit_use:make_kit"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "crisis_kit_use:make_kit"}), (t:TherapyConcept {appToolId: "crisis-kit"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "crisis_kit_use:cool_down"})
+SET x += {skillId: "crisis_kit_use", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "crisis_kit_use"}), (x:SkillExit {id: "crisis_kit_use:cool_down"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "crisis_kit_use:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "crisis_kit_use:safety_open"})
+SET x += {skillId: "crisis_kit_use", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "crisis_kit_use"}), (x:SkillExit {id: "crisis_kit_use:safety_open"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MERGE (x:SkillExit {id: "crisis_kit_use:done"})
+SET x += {skillId: "crisis_kit_use", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "crisis_kit_use"}), (x:SkillExit {id: "crisis_kit_use:done"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (a:SkillStep {id: "crisis_kit_use:deck"}), (b:SkillStep {id: "crisis_kit_use:close"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "crisis_kit_use:deck"}), (x:SkillExit {id: "crisis_kit_use:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "crisis_kit_use:close"}), (b:SkillStep {id: "crisis_kit_use:harder"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.close\", \"worse\"]}";
+MATCH (a:SkillStep {id: "crisis_kit_use:close"}), (b:SkillStep {id: "crisis_kit_use:reach"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "crisis_kit_use:close"}), (x:SkillExit {id: "crisis_kit_use:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "close", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "crisis_kit_use:harder"}), (x:SkillExit {id: "crisis_kit_use:safety_open"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "crisis_kit_use:harder"}), (x:SkillExit {id: "crisis_kit_use:cool_down"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "crisis_kit_use:harder"}), (x:SkillExit {id: "crisis_kit_use:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "crisis_kit_use:reach"}), (x:SkillExit {id: "crisis_kit_use:safety_open"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "crisis_kit_use:reach"}), (x:SkillExit {id: "crisis_kit_use:make_kit"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": [{\"not\": {\"set\": \"$p.crisisKit\"}}, {\"not\": {\"set\": \"$ctx.frame\"}}]}}]";
+MATCH (a:SkillStep {id: "crisis_kit_use:reach"}), (x:SkillExit {id: "crisis_kit_use:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MERGE (o:SkillOption {id: "crisis_kit_use:tvn:much_better"})
+SET o:SkillOption, o += {skillId: "crisis_kit_use", list: "tvn", value: "much_better", label: "Much easier", version: "kit-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "crisis_kit_use"}), (o:SkillOption {id: "crisis_kit_use:tvn:much_better"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "tvn", order: 0};
+MERGE (o:SkillOption {id: "crisis_kit_use:tvn:better"})
+SET o:SkillOption, o += {skillId: "crisis_kit_use", list: "tvn", value: "better", label: "A bit easier", version: "kit-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "crisis_kit_use"}), (o:SkillOption {id: "crisis_kit_use:tvn:better"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "tvn", order: 1};
+MERGE (o:SkillOption {id: "crisis_kit_use:tvn:same"})
+SET o:SkillOption, o += {skillId: "crisis_kit_use", list: "tvn", value: "same", label: "About the same", version: "kit-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "crisis_kit_use"}), (o:SkillOption {id: "crisis_kit_use:tvn:same"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "tvn", order: 2};
+MERGE (o:SkillOption {id: "crisis_kit_use:tvn:worse"})
+SET o:SkillOption, o += {skillId: "crisis_kit_use", list: "tvn", value: "worse", label: "Harder", version: "kit-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "crisis_kit_use"}), (o:SkillOption {id: "crisis_kit_use:tvn:worse"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "tvn", order: 3};
+
+// --- crisis_kit_build (kit-v1) ---
+MERGE (s:Skill {id: "crisis_kit_build"})
+SET s += {toolId: "crisis-kit", version: "kit-v1", contentVersion: "skills-v1", start: "body", ownMax: 80, emotionFields: [], accepts: ["band", "frame"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"body_hint\": \"Pick up to three, or skip. You can change it any time.\", \"body_title\": \"Let's make your kit. What helps your body when it's loud?\", \"cold_caution\": \"Skip this with heart trouble, fainting, an eating disorder, pregnancy, a cold allergy, or after drinking or using today. Never in a shower or a bath. Cold, not ice-cold.\", \"done\": \"Done\", \"end_empty\": \"Nothing picked this time. The starter kit is there whenever you need it.\", \"end_kept\": \"It's kept. Try one card on an ordinary hard day this week, so it feels familiar when you need it.\", \"end_line\": \"It opens one card at a time.\", \"end_not_kept\": \"That's fine. You can make it whenever you like.\", \"hands_hint\": \"Something that takes a bit of attention. Up to three, or skip.\", \"hands_title\": \"What keeps your hands and head busy?\", \"heads_up_hint\": \"You can open a starter kit now, settle first, or keep making it.\", \"heads_up_title\": \"Your body's loud right now. A kit is easier to make on a calmer day.\", \"keep_hint\": \"Your pros & cons cards go in by themselves.\", \"keep_primary\": \"Next\", \"keep_title\": \"Keep this kit? It opens from Help me now and from Tools.\", \"keep_title_has\": \"Keep this kit? It replaces the one you have now.\", \"next\": \"Next\", \"open_kit\": \"Open my kit\", \"own\": \"In my words\", \"place_hint\": \"Somewhere real or made up. Describe it if you like. Skip it if this isn't for you.\", \"place_own\": \"Describe it\", \"place_title\": \"Is there a place you go to in your mind that feels safe?\", \"reasons_hint\": \"Pick what's true, or write your own. Skip it if you like.\", \"reasons_title\": \"What are your reasons to get through a hard night?\", \"safety_open\": \"Talk to someone now\", \"settle_line\": \"The kit can wait for a steadier moment.\", \"soothe_hint\": \"Pick by what you can touch, smell, hear or see. Up to three, or skip.\", \"soothe_title\": \"What feels soothing?\", \"words_hint\": \"Pick up to three, or write one in your own words. Your words count most.\", \"words_title\": \"What would you want to hear on a hard night?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+MATCH (t:TherapyConcept {id: "dbt_crisis_survival_kit"}), (s:Skill {id: "crisis_kit_build"})
+MERGE (t)-[:HAS_SKILL]->(s);
+MATCH (:SkillStep {skillId: "crisis_kit_build"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
+MATCH (:Skill {id: "crisis_kit_build"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
+MERGE (n:SkillStep {id: "crisis_kit_build:body"})
+SET n += {skillId: "crisis_kit_build", step: "body", kind: "ask", version: "kit-v1"}, n.specJson = "{\"fields\": [{\"id\": \"body\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 3, \"options\": {\"list\": \"body\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"own\"}, \"required\": false}], \"hint\": \"body_hint\", \"title\": \"body_title\"}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (n:SkillStep {id: "crisis_kit_build:body"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 0};
+MERGE (n:SkillStep {id: "crisis_kit_build:heads_up"})
+SET n += {skillId: "crisis_kit_build", step: "heads_up", kind: "ask", version: "kit-v1"}, n.specJson = "{\"fields\": [{\"id\": \"heads_up\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"heads_up\"}, \"required\": true}], \"hint\": \"heads_up_hint\", \"title\": \"heads_up_title\"}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (n:SkillStep {id: "crisis_kit_build:heads_up"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 1};
+MERGE (n:SkillStep {id: "crisis_kit_build:hands"})
+SET n += {skillId: "crisis_kit_build", step: "hands", kind: "ask", version: "kit-v1"}, n.specJson = "{\"fields\": [{\"id\": \"hands\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 3, \"options\": {\"list\": \"hands\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"own\"}, \"required\": false}], \"hint\": \"hands_hint\", \"title\": \"hands_title\"}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (n:SkillStep {id: "crisis_kit_build:hands"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 2};
+MERGE (n:SkillStep {id: "crisis_kit_build:soothe"})
+SET n += {skillId: "crisis_kit_build", step: "soothe", kind: "ask", version: "kit-v1"}, n.specJson = "{\"fields\": [{\"id\": \"soothe\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 3, \"options\": {\"list\": \"soothe\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"own\"}, \"required\": false}], \"hint\": \"soothe_hint\", \"title\": \"soothe_title\"}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (n:SkillStep {id: "crisis_kit_build:soothe"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 3};
+MERGE (n:SkillStep {id: "crisis_kit_build:words"})
+SET n += {skillId: "crisis_kit_build", step: "words", kind: "ask", version: "kit-v1"}, n.specJson = "{\"fields\": [{\"id\": \"words\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 3, \"options\": {\"list\": \"words\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"own\"}, \"required\": false}], \"hint\": \"words_hint\", \"title\": \"words_title\"}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (n:SkillStep {id: "crisis_kit_build:words"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 4};
+MERGE (n:SkillStep {id: "crisis_kit_build:place"})
+SET n += {skillId: "crisis_kit_build", step: "place", kind: "ask", version: "kit-v1"}, n.specJson = "{\"fields\": [{\"id\": \"place\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"place\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"place_own\"}, \"required\": false}], \"hint\": \"place_hint\", \"title\": \"place_title\"}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (n:SkillStep {id: "crisis_kit_build:place"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 5};
+MERGE (n:SkillStep {id: "crisis_kit_build:reasons"})
+SET n += {skillId: "crisis_kit_build", step: "reasons", kind: "ask", version: "kit-v1"}, n.specJson = "{\"fields\": [{\"id\": \"reasons\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 4, \"options\": {\"list\": \"reasons\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"own\"}, \"required\": false}], \"hint\": \"reasons_hint\", \"title\": \"reasons_title\"}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (n:SkillStep {id: "crisis_kit_build:reasons"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 6};
+MERGE (n:SkillStep {id: "crisis_kit_build:keep"})
+SET n += {skillId: "crisis_kit_build", step: "keep", kind: "ask", version: "kit-v1"}, n.specJson = "{\"fields\": [{\"id\": \"keepit\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"keepit\"}, \"required\": true}], \"hint\": \"keep_hint\", \"keep\": {\"from\": [\"body\", \"hands\", \"soothe\", \"words\", \"place\", \"reasons\"], \"kind\": \"crisis_kit\", \"many\": false, \"when\": {\"eq\": [\"$a.keepit\", \"keep\"]}}, \"primary\": \"keep_primary\", \"title\": [{\"key\": \"keep_title_has\", \"when\": {\"set\": \"$p.crisisKit\"}}, {\"key\": \"keep_title\"}]}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (n:SkillStep {id: "crisis_kit_build:keep"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 7};
+MERGE (n:SkillStep {id: "crisis_kit_build:end"})
+SET n += {skillId: "crisis_kit_build", step: "end", kind: "handoff", version: "kit-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"end_kept\", \"when\": {\"eq\": [\"$a.keepit\", \"keep\"]}}, {\"key\": \"end_empty\", \"when\": {\"not\": {\"any\": [{\"set\": \"$a.body\"}, {\"set\": \"$a.hands\"}, {\"set\": \"$a.soothe\"}, {\"set\": \"$a.words\"}, {\"set\": \"$a.place\"}, {\"set\": \"$a.reasons\"}]}}}, {\"key\": \"end_not_kept\", \"when\": {\"set\": \"$a.keepit\"}}, {\"key\": \"end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (n:SkillStep {id: "crisis_kit_build:end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 8};
+MERGE (n:SkillStep {id: "crisis_kit_build:settle"})
+SET n += {skillId: "crisis_kit_build", step: "settle", kind: "handoff", version: "kit-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"settle_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (n:SkillStep {id: "crisis_kit_build:settle"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 9};
+MERGE (x:SkillExit {id: "crisis_kit_build:open_kit"})
+SET x += {skillId: "crisis_kit_build", exit: "open_kit", toolId: "crisis-kit", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = "open_kit";
+MATCH (s:Skill {id: "crisis_kit_build"}), (x:SkillExit {id: "crisis_kit_build:open_kit"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "crisis_kit_build:open_kit"}), (t:TherapyConcept {appToolId: "crisis-kit"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "crisis_kit_build:cool_down"})
+SET x += {skillId: "crisis_kit_build", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "crisis_kit_build"}), (x:SkillExit {id: "crisis_kit_build:cool_down"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "crisis_kit_build:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "crisis_kit_build:safety_open"})
+SET x += {skillId: "crisis_kit_build", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "crisis_kit_build"}), (x:SkillExit {id: "crisis_kit_build:safety_open"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MERGE (x:SkillExit {id: "crisis_kit_build:done"})
+SET x += {skillId: "crisis_kit_build", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "crisis_kit_build"}), (x:SkillExit {id: "crisis_kit_build:done"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (a:SkillStep {id: "crisis_kit_build:body"}), (b:SkillStep {id: "crisis_kit_build:heads_up"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
+MATCH (a:SkillStep {id: "crisis_kit_build:body"}), (b:SkillStep {id: "crisis_kit_build:hands"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "crisis_kit_build:body"}), (x:SkillExit {id: "crisis_kit_build:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "body", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "crisis_kit_build:heads_up"}), (b:SkillStep {id: "crisis_kit_build:settle"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"in\": [\"$a.heads_up\", [\"open\", \"settle\"]]}";
+MATCH (a:SkillStep {id: "crisis_kit_build:heads_up"}), (b:SkillStep {id: "crisis_kit_build:hands"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "crisis_kit_build:heads_up"}), (x:SkillExit {id: "crisis_kit_build:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "heads_up", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "crisis_kit_build:hands"}), (b:SkillStep {id: "crisis_kit_build:soothe"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "crisis_kit_build:hands"}), (x:SkillExit {id: "crisis_kit_build:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "hands", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "crisis_kit_build:soothe"}), (b:SkillStep {id: "crisis_kit_build:words"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "crisis_kit_build:soothe"}), (x:SkillExit {id: "crisis_kit_build:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "soothe", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "crisis_kit_build:words"}), (b:SkillStep {id: "crisis_kit_build:place"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "crisis_kit_build:words"}), (x:SkillExit {id: "crisis_kit_build:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "words", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "crisis_kit_build:place"}), (b:SkillStep {id: "crisis_kit_build:reasons"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "crisis_kit_build:place"}), (x:SkillExit {id: "crisis_kit_build:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "place", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "crisis_kit_build:reasons"}), (b:SkillStep {id: "crisis_kit_build:keep"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"any\": [{\"set\": \"$a.body\"}, {\"set\": \"$a.hands\"}, {\"set\": \"$a.soothe\"}, {\"set\": \"$a.words\"}, {\"set\": \"$a.place\"}, {\"set\": \"$a.reasons\"}]}";
+MATCH (a:SkillStep {id: "crisis_kit_build:reasons"}), (b:SkillStep {id: "crisis_kit_build:end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "crisis_kit_build:reasons"}), (x:SkillExit {id: "crisis_kit_build:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "reasons", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "crisis_kit_build:keep"}), (b:SkillStep {id: "crisis_kit_build:end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "crisis_kit_build:keep"}), (x:SkillExit {id: "crisis_kit_build:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "keepit", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "crisis_kit_build:end"}), (x:SkillExit {id: "crisis_kit_build:open_kit"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "crisis_kit_build:end"}), (x:SkillExit {id: "crisis_kit_build:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "crisis_kit_build:settle"}), (x:SkillExit {id: "crisis_kit_build:open_kit"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "crisis_kit_build:settle"}), (x:SkillExit {id: "crisis_kit_build:cool_down"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "crisis_kit_build:settle"}), (x:SkillExit {id: "crisis_kit_build:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MERGE (o:SkillOption {id: "crisis_kit_build:body:cold"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "body", value: "cold", label: "Cold water on my face", version: "kit-v1"}, o.propsJson = "{\"caution\": \"cold_caution\", \"how\": \"Cold water on your face or wrists, or hold something cold (not ice straight on skin). About thirty seconds.\", \"section\": \"body\", \"starter\": true}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:body:cold"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "body", order: 0};
+MERGE (o:SkillOption {id: "crisis_kit_build:body:breath_out"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "body", value: "breath_out", label: "Breathing out longer than in", version: "kit-v1"}, o.propsJson = "{\"how\": \"Breathe in for four, out for six. Five times, slowly. Dizzy or tingly? Stop and breathe normally.\", \"section\": \"body\", \"starter\": true}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:body:breath_out"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "body", order: 1};
+MERGE (o:SkillOption {id: "crisis_kit_build:body:squeeze"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "body", value: "squeeze", label: "Squeezing and letting go", version: "kit-v1"}, o.propsJson = "{\"how\": \"Squeeze your fists, shoulders and legs tight for five seconds, then let go. Three times.\", \"section\": \"body\", \"starter\": true}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:body:squeeze"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "body", order: 2};
+MERGE (o:SkillOption {id: "crisis_kit_build:body:march"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "body", value: "march", label: "Marching on the spot", version: "kit-v1"}, o.propsJson = "{\"how\": \"March on the spot for a minute, at a pace that feels okay.\", \"section\": \"body\", \"starter\": false}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:body:march"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "body", order: 3};
+MERGE (o:SkillOption {id: "crisis_kit_build:body:feet"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "body", value: "feet", label: "Pressing my feet into the floor", version: "kit-v1"}, o.propsJson = "{\"how\": \"Press your feet into the floor and feel it push back. Ten slow breaths.\", \"section\": \"body\", \"starter\": false}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:body:feet"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "body", order: 4};
+MERGE (o:SkillOption {id: "crisis_kit_build:hands:count"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "hands", value: "count", label: "Counting back in threes", version: "kit-v1"}, o.propsJson = "{\"how\": \"Count back from 100 in threes. Lose count? Pick any number and carry on.\", \"section\": \"hands\", \"starter\": true}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:hands:count"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "hands", order: 5};
+MERGE (o:SkillOption {id: "crisis_kit_build:hands:colours"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "hands", value: "colours", label: "Finding five blue things", version: "kit-v1"}, o.propsJson = "{\"how\": \"Look around for five blue things and name each one, out loud if you can.\", \"section\": \"hands\", \"starter\": true}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:hands:colours"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "hands", order: 6};
+MERGE (o:SkillOption {id: "crisis_kit_build:hands:tidy"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "hands", value: "tidy", label: "Tidying something small", version: "kit-v1"}, o.propsJson = "{\"how\": \"One drawer, one bag, one shelf. Five minutes.\", \"section\": \"hands\", \"starter\": false}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:hands:tidy"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "hands", order: 7};
+MERGE (o:SkillOption {id: "crisis_kit_build:hands:puzzle"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "hands", value: "puzzle", label: "A puzzle or a game I know", version: "kit-v1"}, o.propsJson = "{\"how\": \"Something that takes some thinking, not too much.\", \"section\": \"hands\", \"starter\": false}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:hands:puzzle"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "hands", order: 8};
+MERGE (o:SkillOption {id: "crisis_kit_build:hands:sing"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "hands", value: "sing", label: "Singing along to a song", version: "kit-v1"}, o.propsJson = "{\"how\": \"Pick one you know every word of, and sing it through.\", \"section\": \"hands\", \"starter\": false}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:hands:sing"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "hands", order: 9};
+MERGE (o:SkillOption {id: "crisis_kit_build:hands:rewatch"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "hands", value: "rewatch", label: "Something I've watched before", version: "kit-v1"}, o.propsJson = "{\"how\": \"A show you know well, one episode. Nothing new for now.\", \"section\": \"hands\", \"starter\": false}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:hands:rewatch"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "hands", order: 10};
+MERGE (o:SkillOption {id: "crisis_kit_build:soothe:warm"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "soothe", value: "warm", label: "Holding something warm", version: "kit-v1"}, o.propsJson = "{\"how\": \"A mug, a hot water bottle, a warm towel. Warm, not hot.\", \"section\": \"soothe\", \"starter\": true}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:soothe:warm"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "soothe", order: 11};
+MERGE (o:SkillOption {id: "crisis_kit_build:soothe:hand_heart"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "soothe", value: "hand_heart", label: "A hand on my heart", version: "kit-v1"}, o.propsJson = "{\"how\": \"One hand on your chest. Notice the warmth for a minute.\", \"section\": \"soothe\", \"starter\": true}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:soothe:hand_heart"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "soothe", order: 12};
+MERGE (o:SkillOption {id: "crisis_kit_build:soothe:soft"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "soothe", value: "soft", label: "Something soft", version: "kit-v1"}, o.propsJson = "{\"how\": \"A blanket, a jumper, a pet. Let it take some of the weight.\", \"section\": \"soothe\", \"starter\": false}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:soothe:soft"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "soothe", order: 13};
+MERGE (o:SkillOption {id: "crisis_kit_build:soothe:smell"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "soothe", value: "smell", label: "A smell I like", version: "kit-v1"}, o.propsJson = "{\"how\": \"Soap, hand cream, a jumper that smells like someone you love.\", \"section\": \"soothe\", \"starter\": false}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:soothe:smell"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "soothe", order: 14};
+MERGE (o:SkillOption {id: "crisis_kit_build:soothe:sound"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "soothe", value: "sound", label: "A sound that calms me", version: "kit-v1"}, o.propsJson = "{\"how\": \"Rain sounds, a playlist, a voice you like.\", \"section\": \"soothe\", \"starter\": false}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:soothe:sound"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "soothe", order: 15};
+MERGE (o:SkillOption {id: "crisis_kit_build:soothe:look"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "soothe", value: "look", label: "Something to look at", version: "kit-v1"}, o.propsJson = "{\"how\": \"The sky, a photo, a plant. Look at it slowly, one detail at a time.\", \"section\": \"soothe\", \"starter\": false}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:soothe:look"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "soothe", order: 16};
+MERGE (o:SkillOption {id: "crisis_kit_build:words:minute"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "words", value: "minute", label: "You're getting through this minute.", version: "kit-v1"}, o.propsJson = "{\"section\": \"words\", \"starter\": true}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:words:minute"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 17};
+MERGE (o:SkillOption {id: "crisis_kit_build:words:before"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "words", value: "before", label: "You've got through nights like this before.", version: "kit-v1"}, o.propsJson = "{\"section\": \"words\", \"starter\": false}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:words:before"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 18};
+MERGE (o:SkillOption {id: "crisis_kit_build:words:feeling"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "words", value: "feeling", label: "This is a feeling. It isn't the whole of you.", version: "kit-v1"}, o.propsJson = "{\"section\": \"words\", \"starter\": true}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:words:feeling"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 19};
+MERGE (o:SkillOption {id: "crisis_kit_build:words:next"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "words", value: "next", label: "You only have to do the next small thing.", version: "kit-v1"}, o.propsJson = "{\"section\": \"words\", \"starter\": false}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:words:next"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 20};
+MERGE (o:SkillOption {id: "crisis_kit_build:words:wave"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "words", value: "wave", label: "Feelings rise and fall, even the big ones.", version: "kit-v1"}, o.propsJson = "{\"section\": \"words\", \"starter\": false}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:words:wave"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 21};
+MERGE (o:SkillOption {id: "crisis_kit_build:words:trying"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "words", value: "trying", label: "You're doing your best with something hard.", version: "kit-v1"}, o.propsJson = "{\"section\": \"words\", \"starter\": false}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:words:trying"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 22};
+MERGE (o:SkillOption {id: "crisis_kit_build:words:ask"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "words", value: "ask", label: "It's okay to ask for help tonight.", version: "kit-v1"}, o.propsJson = "{\"section\": \"words\", \"starter\": false}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:words:ask"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 23};
+MERGE (o:SkillOption {id: "crisis_kit_build:place:beach"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "place", value: "beach", label: "A beach", version: "kit-v1"}, o.propsJson = "{\"section\": \"place\"}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:place:beach"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "place", order: 24};
+MERGE (o:SkillOption {id: "crisis_kit_build:place:woods"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "place", value: "woods", label: "A forest or a park", version: "kit-v1"}, o.propsJson = "{\"section\": \"place\"}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:place:woods"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "place", order: 25};
+MERGE (o:SkillOption {id: "crisis_kit_build:place:room"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "place", value: "room", label: "A room I love", version: "kit-v1"}, o.propsJson = "{\"section\": \"place\"}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:place:room"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "place", order: 26};
+MERGE (o:SkillOption {id: "crisis_kit_build:place:with"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "place", value: "with", label: "Somewhere with someone I trust", version: "kit-v1"}, o.propsJson = "{\"section\": \"place\"}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:place:with"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "place", order: 27};
+MERGE (o:SkillOption {id: "crisis_kit_build:place:made_up"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "place", value: "made_up", label: "Somewhere I've made up", version: "kit-v1"}, o.propsJson = "{\"section\": \"place\"}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:place:made_up"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "place", order: 28};
+MERGE (o:SkillOption {id: "crisis_kit_build:reasons:tomorrow"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "reasons", value: "tomorrow", label: "Seeing what tomorrow's like", version: "kit-v1"}, o.propsJson = "{\"section\": \"reasons\"}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:reasons:tomorrow"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "reasons", order: 29};
+MERGE (o:SkillOption {id: "crisis_kit_build:reasons:people"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "reasons", value: "people", label: "People I care about", version: "kit-v1"}, o.propsJson = "{\"section\": \"reasons\"}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:reasons:people"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "reasons", order: 30};
+MERGE (o:SkillOption {id: "crisis_kit_build:reasons:pet"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "reasons", value: "pet", label: "My pet", version: "kit-v1"}, o.propsJson = "{\"section\": \"reasons\"}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:reasons:pet"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "reasons", order: 31};
+MERGE (o:SkillOption {id: "crisis_kit_build:reasons:looking_forward"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "reasons", value: "looking_forward", label: "Something I'm looking forward to", version: "kit-v1"}, o.propsJson = "{\"section\": \"reasons\"}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:reasons:looking_forward"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "reasons", order: 32};
+MERGE (o:SkillOption {id: "crisis_kit_build:reasons:prove"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "reasons", value: "prove", label: "Showing myself I can", version: "kit-v1"}, o.propsJson = "{\"section\": \"reasons\"}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:reasons:prove"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "reasons", order: 33};
+MERGE (o:SkillOption {id: "crisis_kit_build:reasons:still_want"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "reasons", value: "still_want", label: "Things I still want to do", version: "kit-v1"}, o.propsJson = "{\"section\": \"reasons\"}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:reasons:still_want"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "reasons", order: 34};
+MERGE (o:SkillOption {id: "crisis_kit_build:heads_up:open"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "heads_up", value: "open", label: "Open a starter kit now", version: "kit-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:heads_up:open"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up", order: 35};
+MERGE (o:SkillOption {id: "crisis_kit_build:heads_up:settle"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "heads_up", value: "settle", label: "Settle my body first", version: "kit-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:heads_up:settle"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up", order: 36};
+MERGE (o:SkillOption {id: "crisis_kit_build:heads_up:go"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "heads_up", value: "go", label: "Keep making it", version: "kit-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:heads_up:go"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up", order: 37};
+MERGE (o:SkillOption {id: "crisis_kit_build:keepit:keep"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "keepit", value: "keep", label: "Keep it", version: "kit-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:keepit:keep"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "keepit", order: 38};
+MERGE (o:SkillOption {id: "crisis_kit_build:keepit:not_now"})
+SET o:SkillOption, o += {skillId: "crisis_kit_build", list: "keepit", value: "not_now", label: "Not this time", version: "kit-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "crisis_kit_build"}), (o:SkillOption {id: "crisis_kit_build:keepit:not_now"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "keepit", order: 39};

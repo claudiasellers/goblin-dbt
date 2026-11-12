@@ -36,6 +36,7 @@ export const PAGE_SKILLS: Readonly<Record<string, readonly string[]>> = {
   'dear-man': ['dear_man_debrief', 'dear_man_one', 'dear_man_prep'],
   'say-no': ['say_no'],
   'give': ['give'],
+  'crisis-kit': ['crisis_kit_use', 'crisis_kit_build'],
 };
 
 /**

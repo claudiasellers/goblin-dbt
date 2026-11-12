@@ -11,6 +11,7 @@ import { StillTrue } from './StillTrue';
 import { QuietHoursEditor } from './QuietHoursEditor';
 import { KeptProsCons } from './KeptProsCons';
 import { KeptHabitPlan } from './KeptHabitPlan';
+import { KeptCrisisKit } from './KeptCrisisKit';
 import { PatternOfferCard } from './PatternOfferCard';
 import { useUserProfile } from '../../contexts/UserProfileContext';
 import { getPartsContent } from '../../services/partsContent';
@@ -123,6 +124,8 @@ export function MeSection() {
               ? <KeptProsCons value={i.value} />
               : i.meta.kind === 'abstinence_plan' && i.value
               ? <KeptHabitPlan value={i.value} />
+              : i.meta.kind === 'crisis_kit' && i.value
+              ? <KeptCrisisKit value={i.value as Record<string, unknown>} />
               : <p className="text-sm text-[var(--color-text-secondary)]">{i.meta.kind === 'cope_ahead_plan'
                 ? (cope ? planLine(cope, planCaFromKept(i.value as Record<string, unknown> | undefined)).text : '')
                 : fillToolName(i.summary, toolName)}</p>}
@@ -137,7 +140,7 @@ export function MeSection() {
           {i.label === 'Person' && (
             <ForgetPerson itemRef={ref(i)} after={after} />
           )}
-          {(i.label === 'OwnLine' || i.meta.kind === 'nightmare_script' || i.meta.kind === 'cope_ahead_plan' || i.meta.kind === 'pros_cons' || i.meta.kind === 'abstinence_plan' || i.meta.kind === 'thing_i_like' || i.label === 'Person') && i.meta.status === 'active' && (
+          {(i.label === 'OwnLine' || i.meta.kind === 'nightmare_script' || i.meta.kind === 'cope_ahead_plan' || i.meta.kind === 'pros_cons' || i.meta.kind === 'abstinence_plan' || i.meta.kind === 'thing_i_like' || i.meta.kind === 'crisis_kit' || i.label === 'Person') && i.meta.status === 'active' && (
             <button type="button" onClick={() => { after(setAsideProfileItem(ref(i))).catch(() => { /* stays */ }); }}
               className="min-h-11 text-sm text-[var(--color-text-tertiary)] underline underline-offset-2">
               Set aside

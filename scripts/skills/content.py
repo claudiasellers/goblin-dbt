@@ -29,13 +29,14 @@ import opposite_action  # noqa: E402
 import habit_plan  # noqa: E402
 import please_skill  # noqa: E402
 import good_things  # noqa: E402
+import crisis_kit  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
 SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKILL, *fast.SKILLS, nightmare_rescript.SKILL, problem_solve.SKILL,
           ending_relationships.SKILL, cope_ahead.SKILL, hold_to_wait.SKILL, dear_man_debrief.SKILL, pros_cons.SKILL, first_body.SKILL,
           ride_it_out.SKILL, let_it_be.SKILL, mind_job.SKILL, say_no.SKILL, dear_man_one.SKILL, held.SKILL, thoughts_passing.SKILL, dear_man_prep.SKILL,
-          opposite_action.SKILL, habit_plan.SKILL, please_skill.SKILL, give.SKILL, good_things.SKILL]
+          opposite_action.SKILL, habit_plan.SKILL, please_skill.SKILL, give.SKILL, good_things.SKILL, *crisis_kit.SKILLS]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -94,11 +95,30 @@ EMBEDS = {
     "pocketCard": {"ids": ["seen_all", "copied"]},
     # Running low's readout (ER-07): a cell per row, the loudest drained to a sliver. No numbers or levels.
     "batteryRead": {"ids": ["read"]},
+    # DT-03's deck (plan C3b `cardDeck`, DT-owned): the kit one card at a time; reports which kinds of card it showed.
+    "kitDeck": {"ids": ["body", "hands", "soothe", "words", "place", "reasons", "pros_cons", "starter"], "measures": ["durationSec", "doneCount"]},
 }
 # What each embed takes from the skill (embeds.ts EMBED_PROPS; the contract test keeps the two equal). build.py
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
 # in [min, max], `enum` one of its values, `field` a field id of the skill, `id` a plain id. Undeclared props fail.
 EMBED_PROPS = {
+    "kitDeck": {
+        "fromSkill": {"type": "id"},
+        "prosSkill": {"type": "id"},
+        "starter": {"type": "copy"},
+        "another": {"type": "copy"},
+        "enough": {"type": "copy"},
+        "secBody": {"type": "copy"},
+        "secHands": {"type": "copy"},
+        "secSoothe": {"type": "copy"},
+        "secWords": {"type": "copy"},
+        "secPlace": {"type": "copy"},
+        "secReasons": {"type": "copy"},
+        "secProsCons": {"type": "copy"},
+        "placeHow": {"type": "copy"},
+        "wordsHow": {"type": "copy"},
+        "reasonsLabel": {"type": "copy"},
+    },
     # `as: heading`: the screen's question (a slot under `$title`, for a step whose question is parts copy).
     "partsLine": {"promptId": {"type": "id"}, "as": {"type": "enum", "values": ["line", "heading"], "optional": True}},
     "partLater": {},

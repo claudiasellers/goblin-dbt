@@ -189,6 +189,9 @@ CONCEPT_TAGS["say-no"] = {"concept": "dbt_saying_no", "side": "change", "skillKi
 # When it's a habit (DT-09, appToolId 'habit-plan', docs/design/habit-plan.md) has none either, by design: the plan is
 # made in calm for one behaviour, and the vocabulary has no word for a habit. Its entries are the Tools intent and Hold
 # to wait's and Ride it out's end cards for the use and check pulls (later CORE's target setup and the weekly review).
+# My crisis kit (DT-03, appToolId 'crisis-kit', docs/design/crisis-kit.md) has none either, by design: it is the person's
+# own kit, opened from Help me now, the Tools list and the crisis routes of Hold to wait, Ride it out, First, the body,
+# pros & cons and the habit plan, never earned by a feeling word.
 # Ending a relationship that's hurting you (IE-08, appToolId 'ending-relationships',
 # docs/design/ending-relationships.md) has none either, by design (PRD: "No intent row"): ending a relationship is a
 # decision made at a calm time, never a card a feeling word earns, and a check-in that surfaced it unasked could be

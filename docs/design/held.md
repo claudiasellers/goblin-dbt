@@ -65,7 +65,7 @@ drive, a blank pattern, so it gets no Held row. `tests/recommendation-select.tes
 - **The Held hands visual** (Shape room: the person's shape held by two cast hands, rocking ~6 a minute, warm hum
   opt-in; PRD open question 1).
 - **Voice**: the trusted-voice memo and their own recorded encouragement (D13: text only for now).
-- **The soothe list** kept as kit cards (DT-03's *soothe* section) and offered back here.
+- **The soothe list** kept in the kit (DT-03's *soothe* section, built) offered back here.
 - DT-01's swap (`soothe?mode=hand`), the kit cards, MF-06's backdraft close, ER's night mode and Recover's
   self-compassion step as hosts; an `enterAt` to open straight at the hand.
 - The WMP witness embed in place of the folded-in witness line (as Let it be defers it).
