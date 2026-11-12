@@ -29,7 +29,8 @@ test("every graph decision path preserves uncertainty and checks urge effectiven
     for (const effectiveness of ["helpful", "unhelpful", "unsure"]) {
       assert.equal(
         oppositeActionRoute(flow, "safe", fact, effectiveness),
-        fact === "unsure" || effectiveness === "unsure"
+        // ER-03 item 5 (D9): a feeling that doesn't fit with an urge that seems helpful is serving another goal: clarify.
+        fact === "unsure" || effectiveness === "unsure" || (fact === "not_fit" && effectiveness === "helpful")
           ? "clarify"
           : effectiveness === "unhelpful"
             ? "opposite"

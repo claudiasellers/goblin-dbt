@@ -1319,7 +1319,9 @@ export function OppositeAction() {
           <button type="button" className={choiceButton} onClick={recheck}>
             Recheck
           </button>
-          {routes.some((r) => r === "clarify" || r === "support") && toolLink("pause")}
+          {/* ER-03 item 6: clarify is a facts question (Check the Facts); Pause stays for support. */}
+          {routes.includes("clarify") && toolLink("check-the-facts")}
+          {routes.includes("support") && toolLink("pause")}
           <button type="button" className={linkButton} onClick={() => setCheckStep(CHECK_STEPS.length - 1)}>
             ← Previous
           </button>
@@ -1439,7 +1441,8 @@ export function OppositeAction() {
               Recheck
             </button>
           )}
-          {(route === "clarify" || route === "support") && toolLink("pause")}
+          {route === "clarify" && toolLink("check-the-facts")}
+          {route === "support" && toolLink("pause")}
           <button
             type="button"
             className={linkButton}
