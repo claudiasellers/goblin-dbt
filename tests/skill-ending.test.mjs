@@ -32,7 +32,7 @@ const answer = (id, v) => [pick(id, v), next];
 
 const safe = answer("safety", "no");
 const toDecide = (what = "harms", safety = safe) => [...safety, ...answer("what", what)];
-const toCard = (decide = "end") => [...toDecide(), ...answer("decide", decide), ...answer("channel", "message"),
+const toCard = (decide = "end", what = "harms") => [...toDecide(what), ...answer("decide", decide), ...answer("channel", "message"),
   ...answer("open_line", "thinking"), ...answer("decision_line", decide === "end" ? "ending" : "less_contact"), next];
 const unsafe = (v = "maybe") => [...answer("safety", v), ...answer("go", "think")];
 
@@ -41,7 +41,9 @@ test("the screens, and the safe path to the plan: safety, what, decide, channel,
   assert.equal(skill.start, "safety");
   const s = run([...toCard(), card(["copied"]), ...answer("checkin", "yes"), ...answer("when", "this_week")]);
   assert.deepEqual(s.path, ["safety", "what", "decide", "channel", "open_line", "decision_line", "practical", "card", "checkin", "when", "ahead"]);
-  assert.deepEqual(s.offered, ["cope_ahead", "rehearse"], "Cope Ahead, and Rehearse it (IE-02)");
+  assert.deepEqual(s.offered, ["cope_ahead"], "it harms them: Cope Ahead, never a practice run with them (Rehearse it, IE-02)");
+  const notHarm = run([...toCard("end", "unsure"), card(["copied"]), ...answer("checkin", "yes"), ...answer("when", "this_week")]);
+  assert.deepEqual(notHarm.offered, ["cope_ahead", "rehearse"], "it doesn't harm them: Cope Ahead, and Rehearse it");
   assert.equal(skill.exits.find((x) => x.id === "cope_ahead").query.situationId, "conversation");
   assert.equal(M.crisisFor(ctx(), step("ahead"), s), null, "no resources on the safe path");
 });

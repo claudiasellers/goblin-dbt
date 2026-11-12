@@ -258,7 +258,9 @@ test("Make my crisis kit has its own card under Distress Tolerance beside the ki
   const { tools, getToolsByModule } = await importTs("src/data/tools.ts");
   const kit = tools.find((t) => t.id === "crisis-kit");
   assert.ok(getToolsByModule("distress-tolerance").some((t) => t.id === "crisis-kit"));
-  assert.deepEqual(kit.moreCards.map((m) => [m.name, m.query]), [["Make my crisis kit", "frame=build"]]);
+  assert.deepEqual(kit.moreCards.map((m) => [m.name, m.query]), [["Make my crisis kit for hard nights", "frame=build"]]);
+  // The mode card leads with its own name even with official names on, so it never reads as a copy of the kit's card (Cludes, 12 Nov).
+  assert.match(readFileSync("src/components/ToolCard.tsx", "utf8"), /\{mode \? mode\.name : label\(tool\)\}/);
   const page = readFileSync("src/pages/Tools.tsx", "utf8");
   assert.match(page, /\(tool\.moreCards \?\? \[\]\)\.map\(m => <ToolCard key=\{`\$\{tool\.id\}:\$\{m\.key\}`\} tool=\{tool\} mode=\{m\} \/>\)/);
   assert.match(readFileSync("src/components/ToolCard.tsx", "utf8"), /to=\{`\/tool\/\$\{tool\.id\}\$\{mode \? `\?\$\{mode\.query\}` : ''\}`\}/);
