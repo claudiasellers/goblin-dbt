@@ -6,7 +6,8 @@
  * `$d.<name>` (a derived value), `$opt.<prop>` (the option under test), `$ctx.<key>` (what the page that opened
  * the skill passed in: an urge, a person, a frame, a carried band; only keys the skill `accepts`), `$p.<slice>`
  * (a profile slice the skill's tool declares in PROFILE_NEEDS: present when the person has kept something there;
- * `.ids` its items' ids). Anything else is a literal.
+ * `.ids` its items' ids), `$each` (R16: the pick a per-pick step is for, such as Do the Opposite's feeling; null on
+ * any other step). Anything else is a literal.
  * `{set: '$a.<field>'}` is true for a pick or own words; every other operator reads the first pick.
  */
 import type { Cond, OptionDef } from '../../data/skillTypes';
@@ -35,11 +36,15 @@ export function profileItemId(item: unknown): string | null {
   return typeof o.id === 'string' ? o.id : typeof o.lineId === 'string' ? o.lineId : null;
 }
 
+/** The answers key a per-pick step's view puts its pick under (R16, machine.ts `answersOf`). */
+export const EACH = '$each';
+
 const REF = /^\$(a|d|opt|ctx|p)\.([A-Za-z_][A-Za-z0-9_]*)(?:\.(ids|own))?$/;
 
 /** A ref's value, or the literal itself. */
 export function resolve(v: unknown, scope: Scope): unknown {
   if (typeof v !== 'string' || !v.startsWith('$')) return v;
+  if (v === EACH) return scope.answers[EACH]?.ids[0] ?? null;
   const m = REF.exec(v);
   if (!m) return null;
   const [, kind, name, part] = m;

@@ -53,6 +53,24 @@ test("the made-up run: the skill's version, the path, each earlier field's first
   if (freshStep) assert.equal(m.resumeRun(ctx, run, last).stepId, freshStep.id, "in the app: back to the ask-fresh question");
 });
 
+test("Do the Opposite's per-feeling steps open with their feeling and its options (Gate 2: never an empty screen)", async () => {
+  const m = await importTs("src/lib/skillRuntime/machine.ts");
+  const sk = shipped.find((s) => s.id === "opposite_action");
+  const content = JSON.parse(readFileSync("src/data/content/skills.json", "utf8")).content;
+  const ctx = { skill: sk, shared: { parentOf: content.parentOf, fitsWhen: content.fitsWhen }, carried: [], gridIds: new Set(["anxious"]),
+    emotionLabel: (x) => x, ctxIn: {}, embedOutputs: { doorPicker: { emotions: 3 } } };
+  for (const id of ["vald", "want", "fits", "help", "cue", "aftb", "size", "back"]) {
+    const s = m.resumeRun(ctx, r.reviewRun(sk, id), id, { keepFresh: true });
+    assert.equal(s?.stepId, id, id);
+    const st = m.stepOf(sk, id);
+    if (st.each) assert.equal(m.currentPick(ctx, s), "anxious", `${id}: its feeling`);
+    for (const f of st.fields ?? []) {
+      const n = m.optionGroups(ctx, f, m.answersOf(ctx, s)).flatMap((g) => g.options).length;
+      assert.ok(n > 0, `${id}.${f.id} has options`);
+    }
+  }
+});
+
 test("the embeds skill's props pass build.py's embed check (copy keys, ranges, fields)", () => {
   const fields = probe.steps.flatMap((s) => [...(s.fields ?? []).map((f) => f.id), ...(s.answerAs ? [s.answerAs] : [])]);
   for (const st of probe.steps.filter((s) => s.kind === "embed")) {

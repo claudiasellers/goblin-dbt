@@ -137,7 +137,7 @@ export interface ProfileSlices {
 export const PROFILE_NEEDS = {
   'recovering-from-invalidation': ['name'],   // later + 'people'
   'find-the-feeling': ['name', 'parts'],     // parts: the tag row on its close
-  'opposite-action': [],                      // later 'values', 'patterns'
+  'opposite-action': ['parts'],               // the tag row on its close (ER-B3 port); later 'values', 'patterns'
   'cool-down': ['parts'],                     // parts: the tag row on its close; DT-01: 'bodyFlags'
   'checkin': ['patterns'],                    // the router's tie-break (E4)
   'today': ['quietHours', 'parts'],          // parts: the check-back card's name (Phase 2, parts on only)

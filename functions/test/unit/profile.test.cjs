@@ -20,8 +20,9 @@ test('getProfileContext returns only the declared slices, with the profile versi
   assert.ok(!f.calls.some((c) => /ProfileFact|MyPattern/.test(c.query)), 'no undeclared resolver ran');
   assert.equal(f.sessions.length, 1, 'one read transaction');
   assert.equal(f.sessions[0].config.defaultAccessMode, 'READ');
+  // Do the Opposite reads parts only (the tag row on its close, ER-B3): nothing else, and nothing kept here.
   const empty = await fns.getProfileContext.run({ auth: auth(), data: { toolId: 'opposite-action' } });
-  assert.deepEqual(empty.slices, {});
+  assert.deepEqual(empty.slices, { parts: [] });
 });
 
 test('getProfileContext rejects unknown and server-only consumers', async () => {
