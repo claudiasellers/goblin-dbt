@@ -2099,7 +2099,7 @@
             "id": "cope_ahead",
             "toolId": "cope-ahead",
             "query": {
-              "first": "other"
+              "situationId": "other"
             },
             "carry": [],
             "done": false
@@ -2797,6 +2797,2211 @@
             {
               "value": "this_week",
               "label": "Later this week"
+            }
+          ]
+        }
+      },
+      {
+        "id": "cope_ahead",
+        "toolId": "cope-ahead",
+        "version": "ca-skill-v1",
+        "start": "what",
+        "accepts": [
+          "situationId",
+          "partId"
+        ],
+        "ownMax": 140,
+        "emotionFields": [
+          "feel"
+        ],
+        "copy": {
+          "what_title": "What's coming up?",
+          "what_own_hint": "Say it your way",
+          "when_title": "When is it?",
+          "when_today": "Today",
+          "when_tomorrow": "Tomorrow",
+          "when_week": "This week",
+          "when_later": "Later, or not sure",
+          "feel_title": "What might you feel there?",
+          "feel_hint": "Pick up to two.",
+          "feel_more": "Something else",
+          "pull_title": "What might you want to do?",
+          "not_sure": "Not sure",
+          "moment_title": "What's the moment you're most worried about?",
+          "moment_own_hint": "Say it your way",
+          "plan_title": "If it happens, I'll…",
+          "plan_use_pull": "Plan for the pull instead",
+          "plan_own_hint": "Say it your way",
+          "rehearse_again_q": "Once more, with something you didn't expect?",
+          "rehearse_again_yes": "Yes",
+          "rehearse_again_no": "That's enough",
+          "rehearse_new_problem": "Something you didn't plan for happens.",
+          "rehearse_keep_move": "Keep the same plan",
+          "rehearse_change_move": "Change what I'll do",
+          "settle_title": "Let your body come back to now.",
+          "settle_breath": "Three long breaths out",
+          "settle_five": "5-4-3-2-1",
+          "settle_ok": "I'm OK",
+          "settle_hold": "Hold while you breathe out, slowly.",
+          "settle_hold_hint": "Three times. Let go between them.",
+          "keep_title": "Here's your plan.",
+          "keep_yes": "Keep this",
+          "keep_no": "Not now",
+          "ask_after_q": "Want me to ask how it went?",
+          "ask_after_yes": "Yes",
+          "ask_after_no": "No thanks",
+          "done": "Done",
+          "next": "Next",
+          "hold_label": "Hold",
+          "hold_running": "Breathe out, slowly",
+          "safety_open": "Talk to someone now",
+          "done_kept": "Your plan is in Me, under My plans.",
+          "done_line": "You've walked through it, start to finish.",
+          "profile_unnamed": "One you haven't named"
+        },
+        "tables": {
+          "feelBySituation": {
+            "conversation": [
+              "anxious",
+              "nervous",
+              "angry",
+              "hurt"
+            ],
+            "someone": [
+              "nervous",
+              "hurt",
+              "angry",
+              "embarrassed"
+            ],
+            "work_school": [
+              "anxious",
+              "pressured",
+              "inadequate",
+              "exposed"
+            ],
+            "place_event": [
+              "nervous",
+              "excluded",
+              "overwhelmed",
+              "embarrassed"
+            ],
+            "hard_day": [
+              "sad",
+              "grief",
+              "lonely",
+              "numb"
+            ],
+            "alone": [
+              "lonely",
+              "empty",
+              "anxious",
+              "bored"
+            ],
+            "other": [
+              "anxious",
+              "nervous",
+              "sad",
+              "angry"
+            ]
+          }
+        },
+        "derive": [
+          {
+            "name": "feelFor",
+            "from": "$a.situation",
+            "table": "feelBySituation",
+            "default": [
+              "anxious",
+              "nervous",
+              "sad",
+              "angry"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "id": "what",
+            "kind": "ask",
+            "title": "what_title",
+            "fields": [
+              {
+                "id": "situation",
+                "options": {
+                  "list": "situation",
+                  "firstFrom": "$ctx.situationId"
+                },
+                "max": 1,
+                "required": true,
+                "own": {
+                  "hint": "what_own_hint",
+                  "countsAsPick": true
+                }
+              },
+              {
+                "id": "when",
+                "label": "when_title",
+                "options": {
+                  "list": "when"
+                },
+                "max": 1
+              }
+            ],
+            "next": [
+              {
+                "to": "feel",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "feel",
+            "kind": "ask",
+            "title": "feel_title",
+            "hint": "feel_hint",
+            "fields": [
+              {
+                "id": "feel",
+                "options": {
+                  "emotions": [
+                    "anxious",
+                    "nervous",
+                    "sad",
+                    "angry"
+                  ],
+                  "emotionsFrom": "$d.feelFor",
+                  "moreKey": "feel_more"
+                },
+                "max": 2,
+                "swap": true
+              },
+              {
+                "id": "pull",
+                "label": "pull_title",
+                "options": {
+                  "list": "pull"
+                },
+                "max": 1
+              }
+            ],
+            "next": [
+              {
+                "to": "who",
+                "when": {
+                  "set": "$p.parts"
+                }
+              },
+              {
+                "to": "hard",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "who",
+            "kind": "ask",
+            "slots": [
+              {
+                "after": "$title",
+                "embed": "partsLine",
+                "props": {
+                  "promptId": "cope_title_any",
+                  "as": "heading"
+                },
+                "showWhen": {
+                  "all": []
+                },
+                "record": "parts_title"
+              }
+            ],
+            "fields": [
+              {
+                "id": "part",
+                "options": {
+                  "profile": "parts",
+                  "firstFrom": "$ctx.partId"
+                },
+                "max": 1
+              }
+            ],
+            "next": [
+              {
+                "to": "hard",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "hard",
+            "kind": "ask",
+            "title": "moment_title",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.moment",
+                    "might_hurt"
+                  ]
+                }
+              },
+              {
+                "variant": "crisis",
+                "when": {
+                  "eq": [
+                    "$a.moment",
+                    "might_hurt_self"
+                  ]
+                }
+              }
+            ],
+            "fields": [
+              {
+                "id": "moment",
+                "options": {
+                  "list": "moment",
+                  "where": {
+                    "any": [
+                      {
+                        "has": [
+                          "$opt.sits",
+                          "$a.situation"
+                        ]
+                      },
+                      {
+                        "all": [
+                          {
+                            "not": {
+                              "in": [
+                                "$a.situation",
+                                [
+                                  "conversation",
+                                  "someone",
+                                  "work_school",
+                                  "place_event",
+                                  "hard_day",
+                                  "alone"
+                                ]
+                              ]
+                            }
+                          },
+                          {
+                            "has": [
+                              "$opt.sits",
+                              "other"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "max": 1,
+                "required": true,
+                "own": {
+                  "hint": "moment_own_hint",
+                  "countsAsPick": true
+                },
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "eq": [
+                        "$a.moment",
+                        "might_hurt_self"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "plan",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "plan",
+            "kind": "ask",
+            "title": "plan_title",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.moment",
+                    "might_hurt"
+                  ]
+                }
+              },
+              {
+                "variant": "crisis",
+                "when": {
+                  "eq": [
+                    "$a.moment",
+                    "might_hurt_self"
+                  ]
+                }
+              }
+            ],
+            "slots": [
+              {
+                "after": "$title",
+                "embed": "planSentence",
+                "props": {
+                  "momentField": "moment",
+                  "movesField": "moves",
+                  "forpullField": "forpull",
+                  "pullField": "pull"
+                },
+                "showWhen": {
+                  "all": []
+                },
+                "record": "plan_line"
+              },
+              {
+                "after": "moves",
+                "embed": "partAnchor",
+                "props": {
+                  "partField": "part"
+                },
+                "showWhen": {
+                  "set": "$a.part"
+                },
+                "record": "part_anchor"
+              }
+            ],
+            "fields": [
+              {
+                "id": "forpull",
+                "options": {
+                  "list": "forpull"
+                },
+                "max": 1,
+                "showWhen": {
+                  "all": [
+                    {
+                      "in": [
+                        "$a.pull",
+                        [
+                          "fight",
+                          "chase",
+                          "hide",
+                          "blank"
+                        ]
+                      ]
+                    },
+                    {
+                      "not": {
+                        "in": [
+                          "$a.moment",
+                          [
+                            "might_hurt",
+                            "might_hurt_self"
+                          ]
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "moves",
+                "options": {
+                  "list": "move",
+                  "where": {
+                    "any": [
+                      {
+                        "has": [
+                          "$opt.forMoments",
+                          "$a.moment"
+                        ]
+                      },
+                      {
+                        "all": [
+                          {
+                            "not": {
+                              "set": "$opt.forMoments"
+                            }
+                          },
+                          {
+                            "all": [
+                              {
+                                "any": [
+                                  {
+                                    "not": {
+                                      "set": "$opt.sits"
+                                    }
+                                  },
+                                  {
+                                    "has": [
+                                      "$opt.sits",
+                                      "$a.situation"
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "any": [
+                                  {
+                                    "all": [
+                                      {
+                                        "in": [
+                                          "$a.pull",
+                                          [
+                                            "fight",
+                                            "chase",
+                                            "hide",
+                                            "blank"
+                                          ]
+                                        ]
+                                      },
+                                      {
+                                        "has": [
+                                          "$opt.pulls",
+                                          "$a.pull"
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "all": [
+                                      {
+                                        "not": {
+                                          "in": [
+                                            "$a.pull",
+                                            [
+                                              "fight",
+                                              "chase",
+                                              "hide",
+                                              "blank"
+                                            ]
+                                          ]
+                                        }
+                                      },
+                                      {
+                                        "eq": [
+                                          "$opt.general",
+                                          true
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "any": [
+                              {
+                                "not": {
+                                  "in": [
+                                    "$a.moment",
+                                    [
+                                      "might_hurt",
+                                      "might_hurt_self"
+                                    ]
+                                  ]
+                                }
+                              },
+                              {
+                                "has": [
+                                  "$opt.safeIn",
+                                  "$a.moment"
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "max": 2,
+                "swap": true,
+                "required": true,
+                "own": {
+                  "hint": "plan_own_hint",
+                  "countsAsPick": true,
+                  "max": 90
+                },
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "eq": [
+                        "$a.moment",
+                        "might_hurt_self"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "walk",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "walk",
+            "kind": "embed",
+            "embed": "rehearsal",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "eq": [
+                    "$a.moment",
+                    "might_hurt_self"
+                  ]
+                }
+              }
+            ],
+            "answerAs": "rehearsed",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.moment",
+                    "might_hurt"
+                  ]
+                }
+              },
+              {
+                "variant": "crisis",
+                "when": {
+                  "eq": [
+                    "$a.moment",
+                    "might_hurt_self"
+                  ]
+                }
+              }
+            ],
+            "props": {
+              "momentField": "moment",
+              "movesField": "moves",
+              "forpullField": "forpull",
+              "pullField": "pull",
+              "pass": 1
+            },
+            "next": [
+              {
+                "to": "more",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "more",
+            "kind": "ask",
+            "title": "rehearse_again_q",
+            "fields": [
+              {
+                "id": "again",
+                "options": {
+                  "list": "again"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
+            "next": [
+              {
+                "to": "new",
+                "when": {
+                  "eq": [
+                    "$a.again",
+                    "yes"
+                  ]
+                }
+              },
+              {
+                "to": "calm",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "new",
+            "kind": "ask",
+            "title": "rehearse_new_problem",
+            "fields": [
+              {
+                "id": "new_moment",
+                "options": {
+                  "list": "new_moment",
+                  "where": {
+                    "all": [
+                      {
+                        "any": [
+                          {
+                            "has": [
+                              "$opt.sits",
+                              "$a.situation"
+                            ]
+                          },
+                          {
+                            "all": [
+                              {
+                                "not": {
+                                  "in": [
+                                    "$a.situation",
+                                    [
+                                      "conversation",
+                                      "someone",
+                                      "work_school",
+                                      "place_event",
+                                      "hard_day",
+                                      "alone"
+                                    ]
+                                  ]
+                                }
+                              },
+                              {
+                                "has": [
+                                  "$opt.sits",
+                                  "other"
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "not": {
+                          "eq": [
+                            "$opt.value",
+                            "$a.moment"
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                "max": 1,
+                "required": true,
+                "own": {
+                  "hint": "moment_own_hint",
+                  "countsAsPick": true,
+                  "max": 90
+                }
+              },
+              {
+                "id": "change_move",
+                "options": {
+                  "list": "change_move"
+                },
+                "max": 1,
+                "required": true,
+                "showWhen": {
+                  "set": "$a.new_moment"
+                }
+              },
+              {
+                "id": "new_moves",
+                "options": {
+                  "list": "new_move",
+                  "where": {
+                    "all": [
+                      {
+                        "any": [
+                          {
+                            "not": {
+                              "set": "$opt.sits"
+                            }
+                          },
+                          {
+                            "has": [
+                              "$opt.sits",
+                              "$a.situation"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "any": [
+                          {
+                            "all": [
+                              {
+                                "in": [
+                                  "$a.pull",
+                                  [
+                                    "fight",
+                                    "chase",
+                                    "hide",
+                                    "blank"
+                                  ]
+                                ]
+                              },
+                              {
+                                "has": [
+                                  "$opt.pulls",
+                                  "$a.pull"
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "all": [
+                              {
+                                "not": {
+                                  "in": [
+                                    "$a.pull",
+                                    [
+                                      "fight",
+                                      "chase",
+                                      "hide",
+                                      "blank"
+                                    ]
+                                  ]
+                                }
+                              },
+                              {
+                                "eq": [
+                                  "$opt.general",
+                                  true
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "max": 2,
+                "swap": true,
+                "required": true,
+                "own": {
+                  "hint": "plan_own_hint",
+                  "countsAsPick": true,
+                  "max": 60
+                },
+                "showWhen": {
+                  "eq": [
+                    "$a.change_move",
+                    "change"
+                  ]
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "redo",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "redo",
+            "kind": "embed",
+            "embed": "rehearsal",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "eq": [
+                    "$a.moment",
+                    "might_hurt_self"
+                  ]
+                }
+              }
+            ],
+            "answerAs": "rehearsed2",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.moment",
+                    "might_hurt"
+                  ]
+                }
+              },
+              {
+                "variant": "crisis",
+                "when": {
+                  "eq": [
+                    "$a.moment",
+                    "might_hurt_self"
+                  ]
+                }
+              }
+            ],
+            "props": {
+              "momentField": "new_moment",
+              "movesField": "moves",
+              "pullField": "pull",
+              "pass": 2,
+              "changeField": "change_move",
+              "changedMovesField": "new_moves"
+            },
+            "next": [
+              {
+                "to": "calm",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "calm",
+            "kind": "ask",
+            "title": "settle_title",
+            "complete": true,
+            "fields": [
+              {
+                "id": "settle",
+                "options": {
+                  "list": "settle"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "five_senses",
+                    "label": "settle_five",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "hold",
+                "when": {
+                  "eq": [
+                    "$a.settle",
+                    "breath"
+                  ]
+                }
+              },
+              {
+                "to": "keep",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "hold",
+            "kind": "embed",
+            "embed": "holdRing",
+            "answerAs": "breath",
+            "title": "settle_hold",
+            "props": {
+              "variant": "settle",
+              "seconds": 6,
+              "holds": 3,
+              "label": "hold_label",
+              "hint": "settle_hold_hint",
+              "runningLabel": "hold_running",
+              "next": "next"
+            },
+            "next": [
+              {
+                "to": "keep",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "keep",
+            "kind": "ask",
+            "title": "keep_title",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.moment",
+                    "might_hurt"
+                  ]
+                }
+              },
+              {
+                "variant": "crisis",
+                "when": {
+                  "eq": [
+                    "$a.moment",
+                    "might_hurt_self"
+                  ]
+                }
+              }
+            ],
+            "slots": [
+              {
+                "after": "$title",
+                "embed": "keepCard",
+                "props": {
+                  "momentField": "moment",
+                  "movesField": "moves",
+                  "forpullField": "forpull",
+                  "pullField": "pull",
+                  "partField": "part"
+                },
+                "showWhen": {
+                  "all": []
+                },
+                "record": "plan_card"
+              }
+            ],
+            "keep": {
+              "kind": "cope_ahead_plan",
+              "many": true,
+              "from": [
+                "situation",
+                "moment",
+                "forpull",
+                "pull",
+                "moves"
+              ],
+              "done": "done_kept"
+            },
+            "primary": "keep_yes",
+            "secondary": "keep_no",
+            "next": [
+              {
+                "to": "ask",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "ask",
+            "kind": "ask",
+            "title": "ask_after_q",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.moment",
+                    "might_hurt"
+                  ]
+                }
+              },
+              {
+                "variant": "crisis",
+                "when": {
+                  "eq": [
+                    "$a.moment",
+                    "might_hurt_self"
+                  ]
+                }
+              }
+            ],
+            "fields": [
+              {
+                "id": "ask",
+                "options": {
+                  "list": "ask"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
+            "followUp": {
+              "type": "cope_ahead_after",
+              "whenFrom": "when",
+              "whenDefault": "later",
+              "when": {
+                "eq": [
+                  "$a.ask",
+                  "yes"
+                ]
+              }
+            },
+            "primary": "done",
+            "next": [
+              {
+                "to": "end",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "end",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "done_line"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": []
+          }
+        ],
+        "exits": [
+          {
+            "id": "done",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": true
+          },
+          {
+            "id": "five_senses",
+            "toolId": "five-senses",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "safety_open",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": false,
+            "safety": true
+          }
+        ],
+        "options": {
+          "situation": [
+            {
+              "value": "conversation",
+              "label": "A conversation I'm dreading"
+            },
+            {
+              "value": "someone",
+              "label": "Seeing someone in particular"
+            },
+            {
+              "value": "work_school",
+              "label": "Something at work or school"
+            },
+            {
+              "value": "place_event",
+              "label": "A place or an event"
+            },
+            {
+              "value": "hard_day",
+              "label": "A day that's hard every year"
+            },
+            {
+              "value": "alone",
+              "label": "Being on my own"
+            },
+            {
+              "value": "other",
+              "label": "Something else"
+            }
+          ],
+          "when": [
+            {
+              "value": "today",
+              "label": "Today"
+            },
+            {
+              "value": "tomorrow",
+              "label": "Tomorrow"
+            },
+            {
+              "value": "this_week",
+              "label": "This week"
+            },
+            {
+              "value": "later",
+              "label": "Later, or not sure"
+            }
+          ],
+          "pull": [
+            {
+              "value": "fight",
+              "label": "Say something sharp"
+            },
+            {
+              "value": "chase",
+              "label": "Text someone a lot"
+            },
+            {
+              "value": "hide",
+              "label": "Disappear"
+            },
+            {
+              "value": "blank",
+              "label": "Nothing. I'm blank"
+            },
+            {
+              "value": "not_sure",
+              "label": "Not sure"
+            }
+          ],
+          "moment": [
+            {
+              "value": "voice_raised",
+              "label": "They raise their voice",
+              "sits": [
+                "conversation",
+                "other"
+              ]
+            },
+            {
+              "value": "go_blank",
+              "label": "I go blank",
+              "sits": [
+                "conversation",
+                "someone",
+                "work_school",
+                "other"
+              ]
+            },
+            {
+              "value": "not_heard",
+              "label": "They don't listen",
+              "sits": [
+                "conversation"
+              ]
+            },
+            {
+              "value": "start_crying",
+              "label": "I start crying",
+              "sits": [
+                "conversation",
+                "hard_day",
+                "other"
+              ]
+            },
+            {
+              "value": "bring_up_past",
+              "label": "They bring up the past",
+              "sits": [
+                "someone"
+              ]
+            },
+            {
+              "value": "cold_with_me",
+              "label": "They're cold with me",
+              "sits": [
+                "someone"
+              ]
+            },
+            {
+              "value": "old_role",
+              "label": "I slip into an old role",
+              "sits": [
+                "someone"
+              ]
+            },
+            {
+              "value": "criticised",
+              "label": "Someone criticises me",
+              "sits": [
+                "work_school"
+              ]
+            },
+            {
+              "value": "mistake_seen",
+              "label": "I make a mistake in front of people",
+              "sits": [
+                "work_school"
+              ]
+            },
+            {
+              "value": "cant_answer",
+              "label": "I'm asked something I can't answer",
+              "sits": [
+                "work_school"
+              ]
+            },
+            {
+              "value": "nobody_talks",
+              "label": "Nobody talks to me",
+              "sits": [
+                "place_event"
+              ]
+            },
+            {
+              "value": "too_much",
+              "label": "It gets too loud or too much",
+              "sits": [
+                "place_event"
+              ]
+            },
+            {
+              "value": "want_leave",
+              "label": "I want to leave straight away",
+              "sits": [
+                "place_event",
+                "other"
+              ]
+            },
+            {
+              "value": "see_someone",
+              "label": "I see someone I'd rather not",
+              "sits": [
+                "place_event"
+              ]
+            },
+            {
+              "value": "wave_hits",
+              "label": "A wave of it hits",
+              "sits": [
+                "hard_day"
+              ]
+            },
+            {
+              "value": "others_normal",
+              "label": "Everyone acts like it's a normal day",
+              "sits": [
+                "hard_day"
+              ]
+            },
+            {
+              "value": "reminder",
+              "label": "Something reminds me out of nowhere",
+              "sits": [
+                "hard_day"
+              ]
+            },
+            {
+              "value": "evening_stretches",
+              "label": "The evening stretches out",
+              "sits": [
+                "alone"
+              ]
+            },
+            {
+              "value": "cant_stop_checking",
+              "label": "I can't stop scrolling or checking",
+              "sits": [
+                "alone"
+              ]
+            },
+            {
+              "value": "thoughts_loop",
+              "label": "The same thoughts go round",
+              "sits": [
+                "alone"
+              ]
+            },
+            {
+              "value": "old_habit",
+              "label": "I want to do the thing I'm trying not to",
+              "sits": [
+                "alone"
+              ]
+            },
+            {
+              "value": "might_hurt",
+              "label": "They might hurt me",
+              "sits": [
+                "conversation",
+                "someone"
+              ],
+              "danger": "other"
+            },
+            {
+              "value": "might_hurt_self",
+              "label": "I might hurt myself",
+              "sits": [
+                "hard_day",
+                "alone"
+              ],
+              "danger": "self"
+            }
+          ],
+          "new_moment": [
+            {
+              "value": "voice_raised",
+              "label": "They raise their voice",
+              "sits": [
+                "conversation",
+                "other"
+              ]
+            },
+            {
+              "value": "go_blank",
+              "label": "I go blank",
+              "sits": [
+                "conversation",
+                "someone",
+                "work_school",
+                "other"
+              ]
+            },
+            {
+              "value": "not_heard",
+              "label": "They don't listen",
+              "sits": [
+                "conversation"
+              ]
+            },
+            {
+              "value": "start_crying",
+              "label": "I start crying",
+              "sits": [
+                "conversation",
+                "hard_day",
+                "other"
+              ]
+            },
+            {
+              "value": "bring_up_past",
+              "label": "They bring up the past",
+              "sits": [
+                "someone"
+              ]
+            },
+            {
+              "value": "cold_with_me",
+              "label": "They're cold with me",
+              "sits": [
+                "someone"
+              ]
+            },
+            {
+              "value": "old_role",
+              "label": "I slip into an old role",
+              "sits": [
+                "someone"
+              ]
+            },
+            {
+              "value": "criticised",
+              "label": "Someone criticises me",
+              "sits": [
+                "work_school"
+              ]
+            },
+            {
+              "value": "mistake_seen",
+              "label": "I make a mistake in front of people",
+              "sits": [
+                "work_school"
+              ]
+            },
+            {
+              "value": "cant_answer",
+              "label": "I'm asked something I can't answer",
+              "sits": [
+                "work_school"
+              ]
+            },
+            {
+              "value": "nobody_talks",
+              "label": "Nobody talks to me",
+              "sits": [
+                "place_event"
+              ]
+            },
+            {
+              "value": "too_much",
+              "label": "It gets too loud or too much",
+              "sits": [
+                "place_event"
+              ]
+            },
+            {
+              "value": "want_leave",
+              "label": "I want to leave straight away",
+              "sits": [
+                "place_event",
+                "other"
+              ]
+            },
+            {
+              "value": "see_someone",
+              "label": "I see someone I'd rather not",
+              "sits": [
+                "place_event"
+              ]
+            },
+            {
+              "value": "wave_hits",
+              "label": "A wave of it hits",
+              "sits": [
+                "hard_day"
+              ]
+            },
+            {
+              "value": "others_normal",
+              "label": "Everyone acts like it's a normal day",
+              "sits": [
+                "hard_day"
+              ]
+            },
+            {
+              "value": "reminder",
+              "label": "Something reminds me out of nowhere",
+              "sits": [
+                "hard_day"
+              ]
+            },
+            {
+              "value": "evening_stretches",
+              "label": "The evening stretches out",
+              "sits": [
+                "alone"
+              ]
+            },
+            {
+              "value": "cant_stop_checking",
+              "label": "I can't stop scrolling or checking",
+              "sits": [
+                "alone"
+              ]
+            },
+            {
+              "value": "thoughts_loop",
+              "label": "The same thoughts go round",
+              "sits": [
+                "alone"
+              ]
+            },
+            {
+              "value": "old_habit",
+              "label": "I want to do the thing I'm trying not to",
+              "sits": [
+                "alone"
+              ]
+            }
+          ],
+          "forpull": [
+            {
+              "value": "pull",
+              "label": "Plan for the pull instead"
+            }
+          ],
+          "move": [
+            {
+              "value": "leave_safe",
+              "label": "Leave and get somewhere safe",
+              "kind": "action",
+              "pulls": [],
+              "general": false,
+              "forMoments": [
+                "might_hurt"
+              ],
+              "sits": [],
+              "safeIn": []
+            },
+            {
+              "value": "reach_help",
+              "label": "Call or text someone who can help, now",
+              "kind": "action",
+              "pulls": [],
+              "general": false,
+              "forMoments": [
+                "might_hurt_self"
+              ],
+              "sits": [],
+              "safeIn": []
+            },
+            {
+              "value": "long_out",
+              "label": "Breathe out longer than in",
+              "kind": "body",
+              "pulls": [
+                "fight",
+                "chase",
+                "hide"
+              ],
+              "general": true,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ]
+            },
+            {
+              "value": "feet",
+              "label": "Feel my feet on the floor",
+              "kind": "body",
+              "pulls": [
+                "hide",
+                "blank",
+                "fight"
+              ],
+              "general": true,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ]
+            },
+            {
+              "value": "cold_water",
+              "label": "Cold water on my hands",
+              "kind": "body",
+              "pulls": [
+                "fight",
+                "chase",
+                "blank"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ]
+            },
+            {
+              "value": "hold_something",
+              "label": "Hold something in my pocket",
+              "kind": "body",
+              "pulls": [
+                "blank",
+                "hide"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ]
+            },
+            {
+              "value": "give_minute",
+              "label": "Say “Give me a minute”",
+              "kind": "words",
+              "pulls": [
+                "fight",
+                "blank",
+                "chase"
+              ],
+              "general": true,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": [
+                "might_hurt_self"
+              ]
+            },
+            {
+              "value": "come_back",
+              "label": "Say “I'll come back to you on that”",
+              "kind": "words",
+              "pulls": [
+                "fight",
+                "chase"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": []
+            },
+            {
+              "value": "say_hard",
+              "label": "Say “This is hard for me”",
+              "kind": "words",
+              "pulls": [
+                "hide",
+                "blank"
+              ],
+              "general": true,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": []
+            },
+            {
+              "value": "one_thing",
+              "label": "Say the one thing I came to say",
+              "kind": "words",
+              "pulls": [
+                "hide",
+                "chase"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": []
+            },
+            {
+              "value": "step_out",
+              "label": "Step out for five minutes",
+              "kind": "action",
+              "pulls": [
+                "fight",
+                "chase",
+                "hide"
+              ],
+              "general": true,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": [
+                "might_hurt_self"
+              ]
+            },
+            {
+              "value": "stay_ten",
+              "label": "Stay ten more minutes, then decide",
+              "kind": "action",
+              "pulls": [
+                "hide"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": []
+            },
+            {
+              "value": "text_trust",
+              "label": "Text someone I trust",
+              "kind": "action",
+              "pulls": [
+                "hide",
+                "blank"
+              ],
+              "general": true,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ]
+            },
+            {
+              "value": "phone_away",
+              "label": "Put my phone in another room",
+              "kind": "action",
+              "pulls": [
+                "chase"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": []
+            },
+            {
+              "value": "name_it",
+              "label": "Name what's happening",
+              "kind": "words",
+              "pulls": [
+                "fight"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [
+                "conversation",
+                "someone"
+              ],
+              "safeIn": []
+            },
+            {
+              "value": "validate_first",
+              "label": "Say “I can see this is hard for you too”",
+              "kind": "words",
+              "pulls": [
+                "fight",
+                "hide"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [
+                "conversation",
+                "someone"
+              ],
+              "safeIn": []
+            },
+            {
+              "value": "tears_ok",
+              "label": "Say “I might cry, and I want to keep going”",
+              "kind": "words",
+              "pulls": [
+                "hide",
+                "blank"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [
+                "conversation",
+                "someone"
+              ],
+              "safeIn": []
+            },
+            {
+              "value": "no_sorry",
+              "label": "Say “I understand” instead of an extra sorry",
+              "kind": "words",
+              "pulls": [
+                "hide"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [
+                "conversation",
+                "someone"
+              ],
+              "safeIn": []
+            },
+            {
+              "value": "notes",
+              "label": "Look at the points I wrote down",
+              "kind": "action",
+              "pulls": [
+                "blank",
+                "hide"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [
+                "conversation",
+                "work_school"
+              ],
+              "safeIn": []
+            },
+            {
+              "value": "pause",
+              "label": "Hold to wait",
+              "kind": "tool",
+              "pulls": [
+                "fight",
+                "chase"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": [
+                "might_hurt_self"
+              ],
+              "tool": "pause"
+            },
+            {
+              "value": "five_senses",
+              "label": "5-4-3-2-1",
+              "kind": "tool",
+              "pulls": [
+                "blank",
+                "hide",
+                "fight"
+              ],
+              "general": true,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ],
+              "tool": "five-senses"
+            },
+            {
+              "value": "cool_down",
+              "label": "First, the body",
+              "kind": "tool",
+              "pulls": [
+                "fight",
+                "chase"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ],
+              "tool": "cool-down"
+            },
+            {
+              "value": "urge_surfing",
+              "label": "Ride it out",
+              "kind": "tool",
+              "pulls": [
+                "chase",
+                "fight"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": [
+                "might_hurt_self"
+              ],
+              "tool": "urge-surfing"
+            }
+          ],
+          "new_move": [
+            {
+              "value": "long_out",
+              "label": "Breathe out longer than in",
+              "kind": "body",
+              "pulls": [
+                "fight",
+                "chase",
+                "hide"
+              ],
+              "general": true,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ]
+            },
+            {
+              "value": "feet",
+              "label": "Feel my feet on the floor",
+              "kind": "body",
+              "pulls": [
+                "hide",
+                "blank",
+                "fight"
+              ],
+              "general": true,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ]
+            },
+            {
+              "value": "cold_water",
+              "label": "Cold water on my hands",
+              "kind": "body",
+              "pulls": [
+                "fight",
+                "chase",
+                "blank"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ]
+            },
+            {
+              "value": "hold_something",
+              "label": "Hold something in my pocket",
+              "kind": "body",
+              "pulls": [
+                "blank",
+                "hide"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ]
+            },
+            {
+              "value": "give_minute",
+              "label": "Say “Give me a minute”",
+              "kind": "words",
+              "pulls": [
+                "fight",
+                "blank",
+                "chase"
+              ],
+              "general": true,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": [
+                "might_hurt_self"
+              ]
+            },
+            {
+              "value": "come_back",
+              "label": "Say “I'll come back to you on that”",
+              "kind": "words",
+              "pulls": [
+                "fight",
+                "chase"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": []
+            },
+            {
+              "value": "say_hard",
+              "label": "Say “This is hard for me”",
+              "kind": "words",
+              "pulls": [
+                "hide",
+                "blank"
+              ],
+              "general": true,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": []
+            },
+            {
+              "value": "one_thing",
+              "label": "Say the one thing I came to say",
+              "kind": "words",
+              "pulls": [
+                "hide",
+                "chase"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": []
+            },
+            {
+              "value": "step_out",
+              "label": "Step out for five minutes",
+              "kind": "action",
+              "pulls": [
+                "fight",
+                "chase",
+                "hide"
+              ],
+              "general": true,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": [
+                "might_hurt_self"
+              ]
+            },
+            {
+              "value": "stay_ten",
+              "label": "Stay ten more minutes, then decide",
+              "kind": "action",
+              "pulls": [
+                "hide"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": []
+            },
+            {
+              "value": "text_trust",
+              "label": "Text someone I trust",
+              "kind": "action",
+              "pulls": [
+                "hide",
+                "blank"
+              ],
+              "general": true,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ]
+            },
+            {
+              "value": "phone_away",
+              "label": "Put my phone in another room",
+              "kind": "action",
+              "pulls": [
+                "chase"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": []
+            },
+            {
+              "value": "name_it",
+              "label": "Name what's happening",
+              "kind": "words",
+              "pulls": [
+                "fight"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [
+                "conversation",
+                "someone"
+              ],
+              "safeIn": []
+            },
+            {
+              "value": "validate_first",
+              "label": "Say “I can see this is hard for you too”",
+              "kind": "words",
+              "pulls": [
+                "fight",
+                "hide"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [
+                "conversation",
+                "someone"
+              ],
+              "safeIn": []
+            },
+            {
+              "value": "tears_ok",
+              "label": "Say “I might cry, and I want to keep going”",
+              "kind": "words",
+              "pulls": [
+                "hide",
+                "blank"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [
+                "conversation",
+                "someone"
+              ],
+              "safeIn": []
+            },
+            {
+              "value": "no_sorry",
+              "label": "Say “I understand” instead of an extra sorry",
+              "kind": "words",
+              "pulls": [
+                "hide"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [
+                "conversation",
+                "someone"
+              ],
+              "safeIn": []
+            },
+            {
+              "value": "notes",
+              "label": "Look at the points I wrote down",
+              "kind": "action",
+              "pulls": [
+                "blank",
+                "hide"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [
+                "conversation",
+                "work_school"
+              ],
+              "safeIn": []
+            },
+            {
+              "value": "pause",
+              "label": "Hold to wait",
+              "kind": "tool",
+              "pulls": [
+                "fight",
+                "chase"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": [
+                "might_hurt_self"
+              ],
+              "tool": "pause"
+            },
+            {
+              "value": "five_senses",
+              "label": "5-4-3-2-1",
+              "kind": "tool",
+              "pulls": [
+                "blank",
+                "hide",
+                "fight"
+              ],
+              "general": true,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ],
+              "tool": "five-senses"
+            },
+            {
+              "value": "cool_down",
+              "label": "First, the body",
+              "kind": "tool",
+              "pulls": [
+                "fight",
+                "chase"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": [
+                "might_hurt",
+                "might_hurt_self"
+              ],
+              "tool": "cool-down"
+            },
+            {
+              "value": "urge_surfing",
+              "label": "Ride it out",
+              "kind": "tool",
+              "pulls": [
+                "chase",
+                "fight"
+              ],
+              "general": false,
+              "forMoments": [],
+              "sits": [],
+              "safeIn": [
+                "might_hurt_self"
+              ],
+              "tool": "urge-surfing"
+            }
+          ],
+          "again": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "That's enough"
+            }
+          ],
+          "change_move": [
+            {
+              "value": "keep",
+              "label": "Keep the same plan"
+            },
+            {
+              "value": "change",
+              "label": "Change what I'll do"
+            }
+          ],
+          "settle": [
+            {
+              "value": "breath",
+              "label": "Three long breaths out"
+            },
+            {
+              "value": "ok",
+              "label": "I'm OK"
+            }
+          ],
+          "ask": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No thanks"
             }
           ]
         }
@@ -4467,7 +6672,7 @@
             "id": "cope_ahead",
             "toolId": "cope-ahead",
             "query": {
-              "first": "conversation"
+              "situationId": "conversation"
             },
             "carry": [],
             "done": false
@@ -6321,7 +8526,7 @@
             "id": "cope_ahead",
             "toolId": "cope-ahead",
             "query": {
-              "first": "conversation"
+              "situationId": "conversation"
             },
             "carry": [],
             "done": false

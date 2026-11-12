@@ -39,8 +39,11 @@ THEN_VS_NOW = {"worse", "same", "better", "much_better"}
 RUN_OWN_MAX = 140  # functions/src/spine/extSchemas.ts RUN_OWN_MAX (tests/skill-contracts.test.mjs keeps them equal)
 SAFETY_EXIT_ID = "safety_open"  # the reserved exit (plan C3a R6); a skill has at most one
 OPS = {"set", "eq", "in", "has", "own", "some", "all", "any", "not"}
-# Content nodes an option may show (PRESENTS): Problem Solve's (ps_graph.py) and DEAR MAN's debrief vocabulary.
+# Content nodes an option may show (PRESENTS), loaded before skills.cypher: Problem Solve's (ps_graph.py), Cope Ahead's,
+# DEAR MAN's debrief vocabulary.
 PRESENTS_LABELS = {"ProblemType", "SolutionDirection", "DecompositionAspect", "BarrierType", "BarrierSubResponse", "AmbivalenceOption",
+                   # Cope Ahead's (schema/cope-ahead.cypher) and Find the feeling's pulls (schema/find-the-feeling.cypher).
+                   "CopeSituation", "HardMoment", "CopeMove", "FeelingUrge",
                    # DEAR MAN's debrief vocabulary (schema/dear-man-debrief-content.cypher, scripts/dear-man/content.py).
                    "TurningPoint", "MomentResponse", "BodySignal", "ThoughtPattern", "Underneath", "CopeAhead", "TroubleshootFactor"}
 
@@ -219,6 +222,15 @@ def check(skill):
                     check_cond(o["where"], fields, derived, w, accepts)
                 if "groupBy" in o:
                     assert o["groupBy"] in fields, (w, o)
+            if "emotionsFrom" in o:
+                assert "emotions" in o, (w, "emotionsFrom keeps emotions as its fallback list", o)
+                ref = o["emotionsFrom"]
+                assert ref.startswith("$d.") and ref[3:] in derived, (w, "emotionsFrom is a derived value", o)
+                d = next(x for x in skill["derive"] if x["name"] == ref[3:])
+                assert d.get("kind", "lookup") == "lookup" and d.get("keep") != "key", (w, "emotionsFrom reads a lookup's row", d)
+                rows = list(skill["tables"].get(d["table"], {}).values()) + ([d["default"]] if "default" in d else [])
+                assert rows and all(isinstance(r, list) and r and all(isinstance(x, str) for x in r) for r in rows), (
+                    w, "every row of an emotionsFrom table is a list of words", d)
             if "moreKey" in o:
                 assert o["moreKey"] in copy, (w, o)
             for k in ("label",):
@@ -264,7 +276,9 @@ def check(skill):
         link_exits = [ln["exit"] for ln in s.get("links", [])] + [ln["exit"] for f in s.get("fields", []) for ln in f.get("links", [])]
         assert len(link_exits) == len(set(link_exits)), (w, "one quiet link per exit on a screen (LINKS is one edge per step and exit)", link_exits)
         for sl in s.get("slots", []):
-            assert sl["embed"] in EMBEDS and sl["after"] in fields, (w, sl)
+            # Under a field of this step, or under the title (`$title`: above every field).
+            assert sl["embed"] in EMBEDS and (sl["after"] == "$title" or sl["after"] in [f["id"] for f in s.get("fields", [])]), (w, sl)
+            assert s["kind"] == "ask", (w, "slots live on ask steps")
             check_embed_props(sl["embed"], sl.get("props"), copy, fields, w)
             check_cond(sl["showWhen"], fields, derived, w, accepts)
         # A line or an offer with `when: None` always holds (a hand-off's default line, an offer for every path).
@@ -279,6 +293,12 @@ def check(skill):
         assert "done" not in s or s["done"] in exits, w
         step_fields = {f["id"] for f in s.get("fields", [])}
         assert "primary" not in s or s["primary"] in copy, (w, "primary is a copy key", s.get("primary"))
+        if "secondary" in s:
+            assert s["kind"] == "ask" and s["secondary"] in copy, (w, "secondary: an ask step's quiet way on, a copy key")
+            assert "keep" in s or "followUp" in s, (w, "secondary skips a keep or a follow-up: a step with neither needs only Next")
+            # Not now goes on without the step's answers, so the step may not require one: the next step's
+            # conditions would otherwise read an answer the quiet way never asked for (plan thread, 11 Nov).
+            assert not any(f.get("required") for f in s.get("fields", [])), (w, "secondary: a step with a required field has no quiet way on")
         if "keep" in s:
             k = s["keep"]
             assert s["kind"] == "ask" and isinstance(k.get("kind"), str), (w, "a keep runs on an ask step's primary tap", k)
@@ -287,6 +307,7 @@ def check(skill):
             assert k["from"] and all(f in fields for f in k["from"]), (w, "keep from fields that exist", k)
             if "when" in k:
                 check_cond(k["when"], fields, derived, w, accepts)
+            assert "done" not in k or k["done"] in copy, (w, "keep.done is a copy key", k)
         if s["kind"] == "handoff" and s.get("fields"):
             # A hand-off's one field is its reminder chips (R5 on a hand-off): never a question in disguise.
             fu = s.get("followUp") or {}
@@ -309,12 +330,17 @@ def check(skill):
             if s["kind"] == "handoff":
                 assert t["window"]["kind"] == "chip" and fu.get("whenFrom"), (w, "a hand-off's follow-up is picked by its chips", fu)
             if t["window"]["kind"] == "chip":
-                assert fu.get("whenFrom") in step_fields, (w, "a chip window needs the field on this step that picks it", fu)
-                f = next(f for f in s["fields"] if f["id"] == fu["whenFrom"])
+                # A hand-off's chips are on the card; an ask step may be timed by an earlier step's answer (Cope Ahead's
+                # *When is it?*), with `whenDefault` for when it wasn't answered.
+                here = fu.get("whenFrom") in step_fields
+                assert here or (s["kind"] == "ask" and fu.get("whenFrom") in fields), (w, "a chip window needs the field that picks it", fu)
+                f = next(f for st2 in skill["steps"] for f in st2.get("fields", []) if f["id"] == fu["whenFrom"])
                 values = {x[1] for x in skill["options"] if x[0] == f["options"].get("list")}
                 assert values and values <= set(t["window"]["chips"]), (w, "the field's options are the window's chips", values)
+                assert not here or "whenDefault" not in fu, (w, "whenDefault is for a field answered earlier", fu)
+                assert "whenDefault" not in fu or fu["whenDefault"] in values, (w, "whenDefault is one of the chips", fu)
             else:
-                assert "whenFrom" not in fu, (w, "this type's window has no choice", fu)
+                assert "whenFrom" not in fu and "whenDefault" not in fu, (w, "this type's window has no choice", fu)
             if "when" in fu:
                 check_cond(fu["when"], fields, derived, w, accepts)
         assert "noClose" not in s or (s["kind"] == "handoff" and s["noClose"] is True), (w, "noClose is a hand-off's", s.get("noClose"))
@@ -390,6 +416,16 @@ def check(skill):
             assert o[3]["urge"] in ACTION_URGES, (sid, "an urge the graph has (schema/opposite-action-data.cypher)", o[1], o[3]["urge"])
         for u in o[3].get("forUrges", []):
             assert u in ACTION_URGES, (sid, "a move is for an urge the graph has", o[1], u)
+    # Resume restores a booked follow-up by its type (the record keeps types), so a type is booked by one step before
+    # any resume point: at most one non-hand-off step per type (a hand-off is the run's end, never restored), bar a
+    # reopens loop's after / again steps (a reopened run restores nothing).
+    loop = {x for st in skill["steps"] if st.get("reopens") for x in [st["reopens"]["after"], *st["reopens"].get("again", [])]}
+    by_type = {}
+    for st in skill["steps"]:
+        if st.get("followUp") and st["kind"] != "handoff" and st["id"] not in loop:
+            by_type.setdefault(st["followUp"]["type"], []).append(st["id"])
+    for t, ids in by_type.items():
+        assert len(ids) == 1, (sid, f"one step books {t} (resume restores bookings by type)", ids)
 
 
 # Every ActionUrge id the graph has (Do the Opposite's and DT's behaviour urges): an option's `urge` names one.

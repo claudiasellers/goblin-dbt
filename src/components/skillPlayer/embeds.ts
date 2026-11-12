@@ -9,6 +9,7 @@ import { ProsConsCard, ProsConsReplay } from './ProsConsCard';
 import { WitnessEmbed } from './WitnessEmbed';
 import { RebellionCard } from './RebellionCard';
 import { RescriptCard } from './RescriptCard';
+import { KeepCardEmbed, PartAnchorEmbed, PlanSentenceEmbed, RehearsalEmbed } from './CopeAheadEmbeds';
 import { WaitLockEmbed } from './WaitLockEmbed';
 import { UrgeWave, WaveTrace } from './UrgeWave';
 import { DebriefWhoEmbed } from './DebriefWhoEmbed';
@@ -57,6 +58,10 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   rebellionCard: RebellionCard,
   boundaryLine: BoundaryLine,
   rescriptCard: RescriptCard,
+  planSentence: PlanSentenceEmbed,
+  rehearsal: RehearsalEmbed,
+  keepCard: KeepCardEmbed,
+  partAnchor: PartAnchorEmbed,
   waitLock: WaitLockEmbed,
   debriefWho: DebriefWhoEmbed,
   prosConsCard: ProsConsCard,
@@ -79,6 +84,10 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   rebellionCard: { ids: ['now', 'today', 'week'] },
   boundaryLine: { ids: ['copied'] },
   rescriptCard: { ids: ['read', 'stopped'], measures: ['durationSec'] },
+  planSentence: {},
+  rehearsal: { ids: ['done'] },
+  keepCard: {},
+  partAnchor: {},
   waitLock: { ids: ['waited', 'back_early'], measures: ['durationSec'] },
   debriefWho: { ids: ['yes', 'a_bit', 'no', 'skip', 'general', 'not_shown'] },
   prosConsCard: { ids: ['read'], measures: ['durationSec'] },
@@ -102,7 +111,7 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
  * (src/lib/skillRuntime/embedProps.ts) and passes nothing undeclared.
  */
 export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, EmbedPropSpec>>> = {
-  partsLine: { promptId: { type: 'id' } },
+  partsLine: { promptId: { type: 'id' }, as: { type: 'enum', values: ['line', 'heading'], optional: true } },
   partLater: {},
   holdRing: {
     variant: { type: 'enum', values: ['press', 'timed', 'settle'] },
@@ -161,6 +170,30 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     doneLabel: { type: 'copy' },
     skipLabel: { type: 'copy' },
   },
+  // Cope Ahead (ER-B2, CopeAheadEmbeds.tsx): the plan's fields, for planLine.
+  planSentence: {
+    momentField: { type: 'field' },
+    movesField: { type: 'field' },
+    forpullField: { type: 'field', optional: true },
+    pullField: { type: 'field' },
+  },
+  rehearsal: {
+    momentField: { type: 'field' },
+    movesField: { type: 'field' },
+    forpullField: { type: 'field', optional: true },
+    pullField: { type: 'field' },
+    pass: { type: 'int', min: 1, max: 2 },
+    changeField: { type: 'field', optional: true },
+    changedMovesField: { type: 'field', optional: true },
+  },
+  keepCard: {
+    momentField: { type: 'field' },
+    movesField: { type: 'field' },
+    forpullField: { type: 'field', optional: true },
+    pullField: { type: 'field' },
+    partField: { type: 'field', optional: true },
+  },
+  partAnchor: { partField: { type: 'field' } },
   waitLock: {
     minutes: { type: 'int', min: 1, max: 60 },
     waiting: { type: 'copy' },

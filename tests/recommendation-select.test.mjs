@@ -44,13 +44,13 @@ const pickIds = (sel) => sel.picks.map((p) => p.concept.appToolId);
 
 // ---- Goldens ----
 
-test("#1–3 Anxious → On guard (its reviewed pattern): Do the Opposite + 5-4-3-2-1 whatever the band but flooded; flooded: Cool Down + 5-4-3-2-1", async () => {
+test("#1–3 Anxious → On guard (its reviewed pattern): Cope Ahead + 5-4-3-2-1 whatever the band but flooded (its anticipatory row, live 12 Nov); flooded: Cool Down + 5-4-3-2-1", async () => {
   const r1 = await run(hu({ emotions: ["Anxious"] }));
   assert.equal(r1.pattern.id, "chronic_vigilance");
   assert.deepEqual([r1.routing.band, r1.routing.bandSource, r1.routing.version], ["stirred", "inferred", "rf-v2"]);
-  assert.deepEqual(ids(r1), ["opposite-action", "five-senses"]);
-  assert.equal(r1.tools[0].ruleId, "rf_chronic_vigilance_words_anticipatory_opposite-action");
-  assert.deepEqual(ids(await run(hu({ emotions: ["Anxious"], band: "steady", bandSource: "probe" }))), ["opposite-action", "five-senses"], "no capacity split");
+  assert.deepEqual(ids(r1), ["cope-ahead", "five-senses"]);
+  assert.equal(r1.tools[0].ruleId, "rf_chronic_vigilance_words_anticipatory_cope-ahead");
+  assert.deepEqual(ids(await run(hu({ emotions: ["Anxious"], band: "steady", bandSource: "probe" }))), ["cope-ahead", "five-senses"], "no capacity split");
   const r3 = await run(hu({ emotions: ["Anxious"], band: "flooded" }));
   assert.deepEqual(ids(r3), ["cool-down", "five-senses"]);
   assert.equal(r3.routing.bandSource, "probe");
@@ -122,7 +122,7 @@ test("#11 On guard always has a card: 5-4-3-2-1 + Problem Solve; Ride it out for
   assert.deepEqual(pickIds(await cell("chronic_vigilance", "steady", { words: ["stressed"] })), ["five-senses", "problem-solve"]);
   assert.deepEqual(pickIds(await cell("chronic_vigilance", "stirred", { words: ["stressed"] })), ["five-senses", "problem-solve"]);
   assert.deepEqual(pickIds(await cell("chronic_vigilance", "flooded")), ["cool-down", "five-senses"]);
-  assert.deepEqual(pickIds(await cell("chronic_vigilance", "stirred", { words: ["worried"] })), ["opposite-action", "urge-surfing"], "worry: Do the Opposite, Ride it out for the checking urge");
+  assert.deepEqual(pickIds(await cell("chronic_vigilance", "stirred", { words: ["worried"] })), ["check-the-facts", "urge-surfing"], "worry: Check the Facts, Ride it out for the checking urge");
 });
 
 test("#12 flooding: crisis flag as today, and the cards still come (banner above them, R12)", async () => {
@@ -137,7 +137,7 @@ test("#13 co-occurring blank pattern: nothing calming and no Do the Opposite (ac
   const sel = await cell("acute_alarm", "stirred", { blank: true, secondary: "dissociation_overmodulation" });
   assert.deepEqual(pickIds(sel), ["five-senses"]);
   assert.deepEqual(sel.filtered.filter((f) => f.reason !== "emotion_gate").map((f) => [f.toolId, f.reason]), [["cool-down", "direction"], ["opposite-action", "contraindicated"]]);
-  assert.deepEqual(sel.filtered.filter((f) => f.reason === "emotion_gate").map((f) => f.toolId).sort(), ["find-the-feeling", "five-senses", "mind-job", "mind-job", "opposite-action", "pause", "problem-solve", "recovering-from-invalidation"], "gated rows that didn't fire are logged (word rules too)");
+  assert.deepEqual(sel.filtered.filter((f) => f.reason === "emotion_gate").map((f) => f.toolId).sort(), ["check-the-facts", "find-the-feeling", "five-senses", "mind-job", "mind-job", "opposite-action", "pause", "problem-solve", "recovering-from-invalidation"], "gated rows that didn't fire are logged (word rules too)");
 });
 
 test("#14 FTF flooded + blank → 5-4-3-2-1 only (no Cool Down, D-02)", async () => {
@@ -240,8 +240,9 @@ test("invariants: 1–2 cards, ≤1 change skill, distinct kinds, no calming whe
   assert.equal(PATTERNS.length * BANDS.length, 27);
   // Oct 2026 review: the thinking tools are no longer held back by capacity, so Do the Opposite shows in more
   // cells (pinned, so a change is deliberate): Alarm, Social threat, Shut down (after moving), Low drive and
-  // On guard's anxiety words, each in the two non-flooded bands.
-  assert.equal(oaCells, 10);
+  // On guard's anxiety words, each in the two non-flooded bands. 12 Nov: Cope Ahead's anticipatory row is live and
+  // leads On guard's anxiety words, so those two cells moved to it (8).
+  assert.equal(oaCells, 8);
 });
 
 test("band: the request's own answer, else inferred (flooded patterns → flooded, else the default)", () => {

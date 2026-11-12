@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { tools as toolsData } from '../../data/tools';
+import { useOfficialNames } from '../../hooks/useOfficialNames';
 import type { ToolEffectivenessData } from '../../services/neo4j';
 import { fromReflect, outcomeLine } from '../../lib/reflect';
 
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export function ToolEffectiveness({ data, delay = 0 }: Props) {
+  const { label } = useOfficialNames();
   return (
     <div
       className="rounded-xl bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] p-6"
@@ -39,7 +41,7 @@ export function ToolEffectiveness({ data, delay = 0 }: Props) {
               <div className="flex-1 min-w-0">
                 <div className="mb-1">
                   <span className="text-sm font-medium text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition-colors">
-                    {tool?.name || t.toolId}
+                    {(tool && label(tool)) || t.toolId}
                   </span>
                 </div>
                 <div className="h-1.5 rounded-full bg-[var(--color-bg-elevated)] overflow-hidden">

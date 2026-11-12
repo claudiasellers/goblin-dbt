@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { activationPatterns } from '../../data/activationPatterns';
 import { tools as toolsData } from '../../data/tools';
+import { useOfficialNames } from '../../hooks/useOfficialNames';
 import type { FormulationInsight } from '../../services/neo4j';
 import { fromReflect } from '../../lib/reflect';
 
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export function FormulationCard({ formulation, delay = 0 }: Props) {
+  const { label } = useOfficialNames();
   const patternMeta = activationPatterns[formulation.primaryPatternId];
   const emoji = patternMeta?.emoji || '🧠';
 
@@ -69,7 +71,7 @@ export function FormulationCard({ formulation, delay = 0 }: Props) {
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)] text-sm text-[var(--color-text-secondary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] hover:shadow-[0_2px_8px_var(--color-accent-muted)] transition-all duration-200"
                 >
                   <span>{tool?.emoji || '🔧'}</span>
-                  <span>{tool?.name || toolId}</span>
+                  <span>{(tool && label(tool)) || toolId}</span>
                 </Link>
               );
             })}

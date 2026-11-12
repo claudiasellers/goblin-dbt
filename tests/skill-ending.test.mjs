@@ -42,7 +42,7 @@ test("the screens, and the safe path to the plan: safety, what, decide, channel,
   const s = run([...toCard(), card(["copied"]), ...answer("checkin", "yes"), ...answer("when", "this_week")]);
   assert.deepEqual(s.path, ["safety", "what", "decide", "channel", "open_line", "decision_line", "practical", "card", "checkin", "when", "ahead"]);
   assert.deepEqual(s.offered, ["cope_ahead"], "rehearse is planned (IE-02), so only Cope Ahead shows");
-  assert.equal(skill.exits.find((x) => x.id === "cope_ahead").query.first, "conversation");
+  assert.equal(skill.exits.find((x) => x.id === "cope_ahead").query.situationId, "conversation");
   assert.equal(M.crisisFor(ctx(), step("ahead"), s), null, "no resources on the safe path");
 });
 

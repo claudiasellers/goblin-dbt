@@ -11,6 +11,7 @@ import fast  # noqa: E402
 import nightmare_rescript  # noqa: E402
 import problem_solve  # noqa: E402
 import ending_relationships  # noqa: E402
+import cope_ahead  # noqa: E402
 import hold_to_wait  # noqa: E402
 import dear_man_debrief  # noqa: E402
 import pros_cons  # noqa: E402
@@ -22,7 +23,7 @@ import mind_job  # noqa: E402
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
 SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKILL, *fast.SKILLS, nightmare_rescript.SKILL, problem_solve.SKILL,
-          ending_relationships.SKILL, hold_to_wait.SKILL, dear_man_debrief.SKILL, pros_cons.SKILL, first_body.SKILL,
+          ending_relationships.SKILL, cope_ahead.SKILL, hold_to_wait.SKILL, dear_man_debrief.SKILL, pros_cons.SKILL, first_body.SKILL,
           ride_it_out.SKILL, let_it_be.SKILL, mind_job.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
@@ -42,6 +43,11 @@ EMBEDS = {
     # Problem Solve's "the part that doesn't want change" (parts on; docs/design/parts.md): a quiet yes that queues a
     # PartCandidate. Reports nothing; its slot's record says it showed.
     "partLater": {},
+    # Cope Ahead (ER-B2): the plan line as it's built, the rehearsal (whole screen), the keepsake paper, the part's anchor.
+    "planSentence": {},
+    "rehearsal": {"ids": ["done"]},
+    "keepCard": {},
+    "partAnchor": {},
     # DEAR MAN's debrief: who showed up? (src/lib/debriefWho.ts; parts on, a kept part, the lines shipped, else it moves
     # on at once). Reports the named form's answer; the general form is the tag row, which writes its own tag.
     "debriefWho": {"ids": ["yes", "a_bit", "no", "skip", "general", "not_shown"]},
@@ -69,7 +75,8 @@ EMBEDS = {
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
 # in [min, max], `enum` one of its values, `field` a field id of the skill, `id` a plain id. Undeclared props fail.
 EMBED_PROPS = {
-    "partsLine": {"promptId": {"type": "id"}},
+    # `as: heading`: the screen's question (a slot under `$title`, for a step whose question is parts copy).
+    "partsLine": {"promptId": {"type": "id"}, "as": {"type": "enum", "values": ["line", "heading"], "optional": True}},
     "partLater": {},
     "debriefWho": {},
     "holdRing": {
@@ -128,6 +135,29 @@ EMBED_PROPS = {
         "doneLabel": {"type": "copy"},
         "skipLabel": {"type": "copy"},
     },
+    "planSentence": {
+        "momentField": {"type": "field"},
+        "movesField": {"type": "field"},
+        "forpullField": {"type": "field", "optional": True},
+        "pullField": {"type": "field"},
+    },
+    "rehearsal": {
+        "momentField": {"type": "field"},
+        "movesField": {"type": "field"},
+        "forpullField": {"type": "field", "optional": True},
+        "pullField": {"type": "field"},
+        "pass": {"type": "int", "min": 1, "max": 2},
+        "changeField": {"type": "field", "optional": True},
+        "changedMovesField": {"type": "field", "optional": True},
+    },
+    "keepCard": {
+        "momentField": {"type": "field"},
+        "movesField": {"type": "field"},
+        "forpullField": {"type": "field", "optional": True},
+        "pullField": {"type": "field"},
+        "partField": {"type": "field", "optional": True},
+    },
+    "partAnchor": {"partField": {"type": "field"}},
     "waitLock": {
         "minutes": {"type": "int", "min": 1, "max": 60},
         "waiting": {"type": "copy"},

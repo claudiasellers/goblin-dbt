@@ -37,7 +37,8 @@ test("cards: names, emoji and tagline from tools.ts; unknown ids dropped; ≤ 2;
   assert.deepEqual(rec.recommendationCards(null), []);
   const comp = read("src/components/checkin/RecommendationCards.tsx");
   assert.doesNotMatch(comp, /\.relevance|\.description|whenToUse|getToolById/);
-  assert.match(comp, /\{tool\.name\}/);
+  // tool.name through the admin "Official DBT names" switch, which is tool.name unless an admin turns it on.
+  assert.match(comp, /\{label\(tool\)\}/);
   assert.match(comp, /\{tool\.tagline\}/);
 });
 

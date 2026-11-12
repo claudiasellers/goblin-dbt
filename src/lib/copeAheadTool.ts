@@ -153,13 +153,15 @@ export const canPlanForPull = (s: CopeState): boolean => s.pull !== null && s.pu
 
 /**
  * Screen 4's move chips for a moment: its forMoments move first, then the moves for the pull (or the
- * general ones when no pull was picked, or Not sure), in content order. Danger moves never show elsewhere.
+ * general ones when no pull was picked, or Not sure), in content order. Danger moves never show elsewhere,
+ * and a move with `forSituations` shows only for those situations.
  */
 export function movesFor(s: CopeState, c: Pick<CopeContext, 'moves'>, momentId: string | null = s.hardMomentId): CopeMoveItem[] {
   const ordered = [...c.moves].sort((a, b) => a.order - b.order);
   const first = ordered.filter((m) => momentId && m.forMoments.includes(momentId));
   const pull = canPlanForPull(s) ? (s.pull as CopePull) : null;
-  const rest = ordered.filter((m) => !m.forMoments.length && (pull ? m.forPulls.includes(pull) : m.general));
+  const fits = (m: CopeMoveItem) => !m.forSituations?.length || (s.situationId !== null && m.forSituations.includes(s.situationId));
+  const rest = ordered.filter((m) => !m.forMoments.length && fits(m) && (pull ? m.forPulls.includes(pull) : m.general));
   return [...first, ...rest];
 }
 

@@ -80,3 +80,63 @@ export function planLine(content: PlanContent, ca: PlanCa | null | undefined): P
     : '';
   return { ifText, moves, text };
 }
+
+/**
+ * The skill runtime's answers as a plan's ids (ER-B2: Cope Ahead on the player). Each field's ids and own words, by
+ * field id: `moment`, `forpull` (`['pull']`: the "If" is the pull), `pull`, `moves`. Shared by the run's embeds
+ * (the live sentence, the rehearsal, the keep card) and Me's kept plan (`cope_ahead_plan`: the same fields as
+ * `<field>Ids` / `<field>Own`), so all of them say the same words.
+ */
+export function planCaFromFields(get: (field: string) => { ids: readonly string[]; own: string | null }, fields: {
+  moment?: string; moves?: string; forpull?: string | null; pull?: string;
+} = {}): PlanCa {
+  const moment = get(fields.moment ?? 'moment');
+  const moves = get(fields.moves ?? 'moves');
+  const forPull = fields.forpull === null ? false : get(fields.forpull ?? 'forpull').ids.includes('pull');
+  const pull = get(fields.pull ?? 'pull').ids.filter((p) => p !== 'not_sure');
+  return {
+    hardMomentId: moment.ids[0] ?? null,
+    hardMomentOwn: moment.own,
+    ifFrom: forPull && pull.length ? 'pull' : 'moment',
+    pullIds: pull,
+    moveIds: moves.ids,
+    moveOwn: moves.own,
+  };
+}
+
+/** A kept plan's value (`cope_ahead_plan`: `<field>Ids` / `<field>Own`) as a plan's ids. */
+export function planCaFromKept(value: Readonly<Record<string, unknown>> | null | undefined): PlanCa {
+  const v = value ?? {};
+  const ids = (k: string) => (Array.isArray(v[`${k}Ids`]) ? (v[`${k}Ids`] as unknown[]).filter((x): x is string => typeof x === 'string') : []);
+  const ownOf = (k: string) => (typeof v[`${k}Own`] === 'string' ? (v[`${k}Own`] as string) : null);
+  return planCaFromFields((f) => ({ ids: ids(f), own: ownOf(f) }));
+}
+
+/** What a skill-runtime embed receives of the run (src/components/skillPlayer/embeds.ts `EmbedProps`), structurally. */
+interface RunView {
+  answerIds?: Readonly<Record<string, readonly string[]>>;
+  picked?: Readonly<Record<string, readonly string[]>>;
+}
+
+/** A field's answer as an embed receives it: its ids, and the person's own words (the label past the ids: own words last). */
+export function fieldAnswer(p: RunView, field: unknown): { ids: string[]; own: string | null } {
+  if (typeof field !== 'string' || !field) return { ids: [], own: null };
+  const ids = [...(p.answerIds?.[field] ?? [])];
+  const labels = p.picked?.[field] ?? [];
+  return { ids, own: labels.length > ids.length ? labels[labels.length - 1] ?? null : null };
+}
+
+/**
+ * The plan's ids from a run, as Cope Ahead's embeds' field props name them (scripts/skills/cope_ahead.py). Pass 2
+ * (*once more*): the new moment is the "If", with the plan's moves or, after *Change what I'll do*, the new ones.
+ */
+export function runPlanCa(p: RunView & { props: Readonly<Record<string, unknown>> }, pass: 1 | 2 = 1): PlanCa {
+  const f = p.props;
+  const changed = pass === 2 && typeof f.changeField === 'string' && fieldAnswer(p, f.changeField).ids.includes('change');
+  return planCaFromFields((x) => fieldAnswer(p, x), {
+    moment: String(f.momentField ?? 'moment'),
+    moves: String(changed ? f.changedMovesField ?? 'moves' : f.movesField ?? 'moves'),
+    forpull: pass === 2 ? null : typeof f.forpullField === 'string' ? f.forpullField : null,
+    pull: String(f.pullField ?? 'pull'),
+  });
+}
