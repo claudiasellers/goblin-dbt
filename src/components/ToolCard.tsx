@@ -29,11 +29,13 @@ export function ToolCard({ tool, state, mode }: ToolCardProps) {
           {mode?.emoji ?? tool.emoji}
         </span>
         <div className="min-w-0">
+          {/* A mode card leads with its own name either way, so it never reads as a second copy of the tool's card;
+              with official names on, the official name sits under it, as on the intent cards. */}
           <h3 className="font-medium text-[var(--color-text-primary)]">
-            {official || !mode ? label(tool) : mode.name}
+            {mode ? mode.name : label(tool)}
           </h3>
           {official && (
-            <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5">In the app: {mode?.name ?? tool.name}</p>
+            <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5">{mode ? label(tool) : `In the app: ${tool.name}`}</p>
           )}
           <p className="text-sm text-[var(--color-text-secondary)] mt-1">
             {mode?.tagline ?? tool.tagline}

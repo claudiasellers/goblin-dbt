@@ -176,7 +176,7 @@ export const tools: Tool[] = [
     dbtBasis: 'Crisis survival skills (DT Handouts 6–9a)',
     emoji: '🧰',
     bare: true,
-    moreCards: [{ key: 'build', name: 'Make my crisis kit', tagline: 'On a calmer day, so it\'s ready for a hard night', emoji: '🧰', query: 'frame=build' }],
+    moreCards: [{ key: 'build', name: 'Make my crisis kit for hard nights', tagline: 'On a calmer day, so it\'s ready for a hard night', emoji: '🧰', query: 'frame=build' }],
   },
   // Emotion Regulation
   {
