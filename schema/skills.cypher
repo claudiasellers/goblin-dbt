@@ -2100,7 +2100,7 @@ SET r += {list: "instead", order: 31};
 
 // --- fast_let_go (fast-let-go-v1) ---
 MERGE (s:Skill {id: "fast_let_go"})
-SET s += {toolId: "fast", version: "fast-let-go-v1", contentVersion: "skills-v1", start: "line", ownMax: 140, emotionFields: [], accepts: ["frame"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"card_copied\": \"Copied\", \"card_copy\": \"Copy\", \"card_selected\": \"The line is selected, ready to copy.\", \"card_title\": \"Your line, to use or not\", \"done\": \"Done\", \"elsewhere_line\": \"What you needed still matters. It can be met somewhere else.\", \"elsewhere_line_no\": \"You said what you needed, and that counts. It's a no for now. What you needed still matters, and it can be met somewhere else.\", \"elsewhere_line_none\": \"Saying nothing is a choice too. What you needed still matters, and it can be met somewhere else.\", \"line_hint\": \"A boundary line says what you'll do. It doesn't argue.\", \"line_none\": \"I don't need to say anything\", \"line_title\": \"Do you want a line that says where you stand?\", \"next\": \"Next\", \"own_hint\": \"Say it my way\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "fast", version: "fast-let-go-v1", contentVersion: "skills-v1", start: "line", ownMax: 140, emotionFields: [], accepts: ["frame", "band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"after_line\": \"Making room for it is something you can come back to. What you needed still matters.\", \"body_line\": \"That's a lot to carry. Your body first, then the rest can wait.\", \"card_copied\": \"Copied\", \"card_copy\": \"Copy\", \"card_selected\": \"The line is selected, ready to copy.\", \"card_title\": \"Your line, to use or not\", \"done\": \"Done\", \"elsewhere_line\": \"What you needed still matters. It can be met somewhere else.\", \"elsewhere_line_no\": \"You said what you needed, and that counts. It's a no for now. What you needed still matters, and it can be met somewhere else.\", \"elsewhere_line_none\": \"Saying nothing is a choice too. What you needed still matters, and it can be met somewhere else.\", \"line_hint\": \"A boundary line says what you'll do. It doesn't argue.\", \"line_none\": \"I don't need to say anything\", \"line_title\": \"Do you want a line that says where you stand?\", \"next\": \"Next\", \"own_hint\": \"Say it my way\", \"room_here\": \"Yes, here\", \"room_hint\": \"Not to agree with the no, or to give up what you need. Only to stop fighting what can't change today.\", \"room_later\": \"Not now\", \"room_title\": \"Do you want to make some room for it here, for a few minutes?\", \"unsafe_line\": \"Your safety comes first. You don't have to accept anything that's still hurting you. The support here is there any time.\", \"unsafe_line_made_room\": \"You made room for what's already happened. You don't have to accept anything that's still hurting you. The support here is there any time.\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "dbt_fast"}), (s:Skill {id: "fast_let_go"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "fast_let_go"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
@@ -2115,17 +2115,58 @@ SET n += {skillId: "fast_let_go", step: "card", kind: "embed", version: "fast-le
 MATCH (s:Skill {id: "fast_let_go"}), (n:SkillStep {id: "fast_let_go:card"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 1};
+MERGE (n:SkillStep {id: "fast_let_go:room"})
+SET n += {skillId: "fast_let_go", step: "room", kind: "ask", version: "fast-let-go-v1"}, n.specJson = "{\"fields\": [{\"id\": \"room\", \"max\": 1, \"options\": {\"list\": \"room\"}, \"required\": true}], \"hint\": \"room_hint\", \"lines\": [{\"key\": \"elsewhere_line_none\", \"when\": {\"eq\": [\"$a.line\", \"none\"]}}, {\"key\": \"elsewhere_line_no\", \"when\": null}], \"title\": \"room_title\"}";
+MATCH (s:Skill {id: "fast_let_go"}), (n:SkillStep {id: "fast_let_go:room"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 2};
+MERGE (n:SkillStep {id: "fast_let_go:accept"})
+SET n += {skillId: "fast_let_go", step: "accept", kind: "embed", version: "fast-let-go-v1"}, n.specJson = "{\"answerAs\": \"accepted\", \"embed\": \"inlineSkill\", \"props\": {\"enterAt\": \"what\", \"skill\": \"let_it_be\"}}";
+MATCH (s:Skill {id: "fast_let_go"}), (n:SkillStep {id: "fast_let_go:accept"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 3};
+MERGE (n:SkillStep {id: "fast_let_go:after"})
+SET n += {skillId: "fast_let_go", step: "after", kind: "handoff", version: "fast-let-go-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"after_line\", \"when\": {\"set\": \"$a.accepted\"}}, {\"key\": \"elsewhere_line\", \"when\": null}]}";
+MATCH (s:Skill {id: "fast_let_go"}), (n:SkillStep {id: "fast_let_go:after"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 4};
+MERGE (n:SkillStep {id: "fast_let_go:unsafe"})
+SET n += {skillId: "fast_let_go", step: "unsafe", kind: "handoff", version: "fast-let-go-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"all\": []}}], \"done\": \"done\", \"lines\": [{\"key\": \"unsafe_line_made_room\", \"when\": {\"has\": [\"$a.accepted.ids\", \"finished\"]}}, {\"key\": \"unsafe_line\", \"when\": null}], \"noClose\": true}";
+MATCH (s:Skill {id: "fast_let_go"}), (n:SkillStep {id: "fast_let_go:unsafe"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 5};
+MERGE (n:SkillStep {id: "fast_let_go:body"})
+SET n += {skillId: "fast_let_go", step: "body", kind: "handoff", version: "fast-let-go-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"body_line\", \"when\": null}], \"noClose\": true}";
+MATCH (s:Skill {id: "fast_let_go"}), (n:SkillStep {id: "fast_let_go:body"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 6};
 MERGE (n:SkillStep {id: "fast_let_go:elsewhere"})
 SET n += {skillId: "fast_let_go", step: "elsewhere", kind: "handoff", version: "fast-let-go-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"elsewhere_line_none\", \"when\": {\"eq\": [\"$a.line\", \"none\"]}}, {\"key\": \"elsewhere_line_no\", \"when\": {\"eq\": [\"$ctx.frame\", \"let_go\"]}}, {\"key\": \"elsewhere_line\", \"when\": null}]}";
 MATCH (s:Skill {id: "fast_let_go"}), (n:SkillStep {id: "fast_let_go:elsewhere"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 2};
+SET r += {order: 7};
 MERGE (x:SkillExit {id: "fast_let_go:let_it_be"})
 SET x += {skillId: "fast_let_go", exit: "let_it_be", toolId: "let-it-be", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "fast_let_go"}), (x:SkillExit {id: "fast_let_go:let_it_be"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "fast_let_go:let_it_be"}), (t:TherapyConcept {appToolId: "let-it-be"})
 MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "fast_let_go:ending_careful"})
+SET x += {skillId: "fast_let_go", exit: "ending_careful", toolId: "ending-relationships", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"careful\"}", x.label = null;
+MATCH (s:Skill {id: "fast_let_go"}), (x:SkillExit {id: "fast_let_go:ending_careful"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "fast_let_go:ending_careful"}), (t:TherapyConcept {appToolId: "ending-relationships"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "fast_let_go:cool_down"})
+SET x += {skillId: "fast_let_go", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "fast_let_go"}), (x:SkillExit {id: "fast_let_go:cool_down"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "fast_let_go:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "fast_let_go:safety_open"})
+SET x += {skillId: "fast_let_go", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "fast_let_go"}), (x:SkillExit {id: "fast_let_go:safety_open"})
+MERGE (s)-[:HAS_EXIT]->(x);
 MERGE (x:SkillExit {id: "fast_let_go:recover"})
 SET x += {skillId: "fast_let_go", exit: "recover", toolId: "recovering-from-invalidation", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "fast_let_go"}), (x:SkillExit {id: "fast_let_go:recover"})
@@ -2142,15 +2183,54 @@ MERGE (x:SkillExit {id: "fast_let_go:done"})
 SET x += {skillId: "fast_let_go", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "fast_let_go"}), (x:SkillExit {id: "fast_let_go:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (a:SkillStep {id: "fast_let_go:line"}), (b:SkillStep {id: "fast_let_go:room"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"all\": [{\"eq\": [\"$a.line\", \"none\"]}, {\"all\": [{\"eq\": [\"$ctx.frame\", \"let_go\"]}, {\"not\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}]}]}";
 MATCH (a:SkillStep {id: "fast_let_go:line"}), (b:SkillStep {id: "fast_let_go:elsewhere"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.line\", \"none\"]}";
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.line\", \"none\"]}";
 MATCH (a:SkillStep {id: "fast_let_go:line"}), (b:SkillStep {id: "fast_let_go:card"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "null";
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "fast_let_go:card"}), (b:SkillStep {id: "fast_let_go:room"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"all\": [{\"eq\": [\"$ctx.frame\", \"let_go\"]}, {\"not\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}]}";
 MATCH (a:SkillStep {id: "fast_let_go:card"}), (b:SkillStep {id: "fast_let_go:elsewhere"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "null";
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "fast_let_go:room"}), (b:SkillStep {id: "fast_let_go:accept"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.room\", \"here\"]}";
+MATCH (a:SkillStep {id: "fast_let_go:room"}), (b:SkillStep {id: "fast_let_go:after"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "fast_let_go:accept"}), (b:SkillStep {id: "fast_let_go:unsafe"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"any\": [{\"has\": [\"$a.accepted.ids\", \"unsafe\"]}, {\"has\": [\"$a.accepted.ids\", \"stopped\"]}]}";
+MATCH (a:SkillStep {id: "fast_let_go:accept"}), (b:SkillStep {id: "fast_let_go:body"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"has\": [\"$a.accepted.ids\", \"body\"]}";
+MATCH (a:SkillStep {id: "fast_let_go:accept"}), (b:SkillStep {id: "fast_let_go:after"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "fast_let_go:after"}), (x:SkillExit {id: "fast_let_go:recover"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": null}]";
+MATCH (a:SkillStep {id: "fast_let_go:after"}), (x:SkillExit {id: "fast_let_go:finding_connection"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": null}]";
+MATCH (a:SkillStep {id: "fast_let_go:unsafe"}), (x:SkillExit {id: "fast_let_go:safety_open"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": null}]";
+MATCH (a:SkillStep {id: "fast_let_go:unsafe"}), (x:SkillExit {id: "fast_let_go:cool_down"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"has\": [\"$a.accepted.ids\", \"body\"]}}]";
+MATCH (a:SkillStep {id: "fast_let_go:unsafe"}), (x:SkillExit {id: "fast_let_go:ending_careful"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": null}]";
+MATCH (a:SkillStep {id: "fast_let_go:body"}), (x:SkillExit {id: "fast_let_go:cool_down"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": null}]";
 MATCH (a:SkillStep {id: "fast_let_go:elsewhere"}), (x:SkillExit {id: "fast_let_go:let_it_be"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": null}]";
@@ -2190,6 +2270,16 @@ SET o:SkillOption:BoundaryLine, o += {skillId: "fast_let_go", list: "line", valu
 MATCH (s:Skill {id: "fast_let_go"}), (o:SkillOption {id: "fast_let_go:line:not_argue"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "line", order: 5};
+MERGE (o:SkillOption {id: "fast_let_go:room:here"})
+SET o:SkillOption, o += {skillId: "fast_let_go", list: "room", value: "here", label: "Yes, here", version: "fast-let-go-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_let_go"}), (o:SkillOption {id: "fast_let_go:room:here"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "room", order: 6};
+MERGE (o:SkillOption {id: "fast_let_go:room:later"})
+SET o:SkillOption, o += {skillId: "fast_let_go", list: "room", value: "later", label: "Not now", version: "fast-let-go-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_let_go"}), (o:SkillOption {id: "fast_let_go:room:later"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "room", order: 7};
 
 // --- nightmare_rescript (nr-v1) ---
 MERGE (s:Skill {id: "nightmare_rescript"})
@@ -9682,7 +9772,7 @@ SET r += {list: "after_round", order: 24};
 
 // --- let_it_be (lb-v1) ---
 MERGE (s:Skill {id: "let_it_be"})
-SET s += {toolId: "let-it-be", version: "lb-v1", contentVersion: "skills-v1", start: "checked", ownMax: 120, emotionFields: [], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"card_copied\": \"Copied\", \"card_copy\": \"Copy\", \"card_next\": \"Next\", \"card_selected\": \"The line is selected, ready to copy.\", \"card_title\": \"Read it once, slowly.\", \"check_first_hint\": \"Problem Solve does that sorting. You can come back here after.\", \"check_first_ps\": \"Look at it with Problem Solve\", \"check_first_title\": \"It can help to sort what might change from what can't, first.\", \"checked_hint\": \"Letting it be is for the part that can't change right now.\", \"checked_title\": \"Some things can change and some can't. Have you looked at which this is?\", \"close_title\": \"Compared to when you started, the fight with it is…\", \"done\": \"Done\", \"end_body\": \"Look after your body tonight: rest, water, being gentle with yourself.\", \"end_boundary\": \"One line to hold your ground, for the next time.\", \"end_line\": \"You let it be, for now. You can come back to this whenever the fight starts again.\", \"end_louder\": \"The fight's loud right now. That happens with hard things. You can come back to this anytime.\", \"end_need\": \"Your need is still real. It can be met somewhere else.\", \"end_nothing\": \"Doing nothing more today is okay. Letting it be was enough.\", \"end_small\": \"Pick one small thing that matters to you, and do it today.\", \"fight_hint\": \"Pick up to four.\", \"fight_title\": \"How does the fight with it show up?\", \"grief_hint\": \"Letting it be can make room for the sad part.\", \"grief_title\": \"If sadness comes, it's allowed. It isn't going backwards.\", \"hands_caution\": \"If it feels right, let your face soften too. You don't have to smile.\", \"hands_done\": \"That's it. Your hands did it.\", \"hands_running\": \"Hands open\", \"hands_start\": \"Start\", \"hands_step1\": \"Sit or stand, arms loose by your sides or in your lap.\", \"hands_step2\": \"Turn your palms up, or rest them however feels safe. Let your fingers relax.\", \"hands_step3\": \"Breathe however you breathe. Let your hands stay open.\", \"hands_still_hint\": \"One thing is plenty. None is okay too.\", \"hands_still_title\": \"What's still in your hands?\", \"hands_title\": \"Willing hands. Let your body practise letting it be.\", \"heads_up_hint\": \"You can settle your body first, or try it now.\", \"heads_up_title\": \"This works better once your body's quieter.\", \"heart_done\": \"That's it.\", \"heart_running\": \"Hand on heart\", \"heart_start\": \"Start\", \"heart_step1\": \"Rest one hand on your chest, over your heart.\", \"heart_step2\": \"Feel the warmth of your hand.\", \"heart_step3\": \"Stay as long as feels okay.\", \"heart_title\": \"Hand on your heart.\", \"next\": \"Next\", \"safety_open\": \"Talk to someone now\", \"settle_line\": \"Body first. Let it be is here when you're ready.\", \"statement_hint\": \"Accepting isn't approving. It isn't giving up on what can change. One line is enough.\", \"statement_own\": \"In my words\", \"statement_title\": \"Pick the words that fit, or write your own.\", \"still_ending\": \"Ending a relationship that's hurting you\", \"still_hint\": \"Letting it be is never about staying somewhere you're being hurt.\", \"still_line_hint\": \"If you're not safe, the support is on this screen. If it's someone close to you, Ending a relationship that's hurting you can help you think it through.\", \"still_line_title\": \"Accepting that it happened isn't accepting you have to stay in it.\", \"still_stop_line\": \"Stopping here is okay. The support stays here for you.\", \"still_title\": \"Is anyone still hurting you, or could this happen to you again?\", \"threat_alone\": \"Of course that's scary. You can let this be and still reach for people.\", \"threat_hint\": \"Pick the closest.\", \"threat_line_hint\": \"Accepting isn't approving. It isn't giving up on what can change.\", \"threat_lose_myself\": \"That makes sense. Letting it be doesn't take away what you care about. That stays yours.\", \"threat_my_fault\": \"That fear makes sense. Accepting that it happened isn't taking the blame. Causes aren't the same as fault.\", \"threat_never_change\": \"That fear makes sense. Accepting what's true now leaves room for what can still change.\", \"threat_other\": \"That fear makes sense. Letting it be is something you do, and you can do it a little at a time.\", \"threat_they_win\": \"That makes sense. Letting it be isn't saying they were right. It's choosing where your energy goes.\", \"threat_title\": \"What feels like it would happen if you let this be?\", \"too_much_line\": \"That's a lot. Let's look after your body first.\", \"what_hint\": \"Pick the closest, or say it your way.\", \"what_own\": \"Say it my way\", \"what_title\": \"It makes sense you're fighting this. It matters to you. What is it you can't change?\", \"willing_hint\": \"Digging in makes sense. It's how we protect what matters.\", \"willing_title\": \"Right now, are you willing to let it be, or digging in against it?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "let-it-be", version: "lb-v1", contentVersion: "skills-v1", start: "checked", ownMax: 120, emotionFields: [], accepts: ["band"]}, s.inlineJson = "{\"ends\": {\"end\": \"finished\", \"settle\": \"body\", \"still_stop\": \"stopped\", \"too_much\": \"body\"}, \"enterAt\": [\"what\"], \"flags\": [{\"id\": \"unsafe\", \"when\": {\"in\": [\"$a.still\", [\"yes\", \"sometimes\", \"unsure\"]]}}, {\"id\": \"body\", \"when\": {\"eq\": [\"$a.close\", \"worse\"]}}], \"returns\": [\"close\"], \"thenVsNowFrom\": \"close\"}", s.runtimeJson = "{}", s.copyJson = "{\"card_copied\": \"Copied\", \"card_copy\": \"Copy\", \"card_next\": \"Next\", \"card_selected\": \"The line is selected, ready to copy.\", \"card_title\": \"Read it once, slowly.\", \"check_first_hint\": \"Problem Solve does that sorting. You can come back here after.\", \"check_first_ps\": \"Look at it with Problem Solve\", \"check_first_title\": \"It can help to sort what might change from what can't, first.\", \"checked_hint\": \"Letting it be is for the part that can't change right now.\", \"checked_title\": \"Some things can change and some can't. Have you looked at which this is?\", \"close_title\": \"Compared to when you started, the fight with it is…\", \"done\": \"Done\", \"end_body\": \"Look after your body tonight: rest, water, being gentle with yourself.\", \"end_boundary\": \"One line to hold your ground, for the next time.\", \"end_line\": \"You let it be, for now. You can come back to this whenever the fight starts again.\", \"end_louder\": \"The fight's loud right now. That happens with hard things. You can come back to this anytime.\", \"end_need\": \"Your need is still real. It can be met somewhere else.\", \"end_nothing\": \"Doing nothing more today is okay. Letting it be was enough.\", \"end_small\": \"Pick one small thing that matters to you, and do it today.\", \"fight_hint\": \"Pick up to four.\", \"fight_title\": \"How does the fight with it show up?\", \"grief_hint\": \"Letting it be can make room for the sad part.\", \"grief_title\": \"If sadness comes, it's allowed. It isn't going backwards.\", \"hands_caution\": \"If it feels right, let your face soften too. You don't have to smile.\", \"hands_done\": \"That's it. Your hands did it.\", \"hands_running\": \"Hands open\", \"hands_start\": \"Start\", \"hands_step1\": \"Sit or stand, arms loose by your sides or in your lap.\", \"hands_step2\": \"Turn your palms up, or rest them however feels safe. Let your fingers relax.\", \"hands_step3\": \"Breathe however you breathe. Let your hands stay open.\", \"hands_still_hint\": \"One thing is plenty. None is okay too.\", \"hands_still_title\": \"What's still in your hands?\", \"hands_title\": \"Willing hands. Let your body practise letting it be.\", \"heads_up_hint\": \"You can settle your body first, or try it now.\", \"heads_up_title\": \"This works better once your body's quieter.\", \"heart_done\": \"That's it.\", \"heart_running\": \"Hand on heart\", \"heart_start\": \"Start\", \"heart_step1\": \"Rest one hand on your chest, over your heart.\", \"heart_step2\": \"Feel the warmth of your hand.\", \"heart_step3\": \"Stay as long as feels okay.\", \"heart_title\": \"Hand on your heart.\", \"inline_back\": \"Leave this for now\", \"next\": \"Next\", \"safety_open\": \"Talk to someone now\", \"settle_line\": \"Body first. Let it be is here when you're ready.\", \"statement_hint\": \"Accepting isn't approving. It isn't giving up on what can change. One line is enough.\", \"statement_own\": \"In my words\", \"statement_title\": \"Pick the words that fit, or write your own.\", \"still_ending\": \"Ending a relationship that's hurting you\", \"still_hint\": \"Letting it be is never about staying somewhere you're being hurt.\", \"still_line_hint\": \"If you're not safe, the support is on this screen. If it's someone close to you, Ending a relationship that's hurting you can help you think it through.\", \"still_line_title\": \"Accepting that it happened isn't accepting you have to stay in it.\", \"still_stop_line\": \"Stopping here is okay. The support stays here for you.\", \"still_title\": \"Is anyone still hurting you, or could this happen to you again?\", \"threat_alone\": \"Of course that's scary. You can let this be and still reach for people.\", \"threat_hint\": \"Pick the closest.\", \"threat_line_hint\": \"Accepting isn't approving. It isn't giving up on what can change.\", \"threat_lose_myself\": \"That makes sense. Letting it be doesn't take away what you care about. That stays yours.\", \"threat_my_fault\": \"That fear makes sense. Accepting that it happened isn't taking the blame. Causes aren't the same as fault.\", \"threat_never_change\": \"That fear makes sense. Accepting what's true now leaves room for what can still change.\", \"threat_other\": \"That fear makes sense. Letting it be is something you do, and you can do it a little at a time.\", \"threat_they_win\": \"That makes sense. Letting it be isn't saying they were right. It's choosing where your energy goes.\", \"threat_title\": \"What feels like it would happen if you let this be?\", \"too_much_line\": \"That's a lot. Let's look after your body first.\", \"what_hint\": \"Pick the closest, or say it your way.\", \"what_own\": \"Say it my way\", \"what_title\": \"It makes sense you're fighting this. It matters to you. What is it you can't change?\", \"willing_hint\": \"Digging in makes sense. It's how we protect what matters.\", \"willing_title\": \"Right now, are you willing to let it be, or digging in against it?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "dbt_radical_acceptance"}), (s:Skill {id: "let_it_be"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "let_it_be"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;

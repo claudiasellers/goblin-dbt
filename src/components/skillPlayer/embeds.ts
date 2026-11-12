@@ -20,6 +20,7 @@ import { OaStepsEmbed } from './OaStepsEmbed';
 import { PocketCard } from './PocketCard';
 import { BatteryRead } from './BatteryRead';
 import { KitDeck } from './KitDeck';
+import { InlineSkillEmbed } from './InlineSkillEmbed';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -88,6 +89,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   pocketCard: PocketCard,
   batteryRead: BatteryRead,
   kitDeck: KitDeck,
+  inlineSkill: InlineSkillEmbed,
 };
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
@@ -123,6 +125,7 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   pocketCard: { ids: ['seen_all', 'copied'] },
   batteryRead: { ids: ['read'] },
   kitDeck: { ids: ['body', 'hands', 'soothe', 'words', 'place', 'reasons', 'pros_cons', 'starter'], measures: ['durationSec', 'doneCount'] },
+  inlineSkill: { ids: ['finished', 'left', 'stopped', 'body', 'unsafe'] },
 };
 
 /**
@@ -403,6 +406,9 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     line: { type: 'copy', optional: true },
     next: { type: 'copy' },
   },
+  // R8: another skill run inline; `skill` names it (it must declare `inline`), `enterAt` one of its `inline.enterAt`.
+  inlineSkill: { skill: { type: 'id' }, enterAt: { type: 'id', optional: true } },
+
   lidShelf: {
     /** The field whose pick is the container: `jar` · `tin` · `box` (its id; anything else draws a jar). */
     containerField: { type: 'field' },

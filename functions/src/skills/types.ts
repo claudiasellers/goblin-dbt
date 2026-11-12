@@ -54,7 +54,19 @@ export interface FollowUpAction { type: string; whenFrom?: string; whenDefault?:
  * back the `returns` fields. `thenVsNowFrom` names the mid-flow change check written as the sub-run's
  * then-vs-now (the sub-run asks no close of its own).
  */
-export interface InlineDef { enterAt: string[]; returns: string[]; thenVsNowFrom?: string }
+export interface InlineDef {
+  enterAt: string[];
+  returns: string[];
+  thenVsNowFrom?: string;
+  /**
+   * What the host hears as the embed's output ids (the `inlineSkill` embed, R8): the hand-off step the sub-run ended
+   * on → an outcome id (`stopped`, `body`, `finished`); a step not named → `finished`, going back early → `left`.
+   * A hand-off gives back at once, so its crisis slot would be lost: the host reads these to show its own.
+   */
+  ends?: Record<string, string>;
+  /** Ids added to the output while their condition holds on the sub-run's answers (`unsafe`: the danger check). */
+  flags?: Array<{ id: string; when: Cond }>;
+}
 
 /** Copy: a key into the skill's copy, or keys under conditions (first match wins; the last has no `when`). */
 export type CopyRef = string | Array<{ when?: Cond; key: string }>;

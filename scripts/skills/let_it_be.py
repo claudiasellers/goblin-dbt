@@ -9,7 +9,7 @@ or willful (and, if willful, what letting it be seems to threaten, each met with
 accepting isn't approving, and it isn't giving up on what can change), the body (willing hands), one acceptance
 statement in their words or ours, room for grief, what's still in their hands, and the close on *the fight with it*.
 docs/design/let-it-be.md lists what this batch defers (the turning-the-mind card and its reminders, the acceptance
-target, the inline entries for FAST's Let go and Recover) and where it departs from the PRD.
+target, the inline entry for Recover; FAST's Let go runs it inline since IE-B4) and where it departs from the PRD.
 
 Safety (plan C6):
 - **Never acceptance of ongoing harm.** A person- or harm-related thing asks once: *Is anyone still hurting you, or could this happen to you again?*
@@ -49,6 +49,8 @@ COPY = {
     "what_title": "It makes sense you're fighting this. It matters to you. What is it you can't change?",
     "what_hint": "Pick the closest, or say it your way.",
     "what_own": "Say it my way",
+    # Inline (R8, inside FAST's Let go): the way back out, named apart from the safety screen's *Back to where I was*.
+    "inline_back": "Leave this for now",
     # The danger check (PRD step 2), once, for person- or harm-related things.
     "still_title": "Is anyone still hurting you, or could this happen to you again?",
     "still_hint": "Letting it be is never about staying somewhere you're being hurt.",
@@ -375,4 +377,15 @@ SKILL = {
     "accepts": ["band"],
     "copy": COPY, "tables": {}, "derive": [], "steps": STEPS, "exits": EXITS, "options": options(),
     "emotionFields": [],
+    # R8, IE-B4: FAST's Let go runs it inline after a no, from *what can't change* (the no already says it can't,
+    # for now), so the danger check still comes first for anything about a person. A hand-off gives back at once, so
+    # its card is the host's to show: the ends and flags tell the host which (the crisis slot when anything but *no*
+    # was said to the danger check, the body when grief was too much or the fight got louder).
+    "inline": {
+        "enterAt": ["what"],
+        "returns": ["close"],
+        "thenVsNowFrom": "close",
+        "ends": {"still_stop": "stopped", "too_much": "body", "settle": "body", "end": "finished"},
+        "flags": [{"id": "unsafe", "when": STILL}, {"id": "body", "when": {"eq": [a("close"), "worse"]}}],
+    },
 }
