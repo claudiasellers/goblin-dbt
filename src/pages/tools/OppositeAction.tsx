@@ -65,6 +65,7 @@ import { useOaGoalLine } from "../../hooks/useOaGoalLine";
 import { GoalLine } from "../../components/tools/oppositeAction/GoalLine";
 import { oaSkillIds } from "../../lib/spine/wrap";
 import { CheckFactsEntryLink } from "../../components/skillPlayer/CheckFactsEntryLink";
+import { CrisisBanner } from "../../components/safety/CrisisBanner";
 
 const FLOW_VERSION = "oa-guided-v2";
 
@@ -542,6 +543,20 @@ export function OppositeAction() {
     setCheckStep(SAFETY_STEP);
     go("check");
   };
+
+  /**
+   * The support route (danger, a boundary, or not sure what's safe): the other-person crisis slot, Ending a
+   * relationship in its careful frame, then Pause (plan C6 rules 4 and 8). Offered, never pushed.
+   */
+  const supportLinks = () => (
+    <div key="support" className="space-y-3" data-testid="oa-support">
+      <CrisisBanner variant="other_person" compact />
+      <Link className={`${choiceButton} block`} to="/tool/ending-relationships?frame=careful">
+        This is about someone who might hurt me →
+      </Link>
+      {toolLink("pause")}
+    </div>
+  );
 
   const toolLink = (id: string, label?: string) => {
     const normalized = id.replace(/^dbt_/, "").replace(/_/g, "-");
@@ -1191,7 +1206,7 @@ export function OppositeAction() {
             blocked && (
               <div className={`space-y-3 ${enterAnimation}`} role="alert">
                 <p>{c.support}</p>
-                {toolLink("pause")}
+                {supportLinks()}
               </div>
             )
           }
@@ -1321,7 +1336,7 @@ export function OppositeAction() {
           </button>
           {/* ER-03 item 6: clarify is a facts question (Check the Facts); Pause stays for support. */}
           {routes.includes("clarify") && toolLink("check-the-facts")}
-          {routes.includes("support") && toolLink("pause")}
+          {routes.includes("support") && supportLinks()}
           <button type="button" className={linkButton} onClick={() => setCheckStep(CHECK_STEPS.length - 1)}>
             ← Previous
           </button>
@@ -1442,7 +1457,7 @@ export function OppositeAction() {
             </button>
           )}
           {route === "clarify" && toolLink("check-the-facts")}
-          {route === "support" && toolLink("pause")}
+          {route === "support" && supportLinks()}
           <button
             type="button"
             className={linkButton}
@@ -1961,7 +1976,7 @@ export function OppositeAction() {
         {draft.outcome === "unsafe" && (
           <Card>
             <p role="alert">{c.readoutUnsafe}</p>
-            {toolLink("pause")}
+            {supportLinks()}
           </Card>
         )}
         <details className="p-4 rounded-xl border border-[var(--color-border)]">
@@ -2283,7 +2298,7 @@ export function OppositeAction() {
         ) : (
           <Card className={enterAnimation}>{readoutOf(draft)}</Card>
         )}
-        {unsafe && toolLink("pause")}
+        {unsafe && supportLinks()}
         {practiced && !unsafe && louder && (
           <div className="space-y-2">
             <p className={secondaryText}>{c.readoutHigherTools}</p>

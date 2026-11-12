@@ -82,6 +82,11 @@
       "state": "built"
     },
     {
+      "from": "src/pages/tools/OppositeAction.tsx",
+      "to": "ending-relationships",
+      "state": "built"
+    },
+    {
       "from": "src/pages/tools/ProblemSolve.tsx",
       "to": "dear-man",
       "state": "built"

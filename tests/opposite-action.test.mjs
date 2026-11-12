@@ -170,3 +170,15 @@ test("all clinical branches have graph copy and unique choice IDs", () => {
   for (const choices of Object.values(flow.choices))
     assert.equal(new Set(choices.map((c) => c.id)).size, choices.length);
 });
+
+test("the support route (danger, a boundary, not sure what's safe) shows the other-person resources and offers Ending careful, on every card and after an unsafe try", () => {
+  const src = readFileSync("src/pages/tools/OppositeAction.tsx", "utf8");
+  const block = src.slice(src.indexOf("const supportLinks"), src.indexOf("const toolLink"));
+  assert.match(block, /<CrisisBanner variant="other_person" compact \/>/);
+  assert.match(block, /\/tool\/ending-relationships\?frame=careful/);
+  assert.match(block, /toolLink\("pause"\)/);
+  // The safety card, both route cards, and the readout's *It felt unsafe* (its answer and the saved readout) all use
+  // it; Pause never stands alone.
+  assert.equal((src.match(/supportLinks\(\)/g) ?? []).length, 5);
+  assert.doesNotMatch(src.replace(block, ""), /toolLink\("pause"\)/);
+});

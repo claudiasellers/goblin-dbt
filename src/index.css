@@ -1094,6 +1094,8 @@ h1.uppercase, h2.uppercase {
   transform: translateY(3px);
   box-shadow: 0 1px 0 color-mix(in srgb, var(--tint) 60%, var(--color-lip)), inset 0 0 0 2px color-mix(in srgb, var(--tint) 70%, var(--color-text-primary));
 }
+/* On the stronger selected tint the secondary colour drops under 4.5:1 in the dark rooms (Gate 2, #89). */
+.oa-door[aria-pressed='true'] .oa-door__urge { color: var(--color-text-primary); }
 .oa-door:disabled { opacity: 0.45; cursor: default; }
 .oa-door:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }
 .oa-door--wide { min-height: 96px; flex-direction: row; align-items: center; justify-content: flex-start; gap: 14px; padding: 14px 18px; }

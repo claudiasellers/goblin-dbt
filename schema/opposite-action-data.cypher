@@ -80,7 +80,7 @@ SET c.fitsFactsGuidance = "If you actually violated your own deeply-held values,
 MATCH (c:EmotionRegulationContent {dbtParent: 'guilt'})
 SET c.fitsFactsGuidance = "If you genuinely violated your own values: apologize sincerely, make amends where possible, commit to doing differently, and then — critically — let it go. Ongoing self-punishment isn't repair.",
     c.whyItWorks = "Unjustified guilt is a false alarm. When you keep acting as if you did something wrong, you reinforce the belief. Acting freely teaches your brain that no harm was done.",
-    c.acknowledgment = "Guilt is urging you to make amends or punish yourself. When you didn't actually violate your values, the self-punishment is just suffering without purpose.",
+    c.acknowledgment = "Guilt is urging you to make amends or punish yourself. When you didn't actually violate your values, the self-punishment is suffering without purpose.",
     c.bodyOpposite = "Stand normally — don't hunch or grovel. Keep a calm, steady voice. Don't wring your hands.",
     c.defaultOppositeSmall = "Notice the self-punishment urge and don't act on it",
     c.defaultOppositeMedium = "Do something neutral instead of punishing yourself",
@@ -110,7 +110,7 @@ SET c.fitsFactsGuidance = "If envy points to something you genuinely want and ca
 MATCH (c:EmotionRegulationContent {dbtParent: 'love'})
 SET c.fitsFactsGuidance = "If the love is for someone available, mutual, and healthy — lean into it. Approach with vulnerability. Express your feelings. Love that fits the facts is worth pursuing.",
     c.whyItWorks = "Love that doesn't fit the facts — someone unavailable, harmful, or gone — keeps you stuck through intermittent reinforcement. Each contact resets the clock. Distance lets the attachment fade.",
-    c.acknowledgment = "Love is pulling you toward connection — but when someone is unavailable, harmful, or gone, each contact resets the clock. Distance is how this attachment fades.",
+    c.acknowledgment = "Love is pulling you toward connection. When someone is unavailable, harmful, or gone, each contact resets the clock. Distance is how this attachment fades.",
     c.bodyOpposite = "When you feel the pull to reach out, put your hands in your lap. Turn away from your phone. Take a breath and ground yourself.",
     c.defaultOppositeSmall = "Write what you want to say, but don't send it",
     c.defaultOppositeMedium = "Put your phone away and do something that requires your full attention",
@@ -241,11 +241,11 @@ MERGE (c)-[:HAS_ACTION_URGE]->(u);
 // What a hurt pulls toward with one person. One node per urge, listed under every parent it belongs to; after each
 // parent's own urges (`order`). Each is mapped for parts in scripts/parts/content.py.
 UNWIND [
-  {id: "text-again", label: "Text them again", small: "Write it in your notes, not to them", medium: "Put the phone in another room for an hour, then decide", bigger: "Leave it unsent today and do something that needs your hands", order: 10, parents: ["love", "sadness"]},
-  {id: "check-profile", label: "Check their profile", small: "Wait ten minutes before you look", medium: "Mute them for today", bigger: "Take the app off your home screen for the week", order: 11, parents: ["jealousy", "sadness"]},
-  {id: "pull-away", label: "Pull away from them", small: "Send one ordinary message back", medium: "Keep one plan with them", bigger: "Tell them a little of what has been going on", order: 12, parents: ["shame", "sadness"]},
-  {id: "fire-back", label: "Fire back", small: "Wait ten breaths before you answer", medium: "Write it out, then send only the calm part", bigger: "Say what you need without the dig", order: 13, parents: ["anger"]},
-  {id: "go-quiet", label: "Go quiet on them", small: "Send one line: I need a minute, I'll come back to this", medium: "Come back to it later today, as you said", bigger: "Say plainly what upset you", order: 14, parents: ["anger", "shame"]}
+  {id: "text-again", label: "Text them again", small: "Write it in your notes, not to them", medium: "Put the phone in another room for an hour, then decide", bigger: "Leave it unsent today and do something that needs your hands", order: 10, parents: ["love"]},
+  {id: "check-profile", label: "Check their profile", small: "Wait ten minutes before you look", medium: "Mute them for today", bigger: "Take the app off your home screen for the week", order: 11, parents: ["jealousy", "love"]},
+  {id: "pull-away", label: "Pull away from them", small: "Send one ordinary message back", medium: "Keep one plan with them", bigger: "If they are safe to tell, tell them a little of what has been going on", order: 12, parents: ["shame", "sadness"]},
+  {id: "fire-back", label: "Fire back", small: "Wait ten breaths before you answer", medium: "Step away until you can answer gently", bigger: "Say one fair or kind thing about their side first", order: 13, parents: ["anger"]},
+  {id: "go-quiet", label: "Go quiet on them", small: "Send one line: I need a minute, I'll come back to this", medium: "Come back to it later today, as you said", bigger: "Say plainly what upset you", order: 14, parents: ["shame", "sadness"]}
 ] AS urge
 MERGE (u:ActionUrge {id: urge.id})
 SET u.label = urge.label, u.small = urge.small, u.medium = urge.medium, u.bigger = urge.bigger, u.order = urge.order, u.interpersonal = true

@@ -43,7 +43,7 @@ const tint = (d: Door) => ({ ["--tint" as string]: d.tint }) as CSSProperties;
 const nameOf = (id: string) => getEmotionById(id)?.name ?? id;
 
 const primary =
-  "w-full min-h-[60px] rounded-[18px] text-[17px] font-bold bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] border-none cursor-pointer disabled:cursor-wait disabled:opacity-60 lift-primary";
+  "w-full min-h-[60px] rounded-[18px] text-[17px] font-bold bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] border-none cursor-pointer disabled:cursor-default disabled:opacity-60 lift-primary";
 const quietLink =
   "min-h-11 px-2 text-[15px] font-semibold text-[var(--color-accent)] bg-transparent border-none cursor-pointer";
 
@@ -98,6 +98,8 @@ export function OppositeActionStart({
   const [ranked, setRanked] = useState<string[]>([]);
   const [overflow, setOverflow] = useState<string[]>([]);
   const heading = useRef<HTMLHeadingElement>(null);
+  /** The body and suggestion views render another screen's heading: focus lands on its first heading. */
+  const borrowed = useRef<HTMLDivElement>(null);
   const shownView = useRef(view);
 
   // Move focus to the new question when the view changes, not on first load (a focus ring around
@@ -105,7 +107,9 @@ export function OppositeActionStart({
   useEffect(() => {
     if (shownView.current === view) return;
     shownView.current = view;
-    heading.current?.focus();
+    if (heading.current) { heading.current.focus(); return; }
+    const h = borrowed.current?.querySelector<HTMLElement>('h1, h2');
+    if (h) { if (!h.hasAttribute('tabindex')) h.setAttribute('tabindex', '-1'); h.focus(); }
   }, [view]);
 
   const go = (next: View) => setView(next);
@@ -235,7 +239,7 @@ export function OppositeActionStart({
 
   if (view === "body") {
     return (
-      <div className="flex flex-col">
+      <div className="flex flex-col" ref={borrowed}>
         <BackLink onClick={() => go("doors")}>Back to the feelings</BackLink>
         <BodyStep marks={marks} onChange={setMarks} onComplete={() => go("suggest")} onSkip={() => go("doors")} isSomaticEntry />
       </div>
@@ -244,7 +248,7 @@ export function OppositeActionStart({
 
   if (view === "suggest") {
     return (
-      <div className="flex flex-col">
+      <div className="flex flex-col" ref={borrowed}>
         <BackLink onClick={() => go("body")}>Back to my body</BackLink>
         <EmotionSuggestion
           bodySensations={marks}
@@ -387,7 +391,7 @@ export function OppositeActionStart({
     picks.length === 0
       ? "Pick up to three. Mixed feelings are normal."
       : full
-        ? "That’s three. Tap one to swap it out."
+        ? "That’s three. Tap a picked one to swap it out."
         : picks.length === 1
           ? "Anything else in there? Up to three."
           : "You’ll choose the loudest next.";

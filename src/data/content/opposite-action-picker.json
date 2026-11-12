@@ -29,10 +29,6 @@
           {
             "id": "fire-back",
             "label": "Fire back"
-          },
-          {
-            "id": "go-quiet",
-            "label": "Go quiet on them"
           }
         ],
         "wordIds": [
@@ -150,7 +146,7 @@
       {
         "id": "guilt",
         "label": "Guilt",
-        "acknowledgment": "Guilt is urging you to make amends or punish yourself. When you didn't actually violate your values, the self-punishment is just suffering without purpose.",
+        "acknowledgment": "Guilt is urging you to make amends or punish yourself. When you didn't actually violate your values, the self-punishment is suffering without purpose.",
         "urges": [
           {
             "id": "guilt-apologize",
@@ -199,7 +195,7 @@
       {
         "id": "love",
         "label": "Love",
-        "acknowledgment": "Love is pulling you toward connection — but when someone is unavailable, harmful, or gone, each contact resets the clock. Distance is how this attachment fades.",
+        "acknowledgment": "Love is pulling you toward connection. When someone is unavailable, harmful, or gone, each contact resets the clock. Distance is how this attachment fades.",
         "urges": [
           {
             "id": "love-reach-out",
@@ -220,6 +216,10 @@
           {
             "id": "text-again",
             "label": "Text them again"
+          },
+          {
+            "id": "check-profile",
+            "label": "Check their profile"
           }
         ],
         "wordIds": [
@@ -250,16 +250,12 @@
             "label": "Scroll mindlessly or zone out"
           },
           {
-            "id": "text-again",
-            "label": "Text them again"
-          },
-          {
-            "id": "check-profile",
-            "label": "Check their profile"
-          },
-          {
             "id": "pull-away",
             "label": "Pull away from them"
+          },
+          {
+            "id": "go-quiet",
+            "label": "Go quiet on them"
           }
         ],
         "wordIds": [
