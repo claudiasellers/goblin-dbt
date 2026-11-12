@@ -172,6 +172,20 @@ FOLLOW_UP_TYPES = [
         "notification": "A plan you made is ready.",
     },
     {
+        # Running low on the skill runtime (ER-07, ER-B4, docs/design/running-low.md): the PRD's evening check. The
+        # *Want me to ask tonight?* chip (on *Later today*) schedules it; its card reopens that visit's run at *Did
+        # the fix happen?* (`back`, a `reopens` step, R9). Opening it is the resolution, as for oa_try. It's about
+        # today only, so it goes stale overnight and has no missed path.
+        "id": "please_fix", "ownerModule": "er", "tier": "quality", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/please-skill?run={sourceSessionId}&at=back&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"evening": {"kind": "at_local", "days": 0, "time": "20:00"}}},
+        "staleAfterHours": 16, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "The one thing for today", "body": "The fix you picked in Running low. Did it happen?"},
+        "choices": [{"id": "dismiss", "label": "Not today", "status": "dismissed"}],
+        "notification": "Your check from Running low is ready.",
+    },
+    {
         # Cope Ahead (docs/design/cope-ahead.md, "Today, afterwards"): on the keep screen's "Want me to ask how
         # it went?" Yes, for the time from screen 1 (the chip is ext.ca.when). Scheduled only on the caller's
         # own cope-ahead ToolSession. Its Today card is the tool's own (cope-ahead.json's after_* lines, the

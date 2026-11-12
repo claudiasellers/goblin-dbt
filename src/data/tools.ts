@@ -232,6 +232,18 @@ export const tools: Tool[] = [
     emoji: '🌙',
     bare: true,
   },
+  {
+    // ER-07 on the skill runtime (docs/design/running-low.md): PLEASE, for a day when everything is too loud.
+    id: 'please-skill',
+    name: 'Running Low',
+    tagline: 'Check what your body is running on today',
+    description: 'Sleep, food, your body, last night and moving, one tap each. See which one is turning the volume up, and pick one small thing for it today.',
+    whenToUse: 'When everything feels like too much today and you don\'t know why.',
+    module: 'emotion-regulation',
+    dbtBasis: 'DBT ER Handout 20 (PLEASE)',
+    emoji: '🔋',
+    bare: true,
+  },
   // Interpersonal Effectiveness
   {
     id: 'dear-man',
@@ -383,6 +395,7 @@ export const allIntents: Intent[] = [
   { id: 'give', label: 'Repair things after a fight, or keep it warm', toolId: 'give', emoji: '🤝' },
   { id: 'overreacting', label: 'I can\'t tell if I\'m overreacting', toolId: 'check-the-facts', emoji: '🔍' },
   { id: 'not-working', label: 'My skills aren\'t working', toolId: 'er-troubleshoot', emoji: '🧩' },
+  { id: 'running-low', label: 'Everything feels like too much today', toolId: 'please-skill', emoji: '🔋' },
   { id: 'nightmares', label: 'The same nightmare keeps coming back', toolId: 'nightmare-rescript', emoji: '🌙' },
 ];
 

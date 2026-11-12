@@ -84,6 +84,7 @@ SIGNED_OFF = {
     "rf_rumination_loop_flooded_cool-down": "2026-10-05",
     "rf_rumination_loop_flooded_five-senses": "2026-10-05",
     "rf_reward_drive_low_default_opposite-action": "2026-10-05",
+    "rf_reward_drive_low_default_please-skill": "2026-11-12",
     "rf_reward_drive_low_flooded_five-senses": "2026-10-05",
     "rf_conservation_freeze_default_five-senses": "2026-10-05",
     "rf_conservation_freeze_default_opposite-action": "2026-10-05",
@@ -215,11 +216,14 @@ CONCEPT_TAGS["thoughts-passing"] = {"concept": "dbt_mindfulness_current_thoughts
 # they brought, a repair, a break and return, an ask). Its ways in are the Tools list and intent, the debrief's *shaky*
 # between you, Ending's *try to change it first* and Problem Solve's links.
 CONCEPT_TAGS["give"] = {"concept": "dbt_give", "side": "change", "skillKind": "relational", "direction": "neutral"}
+# Running low (ER-07, appToolId 'please-skill': routing's planned `running-low` renamed, docs/design/running-low.md) has
+# shipped on the skill runtime: out of PLANNED; it leads Low drive's default cell, Do the Opposite as its swap, live
+# (connected by default, 12 Nov 2026). Body-kind and neutral: it refills, never calms, so blank patterns keep it.
+CONCEPT_TAGS["please-skill"] = {"concept": "dbt_please", "side": "both", "skillKind": "body", "direction": "neutral"}
 BUILT_NOT_SIGNED_OFF = {
 }
 # Ride it out (urge-surfing), Let it be and Give your mind a job are live (Claudia, 12 Nov 2026: default to connected).
 PLANNED = {
-    "running-low":        {"concept": "dbt_please",             "side": "both",       "skillKind": "body",       "direction": "neutral"},
 }
 CONCEPT_TAGS.update(PLANNED)
 INACTIVE_TOOLS.update({t: "not built yet (planned, Oct 2026 review)" for t in PLANNED})
@@ -272,7 +276,7 @@ TABLE = {
         "flooded": ("cool-down", "five-senses", "Flooded: bottom-up only."),
     },
     "reward_drive_low": {
-        "default": ("opposite-action", None, "Do the Opposite as 'get active' (behavioural activation) until Running low (PLEASE) ships; never calming, and no 5-4-3-2-1 for vegetative states (review, Oct 2026). The guided Micro win shows above."),
+        "default": ("please-skill", "opposite-action", "Running low (PLEASE: the body's vulnerability) leads, Do the Opposite as 'get active' (behavioural activation) after it; never calming, and no 5-4-3-2-1 for vegetative states (review, Oct 2026). The guided Micro win shows above."),
         "flooded": ("five-senses", None, "Flooded + blank: orient only (no Cool Down, D-02)."),
     },
     "conservation_freeze": {
@@ -402,8 +406,6 @@ WORD_RULES = [
 
 # Planned pattern-level rows (no word gate): the review's intended first pick for the pattern.
 PLANNED_ROWS = [
-    {"pattern": "reward_drive_low", "tool": "running-low", "priority": 0.9,
-     "why": "Planned: Running low (PLEASE: address the body's vulnerability) leads Low drive, Do the Opposite after it."},
 ]
 
 

@@ -41,6 +41,9 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   // Rewrite the nightmare (ER-15, docs/design/nightmare-rescript.md): no close question ("how strong is it now?"
   // means nothing after rewriting a dream); its practice is the read-through reminders.
   'nightmare-rescript': { module: 'er', closeKind: 'none' },
+  // Running low (ER-07, docs/design/running-low.md): a body check and one fix for today. No close question (the
+  // fix happens later, if at all); its outcome is the evening card's *Did it happen?* (`please_fix`).
+  'please-skill': { module: 'er', closeKind: 'none' },
   // These ask their own questions inside their flows; the spine adds none (PR-S4 wraps them).
   'opposite-action': { module: 'er', closeKind: 'regulation_down' },
   'dear-man': { module: 'ie', closeKind: 'none' },

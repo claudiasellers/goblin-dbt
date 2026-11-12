@@ -265,7 +265,7 @@ START_SMALL = {r["id"]: "yes" for rows in PS["subs"].values() for r in rows if r
 
 # --- Exits: every tool the content names. Unbuilt ones are planned: written, never offered or linked. ---
 BUILT = {"cool-down", "five-senses", "pause", "cope-ahead", "dear-man", "fast", "opposite-action", "check-the-facts",
-         "find-the-feeling", "ending-relationships", "let-it-be", "give"}
+         "find-the-feeling", "ending-relationships", "let-it-be", "please-skill", "give"}
 
 
 def exit_id(tool):
@@ -571,7 +571,7 @@ STEPS = [
     },
     {
         "id": "rest", "kind": "handoff", "complete": True, "lines": [{"when": None, "key": "rest_line"}],
-        # Running low wants refilling, not calming down: Look after the basics (planned), and outward attention.
+        # Running low wants refilling, not calming down: Look after the basics (Running low), and outward attention.
         "offers": [{"exit": "please_skill", "when": None}, {"exit": "five_senses", "when": None}],
         "done": "done",
     },

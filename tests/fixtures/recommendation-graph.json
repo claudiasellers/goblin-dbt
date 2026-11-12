@@ -508,6 +508,17 @@
     "sadness"
    ]
   },
+  "dbt_please": {
+   "appToolId": "please-skill",
+   "name": "PLEASE Skills",
+   "description": "Physical self-care: treat illness, balanced eating, avoid drugs, balanced sleep, exercise",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": "both",
+   "skillKind": "body",
+   "direction": "neutral",
+   "addresses": []
+  },
   "dbt_problem_solving": {
    "appToolId": "problem-solve",
    "name": "Problem Solving",
@@ -3501,6 +3512,30 @@
     "steady",
     "stirred"
    ],
+   "priority": 2.0,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": null,
+   "words": [],
+   "beside": [],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "approved",
+   "rationale": "Running low (PLEASE: the body's vulnerability) leads, Do the Opposite as 'get active' (behavioural activation) after it; never calming, and no 5-4-3-2-1 for vegetative states (review, Oct 2026). The guided Micro win shows above."
+  },
+  {
+   "id": "rf_reward_drive_low_default_please-skill",
+   "conceptId": "dbt_please",
+   "patternId": "reward_drive_low",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
    "priority": 1.0,
    "direction": "neutral",
    "side": null,
@@ -3515,7 +3550,7 @@
    "active": true,
    "version": "rf-v2",
    "reviewStatus": "approved",
-   "rationale": "Do the Opposite as 'get active' (behavioural activation) until Running low (PLEASE) ships; never calming, and no 5-4-3-2-1 for vegetative states (review, Oct 2026). The guided Micro win shows above."
+   "rationale": "Running low (PLEASE: the body's vulnerability) leads, Do the Opposite as 'get active' (behavioural activation) after it; never calming, and no 5-4-3-2-1 for vegetative states (review, Oct 2026). The guided Micro win shows above."
   },
   {
    "id": "rf_reward_drive_low_flooded_five-senses",
@@ -3539,30 +3574,6 @@
    "version": "rf-v2",
    "reviewStatus": "approved",
    "rationale": "Flooded + blank: orient only (no Cool Down, D-02)."
-  },
-  {
-   "id": "rf_reward_drive_low_planned_running-low",
-   "conceptId": "dbt_please",
-   "patternId": "reward_drive_low",
-   "bands": [
-    "steady",
-    "stirred"
-   ],
-   "priority": 0.9,
-   "direction": "neutral",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": null,
-   "words": [],
-   "beside": [],
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": false,
-   "version": "rf-v2",
-   "reviewStatus": "draft",
-   "rationale": "Planned: Running low (PLEASE: address the body's vulnerability) leads Low drive, Do the Opposite after it."
   },
   {
    "id": "rf_reward_drive_low_words_fragile_let-it-be",

@@ -164,7 +164,7 @@ def steps():
 
 
 EXITS = [
-    {"id": "please", "toolId": "please-skill", "planned": True},             # ER-07 Running low (ER-B4)
+    {"id": "please", "toolId": "please-skill"},                              # ER-07 Running low
     {"id": "problem_solve", "toolId": "problem-solve"},
     {"id": "check_the_facts", "toolId": "check-the-facts"},
     {"id": "let_it_be", "toolId": "let-it-be"},             # DT-04 willingness (DT-B4)

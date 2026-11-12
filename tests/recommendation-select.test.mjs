@@ -99,10 +99,10 @@ test("#7 dissociation (any band): 5-4-3-2-1 only, never OA, no flag", async () =
   }
 });
 
-test("#8 Low drive: Do the Opposite ('get active'), never 5-4-3-2-1 for vegetative states, never Cool Down or Pause", async () => {
+test("#8 Low drive: Running low (PLEASE) + Do the Opposite ('get active'), never 5-4-3-2-1 for vegetative states, never Cool Down or Pause", async () => {
   const r = await run(lu({ emotions: ["Bored"], discriminatingAnswers: ans("lu_body_flat") }));
   assert.equal(r.pattern.id, "reward_drive_low");
-  assert.deepEqual(ids(r), ["opposite-action"]);
+  assert.deepEqual(ids(r), ["please-skill", "opposite-action"]);
   assert.equal(r.guidedActivity.activityId, "micro-win");
 });
 
