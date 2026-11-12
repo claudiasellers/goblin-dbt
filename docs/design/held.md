@@ -50,11 +50,12 @@ at close like every `ext` text field. Nothing is kept to the profile in part 1.
 
 ## Routing
 
-No `RECOMMENDED_FOR` rows: the PRD names no check-in entry (its entry points are the hosts above, DT-01's swap, the
-kit and the Tools intent), so there's nowhere it puts a row. Whether it should have one is Claudia's call. The likely
-candidates (the low-energy shame and loneliness words) sit on blank patterns, so a row needs the concept's
-`direction` / `side` / `skillKind` tags first, so the blank "nothing down" filter and C6.3 still hold (Held is mostly
-calming; its waking-up path is the exception).
+One word row, live with the module (connected by default, 12 Nov 2026): *ashamed* or *embarrassed* on replay
+(`rumination_loop`) gets Held beside Recover (`beside: ['recovering-from-invalidation']`), ahead of Do the Opposite's
+unhiding, which asks more than a low-energy moment has. The concept's tags are `side: acceptance`, `skillKind: body`,
+`direction: down`: it calms, so the blank-pattern ban keeps it off every blank result (a blank primary, or a blank
+pattern alongside), and it never shows when flooded (no flooded row). Loneliness (*lonely*, *isolated*) sits on Low
+drive, a blank pattern, so it gets no Held row. `tests/recommendation-select.test.mjs` pins all of it.
 
 ## Deferred (DT-07 part 2)
 

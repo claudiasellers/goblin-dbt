@@ -47,6 +47,7 @@ SIGNED_OFF = {
     "rf_acute_alarm_words_stress_mind-job": "2026-11-12",
     "rf_acute_alarm_words_annoyed_mind-job": "2026-11-12",
     "rf_rumination_loop_words_aversion_mind-job": "2026-11-12",
+    "rf_rumination_loop_words_low-shame_soothe": "2026-11-12",
     # Claudia, 12 Nov 2026: default to connected, so built tools' rows go live (Cope Ahead, Check the Facts).
     "rf_acute_alarm_words_annoyed_check-the-facts": "2026-11-12",
     "rf_chronic_vigilance_words_anticipatory_cope-ahead": "2026-11-12",
@@ -193,6 +194,10 @@ CONCEPT_TAGS["say-no"] = {"concept": "dbt_saying_no", "side": "change", "skillKi
 # shipped on the skill runtime: out of PLANNED; its three rows are live (12 Nov 2026).
 CONCEPT_TAGS["mind-job"] = {"concept": "dbt_accepts", "side": "acceptance", "skillKind": "redirect", "direction": "neutral"}
 CONCEPT_TAGS["let-it-be"] = {"concept": "dbt_radical_acceptance", "side": "acceptance", "skillKind": "hold", "direction": "neutral"}
+# Held (DT-07, appToolId 'soothe', docs/design/held.md): self-soothe calms (direction `down`, so the blank-pattern ban
+# keeps it off every blank result, primary or alongside), by the body and senses (`body`). One word row, live with the
+# module (connected by default, 12 Nov 2026): cold shame on replay, beside Recover.
+CONCEPT_TAGS["soothe"] = {"concept": "dbt_self_soothe", "side": "acceptance", "skillKind": "body", "direction": "down"}
 BUILT_NOT_SIGNED_OFF = {
 }
 # Ride it out (urge-surfing), Let it be and Give your mind a job are live (Claudia, 12 Nov 2026: default to connected).
@@ -366,6 +371,8 @@ WORD_RULES = [
      "why": "Planned: Check the Facts leads for guilt (is it justified?) and hesitation."},
     {"key": "low-shame", "pattern": "rumination_loop", "tool": "recovering-from-invalidation", "priority": WORD_LEAD, "words": ["embarrassed", "ashamed", "victimized"],
      "why": "Low-energy shame: Recover (self-validation) first. The review's Cool Down isn't used on this side: the person marked low energy and Cool Down brings it down further."},
+    {"key": "low-shame", "pattern": "rumination_loop", "tool": "soothe", "priority": 0.55, "words": ["embarrassed", "ashamed"], "beside": ["recovering-from-invalidation"],
+     "why": "Held (self-soothe, hand on heart) beside Recover for cold shame: kindness first, which shame makes hardest to take in; Do the Opposite (unhiding) asks more than a low-energy moment has. Never on a blank result (direction down)."},
     {"key": "low-shame", "pattern": "rumination_loop", "tool": "opposite-action", "priority": WORD_NEXT, "words": ["embarrassed", "ashamed"],
      "why": "Do the Opposite (unhiding) as the alternative for shame."},
     # --- Low drive ---

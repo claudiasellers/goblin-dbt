@@ -544,9 +544,9 @@
    "description": "Comforting yourself through the five senses and kind touch, so a hard moment is met with care",
    "whenToUse": null,
    "dbtBasis": null,
-   "side": null,
-   "skillKind": null,
-   "direction": null,
+   "side": "acceptance",
+   "skillKind": "body",
+   "direction": "down",
    "addresses": []
   },
   "dbt_stop": {
@@ -3914,6 +3914,35 @@
    "version": "rf-v2",
    "reviewStatus": "approved",
    "rationale": "Low-energy shame: Recover (self-validation) first. The review's Cool Down isn't used on this side: the person marked low energy and Cool Down brings it down further."
+  },
+  {
+   "id": "rf_rumination_loop_words_low-shame_soothe",
+   "conceptId": "dbt_self_soothe",
+   "patternId": "rumination_loop",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.55,
+   "direction": "down",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "embarrassed",
+    "ashamed"
+   ],
+   "beside": [
+    "recovering-from-invalidation"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "approved",
+   "rationale": "Held (self-soothe, hand on heart) beside Recover for cold shame: kindness first, which shame makes hardest to take in; Do the Opposite (unhiding) asks more than a low-energy moment has. Never on a blank result (direction down)."
   },
   {
    "id": "rf_social_threat_shame_addresses_recovering-from-invalidation",
