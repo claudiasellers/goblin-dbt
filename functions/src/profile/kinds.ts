@@ -126,6 +126,28 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
       return out;
     },
   },
+  // Good things (ER-04, docs/design/good-things.md): one thing the person likes, kept on *Keep it* (a found thing:
+  // `kind`, the chip, or a few words) or *Add it* (a good thing that left them lighter: `pick`, a catalogue id or a few
+  // words). The runtime's keep (R4: `<field>Ids` / `<field>Own`). Read back by the `thingsILike` slice, named there
+  // (own words, else the option's label from the graph), so the next visit can offer it first.
+  thing_i_like: {
+    kind: 'thing_i_like', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'my_words', slice: 'thingsILike',
+    owner: 'ER', many: true, maxItems: 60, editor: null, ownFields: ['kindOwn', 'pickOwn'],
+    validate: (v) => {
+      const o = obj(v);
+      const out: Record<string, unknown> = {};
+      for (const f of ['kind', 'pick'] as const) {
+        const ids = o[`${f}Ids`];
+        const own = o[`${f}Own`];
+        if (ids !== undefined) out[`${f}Ids`] = strArray(ids, { max: 1, item: (x) => str(x, { max: 40, pattern: OPTION_ID }) });
+        if (own !== undefined) out[`${f}Own`] = str(own, { max: 40 });
+      }
+      for (const k of Object.keys(o)) if (!/^(kind|pick)(Ids|Own)$/.test(k)) throw new ValidationError('Unexpected field');
+      const has = (k: string) => (Array.isArray(out[`${k}Ids`]) && (out[`${k}Ids`] as string[]).length > 0) || (typeof out[`${k}Own`] === 'string' && (out[`${k}Own`] as string).trim() !== '');
+      if (!has('kind') && !has('pick')) throw new ValidationError('Nothing to keep');
+      return out;
+    },
+  },
   crisis_kit: {
     // DT-03 My crisis kit (docs/design/crisis-kit.md): one per person (keeping it again replaces it), option ids and own
     // words per section; the kit plays it one card at a time through the `crisisKit` slice.

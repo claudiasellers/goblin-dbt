@@ -356,6 +356,17 @@
    "direction": "neutral",
    "addresses": []
   },
+  "dbt_accumulate_positives": {
+   "appToolId": "good-things",
+   "name": "Accumulate Positive Experiences",
+   "description": "Build a life worth living through pleasant activities and long-term goals",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": "change",
+   "skillKind": "redirect",
+   "direction": "up",
+   "addresses": []
+  },
   "dbt_alternate_rebellion": {
    "appToolId": "alternate-rebellion",
    "name": "Alternate Rebellion",
@@ -3585,6 +3596,34 @@
    "version": "rf-v2",
    "reviewStatus": "approved",
    "rationale": "Flooded + blank: orient only (no Cool Down, D-02)."
+  },
+  {
+   "id": "rf_reward_drive_low_words_flat_good-things",
+   "conceptId": "dbt_accumulate_positives",
+   "patternId": "reward_drive_low",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 1.5,
+   "direction": "up",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "bored",
+    "apathetic",
+    "indifferent"
+   ],
+   "beside": [],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "approved",
+   "rationale": "Nothing sounds good (ER PRD ER-04): one small good thing, picked for the energy there is, as the second card after Running low; Do the Opposite stays for the rest of Low drive (12 Nov 2026, default to connected)."
   },
   {
    "id": "rf_reward_drive_low_words_fragile_let-it-be",

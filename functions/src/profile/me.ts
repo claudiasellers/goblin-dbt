@@ -7,7 +7,7 @@ import { callable } from '../shared/callable';
 import { readTx } from '../shared/neo4j';
 import { int } from '../shared/values';
 import { metaFrom } from './meta';
-import { readProfileSlices, readProfileVersion } from './slices';
+import { readProfileSlices, readProfileVersion, THING_LABELS, THING_OPTION } from './slices';
 import type { ProfileAreaId, ProfileItemMeta } from './types';
 import { statsByPart } from '../parts/stats';
 import { readStatsRows } from '../parts/statsQueries';
@@ -180,6 +180,7 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
   const byArea = new Map<string, MeItem[]>();
   let staleCount = 0;
   let decrypt: ((v: unknown) => string | null) | null = null;
+  const unnamedThings: Array<{ ids: string[]; item: MeItem }> = [];
   for (const r of itemsRes.records) {
     if (r.get('label') === 'Part' && !partsOn) continue;   // the query gates it too
     const p = r.get('p') as Record<string, unknown>;
@@ -187,6 +188,7 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
     if (meta.prompt === 'ask') staleCount++;
     let value: Record<string, unknown> | undefined;
     let summary = '';
+    let thingIds: string[] | null = null;
     if (p.valueJson) {
       try { value = JSON.parse(String(p.valueJson)); } catch { value = undefined; }
     }
@@ -206,6 +208,16 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
     }
     // A habit plan: the behaviour in their words when they wrote it (picked behaviours are ids; the title says enough).
     if (meta.kind === 'abstinence_plan' && value && typeof value.whatOwn === 'string' && value.whatOwn.trim()) summary = value.whatOwn;
+    // A thing I like (ER-04): what they called it; a picked one is named from the graph after the loop.
+    if (meta.kind === 'thing_i_like' && value) {
+      const own = [value.kindOwn, value.pickOwn].find((x) => typeof x === 'string' && x.trim());
+      if (typeof own === 'string') summary = own;
+      else {
+        const ids = (['pick', 'kind'] as const).flatMap((f) => (Array.isArray(value![`${f}Ids`]) ? (value![`${f}Ids`] as unknown[]) : [])
+          .filter((x): x is string => typeof x === 'string').slice(0, 1).map((id) => THING_OPTION[f] + id));
+        if (ids.length) thingIds = ids;
+      }
+    }
     // A person (IE-03): the name they gave, never the safety answer (Me is not where that's asked or shown).
     if (meta.kind === 'person' && value) {
       summary = typeof value.label === 'string' ? value.label : '';
@@ -227,7 +239,14 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
       ...(p.toolId !== undefined ? { toolId: (p.toolId as string | null) ?? null } : {}),
       ...(part ? { part } : {}),
     };
+    if (thingIds) unnamedThings.push({ ids: thingIds, item });
     (byArea.get(meta.area) ?? byArea.set(meta.area, []).get(meta.area)!).push(item);
+  }
+  if (unnamedThings.length) {
+    const labels = new Map<string, string>();
+    const ids = [...new Set(unnamedThings.flatMap((t) => t.ids))];
+    for (const rec of (await tx.run(THING_LABELS, { ids })).records) labels.set(String(rec.get('id')), String(rec.get('label')));
+    for (const t of unnamedThings) t.item.summary = t.ids.map((id) => labels.get(id)).find((x) => !!x) ?? '';
   }
   const { name } = await readProfileSlices(tx, uid, 'find-the-feeling', now);
   return {

@@ -50,6 +50,7 @@ const SEEDS: Record<string, Record<string, string[]>> = {
   opposite_action: { feel: ['anxious'], urge: ['fear-escape'], fits: ['not_fit'], help: ['unhelpful'], size: ['fear-escape:small'] },
   // Running low: sleep short and food skipped, so the readout drains Sleep and the fix screen lists real fixes.
   please_skill: { sleep: ['sleep_short'], food: ['food_skipped'], fix: ['fix_rest'], when: ['later'], remind: ['evening'] },
+  good_things: { start: ['one'], energy: ['little'], pick: ['outside'], when: ['evening'], remind: ['yes'], kind: ['colour'], keepit: ['keep'], happened: ['yes'], compared: ['lighter'], mind: ['here'] },
 };
 
 /** The first option a field offers: a seed, an emotion id, or its list's first value (tables and profile options: none). */

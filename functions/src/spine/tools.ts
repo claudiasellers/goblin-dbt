@@ -47,6 +47,9 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   // Running low (ER-07, docs/design/running-low.md): a body check and one fix for today. No close question (the
   // fix happens later, if at all); its outcome is the evening card's *Did it happen?* (`please_fix`).
   'please-skill': { module: 'er', closeKind: 'none' },
+  // Good things (ER-04, docs/design/good-things.md): no close question; *lighter · same · heavier* is asked on the
+  // `good_thing` card's visit, after the thing was done (asking right after picking it would mean nothing).
+  'good-things': { module: 'er', closeKind: 'none' },
   // These ask their own questions inside their flows; the spine adds none (PR-S4 wraps them).
   'opposite-action': { module: 'er', closeKind: 'regulation_down' },
   'dear-man': { module: 'ie', closeKind: 'none' },

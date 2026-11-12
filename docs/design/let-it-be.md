@@ -94,7 +94,7 @@ Recover. A flooded entry to Let go, with a frame or without, keeps Let it be as 
 | Willful → "willful" | *Digging in* on the chip | Plainer; "willful" reads as a telling-off |
 | The statement held for 4 s | On paper, read once, copyable | The hold needs the witness hold mechanics (part 2) |
 | From First, the body's fork: DT-04 "now (if steady) or scheduled" | Opened straight away; a still-carried flooded reading gets the heads-up, where *Try it now* goes on (no loop back) | No scheduling yet; nothing locks |
-| One small thing → ER values / positives; body → PLEASE | Body opens Running low (built 12 Nov); values / positives are lines only, planned exits | ER-04 isn't built |
+| One small thing → ER values / positives; body → PLEASE | Body opens Running low and one small thing opens Good things (both built 12 Nov); values is a line only | ER-09 isn't built |
 
 ## Clinician pass (open)
 
