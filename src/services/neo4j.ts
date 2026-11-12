@@ -661,31 +661,8 @@ export async function exportUserData(): Promise<Record<string, unknown>> {
 import type { DearManContentResult, DearManSessionData, DearManDebriefContentResult, DearManReflectionResult } from '../data/dearManTypes';
 export type { DearManContentResult, DearManSessionData, DearManDebriefContentResult, DearManReflectionResult };
 
-const getDearManContentFn = httpsCallable<void, DearManContentResult>(
-  functions, 'getDearManContent', { timeout: CONTENT_TIMEOUT_MS }
-);
-
-/**
- * Get all DEAR MAN content from the graph in one call.
- * Returns situation types, curated options, coaching content, etc.
- */
-export async function getDearManContent(): Promise<DearManContentResult> {
-  const result = await getDearManContentFn();
-  return result.data;
-}
-
-const saveDearManSessionFn = httpsCallable<
-  DearManSessionData,
-  { success: boolean; id?: string | null }
->(functions, 'saveDearManSession');
-
-/** Resolves to the saved session's id (PR-S4; null from an older server). */
-export async function saveDearManSession(
-  data: DearManSessionData
-): Promise<string | null> {
-  const result = await saveDearManSessionFn(data);
-  return result.data.id ?? null;
-}
+// getDearManContent / saveDearManSession stay deployed for the old page's open tabs; nothing in the app calls them
+// since the hand-built prep was deleted (IE-B4).
 
 const getDearManDebriefContentFn = httpsCallable<void, DearManDebriefContentResult>(
   functions, 'getDearManDebriefContent', { timeout: CONTENT_TIMEOUT_MS }

@@ -77,8 +77,9 @@ ships (`pickerCopy`); an older graph keeps the old role chips.
 
 ## Resume and errors
 
-- A resumed DEAR MAN draft carries the picked person (never one on the safety route). A draft with no person (from
-  before the picker) resumes at the picker, so the question comes before any plan step.
+- The answers given in a visit are folded into the kept list for the rest of it (`withAnswer`, in
+  `PersonFirstSkill`): picking someone again after *Things changed* offers the new answer, never the old one. (The
+  hand-built DEAR MAN prep's resume draft went with that page, IE-B4.)
 - If the `people` slice fails to load, the picker opens on *Someone new* and keeps nothing this visit (no
   duplicates); the safety question is still asked.
 

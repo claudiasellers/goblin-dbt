@@ -40,7 +40,7 @@
  *                          label, acknowledgment and urges, for every word (Do the Opposite's doors)
  * Each builder mirrors the Cypher in the Cloud Function it replaces (named on the function).
  */
-import { readFileSync, writeFileSync, readdirSync, mkdirSync, statSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, mkdirSync, statSync, existsSync } from 'node:fs';
 import { resolve, dirname, basename, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { importTs } from '../../tests/lib/importTs.mjs';
@@ -685,8 +685,21 @@ export function writeSnapshots(snapshots, source, { outDir = OUT_DIR, log = cons
     log.warn(`! src/data/content/${name}: no content for it in this graph yet; kept the committed file`);
   }
   for (const [name, content] of Object.entries(snapshots)) {
+    const path = join(outDir, name);
+    const body = JSON.stringify(content, null, 2);
+    // Same content as the committed file: leave it alone, `source` (export time) and all, so a load that
+    // changed nothing makes no commit (each one used to push a timestamp-only "Content snapshots" commit
+    // to main, which every open branch then had to merge, and which raced the next merge's deploy).
+    if (existsSync(path)) {
+      try {
+        if (JSON.stringify(JSON.parse(readFileSync(path, 'utf8')).content, null, 2) === body) {
+          log.log(`= src/data/content/${name.padEnd(22)} unchanged`);
+          continue;
+        }
+      } catch { /* unreadable: rewrite it */ }
+    }
     const text = `${JSON.stringify({ source, content }, null, 2)}\n`;
-    writeFileSync(join(outDir, name), text);
+    writeFileSync(path, text);
     log.log(`✓ src/data/content/${name.padEnd(22)} ${(text.length / 1024).toFixed(1)} KB`);
   }
   log.log(`  from ${source.file} (exported ${source.exportedAt})`);

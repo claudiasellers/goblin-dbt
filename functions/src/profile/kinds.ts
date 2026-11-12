@@ -171,6 +171,27 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
       return out;
     },
   },
+  // Build mastery (ER-11, docs/design/build-mastery.md): one step the person did (done or partly), kept on the done
+  // card's *Yes, add it* to their I can list. The runtime's keep (R4: `rungIds`, the ladder's option id, or `rungOwn`).
+  // Me names it (own words, else the option's label from the graph); the `iCanRungs` slice keeps a ladder step from
+  // being kept twice.
+  i_can: {
+    kind: 'i_can', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'about_me', slice: 'iCanRungs',
+    owner: 'ER', many: true, maxItems: 100, editor: null, ownFields: ['areaOwn', 'rungOwn'],
+    validate: (v) => {
+      const o = obj(v);
+      const out: Record<string, unknown> = {};
+      // The area comes along (an id, or the person's words), so a general step still says what it was for.
+      for (const f of ['area', 'rung'] as const) {
+        if (o[`${f}Ids`] !== undefined) out[`${f}Ids`] = strArray(o[`${f}Ids`], { max: 1, item: (x) => str(x, { max: 40, pattern: OPTION_ID }) });
+        if (o[`${f}Own`] !== undefined) out[`${f}Own`] = str(o[`${f}Own`], { max: 60 });
+      }
+      for (const k of Object.keys(o)) if (!/^(area|rung)(Ids|Own)$/.test(k)) throw new ValidationError('Unexpected field');
+      const has = ((out.rungIds as string[] | undefined)?.length ?? 0) > 0 || (typeof out.rungOwn === 'string' && out.rungOwn.trim() !== '');
+      if (!has) throw new ValidationError('Nothing to keep');
+      return out;
+    },
+  },
   crisis_kit: {
     // DT-03 My crisis kit (docs/design/crisis-kit.md): one per person (keeping it again replaces it), option ids and own
     // words per section; the kit plays it one card at a time through the `crisisKit` slice.

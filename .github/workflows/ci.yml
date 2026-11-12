@@ -1,5 +1,7 @@
 # Tier-1 checks on every PR and push to main (D-12). No secrets: nothing here talks to
 # Firebase or Neo4j. Tier 2 (emulators + local Neo4j) runs on Claudia's machine.
+# Runs on the self-hosted runner on Claudia's Mac mini (label `goblin`; setup in docs/ci-runner.md),
+# not GitHub's paid minutes. The Mac's own python3 runs the generator-freshness tests.
 name: CI
 
 on:
@@ -16,20 +18,27 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, goblin]
     timeout-minutes: 30
     steps:
+      # The Mac mini runner had ~18 GB free when it was set up; a build needs a few. Stop with a
+      # plain message rather than failing somewhere in npm ci or the build.
+      - name: Free disk space
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE"
+          free_gb=$(( $(df -Pk "$GITHUB_WORKSPACE" | awk 'NR==2 {print $4}') / 1048576 ))
+          echo "free: ${free_gb} GB"
+          if [ "$free_gb" -lt 5 ]; then
+            echo "::error::Only ${free_gb} GB free on the runner Mac; a job needs at least 5. Clear space (start with ~/actions-runner/goblin-dbt/_work and ~/.npm), then re-run."
+            exit 1
+          fi
+          [ "$free_gb" -ge 10 ] || echo "::warning::Only ${free_gb} GB free on the runner Mac."
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            functions/package-lock.json
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'   # generator-freshness tests shell out to python3
+          node-version: 22 # no `cache:`: the Mac keeps ~/.npm between runs
+      - name: Check the runner
+        run: node scripts/ci/runner-check.mjs
       - name: Install (root)
         run: npm ci
       - name: Install (functions)
@@ -42,3 +51,8 @@ jobs:
         run: npm test
       - name: Lint (no new errors)
         run: node scripts/ci/lint-budget.mjs
+
+      # Give back node_modules, builds, old Node versions and an oversized npm cache (docs/ci-runner.md).
+      - name: Tidy the runner
+        if: always()
+        run: '[ -f scripts/ci/runner-tidy.sh ] && bash scripts/ci/runner-tidy.sh || true'

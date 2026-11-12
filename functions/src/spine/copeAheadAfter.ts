@@ -45,6 +45,7 @@ export const FOLLOW_UP_SESSION_TOOL: Readonly<Record<string, string>> = {
   please_fix: 'please-skill',
   good_thing: 'good-things',
   value_step: 'values-clarification',
+  mastery_step: 'build-mastery',
 };
 
 /** The plan's ids, as the after card needs them. Own words are the visit's (its Today card may show them). */

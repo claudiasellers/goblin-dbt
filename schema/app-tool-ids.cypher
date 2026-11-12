@@ -39,6 +39,7 @@ UNWIND [
   {c: "dbt_please", t: "please-skill"},
   {c: "dbt_accumulate_positives", t: "good-things"},
   {c: "dbt_values_priorities", t: "values-clarification"},
+  {c: "dbt_build_mastery", t: "build-mastery"},
   {c: "dbt_crisis_survival_kit", t: "crisis-kit"}
 ] AS row
 MATCH (c:TherapyConcept {id: row.c})

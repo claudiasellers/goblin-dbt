@@ -82,12 +82,16 @@ test("an answer given this visit replaces the mounted list's: no stale safe answ
   assert.equal(after.risk, "harm");
   assert.equal(after.safeAskedAt, iso);
   assert.equal(people.pickedKept(after).route, "safety", "picked again: the safety route, not the old yes");
-  // A fresh answer picked unchanged keeps its date; a newly kept person goes first; nothing kept, nothing changes.
   assert.equal(people.withAnswer([k], people.pickedKept(k), iso)[0].safeAskedAt, k.safeAskedAt);
   const fresh = people.withAnswer([k], { personId: "new-id", label: "Jo", role: "boss", safe: "yes", risk: "none", route: "ok" }, iso);
   assert.deepEqual(fresh.map((x) => x.id), ["new-id", k.id]);
   assert.deepEqual(people.withAnswer([k], { ...harm, personId: null }, iso), [k]);
-  assert.match(read("src/pages/tools/DearMan.tsx"), /people=\{answeredPeople \?\? copeProfile\.slices\?\.people \?\? null\}/);
+  // Every skill that asks who first (the prep, the debrief, One message, Say no, Give) keeps the visit's answers:
+  // *This is about someone else* after the safety route offers the new answer, never the old fresh yes.
+  const first = read("src/components/people/PersonFirstSkill.tsx");
+  assert.match(first, /const people = answered \?\? profile\.slices\?\.people \?\? null;/);
+  assert.match(first, /onDone=\{\(p\) => \{ setAnswered\(withAnswer\(people, p, new Date\(\)\.toISOString\(\)\)\); setPicked\(p\); \}\}/);
+  assert.match(first, /presetPerson\(people, q\.get\('person'\), openedAt\)/);
 });
 
 test("what gets kept: only someone named, only signed in; the screen's keep line names them first", () => {
@@ -158,11 +162,11 @@ test("saveDearManSession refuses a prep for someone on the safety route, and lin
 });
 
 test("DEAR MAN's prep opens with the picker; the safety route has the other-person resources and Ending, no plan", () => {
-  const dm = read("src/pages/tools/DearMan.tsx");
-  assert.match(dm, /<PersonPicker key=\{pickerKey\}/);
-  assert.match(dm, /if \(p\.route === 'safety'\) setPhase\('person-safety'\)/);
-  assert.match(dm, /<PersonSafetyRoute copy=\{routeCopy\}/);
-  assert.match(dm, /personId: person\?\.personId \?\? null/);
+  // The prep is the skill behind PersonFirstSkill (IE-B4): the picker first, the safety route never reaches the skill.
+  assert.match(read("src/components/tools/dearMan/DearManPrepSkill.tsx"), /<PersonFirstSkill skillId="dear_man_prep" toolId="dear-man"/);
+  const first = read("src/components/people/PersonFirstSkill.tsx");
+  assert.match(first, /<PersonPicker key=\{pickerKey\}/);
+  assert.match(first, /if \(who\.route === 'safety'\) \{\s*return \(\s*<PersonSafetyRoute copy=\{safetyCopy\}/);
   const route = read("src/components/people/PersonSafetyRoute.tsx");
   assert.match(route, /<CrisisBanner variant="other_person" \/>/);
   assert.match(route, /<QuickExit \/>/, "the other person may be close by");
@@ -172,18 +176,14 @@ test("DEAR MAN's prep opens with the picker; the safety route has the other-pers
 
 test("D4 copy ships in DearManSafetyCopy, in the voice (no exclamation, should, just or but)", () => {
   const cypher = read("schema/dear-man-safety-gates.cypher");
-  const copy = people.PERSON_PICKER_COPY.concat(people.PERSON_SAFETY_ROUTE_COPY, ["badlyHeadsUp"]);
+  const copy = people.PERSON_PICKER_COPY.concat(["safetyRouteHeading", "safetyRouteBody", "safetyRouteEnding", "safetyRouteBack", "badlyHeadsUp"]);
   for (const k of copy) assert.match(cypher, new RegExp(`c\\.${k} = `), k);
   const lines = cypher.split("\n").filter((l) => /c\.(person|safe|risk|safetyRoute|badly)\w* = /.test(l));
   assert.ok(lines.length >= copy.length);
   for (const l of lines) assert.doesNotMatch(l.replace(/^[^=]*= /, ""), /!|\bshould\b|\bjust\b|\bbut\b/i, l);
 });
 
-test("fixes: Body Reminder comes from the graph (ConfidenceCue), Done for now goes home", () => {
-  const dm = read("src/pages/tools/DearMan.tsx");
-  assert.doesNotMatch(dm, /Shoulders back, steady voice, feet on the ground/);
-  assert.match(dm, /content\.confidenceCues!\.map/);
-  assert.doesNotMatch(dm, /\/category\/better-relationships/);
+test("fixes: Body Reminder comes from the graph (ConfidenceCue)", () => {
   assert.match(read("schema/dear-man-content.cypher"), /MERGE \(cue:ConfidenceCue \{id: c\.id\}\)[\s\S]*MERGE \(cue\)-\[:IMPLEMENTS\]->\(tc\);/);
   assert.match(read("functions/src/dearMan/index.ts"), /MATCH \(c:ConfidenceCue\)-\[:IMPLEMENTS\]->\(:TherapyConcept \{id: 'dbt_dear_man'\}\)/);
 });
@@ -198,18 +198,3 @@ test("Me lists people under My people with Set aside and a two-step Forget them;
   assert.match(read("src/components/me/ForgetPerson.tsx"), /deleteProfileItem\(itemRef\)/);
 });
 
-test("a resumed draft keeps the person, and never a safety-route one", async () => {
-  const { isDearManDraft } = await importTs("src/lib/dearManResume.ts");
-  const base = {
-    v: 1, relationshipType: "parent", situationType: "ask", priorities: [], barriers: [], barriersCustom: "", describeId: null,
-    describeCustom: "", feelings: [], feelingCustom: "", assertIds: [], assertDetails: {}, assertCustom: "", reinforceIds: [],
-    reinforceCustom: "", anchorPhrase: "", middleGroundId: null, middleGroundCustom: "", walkAwayId: null, walkAwayCustom: "",
-  };
-  const p = { personId: null, label: "Sam", role: "parent", safe: "no", risk: "invalidating", route: "heads_up" };
-  assert.equal(isDearManDraft(base), true);
-  assert.equal(isDearManDraft({ ...base, person: p }), true);
-  assert.equal(isDearManDraft({ ...base, person: null }), true);
-  assert.equal(isDearManDraft({ ...base, person: { ...p, risk: "harm", route: "safety" } }), false);
-  // A draft with no person resumes at the picker (scene 0), so the safety question comes before any plan step.
-  assert.match(read("src/pages/tools/DearMan.tsx"), /resumed\?\.token && \(resumed\.token\.draft as DearManDraft\)\.person\s+\? dearManStepFromId\(resumed\.token\.stepId\) : \{ phase: 'scene', sceneStep: 0 \}/);
-});

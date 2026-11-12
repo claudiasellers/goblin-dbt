@@ -9,6 +9,7 @@ import { importTs } from "./lib/importTs.mjs";
 
 const read = (f) => readFileSync(f, "utf8");
 const lib = await importTs("src/lib/dearManDebrief.ts");
+const first = await importTs("src/lib/personFirst.ts");
 const skills = JSON.parse(read("src/data/content/skills.json")).content.skills;
 const dm = skills.find((s) => s.id === "dear_man_debrief");
 const step = (id) => dm.steps.find((s) => s.id === id);
@@ -72,11 +73,11 @@ test("skill: the picker's lines come from DEAR MAN's one source, with the debrie
     assert.ok(dm.copy[`picker_${k}`], k);
     assert.match(sc, new RegExp(`c\\.${k} = `), `${k} is in DearManSafetyCopy`);
   }
-  const copy = lib.debriefPickerCopy(dm.copy);
+  const copy = first.personFirstPickerCopy(dm.copy, "personWhoDebrief");
   assert.equal(copy.personWho, dm.copy.picker_personWhoDebrief, "Who was the conversation with?");
-  assert.equal(lib.debriefSafetyCopy(dm.copy).safetyRouteHeading, dm.copy.picker_safetyRouteDebriefHeading);
-  assert.equal(lib.debriefPickerCopy({}), null);
-  assert.equal(lib.debriefSafetyCopy({ picker_safetyRouteBody: "x" }), null);
+  assert.equal(first.personFirstSafetyCopy(dm.copy, "safetyRouteDebriefHeading").safetyRouteHeading, dm.copy.picker_safetyRouteDebriefHeading);
+  assert.equal(first.personFirstPickerCopy({}, "personWhoDebrief"), null);
+  assert.equal(first.personFirstSafetyCopy({ picker_safetyRouteBody: "x" }, "safetyRouteDebriefHeading"), null);
 });
 
 test("safety inside the run: unsafe with them → the resources and Ending (careful) only; hurt, defeated or can't handle it → Talk to someone now", () => {
@@ -112,31 +113,24 @@ test("page: the context in is the kept person's id (empty clears a link's), and 
   assert.deepEqual(lib.debriefCtx({ personId: "p1" }, "part1"), { personId: "p1", partId: "part1" });
   assert.deepEqual(lib.debriefCtx({ personId: null }, null), { personId: "none" }, "nobody kept: said, so no prep's person stands in");
   assert.deepEqual(lib.debriefCtx({ personId: "p1" }, "a b"), { personId: "p1" });
-  assert.equal(lib.debriefLink(null, null), "/tool/dear-man?mode=debrief");
-  assert.equal(lib.debriefLink("part1", "p1"), "/tool/dear-man?mode=debrief&person=p1&partId=part1");
-  assert.equal(lib.debriefLink("x y", "p/1"), "/tool/dear-man?mode=debrief", "only plain ids ride the link");
 });
 
-test("page: DearMan picks the mode once; the debrief is lazy and the prep keeps no debrief steps or check-in", () => {
+test("page: DearMan picks the mode once; each mode is a lazy skill page, with no check-in or end cards", () => {
   const page = read("src/pages/tools/DearMan.tsx");
   assert.match(page, /const \[mode\] = useState\(\(\) => new URLSearchParams\(search\)\.get\('mode'\)\);/);
   assert.match(page, /if \(mode === 'debrief'\) return <Suspense fallback=\{<ToolLoading \/>\}><LazyDearManDebrief \/><\/Suspense>;/);
   assert.match(page, /if \(mode === 'one'\) return <Suspense fallback=\{<ToolLoading \/>\}><LazyDearManOne \/><\/Suspense>;/, "One message (IE-B3) on ?mode=one");
-  // IE-B4: the prep on the skill player; the hand-built prep only for an old ?resume= draft (and as the rollback).
-  assert.match(page, /if \(PREP_ON_PLAYER && !resumeLink\) return <Suspense fallback=\{<ToolLoading \/>\}><LazyDearManPrepSkill \/><\/Suspense>;\s*return <DearManPrep \/>;/);
   assert.match(page, /const LazyDearManDebrief = lazy\(\(\) => import\('\.\.\/\.\.\/components\/tools\/dearMan\/DearManDebrief'\)/);
-  for (const gone of ["debrief-", "getStateAndTools", "saveCheckIn", "getDearManDebriefContent", "getDearManReflection", "debriefCheckInId", "recommendationCards"]) {
-    assert.ok(!page.includes(gone), `${gone} is gone from the prep page (Claudia, 11 Nov: no end cards, no silent check-in)`);
+  for (const gone of ["getStateAndTools", "saveCheckIn", "getDearManDebriefContent", "getDearManReflection", "recommendationCards"]) {
+    assert.ok(!page.includes(gone), `${gone} is not on the page (Claudia, 11 Nov: no end cards, no silent check-in)`);
   }
-  assert.match(page, /onClick=\{\(\) => navigate\('\/tool\/dear-man\?mode=debrief'\)\}/, "the entry's I just had a conversation");
-  assert.match(page, /navigate\(debriefLink\(partsOn \? copeAheadPartId : null, person\?\.personId \?\? null\)\)/, "the summary's How did it go?");
+  // The prep's way into the debrief is its first screen's link, and its card's ask_outcome (tests/dear-man-prep.test.mjs).
 });
-
 test("page: picker first; the safety route gets the safety screen, never the skill; one visit, one session", () => {
   const page = read("src/components/people/PersonFirstSkill.tsx");
-  assert.match(page, /<PersonPicker key=\{pickerKey\} people=\{profile\.slices\?\.people \?\? null\} copy=\{pickerCopy\}/);
+  assert.match(page, /<PersonPicker key=\{pickerKey\} people=\{people\} copy=\{pickerCopy\}/);
   assert.match(page, /if \(who\.route === 'safety'\) \{\s*return \(\s*<PersonSafetyRoute copy=\{safetyCopy\}/);
-  assert.match(page, /return <SkillPlayer skillId=\{skillId\} ctx=\{ctxFor\(who, profile\.slices\?\.people \?\? null\)\} \{\.\.\.\(reopening \? \{ resumeRecord: resumeAfterPicker\(checked, who\) \} : \{\}\)\} \/>;/);
+  assert.match(page, /return <SkillPlayer skillId=\{skillId\} ctx=\{ctxFor\(who, people\)\} \{\.\.\.\(reopening \? \{ resumeRecord: resumeAfterPicker\(checked, who\) \} : \{\}\)\} \/>;/);
   assert.match(page, /if \(copyFailed\) return <ToolLoadError/, "fails closed without the picker's copy");
   assert.doesNotMatch(page, /navigate\(/, "no navigation between the picker and the skill: the ToolSession (and a card's RESOLVING) stays");
   const debrief = read("src/components/tools/dearMan/DearManDebrief.tsx");
@@ -151,27 +145,20 @@ test("ask_outcome: on, a deep link into the debrief, session-bound to DEAR MAN, 
   assert.ok(t?.enabled);
   assert.equal(t.resolveMode, "deeplink");
   assert.equal(t.deepLinkTemplate, "/tool/dear-man?mode=debrief&followUp={followUpId}");
-  assert.deepEqual(Object.keys(t.window.chips).sort(), [...lib.ASK_OUTCOME_CHIPS].sort());
+  assert.deepEqual(Object.keys(t.window.chips).sort(), ["this_week", "today", "tomorrow", "unsure"]);
   for (const id of ["not_yet", "no_answer", "later"]) {
     for (const o of dm.options.again) assert.ok(o.value in t.window.chips, `${o.value} is an ask_outcome chip`);
   }
   assert.doesNotMatch(JSON.stringify(t.copy) + t.notification, /\{who\}|label/, "the card names no one");
   assert.match(read("functions/src/spine/copeAheadAfter.ts"), /ask_outcome: 'dear-man',/);
-  const page = read("src/pages/tools/DearMan.tsx");
-  assert.match(page, /\{saved && sc\.askOutcomeQuestion && sc\.askOutcomeSet && \(\s*<AskOutcome copy=\{sc\} sessionId=\{session\.id\} \/>/);
-  assert.match(page, /scheduleFollowUps\(\[\{ id: newId\(\), type: 'ask_outcome', dueAt: due\.toISOString\(\), window: chip \}\],\s*\{ sourceSessionId: sessionId, sourceToolId: 'dear-man' \}\)/);
-});
-
-test("Let go: offered on the next ask to be heard, once the debrief has counted one refused", () => {
-  assert.equal(lib.offerLetGo({ refusalsValidation: 1 }, "address"), true);
-  assert.equal(lib.offerLetGo({ refusalsValidation: 2 }, "pattern"), true);
-  assert.equal(lib.offerLetGo({ refusalsValidation: 0 }, "address"), false);
-  assert.equal(lib.offerLetGo({ refusalsValidation: 3 }, "ask"), false, "a practical ask: not this");
-  assert.equal(lib.offerLetGo({ refusalsValidation: 3 }, null), false);
-  assert.equal(lib.offerLetGo(null, "address"), false, "someone not kept has no count");
-  const page = read("src/pages/tools/DearMan.tsx");
-  assert.match(page, /\{offerLetGo\(keptPerson, situationType\) && sc\.letGoLine && sc\.letGoLink && \(/);
-  assert.match(page, /navigate\('\/tool\/fast\?frame=let_go'\)/);
+  // Every DEAR MAN skill that schedules it does so from its own step's followUp, on its chips.
+  for (const id of ["dear_man_prep", "dear_man_one"]) {
+    const sk = skills.find((s) => s.id === id);
+    const st = sk.steps.find((x) => x.followUp?.type === "ask_outcome");
+    assert.ok(st, id);
+    const list = st.fields.find((x) => x.id === st.followUp.whenFrom).options.list;
+    for (const o of sk.options[list]) assert.ok(o.value in t.window.chips, `${id}: ${o.value} is an ask_outcome chip`);
+  }
 });
 
 test("copy: the new DEAR MAN lines are in the voice (no exclamation, should, just or but)", () => {

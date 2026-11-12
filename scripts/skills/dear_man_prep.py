@@ -60,7 +60,7 @@ def has(field, v):
 
 HEADS_UP = {"eq": ["$ctx.frame", "heads_up"]}
 REFUSED = {"eq": ["$ctx.refused", "validation"]}
-# The plan's heads-up (summaryHeadsUpForBand): a carried reading that isn't steady.
+# The plan's heads-up for a carried stirred or flooded reading (a much-quieter P2 reread drops the band).
 HOT = {"in": ["$ctx.band", ["stirred", "flooded"]]}
 # A carried flooded reading: the body first is offered on the first screen (BandRule dear-man flooded → hand-off), never a gate.
 FLOODED = {"eq": ["$ctx.band", "flooded"]}
@@ -345,7 +345,9 @@ STEPS = [
     {
         "id": "thought", "kind": "ask", "title": "thought_title", "hint": "thought_hint",
         "fields": [{"id": "thought", "options": {"list": "thought"}, "max": 2}],
-        "next": [{"when": {"set": "$p.parts"}, "to": "who"}, {"to": "describe"}],
+        # Who might show up: parts on with a kept part, and never on a carried flooded reading (the old page's
+        # showCopeAhead rule, Gate 3 on the page's deletion).
+        "next": [{"when": {"all": [{"set": "$p.parts"}, {"not": FLOODED}]}, "to": "who"}, {"to": "describe"}],
     },
     {
         "id": "scared", "kind": "handoff", "complete": True, "noClose": True,

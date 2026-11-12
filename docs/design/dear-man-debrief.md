@@ -9,7 +9,7 @@ question: [`people.md`](people.md).
 *I just had a conversation* (DEAR MAN's entry), the prep summary's *After the conversation → How did it go?* and
 the new `ask_outcome` card all open `/tool/dear-man?mode=debrief`. The page asks who it was with, then plays the
 `dear_man_debrief` skill (`scripts/skills/dear_man_debrief.py`) on the skill player. The hand-built debrief
-phases in `DearMan.tsx` are gone; that file is the prep only (`DearManPrep`), with `DearMan` choosing the mode once
+phases in `DearMan.tsx` are gone; since IE-B4 the hand-built prep is too, and `DearMan` only chooses the mode once
 per visit.
 
 ```

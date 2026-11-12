@@ -91,13 +91,6 @@ test("the link: cope-ahead.json's label, the contract's href, nothing until the 
   assert.match(src, /min-h-11/);
 });
 
-test("DEAR MAN: Rehearse it on the summary, beside How did it go?, the visit's part only with parts on", () => {
-  const src = read("src/pages/tools/DearMan.tsx");
-  const summary = src.slice(src.indexOf("if (phase === 'summary') {"), src.indexOf("After the conversation &rarr; How did it go?"));
-  assert.match(summary, /<CopeAheadEntryLink copyKey="entry_dear_man" situationId="conversation" partId=\{partsOn \? copeAheadPartId : null\} \/>/);
-  assert.equal(src.match(/<CopeAheadEntryLink /g).length, 1);
-});
-
 test("Recover: Today's Rehearse the next time gains Walk through it with Cope Ahead; the follow-up is unchanged", () => {
   const src = read("src/components/today/TodayCard.tsx");
   assert.match(src, /\{item\.type === RECOVER_FOLLOW_UP_TYPES\.rehearse && \(\s*<CopeAheadEntryLink copyKey="entry_recover" situationId="someone" \/>\s*\)\}/);

@@ -20,19 +20,16 @@ test("Recover's three follow-ups become scheduled follow-ups at the D-09 windows
   assert.deepEqual(wrap.recoverSchedule(["tomorrow"], null, now), [], "no content, no schedule (the close still links)");
 });
 
-test("reps: OA only when practised; DEAR MAN debrief is off-phone", () => {
+test("reps: OA only when practised", () => {
   assert.equal(wrap.oaSkillIds("practiced"), undefined, "defaultFor → opposite");
   assert.deepEqual(wrap.oaSkillIds("planned"), []);
   assert.deepEqual(wrap.oaSkillIds("missed"), []);
-  assert.equal(wrap.dearManRepSource("prep"), "standalone");
-  assert.equal(wrap.dearManRepSource("debrief"), "followup_offphone");
 });
 
 test("each wrapped tool closes its session with its detail kind; FTF embeds inside the check-in", () => {
   const src = (f) => readFileSync(`src/pages/tools/${f}.tsx`, "utf8");
   assert.match(src("OppositeAction"), /detail: \{ kind: "opposite_action", id: fresh\.id \}/);
   assert.match(src("InvalidationRecovery"), /detail: \{ kind: 'invalidation_recovery', id: sessionId \}[\s\S]*skillIds: used[\s\S]*schedule: recoverSchedule/);
-  assert.match(src("DearMan"), /detail: \{ kind: 'dear_man', id: savedId \}, repSource: dearManRepSource\('prep'\)/);
   // The debrief is a skill (IE-B2): its rep is the off-phone one, set by the close from the run (runRep).
   assert.match(readFileSync("functions/src/skills/projections.ts", "utf8"), /dear_man_debrief: \{ toolId: 'dear-man', happenedField: 'happened', yes: 'yes' \}/);
   const ftf = src("FindTheFeeling");

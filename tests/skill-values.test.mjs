@@ -139,6 +139,9 @@ test("value_step: registered, content-free, reopens at back; yes names the value
   const smaller = run([pick("again", "smaller"), next], ctx(), no);
   assert.equal(smaller.stepId, "step", "a smaller step for the same value");
   assert.deepEqual(values(smaller, "step"), ["friendship_1", "friendship_2", "friendship_3"]);
+  assert.equal(smaller.answers.step, undefined, "last time's step isn't picked for them");
+  const again = run([pick("step", "friendship_1"), next, pick("when", "tomorrow"), pick("remind", "yes")], ctx(), smaller);
+  assert.deepEqual(M.followUpFor(ctx(), M.stepOf(skill, "when"), again), { type: "value_step", chip: "tomorrow" }, "a smaller step books its own card");
   const later = run([pick("again", "not_now"), next], ctx(), no);
   assert.equal(later.stepId, "back_end");
   assert.deepEqual(offers(later), []);

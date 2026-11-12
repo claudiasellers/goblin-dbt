@@ -31,8 +31,3 @@ export function recoverSchedule(followUps: string[], content: Pick<SpineContent,
 export function oaSkillIds(status: string): string[] | undefined {
   return status === 'practiced' ? undefined : [];
 }
-
-/** DEAR MAN (D-09): a prep is an in-app rep of `request`; a debrief an off-phone, self-reported one. */
-export function dearManRepSource(type: 'prep' | 'debrief'): 'standalone' | 'followup_offphone' {
-  return type === 'debrief' ? 'followup_offphone' : 'standalone';
-}

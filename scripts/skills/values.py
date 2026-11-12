@@ -226,7 +226,9 @@ STEPS = [
     ask("one", "one_title", "one_hint", [field("focus", "value", where=IN_KEPT, own="focus_own")], [{"to": "step"}]),
     ask("one_kept", "one_title", "one_hint", [field("focus_kept", "value", where={"any": []}, profile="values")],
         [{"to": "step"}]),
-    ask("step", "step_title", "step_hint", [field("step", "step", own="step_own", where=FOR_FOCUS)], [{"to": "when"}]),
+    # A smaller step after *Not this time* starts fresh: last time's step, when and reminder don't stand in.
+    ask("step", "step_title", "step_hint", [field("step", "step", own="step_own", where=FOR_FOCUS)], [{"to": "when"}],
+        clears=["step", "when", "remind"]),
     ask("when", "when_title", None,
         [field("when", "when"), field("remind", "remind", required=False, label="remind_label")],
         [{"to": "set"}],

@@ -464,3 +464,21 @@ test("Cope Ahead: no content in the graph yet builds nothing; a wrong version th
   const wrong = indexGraph({ scope: "content-only", nodes: [node("cope_ahead_flow", ["CopeAheadFlow"], { version: "cope-ahead-v0", contentJson: "{}" })], relationships: [] });
   assert.throws(() => buildCopeAhead(wrong), /cope-ahead-v0; the app expects cope-ahead-v1/);
 });
+
+test("writeSnapshots leaves a file with unchanged content alone (no timestamp-only commits)", async () => {
+  const { writeSnapshots } = await import("../scripts/content-snapshot/build.mjs");
+  const { mkdtempSync, readFileSync, rmSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const dir = mkdtempSync(join(tmpdir(), "snap-same-"));
+  const quiet = { warn: () => {}, log: () => {} };
+  try {
+    writeSnapshots({ "spine.json": { a: 1 } }, { file: "first.json", exportedAt: "2026-11-01T00:00:00Z" }, { outDir: dir, log: quiet });
+    writeSnapshots({ "spine.json": { a: 1 } }, { file: "second.json", exportedAt: "2026-11-02T00:00:00Z" }, { outDir: dir, log: quiet });
+    assert.equal(JSON.parse(readFileSync(join(dir, "spine.json"), "utf8")).source.file, "first.json", "same content: not rewritten");
+    writeSnapshots({ "spine.json": { a: 2 } }, { file: "third.json", exportedAt: "2026-11-03T00:00:00Z" }, { outDir: dir, log: quiet });
+    const f = JSON.parse(readFileSync(join(dir, "spine.json"), "utf8"));
+    assert.equal(f.source.file, "third.json");
+    assert.deepEqual(f.content, { a: 2 });
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
