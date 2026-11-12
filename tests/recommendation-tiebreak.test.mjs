@@ -53,6 +53,32 @@ test("scorePatternParts keeps the words' share apart; scorePatterns is its total
   assert.ok(Math.abs(scoring.scorePatternParts({ ...o, answerWeight: 1.5 }).scores.b - (p.scores.b - 0.25)) < 1e-9);
 });
 
+test("totals add up bit for bit as before rf-v2.1 (the plain sort has no epsilon, so the kill switch needs it)", () => {
+  // The pre-rf-v2.1 scorer, verbatim in its order of addition.
+  const BONUS = (st) => (st.includes("strong") ? 0.3 : st.includes("moderate") ? 0.2 : 0.1);
+  const old = (o) => {
+    const s = {}; for (const p of o.candidates) s[p] = 0.25;
+    const by = new Map();
+    for (const r of o.emotionRows) { const e = by.get(r.patternId) ?? { w: new Set(), st: [] }; e.w.add(r.emotionId); e.st.push(r.strength); by.set(r.patternId, e); }
+    for (const [p, e] of by) s[p] = (s[p] || 0) + (e.w.size / o.emotionIds.length) * 0.4 + BONUS(e.st);
+    for (const r of o.responseRows) s[r.patternId] = (s[r.patternId] || 0) + r.weight * 2.0;
+    return s;
+  };
+  // The reviewer's case: three words, a weak edge to dissociation, a strong one to low drive, "not sure".
+  const o = {
+    candidates: ["dissociation_overmodulation", "reward_drive_low"], emotionIds: ["a", "b", "c"],
+    emotionRows: [{ patternId: "dissociation_overmodulation", emotionId: "a", strength: "weak" }, { patternId: "reward_drive_low", emotionId: "b", strength: "strong" }],
+    responseRows: [{ patternId: "dissociation_overmodulation", weight: 0.25 }, { patternId: "reward_drive_low", weight: 0.15 }],
+  };
+  assert.deepEqual(scoring.scorePatterns(o), old(o));
+  assert.equal(scoring.rankPatterns(scoring.scorePatterns(o)).primaryId, scoring.rankPatterns(old(o)).primaryId);
+  for (let n = 1; n <= 7; n++) for (let k = 1; k <= n; k++) for (const st of ["weak", "moderate", "strong"]) for (const w of [0.1, 0.15, 0.25, 0.35, 0.4]) {
+    const c = { candidates: ["p"], emotionIds: Array.from({ length: n }, (_, i) => `e${i}`),
+      emotionRows: Array.from({ length: k }, (_, i) => ({ patternId: "p", emotionId: `e${i}`, strength: st })), responseRows: [{ patternId: "p", weight: w }] };
+    assert.equal(scoring.scorePatterns(c).p, old(c).p, `${k}/${n} ${st} ${w}`);
+  }
+});
+
 test("the policy turns the knobs on; off or missing is the pre-review scoring whole", () => {
   assert.deepEqual(reachFor(null), NO_REACH);
   assert.deepEqual(reachFor({ enabled: false, answerWeight: 1, tieBreak: "words" }), NO_REACH, "the kill switch ignores the knobs");

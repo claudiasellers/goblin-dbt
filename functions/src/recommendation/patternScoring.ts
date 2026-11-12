@@ -69,8 +69,11 @@ export function scorePatternParts(o: {
   responseRows: readonly ResponseEvidenceRow[];
   answerWeight?: number;
 }): PatternScores {
+  // `scores` adds up in exactly the pre-rf-v2.1 order (float addition isn't associative, and the plain sort
+  // has no epsilon, so the kill switch must see the same totals bit for bit); `wordScores` alongside.
+  const scores: Record<string, number> = {};
   const wordScores: Record<string, number> = {};
-  for (const pid of o.candidates) wordScores[pid] = 0;
+  for (const pid of o.candidates) { scores[pid] = BASE_SCORE; wordScores[pid] = 0; }
 
   if (o.emotionIds.length > 0) {
     const byPattern = new Map<string, { words: Set<string>; strengths: Array<string | null> }>();
@@ -82,20 +85,21 @@ export function scorePatternParts(o: {
       byPattern.set(r.patternId, e);
     }
     for (const [pid, e] of byPattern) {
-      wordScores[pid] += (e.words.size / o.emotionIds.length) * 0.4 + strengthBonus(e.strengths);
+      const ratio = (e.words.size / o.emotionIds.length) * 0.4;
+      const bonus = strengthBonus(e.strengths);
+      scores[pid] = (scores[pid] || 0) + ratio + bonus; // left to right, as before
+      wordScores[pid] = (wordScores[pid] || 0) + ratio + bonus;
     }
   } else {
     const y = o.intensityY ?? 0.5;
     for (const pid of o.candidates) {
-      if (y > 0.7 && ['acute_alarm', 'emotional_flooding'].includes(pid)) wordScores[pid] += 0.3;
-      else if (y > 0.7 && ['chronic_vigilance', 'social_threat_shame'].includes(pid)) wordScores[pid] += 0.15;
-      else if (y < 0.3 && ['conservation_freeze', 'reward_drive_low'].includes(pid)) wordScores[pid] += 0.3;
-      else if (y < 0.3 && ['dissociation_overmodulation', 'rumination_loop'].includes(pid)) wordScores[pid] += 0.15;
+      if (y > 0.7 && ['acute_alarm', 'emotional_flooding'].includes(pid)) { scores[pid] += 0.3; wordScores[pid] += 0.3; }
+      else if (y > 0.7 && ['chronic_vigilance', 'social_threat_shame'].includes(pid)) { scores[pid] += 0.15; wordScores[pid] += 0.15; }
+      else if (y < 0.3 && ['conservation_freeze', 'reward_drive_low'].includes(pid)) { scores[pid] += 0.3; wordScores[pid] += 0.3; }
+      else if (y < 0.3 && ['dissociation_overmodulation', 'rumination_loop'].includes(pid)) { scores[pid] += 0.15; wordScores[pid] += 0.15; }
     }
   }
 
-  const scores: Record<string, number> = {};
-  for (const pid of o.candidates) scores[pid] = BASE_SCORE + wordScores[pid];
   const w = o.answerWeight ?? DEFAULT_ANSWER_WEIGHT;
   for (const r of o.responseRows) {
     if (!o.candidates.includes(r.patternId)) continue;
