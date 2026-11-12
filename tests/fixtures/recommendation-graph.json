@@ -345,6 +345,17 @@
     "fear"
    ]
   },
+  "dbt_accepts": {
+   "appToolId": "mind-job",
+   "name": "ACCEPTS",
+   "description": "Activities, Contributing, Comparisons, Emotions, Pushing away, Thoughts, Sensations",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": "acceptance",
+   "skillKind": "redirect",
+   "direction": "neutral",
+   "addresses": []
+  },
   "dbt_alternate_rebellion": {
    "appToolId": "alternate-rebellion",
    "name": "Alternate Rebellion",
@@ -525,6 +536,17 @@
    "side": "change",
    "skillKind": "relational",
    "direction": "neutral",
+   "addresses": []
+  },
+  "dbt_self_soothe": {
+   "appToolId": "soothe",
+   "name": "Self-Soothe",
+   "description": "Comforting yourself through the five senses and kind touch, so a hard moment is met with care",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": "acceptance",
+   "skillKind": "body",
+   "direction": "down",
    "addresses": []
   },
   "dbt_stop": {
@@ -2333,32 +2355,6 @@
    "rationale": "Nothing was named (somatic skip): offer to find the word as the alternative (R9)."
   },
   {
-   "id": "rf_acute_alarm_words_annoyed_accepts",
-   "conceptId": "dbt_accepts",
-   "patternId": "acute_alarm",
-   "bands": [
-    "steady",
-    "stirred"
-   ],
-   "priority": 0.6,
-   "direction": "neutral",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": "words",
-   "words": [
-    "annoyed"
-   ],
-   "beside": [],
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": false,
-   "version": "rf-v2",
-   "reviewStatus": "draft",
-   "rationale": "Planned: ACCEPTS as the alternative."
-  },
-  {
    "id": "rf_acute_alarm_words_annoyed_check-the-facts",
    "conceptId": "dbt_check_facts",
    "patternId": "acute_alarm",
@@ -2383,6 +2379,32 @@
    "version": "rf-v2",
    "reviewStatus": "approved",
    "rationale": "Planned: Check the Facts leads for low-grade anger."
+  },
+  {
+   "id": "rf_acute_alarm_words_annoyed_mind-job",
+   "conceptId": "dbt_accepts",
+   "patternId": "acute_alarm",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.6,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "annoyed"
+   ],
+   "beside": [],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "approved",
+   "rationale": "Give your mind a job (ACCEPTS) as the alternative."
   },
   {
    "id": "rf_acute_alarm_words_annoyed_opposite-action",
@@ -2493,7 +2515,7 @@
    "rationale": "Capacity saturation needs a behavioural halt: Pause (STOP), then Cool Down (TIPP). Overwhelmed stays on Alarm, not Flooded: one everyday word doesn't raise the crisis banner."
   },
   {
-   "id": "rf_acute_alarm_words_stress_accepts",
+   "id": "rf_acute_alarm_words_stress_mind-job",
    "conceptId": "dbt_accepts",
    "patternId": "acute_alarm",
    "bands": [
@@ -2509,18 +2531,17 @@
     "frustrated",
     "stressed",
     "busy",
-    "rushed",
-    "pressured"
+    "rushed"
    ],
    "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
-   "rationale": "Planned: ACCEPTS (distract) leads for strain words once built."
+   "reviewStatus": "approved",
+   "rationale": "Give your mind a job (ACCEPTS, distract) leads for strain words; not pressured, where Say no sits beside Problem Solve (a demand to answer, not to distract from)."
   },
   {
    "id": "rf_acute_alarm_words_stress_problem-solve",
@@ -2550,7 +2571,7 @@
    "active": true,
    "version": "rf-v2",
    "reviewStatus": "approved",
-   "rationale": "Bridge high agitation: distraction (ACCEPTS, planned) then Problem Solve; until ACCEPTS ships, Problem Solve leads and Cool Down follows."
+   "rationale": "Bridge high agitation: distraction (Give your mind a job) leads, then Problem Solve."
   },
   {
    "id": "rf_chronic_vigilance_addresses_recovering-from-invalidation",
@@ -2800,9 +2821,9 @@
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
+   "reviewStatus": "approved",
    "rationale": "Let it be (radical acceptance) leads for helplessness."
   },
   {
@@ -2829,7 +2850,7 @@
    "active": true,
    "version": "rf-v2",
    "reviewStatus": "approved",
-   "rationale": "Let it be (built, row off until signed off), then Problem Solve in micro-steps; Problem Solve leads until then."
+   "rationale": "Let it be leads (its own row), then Problem Solve in micro-steps."
   },
   {
    "id": "rf_chronic_vigilance_words_watchful_wise-mind",
@@ -2944,10 +2965,10 @@
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
-   "rationale": "Ride it out (DT-05, rebuilt on the skill runtime) for the checking / reassurance urge; off until signed off."
+   "reviewStatus": "approved",
+   "rationale": "Ride it out (DT-05, rebuilt on the skill runtime) for the checking / reassurance urge."
   },
   {
    "id": "rf_conservation_freeze_addresses_recovering-from-invalidation",
@@ -3045,7 +3066,7 @@
    "rationale": "Flooded + blank: orient only (no Cool Down, D-02)."
   },
   {
-   "id": "rf_conservation_freeze_planned_let-it-be",
+   "id": "rf_conservation_freeze_words_grief_let-it-be",
    "conceptId": "dbt_radical_acceptance",
    "patternId": "conservation_freeze",
    "bands": [
@@ -3055,18 +3076,22 @@
    "priority": 1.5,
    "direction": "neutral",
    "side": null,
-   "requiresPrior": null,
-   "emotionGate": null,
-   "words": [],
+   "requiresPrior": "up_regulation",
+   "emotionGate": "words",
+   "words": [
+    "despair",
+    "grief",
+    "empty"
+   ],
    "beside": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
-   "rationale": "Let it be (radical acceptance) after gentle movement for despair, grief, emptiness and numbness."
+   "reviewStatus": "approved",
+   "rationale": "Let it be (radical acceptance) after gentle movement for despair, grief and emptiness; not for numbness, which needs the body first (12 Nov 2026: was a pattern row for all of Shut down)."
   },
   {
    "id": "rf_dissociation_overmodulation_addresses_recovering-from-invalidation",
@@ -3556,9 +3581,9 @@
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
+   "reviewStatus": "approved",
    "rationale": "Let it be (radical acceptance) leads."
   },
   {
@@ -3732,7 +3757,7 @@
    "rationale": "Nothing was named (somatic skip): offer to find the word as the alternative (R9)."
   },
   {
-   "id": "rf_rumination_loop_words_aversion_accepts",
+   "id": "rf_rumination_loop_words_aversion_mind-job",
    "conceptId": "dbt_accepts",
    "patternId": "rumination_loop",
    "bands": [
@@ -3763,10 +3788,10 @@
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
-   "rationale": "Planned: ACCEPTS as the alternative."
+   "reviewStatus": "approved",
+   "rationale": "Give your mind a job (ACCEPTS) as the alternative."
   },
   {
    "id": "rf_rumination_loop_words_aversion_opposite-action",
@@ -3889,6 +3914,35 @@
    "version": "rf-v2",
    "reviewStatus": "approved",
    "rationale": "Low-energy shame: Recover (self-validation) first. The review's Cool Down isn't used on this side: the person marked low energy and Cool Down brings it down further."
+  },
+  {
+   "id": "rf_rumination_loop_words_low-shame_soothe",
+   "conceptId": "dbt_self_soothe",
+   "patternId": "rumination_loop",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.55,
+   "direction": "down",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "embarrassed",
+    "ashamed"
+   ],
+   "beside": [
+    "recovering-from-invalidation"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "approved",
+   "rationale": "Held (self-soothe, hand on heart) beside Recover for cold shame: kindness first, which shame makes hardest to take in; Do the Opposite (unhiding) asks more than a low-energy moment has. Never on a blank result (direction down)."
   },
   {
    "id": "rf_social_threat_shame_addresses_recovering-from-invalidation",
@@ -4174,6 +4228,10 @@
   }
  ],
  "contraindicated": [
+  {
+   "conceptId": "dbt_accepts",
+   "targetId": "dissociation_overmodulation"
+  },
   {
    "conceptId": "dbt_opposite_action",
    "targetId": "dissociation_overmodulation"

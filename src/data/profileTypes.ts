@@ -153,6 +153,8 @@ export const PROFILE_NEEDS = {
   'pause': ['parts', 'prosCons'],              // prosCons: the kept card for the pull (DT-10's replay, on proceed)
   'urge-surfing': ['parts'],
   'let-it-be': ['parts'],                    // the tag row on its in-flow close (docs/design/let-it-be.md)
+  'mind-job': ['parts'],                     // the tag row on its in-flow close (docs/design/mind-job.md)
+  'soothe': ['parts'],                       // the tag row on its in-flow close (docs/design/held.md)
   'alternate-rebellion': ['parts'],          // the tag row on its urge close (DT-11, Held off)
   'check-the-facts': ['parts'],              // the tag row on its close (docs/design/check-the-facts.md, screen 3)
   'fast': ['parts'],                         // the tag row on its close (docs/design/fast.md)

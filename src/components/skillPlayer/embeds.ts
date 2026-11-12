@@ -13,6 +13,7 @@ import { KeepCardEmbed, PartAnchorEmbed, PlanSentenceEmbed, RehearsalEmbed } fro
 import { WaitLockEmbed } from './WaitLockEmbed';
 import { UrgeWave, WaveTrace } from './UrgeWave';
 import { DebriefWhoEmbed } from './DebriefWhoEmbed';
+import { LidShelf } from './LidShelf';
 import { MessageComposer } from './MessageComposer';
 import { PocketCard } from './PocketCard';
 
@@ -74,6 +75,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   orientFind: OrientFind,
   urgeWave: UrgeWave,
   waveTrace: WaveTrace,
+  lidShelf: LidShelf,
   messageComposer: MessageComposer,
   pocketCard: PocketCard,
 };
@@ -104,6 +106,7 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
     measures: ['durationSec', 'doneCount'],
   },
   waveTrace: { ids: ['read'] },
+  lidShelf: { ids: ['shut', 'partly', 'skipped'], measures: ['durationSec'] },
   messageComposer: { ids: ['copied', 'opened', 'dropped_sorry'] },
   pocketCard: { ids: ['seen_all', 'copied'] },
 };
@@ -355,5 +358,18 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     riseLine: { type: 'copy', optional: true },
     heldLine: { type: 'copy' },
     next: { type: 'copy' },
+  },
+  lidShelf: {
+    /** The field whose pick is the container: `jar` · `tin` · `box` (its id; anything else draws a jar). */
+    containerField: { type: 'field' },
+    put: { type: 'copy' },
+    hold: { type: 'copy' },
+    holding: { type: 'copy' },
+    hint: { type: 'copy' },
+    holdSec: { type: 'int', min: 1, max: 10 },
+    done: { type: 'copy' },
+    next: { type: 'copy' },
+    /** The quiet way on after a let-go, worded as what it does (going on with the lid open). */
+    skip: { type: 'copy' },
   },
 };

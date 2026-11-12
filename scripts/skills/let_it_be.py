@@ -340,7 +340,7 @@ EXITS = [
     {"id": "cool_down", "toolId": "cool-down"},                          # DT-01 First, the body
     {"id": "good_things", "toolId": "good-things", "planned": True},     # ER-04 (ER-B4)
     {"id": "please_skill", "toolId": "please-skill", "planned": True},   # ER-07 Running low (ER-B4)
-    {"id": "soothe", "toolId": "soothe", "planned": True},               # DT-07 Held (grief)
+    {"id": "soothe", "toolId": "soothe"},                                # DT-07 Held (grief)
     {"id": "safety_open", "toolId": None, "safety": True},               # safety.open (R6)
     {"id": "done", "done": True},
 ]

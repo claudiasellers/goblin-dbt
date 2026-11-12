@@ -106,7 +106,7 @@ test("hosts: every tool whose close asks then-vs-now or about the urge, minus Me
     .filter(([, k]) => dirFor(k.closeKind) !== null || k.closeKind === "urge").map(([id]) => id);
   const hosts = asks.filter((id) => !NEVER_HOSTS.includes(id));
   assert.deepEqual([...lib.TAG_ROW_TOOLS], hosts);
-  assert.deepEqual(hosts, ["cool-down", "five-senses", "pause", "urge-surfing", "let-it-be", "alternate-rebellion", "find-the-feeling", "check-the-facts", "fast"], "the survey (Oct 2026), plus Check the Facts, Rebel without the wreckage, Keep your self-respect and Let it be (Nov 2026)");
+  assert.deepEqual(hosts, ["cool-down", "five-senses", "pause", "urge-surfing", "let-it-be", "mind-job", "soothe", "alternate-rebellion", "find-the-feeling", "check-the-facts", "fast"], "the survey (Oct 2026), plus Check the Facts, Rebel without the wreckage, Keep your self-respect, Let it be, Give your mind a job and Held (Nov 2026)");
   // Every page that closes with a then-vs-now is a host or never one (a tool recording it by hand
   // without a then-vs-now close kind would fail here).
   for (const id of Object.keys(TOOL_CLOSE_KIND)) {

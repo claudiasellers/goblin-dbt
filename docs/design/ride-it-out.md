@@ -68,9 +68,8 @@ and nothing cold or squeezed for hurt myself (Gate 3: a sensation substitute kee
 
 ## Routing
 
-`urge-surfing`'s rows (today one: chronic vigilance, *worried*) move from the slider's off switch to
-`BUILT_NOT_SIGNED_OFF`: still switched off and drafts, live on Claudia's sign-off. The generated
-`schema/recommended-for.cypher` is unchanged by the move.
+`urge-surfing`'s row (today one: chronic vigilance, *worried*, the alternative to Do the Opposite) is live since
+12 Nov 2026 (Claudia: default to connected).
 
 ## Safety
 
