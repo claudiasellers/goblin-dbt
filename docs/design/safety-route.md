@@ -1,7 +1,8 @@
 # The safety route (CORE-01) and safety plan (CORE-02)
 
-**Status:** PR 1 of 4 built 12 Nov 2026: content, the server side and the record, **switched off**. Nothing a person
-sees changes until PR 4 turns `SafetyPolicy {id: 'safety_route'}.enabled` on. Source of truth for the PRD:
+**Status:** PR 1 built 12 Nov 2026 (content, the server side and the record). PR 2 (12 Nov 2026) adds the screens and
+**switches the route on** (`SafetyPolicy {id: 'safety_route'}.enabled`, PR 4 folded in: build and connect, a clinician
+tweaks after). PR 3, the safety plan, is next. Source of truth for the PRD:
 *PRD Structure & Behavioural Analysis* §CORE-01 / §CORE-02 and the architecture map's safety sections (Arch §4.1, §6.2).
 
 ## Why
@@ -18,9 +19,11 @@ of the darker places people actually go (Claudia, 12 Nov: build to the depths, s
 | PR | What | Visible? |
 |---|---|---|
 | 1 (this) | `scripts/safety/` → `schema/safety-route.cypher` and `src/data/content/safety.json`: the question and every screen's copy, countries and crisis lines, `ASKS_SAFETY`, `Emotion.safetyScreen`, the SafetyFlag rewrite, `SafetyPolicy` (off). `getStateAndTools` decides whether to ask (`safetyAsk`) while the policy is on. `SafetyCheck` (log) and `saveSafetyCheck`. The `safety_checkin` follow-up type | No |
-| 2 | Screens A (the question), B (strong thoughts), C (a plan or an act), the exit, the morning check; *Help & safety* in the header on every screen; Help me now's *I might hurt myself*; signed out on the device; offline. `safety.open()` replaces `SafetyOpen.tsx`'s interim. `core_safety_route.appToolId = 'safety'` with the page | Behind the switch |
-| 3 | CORE-02: the `safety_plan` profile kind, build mode (steady / stirred) and use mode (any band), step 2 reading the crisis kit's card ids (`section:optionId`, `docs/design/crisis-kit.md`), the quick plan as a draft plan, `safety_plan_review` at +30 days | Behind the switch |
-| 4 | The switch on; the auto-crisis banner from a pattern retired (StateResult / LowEnergyStateResult); the dead low-energy crisis branch removed | Yes |
+| 2 | The screens (`src/lib/safetyRoute.ts`, the pure step machine; `src/components/safety/SafetyRoute.tsx`; `SafetyPeople.tsx`): the question, passing, rather not say, strong thoughts (means first), a plan or an act (*Have you already done something?* → medical first, first aid only after a known injury), the quick plan (three lines, on the device until PR 3), the exit, the morning check (`/safety?checkin=`). `/safety` is *Help & safety*, linked from the header on every screen; Help me now's *I'm thinking about hurting myself* (`?say=1&from=help_now`); every skill's `safety.open` (`SafetyOpen.tsx`, source `module:<toolId>`). The check-in asks before its result (once per browser session) and saves `safetyCheckId`. Clinical notes show `SafetyFlag.userCopy`. **The switch on** (PR 4 folded in). No `appToolId`: the route is a page, not a tool | Yes |
+| 3 | CORE-02: the `safety_plan` profile kind, build mode (steady / stirred) and use mode (any band), step 2 reading the crisis kit's card ids (`section:optionId`, `docs/design/crisis-kit.md`), the quick plan as a draft plan, `safety_plan_review` at +30 days | Yes |
+
+With the switch on the server never returns a crisis flag, so the old auto banner on StateResult / LowEnergyStateResult
+never shows; its code stays as the kill switch's fallback (switching the policy off restores it whole).
 
 CrisisBanner stays the only hand-written file with numbers (its `other_person` and `medical` variants are unchanged);
 the route's lines are generated content. One user-facing switch, in the last PR.
@@ -58,8 +61,8 @@ only rises (plan → act), set-once fields stay set, means actions only grow, co
 The next-morning check is a FollowUp `safety_checkin` (09:30 the next day, content-free card and notification, the
 `safety` tier so it sorts first), scheduled by the route after the person's yes through `scheduleFollowUp`.
 
-The question's answer never goes on the saved check-in (PR #47's rule, kept). CORE-05's `safetyCheckId` on the check-in
-comes with PR 2.
+The question's answer never goes on the saved check-in (PR #47's rule, kept). The check-in carries only the visit's id,
+`CheckIn.safetyCheckId` (CORE-05; set once, never cleared), saved after the question is answered.
 
 ## Helplines
 

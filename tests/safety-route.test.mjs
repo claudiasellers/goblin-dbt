@@ -44,9 +44,11 @@ test("loads after the graph it touches and before routing; MERGE-only; constrain
   assert.ok(stmts.some((x) => /^MATCH \(l:CrisisLine\) WHERE NOT l\.id IN \[.*"us_988".*\]\nDETACH DELETE l$/s.test(x)));
 });
 
-test("the switch is off, and the content says so in one place", () => {
-  assert.match(cypher, /MERGE \(p:SafetyPolicy \{id: "safety_route"\}\)\nSET p\.enabled = false/);
-  assert.match(read("scripts/safety/content.py"), /POLICY = \{"id": "safety_route", "enabled": False/);
+test("the switch is on, with its reason named in one place", () => {
+  assert.match(cypher, /MERGE \(p:SafetyPolicy \{id: "safety_route"\}\)\nSET p\.enabled = true/);
+  const content = read("scripts/safety/content.py");
+  assert.match(content, /POLICY = \{"id": "safety_route", "enabled": True/);
+  assert.match(content, /APPROVED_TO_SHIP = "Claudia, 12 Nov 2026: [^"]+"/);
 });
 
 // The schema replayed in memory (scripts/recommendations/schema_graph.py), as a content-only export.

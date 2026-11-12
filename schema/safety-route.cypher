@@ -185,4 +185,4 @@ MERGE (l)-[:COVERS]->(c);
 
 // --- The switch ---
 MERGE (p:SafetyPolicy {id: "safety_route"})
-SET p.enabled = false, p.version = "safety-v1";
+SET p.enabled = true, p.version = "safety-v1";

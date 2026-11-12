@@ -38,6 +38,9 @@ import { bandStepFor, checkInIntensity } from '../lib/checkInBand';
 import { beatBand, beatRequest, type WitnessHandlers } from '../lib/witness';
 import { recordWitnessBeat } from '../services/witness';
 import { profileCache } from '../lib/profileCache';
+import { SafetyRoute } from '../components/safety/SafetyRoute';
+import { ASKED_KEY, shouldAsk } from '../lib/safetyRoute';
+import { preloadSafetyContent } from '../services/safety';
 
 type EntryPoint = 'standard' | 'somatic';
 
@@ -73,6 +76,14 @@ export interface CheckInData {
   bodySensations: BodySensation[];
   note: string;
   timestamp: Date;
+}
+
+/** The check-in asks the safety question at most once per browser session (CORE-01). */
+function askedThisSession(): boolean {
+  try { return sessionStorage.getItem(ASKED_KEY) === '1'; } catch { return false; }
+}
+function markAsked() {
+  try { sessionStorage.setItem(ASKED_KEY, '1'); } catch { /* private mode: asks again next time */ }
 }
 
 export function CheckIn() {
@@ -137,6 +148,12 @@ export function CheckIn() {
   /** The render save in flight: resolves true when saved. Next actions chain after it. */
   const savePromise = useRef<Promise<boolean> | null>(null);
   const savedResult = useRef<StateResultType | null>(null);
+  // === The safety route (CORE-01) ===
+  // When the result says so (`safetyAsk.ask`) and this browser session hasn't asked yet, the question
+  // comes before the result. The check-in is saved once it is answered, carrying the visit's id.
+  const [safetyAsking, setSafetyAsking] = useState(false);
+  const [safetyCheckId, setSafetyCheckId] = useState<string | null>(null);
+  const savedSafetyId = useRef<string | null>(null);
 
   const emotionX = (emotions: string[]) => (emotions.length ? getEmotionByName(emotions[0])?.x : undefined);
   const intensityFor = (cap: CapacityReading | null, emotions: string[]) =>
@@ -157,13 +174,15 @@ export function CheckIn() {
     embeddedToolSessionIds: embeddedIds,
     // Which words sat in which spot (sent only for a grid check-in with 2+ filled spots).
     spots,
+    safetyCheckId,
   });
 
   // Save on result render, before any tool can open (R4: every downstream write keys on this id).
   useEffect(() => {
-    if (!user || step !== 'result' || !stateResult || !checkInData.quadrant) return;
-    if (savedResult.current === stateResult) return;
+    if (!user || step !== 'result' || !stateResult || !checkInData.quadrant || safetyAsking) return;
+    if (savedResult.current === stateResult && savedSafetyId.current === safetyCheckId) return;
     savedResult.current = stateResult;
+    savedSafetyId.current = safetyCheckId;
     // A re-save ("add more detail") waits for the one in flight, so an earlier snapshot can never
     // land after a newer one (Codex, PR #16). The payload is taken now, not when it runs.
     const payload = buildCheckInPayload(payloadState(), stateResult);
@@ -176,7 +195,7 @@ export function CheckIn() {
         return false;
       });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, step, stateResult]);
+  }, [user, step, stateResult, safetyAsking, safetyCheckId]);
 
   // === Witness beat (A5-3) ===
   // The beat's log is queued behind the render save (R4: it keys on the check-in id) and ahead of
@@ -288,6 +307,11 @@ export function CheckIn() {
         surface: 'checkin',
       });
       
+      if (shouldAsk(result, askedThisSession())) {
+        markAsked();
+        preloadSafetyContent();
+        setSafetyAsking(true);
+      }
       setStateResult(result);
       setStep('result');
     } catch (error) {
@@ -595,6 +619,9 @@ export function CheckIn() {
 
   function handleComplete() {
     setCheckInId(newId());
+    setSafetyAsking(false);
+    setSafetyCheckId(null);
+    savedSafetyId.current = null;
     setStartedAt(new Date());
     savePromise.current = null;
     savedResult.current = null;
@@ -648,6 +675,7 @@ export function CheckIn() {
         setStep('body');
         break;
       case 'result':
+        if (safetyAsking) break;
         handleAddMoreDetail();
         break;
       case 'complete':
@@ -803,7 +831,19 @@ export function CheckIn() {
           </div>
         )}
 
-        {step === 'result' && stateResult && (
+        {step === 'result' && stateResult && safetyAsking && (
+          <SafetyRoute
+            entry="checkin"
+            source="checkin"
+            sourceSessionId={checkInId}
+            onDone={(r) => {
+              if (r.safetyCheckId) setSafetyCheckId(r.safetyCheckId);
+              setSafetyAsking(false);
+            }}
+          />
+        )}
+
+        {step === 'result' && stateResult && !safetyAsking && (
           stateResult.guidedActivity && checkInData.quadrant === 'low-unpleasant' ? (
             <LowEnergyStateResult
               result={stateResult}

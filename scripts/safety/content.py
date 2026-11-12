@@ -293,7 +293,7 @@ VERIFIED = {}
 LINE_KINDS = ["crisis", "text", "chat", "poison", "urgent", "youth", "lgbtq", "warmline"]
 
 # ---- The switch ---------------------------------------------------------------------------------------
-# Off until CORE-01's last PR. build.py refuses `enabled: True` while REVIEW_STATUS is "draft" unless
-# APPROVED_TO_SHIP names the reason (Claudia: build and connect everything, a clinician tweaks after).
-POLICY = {"id": "safety_route", "enabled": False, "version": VERSION}
-APPROVED_TO_SHIP = None
+# On since CORE-01 PR 2 (the screens). build.py refuses `enabled: True` while REVIEW_STATUS is "draft"
+# unless APPROVED_TO_SHIP names the reason. Switching it off restores the old crisis banner whole.
+POLICY = {"id": "safety_route", "enabled": True, "version": VERSION}
+APPROVED_TO_SHIP = "Claudia, 12 Nov 2026: build and connect everything; a clinician reviews the copy after"

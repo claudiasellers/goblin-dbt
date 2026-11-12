@@ -195,6 +195,8 @@ export interface SafetyFlag {
   type: string;
   trigger: string;
   action: string;
+  /** CORE-01: what the person sees (the clinician `action` is never shown). */
+  userCopy?: string | null;
 }
 
 export interface CoOccurrence {
@@ -218,6 +220,8 @@ export interface StateResult {
   coOccurrence?: CoOccurrence;
   guidedActivity?: GuidedActivityRecommendation;
   routing?: Routing;
+  /** CORE-01: present while the safety route is on; `ask` means the check-in asks before the result. */
+  safetyAsk?: { ask: boolean; reasons: string[] } | null;
 }
 
 export interface DiscriminatingQuestion {
