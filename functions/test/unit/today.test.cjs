@@ -21,7 +21,7 @@ test('scheduleFollowUp: only enabled types, MERGE by key, dueAt bounded, SCHEDUL
   assert.match(q.query, /MERGE \(f:FollowUp \{key: \$uid \+ ':' \+ it\.id\}\)[\s\S]*f:UserData:LogRecord[\s\S]*f\.status = 'scheduled'/);
   assert.match(q.query, /MERGE \(x\)-\[:SCHEDULED\]->\(f\)/);
   assert.equal(q.params.sourceSessionKey, `u1:${TS}`);
-  await assert.rejects(fns.scheduleFollowUp.run({ auth: auth(), data: { id: ID, type: 'recover_log', dueAt: inH(24 * 15) } }), (e) => e.code === 'invalid-argument');
+  await assert.rejects(fns.scheduleFollowUp.run({ auth: auth(), data: { id: ID, type: 'recover_log', dueAt: inH(24 * 33) } }), (e) => e.code === 'invalid-argument');
   await assert.rejects(fns.scheduleFollowUp.run({ auth: auth(), data: { id: ID, type: 'recover_log', dueAt: inH(1), sourceToolId: 'nope' } }), (e) => e.code === 'invalid-argument');
 });
 
