@@ -2,6 +2,7 @@ import type { ManagedTransaction } from 'neo4j-driver';
 import { projectCopeAhead } from '../copeAhead/projection';
 import { projectDearManDebrief } from '../dearMan/debriefProjection';
 import { projectDearManOne } from '../dearMan/oneProjection';
+import { projectDearManPrep } from '../dearMan/prepProjection';
 import { projectSayNo } from '../sayNo/projection';
 
 /**
@@ -27,6 +28,7 @@ export type Projection = (tx: ManagedTransaction, input: ProjectionInput) => Pro
 export async function projectDearMan(tx: ManagedTransaction, input: ProjectionInput): Promise<void> {
   await projectDearManDebrief(tx, input);
   await projectDearManOne(tx, input);
+  await projectDearManPrep(tx, input);
 }
 
 export const PROJECTIONS: Readonly<Record<string, Projection>> = {

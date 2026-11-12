@@ -220,7 +220,7 @@ test("wiring: the cards, the projection, the Tools intent and the player's skill
   assert.match(read("functions/src/spine/copeAheadAfter.ts"), /ask_delayed: 'dear-man'/);
   assert.match(read("functions/src/spine/toolSession.ts"), /'ask_delayed'\] as const/);
   assert.match(read("functions/src/skills/projections.ts"), /'dear-man': projectDearMan,/);
-  assert.match(read("src/lib/skillRuntime/playerTools.ts"), /'dear-man': \['dear_man_debrief', 'dear_man_one'\]/);
+  assert.match(read("src/lib/skillRuntime/playerTools.ts"), /'dear-man': \['dear_man_debrief', 'dear_man_one', 'dear_man_prep'\]/);
   const T = await importTs("src/data/tools.ts");
   const intent = T.intents.find((i) => i.id === "one_message");
   assert.deepEqual([intent.toolId, intent.query], ["dear-man", "mode=one"]);
