@@ -39,7 +39,7 @@ export const PARTS_FILE = join(root, 'schema/parts.cypher');
 export const FLOW_DOC_FILES = [
   'schema/find-the-feeling.cypher', 'schema/invalidation-recovery.cypher', 'schema/capacity.cypher',
   'schema/opposite-action-flow.cypher', 'schema/practice-spine.cypher', 'schema/wise-mind.cypher',
-  'schema/cope-ahead.cypher', 'schema/skills.cypher', 'schema/safety-route.cypher',
+  'schema/cope-ahead.cypher', 'schema/skills.cypher', 'schema/safety-route.cypher', 'schema/emotion-guide.cypher',
 ];
 
 export const RULESET = JSON.parse(readFileSync(RULES_FILE, 'utf8'));
