@@ -783,7 +783,7 @@ test("own.seed: a chip writes its words into the open box to change; once the wo
 
 test("covered: P2 or safety.open over an embed step reaches the embed; a new step starts uncovered", () => {
   const player = read("src/components/skillPlayer/SkillPlayer.tsx");
-  assert.match(player, /covered=\{safetyOpen \|\| p2Open\}/);
+  assert.match(player, /covered=\{safetyOpen \|\| p2Open \|\| !!inline\?\.covered\}/, "an inline run is covered by its host's P2 too");
   assert.match(player, /inert=\{safetyOpen \|\| p2Open\}/, "under P2 the step is inert: nothing underneath takes focus from the dialog");
   assert.match(player, /onOpen=\{\(\) => setP2Open\(true\)\} onClose=\{\(\) => setP2Open\(false\)\}/);
   assert.match(player, /useEffect\(\(\) => \{ setP2Open\(false\); \}, \[st\.stepId\]\);/);
