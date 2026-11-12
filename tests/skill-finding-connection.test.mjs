@@ -227,6 +227,16 @@ test("a bigger step picked on a steady day survives its card opened on a stirred
   assert.ok(!values(smaller, "step", stirred).includes("friend_invite"), "a smaller step is still the smallest");
 });
 
+test("going back on a stirred first visit after booking the card never unlocks the bigger steps (Gate 3)", () => {
+  const stirred = ctx({ band: "stirred" });
+  let s = run([pick("area", "friend"), next], stirred);
+  const small = values(s, "step", stirred);
+  s = run([pick("step", small[0]), next, pick("predict", "well"), next, held, pick("when", "tomorrow"), pick("remind", "yes")], stirred, s);
+  for (let i = 0; i < 6 && s.stepId !== "step"; i++) s = M.runNext(stirred, s, { type: "back" });
+  assert.equal(s.stepId, "step");
+  assert.deepEqual(values(s, "step", stirred), small, "the same smallest steps, nothing bigger");
+});
+
 test("pick a smaller step: the smallest only, whatever the band", () => {
   const again = run([pick("happened", "not_yet"), next], ctx(), reopened(booked()));
   const st = run([pick("again", "smaller"), next], ctx(), again);

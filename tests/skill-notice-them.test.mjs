@@ -50,7 +50,7 @@ test("the skill: tool mindfulness-of-others on the new concept dbt_mindfulness_o
   for (const f of ["functions/src/profile/types.ts", "src/data/profileTypes.ts"]) {
     assert.match(readFileSync(f, "utf8"), /'mindfulness-of-others': \['people'\]/, f);
   }
-  assert.deepEqual(skill.accepts, ["personId", "band", "situationId"]);
+  assert.deepEqual(skill.accepts, ["personId", "band", "situationId", "frame"]);
 });
 
 test("the picker: someone unsafe gets the safety screen with this skill's heading, never the practice", () => {
@@ -103,7 +103,7 @@ test("the notice_back card reopens at back: did you get to notice them (or do it
   assert.equal(r.stepId, "back");
   assert.equal(title(r), "Did you get to notice them?");
   assert.equal(title(reopened(booked("fully", "walk"))), "Did you get to do it fully?");
-  assert.deepEqual(values(r, "back"), ["yes", "forgot", "couldnt", "not_seen"]);
+  assert.deepEqual(values(r, "back"), ["yes", "forgot", "couldnt", "not_seen", "unsafe"]);
   const yes = run([pick("back", "yes"), next], ctx(), r);
   assert.equal(yes.stepId, "noticed");
   const end = run([next], ctx(), yes);
@@ -125,7 +125,9 @@ test("forgot or didn't see them: another go books a new card; couldn't is a real
   assert.deepEqual(M.stepOf(skill, "again").followUp, { type: "notice_back", whenFrom: "again_when" });
   const couldnt = run([pick("back", "couldnt"), next], ctx(), reopened());
   assert.equal(couldnt.stepId, "couldnt");
-  assert.deepEqual(offers(couldnt), ["look_again"]);
+  assert.equal(line(couldnt), "Some days it's too much to be curious about someone. That's allowed.");
+  assert.deepEqual(offers(couldnt), ["recover", "look_again"]);
+  assert.equal(skill.copy[skill.exits.find((e) => e.id === "look_again").label], "Look again at what happened");
   assert.deepEqual(skill.exits.find((e) => e.id === "look_again").query, { situationId: "look_again", person: "$ctx.personId" });
 });
 
@@ -140,6 +142,7 @@ test("look again: what a camera would catch, then what I added, as two columns o
   assert.equal(title(added), "And what did you add?");
   assert.ok(values(added, "added").includes("nothing"), "nothing added is an answer");
   const st = columns(["no_reply", "short"], ["dont_care"], "think_so", "stressed");
+  assert.equal(skill.copy[skill.exits.find((e) => e.id === "one_message").label], "Send them one clear message");
   assert.equal(st.stepId, "columns");
   const step = M.stepOf(skill, "columns");
   assert.equal(step.embed, "twoColumns");
@@ -152,18 +155,21 @@ test("look again: what a camera would catch, then what I added, as two columns o
   assert.equal(line(run([read], ctx(), columns(["no_reply"], ["angry"], "not_sure", "tired"))), "Not knowing leaves room. Holding it a bit looser can make the next conversation easier.");
 });
 
-test("never asks the person to doubt themselves: sure, or nothing added, skips the not-knowing card", () => {
+test("never asks the person to doubt themselves: sure, when what they did outweighs what was added, or nothing added, skips the not-knowing card", () => {
   const sure = columns(["loud"], ["angry"], "sure");
   assert.equal(sure.stepId, "trust");
   assert.equal(M.stepOf(skill, "trust").props.foot, undefined);
   const end = run([read], ctx(), sure);
-  assert.equal(title(end), "You saw what happened.");
-  assert.equal(line(end), "You don't need to talk yourself out of it.");
+  assert.equal(title(end), "You're sure.");
+  assert.equal(line(end), "You don't have to argue yourself out of it. What they did is on the left; what it meant to you is on the right.");
   assert.deepEqual(offers(end), ["fast_let_go"]);
+  assert.equal(columns(["loud", "phone"], ["angry"], "sure").stepId, "trust", "more done than added");
+  assert.equal(columns(["loud"], ["angry", "always"], "sure").stepId, "not_knowing", "PRD: most chips in what they did, and sure");
   const nothing = columns(["said_no"], ["nothing"]);
   assert.equal(nothing.stepId, "trust", "nothing added: no certainty question either");
   const nEnd = run([read], ctx(), nothing);
-  assert.equal(line(nEnd), "You took it as it was. That's the practice.");
+  assert.equal(title(nEnd), "You took it as it was.");
+  assert.equal(line(nEnd), "That's the practice.");
   assert.deepEqual(offers(nEnd), []);
   assert.equal(columns(["said_no"], ["nothing", "angry"]).stepId, "sure", "nothing with something else is the something else");
 });
@@ -175,14 +181,58 @@ test("they meant to hurt me is always a valid answer, and goes to FAST's Let go 
   assert.equal(label("not_knowing", "meant_harm"), "They meant to hurt me");
   const harm = run([pick("not_knowing", "meant_harm"), next], ctx(), nk);
   assert.equal(harm.stepId, "harm_seen");
-  assert.equal(line(harm), "You don't have to find a kinder reading. Looking after yourself with them comes first.");
-  assert.deepEqual(offers(harm), ["fast_let_go", "recover"]);
+  assert.equal(line(harm), "You don't have to find a kinder reading. Looking after yourself with them comes first. If they might hurt or control you, there's help for that too.");
+  assert.deepEqual(offers(harm), ["fast_let_go", "recover", "ending_careful"]);
+  assert.ok(M.stepOf(skill, "harm_seen").noClose);
+  assert.deepEqual(skill.exits.find((e) => e.id === "ending_careful").query, { frame: "careful" });
   assert.deepEqual(skill.exits.find((e) => e.id === "fast_let_go").query, { frame: "let_go" });
 });
 
-test("Talk to someone now on every screen", () => {
+test("danger in what they did, or on the card, goes to the other-person resources and Ending, never the practice", () => {
+  for (const v of ["threatened", "hurt"]) {
+    assert.equal(skill.options.did.find((o) => o.value === v).danger, "other", v);
+    const st = run([...LOOK, pick("did", v)]);
+    assert.ok(M.stepOf(skill, "did").crisis.some((c) => c.variant === "other_person"));
+    const un = run([next], ctx(), st);
+    assert.equal(un.stepId, "unsafe", v);
+    assert.equal(title(un), "Your safety comes first.");
+    assert.match(line(un), /^You don't have to work out what they meant\./);
+    assert.deepEqual(offers(un), ["ending_careful"]);
+    assert.ok(M.stepOf(skill, "unsafe").noClose);
+    assert.deepEqual(M.stepOf(skill, "unsafe").crisis, [{ variant: "other_person", when: { all: [] } }]);
+  }
+  const back = run([pick("back", "unsafe"), next], ctx(), reopened());
+  assert.equal(back.stepId, "unsafe");
+  assert.equal(label("back", "unsafe"), "I don't feel safe with them");
+});
+
+test("it tends to go badly (heads_up): what was added asked lightly, *they meant to hurt me* first, Recover leads", () => {
+  const hu = ctx({ frame: "heads_up" });
+  const added = run([...LOOK, pick("did", "short"), next], hu);
+  assert.equal(line(added, hu), "If anything. Nothing is an answer too.");
+  assert.equal(line(added), "The meaning you put on it. Most of us add something.");
+  const nk = run([pick("added", "angry"), next, pick("sure", "think_so"), next], hu, added);
+  assert.equal(values(nk, "not_knowing", hu)[0], "meant_harm");
+  assert.equal(values(nk, "not_knowing")[0], "tired");
+  const harm = run([pick("not_knowing", "meant_harm"), next], hu, nk);
+  assert.deepEqual(offers(harm, hu), ["recover", "fast_let_go", "ending_careful"]);
+});
+
+test("the page sends heads_up from the picker's *it tends to go badly*", async () => {
+  const { noticeCtx } = await importTs("src/lib/personFirst.ts");
+  assert.deepEqual(noticeCtx({ personId: null, route: "heads_up" }), { personId: "none", frame: "heads_up" });
+  assert.deepEqual(noticeCtx({ personId: null, route: "ok" }), { personId: "none" });
+});
+
+test("observe copy: curiosity, never a read on how they are", () => {
+  assert.ok(!values(run([pick("way", "notice"), next]), "notice_what").includes("doing"));
+  assert.match(skill.copy.notice_hint, /a song you like/);
+  assert.equal(skill.copy.noticed_end_line, "Attention with curiosity, off the phone. It can get easier with practice.");
+});
+
+test("Talk to someone now on every screen, on a field that is always shown", () => {
   for (const s of skill.steps) {
-    const links = s.kind === "ask" ? s.fields.flatMap((f) => f.links ?? []) : (s.links ?? []);
+    const links = s.kind === "ask" ? s.fields.filter((f) => !f.showWhen).flatMap((f) => f.links ?? []) : (s.links ?? []);
     assert.ok(links.some((l) => l.exit === "safety_open"), s.id);
   }
 });
@@ -194,7 +244,8 @@ test("the entry points: the debrief after *they got defensive* (look again, with
   assert.deepEqual(deb.exits.find((e) => e.id === "notice_them").query, { situationId: "look_again", person: "$ctx.personId" });
   for (const id of ["good", "fix"]) {
     const o = deb.steps.find((s) => s.id === id).offers.find((x) => x.exit === "notice_them");
-    assert.deepEqual(o.when, { has: ["$a.moment.ids", "tp_defensive"] }, id);
+    assert.deepEqual(o.when, { all: [{ has: ["$a.moment.ids", "tp_defensive"] }, { not: { has: ["$a.moment.ids", "tp_escalated"] } },
+      { not: { has: ["$a.moment.ids", "tp_gave_in"] } }, { not: { in: ["$a.between", ["no", "unsafe"]] } }] }, id);
   }
 });
 
@@ -219,6 +270,10 @@ test("routing: critical / dismissive on Watchful → Check the Facts first, Noti
   }
   const p = await getStateAndToolsHandler({ quadrant: "high-unpleasant", emotions: ["Persecuted"] }, fixtureDeps(on));
   assert.ok(!p.tools.some((t) => t.id === "mindfulness-of-others"), "never for persecuted");
+  // Words are read one at a time: with critical as well, it still shows (the safety question and the danger picks
+  // answer it; notice-them.md, Routing).
+  const both = await getStateAndToolsHandler({ quadrant: "high-unpleasant", emotions: ["Critical", "Persecuted"] }, fixtureDeps(on));
+  assert.ok(both.tools.some((t) => t.id === "mindfulness-of-others"), JSON.stringify(both.tools.map((t) => t.id)));
   const row = on.recommendedFor.find((x) => x.id === "rf_chronic_vigilance_words_others_mindfulness-of-others");
   assert.deepEqual(row.bands, ["steady", "stirred"]);
   assert.equal(row.reviewStatus, "approved");

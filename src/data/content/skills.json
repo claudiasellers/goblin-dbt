@@ -8895,9 +8895,40 @@
               {
                 "exit": "notice_them",
                 "when": {
-                  "has": [
-                    "$a.moment.ids",
-                    "tp_defensive"
+                  "all": [
+                    {
+                      "has": [
+                        "$a.moment.ids",
+                        "tp_defensive"
+                      ]
+                    },
+                    {
+                      "not": {
+                        "has": [
+                          "$a.moment.ids",
+                          "tp_escalated"
+                        ]
+                      }
+                    },
+                    {
+                      "not": {
+                        "has": [
+                          "$a.moment.ids",
+                          "tp_gave_in"
+                        ]
+                      }
+                    },
+                    {
+                      "not": {
+                        "in": [
+                          "$a.between",
+                          [
+                            "no",
+                            "unsafe"
+                          ]
+                        ]
+                      }
+                    }
                   ]
                 }
               }
@@ -9093,9 +9124,40 @@
               {
                 "exit": "notice_them",
                 "when": {
-                  "has": [
-                    "$a.moment.ids",
-                    "tp_defensive"
+                  "all": [
+                    {
+                      "has": [
+                        "$a.moment.ids",
+                        "tp_defensive"
+                      ]
+                    },
+                    {
+                      "not": {
+                        "has": [
+                          "$a.moment.ids",
+                          "tp_escalated"
+                        ]
+                      }
+                    },
+                    {
+                      "not": {
+                        "has": [
+                          "$a.moment.ids",
+                          "tp_gave_in"
+                        ]
+                      }
+                    },
+                    {
+                      "not": {
+                        "in": [
+                          "$a.between",
+                          [
+                            "no",
+                            "unsafe"
+                          ]
+                        ]
+                      }
+                    }
                   ]
                 }
               }
@@ -16941,9 +17003,19 @@
                                     }
                                   },
                                   {
-                                    "eq": [
-                                      "$a.remind",
-                                      "yes"
+                                    "all": [
+                                      {
+                                        "eq": [
+                                          "$a.remind",
+                                          "yes"
+                                        ]
+                                      },
+                                      {
+                                        "has": [
+                                          "$a.step.ids",
+                                          "$opt.value"
+                                        ]
+                                      }
                                     ]
                                   }
                                 ]
@@ -35632,7 +35704,8 @@
         "accepts": [
           "personId",
           "band",
-          "situationId"
+          "situationId",
+          "frame"
         ],
         "ownMax": 60,
         "emotionFields": [],
@@ -35642,7 +35715,7 @@
           "way_flooded": "Looking again at what happened works better once your body settles. The other two are here now.",
           "cool_down": "Settle my body first",
           "notice_title": "Next time you're with them, notice one thing with curiosity.",
-          "notice_hint": "Not checking whether they're upset. Noticing them, the way you'd notice weather.",
+          "notice_hint": "Not checking whether they're upset. Noticing them, the way you'd notice a song you like.",
           "fully_title": "Pick one thing to do with them fully.",
           "fully_hint": "No phone, and go with it. If your mind drifts, come back to them.",
           "when_title": "When will you see them?",
@@ -35655,17 +35728,18 @@
           "noticed_title": "What did you notice?",
           "noticed_hint": "Anything counts, including about yourself.",
           "noticed_end_title": "That's mindfulness of someone else.",
-          "noticed_end_line": "Attention with curiosity, off the phone. It gets easier with practice.",
+          "noticed_end_line": "Attention with curiosity, off the phone. It can get easier with practice.",
           "again_title": "That's part of practising. Another go?",
           "again_when_label": "When will you see them next?",
           "again_set_line": "I'll ask again then.",
           "leave_line": "It'll keep. Come back to it any time.",
           "couldnt_title": "That's a real answer.",
-          "couldnt_line": "Some days it's too much to be curious about someone. Looking again at what happened can help.",
+          "couldnt_line": "Some days it's too much to be curious about someone. That's allowed.",
           "did_title": "What did they actually say or do?",
           "did_hint": "What a camera would have caught.",
           "added_title": "And what did you add?",
           "added_hint": "The meaning you put on it. Most of us add something.",
+          "added_hint_heads_up": "If anything. Nothing is an answer too.",
           "sure_title": "How sure are you of what you added?",
           "not_knowing_title": "What might have been going on for them?",
           "not_knowing_hint": "A guess. You can't know for sure, and that's allowed.",
@@ -35674,15 +35748,21 @@
           "col_did": "What they did",
           "col_added": "What I added",
           "col_maybe": "Maybe",
-          "end_title": "Two columns.",
+          "end_title": "That's the two columns.",
           "end_line_unsure": "Not knowing leaves room. Holding it a bit looser can make the next conversation easier.",
           "end_line": "Holding your reading a bit looser can make the next conversation easier.",
           "harm_title": "That's a real answer.",
-          "harm_line": "You don't have to find a kinder reading. Looking after yourself with them comes first.",
-          "trust_end_title": "You saw what happened.",
-          "trust_end_line": "You don't need to talk yourself out of it.",
-          "trust_end_nothing": "You took it as it was. That's the practice.",
+          "harm_line": "You don't have to find a kinder reading. Looking after yourself with them comes first. If they might hurt or control you, there's help for that too.",
+          "trust_end_title": "You're sure.",
+          "trust_end_line": "You don't have to argue yourself out of it. What they did is on the left; what it meant to you is on the right.",
+          "trust_end_nothing_title": "You took it as it was.",
+          "trust_end_nothing": "That's the practice.",
+          "unsafe_title": "Your safety comes first.",
+          "unsafe_line": "You don't have to work out what they meant. There's help for this, any time.",
           "safety_open": "Talk to someone now",
+          "look_again_offer": "Look again at what happened",
+          "one_message_offer": "Send them one clear message",
+          "fast_let_go_offer": "Let go, and keep your self-respect",
           "next": "Next",
           "done": "Done",
           "picker_personNew": "Someone new",
@@ -35710,8 +35790,52 @@
           "picker_safetyRouteNoticeHeading": "With {who}, noticing danger signs is the right kind of attention. Your safety comes first.",
           "own_words": "Something else"
         },
-        "tables": {},
-        "derive": [],
+        "tables": {
+          "balance": {
+            "-3": "added_more",
+            "0": "did_more"
+          },
+          "nk_first": {
+            "heads_up": "meant_harm"
+          }
+        },
+        "derive": [
+          {
+            "name": "balance",
+            "kind": "count",
+            "fields": [
+              "did",
+              "added"
+            ],
+            "weights": {
+              "short": 1,
+              "no_reply": 1,
+              "interrupted": 1,
+              "loud": 1,
+              "said_no": 1,
+              "forgot": 1,
+              "phone": 1,
+              "criticised": 1,
+              "left": 1,
+              "threatened": 1,
+              "hurt": 1,
+              "dont_care": -1,
+              "angry": -1,
+              "on_purpose": -1,
+              "think_less": -1,
+              "always": -1,
+              "pulling_away": -1
+            },
+            "table": "balance",
+            "default": "added_more"
+          },
+          {
+            "name": "nk_first",
+            "from": "$ctx.frame",
+            "table": "nk_first",
+            "default": null
+          }
+        ],
         "steps": [
           {
             "id": "way",
@@ -35998,6 +36122,17 @@
                 ]
               }
             ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.back",
+                    "unsafe"
+                  ]
+                }
+              }
+            ],
             "reopens": {
               "after": "when",
               "again": [
@@ -36011,6 +36146,15 @@
               "again_when"
             ],
             "next": [
+              {
+                "to": "unsafe",
+                "when": {
+                  "eq": [
+                    "$a.back",
+                    "unsafe"
+                  ]
+                }
+              },
               {
                 "to": "noticed",
                 "when": {
@@ -36110,7 +36254,16 @@
                   "list": "again"
                 },
                 "max": 1,
-                "required": true
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
               },
               {
                 "id": "again_when",
@@ -36125,16 +36278,7 @@
                     "$a.again",
                     "new_time"
                   ]
-                },
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
+                }
               }
             ],
             "followUp": {
@@ -36238,7 +36382,55 @@
             "next": [],
             "offers": [
               {
+                "exit": "recover",
+                "when": {
+                  "all": []
+                }
+              },
+              {
                 "exit": "look_again",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
+          },
+          {
+            "id": "unsafe",
+            "kind": "handoff",
+            "complete": true,
+            "title": "unsafe_title",
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "unsafe_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
+            "next": [],
+            "offers": [
+              {
+                "exit": "ending_careful",
                 "when": {
                   "all": []
                 }
@@ -36273,8 +36465,48 @@
                 ]
               }
             ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "any": [
+                    {
+                      "has": [
+                        "$a.did.ids",
+                        "threatened"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$a.did.ids",
+                        "hurt"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
             "hint": "did_hint",
             "next": [
+              {
+                "to": "unsafe",
+                "when": {
+                  "any": [
+                    {
+                      "has": [
+                        "$a.did.ids",
+                        "threatened"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$a.did.ids",
+                        "hurt"
+                      ]
+                    }
+                  ]
+                }
+              },
               {
                 "to": "added",
                 "when": null
@@ -36310,7 +36542,28 @@
                 ]
               }
             ],
-            "hint": "added_hint",
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "heads_up"
+                  ]
+                },
+                "key": "added_hint_heads_up"
+              },
+              {
+                "when": {
+                  "not": {
+                    "eq": [
+                      "$ctx.frame",
+                      "heads_up"
+                    ]
+                  }
+                },
+                "key": "added_hint"
+              }
+            ],
             "next": [
               {
                 "to": "trust",
@@ -36406,9 +36659,19 @@
               {
                 "to": "trust",
                 "when": {
-                  "eq": [
-                    "$a.sure",
-                    "sure"
+                  "all": [
+                    {
+                      "eq": [
+                        "$a.sure",
+                        "sure"
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$d.balance",
+                        "did_more"
+                      ]
+                    }
                   ]
                 }
               },
@@ -36427,7 +36690,8 @@
               {
                 "id": "not_knowing",
                 "options": {
-                  "list": "not_knowing"
+                  "list": "not_knowing",
+                  "firstFrom": "$d.nk_first"
                 },
                 "max": 1,
                 "required": true,
@@ -36572,6 +36836,15 @@
             "next": [],
             "offers": [
               {
+                "exit": "recover",
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "heads_up"
+                  ]
+                }
+              },
+              {
                 "exit": "fast_let_go",
                 "when": {
                   "all": []
@@ -36579,6 +36852,17 @@
               },
               {
                 "exit": "recover",
+                "when": {
+                  "not": {
+                    "eq": [
+                      "$ctx.frame",
+                      "heads_up"
+                    ]
+                  }
+                }
+              },
+              {
+                "exit": "ending_careful",
                 "when": {
                   "all": []
                 }
@@ -36620,7 +36904,71 @@
             "id": "trust_end",
             "kind": "handoff",
             "complete": true,
-            "title": "trust_end_title",
+            "title": [
+              {
+                "key": "trust_end_nothing_title",
+                "when": {
+                  "all": [
+                    {
+                      "has": [
+                        "$a.added.ids",
+                        "nothing"
+                      ]
+                    },
+                    {
+                      "not": {
+                        "any": [
+                          {
+                            "has": [
+                              "$a.added.ids",
+                              "dont_care"
+                            ]
+                          },
+                          {
+                            "has": [
+                              "$a.added.ids",
+                              "angry"
+                            ]
+                          },
+                          {
+                            "has": [
+                              "$a.added.ids",
+                              "on_purpose"
+                            ]
+                          },
+                          {
+                            "has": [
+                              "$a.added.ids",
+                              "think_less"
+                            ]
+                          },
+                          {
+                            "has": [
+                              "$a.added.ids",
+                              "always"
+                            ]
+                          },
+                          {
+                            "has": [
+                              "$a.added.ids",
+                              "pulling_away"
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "not": {
+                        "set": "$a.added.own"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "key": "trust_end_title"
+              }
+            ],
             "lines": [
               {
                 "when": {
@@ -36684,7 +37032,63 @@
               },
               {
                 "when": {
-                  "all": []
+                  "not": {
+                    "all": [
+                      {
+                        "has": [
+                          "$a.added.ids",
+                          "nothing"
+                        ]
+                      },
+                      {
+                        "not": {
+                          "any": [
+                            {
+                              "has": [
+                                "$a.added.ids",
+                                "dont_care"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$a.added.ids",
+                                "angry"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$a.added.ids",
+                                "on_purpose"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$a.added.ids",
+                                "think_less"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$a.added.ids",
+                                "always"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$a.added.ids",
+                                "pulling_away"
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "not": {
+                          "set": "$a.added.own"
+                        }
+                      }
+                    ]
+                  }
                 },
                 "key": "trust_end_line"
               }
@@ -36782,13 +37186,23 @@
             "done": true
           },
           {
+            "id": "ending_careful",
+            "toolId": "ending-relationships",
+            "query": {
+              "frame": "careful"
+            },
+            "carry": [],
+            "done": false
+          },
+          {
             "id": "fast_let_go",
             "toolId": "fast",
             "query": {
               "frame": "let_go"
             },
             "carry": [],
-            "done": false
+            "done": false,
+            "label": "fast_let_go_offer"
           },
           {
             "id": "look_again",
@@ -36798,7 +37212,8 @@
               "person": "$ctx.personId"
             },
             "carry": [],
-            "done": false
+            "done": false,
+            "label": "look_again_offer"
           },
           {
             "id": "one_message",
@@ -36808,7 +37223,8 @@
               "person": "$ctx.personId"
             },
             "carry": [],
-            "done": false
+            "done": false,
+            "label": "one_message_offer"
           },
           {
             "id": "recover",
@@ -36854,8 +37270,12 @@
               "label": "What they care about right now"
             },
             {
-              "value": "doing",
-              "label": "How they're doing"
+              "value": "into",
+              "label": "What they're into lately"
+            },
+            {
+              "value": "laugh",
+              "label": "Something that makes them laugh"
             },
             {
               "value": "good_at",
@@ -36928,6 +37348,11 @@
             {
               "value": "not_seen",
               "label": "We didn't see each other"
+            },
+            {
+              "value": "unsafe",
+              "label": "I don't feel safe with them",
+              "danger": "other"
             }
           ],
           "noticed": [
@@ -36936,8 +37361,8 @@
               "label": "They seemed tired or busy"
             },
             {
-              "value": "seemed_glad",
-              "label": "They seemed glad to see me"
+              "value": "laughed",
+              "label": "Something we laughed about"
             },
             {
               "value": "something_new",
@@ -36998,6 +37423,16 @@
             {
               "value": "left",
               "label": "Walked away"
+            },
+            {
+              "value": "threatened",
+              "label": "Threatened me, or scared me",
+              "danger": "other"
+            },
+            {
+              "value": "hurt",
+              "label": "Hurt me, or grabbed me",
+              "danger": "other"
             }
           ],
           "added": [

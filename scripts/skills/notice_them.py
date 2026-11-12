@@ -15,20 +15,23 @@ Steps:
                (the debrief after *they got defensive*, and *I couldn't*: look again). A carried flooded
                reading doesn't get *look again* (PRD: never while flooded; Recover owns the acute path).
   notice       observe: one thing to notice next time, with curiosity (their face, what they care about right now,
-               how they're doing, …). Curiosity, not checking on them (the hypervigilance guard).
+               what they're into lately, …). Curiosity, not checking on them (the hypervigilance guard): no chip
+               asks how they are.
   fully        participate: one thing to do with them fully, no phone, going with it.
   when         when you'll see them, and *Want me to ask how it went?* (`notice_back`).
   set          the practice, and *notice yourself too* (the PRD's closing cue).
   back         the `notice_back` card reopens the run here (R9): *Did you get to notice them?* / *Did you get to do
-               it?* yes · I forgot · I couldn't · we didn't see each other.
+               it?* yes · I forgot · I couldn't · we didn't see each other · I don't feel safe with them (→ unsafe).
   noticed      yes: what did you notice? (optional) → noticed_end.
   again        forgot or didn't see them: another go (a new card) or leave it. couldn't → couldnt (a real answer;
                look again at what happened, offered).
   did          describe: what did they actually say or do? What a camera would catch (up to three, own words).
+               *Threatened me* / *Hurt me* show the other-person resources and go to `unsafe` (Ending, careful).
   added        and what did you add? The meaning you put on it (up to three, own words; *Nothing, I took it as it
                was* is an answer).
-  sure         how sure are you of what you added? sure · think so · not sure. Sure goes to `trust` (PRD: never asks
-               the person to doubt themselves), and so does *Nothing*.
+  sure         how sure are you of what you added? sure · think so · not sure. Sure goes to `trust` when what they
+               did outweighs what was added (a counting derive; PRD: never asks the person to doubt themselves), and
+               so does *Nothing*.
   not_knowing  think so / not sure: what might have been going on for them? (one pick; a guess). *They meant to hurt
                me* is always a valid answer and goes to `harm_seen` (FAST's Let go, Recover), never to more empathy.
   columns      the two columns on paper (`twoColumns`): what they did, what I added, and the maybe line.
@@ -67,6 +70,7 @@ def has(field, v):
 
 ALWAYS = {"all": []}
 FLOODED = {"eq": ["$ctx.band", "flooded"]}
+HEADS_UP = {"eq": ["$ctx.frame", "heads_up"]}  # the picker's *it tends to go badly*
 SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
 
 # The picker's copy (the shared keys from DEAR MAN's content; this skill's own question and safety heading).
@@ -97,7 +101,7 @@ COPY = {
     "cool_down": "Settle my body first",
     # --- Observe ---
     "notice_title": "Next time you're with them, notice one thing with curiosity.",
-    "notice_hint": "Not checking whether they're upset. Noticing them, the way you'd notice weather.",
+    "notice_hint": "Not checking whether they're upset. Noticing them, the way you'd notice a song you like.",
     # --- Participate ---
     "fully_title": "Pick one thing to do with them fully.",
     "fully_hint": "No phone, and go with it. If your mind drifts, come back to them.",
@@ -112,18 +116,19 @@ COPY = {
     "noticed_title": "What did you notice?",
     "noticed_hint": "Anything counts, including about yourself.",
     "noticed_end_title": "That's mindfulness of someone else.",
-    "noticed_end_line": "Attention with curiosity, off the phone. It gets easier with practice.",
+    "noticed_end_line": "Attention with curiosity, off the phone. It can get easier with practice.",
     "again_title": "That's part of practising. Another go?",
     "again_when_label": "When will you see them next?",
     "again_set_line": "I'll ask again then.",
     "leave_line": "It'll keep. Come back to it any time.",
     "couldnt_title": "That's a real answer.",
-    "couldnt_line": "Some days it's too much to be curious about someone. Looking again at what happened can help.",
+    "couldnt_line": "Some days it's too much to be curious about someone. That's allowed.",
     # --- Describe: the two columns ---
     "did_title": "What did they actually say or do?",
     "did_hint": "What a camera would have caught.",
     "added_title": "And what did you add?",
     "added_hint": "The meaning you put on it. Most of us add something.",
+    "added_hint_heads_up": "If anything. Nothing is an answer too.",
     "sure_title": "How sure are you of what you added?",
     "not_knowing_title": "What might have been going on for them?",
     "not_knowing_hint": "A guess. You can't know for sure, and that's allowed.",
@@ -132,15 +137,23 @@ COPY = {
     "col_did": "What they did",
     "col_added": "What I added",
     "col_maybe": "Maybe",
-    "end_title": "Two columns.",
+    "end_title": "That's the two columns.",
     "end_line_unsure": "Not knowing leaves room. Holding it a bit looser can make the next conversation easier.",
     "end_line": "Holding your reading a bit looser can make the next conversation easier.",
     "harm_title": "That's a real answer.",
-    "harm_line": "You don't have to find a kinder reading. Looking after yourself with them comes first.",
-    "trust_end_title": "You saw what happened.",
-    "trust_end_line": "You don't need to talk yourself out of it.",
-    "trust_end_nothing": "You took it as it was. That's the practice.",
+    "harm_line": "You don't have to find a kinder reading. Looking after yourself with them comes first. If they might hurt or control you, there's help for that too.",
+    "trust_end_title": "You're sure.",
+    "trust_end_line": "You don't have to argue yourself out of it. What they did is on the left; what it meant to you is on the right.",
+    "trust_end_nothing_title": "You took it as it was.",
+    "trust_end_nothing": "That's the practice.",
+    # Danger in what they did, or on the card: never a practice in reading them kindly (Gate 3).
+    "unsafe_title": "Your safety comes first.",
+    "unsafe_line": "You don't have to work out what they meant. There's help for this, any time.",
     "safety_open": "Talk to someone now",
+    # Exit labels: where each offer lands, in this skill's words (Gate 2).
+    "look_again_offer": "Look again at what happened",
+    "one_message_offer": "Send them one clear message",
+    "fast_let_go_offer": "Let go, and keep your self-respect",
     "next": "Next",
     "done": "Done",
     **PICKER_COPY,
@@ -154,7 +167,8 @@ WAY = [
 NOTICE = [
     ("face", "Their face"),
     ("cares", "What they care about right now"),
-    ("doing", "How they're doing"),
+    ("into", "What they're into lately"),
+    ("laugh", "Something that makes them laugh"),
     ("good_at", "Something they're good at"),
     ("new", "Something I hadn't noticed before"),
 ]
@@ -167,10 +181,11 @@ FULLY = [
 ]
 WHEN = [("today", "Later today"), ("tomorrow", "Tomorrow"), ("few_days", "In a few days"), ("this_week", "Sometime this week")]
 REMIND = [("yes", "Yes")]
-BACK = [("yes", "Yes"), ("forgot", "I forgot"), ("couldnt", "I couldn't"), ("not_seen", "We didn't see each other")]
+BACK = [("yes", "Yes"), ("forgot", "I forgot"), ("couldnt", "I couldn't"), ("not_seen", "We didn't see each other"),
+        ("unsafe", "I don't feel safe with them")]
 NOTICED = [
     ("seemed_tired", "They seemed tired or busy"),
-    ("seemed_glad", "They seemed glad to see me"),
+    ("laughed", "Something we laughed about"),
     ("something_new", "Something new about them"),
     ("what_matters", "What matters to them"),
     ("calmer", "I was calmer around them"),
@@ -187,7 +202,10 @@ DID = [
     ("phone", "Looked at their phone"),
     ("criticised", "Criticised something"),
     ("left", "Walked away"),
+    ("threatened", "Threatened me, or scared me"),
+    ("hurt", "Hurt me, or grabbed me"),
 ]
+DID_DANGER = ("threatened", "hurt")
 # What I added (the meaning, not the facts).
 ADDED = [
     ("dont_care", "They don't care"),
@@ -210,6 +228,16 @@ NOT_KNOWING = [
     ("dont_know", "I don't know"),
 ]
 
+DANGER_DID = {"any": [has("did", v) for v in DID_DANGER]}
+UNSAFE_BACK = is_("back", "unsafe")
+
+# *Sure* goes to the columns and Let go only when what they did outweighs what was added (PRD IE-10: most chips in
+# *what they did*): a counting derive, each *did* pick +1 and each meaning added -1 (*Nothing* counts 0). Own words
+# aren't counted.
+BALANCE_WEIGHTS = {**{v: 1 for v, _ in DID}, **{v: -1 for v, _ in ADDED if v != "nothing"}}
+BALANCE_TABLE = {"-3": "added_more", "0": "did_more"}
+DID_OUTWEIGHS = {"eq": ["$d.balance", "did_more"]}
+
 # Nothing, and nothing else: picking *Nothing* with something else is read as the something else.
 ADDED_NOTHING = {"all": [has("added", "nothing"),
                          {"not": {"any": [has("added", v) for v, _ in ADDED if v != "nothing"]}},
@@ -217,9 +245,10 @@ ADDED_NOTHING = {"all": [has("added", "nothing"),
 
 
 def ask(sid, title, hint, fields, nxt, **extra):
-    # *Talk to someone now* on every screen: an ask step's links live on a field, the last, so they sit below the form.
-    last = fields[-1]
-    fields = [*fields[:-1], {**last, "links": [*last.get("links", []), SAFETY_LINK]}]
+    # *Talk to someone now* on every screen: an ask step's links live on a field, the last one always shown (a field
+    # with `showWhen` can be hidden, and its links with it; Gate 2), so they sit below the form.
+    i = max(j for j, f in enumerate(fields) if "showWhen" not in f)
+    fields = [*fields[:i], {**fields[i], "links": [*fields[i].get("links", []), SAFETY_LINK]}, *fields[i + 1:]]
     s = {"id": sid, "kind": "ask", "title": title, "fields": fields, "next": nxt, **extra}
     if hint:
         s["hint"] = hint
@@ -261,7 +290,9 @@ STEPS = [
     # --- The notice_back card reopens the run here (R9), on a run that reached `when` ---
     ask("back", [{"key": "back_title_fully", "when": is_("way", "fully")}, {"key": "back_title_notice"}], None,
         [field("back", "back")],
-        [{"when": is_("back", "yes"), "to": "noticed"}, {"when": is_("back", "couldnt"), "to": "couldnt"}, {"to": "again"}],
+        [{"when": UNSAFE_BACK, "to": "unsafe"}, {"when": is_("back", "yes"), "to": "noticed"},
+         {"when": is_("back", "couldnt"), "to": "couldnt"}, {"to": "again"}],
+        crisis=[{"variant": "other_person", "when": UNSAFE_BACK}],
         reopens={"after": "when", "again": ["again"]}, clears=["back", "noticed", "again", "again_when"]),
     ask("noticed", "noticed_title", "noticed_hint", [field("noticed", "noticed", mx=2, required=False, own="own_words")],
         [{"to": "noticed_end"}]),
@@ -273,15 +304,22 @@ STEPS = [
         followUp={"type": "notice_back", "whenFrom": "again_when"}),
     handoff("again_set", "set_title", [{"when": ALWAYS, "key": "again_set_line"}], []),
     handoff("leave", "again_title", [{"when": ALWAYS, "key": "leave_line"}], [], no_close=True),
-    handoff("couldnt", "couldnt_title", [{"when": ALWAYS, "key": "couldnt_line"}], [{"exit": "look_again", "when": ALWAYS}],
+    handoff("couldnt", "couldnt_title", [{"when": ALWAYS, "key": "couldnt_line"}], [{"exit": "recover", "when": ALWAYS}, {"exit": "look_again", "when": ALWAYS}],
             no_close=True),
+    # Danger in what they did or on the card: the other-person resources, Ending in its careful frame, no practice.
+    handoff("unsafe", "unsafe_title", [{"when": ALWAYS, "key": "unsafe_line"}],
+            [{"exit": "ending_careful", "when": ALWAYS}], no_close=True,
+            crisis=[{"variant": "other_person", "when": ALWAYS}]),
     # --- Describe: what they did, what I added (the two columns) ---
-    ask("did", "did_title", "did_hint", [field("did", "did", mx=3, own="own_words")], [{"to": "added"}]),
-    ask("added", "added_title", "added_hint", [field("added", "added", mx=3, own="own_words")],
-        [{"when": ADDED_NOTHING, "to": "trust"}, {"to": "sure"}]),
+    ask("did", "did_title", "did_hint", [field("did", "did", mx=3, own="own_words")],
+        [{"when": DANGER_DID, "to": "unsafe"}, {"to": "added"}],
+        crisis=[{"variant": "other_person", "when": DANGER_DID}]),
+    ask("added", "added_title", None, [field("added", "added", mx=3, own="own_words")],
+        [{"when": ADDED_NOTHING, "to": "trust"}, {"to": "sure"}],
+        lines=[{"when": HEADS_UP, "key": "added_hint_heads_up"}, {"when": {"not": HEADS_UP}, "key": "added_hint"}]),
     ask("sure", "sure_title", None, [field("sure", "sure")],
-        [{"when": is_("sure", "sure"), "to": "trust"}, {"to": "not_knowing"}]),
-    ask("not_knowing", "not_knowing_title", "not_knowing_hint", [field("not_knowing", "not_knowing")],
+        [{"when": {"all": [is_("sure", "sure"), DID_OUTWEIGHS]}, "to": "trust"}, {"to": "not_knowing"}]),
+    ask("not_knowing", "not_knowing_title", "not_knowing_hint", [field("not_knowing", "not_knowing", first="$d.nk_first")],
         [{"when": is_("not_knowing", "meant_harm"), "to": "harm_seen"}, {"to": "columns"}]),
     {"id": "columns", "kind": "embed", "embed": "twoColumns", "answerAs": "columns_read", "title": "columns_title",
      "hint": "columns_hint", "props": {**COLUMNS_PROPS, "foot": "not_knowing", "footLabel": "col_maybe"},
@@ -292,22 +330,25 @@ STEPS = [
             [{"exit": "one_message", "when": ALWAYS}]),
     # PRD IE-10: *meant to hurt me* is always valid, and routes to FAST's Let go, not to more empathy.
     handoff("harm_seen", "harm_title", [{"when": ALWAYS, "key": "harm_line"}],
-            [{"exit": "fast_let_go", "when": ALWAYS}, {"exit": "recover", "when": ALWAYS}], no_close=True),
+            [{"exit": "recover", "when": HEADS_UP}, {"exit": "fast_let_go", "when": ALWAYS},
+             {"exit": "recover", "when": {"not": HEADS_UP}}, {"exit": "ending_careful", "when": ALWAYS}], no_close=True),
     # Sure, or nothing added: the columns, and never a question that asks the person to doubt what they saw.
     {"id": "trust", "kind": "embed", "embed": "twoColumns", "answerAs": "columns_read", "title": "columns_title",
      "hint": "columns_hint", "props": COLUMNS_PROPS, "links": [SAFETY_LINK], "next": [{"to": "trust_end"}]},
-    handoff("trust_end", "trust_end_title",
-            [{"when": ADDED_NOTHING, "key": "trust_end_nothing"}, {"when": ALWAYS, "key": "trust_end_line"}],
+    handoff("trust_end", [{"key": "trust_end_nothing_title", "when": ADDED_NOTHING}, {"key": "trust_end_title"}],
+            [{"when": ADDED_NOTHING, "key": "trust_end_nothing"}, {"when": {"not": ADDED_NOTHING}, "key": "trust_end_line"}],
             [{"exit": "fast_let_go", "when": {"not": ADDED_NOTHING}}]),
 ]
 COPY["own_words"] = "Something else"
 
 EXITS = [
     {"id": "cool_down", "toolId": "cool-down"},                                       # DT-01 First, the body (flooded)
-    {"id": "look_again", "toolId": "mindfulness-of-others", "query": {"situationId": "look_again", "person": "$ctx.personId"}},
-    {"id": "one_message", "toolId": "dear-man", "query": {"mode": "one", "person": "$ctx.personId"}},
-    {"id": "fast_let_go", "toolId": "fast", "query": {"frame": "let_go"}},
+    {"id": "look_again", "toolId": "mindfulness-of-others", "query": {"situationId": "look_again", "person": "$ctx.personId"},
+     "label": "look_again_offer"},
+    {"id": "one_message", "toolId": "dear-man", "query": {"mode": "one", "person": "$ctx.personId"}, "label": "one_message_offer"},
+    {"id": "fast_let_go", "toolId": "fast", "query": {"frame": "let_go"}, "label": "fast_let_go_offer"},
     {"id": "recover", "toolId": "recovering-from-invalidation"},
+    {"id": "ending_careful", "toolId": "ending-relationships", "query": {"frame": "careful"}},
     {"id": "safety_open", "toolId": None, "safety": True},
     {"id": "done", "done": True},
 ]
@@ -319,10 +360,10 @@ def options():
     out += [("fully", v, label, {}, None) for v, label in FULLY]
     out += [("when", v, label, {}, None) for v, label in WHEN]
     out += [("remind", v, label, {}, None) for v, label in REMIND]
-    out += [("back", v, label, {}, None) for v, label in BACK]
+    out += [("back", v, label, {"danger": "other"} if v == "unsafe" else {}, None) for v, label in BACK]
     out += [("noticed", v, label, {}, None) for v, label in NOTICED]
     out += [("again", v, label, {}, None) for v, label in AGAIN]
-    out += [("did", v, label, {}, None) for v, label in DID]
+    out += [("did", v, label, {"danger": "other"} if v in DID_DANGER else {}, None) for v, label in DID]
     out += [("added", v, label, {}, None) for v, label in ADDED]
     out += [("sure", v, label, {}, None) for v, label in SURE]
     out += [("not_knowing", v, label, {}, None) for v, label in NOT_KNOWING]
@@ -333,7 +374,13 @@ SKILL = {
     "id": ID, "toolId": TOOL_ID, "concept": CONCEPT, "version": VERSION, "start": "way", "ownMax": OWN_MAX,
     # personId: the person picked on the page (or `none`); band: a host's or the carried reading (flooded: no looking
     # again); situationId: which way in comes first (the debrief: look_again).
-    "accepts": ["personId", "band", "situationId"],
-    "copy": COPY, "tables": {}, "derive": [], "steps": STEPS, "exits": EXITS, "options": options(),
+    # frame: heads_up when the picker's answer was *it tends to go badly* (lighter on what was added, harm first).
+    "accepts": ["personId", "band", "situationId", "frame"],
+    "copy": COPY, "tables": {"balance": BALANCE_TABLE, "nk_first": {"heads_up": "meant_harm"}},
+    "derive": [
+        {"name": "balance", "kind": "count", "fields": ["did", "added"], "weights": BALANCE_WEIGHTS, "table": "balance",
+         "default": "added_more"},
+        {"name": "nk_first", "from": "$ctx.frame", "table": "nk_first", "default": None},
+    ], "steps": STEPS, "exits": EXITS, "options": options(),
     "emotionFields": [],
 }

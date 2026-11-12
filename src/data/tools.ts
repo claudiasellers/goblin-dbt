@@ -371,7 +371,7 @@ export const tools: Tool[] = [
     whenToUse: 'When you were sure they meant it, or you\'re planning your comeback instead of listening.',
     module: 'interpersonal-effectiveness',
     dbtBasis: 'DBT IE Handout 12 (mindfulness of others)',
-    emoji: '👀',
+    emoji: '🌤️',
     bare: true,
   },
   {
@@ -469,7 +469,7 @@ export const allIntents: Intent[] = [
   { id: 'say-no', label: 'Say no to someone', toolId: 'say-no', emoji: '🙅' },
   { id: 'give', label: 'Repair things after a fight, or keep it warm', toolId: 'give', emoji: '🤝' },
   { id: 'less-alone', label: 'Feel less alone', toolId: 'finding-connection', emoji: '🌱' },
-  { id: 'look-again', label: 'I was sure they meant it', toolId: 'mindfulness-of-others', emoji: '👀' },
+  { id: 'look-again', label: 'I was sure they meant it', toolId: 'mindfulness-of-others', emoji: '🌤️' },
   { id: 'overreacting', label: 'I can\'t tell if I\'m overreacting', toolId: 'check-the-facts', emoji: '🔍' },
   { id: 'not-working', label: 'My skills aren\'t working', toolId: 'er-troubleshoot', emoji: '🧩' },
   { id: 'running-low', label: 'Everything feels like too much today', toolId: 'please-skill', emoji: '🔋' },

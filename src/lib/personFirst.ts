@@ -42,11 +42,12 @@ export function giveCtx(p: PickedPerson, people: readonly KeptPerson[] | null): 
 }
 
 /**
- * Notice them's context (docs/design/notice-them.md): the kept person's id, or `none`. *It tends to go badly* changes
- * nothing here (the practice is curiosity, never a conversation with them); the safety route never gets here.
+ * Notice them's context (docs/design/notice-them.md): the kept person's id, or `none`, and *it tends to go badly* as
+ * the `heads_up` frame (what was added is asked more lightly, *They meant to hurt me* comes first, and Recover leads
+ * on `harm_seen`). The safety route never gets here.
  */
 export function noticeCtx(p: PickedPerson): Record<string, string> {
-  return { personId: p.personId ?? 'none' };
+  return { personId: p.personId ?? 'none', ...(p.route === 'heads_up' ? { frame: 'heads_up' } : {}) };
 }
 
 /**

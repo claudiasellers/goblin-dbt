@@ -175,8 +175,9 @@ NOT_NO_ANSWER = {"any": [CONTACT, {"not": {"eq": ["$opt.value", "no_answer"]}}]}
 FOR_AREA = {"eq": ["$opt.area", a("area")]}
 # A step already planned stays valid whatever the band when its card reopens the run: the reopened run is checked
 # against today's context, and a steady day's bigger step must not vanish on a stirred one (Codex on #114). Only a run
-# that booked the card reopens, and `remind` is read back (an embed's answer isn't). *Pick a smaller step* still narrows it.
-PLANNED = {"eq": [a("remind"), "yes"]}
+# that booked the card reopens, and `remind` is read back (an embed's answer isn't). Only the booked step itself stays:
+# going back on a low first visit never unlocks the bigger ones (Gate 3). *Pick a smaller step* still narrows it.
+PLANNED = {"all": [{"eq": [a("remind"), "yes"]}, {"has": [a("step") + ".ids", "$opt.value"]}]}
 SMALL_IF_LOW = {"any": [{"all": [{"any": [{"not": LOW}, PLANNED]}, {"not": SMALLER}]}, {"eq": ["$opt.small", True]}]}
 # The prediction and the outcome share a scale, so the gap is one comparison.
 HOW = [("well", "Well"), ("mixed", "Mixed"), ("badly", "Badly"), ("no_answer", "No one will respond")]
