@@ -31,7 +31,13 @@ test("shipped tool-names.json is the schema's concept names (the next graph load
   assert.match(f.source.file, /^(graph-content-only-.*\.json|tests\/fixtures\/recommendation-graph\.json \(from the schema files\))$/);
   const fx = JSON.parse(readFileSync("tests/fixtures/recommendation-graph.json", "utf8"));
   const expected = buildToolNames(indexGraph(concepts(Object.entries(fx.concepts).map(([id, c]) => ({ id, ...c })))));
-  assert.deepEqual(f.content, expected);
+  // Compared over the app's tools: a name is only ever read by an app tool's id (toolLabel), and Aura can hold an
+  // appToolId the schema no longer sets (MERGE never removes a property: the live dbt_please carries 'please-skill',
+  // a tool the app doesn't have), which the next refresh writes back into the file.
+  const appIds = new Set(tools.map((t) => t.id));
+  const inApp = (o) => Object.fromEntries(Object.entries(o).filter(([id]) => appIds.has(id)));
+  assert.deepEqual(inApp(f.content.tools), inApp(expected.tools));
+  assert.deepEqual(Object.keys(expected.tools).filter((id) => !appIds.has(id)), [], "the schema names no tool the app lacks");
   // The examples the switch was asked for.
   assert.equal(f.content.tools["urge-surfing"], "Urge Surfing");
   assert.equal(f.content.tools["let-it-be"], "Radical Acceptance");

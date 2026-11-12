@@ -15,7 +15,7 @@ export type Surface = 'checkin' | 'dear_man_debrief';
 export const SURFACES: readonly Surface[] = ['checkin', 'dear_man_debrief'];
 export type Side = 'acceptance' | 'change' | 'both';
 export type Direction = 'down' | 'up' | 'orient' | 'neutral';
-export type SkillKind = 'body' | 'orient' | 'hold' | 'change' | 'naming' | 'relational' | 'redirect';
+export type SkillKind = 'body' | 'orient' | 'hold' | 'change' | 'naming' | 'relational' | 'redirect' | 'values';
 export type RejectReason = 'band' | 'direction' | 'contraindicated' | 'emotion_gate' | 'diversity';
 export type Slot = 'primary' | 'swap';
 

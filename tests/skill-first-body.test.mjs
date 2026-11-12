@@ -1,6 +1,6 @@
 // First, the body (PRD DT-01; DBT DT Handouts 1-3, 6; docs/design/first-the-body.md) on the skill runtime: one tap for
 // the state, one body mode per screen, the close asked in the flow (quieter → the fork; not quieter → one swap, then
-// lowering the demand with someone on the screen). Cold only after the one-tap self-check (D4); frozen and far away
+// lowering the demand with someone on the screen). Cold carries its caution line (D4, changed 12 Nov); frozen and far away
 // never get a calming mode (C6.3); chest pain or fainting gets the emergency number; a pull to do something goes to
 // Hold to wait. Tested through the same pure machine the player runs.
 import { test } from "node:test";
@@ -26,10 +26,10 @@ const next = { type: "next" };
 const did = (id = "done") => ({ type: "embedDone", output: { ids: [id], durationSec: 10 } });
 const run = (events, c = ctx(), from = M.initialRun(skill)) => events.reduce((s, e) => M.runNext(c, s, e), from);
 const offers = (s) => M.offersFor(ctx(), M.stepOf(skill, s.stepId), s);
-const CALMING = ["cold", "cool", "exhale", "squeeze"];
+const CALMING = ["cold", "exhale", "squeeze"];
 
 // The first mode for each state, as far as its first check.
-const WAVE_COLD = [pick("state", "wave"), next, pick("screen", "none"), next, pick("cold_near", "yes"), next, did()];
+const WAVE_COLD = [pick("state", "wave"), next, pick("cold_near", "yes"), next, did()];
 const FIRST = {
   wave: WAVE_COLD,
   frozen: [pick("state", "frozen"), next, did("held")],
@@ -49,7 +49,7 @@ test("the skill: tool cool-down, named First, the body, then-vs-now close kind, 
 
 test("each state gets its own first mode", () => {
   const at = (state) => run([pick("state", state), next]).stepId;
-  assert.equal(at("wave"), "screen", "cold is only ever after the self-check");
+  assert.equal(at("wave"), "cold_near", "the wave: is there something cold near you?");
   assert.equal(at("frozen"), "press");
   assert.equal(at("far_away"), "orient");
   assert.equal(at("loop"), "find");
@@ -58,25 +58,21 @@ test("each state gets its own first mode", () => {
   assert.equal(at("medical"), "medical");
 });
 
-test("D4: cold only after the one-tap self-check; any flag rules it out; not sure gets the gentle cool cloth", () => {
-  const wave = (screen, near) => run([pick("state", "wave"), next, pick("screen", screen), next, ...(near ? [pick("cold_near", near), next] : [])]).stepId;
-  assert.equal(wave("some"), "squeeze", "a flag: squeeze and drop, never cold");
-  assert.equal(wave("none", "yes"), "cold");
-  assert.equal(wave("none", "no"), "squeeze", "nothing cold near: squeeze and drop");
-  assert.equal(wave("unsure", "yes"), "cool");
+test("D4 (changed 12 Nov): no self-check before cold; the cold card carries the one caution line", () => {
+  const wave = (near) => run([pick("state", "wave"), next, pick("cold_near", near), next]).stepId;
+  assert.equal(wave("yes"), "cold");
+  assert.equal(wave("no"), "squeeze", "nothing cold near: squeeze and drop");
+  assert.equal(skill.steps.find((s) => s.id === "screen"), undefined, "no screen step");
+  assert.equal(skill.steps.find((s) => s.id === "cool"), undefined, "no not-sure cool cloth (it hung on the screen)");
   const cold = M.stepOf(skill, "cold").props;
-  const cool = M.stepOf(skill, "cool").props;
-  assert.ok(cold.seconds <= 30 && cool.seconds <= 15, "15-30 s; a cool cloth is shorter");
-  assert.match(skill.copy[cold.caution], /Never in a shower or a bath/);
-  assert.match(skill.copy[cool.caution], /Stop if anything feels wrong/);
-  for (const flag of [/slow heart/, /heart medicine/, /Fainting/, /eating disorder/, /very low weight/, /Pregnant/, /Raynaud's/, /cold allergy/, /Drinking or using today/])
-    assert.match(skill.copy.screen_hint, flag, "the self-check names every cold contraindication (Gate 3)");
-  // No path reaches cold or the cool cloth without the self-check answered none or not sure.
+  assert.ok(cold.seconds <= 30, "15-30 s");
+  const caution = skill.copy[cold.caution];
+  assert.match(caution, /Never in a shower or a bath/);
+  for (const flag of [/heart trouble/, /fainting/, /eating disorder/, /pregnancy/, /cold allergy/, /drinking or using today/])
+    assert.match(caution, flag, "the caution line names who should skip cold");
   for (const s of skill.steps) for (const t of s.next ?? []) {
-    if (["cold", "cool"].includes(t.to)) assert.equal(s.id, "cold_near", `${s.id} → ${t.to}`);
+    if (t.to === "cold") assert.equal(s.id, "cold_near", `${s.id} → cold`);
   }
-  const near = M.stepOf(skill, "screen").next;
-  assert.deepEqual(near.map((t) => t.to), ["squeeze", "cold_near"]);
 });
 
 test("C6.3: frozen and far away never get a calming mode, first or swap, and their check is worded for here", () => {
@@ -103,8 +99,8 @@ test("the wave's swap is the long out-breath, with its stop rule; dizzy switches
   const still = skill.steps.find((x) => x.id === "squeeze_still");
   for (const k of [still.props.step1, still.props.step2]) assert.doesNotMatch(skill.copy[k], /breathe (in|out)/i, "no paced breath after dizziness (Gate 3)");
   assert.equal(run([did("done")], ctx(), swap).stepId, "check2");
-  // When squeeze already ran (a flag ruled out cold), dizzy goes straight to the check.
-  const flagged = run([pick("state", "wave"), next, pick("screen", "some"), next, did(), next, pick("check1", "same"), next]);
+  // When squeeze already ran (nothing cold near), dizzy goes straight to the check.
+  const flagged = run([pick("state", "wave"), next, pick("cold_near", "no"), next, did(), next, pick("check1", "same"), next]);
   assert.equal(flagged.stepId, "exhale");
   assert.equal(run([did("dizzy")], ctx(), flagged).stepId, "check2");
 });

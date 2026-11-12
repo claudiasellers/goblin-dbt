@@ -411,8 +411,8 @@
    "description": "Fair, no excessive Apologies, Stick to values, Truthful",
    "whenToUse": null,
    "dbtBasis": null,
-   "side": "change",
-   "skillKind": "relational",
+   "side": "both",
+   "skillKind": "values",
    "direction": "neutral",
    "addresses": [
     "cold_shame",
@@ -2823,10 +2823,10 @@
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
-   "rationale": "Planned: Wise Mind as the alternative for suspicion and judgement."
+   "reviewStatus": "approved",
+   "rationale": "Wise Mind as the alternative for suspicion and judgement."
   },
   {
    "id": "rf_chronic_vigilance_words_worry_check-the-facts",
