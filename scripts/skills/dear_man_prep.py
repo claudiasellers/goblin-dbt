@@ -233,22 +233,33 @@ WHEN = [("today", "Later today"), ("tomorrow", "Tomorrow"), ("this_week", "This 
 # so *yes* leans toward asking firmly (capability, priorities, rights, timing, homework). A counting derive (R10); the
 # screen names the level, never a score, and a softer / firmer nudge counts one step. Not on a carried flooded reading.
 ASK_LEVELS = ["hint", "gentle", "plain", "firm", "firm_hold"]
-ASK_LEVEL_LINES = {
-    "hint": "The facts lean toward waiting, or a light first mention. It's still your call.",
-    "gentle": "Ask gently, and a no is something you can take for now.",
+ASK_LEVEL_LINES = {"hint": "From what you said, a light first mention may fit, or waiting. Asking is still okay, and it's your call.",
+    "gentle": "Ask gently. If they say no, that can be okay for now.",
     "plain": "Ask plainly, and listen to what they say.",
     "firm": "Ask firmly, and keep asking if they push back.",
-    "firm_hold": "Ask firmly, and hold to it.",
-}
+    "firm_hold": "Ask firmly, and keep coming back to it."}
+# Gate 2: with someone it tends to go badly with (heads_up), the firm levels ask once and don't keep pushing
+# (Handout 8: a shaky relationship is a reason to ask less hard).
+ASK_LEVEL_HEADS_UP = "Ask firmly once, and say it again calmly if you need to. With them, you don't have to keep pushing."
+FIRM = ["firm", "firm_hold"]
+# The middle-ground screen bridges from the level instead of repeating it (Gates 2 and 3: "hold to it" above
+# "what middle ground?" pulled against each other).
+ASK_MIDDLE_LINES = {"hint": "You leaned toward a light first mention. A small step counts.",
+    "gentle": "You meant to ask gently. Meeting in the middle fits that.",
+    "plain": "You meant to ask plainly. A middle ground keeps it workable.",
+    "firm": "You meant to ask firmly. A middle ground can still be part of that.",
+    "firm_hold": "You meant to keep coming back to it. Is there any middle ground at all?"}
+ASK_MIDDLE_HEADS_UP = "With them, one clear ask is enough. A middle ground can help it land."
 ASK_FACTORS = [
     ("s_able", "s_able_q", "Can they actually give you this?"),
     ("s_matters", "s_matters_q", "Does it matter a lot to you right now?"),
-    ("s_right", "s_right_q", "Is it fair to ask this of them?"),
+    ("s_right", "s_right_q", "Is it reasonable to ask this of them?"),
     ("s_timing", "s_timing_q", "Is this a good time to ask?"),
     ("s_ready", "s_ready_q", "Do you know what you want, and have the facts straight?"),
 ]
 ASK_WEIGHTS = {"yes": 1, "not_sure": 0.5, "no": 0, "softer": -1, "right": 0, "firmer": 1}
-ASK_TABLE = {"-1": "hint", "1.5": "gentle", "2.5": "plain", "3.5": "firm", "4.5": "firm_hold"}
+# -1 catches *A bit softer* on a total of 0. Gentle starts at 1 (Gate 2), so *A bit firmer* from 0 or 0.5 moves a level.
+ASK_TABLE = {"-1": "hint", "1": "gentle", "2.5": "plain", "3.5": "firm", "4.5": "firm_hold"}
 SIZE_ANSWERS = [("yes", "Yes"), ("not_sure", "Not sure"), ("no", "No")]
 NUDGE = [("right", "That fits"), ("softer", "A bit softer"), ("firmer", "A bit firmer")]
 ASK_SIZED = {"set": "$a.s_able"}
@@ -290,12 +301,15 @@ COPY = {
     "middle_title_self_respect": "Your self-respect comes first, so notice any pressure to agree to what doesn't sit right. What middle ground could you live with?",
     "walk_title": "What won't you accept?",
     "walk_hint": "Knowing this ahead makes it easier to stop or step away.",
-    "size_title": "How hard to push on this ask?",
+    "size_title": "How firmly to ask? A few questions to size it.",
     "size_hint": "Yes, no or not sure. There's no right answer.",
     "level_hint": "From what you said.",
     "nudge_label": "Does that sit right?",
     **{q: text for _, q, text in ASK_FACTORS},
     **{f"ask_level_{k}": v for k, v in ASK_LEVEL_LINES.items()},
+    "ask_level_firm_heads_up": ASK_LEVEL_HEADS_UP,
+    **{f"ask_middle_{k}": v for k, v in ASK_MIDDLE_LINES.items()},
+    "ask_middle_firm_heads_up": ASK_MIDDLE_HEADS_UP,
     "card_title": "Your plan, on three cards.",
     "card_say": "Say it",
     "card_steady": "Stay steady",
@@ -435,9 +449,14 @@ STEPS = [
     },
     {
         "id": "level", "kind": "ask",
-        "title": [{"key": f"ask_level_{k}", "when": {"eq": ["$d.ask_level", k]}} for k in reversed(ASK_LEVELS)],
+        "title": [{"key": "ask_level_firm_heads_up", "when": {"all": [HEADS_UP, {"in": ["$d.ask_level", FIRM]}]}}]
+                 + [{"key": f"ask_level_{k}", "when": {"eq": ["$d.ask_level", k]}} for k in reversed(ASK_LEVELS)]
+                 + [{"key": "ask_level_plain"}],
         "hint": "level_hint",
-        "fields": [{"id": "nudge", "label": "nudge_label", "options": {"list": "nudge"}, "max": 1, "required": True}],
+        # Neither end offers a nudge that can't move it (Gates 1-3).
+        "fields": [{"id": "nudge", "label": "nudge_label", "max": 1, "required": True, "options": {"list": "nudge", "where": {"not": {"any": [
+            {"all": [{"eq": ["$opt.dir", "firmer"]}, {"eq": ["$d.ask_level", "firm_hold"]}]},
+            {"all": [{"eq": ["$opt.dir", "softer"]}, {"eq": ["$d.ask_level", "hint"]}]}]}}}}],
         "next": [{"to": "reinforce"}],
     },
     {
@@ -469,7 +488,8 @@ STEPS = [
         "id": "middle", "kind": "ask",
         "title": [{"key": f"middle_title_{k}", "when": is_("matters", k)} for k, _ in MATTERS] + [{"key": "middle_title"}],
         # The level they sized (after the nudge), as a reminder above the middle ground.
-        "lines": [{"key": f"ask_level_{k}", "when": {"all": [ASK_SIZED, {"eq": ["$d.ask_final", k]}]}} for k in reversed(ASK_LEVELS)],
+        "lines": [{"key": "ask_middle_firm_heads_up", "when": {"all": [ASK_SIZED, HEADS_UP, {"in": ["$d.ask_final", FIRM]}]}}]
+                 + [{"key": f"ask_middle_{k}", "when": {"all": [ASK_SIZED, {"eq": ["$d.ask_final", k]}]}} for k in reversed(ASK_LEVELS)],
         "fields": [{"id": "middle", "options": {"list": "middle"}, "max": 1,
                     "own": {"hint": "own_line", "countsAsPick": True, "max": 35}}],
         "next": [{"to": "walk"}],
@@ -552,7 +572,7 @@ def options():
     out += [("middle", v, l, {}, ("DearManNegotiateOption", v)) for v, l in MIDDLE]
     out += [("walk", v, l, {}, ("DearManNegotiateOption", v)) for v, l in WALK]
     out += [("size_answer", v, l, {}, None) for v, l in SIZE_ANSWERS]
-    out += [("nudge", v, l, {}, None) for v, l in NUDGE]
+    out += [("nudge", v, l, {"dir": v}, None) for v, l in NUDGE]
     out += [("hot", v, l, {}, None) for v, l in HOT_CHOICES]
     out += [("when", v, l, {}, None) for v, l in WHEN]
     return out

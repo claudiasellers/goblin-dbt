@@ -94,17 +94,23 @@ sort needs `pileSort` from ER-B4, Check the Facts inline needs ER-B5's inline mi
 
 ## How hard to push (IE-07, Handout 8's ask column, built 12 Nov)
 
-After the ask (and its blank), five questions, each *Yes · Not sure · No*: can they actually give you this, does it matter
-a lot to you right now, is it fair to ask this of them, is this a good time, do you know what you want and have the facts
-straight. The same counting derive as Say no's "no" column (R10): yes counts 1, not sure half, no nothing, and the total
-is looked up in `tables.ask_level` (`$d.ask_level`): *hint* (below 1.5: the facts lean toward waiting or a light first
-mention, still your call), *gentle*, *plain*, *firm*, *firm_hold* (4.5 and up). The level screen shows the named level as
-its title, never a number, and a nudge (*That fits · A bit softer · A bit firmer*) moves it one step (`$d.ask_final`, the
-five fields plus the nudge). The middle-ground screen repeats the final level as its line, so what you'd settle for is
-chosen knowing how hard you meant to push. A carried flooded reading skips both screens (the short path). Departures:
-Linehan's dime game has ten questions (it asks about the relationship and self-respect separately); *what matters most*
-already asked that, so five are kept here, the same five Say no counts in its no form. The level isn't on the pocket
-card or in the projection yet.
+After the ask (and its blank), *How firmly to ask?*: five questions, each *Yes · Not sure · No*. Can they actually give
+you this (capability), does it matter a lot to you right now (priorities), is it reasonable to ask this of them (rights,
+relationship and give and take in one plain question), is this a good time (timing), do you know what you want and have
+the facts straight (homework). The same counting method as Say no's "no" column (R10), with the ask column's own
+factors: yes counts 1, not sure half, no nothing, and the total is looked up in `tables.ask_level` (`$d.ask_level`):
+*hint* (below 1: a light first mention may fit, or waiting; asking is still okay), *gentle* (from 1), *plain*, *firm*,
+*firm_hold* (4.5 and up: ask firmly and keep coming back to it, which still negotiates). The level screen shows the named
+level as its title (never a number; *plain* if nothing matched), and a nudge (*That fits · A bit softer · A bit firmer*)
+moves it one step (`$d.ask_final`, the five fields plus the nudge); neither end offers the direction that can't move.
+With someone it tends to go badly with (`heads_up`) the two firm levels read *Ask firmly once, and say it again calmly if
+you need to. With them, you don't have to keep pushing.* (Handout 8: a shaky relationship is a reason to ask less hard).
+The middle-ground screen bridges from the final level (`ask_middle_*`) rather than repeating it. A carried flooded
+reading skips both screens (the short path).
+
+Departures: Handout 8's ask column has about ten factors. Self-respect and the relationship are what *what matters most*
+already asks; authority, long term vs short term and give and take are dropped (give and take is folded into
+*reasonable*), to keep it to one phone screen. The level isn't on the pocket card or in the projection yet.
 
 ## The pocket card (`pocketCard`, Mode C)
 

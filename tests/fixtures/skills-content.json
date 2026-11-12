@@ -11475,20 +11475,27 @@
     "middle_title_self_respect": "Your self-respect comes first, so notice any pressure to agree to what doesn't sit right. What middle ground could you live with?",
     "walk_title": "What won't you accept?",
     "walk_hint": "Knowing this ahead makes it easier to stop or step away.",
-    "size_title": "How hard to push on this ask?",
+    "size_title": "How firmly to ask? A few questions to size it.",
     "size_hint": "Yes, no or not sure. There's no right answer.",
     "level_hint": "From what you said.",
     "nudge_label": "Does that sit right?",
     "s_able_q": "Can they actually give you this?",
     "s_matters_q": "Does it matter a lot to you right now?",
-    "s_right_q": "Is it fair to ask this of them?",
+    "s_right_q": "Is it reasonable to ask this of them?",
     "s_timing_q": "Is this a good time to ask?",
     "s_ready_q": "Do you know what you want, and have the facts straight?",
-    "ask_level_hint": "The facts lean toward waiting, or a light first mention. It's still your call.",
-    "ask_level_gentle": "Ask gently, and a no is something you can take for now.",
+    "ask_level_hint": "From what you said, a light first mention may fit, or waiting. Asking is still okay, and it's your call.",
+    "ask_level_gentle": "Ask gently. If they say no, that can be okay for now.",
     "ask_level_plain": "Ask plainly, and listen to what they say.",
     "ask_level_firm": "Ask firmly, and keep asking if they push back.",
-    "ask_level_firm_hold": "Ask firmly, and hold to it.",
+    "ask_level_firm_hold": "Ask firmly, and keep coming back to it.",
+    "ask_level_firm_heads_up": "Ask firmly once, and say it again calmly if you need to. With them, you don't have to keep pushing.",
+    "ask_middle_hint": "You leaned toward a light first mention. A small step counts.",
+    "ask_middle_gentle": "You meant to ask gently. Meeting in the middle fits that.",
+    "ask_middle_plain": "You meant to ask plainly. A middle ground keeps it workable.",
+    "ask_middle_firm": "You meant to ask firmly. A middle ground can still be part of that.",
+    "ask_middle_firm_hold": "You meant to keep coming back to it. Is there any middle ground at all?",
+    "ask_middle_firm_heads_up": "With them, one clear ask is enough. A middle ground can help it land.",
     "card_title": "Your plan, on three cards.",
     "card_say": "Say it",
     "card_steady": "Stay steady",
@@ -11588,7 +11595,7 @@
    "tables": {
     "ask_level": {
      "-1": "hint",
-     "1.5": "gentle",
+     "1": "gentle",
      "2.5": "plain",
      "3.5": "firm",
      "4.5": "firm_hold"
@@ -12429,6 +12436,28 @@
      "kind": "ask",
      "title": [
       {
+       "key": "ask_level_firm_heads_up",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$ctx.frame",
+           "heads_up"
+          ]
+         },
+         {
+          "in": [
+           "$d.ask_level",
+           [
+            "firm",
+            "firm_hold"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
        "key": "ask_level_firm_hold",
        "when": {
         "eq": [
@@ -12472,6 +12501,9 @@
          "hint"
         ]
        }
+      },
+      {
+       "key": "ask_level_plain"
       }
      ],
      "hint": "level_hint",
@@ -12479,11 +12511,49 @@
       {
        "id": "nudge",
        "label": "nudge_label",
-       "options": {
-        "list": "nudge"
-       },
        "max": 1,
-       "required": true
+       "required": true,
+       "options": {
+        "list": "nudge",
+        "where": {
+         "not": {
+          "any": [
+           {
+            "all": [
+             {
+              "eq": [
+               "$opt.dir",
+               "firmer"
+              ]
+             },
+             {
+              "eq": [
+               "$d.ask_level",
+               "firm_hold"
+              ]
+             }
+            ]
+           },
+           {
+            "all": [
+             {
+              "eq": [
+               "$opt.dir",
+               "softer"
+              ]
+             },
+             {
+              "eq": [
+               "$d.ask_level",
+               "hint"
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        }
+       }
       }
      ],
      "next": [
@@ -12759,7 +12829,32 @@
      ],
      "lines": [
       {
-       "key": "ask_level_firm_hold",
+       "key": "ask_middle_firm_heads_up",
+       "when": {
+        "all": [
+         {
+          "set": "$a.s_able"
+         },
+         {
+          "eq": [
+           "$ctx.frame",
+           "heads_up"
+          ]
+         },
+         {
+          "in": [
+           "$d.ask_final",
+           [
+            "firm",
+            "firm_hold"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "key": "ask_middle_firm_hold",
        "when": {
         "all": [
          {
@@ -12775,7 +12870,7 @@
        }
       },
       {
-       "key": "ask_level_firm",
+       "key": "ask_middle_firm",
        "when": {
         "all": [
          {
@@ -12791,7 +12886,7 @@
        }
       },
       {
-       "key": "ask_level_plain",
+       "key": "ask_middle_plain",
        "when": {
         "all": [
          {
@@ -12807,7 +12902,7 @@
        }
       },
       {
-       "key": "ask_level_gentle",
+       "key": "ask_middle_gentle",
        "when": {
         "all": [
          {
@@ -12823,7 +12918,7 @@
        }
       },
       {
-       "key": "ask_level_hint",
+       "key": "ask_middle_hint",
        "when": {
         "all": [
          {
@@ -13987,15 +14082,18 @@
     "nudge": [
      {
       "value": "right",
-      "label": "That fits"
+      "label": "That fits",
+      "dir": "right"
      },
      {
       "value": "softer",
-      "label": "A bit softer"
+      "label": "A bit softer",
+      "dir": "softer"
      },
      {
       "value": "firmer",
-      "label": "A bit firmer"
+      "label": "A bit firmer",
+      "dir": "firmer"
      }
     ],
     "hot": [

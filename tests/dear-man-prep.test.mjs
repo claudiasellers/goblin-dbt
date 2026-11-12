@@ -282,11 +282,19 @@ test("skill: how hard to push (IE-07, Handout 8's ask column): five questions co
   assert.match(skill.copy.ask_level_hint, /your call/);
   const toMiddle = (v, nudge) => play([pick("nudge", nudge), next, pick("reinforce", "reinf_more_trust"), next, pick("need", "need_reaction"), next,
     pick("phrase", "anchor_their_feelings"), next, pick("confident", "cue_feet"), next], ctx(), toLevel(v));
-  for (const [v, nudge, key] of [["yes", "right", "firm_hold"], ["yes", "softer", "firm"], ["not_sure", "firmer", "firm"], ["not_sure", "softer", "gentle"], ["no", "softer", "hint"]]) {
+  for (const [v, nudge, key] of [["yes", "right", "firm_hold"], ["yes", "softer", "firm"], ["not_sure", "firmer", "firm"], ["not_sure", "softer", "gentle"], ["no", "firmer", "gentle"], ["no", "right", "hint"]]) {
     const s = toMiddle(v, nudge);
     assert.equal(s.stepId, "middle");
-    assert.equal(M.handoffLine(ctx(), step("middle"), s), skill.copy[`ask_level_${key}`], `${v} + ${nudge}: ${key}`);
+    assert.equal(M.handoffLine(ctx(), step("middle"), s), skill.copy[`ask_middle_${key}`], `${v} + ${nudge}: ${key}, as a bridge to the middle ground`);
   }
+  const nudges = (v) => values(ctx(), "level", "nudge", toLevel(v));
+  assert.deepEqual(nudges("yes"), ["right", "softer"], "no firmer than the top");
+  assert.deepEqual(nudges("no"), ["right", "firmer"], "no softer than the bottom");
+  assert.deepEqual(nudges("not_sure"), ["right", "softer", "firmer"]);
+  const badly = ctx({ frame: "heads_up" });
+  const atBadly = play([pick("assert", "addr_follow_through"), next, ...sized("yes"), next], badly, toAssert(badly));
+  assert.equal(M.copyText(badly, step("level").title, atBadly), skill.copy.ask_level_firm_heads_up, "it tends to go badly: ask once, no need to keep pushing (Gate 2)");
+  assert.doesNotMatch(skill.copy.ask_level_firm_hold, /hold to it/, "the top level still negotiates");
   const flooded = ctx({ band: "flooded" });
   assert.equal(play([pick("assert", "addr_follow_through"), next], flooded, toAssert(flooded)).stepId, "reinforce", "a carried flooded reading skips the sizing");
   assert.ok(Object.keys(skill.copy).filter((k) => k.startsWith("ask_level_") || k.startsWith("s_")).every((k) => !/\d/.test(skill.copy[k])), "never a number on screen (R10)");
