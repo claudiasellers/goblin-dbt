@@ -26,8 +26,9 @@ in a directory of things I like, built slowly.
   back       the `good_thing` card reopens the run here (R9): *Did it happen?*
   after      compared to before (*lighter · about the same · heavier*) and where the mind was (*mostly here ·
              partly · somewhere else*: being unmindful of worries, H16).
-  keep_more  lighter, and a pick that isn't already kept: *Add it to things you like?*
-  after_end  "You did it. Enjoying it comes later; doing it is the rep." when it wasn't lighter.
+  keep_more  lighter, and a listed pick that isn't already kept (never own words): *Add it to things you like?*
+  after_end  "You did it." Heavier: "That happens sometimes. It isn't a sign you did it wrong." with First, the body
+             and Running low; else "Enjoying it comes later. Doing it is the rep." when it wasn't lighter.
 
 Departures from the PRD (docs/design/good-things.md lists them with the batch that picks each up): no graduation
 rule (every level is a choice from the start, level 0 first; counting reps needs a server read); level 2 (plan the
@@ -68,7 +69,7 @@ COPY = {
     "stay_title_savour": "Stay with what's good for a few seconds.",
     "stay_label": "Start",
     "stay_running": "Staying with it",
-    "stay_hint": "Let your eyes rest on it, or keep it in mind. Notice one thing you like about it.",
+    "stay_hint": "Let your eyes rest on it, or keep it in mind. Notice one thing you like about it. Let it be as big as it is; it doesn't have to last.",
     "stay_done": "You noticed it. That counts.",
     "name_title": "What was it?",
     "name_hint": "Pick the closest, or name it in a few words.",
@@ -100,7 +101,9 @@ COPY = {
     # PRD: *Didn't enjoy it* is data, with this line (reps, not feelings).
     "after_flat": "Enjoying it comes later. Doing it is the rep.",
     # H16: being unmindful of worries.
-    "after_mind": "Next time your mind drifts to worries, bring it back to what you're doing. That's part of the skill.",
+    "after_mind": "If 'it won't last' or 'I don't deserve this' shows up next time, notice it and come back to what you're doing. That's part of the skill.",
+    # Heavier after trying: no blame, and somewhere to go (the body, Running low, someone to talk to).
+    "after_heavier": "That happens sometimes. It isn't a sign you did it wrong.",
     "no_title": "That's okay.",
     "no_line": "A smaller one tomorrow still counts.",
     "keep_primary": "Next",
@@ -122,6 +125,7 @@ SAVOUR = {"eq": ["$ctx.frame", "savour"]}
 SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
 KEPT = {"eq": [a("keepit"), "keep"]}
 LIGHTER = {"eq": [a("compared"), "lighter"]}
+HEAVIER = {"eq": [a("compared"), "heavier"]}
 # A pick from Things I like is already kept: never offered again.
 FROM_KEPT = {"has": ["$p.thingsILike.ids", a("pick")]}
 KEPT_MORE = {"eq": [a("keep_more"), "keep"]}
@@ -135,6 +139,7 @@ STARTS = [
 HEADS_UP = [("settle", "Look after the next few minutes first"), ("try", "Try it anyway")]
 # What it was (PRD level 0's chip labels), read in Things I like as the item's name when there are no own words.
 KINDS = [
+    ("moment", "A moment, or how I felt", {"savour": True}),
     ("colour", "A colour"),
     ("texture", "Something soft or comfortable"),
     ("sound", "A sound"),
@@ -148,12 +153,12 @@ ENERGY = [("none", "Hardly any"), ("little", "A little"), ("some", "Some")]
 # The catalogue (paraphrasing H16's range, no verbatim list; PRD: no impulsive pleasures). `energy` is the least
 # it takes: hardly any (sitting or lying down), a little (getting up), some (going out, or someone else).
 ACTIVITIES = [
-    ("song", "Put on a song you used to love", "none"),
+    ("song", "Put on a song you like", "none"),
     ("sun", "Sit by a window, or in a patch of sun", "none"),
-    ("photos", "Look through photos that make you smile", "none"),
-    ("laugh", "Watch something that's made you laugh before", "none"),
+    ("photos", "Look at a photo of a place or a day you liked", "none"),
+    ("laugh", "Watch one clip that's made you laugh before", "none"),
     ("scent", "Smell something you like: soap, coffee, a candle", "none"),
-    ("curious", "Look up something you've been curious about", "none"),
+    ("curious", "Read about something you're curious about, for ten minutes", "none"),
     ("warm", "A warm shower or bath", "little"),
     ("animal", "Spend a few minutes with an animal", "little"),
     ("message", "Send a message to someone you like", "little"),
@@ -164,7 +169,7 @@ ACTIVITIES = [
     ("walk", "A short walk somewhere you like", "some"),
     ("dance", "Dance to one song", "some"),
     ("see", "Call or see someone you're easy with", "some"),
-    ("place", "Go somewhere you like being: a park, a library, a café", "some"),
+    ("place", "Go somewhere you like being: a park, a library, a bench", "some"),
 ]
 # Hardly any shows the none ones; a little adds a little; some shows them all.
 ENERGY_OK = {"none": ["none"], "little": ["none", "little"], "some": ["none", "little", "some"]}
@@ -203,6 +208,9 @@ def handoff(sid, title, lines, offers, *, no_close=False, **extra):
     return s
 
 
+# What it was: *A moment, or how I felt* only when staying with a good moment.
+FROM_SAVOUR = {"any": [{"not": {"eq": ["$opt.savour", True]}}, {"eq": [a("start"), "savour"]}]}
+
 BY_START = [{"when": {"eq": [a("start"), "savour"]}, "to": "stay"}, {"when": {"eq": [a("start"), "find"]}, "to": "find"},
             {"to": "energy"}]
 
@@ -226,7 +234,7 @@ STEPS = [
      "links": [SAFETY_LINK], "next": [{"to": "name"}]},
     # Keep (R4) on *Keep it*: that tap is the yes (C2.2).
     ask("name", "name_title", "name_hint",
-        [field("kind", "kind", own="name_own"),
+        [field("kind", "kind", own="name_own", where=FROM_SAVOUR),
          field("keepit", "keepit", label="keepit_label")],
         [{"to": "name_end"}],
         keep={"kind": "thing_i_like", "many": True, "when": KEPT, "from": ["kind"]}, primary="keep_primary"),
@@ -248,15 +256,17 @@ STEPS = [
         titleSlots={"pick": {"labelOf": "pick"}}),
     ask("after", "after_title", None,
         [field("compared", "compared"), field("mind", "mind", required=False, label="mind_label")],
-        [{"when": {"all": [LIGHTER, {"set": a("pick")}, {"not": FROM_KEPT}]}, "to": "keep_more"}, {"to": "after_end"}]),
+        # Not for own words until CORE's target behaviours can check them (an own pick could be anything).
+        [{"when": {"all": [LIGHTER, {"set": a("pick") + ".ids"}, {"not": FROM_KEPT}]}, "to": "keep_more"}, {"to": "after_end"}]),
     ask("keep_more", "keep_more_title", "keep_more_hint", [field("keep_more", "keep_more")], [{"to": "after_end"}],
         keep={"kind": "thing_i_like", "many": True, "when": KEPT_MORE, "from": ["pick"]}, primary="keep_primary"),
     handoff("after_end", "after_end_title", [
         {"when": KEPT_MORE, "key": "after_kept"},
+        {"when": HEAVIER, "key": "after_heavier"},
         {"when": {"eq": [a("mind"), "elsewhere"]}, "key": "after_mind"},
         {"when": LIGHTER, "key": "after_lighter"},
         {"when": ALWAYS, "key": "after_flat"},
-    ], [], no_close=True),
+    ], [{"exit": "cool_down", "when": HEAVIER}, {"exit": "please_skill", "when": HEAVIER}], no_close=True),
     handoff("not_today", "no_title", [{"when": ALWAYS, "key": "no_line"}], [{"exit": "please_skill", "when": ALWAYS}],
             no_close=True),
 ]
@@ -272,7 +282,7 @@ EXITS = [
 def options():
     out = [("start", v, label, props, None) for v, label, props in STARTS]
     out += [("heads_up", v, label, {}, None) for v, label in HEADS_UP]
-    out += [("kind", v, label, {}, None) for v, label in KINDS]
+    out += [("kind", k[0], k[1], k[2] if len(k) > 2 else {}, None) for k in KINDS]
     out += [("keepit", v, label, {}, None) for v, label in KEEPIT]
     out += [("energy", v, label, {}, None) for v, label in ENERGY]
     out += [("activity", v, label, {"energy": e}, None) for v, label, e in ACTIVITIES]

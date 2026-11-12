@@ -15748,7 +15748,7 @@
     "stay_title_savour": "Stay with what's good for a few seconds.",
     "stay_label": "Start",
     "stay_running": "Staying with it",
-    "stay_hint": "Let your eyes rest on it, or keep it in mind. Notice one thing you like about it.",
+    "stay_hint": "Let your eyes rest on it, or keep it in mind. Notice one thing you like about it. Let it be as big as it is; it doesn't have to last.",
     "stay_done": "You noticed it. That counts.",
     "name_title": "What was it?",
     "name_hint": "Pick the closest, or name it in a few words.",
@@ -15775,7 +15775,8 @@
     "after_kept": "It's in Things I like.",
     "after_lighter": "Something lifted. That's worth noticing.",
     "after_flat": "Enjoying it comes later. Doing it is the rep.",
-    "after_mind": "Next time your mind drifts to worries, bring it back to what you're doing. That's part of the skill.",
+    "after_mind": "If 'it won't last' or 'I don't deserve this' shows up next time, notice it and come back to what you're doing. That's part of the skill.",
+    "after_heavier": "That happens sometimes. It isn't a sign you did it wrong.",
     "no_title": "That's okay.",
     "no_line": "A smaller one tomorrow still counts.",
     "keep_primary": "Next",
@@ -16055,7 +16056,25 @@
       {
        "id": "kind",
        "options": {
-        "list": "kind"
+        "list": "kind",
+        "where": {
+         "any": [
+          {
+           "not": {
+            "eq": [
+             "$opt.savour",
+             true
+            ]
+           }
+          },
+          {
+           "eq": [
+            "$a.start",
+            "savour"
+           ]
+          }
+         ]
+        }
        },
        "max": 1,
        "required": true,
@@ -16461,7 +16480,7 @@
           ]
          },
          {
-          "set": "$a.pick"
+          "set": "$a.pick.ids"
          },
          {
           "not": {
@@ -16545,6 +16564,15 @@
       {
        "when": {
         "eq": [
+         "$a.compared",
+         "heavier"
+        ]
+       },
+       "key": "after_heavier"
+      },
+      {
+       "when": {
+        "eq": [
          "$a.mind",
          "elsewhere"
         ]
@@ -16579,7 +16607,26 @@
      ],
      "noClose": true,
      "next": [],
-     "offers": []
+     "offers": [
+      {
+       "exit": "cool_down",
+       "when": {
+        "eq": [
+         "$a.compared",
+         "heavier"
+        ]
+       }
+      },
+      {
+       "exit": "please_skill",
+       "when": {
+        "eq": [
+         "$a.compared",
+         "heavier"
+        ]
+       }
+      }
+     ]
     },
     {
      "id": "not_today",
@@ -16675,6 +16722,11 @@
     ],
     "kind": [
      {
+      "value": "moment",
+      "label": "A moment, or how I felt",
+      "savour": true
+     },
+     {
       "value": "colour",
       "label": "A colour"
      },
@@ -16730,7 +16782,7 @@
     "activity": [
      {
       "value": "song",
-      "label": "Put on a song you used to love",
+      "label": "Put on a song you like",
       "energy": "none"
      },
      {
@@ -16740,12 +16792,12 @@
      },
      {
       "value": "photos",
-      "label": "Look through photos that make you smile",
+      "label": "Look at a photo of a place or a day you liked",
       "energy": "none"
      },
      {
       "value": "laugh",
-      "label": "Watch something that's made you laugh before",
+      "label": "Watch one clip that's made you laugh before",
       "energy": "none"
      },
      {
@@ -16755,7 +16807,7 @@
      },
      {
       "value": "curious",
-      "label": "Look up something you've been curious about",
+      "label": "Read about something you're curious about, for ten minutes",
       "energy": "none"
      },
      {
@@ -16810,7 +16862,7 @@
      },
      {
       "value": "place",
-      "label": "Go somewhere you like being: a park, a library, a café",
+      "label": "Go somewhere you like being: a park, a library, a bench",
       "energy": "some"
      }
     ],

@@ -51,6 +51,10 @@ test("where to start: find one okay thing or one good thing; the good moment onl
   assert.deepEqual(values(s, "start", sv), ["savour", "find", "one"]);
   assert.equal(title(s, sv), "Something's good right now. Want to stay with it a moment?");
   assert.equal(run([pick("start", "savour"), next], sv).stepId, "stay", "the good moment goes straight to staying with it");
+  const svName = run([done("held")], sv, run([pick("start", "savour"), next], sv));
+  assert.equal(values(svName, "kind", sv)[0], "moment", "a good moment can be a moment, or how I felt");
+  const findName = run([done("held")], ctx(), run([done("found")], ctx(), run([pick("start", "find"), next])));
+  assert.ok(!values(findName, "kind").includes("moment"), "only when staying with a good moment");
   assert.match(readFileSync("src/components/checkin/StateResult.tsx", "utf8"), /to="\/tool\/good-things\?frame=savour"/, "the positive-state result opens it");
   assert.doesNotMatch(readFileSync("src/components/checkin/StateResult.tsx", "utf8"), /No action needed/, "a good moment is no longer a dead end");
 });
@@ -151,7 +155,16 @@ test("back: did it happen? names the pick; lighter offers Things I like; flat ge
   const flat = run([pick("compared", "same"), next], ctx(), after);
   assert.equal(flat.stepId, "after_end");
   assert.equal(line(flat), "Enjoying it comes later. Doing it is the rep.");
-  assert.match(line(run([pick("compared", "heavier"), pick("mind", "elsewhere"), next], ctx(), after)), /^Next time your mind drifts to worries/);
+  assert.match(line(run([pick("compared", "same"), pick("mind", "elsewhere"), next], ctx(), after)), /^If 'it won't last' or 'I don't deserve this' shows up/);
+  // Heavier after trying: no blame, and somewhere to go (Gate 3).
+  const heavy = run([pick("compared", "heavier"), pick("mind", "elsewhere"), next], ctx(), after);
+  assert.equal(line(heavy), "That happens sometimes. It isn't a sign you did it wrong.");
+  assert.deepEqual(offers(heavy), ["cool_down", "please_skill"]);
+  assert.deepEqual(offers(flat), [], "only heavier gets the hand-offs");
+  // An own-words pick is never offered for Things I like (CORE checks own additions; part 2).
+  const ownBooked = run([pick("when", "evening"), pick("remind", "yes"), next], ctx(), run([own("pick", "Bake bread")], ctx(), run([pick("start", "one"), next, pick("energy", "little"), next])));
+  const ownAfter = run([pick("happened", "yes"), next], ctx(), M.resumeRun(ctx(), M.runRecord(ctx(), run([next], ctx(), ownBooked)), "back"));
+  assert.equal(run([pick("compared", "lighter"), next], ctx(), ownAfter).stepId, "after_end");
   const no = run([pick("happened", "no"), next], ctx(), r);
   assert.equal(no.stepId, "not_today");
   assert.equal(line(no), "A smaller one tomorrow still counts.");
