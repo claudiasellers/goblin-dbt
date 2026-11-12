@@ -43,6 +43,18 @@ jobs:
       VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID }}
       VITE_ADMIN_UIDS: ${{ vars.VITE_ADMIN_UIDS }}
     steps:
+      # The Mac mini runner had ~18 GB free when it was set up; a build needs a few. Stop with a
+      # plain message rather than failing somewhere in npm ci or the build.
+      - name: Free disk space
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE"
+          free_gb=$(( $(df -Pk "$GITHUB_WORKSPACE" | awk 'NR==2 {print $4}') / 1048576 ))
+          echo "free: ${free_gb} GB"
+          if [ "$free_gb" -lt 5 ]; then
+            echo "::error::Only ${free_gb} GB free on the runner Mac; a job needs at least 5. Clear space (start with ~/actions-runner/goblin-dbt/_work and ~/.npm), then re-run."
+            exit 1
+          fi
+          [ "$free_gb" -ge 10 ] || echo "::warning::Only ${free_gb} GB free on the runner Mac."
       # main's tip, not the pushed commit: a queued run must include an earlier run's content commit.
       - uses: actions/checkout@v4
         with:
@@ -155,3 +167,8 @@ jobs:
         run: |
           ./functions/node_modules/.bin/firebase deploy --only hosting --non-interactive
           git tag -f deploy/hosting HEAD && git push -f origin refs/tags/deploy/hosting
+
+      # Give back node_modules, builds, old Node versions and an oversized npm cache (docs/ci-runner.md).
+      - name: Tidy the runner
+        if: always()
+        run: '[ -f scripts/ci/runner-tidy.sh ] && bash scripts/ci/runner-tidy.sh || true'
