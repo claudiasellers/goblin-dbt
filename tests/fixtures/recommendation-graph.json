@@ -525,6 +525,17 @@
    "direction": "neutral",
    "addresses": []
   },
+  "dbt_mindfulness_of_others": {
+   "appToolId": "mindfulness-of-others",
+   "name": "Mindfulness of Others",
+   "description": "Noticing other people with curiosity: what they actually did, what you added, and what might have been going on for them",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": "both",
+   "skillKind": "relational",
+   "direction": "neutral",
+   "addresses": []
+  },
   "dbt_nightmare_protocol": {
    "appToolId": "nightmare-rescript",
    "name": "Nightmare Protocol",
@@ -2950,6 +2961,33 @@
    "version": "rf-v2",
    "reviewStatus": "approved",
    "rationale": "Let it be leads (its own row), then Problem Solve in micro-steps."
+  },
+  {
+   "id": "rf_chronic_vigilance_words_others_mindfulness-of-others",
+   "conceptId": "dbt_mindfulness_of_others",
+   "patternId": "chronic_vigilance",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.55,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "critical",
+    "dismissive"
+   ],
+   "beside": [],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "approved",
+   "rationale": "Notice them (IE-10, mindfulness of others) as the alternative to Check the Facts when the judgement is about someone else: what they did, what I added. Before Wise Mind for these two; not persecuted (a word that can mean real harm, where looking for another reading is the wrong ask), skeptical or jealous."
   },
   {
    "id": "rf_chronic_vigilance_words_watchful_wise-mind",

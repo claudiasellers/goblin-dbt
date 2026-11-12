@@ -54,6 +54,7 @@ const SEEDS: Record<string, Record<string, string[]>> = {
   values: { start: ['step'], mine: ['honesty', 'friendship', 'calm', 'fun', 'learning'], kept: ['friendship', 'honesty'], focus: ['friendship'], focus_kept: ['friendship'], step: ['friendship_1'], when: ['few_days'], remind: ['yes'], happened: ['yes'] },
   build_mastery: { area: ['caring'], rung: ['caring_2'], when: ['tomorrow'], remind: ['yes'], happened: ['done'], ican: ['yes'], then: ['up'], again: ['smaller'] },
   finding_connection: { area: ['friend'], step: ['friend_thought'], predict: ['badly'], liking: ['not_much'], when: ['tomorrow'], remind: ['yes'], happened: ['did'], went: ['well'], liked: ['some'], again: ['new_time'] },
+  notice_them: { way: ['look_again'], notice_what: ['cares'], fully_what: ['walk'], when: ['tomorrow'], remind: ['yes'], back: ['yes'], noticed: ['seemed_tired'], again: ['new_time'], again_when: ['few_days'], did: ['no_reply', 'short'], added: ['dont_care', 'always'], sure: ['think_so'], not_knowing: ['stressed'] },
 };
 
 /** The first option a field offers: a seed, an emotion id, or its list's first value (tables and profile options: none). */

@@ -127,6 +127,7 @@ SIGNED_OFF = {
     "rf_acute_alarm_words_demand_say-no": "2026-11-12",
     "rf_rumination_loop_words_repair_give": "2026-11-12",
     "rf_reward_drive_low_words_cut-off_finding-connection": "2026-11-12",
+    "rf_chronic_vigilance_words_others_mindfulness-of-others": "2026-11-12",
 }
 BANDS = ["steady", "stirred", "flooded"]
 
@@ -236,6 +237,11 @@ CONCEPT_TAGS["good-things"] = {"concept": "dbt_accumulate_positives", "side": "c
 # with the module (connected by default, 12 Nov 2026): *lonely* / *isolated* on Low drive lead with it, Running low
 # beside it. These are the words Keep it warm's note above set aside for "reaching out to people".
 CONCEPT_TAGS["finding-connection"] = {"concept": "dbt_building_relationships", "side": "change", "skillKind": "relational", "direction": "up"}
+# Notice them (IE-10, appToolId 'mindfulness-of-others' on the new concept dbt_mindfulness_of_others,
+# docs/design/notice-them.md): mindfulness of others. Relational, so the diversity rule lets it beside Check the Facts;
+# both sides (noticing is acceptance, looking again can change the reading); neutral direction. No ADDRESSES edges (the
+# legacy ranker counts any dbt_* concept that reaches a pattern's emotions): the word row routes it.
+CONCEPT_TAGS["mindfulness-of-others"] = {"concept": "dbt_mindfulness_of_others", "side": "both", "skillKind": "relational", "direction": "neutral"}
 BUILT_NOT_SIGNED_OFF = {
 }
 # Ride it out (urge-surfing), Let it be and Give your mind a job are live (Claudia, 12 Nov 2026: default to connected).
@@ -373,6 +379,8 @@ WORD_RULES = [
      "why": "Ride it out (DT-05, rebuilt on the skill runtime) for the checking / reassurance urge."},
     {"key": "watchful", "pattern": "chronic_vigilance", "tool": "wise-mind", "priority": WORD_NEXT, "words": WATCHFUL_WORDS,
      "why": "Wise Mind as the alternative for suspicion and judgement."},
+    {"key": "others", "pattern": "chronic_vigilance", "tool": "mindfulness-of-others", "priority": 0.55, "words": ["critical", "dismissive"],
+     "why": "Notice them (IE-10, mindfulness of others) as the alternative to Check the Facts when the judgement is about someone else: what they did, what I added. Before Wise Mind for these two; not persecuted (a word that can mean real harm, where looking for another reading is the wrong ask), skeptical or jealous."},
     {"key": "helpless", "pattern": "chronic_vigilance", "tool": "problem-solve", "priority": WORD_LEAD, "words": ["helpless"],
      "why": "Let it be leads (its own row), then Problem Solve in micro-steps."},
     {"key": "helpless", "pattern": "chronic_vigilance", "tool": "let-it-be", "priority": 0.4, "words": ["helpless"],

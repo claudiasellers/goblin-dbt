@@ -43,6 +43,7 @@ card       the pocket card: Say it · Stay steady · If they push (one PaperCard
    │                                (flooded: Settle my body first, a link)
 when       *When is the conversation?* today · tomorrow · this week · not sure (ask_outcome: the card opens the debrief)
            offer: Rehearse it → Cope Ahead (situationId=conversation, partId = the part picked in who)
+           offer: Notice them (IE-10, situationId=notice, the person): the PRD's *their side*, as an offer (12 Nov)
 ```
 
 Exits: `debrief` (the first screen's link), `let_go` (FAST, `frame=let_go`), `cool_down` (flooded), `cope_ahead`

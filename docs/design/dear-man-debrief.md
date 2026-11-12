@@ -50,6 +50,8 @@ Handout 9's factors, phrased as things that happen (`TROUBLESHOOT_FACTORS` in `s
 | They can't give it | the need is real, maybe met elsewhere | FAST's Let go, Find your people (built 12 Nov) |
 | I asked well, and they still said no | asking skilfully doesn't decide their answer | FAST, FAST's Let go |
 
+When the turning point was *They got defensive*, the end card (`good` or `fix`) also offers Notice them (IE-10) with `situationId=look_again` and the person: what they did, what I added, and what might have been going on for them (12 Nov).
+
 One chip. The chain is reachable from the factor step (*look at what happened first*) and comes back to it, which
 asks again (`clears: ['factor']`), since the chain can change the answer.
 

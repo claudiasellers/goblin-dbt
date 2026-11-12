@@ -1431,6 +1431,16 @@ SET building_relationships += {
   skill_type: "relationship_building"
 };
 
+// IE Handout 12 (PRD IE-10): mindfulness of others; Notice them (docs/design/notice-them.md).
+MERGE (mindfulness_of_others:TherapyConcept {id: "dbt_mindfulness_of_others"})
+SET mindfulness_of_others += {
+  name: "Mindfulness of Others",
+  description: "Noticing other people with curiosity: what they actually did, what you added, and what might have been going on for them",
+  modality: "DBT",
+  module: "Interpersonal Effectiveness",
+  skill_type: "relationship_mindfulness"
+};
+
 MERGE (fast:TherapyConcept {id: "dbt_fast"})
 SET fast += {
   name: "FAST",

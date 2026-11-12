@@ -62,7 +62,9 @@ test("skill: every factor's fix has a line, and its offers are only the tools th
     assert.ok(fix.lines.some((l) => JSON.stringify(l.when) === JSON.stringify({ eq: ["$a.factor", f] })), f);
   }
   const tools = new Set(fix.offers.map((o) => dm.exits.find((x) => x.id === o.exit).toolId));
-  assert.deepEqual([...tools].sort(), ["check-the-facts", "cope-ahead", "dear-man", "ending-relationships", "fast", "finding-connection", "let-it-be", "rehearse", "thoughts-passing"]);
+  assert.deepEqual([...tools].sort(), ["check-the-facts", "cope-ahead", "dear-man", "ending-relationships", "fast", "finding-connection", "let-it-be", "mindfulness-of-others", "rehearse", "thoughts-passing"]);
+  // IE-10: Notice them only after the turning point *they got defensive*, looking again, with the person.
+  assert.deepEqual(fix.offers.find((o) => o.exit === "notice_them").when, { has: ["$a.moment.ids", "tp_defensive"] });
   const letGo = dm.exits.find((x) => x.id === "fast_let_go");
   assert.deepEqual(letGo.query, { frame: "let_go" });
 });

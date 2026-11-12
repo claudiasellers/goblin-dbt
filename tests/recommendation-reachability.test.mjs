@@ -210,5 +210,7 @@ test("the FAST and Wise mind rows show on the check-in result, not only sit acti
   const shown = async (emotion) => (await run({ quadrant: "high-unpleasant", emotions: [emotion] }, live)).tools.map((t) => t.id);
   for (const w of ["Betrayed", "Disrespected"]) assert.deepEqual(await shown(w), ["recovering-from-invalidation", "fast"], w);
   for (const w of ["Bitter", "Resentful"]) assert.deepEqual(await shown(w), ["check-the-facts", "fast"], w);
-  for (const w of ["Skeptical", "Jealous", "Critical"]) assert.ok((await shown(w)).includes("wise-mind"), w);
+  for (const w of ["Skeptical", "Jealous", "Persecuted"]) assert.ok((await shown(w)).includes("wise-mind"), w);
+  // IE-10 (12 Nov): a judgement about someone else gets Notice them beside Check the Facts instead.
+  for (const w of ["Critical", "Dismissive"]) assert.ok((await shown(w)).includes("mindfulness-of-others"), w);
 });

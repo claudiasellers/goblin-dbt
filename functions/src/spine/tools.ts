@@ -57,6 +57,9 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   // Find your people (IE-09, docs/design/find-your-people.md): no close question; the outcome is the
   // `reach_out_outcome` card's *Did you do it?* and *How did it go?*, after the step, against the prediction.
   'finding-connection': { module: 'ie', closeKind: 'none' },
+  // Notice them (IE-10, docs/design/notice-them.md): no close question; the practice is checked by the `notice_back`
+  // card (*Did you get to notice them?*), and the two columns have no then-vs-now.
+  'mindfulness-of-others': { module: 'ie', closeKind: 'none' },
   // These ask their own questions inside their flows; the spine adds none (PR-S4 wraps them).
   'opposite-action': { module: 'er', closeKind: 'regulation_down' },
   'dear-man': { module: 'ie', closeKind: 'none' },

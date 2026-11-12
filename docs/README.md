@@ -131,7 +131,7 @@ Waves follow the index: 1 safety floor and platform, 2 validation and the transf
 | 60 | WMP-08 | Validate them | spec only | |
 | 61 | CORE-12 | Outcomes, fade and graduation | spec only | Reflect shows what helped; no outcomes or fade |
 | 62 | DT-08 | Thoughts passing through | spec only | |
-| 63 | IE-10 | Notice them | spec only | |
+| 63 | IE-10 | Notice them | built (part 1) | What they did and what I added, and noticing someone with curiosity ([design/notice-them.md](design/notice-them.md)) |
 | 64 | MF-09 | Doing mind, being mind | spec only | |
 | 65 | ER-14 | It isn't working (ER troubleshooting) | shipped | On the runtime (PRs #58, #67): [er-troubleshoot.md](design/er-troubleshoot.md) |
 | 66 | WMP-09 | Where am I swinging? | spec only | |

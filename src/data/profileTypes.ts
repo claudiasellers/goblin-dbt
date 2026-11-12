@@ -181,6 +181,7 @@ export const PROFILE_NEEDS = {
   'good-things': ['thingsILike', 'thingsILikePicks'],             // its pick step: the person's own things first (docs/design/good-things.md)
   'build-mastery': ['iCanRungs'],             // the done card: a step already on the I can list isn't offered again (docs/design/build-mastery.md)
   'give': ['people'],                        // the picker (IE-03), before the skill (docs/design/give.md)
+  'mindfulness-of-others': ['people'],       // the picker (IE-03), before the skill (docs/design/notice-them.md)
   'values-clarification': ['values'],         // the start screen (*Your values are here*) and a step for one kept before (docs/design/values.md)
   // Wise mind's step back (parts on only): the person's parts in the room, with their names, shapes,
   // tender and safety flags. Empty while parts are off, so the tool shows its two-minds form.

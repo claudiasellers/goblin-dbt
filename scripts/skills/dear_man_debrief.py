@@ -372,7 +372,8 @@ STEPS = [
         ],
         # Keeping it warm (IE-06, GIVE) when things feel unsettled between you.
         "offers": [{"exit": "give", "when": {"in": [a("between"), ["shaky", "no"]]}},
-                   {"exit": "fast", "when": {"all": [is_("outcome", "got_it"), is_("proud", "no")]}}],
+                   {"exit": "fast", "when": {"all": [is_("outcome", "got_it"), is_("proud", "no")]}},
+                   {"exit": "notice_them", "when": has("moment", "tp_defensive")}],
         "done": "done",
     },
     {
@@ -389,6 +390,8 @@ STEPS = [
             {"exit": "fast_let_go", "when": {"in": [a("factor"), ["cant_give", "not_willing"]]}},
             {"exit": "finding_connection", "when": is_("factor", "cant_give")},
             {"exit": "dear_man", "when": RETRY},
+            # IE-10 (PRD: the turning point *they got defensive*): what might have been going on for them.
+            {"exit": "notice_them", "when": has("moment", "tp_defensive")},
         ],
         "done": "done",
     },
@@ -396,6 +399,7 @@ STEPS = [
 
 EXITS = [
     {"id": "cool_down", "toolId": "cool-down"},
+    {"id": "notice_them", "toolId": "mindfulness-of-others", "query": {"situationId": "look_again", "person": "$ctx.personId"}},
     {"id": "thoughts", "toolId": "thoughts-passing"},                     # DT-08 Thoughts passing through
     {"id": "dear_man", "toolId": "dear-man"},
     {"id": "cope_ahead", "toolId": "cope-ahead", "query": {"situationId": "conversation"}},
