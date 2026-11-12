@@ -5,14 +5,14 @@
  * plays the same script whatever the kind.
  *
  * One exchange: your words in your bubble → *I said it out loud* / *in my head* → their reply → your move. A move to
- * step out or end the conversation ends it (`left`), *I'd lose it here* ends it (`lost_it`), Stop ends it at any point
+ * step out or end the conversation ends it (`stepped_out`; never `left`, which the player reads as an inline run left early and so records no rep), *I'd lose it here* ends it (`lost_it`), Stop ends it at any point
  * (`stopped`). Their last reply takes no move: *That's the conversation* and Next end it (`finished`).
  */
 
 export interface StageOption { value: string; label: string; [k: string]: unknown }
 export interface Turn { value: string; line: string; pose: string; moves: string[] }
 export interface Move { value: string; label: string; says: string | null }
-export type StageEnd = 'finished' | 'stopped' | 'lost_it' | 'left';
+export type StageEnd = 'finished' | 'stopped' | 'lost_it' | 'stepped_out';
 
 export interface StageState {
   /** Index of the reply being shown or about to be shown. */
@@ -73,7 +73,7 @@ export function moved(s: StageState, move: Move, line: string): StageState {
   const used = s.used.includes(move.value) || move.value === 'lost_it' ? s.used : [...s.used, move.value];
   if (move.value === 'lost_it') return { ...s, used, phase: 'end', end: 'lost_it' };
   const yours = move.says ?? line;
-  if (LEAVING.has(move.value)) return { ...s, used, yours, phase: 'end', end: 'left' };
+  if (LEAVING.has(move.value)) return { ...s, used, yours, phase: 'end', end: 'stepped_out' };
   return { ...s, used, yours, phase: 'say', at: s.at + 1 };
 }
 

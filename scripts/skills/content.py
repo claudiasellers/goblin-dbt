@@ -108,7 +108,7 @@ EMBEDS = {
     # IE-02's stage (plan C3b `rehearsalStage`, IE-owned): two figures, the script's replies, your moves, Stop. Reports
     # the moves used, whether a line was said out loud, how it ended, and how many exchanges.
     "rehearsalStage": {"ids": ["again", "acknowledge", "name", "middle", "turn", "break", "done", "aloud",
-                               "finished", "stopped", "lost_it", "left"], "measures": ["doneCount"]},
+                               "finished", "stopped", "lost_it", "stepped_out"], "measures": ["doneCount"]},
     # DT-03's deck (plan C3b `cardDeck`, DT-owned): the kit one card at a time; reports which kinds of card it showed.
     "kitDeck": {"ids": ["body", "hands", "soothe", "words", "place", "reasons", "pros_cons", "starter"], "measures": ["durationSec", "doneCount"]},
     # R8: another skill run inline (runtime-owned); its `inline.ends` / `flags` give these ids.
@@ -227,6 +227,10 @@ EMBED_PROPS = {
         "them": {"type": "copy"},
         "endLine": {"type": "copy"},
         "next": {"type": "copy"},
+        "poseCloser": {"type": "copy", "optional": True},
+        "poseArms": {"type": "copy", "optional": True},
+        "poseTurnAway": {"type": "copy", "optional": True},
+        "poseStill": {"type": "copy", "optional": True},
     },
     "boundaryLine": {
         "field": {"type": "field"},

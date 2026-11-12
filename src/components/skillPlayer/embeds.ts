@@ -131,7 +131,7 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   pocketCard: { ids: ['seen_all', 'copied'] },
   batteryRead: { ids: ['read'] },
   twoColumns: { ids: ['read'] },
-  rehearsalStage: { ids: ['again', 'acknowledge', 'name', 'middle', 'turn', 'break', 'done', 'aloud', 'finished', 'stopped', 'lost_it', 'left'], measures: ['doneCount'] },
+  rehearsalStage: { ids: ['again', 'acknowledge', 'name', 'middle', 'turn', 'break', 'done', 'aloud', 'finished', 'stopped', 'lost_it', 'stepped_out'], measures: ['doneCount'] },
   // ER-10's feeling card: read, then on.
   feelingCard: { ids: ['read'] },
   kitDeck: { ids: ['body', 'hands', 'soothe', 'words', 'place', 'reasons', 'pros_cons', 'starter'], measures: ['durationSec', 'doneCount'] },
@@ -217,6 +217,10 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     them: { type: 'copy' },
     endLine: { type: 'copy' },
     next: { type: 'copy' },
+    poseCloser: { type: 'copy', optional: true },
+    poseArms: { type: 'copy', optional: true },
+    poseTurnAway: { type: 'copy', optional: true },
+    poseStill: { type: 'copy', optional: true },
   },
   boundaryLine: {
     field: { type: 'field' },
