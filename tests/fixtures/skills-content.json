@@ -37834,6 +37834,14 @@
        "when": {
         "all": [
          {
+          "not": {
+           "has": [
+            "$a.checked.ids",
+            "left"
+           ]
+          }
+         },
+         {
           "in": [
            "$d.parent",
            [
@@ -37862,6 +37870,14 @@
        "when": {
         "all": [
          {
+          "not": {
+           "has": [
+            "$a.checked.ids",
+            "left"
+           ]
+          }
+         },
+         {
           "eq": [
            "$a.urge",
            "guilt-punish"
@@ -37889,35 +37905,47 @@
       {
        "to": "prob",
        "when": {
-        "any": [
+        "all": [
          {
-          "all": [
-           {
-            "has": [
-             "$a.checked.ids",
-             "fits"
-            ]
-           },
-           {
-            "eq": [
-             "$a.help",
-             "helpful"
-            ]
-           }
-          ]
+          "not": {
+           "has": [
+            "$a.checked.ids",
+            "left"
+           ]
+          }
          },
          {
-          "all": [
+          "any": [
            {
-            "has": [
-             "$a.checked.ids",
-             "partly"
+            "all": [
+             {
+              "has": [
+               "$a.checked.ids",
+               "fits"
+              ]
+             },
+             {
+              "eq": [
+               "$a.help",
+               "helpful"
+              ]
+             }
             ]
            },
            {
-            "eq": [
-             "$a.help",
-             "helpful"
+            "all": [
+             {
+              "has": [
+               "$a.checked.ids",
+               "partly"
+              ]
+             },
+             {
+              "eq": [
+               "$a.help",
+               "helpful"
+              ]
+             }
             ]
            }
           ]
@@ -37928,51 +37956,63 @@
       {
        "to": "cue",
        "when": {
-        "any": [
+        "all": [
          {
-          "all": [
-           {
-            "has": [
-             "$a.checked.ids",
-             "doesnt_fit"
-            ]
-           },
-           {
-            "eq": [
-             "$a.help",
-             "unhelpful"
-            ]
-           }
-          ]
+          "not": {
+           "has": [
+            "$a.checked.ids",
+            "left"
+           ]
+          }
          },
          {
-          "all": [
+          "any": [
            {
-            "has": [
-             "$a.checked.ids",
-             "fits"
+            "all": [
+             {
+              "has": [
+               "$a.checked.ids",
+               "doesnt_fit"
+              ]
+             },
+             {
+              "eq": [
+               "$a.help",
+               "unhelpful"
+              ]
+             }
             ]
            },
            {
-            "eq": [
-             "$a.help",
-             "unhelpful"
-            ]
-           }
-          ]
-         },
-         {
-          "all": [
-           {
-            "has": [
-             "$a.checked.ids",
-             "partly"
+            "all": [
+             {
+              "has": [
+               "$a.checked.ids",
+               "fits"
+              ]
+             },
+             {
+              "eq": [
+               "$a.help",
+               "unhelpful"
+              ]
+             }
             ]
            },
            {
-            "eq": [
-             "$a.help",
-             "unhelpful"
+            "all": [
+             {
+              "has": [
+               "$a.checked.ids",
+               "partly"
+              ]
+             },
+             {
+              "eq": [
+               "$a.help",
+               "unhelpful"
+              ]
+             }
             ]
            }
           ]

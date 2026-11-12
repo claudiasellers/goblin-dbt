@@ -114,6 +114,27 @@ test('the repair rule: guilt that fits with the goal repair never becomes an opp
   assert.equal(P.repairRule('sadness', 'fits', 'repair'), false);
 });
 
+test('the inline check (ER-B5): its verdict stands in for *does it fit?* in the table; left early or unsafe records nothing', async () => {
+  const FLOW2 = JSON.stringify({ routes: { 'unsure:unhelpful': 'clarify', 'not_fit:unhelpful': 'opposite', 'fits:unhelpful': 'opposite', 'excessive:unhelpful': 'opposite', 'excessive:helpful': 'problem' } });
+  const withCheck = (ids, help = 'unhelpful') => sadRun({ answers: sadRun().answers.map((x) =>
+    x.fieldId === 'fits' ? at('fits', 'sad', ['unsure']) : x.fieldId === 'help' ? at('help', 'sad', [help]) : x).concat([at('checked', 'sad', ids)]) });
+  const runIt = async (run) => {
+    const tx = fakeTx((q, params) => (q === P.CHECK_PICK ? [{ parentId: 'sadness', urgeId: params.urgeId, flow: FLOW2 }] : undefined));
+    await P.projectOppositeAction(tx, input(run));
+    return writes(tx).map((w) => JSON.parse(w.params.dataJson));
+  };
+  for (const v of ['fits', 'partly', 'doesnt_fit']) {
+    const [d] = await runIt(withCheck(['finished', v]));
+    assert.ok(d, `${v} on the opposite route is recorded`);
+    assert.equal(d.factsChecked, v);
+    assert.equal(d.facts, 'unsure', 'the answer as given stays');
+  }
+  assert.deepEqual(await runIt(withCheck(['finished', 'partly'], 'helpful')), [], 'partly + helpful is the table\'s problem route');
+  assert.deepEqual(await runIt(withCheck(['left', 'doesnt_fit'])), [], 'a check left early never counts');
+  assert.deepEqual(await runIt(withCheck(['finished', 'doesnt_fit', 'unsafe'])), [], 'unsafe told: nothing');
+  assert.deepEqual(await runIt(withCheck(['finished', 'unsure'])), [], 'not sure stays clarify');
+});
+
 test('a reopened visit moves the first visit\'s records on, never writes new ones: tried → practiced, not → missed', async () => {
   const reopened = (tried, extra = []) => sadRun({ path: ['back', tried === 'yes' ? 'aft2' : 'miss'], answers: [...sadRun().answers.filter((a) => !['outcome', 'actual'].includes(a.fieldId)), ans('tried', [tried]), ...extra] });
   const first = [{ key: `u1:first-1`, dataJson: JSON.stringify({ schemaVersion: 3, status: 'planned', urgeId: 'sad-bed' }) }];

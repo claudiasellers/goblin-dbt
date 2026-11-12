@@ -242,6 +242,7 @@ CHECK_UNSAFE = {"any": [CHECKED("unsafe"), CHECKED("stopped")]}
 VERDICT = {"fits": "fits", "partly": "excessive", "doesnt_fit": "not_fit"}
 CHECKED_FITS = {"any": [CHECKED("fits"), CHECKED("partly")]}
 NOT_CHECKED = {"not": {"set": a("checked")}}
+NOT_LEFT = {"not": CHECKED("left")}
 
 
 def _checked_to(step):
@@ -339,11 +340,12 @@ STEPS = [
         "props": {"skill": "check_the_facts", "enterAt": "event", "ctx": {"feelingId": "$each"}},
         # Unsafe first; guilt or shame that fits with the repair goal is repair (H11); *Punish yourself* is never "it fits,
         # work on the situation"; then the table on the verdict; the rest (not sure, left) is the clarify card.
+        # Leaving early is the clarify card whatever the verdict screen held (its flags still come back on a leave).
         "next": [{"when": CHECK_UNSAFE, "to": "cdng"},
-                 {"when": {"all": [{"in": ["$d.parent", ["guilt", "shame"]]}, CHECKED("fits"), EQ("goal", "repair")]}, "to": "repr"},
-                 {"when": {"all": [PUNISH, CHECKED_FITS]}, "to": "pun"},
-                 {"when": _checked_to("prob"), "to": "prob"},
-                 {"when": _checked_to("cue"), "to": "cue"},
+                 {"when": {"all": [NOT_LEFT, {"in": ["$d.parent", ["guilt", "shame"]]}, CHECKED("fits"), EQ("goal", "repair")]}, "to": "repr"},
+                 {"when": {"all": [NOT_LEFT, PUNISH, CHECKED_FITS]}, "to": "pun"},
+                 {"when": {"all": [NOT_LEFT, _checked_to("prob")]}, "to": "prob"},
+                 {"when": {"all": [NOT_LEFT, _checked_to("cue")]}, "to": "cue"},
                  {"to": "clar"}],
     },
     # A person hurt or threatened them, told to the check: this feeling's danger card (the whole run's is `dang`).

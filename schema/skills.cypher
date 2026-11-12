@@ -14896,16 +14896,16 @@ MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"any\": [{\"has\": [\"$a.checked.ids\", \"unsafe\"]}, {\"has\": [\"$a.checked.ids\", \"stopped\"]}]}";
 MATCH (a:SkillStep {id: "opposite_action:ctf"}), (b:SkillStep {id: "opposite_action:repr"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "{\"all\": [{\"in\": [\"$d.parent\", [\"guilt\", \"shame\"]]}, {\"has\": [\"$a.checked.ids\", \"fits\"]}, {\"eq\": [\"$a.goal\", \"repair\"]}]}";
+SET r += {order: 1}, r.whenJson = "{\"all\": [{\"not\": {\"has\": [\"$a.checked.ids\", \"left\"]}}, {\"in\": [\"$d.parent\", [\"guilt\", \"shame\"]]}, {\"has\": [\"$a.checked.ids\", \"fits\"]}, {\"eq\": [\"$a.goal\", \"repair\"]}]}";
 MATCH (a:SkillStep {id: "opposite_action:ctf"}), (b:SkillStep {id: "opposite_action:pun"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 2}, r.whenJson = "{\"all\": [{\"eq\": [\"$a.urge\", \"guilt-punish\"]}, {\"any\": [{\"has\": [\"$a.checked.ids\", \"fits\"]}, {\"has\": [\"$a.checked.ids\", \"partly\"]}]}]}";
+SET r += {order: 2}, r.whenJson = "{\"all\": [{\"not\": {\"has\": [\"$a.checked.ids\", \"left\"]}}, {\"eq\": [\"$a.urge\", \"guilt-punish\"]}, {\"any\": [{\"has\": [\"$a.checked.ids\", \"fits\"]}, {\"has\": [\"$a.checked.ids\", \"partly\"]}]}]}";
 MATCH (a:SkillStep {id: "opposite_action:ctf"}), (b:SkillStep {id: "opposite_action:prob"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 3}, r.whenJson = "{\"any\": [{\"all\": [{\"has\": [\"$a.checked.ids\", \"fits\"]}, {\"eq\": [\"$a.help\", \"helpful\"]}]}, {\"all\": [{\"has\": [\"$a.checked.ids\", \"partly\"]}, {\"eq\": [\"$a.help\", \"helpful\"]}]}]}";
+SET r += {order: 3}, r.whenJson = "{\"all\": [{\"not\": {\"has\": [\"$a.checked.ids\", \"left\"]}}, {\"any\": [{\"all\": [{\"has\": [\"$a.checked.ids\", \"fits\"]}, {\"eq\": [\"$a.help\", \"helpful\"]}]}, {\"all\": [{\"has\": [\"$a.checked.ids\", \"partly\"]}, {\"eq\": [\"$a.help\", \"helpful\"]}]}]}]}";
 MATCH (a:SkillStep {id: "opposite_action:ctf"}), (b:SkillStep {id: "opposite_action:cue"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 4}, r.whenJson = "{\"any\": [{\"all\": [{\"has\": [\"$a.checked.ids\", \"doesnt_fit\"]}, {\"eq\": [\"$a.help\", \"unhelpful\"]}]}, {\"all\": [{\"has\": [\"$a.checked.ids\", \"fits\"]}, {\"eq\": [\"$a.help\", \"unhelpful\"]}]}, {\"all\": [{\"has\": [\"$a.checked.ids\", \"partly\"]}, {\"eq\": [\"$a.help\", \"unhelpful\"]}]}]}";
+SET r += {order: 4}, r.whenJson = "{\"all\": [{\"not\": {\"has\": [\"$a.checked.ids\", \"left\"]}}, {\"any\": [{\"all\": [{\"has\": [\"$a.checked.ids\", \"doesnt_fit\"]}, {\"eq\": [\"$a.help\", \"unhelpful\"]}]}, {\"all\": [{\"has\": [\"$a.checked.ids\", \"fits\"]}, {\"eq\": [\"$a.help\", \"unhelpful\"]}]}, {\"all\": [{\"has\": [\"$a.checked.ids\", \"partly\"]}, {\"eq\": [\"$a.help\", \"unhelpful\"]}]}]}]}";
 MATCH (a:SkillStep {id: "opposite_action:ctf"}), (b:SkillStep {id: "opposite_action:clar"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 5}, r.whenJson = "null";
