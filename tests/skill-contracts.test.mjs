@@ -18,6 +18,8 @@ const waitsForFrame = (x) => {
 };
 const CTX_KEYS = new Set(["urgeId", "personId", "frame", "enterAt", "situationId", "partId", "band", "returnTo", "emotionId", "refused", "feelingId"]);
 const EXT_MAX_BYTES = 4096;
+/** Tools whose page is PersonFirstSkill (the picker, then the skill): they read `?person=` themselves. */
+const PERSON_FIRST_TOOLS = new Set(["dear-man", "say-no", "give"]);
 
 const m = await importTs("src/lib/skillRuntime/machine.ts");
 const { validateExt, EXT_SCHEMAS, RUN_OWN_MAX } = await importTs("functions/src/spine/extSchemas.ts");
@@ -79,7 +81,10 @@ for (const sk of fixture.skills) {
       if (!target) continue; // a page not on the runtime yet: its own entry contract (tests per tool)
       if (x.planned && waitsForFrame(x)) continue; // never opened until its frame is built
       // `mode` picks which of a tool's skills the page plays (DEAR MAN: debrief, one message, the prep); it isn't context.
-      for (const key of Object.keys(x.query)) if (key !== "mode") assert.ok(target.accepts.includes(key), `${x.id}: ${target.id} doesn't accept ${key}`);
+      // `person` is the person picker's preset on a PersonFirstSkill page (a kept person whose safety answer is fresh
+      // skips the picker; anyone else is asked), read by the page before the skill, never by the skill.
+      const pageKey = (key) => key === "mode" || (key === "person" && PERSON_FIRST_TOOLS.has(x.toolId));
+      for (const key of Object.keys(x.query)) if (!pageKey(key)) assert.ok(target.accepts.includes(key), `${x.id}: ${target.id} doesn't accept ${key}`);
     }
   });
 

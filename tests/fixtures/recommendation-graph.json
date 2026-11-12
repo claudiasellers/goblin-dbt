@@ -459,6 +459,17 @@
     "perplexed"
    ]
   },
+  "dbt_give": {
+   "appToolId": "give",
+   "name": "GIVE",
+   "description": "Gentle, Interested, Validate, Easy manner",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": "change",
+   "skillKind": "relational",
+   "direction": "neutral",
+   "addresses": []
+  },
   "dbt_mindfulness_current_thoughts": {
    "appToolId": "thoughts-passing",
    "name": "Mindfulness of Current Thoughts",
@@ -3565,33 +3576,6 @@
    "rationale": "Flooded + blank: orient only (no Cool Down, D-02)."
   },
   {
-   "id": "rf_reward_drive_low_words_connection_give",
-   "conceptId": "dbt_give",
-   "patternId": "reward_drive_low",
-   "bands": [
-    "steady",
-    "stirred"
-   ],
-   "priority": 0.85,
-   "direction": "neutral",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": "words",
-   "words": [
-    "lonely",
-    "isolated"
-   ],
-   "beside": [],
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": false,
-   "version": "rf-v2",
-   "reviewStatus": "draft",
-   "rationale": "Planned: GIVE (reaching towards people) leads for loneliness once built, Running low after it; Do the Opposite until then."
-  },
-  {
    "id": "rf_reward_drive_low_words_fragile_let-it-be",
    "conceptId": "dbt_radical_acceptance",
    "patternId": "reward_drive_low",
@@ -3978,6 +3962,34 @@
    "rationale": "Held (self-soothe, hand on heart) beside Recover for cold shame: kindness first, which shame makes hardest to take in; Do the Opposite (unhiding) asks more than a low-energy moment has. Never on a blank result (direction down)."
   },
   {
+   "id": "rf_rumination_loop_words_repair_give",
+   "conceptId": "dbt_give",
+   "patternId": "rumination_loop",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.6,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "remorseful"
+   ],
+   "beside": [
+    "check-the-facts"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "approved",
+   "rationale": "Keep it warm's repair (IE-06) beside Check the Facts for remorse: is the guilt justified, then repair with the person (one acknowledgement, one sorry). Its repair route asks whether some of it was yours first. Not guilty: guilt is often about the self, not someone to repair with."
+  },
+  {
    "id": "rf_social_threat_shame_addresses_recovering-from-invalidation",
    "conceptId": "dbt_recovering_from_invalidation",
    "patternId": "social_threat_shame",
@@ -4174,32 +4186,6 @@
    "version": "rf-v2",
    "reviewStatus": "approved",
    "rationale": "Hot shame: Cool Down (TIPP cold water triggers the dive reflex, slowing the heart and narrowing peripheral blood vessels), then Recover. Humiliated is a wound word, so Recover still leads it (R7)."
-  },
-  {
-   "id": "rf_social_threat_shame_words_let-down_give",
-   "conceptId": "dbt_give",
-   "patternId": "social_threat_shame",
-   "bands": [
-    "steady",
-    "stirred"
-   ],
-   "priority": 1.5,
-   "direction": "neutral",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": "words",
-   "words": [
-    "let_down"
-   ],
-   "beside": [],
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": false,
-   "version": "rf-v2",
-   "reviewStatus": "draft",
-   "rationale": "Planned: GIVE (keep the relationship) as the alternative to Recover."
   },
   {
    "id": "rf_social_threat_shame_words_self-respect_fast",
