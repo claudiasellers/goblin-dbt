@@ -14330,7 +14330,8 @@
         "version": "fast-let-go-v1",
         "start": "line",
         "accepts": [
-          "frame"
+          "frame",
+          "band"
         ],
         "ownMax": 140,
         "emotionFields": [],
@@ -14344,11 +14345,12 @@
           "elsewhere_line": "What you needed still matters. It can be met somewhere else.",
           "elsewhere_line_none": "Saying nothing is a choice too. What you needed still matters, and it can be met somewhere else.",
           "room_title": "Do you want to make some room for it here, for a few minutes?",
-          "room_hint": "Not to agree with the no. Only to stop fighting what can't change today.",
+          "room_hint": "Not to agree with the no, or to give up what you need. Only to stop fighting what can't change today.",
           "room_here": "Yes, here",
           "room_later": "Not now",
           "after_line": "Making room for it is something you can come back to. What you needed still matters.",
-          "unsafe_line": "Your safety comes first. You don't have to accept anything that's still hurting you. The people below can help, any time.",
+          "unsafe_line": "Your safety comes first. You don't have to accept anything that's still hurting you. The support here is there any time.",
+          "unsafe_line_made_room": "You made room for what's already happened. You don't have to accept anything that's still hurting you. The support here is there any time.",
           "body_line": "That's a lot to carry. Your body first, then the rest can wait.",
           "next": "Next",
           "done": "Done",
@@ -14391,9 +14393,21 @@
                       ]
                     },
                     {
-                      "eq": [
-                        "$ctx.frame",
-                        "let_go"
+                      "all": [
+                        {
+                          "eq": [
+                            "$ctx.frame",
+                            "let_go"
+                          ]
+                        },
+                        {
+                          "not": {
+                            "eq": [
+                              "$ctx.band",
+                              "flooded"
+                            ]
+                          }
+                        }
                       ]
                     }
                   ]
@@ -14433,9 +14447,21 @@
               {
                 "to": "room",
                 "when": {
-                  "eq": [
-                    "$ctx.frame",
-                    "let_go"
+                  "all": [
+                    {
+                      "eq": [
+                        "$ctx.frame",
+                        "let_go"
+                      ]
+                    },
+                    {
+                      "not": {
+                        "eq": [
+                          "$ctx.band",
+                          "flooded"
+                        ]
+                      }
+                    }
                   ]
                 }
               },
@@ -14582,6 +14608,15 @@
             ],
             "lines": [
               {
+                "when": {
+                  "has": [
+                    "$a.accepted.ids",
+                    "finished"
+                  ]
+                },
+                "key": "unsafe_line_made_room"
+              },
+              {
                 "when": null,
                 "key": "unsafe_line"
               }
@@ -14592,6 +14627,15 @@
               {
                 "exit": "safety_open",
                 "when": null
+              },
+              {
+                "exit": "cool_down",
+                "when": {
+                  "has": [
+                    "$a.accepted.ids",
+                    "body"
+                  ]
+                }
               },
               {
                 "exit": "ending_careful",
@@ -25411,6 +25455,7 @@
           "what_title": "It makes sense you're fighting this. It matters to you. What is it you can't change?",
           "what_hint": "Pick the closest, or say it your way.",
           "what_own": "Say it my way",
+          "inline_back": "Leave this for now",
           "still_title": "Is anyone still hurting you, or could this happen to you again?",
           "still_hint": "Letting it be is never about staying somewhere you're being hurt.",
           "still_line_title": "Accepting that it happened isn't accepting you have to stay in it.",

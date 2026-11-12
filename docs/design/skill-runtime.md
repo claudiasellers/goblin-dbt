@@ -426,6 +426,8 @@ The first host of an inline run is another skill: FAST's Let go runs Let it be a
   not named is `finished`, *Back to where I was* is `left`), then each flag whose condition holds on the sub-run's
   answers (`unsafe`, `body`). The host's transitions read them with `has` on `$a.<answerAs>.ids`. The ids are
   fixed (`EMBED_OUTPUTS.inlineSkill`); `build.py` checks `ends` name hand-off steps and give outcome ids.
+- A way out of the sub-run (a link to another tool) leaves the page: the sub-run closes as left early and asks no
+  close of its own, which would sit inside the host's screen without the step's crisis slot.
 - What's not carried: context. An inline run starts with no context in (no band, frame or person), so a host
-  runs it only where its own context makes that safe (Let go only after a host's no, never on a flooded entry).
+  runs it only where its own context makes that safe (Let go only after a host's no and never flooded: it accepts the band for that).
 

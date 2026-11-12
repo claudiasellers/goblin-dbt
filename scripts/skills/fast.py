@@ -116,7 +116,9 @@ LETTER_OF = {v: letter for v, _label, letter in WHAT}
 OWN_WHAT = {"all": [{"own": "what"}, {"not": {"set": a("what") + ".ids"}}]}  # own words, no chip (`set` on the bare ref counts own words)
 
 
-AFTER_NO = {"eq": ["$ctx.frame", "let_go"]}  # a host's no (?frame=let_go), not a flooded entry
+# A host's no (?frame=let_go), and not flooded: a flooded entry, frame or not, keeps the line now and the link (DT-04's
+# body first, IE-05's nothing long when flooded; an inline run carries no band).
+AFTER_NO = {"all": [{"eq": ["$ctx.frame", "let_go"]}, {"not": {"eq": ["$ctx.band", "flooded"]}}]}
 
 
 def card(step_id, title, field, copyable, next_to="next"):
@@ -237,11 +239,12 @@ LET_GO_COPY = {
     "elsewhere_line_none": "Saying nothing is a choice too. What you needed still matters, and it can be met somewhere else.",
     # IE-B4: after a host's no, Let it be (DT-04) inline, here, instead of a link out.
     "room_title": "Do you want to make some room for it here, for a few minutes?",
-    "room_hint": "Not to agree with the no. Only to stop fighting what can't change today.",
+    "room_hint": "Not to agree with the no, or to give up what you need. Only to stop fighting what can't change today.",
     "room_here": "Yes, here",
     "room_later": "Not now",
     "after_line": "Making room for it is something you can come back to. What you needed still matters.",
-    "unsafe_line": "Your safety comes first. You don't have to accept anything that's still hurting you. The people below can help, any time.",
+    "unsafe_line": "Your safety comes first. You don't have to accept anything that's still hurting you. The support here is there any time.",
+    "unsafe_line_made_room": "You made room for what's already happened. You don't have to accept anything that's still hurting you. The support here is there any time.",
     "body_line": "That's a lot to carry. Your body first, then the rest can wait.",
     "next": "Next",
     "done": "Done",
@@ -309,8 +312,9 @@ LET_GO_STEPS = [
         # Let it be's danger check said anything but no: never acceptance of ongoing harm (C6, its own safety rule).
         "id": "unsafe", "kind": "handoff", "complete": True, "noClose": True,
         "crisis": [{"variant": "other_person", "when": {"all": []}}],
-        "lines": [{"when": None, "key": "unsafe_line"}],
-        "offers": [{"exit": "safety_open", "when": None}, {"exit": "ending_careful", "when": None}],
+        "lines": [{"when": {"has": ["$a.accepted.ids", "finished"]}, "key": "unsafe_line_made_room"}, {"when": None, "key": "unsafe_line"}],
+        "offers": [{"exit": "safety_open", "when": None}, {"exit": "cool_down", "when": {"has": ["$a.accepted.ids", "body"]}},
+                   {"exit": "ending_careful", "when": None}],
         "done": "done",
     },
     {
@@ -350,7 +354,7 @@ LET_GO_EXITS = [
 
 LET_GO = {
     "id": "fast_let_go", "toolId": TOOL_ID, "concept": CONCEPT, "version": "fast-let-go-v1", "start": "line",
-    "ownMax": OWN_MAX, "accepts": ["frame"], "copy": LET_GO_COPY, "tables": {}, "derive": [],
+    "ownMax": OWN_MAX, "accepts": ["frame", "band"], "copy": LET_GO_COPY, "tables": {}, "derive": [],
     "steps": LET_GO_STEPS, "exits": LET_GO_EXITS,
     "options": [("line", v, LINE_LABEL[v], {}, "BoundaryLine" if v != "none" else None) for v in SERVED_LINES]
     + [("room", "here", LET_GO_COPY["room_here"], {}, None), ("room", "later", LET_GO_COPY["room_later"], {}, None)],

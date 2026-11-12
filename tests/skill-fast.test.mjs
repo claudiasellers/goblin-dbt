@@ -138,6 +138,14 @@ test("Let go after a host's no (IE-B4): *make some room for it here* runs Let it
   assert.deepEqual(end(["body"]).offered, ["cool_down"]);
   const flooded = run(letGo, [pick("line", "none"), next]);
   assert.equal(flooded.stepId, "elsewhere", "a flooded entry with no frame keeps the link (Let it be asks about the body itself)");
+  const heardFlooded = run(letGo, [pick("line", "none"), next], { frame: "let_go", band: "flooded" });
+  assert.equal(heardFlooded.stepId, "elsewhere", "flooded after a no: no room offer either (an inline run carries no band)");
+  assert.ok(letGo.accepts.includes("band"));
+  const both = end(["finished", "unsafe", "body"]);
+  assert.equal(both.stepId, "unsafe", "unsafe wins over body");
+  assert.deepEqual(both.offered, ["safety_open", "cool_down", "ending_careful"], "the body stays offered beside the resources");
+  assert.equal(M.handoffLine(ctx(letGo, c), M.stepOf(letGo, "unsafe"), both), letGo.copy.unsafe_line_made_room, "going on for what already happened counted");
+  assert.equal(M.handoffLine(ctx(letGo, c), M.stepOf(letGo, "unsafe"), end(["stopped", "unsafe"])), letGo.copy.unsafe_line);
 });
 
 test("Let it be runs inline from *what can't change*: its hand-offs become the host's outcome, the danger check a flag", () => {

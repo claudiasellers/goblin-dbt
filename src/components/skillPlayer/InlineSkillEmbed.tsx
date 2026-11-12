@@ -15,7 +15,7 @@ import type { EmbedProps } from './embeds';
  *
  * Output: `finished`, `left`, `stopped`, `body`, `unsafe`.
  */
-export function InlineSkillEmbed({ props, onShown, onDone }: EmbedProps) {
+export function InlineSkillEmbed({ props, onShown, onDone, covered }: EmbedProps) {
   const toolSession = useToolSession();
   const shown = useRef(false);
   useEffect(() => {
@@ -29,7 +29,7 @@ export function InlineSkillEmbed({ props, onShown, onDone }: EmbedProps) {
   if (!skillId || !toolSession.id) return null;
   return (
     <div data-testid="inline-skill" data-inline-skill={skillId}>
-      <SkillPlayer skillId={skillId} mode="inline" enterAt={enterAt} hostSessionId={toolSession.id}
+      <SkillPlayer skillId={skillId} mode="inline" enterAt={enterAt} hostSessionId={toolSession.id} covered={covered}
         onReturn={(r) => onDone?.({ ids: r.ids })} />
     </div>
   );

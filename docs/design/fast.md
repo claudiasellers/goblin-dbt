@@ -124,7 +124,7 @@ acknowledgement, then *Do you want to make some room for it here, for a few minu
 inline from *what can't change* (`accept`, the `inlineSkill` embed); *Not now* goes to `after` (Recover). Where Let
 it be ended picks the card: its danger check said anything but no → `unsafe` (the `other_person` resources,
 `safety.open`, Ending in its careful frame); grief too much or the fight louder → `body` (First, the body);
-otherwise `after`. A flooded entry with no frame keeps `elsewhere`, with Let it be as a link (it asks about the body
+otherwise `after`. A flooded entry, with a frame or without, keeps `elsewhere`, with Let it be as a link (it asks about the body
 itself; an inline run carries no band). See [`let-it-be.md`](let-it-be.md) and [`skill-runtime.md`](skill-runtime.md).
 ## Not in this batch
 

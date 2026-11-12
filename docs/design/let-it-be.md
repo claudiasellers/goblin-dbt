@@ -66,7 +66,7 @@ check still comes first for anything about a person. The skill's `inline` gives 
 `stopped`, `too_much` and `settle` → `body`, `end` → `finished`) and `flags` (`unsafe` while the danger check said
 anything but no; `body` when the fight got louder). Let go then shows its own card: `unsafe` or `stopped` → the
 `other_person` resources, `safety.open` and Ending (careful), no acceptance; `body` → First, the body; otherwise
-Recover. A flooded entry to Let go with no frame keeps Let it be as a link, since an inline run carries no band.
+Recover. A flooded entry to Let go, with a frame or without, keeps Let it be as a link, since an inline run carries no band.
 
 ## Deferred (DT-04 part 2, with DT-B4's rest)
 
