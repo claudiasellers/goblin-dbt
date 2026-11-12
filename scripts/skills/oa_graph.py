@@ -1,5 +1,6 @@
 """Do the Opposite's clinical content, read from the schema files it lives in (schema/opposite-action-data.cypher,
-schema/opposite-action-flow.cypher), without a database: those files stay the one editable source of the knowledge
+generated from scripts/opposite-action/content.py, and schema/opposite-action-flow.cypher), without a database: they
+stay the one source of the knowledge
 (each DBT parent's acknowledgment, fit statements, default steps and body cues; each urge's graduated opposites and
 cues; which words the skill works on and where the others go; the route table). opposite_action.py turns it into the
 skill's options and transitions, and each option keeps a PRESENTS edge back to the node it shows (build.py).

@@ -66,6 +66,19 @@ export interface InlineDef {
   ends?: Record<string, string>;
   /** Ids added to the output while their condition holds on the sub-run's answers (`unsafe`: the danger check). */
   flags?: Array<{ id: string; when: Cond }>;
+  /**
+   * Outcome ids of the skill's own, beyond the fixed five (`finished`, `left`, `stopped`, `body`, `unsafe`): what its
+   * `ends` and `flags` may give besides them (Check the Facts' verdict: `fits`, `partly`, `doesnt_fit`, `unsure`). A host
+   * that branches on one branches on `unsafe` first (build.py), and its step's `outcomes` prop is this list.
+   */
+  outcomes?: string[];
+  /**
+   * Answers the sub-run starts with, from the host's context in (`field` → `$ctx.<key>`), when it enters at one of
+   * `enterAt` (never at its start: there, an emotion value is carried, first and never pre-selected).
+   */
+  seed?: Record<string, string>;
+  /** An entry's condition, on the seeded answers: when it doesn't hold the run starts at the skill's start. */
+  enterWhen?: Record<string, Cond>;
 }
 
 /** Copy: a key into the skill's copy, or keys under conditions (first match wins; the last has no `when`). */
@@ -166,7 +179,11 @@ export type EmbedPropSpec =
   | { type: 'enum'; values: readonly string[]; optional?: boolean }
   | { type: 'field'; optional?: boolean }
   | { type: 'fields'; optional?: boolean }
-  | { type: 'id'; optional?: boolean };
+  | { type: 'id'; optional?: boolean }
+  /** Ids written by build.py, never by hand (the `inlineSkill` step's `outcomes`: its sub-skill's own). */
+  | { type: 'ids'; optional?: boolean }
+  /** Context for another run: context key → a ref read in this run (`$a.`, `$d.`, `$ctx.`, `$each`) as it renders. */
+  | { type: 'ctx'; optional?: boolean };
 
 /**
  * What an embed may report through `onDone` (src/components/skillPlayer/embeds.ts EMBED_OUTPUTS, mirrored in

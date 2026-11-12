@@ -8,7 +8,9 @@
  * Ids only: the person's own urge or step stays in `ext.run` (encrypted at close), never copied. Nothing is trusted from
  * the client beyond the ids: each pick must be a word that works on Opposite Action (`HAS_REGULATION_CONTENT`,
  * `oppositeActionApplicable`), its urge one of its parent's, and its route the graph's `opposite` (safe, and not the
- * repair rule). A pick that fails is skipped, never fatal: the close still saves.
+ * repair rule), or the clarify route where Check the Facts, run inline (ER-B5), found it doesn't fit and nothing unsafe
+ * was told (`checked`: the skill's own jump to the cue; recorded as `factsChecked`). A pick that fails is skipped, never
+ * fatal: the close still saves.
  *
  * A reopened visit (the `oa_try` card: *Did you get to try it?*) doesn't write new records: it moves the first visit's
  * records on, planned → practiced or missed, as the hand-built page's follow-up did.
@@ -33,6 +35,8 @@ export interface OaPick {
   actionSize: 'small' | 'medium' | 'bigger' | 'custom';
   facts: string;
   effectiveness: string;
+  /** Check the Facts inline (ER-B5): `doesnt_fit` when its verdict sent this feeling to the cue, else null. */
+  checked: 'doesnt_fit' | null;
   thenVsNowBody: string | null;
 }
 
@@ -70,7 +74,10 @@ export function oaFromRun(run: Record<string, unknown>): OaRun {
     const facts = one('fits', emotionId);
     const effectiveness = one('help', emotionId);
     if (!actionSize || !urgeId || !facts || !effectiveness) return;
-    picks.push({ index, emotionId, urgeId, actionSize, facts, effectiveness, thenVsNowBody: one('tvnb', emotionId) });
+    // The inline check's outcome ids: its verdict sent the feeling to the cue only when nothing unsafe came with it.
+    const chk = get('checked', emotionId)?.ids ?? [];
+    const checked = chk.includes('doesnt_fit') && !chk.includes('unsafe') && !chk.includes('stopped') ? 'doesnt_fit' : null;
+    picks.push({ index, emotionId, urgeId, actionSize, facts, effectiveness, checked, thenVsNowBody: one('tvnb', emotionId) });
   });
   const goal = one('goal');
   const cueId = one('when');
@@ -162,11 +169,14 @@ export async function projectOppositeAction(tx: ManagedTransaction, { uid, toolS
     if (p.urgeId !== 'custom' && !rec.get('urgeId')) continue;
     let flow: { routes?: Record<string, string> } = {};
     try { flow = JSON.parse(rec.get('flow') as string) as typeof flow; } catch { continue; }
-    if (flow.routes?.[`${p.facts}:${p.effectiveness}`] !== 'opposite' || repairRule(parentId, p.facts, oa.goal)) continue;
+    const route = flow.routes?.[`${p.facts}:${p.effectiveness}`];
+    // The table's opposite, or its clarify where the inline check found it doesn't fit (the skill's `ctf` → `cue`).
+    if (!(route === 'opposite' || (route === 'clarify' && p.checked === 'doesnt_fit')) || repairRule(parentId, p.facts, oa.goal)) continue;
     const id = `${toolSessionId}-${p.index + 1}`;
     const data = {
       schemaVersion: 3, id, status: oa.status, emotionId: p.emotionId, parentId, urgeId: p.urgeId,
       goal: oa.goal ?? '', safety: 'safe', facts: p.facts, effectiveness: p.effectiveness, actionSize: p.actionSize,
+      ...(p.checked ? { factsChecked: p.checked } : {}),
       cueId: oa.cueId ?? '', outcome: oa.status === 'practiced' ? oa.outcome ?? '' : '', predict: oa.predict ?? '',
       actual: oa.status === 'practiced' ? oa.actual ?? '' : '', thenVsNowBody: p.thenVsNowBody ?? '', missedReason: '',
     };

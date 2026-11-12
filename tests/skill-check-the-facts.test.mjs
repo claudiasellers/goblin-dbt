@@ -297,3 +297,49 @@ test("v1.2, still don't know: one missing fact and an optional check-in; a chip 
   // Every other answer goes straight to the card.
   for (const f of ["fits", "partly", "doesnt_fit"]) assert.equal(run([...toFits("hurt", ["sad_gone"]), pick("fits", f), next], c).stepId, "next");
 });
+
+// --- Inline (R8, ER-B5): the mini-card inside Do the Opposite's clarify step ------------------------------------------
+const inl = (ctxIn) => ({ ...ctx(), ctxIn: M.contextIn(skill, ctxIn) });
+
+test("inline: with a feeling it has fit statements for, it starts at what happened with the feeling answered", () => {
+  const c = inl({ feelingId: "annoyed" });
+  const s = M.inlineStart(c, "event");
+  assert.equal(s.stepId, "event");
+  assert.deepEqual(s.answers.feel, { ids: ["annoyed"], own: null });
+  assert.equal(M.scope(c, s).derived.fitsParent, "anger");
+  assert.deepEqual(M.inlineCarried(c), ["annoyed"]);
+});
+
+test("inline: no feeling, a feeling with no fit statements, or one off the grid starts at the feeling (carried, never pre-selected)", () => {
+  for (const ctxIn of [{}, { feelingId: "happy" }, { feelingId: "not_a_word" }]) {
+    const c = inl(ctxIn);
+    const s = M.inlineStart(c, "event");
+    assert.equal(s.stepId, "feel", JSON.stringify(ctxIn));
+    assert.deepEqual(s.answers, {}, "nothing seeded, so never an empty facts screen");
+  }
+  assert.deepEqual(M.inlineCarried(inl({ feelingId: "happy" })), ["happy"]);
+  assert.deepEqual(M.inlineCarried(inl({})), []);
+  // A page visit never takes the seed: it starts at its start, as before.
+  assert.equal(M.initialRun(skill).stepId, "feel");
+});
+
+test("inline: it gives back its verdict, `unsafe` with any danger, `stopped` on the safe card", () => {
+  const c = inl({ feelingId: "annoyed" });
+  const go = (events) => events.reduce((s, e) => M.runNext(c, s, e), M.inlineStart(c, "event"));
+  const toVerdict = (v) => go([pick("event", "said"), next, pick("story", "anger_on_purpose"), next, next, pick("fits", v), next]);
+  assert.deepEqual(M.inlineResult(c, toVerdict("doesnt_fit")).ids, ["finished", "doesnt_fit"]);
+  assert.deepEqual(M.inlineResult(c, toVerdict("fits")).ids, ["finished", "fits"]);
+  const danger = "threatened";
+  const safe = go([pick("event", danger), next]);
+  assert.equal(safe.stepId, "safe");
+  assert.deepEqual(M.inlineResult(c, safe).ids, ["stopped", "unsafe"]);
+  assert.deepEqual(skill.inline.outcomes, ["fits", "partly", "doesnt_fit", "unsure"]);
+});
+
+test("inline: the verdict's ask-fresh fitsFacts stays on this run's own session, never the host's", () => {
+  const c = inl({ feelingId: "annoyed" });
+  const s = [pick("event", "said"), next, pick("story", "anger_on_purpose"), next, next, pick("fits", "doesnt_fit")].reduce((st, e) => M.runNext(c, st, e), M.inlineStart(c, "event"));
+  assert.equal(M.askFresh(c, s).fitsFacts, "doesnt_fit", "the inline run's own ToolSession records it");
+  assert.deepEqual(M.inlineResult(c, s).answers, {}, "returns nothing to the host: Do the Opposite's session never gets a second fitsFacts");
+  assert.deepEqual(skill.inline.returns, []);
+});

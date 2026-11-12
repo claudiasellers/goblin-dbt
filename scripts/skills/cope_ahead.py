@@ -43,7 +43,7 @@ VERSION = "ca-skill-v1"
 OWN_MAX = CA.OWN_MAX            # the situation and the hardest moment (140)
 MOVE_OWN_MAX = CA.MOVE_OWN_MAX  # a move (90)
 # *Once more*'s twist and its changed moves are rehearsed once and never kept: shorter boxes, so the visit's
-# longest record fits ext's 4 KB (the hand-built page used the moment's and the move's caps).
+# longest record fits ext's 6 KB (the hand-built page used the moment's and the move's caps).
 TWIST_OWN_MAX = 90
 NEW_MOVE_OWN_MAX = 60
 
@@ -115,7 +115,7 @@ FEEL_FIELD = {"id": "feel", "options": {"emotions": FEEL_OTHER, "emotionsFrom": 
 
 
 # Step ids are four letters at most (the moment's step is `hard`, *Once more* is `more` → `new` → `redo`, settle is
-# `calm`): the path is in the record, and its worst case must fit ext's 4 KB. Field ids keep their names.
+# `calm`): the path is in the record, and its worst case must fit ext's 6 KB. Field ids keep their names.
 STEPS = [
     {
         "id": "what", "kind": "ask", "title": "what_title",
