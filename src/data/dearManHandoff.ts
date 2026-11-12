@@ -31,17 +31,3 @@ export interface DearManHandoff {
   hurtId?: string;
 }
 
-/** A graph id (ProtectedHurt ids are snake_case). */
-const GRAPH_ID = /^[a-z][a-z0-9_]{0,63}$/;
-
-export function isDearManHandoff(v: unknown): v is DearManHandoff {
-  if (!v || typeof v !== 'object') return false;
-  const h = v as Record<string, unknown>;
-  return h.source === 'recovering-from-invalidation'
-    && typeof h.emotionId === 'string' && typeof h.emotionName === 'string'
-    && typeof h.needLabel === 'string' && typeof h.intensity === 'number'
-    && typeof h.waitMinutes === 'number' && typeof h.oneMessageOnly === 'boolean'
-    && (h.band === undefined || h.band === 'steady' || h.band === 'stirred' || h.band === 'flooded')
-    && (h.bandAt === undefined || (typeof h.bandAt === 'string' && !Number.isNaN(Date.parse(h.bandAt))))
-    && (h.hurtId === undefined || (typeof h.hurtId === 'string' && GRAPH_ID.test(h.hurtId)));
-}

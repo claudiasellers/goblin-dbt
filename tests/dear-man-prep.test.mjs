@@ -4,7 +4,7 @@
 // what the ways in carry. The projection is pinned in functions/test/unit/dearManPrep.test.cjs.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { importTs } from "./lib/importTs.mjs";
 
 const read = (f) => readFileSync(f, "utf8");
@@ -227,10 +227,13 @@ test("page: the prep's ways in carry ids only (Recover: the situation, the feeli
     { situationId: "address", personId: "none", frame: "heads_up" });
 });
 
-test("page: the prep plays on PersonFirstSkill (the picker and safety question first); the hand-built page stays for an old ?resume= draft", () => {
+test("page: the prep plays on PersonFirstSkill (the picker and safety question first); the hand-built page is gone, an old ?resume= link opens this", () => {
   const page = read("src/components/tools/dearMan/DearManPrepSkill.tsx");
   assert.match(page, /<PersonFirstSkill skillId="dear_man_prep" toolId="dear-man" questionKey="personWho" headingKey="safetyRouteHeading"/);
-  assert.equal(PREP.PREP_ON_PLAYER, true, "rolling back is flipping this");
+  const dm = read("src/pages/tools/DearMan.tsx");
+  assert.match(dm, /return <Suspense fallback=\{<ToolLoading \/>\}><LazyDearManPrepSkill \/><\/Suspense>;\n\}/, "no mode, any query (?resume= too): the prep skill");
+  assert.doesNotMatch(dm, /ResumeToken|resumeLink|<DearManPrep \/>|PREP_ON_PLAYER/);
+  assert.ok(!existsSync("src/lib/dearManResume.ts"), "the hand-built prep's resume draft went with it");
   for (const k of ["picker_personWho", "picker_safetyRouteHeading", "picker_safeQuestion", "picker_riskHarm"]) assert.ok(skill.copy[k], k);
   assert.match(read("src/lib/skillRuntime/playerTools.ts"), /'dear-man': \['dear_man_debrief', 'dear_man_one', 'dear_man_prep'\]/);
   assert.match(read("functions/src/skills/projections.ts"), /await projectDearManPrep\(tx, input\);/);

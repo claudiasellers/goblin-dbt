@@ -1,6 +1,7 @@
-// Recover → DEAR MAN: the hurt picked on Recover's angry-part card becomes the first "I felt" chip in
-// Express, not selected (src/lib/dearManHurt.ts, src/pages/tools/DearMan.tsx). Only a hurt the shipped
-// parts content has, with a felt phrase; no hurt in the hand-off leaves Express as it was.
+// Recover → DEAR MAN: the hurt picked on Recover's angry-part card, as the first "I felt" chip in Express, not
+// selected (src/lib/dearManHurt.ts). Only a hurt the shipped parts content has, with a felt phrase. The hand-built prep
+// that showed it is gone (IE-B4); carrying it into the prep skill is open (docs/design/dear-man-prep.md), and these
+// rules are what that port composes. History still reads saved hurt ids.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -8,10 +9,8 @@ import { importTs } from "./lib/importTs.mjs";
 import { partsFromFixture } from "./lib/partsContentFixture.mjs";
 
 const { hurtFeelingChip, feelingLabel, feelingEmotionWords, hurtLabel, chipCase } = await importTs("src/lib/dearManHurt.ts");
-const { dearManDraftOf, isDearManDraft } = await importTs("src/lib/dearManResume.ts");
 const { getPartsContent } = await importTs("src/services/partsContent.ts");
 const fixture = JSON.parse(readFileSync("tests/fixtures/parts-content.json", "utf8"));
-const tsx = readFileSync("src/pages/tools/DearMan.tsx", "utf8");
 const recover = readFileSync("src/pages/tools/InvalidationRecovery.tsx", "utf8");
 const chips = [{ id: "feel_hurt", label: "Hurt" }, { id: "feel_disrespected", label: "Disrespected" }];
 /** parts.json as it would be with these hurts signed off. */
@@ -68,33 +67,8 @@ test("what Express reads back: the chip's words in the summary, its NAMED_AS wor
   assert.deepEqual(feelingEmotionWords(["feel_disrespected"], chips, null), ["Disrespected"]);
 });
 
-test("the saved value: the hurt id in DearManSession.feelings, through the existing save and resume draft", () => {
-  // The hurt id sits beside the feel_* ids; the server stores feelings as given (no free text added).
+test("the saved value: a hurt id beside the feel_* ids in DearManSession.feelings, stored as given", () => {
   assert.match(readFileSync("functions/src/dearMan/index.ts", "utf8"), /feelings: data\.feelings \|\| \[\],/);
-  assert.match(tsx, /saveDearManSession\(\{[\s\S]{0,400}\bfeelings,\n/);
-  const draft = dearManDraftOf({
-    relationshipType: "boss", situationType: "ask", priorities: [], barriers: [], barriersCustom: "", describeId: null,
-    describeCustom: "", feelings: ["brushed_off", "feel_hurt"], feelingCustom: "", assertIds: [], assertDetails: {}, assertCustom: "",
-    reinforceIds: [], reinforceCustom: "", anchorPhrase: "", middleGroundId: null, middleGroundCustom: "", walkAwayId: null, walkAwayCustom: "",
-  });
-  assert.equal(isDearManDraft(draft), true);
-  assert.deepEqual(draft.feelings, ["brushed_off", "feel_hurt"]);
-});
-
-test("DEAR MAN: the chip first, never pre-selected; parts read only with a hurt in play", () => {
-  const express = tsx.slice(tsx.indexOf("// ─── EXPRESS ───"), tsx.indexOf("// ─── ASSERT"));
-  assert.ok(express.length > 1000, "found the Express step");
-  const at = (s) => { const i = express.indexOf(s); assert.ok(i > 0, s); return i; };
-  // Before the "typical" mirror and every graph chip group.
-  assert.ok(at("renderFeelingChip({ id: hurtChip.id, label: hurtChip.label }") < at("{mirror && ("));
-  assert.ok(at("{mirror && (") < at("{grouped.map(g =>"));
-  // Never put into the picked feelings for the person.
-  assert.doesNotMatch(tsx, /setFeelings\([^)]*hurt/i);
-  // The parts content loads only when a hurt is in play (a hand-off's, or a resumed draft's).
-  assert.match(tsx, /if \(!hurtInPlay \|\| partsHurts\) return;/);
-  assert.match(tsx, /const hurtInPlay = Boolean\(handoff\?\.hurtId\)/);
-  // Nothing parts-worded on the DEAR MAN page.
-  assert.doesNotMatch(express, /\bparts?\b/i);
 });
 
 test("Recover hands over the card's hurt only when there is one", () => {

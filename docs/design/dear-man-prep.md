@@ -143,16 +143,21 @@ History labels it *Prep*.
   angry card (`dearManHurt.ts`) isn't carried; the debrief opened from the `ask_outcome` card doesn't get the part
   (`ext.er.copeAheadPartId` isn't written, so its *who showed up* stays in its general form for these plans; a C8
   amendment); History shows no anchor preview (the old prep stored the phrase's text, this one its id), and a plan
-  whose ask was in own words shows no *Asking for*; device-only `?resume=<sessionId>` drafts still open the old page
-  until their tokens age out; the rep source for the prep isn't set; per-step parity tests against the old page
-  (C8.5): the old page's own tests stay with it until it's deleted.
+  whose ask was in own words shows no *Asking for*; the rep source for the prep isn't set.
 
-## Rolling back
+## The hand-built page is gone (IE-B4, 12 Nov)
 
-`PREP_ON_PLAYER` in `src/lib/dearManPrep.ts` (false → the hand-built `DearManPrep` again, unchanged). The skill's
-content and projection stay; with the flag off nothing opens the skill.
+`DearManPrep` and the `PREP_ON_PLAYER` rollback are deleted: `src/pages/tools/DearMan.tsx` only picks the mode
+(prep, `?mode=debrief`, `?mode=one`). With them went the old page's device-only resume draft
+(`src/lib/dearManResume.ts`), its band gate, summary heads-up and hand-off prefill (`src/lib/dearManSafety.ts` keeps
+only Recover's `withBand`), `debriefLink` / `offerLetGo` / `ASK_OUTCOME_CHIPS` (the skills carry these now),
+`withAnswer` and `dearManRepSource`. An old `?resume=<sessionId>` link (a 24-hour token on one device) opens the
+prep fresh. The callables `getDearManContent` and `saveDearManSession` stay deployed for open tabs of the old page;
+nothing in the app calls them. Kept for ports still open: `src/lib/dearManHurt.ts` (the parts hurt chip, above)
+and `src/lib/copeAhead.ts` with `CopeAheadStep` (Cope Ahead's hand-built page and the parts review use them).
+The old page's source pins went with it; what they guarded on the skill is pinned in `tests/dear-man-prep.test.mjs`.
 
 ## Still in IE-B4
 
-Recover drops `boundaryLocked` and `tooHot` (built 12 Nov, the second PR: [`recover-from-invalidation.md`](recover-from-invalidation.md)); IE-06 Keep it warm (built 12 Nov, [`give.md`](give.md)); IE-12's thoughts about asking (built 12 Nov, above); Let go inline;
-then DEAR MAN's hand-built page can be deleted.
+Recover drops `boundaryLocked` and `tooHot` (built 12 Nov, the second PR: [`recover-from-invalidation.md`](recover-from-invalidation.md)); IE-06 Keep it warm (built 12 Nov, [`give.md`](give.md)); IE-12's thoughts about asking (built 12 Nov, above); Let go inline (built 12 Nov, [`fast.md`](fast.md));
+and DEAR MAN's hand-built page is deleted (above).

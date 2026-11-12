@@ -11,7 +11,6 @@ const read = (f) => readFileSync(f, "utf8");
 const lib = await importTs("src/lib/debriefWho.ts");
 const tagLib = await importTs("src/lib/partTag.ts");
 const ext = await importTs("functions/src/spine/extSchemas.ts");
-const resume = await importTs("src/lib/dearManResume.ts");
 const fixture = JSON.parse(read("tests/fixtures/parts-content.json"));
 const IDS = [...lib.DEBRIEF_PROMPTS, ...lib.DEBRIEF_OPTIONS, ...tagLib.TAG_PROMPTS, ...tagLib.TAG_OPTIONS, ...tagLib.UNNAMED_PROMPTS];
 const shipped = (ids) => partsFromFixture(fixture, (id) => ids.includes(id));
@@ -84,6 +83,5 @@ test("DEAR MAN's debrief skill: its own step after Underneath, before the reflec
   assert.match(embed, /useEffect\(\(\) => \{ if \(settled && !shown\) finish\('not_shown'\); \}\);/, "gate fails: straight on");
   assert.match(embed, /copeAheadPartId=\{ctx\?\.partId \?\? null\} toolSessionId=\{session\.id\}/, "the prep's pick, carried in as the part");
   assert.match(embed, /onDone=\{\(\) => finish\(answer\.current \?\? \(ctx\?\.partId \? 'skip' : 'general'\)\)\}/, "the named form's answer only");
-  assert.ok(!resume.TOO_MUCH_PHASES.some((p) => p.startsWith("debrief")), "no too-much overlay over the debrief");
   assert.doesNotMatch(read("src/pages/tools/DearMan.tsx"), /DebriefWho|debrief-parts/, "the prep page carries no debrief step");
 });
