@@ -42,7 +42,11 @@ test("rows are drafts until signed off; the policy can only be enabled once ever
   assert.ok(rows.every((r) => ["draft", "approved"].includes(r.reviewStatus)), "reviewStatus comes from SIGNED_OFF in content.py");
   const p = rawGraph.routingPolicy;
   const { enabled, reviewStatus, ...shape } = p;
-  assert.deepEqual(shape, { version: "rf-v2", maxCards: 2, fallbackConceptId: "se_orienting", defaultBand: "stirred", floodedPatterns: ["emotional_flooding"] });
+  // rf-v2.1 (5 Oct 2026): the policy carries its own version and scoring knobs; the rows stay rf-v2.
+  assert.deepEqual(shape, {
+    version: "rf-v2.1", maxCards: 2, fallbackConceptId: "se_orienting", defaultBand: "stirred", floodedPatterns: ["emotional_flooding"],
+    answerWeight: 2, tieBreak: "words",
+  });
   assert.ok(["draft", "approved"].includes(reviewStatus));
   if (enabled) {
     assert.equal(reviewStatus, "approved", "sign the policy off (SIGNED_OFF['checkin_result']) before enabling it");

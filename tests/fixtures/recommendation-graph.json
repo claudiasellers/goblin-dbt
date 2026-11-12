@@ -4367,7 +4367,7 @@
   }
  ],
  "routingPolicy": {
-  "version": "rf-v2",
+  "version": "rf-v2.1",
   "enabled": true,
   "maxCards": 2,
   "fallbackConceptId": "se_orienting",
@@ -4375,6 +4375,8 @@
   "floodedPatterns": [
    "emotional_flooding"
   ],
+  "answerWeight": 2,
+  "tieBreak": "words",
   "reviewStatus": "approved"
  }
 }

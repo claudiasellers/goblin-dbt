@@ -5,8 +5,8 @@
  */
 import { ValidationError } from '../shared/validate';
 import {
-  GUIDED_ACTIVITY, POSITIVE_STATE, applyCoOccurrence, candidatesFor, normaliseEmotionId, rankPatterns,
-  scorePatterns, wantsCoOccurrence, withConfidence,
+  DEFAULT_ANSWER_WEIGHT, GUIDED_ACTIVITY, POSITIVE_STATE, applyCoOccurrence, candidatesFor, normaliseEmotionId,
+  rankPatterns, scorePatternParts, wantsCoOccurrence, withConfidence,
 } from './patternScoring';
 import { legacyTools } from './legacy';
 import { resolveBand } from './band';
@@ -65,9 +65,22 @@ export interface PatternSelection {
  * with the legacy ranker, newly reachable patterns would get no card (chronic_vigilance) or the
  * flooding banner with OA.
  */
-export interface Reachability { aliases: boolean; highUnpleasantAnswers: boolean }
-export const FULL_REACH: Reachability = { aliases: true, highUnpleasantAnswers: true };
-export const NO_REACH: Reachability = { aliases: false, highUnpleasantAnswers: false };
+export interface Reachability {
+  aliases: boolean;
+  highUnpleasantAnswers: boolean;
+  /** Each answer's evidence weight × this (rf-v2.1: the policy's answerWeight). */
+  answerWeight: number;
+  /** Break pattern ties toward the person's words (rf-v2.1: the policy's tieBreak "words"). */
+  wordTieBreak: boolean;
+}
+export const FULL_REACH: Reachability = { aliases: true, highUnpleasantAnswers: true, answerWeight: DEFAULT_ANSWER_WEIGHT, wordTieBreak: false };
+export const NO_REACH: Reachability = { aliases: false, highUnpleasantAnswers: false, answerWeight: DEFAULT_ANSWER_WEIGHT, wordTieBreak: false };
+
+/** What the policy turns on. Off (or missing): NO_REACH, the pre-review scoring whole. */
+export function reachFor(policy: RoutingPolicy | null): Reachability {
+  if (!policy?.enabled) return NO_REACH;
+  return { ...FULL_REACH, answerWeight: policy.answerWeight ?? DEFAULT_ANSWER_WEIGHT, wordTieBreak: policy.tieBreak === 'words' };
+}
 
 export async function selectPattern(
   input: CheckInInput, candidates: string[], deps: StateDeps, reach: Reachability = FULL_REACH,
@@ -77,9 +90,10 @@ export async function selectPattern(
   const answers = input.quadrant === 'high-unpleasant' && !reach.highUnpleasantAnswers ? [] : (input.discriminatingAnswers ?? []);
   const responseIds = answers.map((a) => a.responseId);
   const responseRows = responseIds.length > 0 ? await deps.responseEvidence(candidates, responseIds) : [];
-  const ranked = rankPatterns(scorePatterns({
-    candidates, emotionIds, intensityY: input.intensity?.y, emotionRows, responseRows,
-  }));
+  const parts = scorePatternParts({
+    candidates, emotionIds, intensityY: input.intensity?.y, emotionRows, responseRows, answerWeight: reach.answerWeight,
+  });
+  const ranked = rankPatterns(parts.scores, reach.wordTieBreak ? parts.wordScores : undefined);
 
   const detail = await deps.patternDetail(ranked.primaryId);
   if (!detail) throw new PatternNotFoundError(input.quadrant);
@@ -134,7 +148,7 @@ export async function getStateAndToolsHandler(input: CheckInInput, deps: StateDe
   const { policy, fallback } = await deps.routingPolicy();
   const candidates = candidatesFor(input.quadrant, policy?.enabled === true);
   const { pattern, secondaryPattern, coOccurrence, emotionIds } = await selectPattern(
-    input, candidates, deps, policy?.enabled ? FULL_REACH : NO_REACH,
+    input, candidates, deps, reachFor(policy),
   );
   const { band, bandSource } = resolveBand(input, pattern.id, policy);
   const surface = input.surface ?? 'checkin';
