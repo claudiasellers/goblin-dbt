@@ -159,77 +159,118 @@ MERGE (t)-[:HAS_SITUATION]->(s);
 // --- What you'll do (screen 4) ---
 MATCH (:TherapyConcept {id: 'dbt_cope_ahead'})-[r:HAS_MOVE]->() DELETE r;
 MERGE (n:CopeMove {id: "long_out"})
-SET n += {kind: "body", label: "Breathe out longer than in", line: "breathe out longer than in", forPulls: ["fight", "chase", "hide"], general: true, forMoments: [], order: 0, version: "cope-ahead-v1"};
+SET n += {kind: "body", label: "Breathe out longer than in", line: "breathe out longer than in", forPulls: ["fight", "chase", "hide"], general: true, forMoments: [], forSituations: [], order: 0, version: "cope-ahead-v1"};
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "long_out"})
 MERGE (t)-[:HAS_MOVE]->(m);
 MERGE (n:CopeMove {id: "feet"})
-SET n += {kind: "body", label: "Feel my feet on the floor", line: "feel my feet on the floor", forPulls: ["hide", "blank", "fight"], general: true, forMoments: [], order: 1, version: "cope-ahead-v1"};
+SET n += {kind: "body", label: "Feel my feet on the floor", line: "feel my feet on the floor", forPulls: ["hide", "blank", "fight"], general: true, forMoments: [], forSituations: [], order: 1, version: "cope-ahead-v1"};
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "feet"})
 MERGE (t)-[:HAS_MOVE]->(m);
 MERGE (n:CopeMove {id: "cold_water"})
-SET n += {kind: "body", label: "Cold water on my hands", line: "put cold water on my hands", forPulls: ["fight", "chase", "blank"], general: false, forMoments: [], order: 2, version: "cope-ahead-v1"};
+SET n += {kind: "body", label: "Cold water on my hands", line: "put cold water on my hands", forPulls: ["fight", "chase", "blank"], general: false, forMoments: [], forSituations: [], order: 2, version: "cope-ahead-v1"};
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "cold_water"})
 MERGE (t)-[:HAS_MOVE]->(m);
 MERGE (n:CopeMove {id: "hold_something"})
-SET n += {kind: "body", label: "Hold something in my pocket", line: "hold something in my pocket", forPulls: ["blank", "hide"], general: false, forMoments: [], order: 3, version: "cope-ahead-v1"};
+SET n += {kind: "body", label: "Hold something in my pocket", line: "hold something in my pocket", forPulls: ["blank", "hide"], general: false, forMoments: [], forSituations: [], order: 3, version: "cope-ahead-v1"};
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "hold_something"})
 MERGE (t)-[:HAS_MOVE]->(m);
 MERGE (n:CopeMove {id: "give_minute"})
-SET n += {kind: "words", label: "Say “Give me a minute”", line: "say “Give me a minute”", forPulls: ["fight", "blank", "chase"], general: true, forMoments: [], order: 4, version: "cope-ahead-v1"};
+SET n += {kind: "words", label: "Say “Give me a minute”", line: "say “Give me a minute”", forPulls: ["fight", "blank", "chase"], general: true, forMoments: [], forSituations: [], order: 4, version: "cope-ahead-v1"};
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "give_minute"})
 MERGE (t)-[:HAS_MOVE]->(m);
 MERGE (n:CopeMove {id: "come_back"})
-SET n += {kind: "words", label: "Say “I'll come back to you on that”", line: "say “I'll come back to you on that”", forPulls: ["fight", "chase"], general: false, forMoments: [], order: 5, version: "cope-ahead-v1"};
+SET n += {kind: "words", label: "Say “I'll come back to you on that”", line: "say “I'll come back to you on that”", forPulls: ["fight", "chase"], general: false, forMoments: [], forSituations: [], order: 5, version: "cope-ahead-v1"};
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "come_back"})
 MERGE (t)-[:HAS_MOVE]->(m);
 MERGE (n:CopeMove {id: "say_hard"})
-SET n += {kind: "words", label: "Say “This is hard for me”", line: "say “This is hard for me”", forPulls: ["hide", "blank"], general: true, forMoments: [], order: 6, version: "cope-ahead-v1"};
+SET n += {kind: "words", label: "Say “This is hard for me”", line: "say “This is hard for me”", forPulls: ["hide", "blank"], general: true, forMoments: [], forSituations: [], order: 6, version: "cope-ahead-v1"};
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "say_hard"})
 MERGE (t)-[:HAS_MOVE]->(m);
 MERGE (n:CopeMove {id: "one_thing"})
-SET n += {kind: "words", label: "Say the one thing I came to say", line: "say the one thing I came to say", forPulls: ["hide", "chase"], general: false, forMoments: [], order: 7, version: "cope-ahead-v1"};
+SET n += {kind: "words", label: "Say the one thing I came to say", line: "say the one thing I came to say", forPulls: ["hide", "chase"], general: false, forMoments: [], forSituations: [], order: 7, version: "cope-ahead-v1"};
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "one_thing"})
 MERGE (t)-[:HAS_MOVE]->(m);
 MERGE (n:CopeMove {id: "step_out"})
-SET n += {kind: "action", label: "Step out for five minutes", line: "step out for five minutes", forPulls: ["fight", "chase", "hide"], general: true, forMoments: [], order: 8, version: "cope-ahead-v1"};
+SET n += {kind: "action", label: "Step out for five minutes", line: "step out for five minutes", forPulls: ["fight", "chase", "hide"], general: true, forMoments: [], forSituations: [], order: 8, version: "cope-ahead-v1"};
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "step_out"})
 MERGE (t)-[:HAS_MOVE]->(m);
 MERGE (n:CopeMove {id: "stay_ten"})
-SET n += {kind: "action", label: "Stay ten more minutes, then decide", line: "stay ten more minutes, then decide", forPulls: ["hide"], general: false, forMoments: [], order: 9, version: "cope-ahead-v1"};
+SET n += {kind: "action", label: "Stay ten more minutes, then decide", line: "stay ten more minutes, then decide", forPulls: ["hide"], general: false, forMoments: [], forSituations: [], order: 9, version: "cope-ahead-v1"};
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "stay_ten"})
 MERGE (t)-[:HAS_MOVE]->(m);
 MERGE (n:CopeMove {id: "text_trust"})
-SET n += {kind: "action", label: "Text someone I trust", line: "text someone I trust", forPulls: ["hide", "blank"], general: true, forMoments: [], order: 10, version: "cope-ahead-v1"};
+SET n += {kind: "action", label: "Text someone I trust", line: "text someone I trust", forPulls: ["hide", "blank"], general: true, forMoments: [], forSituations: [], order: 10, version: "cope-ahead-v1"};
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "text_trust"})
 MERGE (t)-[:HAS_MOVE]->(m);
 MERGE (n:CopeMove {id: "phone_away"})
-SET n += {kind: "action", label: "Put my phone in another room", line: "put my phone in another room", forPulls: ["chase"], general: false, forMoments: [], order: 11, version: "cope-ahead-v1"};
+SET n += {kind: "action", label: "Put my phone in another room", line: "put my phone in another room", forPulls: ["chase"], general: false, forMoments: [], forSituations: [], order: 11, version: "cope-ahead-v1"};
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "phone_away"})
 MERGE (t)-[:HAS_MOVE]->(m);
 MERGE (n:CopeMove {id: "leave_safe"})
-SET n += {kind: "action", label: "Leave and get somewhere safe", line: "leave and get somewhere safe", forPulls: [], general: false, forMoments: ["might_hurt"], order: 12, version: "cope-ahead-v1"};
+SET n += {kind: "action", label: "Leave and get somewhere safe", line: "leave and get somewhere safe", forPulls: [], general: false, forMoments: ["might_hurt"], forSituations: [], order: 12, version: "cope-ahead-v1"};
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "leave_safe"})
 MERGE (t)-[:HAS_MOVE]->(m);
 MERGE (n:CopeMove {id: "reach_help"})
-SET n += {kind: "action", label: "Call or text someone who can help, now", line: "call or text someone who can help, now", forPulls: [], general: false, forMoments: ["might_hurt_self"], order: 13, version: "cope-ahead-v1"};
+SET n += {kind: "action", label: "Call or text someone who can help, now", line: "call or text someone who can help, now", forPulls: [], general: false, forMoments: ["might_hurt_self"], forSituations: [], order: 13, version: "cope-ahead-v1"};
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "reach_help"})
 MERGE (t)-[:HAS_MOVE]->(m);
+MERGE (n:CopeMove {id: "name_it"})
+SET n += {kind: "words", label: "Name what's happening", line: "name what's happening out loud", forPulls: ["fight"], general: false, forMoments: [], forSituations: ["conversation", "someone"], order: 14, version: "cope-ahead-v1"};
+MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "name_it"})
+MERGE (t)-[:HAS_MOVE]->(m);
+MERGE (n:CopeMove {id: "validate_first"})
+SET n += {kind: "words", label: "Say “I can see this is hard for you too”", line: "say “I can see this is hard for you too”", forPulls: ["fight", "hide"], general: false, forMoments: [], forSituations: ["conversation", "someone"], order: 15, version: "cope-ahead-v1"};
+MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "validate_first"})
+MERGE (t)-[:HAS_MOVE]->(m);
+MERGE (n:CopeMove {id: "tears_ok"})
+SET n += {kind: "words", label: "Say “I might cry, and I want to keep going”", line: "say “I might cry, and I want to keep going”", forPulls: ["hide", "blank"], general: false, forMoments: [], forSituations: ["conversation", "someone"], order: 16, version: "cope-ahead-v1"};
+MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "tears_ok"})
+MERGE (t)-[:HAS_MOVE]->(m);
+MERGE (n:CopeMove {id: "no_sorry"})
+SET n += {kind: "words", label: "Say “I understand” instead of an extra sorry", line: "say “I understand” instead of an extra sorry", forPulls: ["hide"], general: false, forMoments: [], forSituations: ["conversation", "someone"], order: 17, version: "cope-ahead-v1"};
+MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "no_sorry"})
+MERGE (t)-[:HAS_MOVE]->(m);
+MERGE (n:CopeMove {id: "notes"})
+SET n += {kind: "action", label: "Look at the points I wrote down", line: "look at the points I wrote down", forPulls: ["blank", "hide"], general: false, forMoments: [], forSituations: ["conversation", "work_school"], order: 18, version: "cope-ahead-v1"};
+MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "notes"})
+MERGE (t)-[:HAS_MOVE]->(m);
 MERGE (n:CopeMove {id: "pause"})
-SET n += {kind: "tool", label: "Hold to wait", line: "open Hold to wait", forPulls: ["fight", "chase"], general: false, appToolId: "pause", forMoments: [], order: 14, version: "cope-ahead-v1"};
+SET n += {kind: "tool", label: "Hold to wait", line: "open Hold to wait", forPulls: ["fight", "chase"], general: false, appToolId: "pause", forMoments: [], forSituations: [], order: 19, version: "cope-ahead-v1"};
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "pause"})
 MERGE (t)-[:HAS_MOVE]->(m);
 MERGE (n:CopeMove {id: "five_senses"})
-SET n += {kind: "tool", label: "5-4-3-2-1", line: "do 5-4-3-2-1", forPulls: ["blank", "hide", "fight"], general: true, appToolId: "five-senses", forMoments: [], order: 15, version: "cope-ahead-v1"};
+SET n += {kind: "tool", label: "5-4-3-2-1", line: "do 5-4-3-2-1", forPulls: ["blank", "hide", "fight"], general: true, appToolId: "five-senses", forMoments: [], forSituations: [], order: 20, version: "cope-ahead-v1"};
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "five_senses"})
 MERGE (t)-[:HAS_MOVE]->(m);
 MERGE (n:CopeMove {id: "cool_down"})
-SET n += {kind: "tool", label: "First, the body", line: "bring my body down first", forPulls: ["fight", "chase"], general: false, appToolId: "cool-down", forMoments: [], order: 16, version: "cope-ahead-v1"};
+SET n += {kind: "tool", label: "First, the body", line: "bring my body down first", forPulls: ["fight", "chase"], general: false, appToolId: "cool-down", forMoments: [], forSituations: [], order: 21, version: "cope-ahead-v1"};
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "cool_down"})
 MERGE (t)-[:HAS_MOVE]->(m);
 MERGE (n:CopeMove {id: "urge_surfing"})
-SET n += {kind: "tool", label: "Ride it out", line: "ride it out", forPulls: ["chase", "fight"], general: false, appToolId: "urge-surfing", forMoments: [], order: 17, version: "cope-ahead-v1"};
+SET n += {kind: "tool", label: "Ride it out", line: "ride it out", forPulls: ["chase", "fight"], general: false, appToolId: "urge-surfing", forMoments: [], forSituations: [], order: 22, version: "cope-ahead-v1"};
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "urge_surfing"})
 MERGE (t)-[:HAS_MOVE]->(m);
+
+// --- DEAR MAN's cope-ahead moves, absorbed (D10): the same move, linked, never renamed or deleted ---
+MATCH (:CopeAhead)-[r:SAME_MOVE_AS]->(:CopeMove) DELETE r;
+MATCH (c:CopeAhead {id: "ca_pause_phrase"}), (m:CopeMove {id: "give_minute"})
+MERGE (c)-[:SAME_MOVE_AS]->(m);
+MATCH (c:CopeAhead {id: "ca_body_anchor"}), (m:CopeMove {id: "feet"})
+MERGE (c)-[:SAME_MOVE_AS]->(m);
+MATCH (c:CopeAhead {id: "ca_broken_record"}), (m:CopeMove {id: "one_thing"})
+MERGE (c)-[:SAME_MOVE_AS]->(m);
+MATCH (c:CopeAhead {id: "ca_planned_exit"}), (m:CopeMove {id: "come_back"})
+MERGE (c)-[:SAME_MOVE_AS]->(m);
+MATCH (c:CopeAhead {id: "ca_name_the_dynamic"}), (m:CopeMove {id: "name_it"})
+MERGE (c)-[:SAME_MOVE_AS]->(m);
+MATCH (c:CopeAhead {id: "ca_validate_first"}), (m:CopeMove {id: "validate_first"})
+MERGE (c)-[:SAME_MOVE_AS]->(m);
+MATCH (c:CopeAhead {id: "ca_tears_plan"}), (m:CopeMove {id: "tears_ok"})
+MERGE (c)-[:SAME_MOVE_AS]->(m);
+MATCH (c:CopeAhead {id: "ca_apology_check"}), (m:CopeMove {id: "no_sorry"})
+MERGE (c)-[:SAME_MOVE_AS]->(m);
+MATCH (c:CopeAhead {id: "ca_write_it_down"}), (m:CopeMove {id: "notes"})
+MERGE (c)-[:SAME_MOVE_AS]->(m);
 
 // --- The rehearsal (screen 5) ---
 MATCH (:TherapyConcept {id: 'dbt_cope_ahead'})-[r:HAS_BEAT]->() DELETE r;

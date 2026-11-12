@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import type { Tool } from '../data/tools';
+import { useOfficialNames } from '../hooks/useOfficialNames';
 
 interface ToolCardProps {
   tool: Tool;
@@ -8,6 +9,8 @@ interface ToolCardProps {
 }
 
 export function ToolCard({ tool, state }: ToolCardProps) {
+  const { label, names } = useOfficialNames();
+  const official = Boolean(names?.[tool.id]);
   return (
     <Link
       to={`/tool/${tool.id}`}
@@ -25,8 +28,11 @@ export function ToolCard({ tool, state }: ToolCardProps) {
         </span>
         <div className="min-w-0">
           <h3 className="font-medium text-[var(--color-text-primary)]">
-            {tool.name}
+            {label(tool)}
           </h3>
+          {official && (
+            <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5">In the app: {tool.name}</p>
+          )}
           <p className="text-sm text-[var(--color-text-secondary)] mt-1">
             {tool.tagline}
           </p>

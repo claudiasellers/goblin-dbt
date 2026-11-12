@@ -31,6 +31,8 @@
  *                          serves it; the shape is tests/fixtures/parts-content.json's moves / prompts /
  *                          options / hurts, plus canTouch (Recover event → hurt ids, approved edges),
  *                          cut to the fields screens read (an allowlist, partsAllowlist.mjs)
+ *   tool-names.json        each app tool's official skill name: TherapyConcept.name by appToolId (the admin
+ *                          "Official DBT names" switch on the Tools page; no Cloud Function serves it)
  * Each builder mirrors the Cypher in the Cloud Function it replaces (named on the function).
  */
 import { readFileSync, writeFileSync, readdirSync, mkdirSync, statSync } from 'node:fs';
@@ -477,7 +479,7 @@ export function buildCopeAhead(g) {
   const hardMoments = off('HAS_HARD_MOMENT', 'HardMoment').map((m) => ({ id: m.id, label: m.label, ifText: m.ifText, order: intOrNull(m.order) }));
   const moves = off('HAS_MOVE', 'CopeMove').map((m) => ({
     id: m.id, kind: m.kind, label: m.label, line: m.line, forPulls: m.forPulls ?? [], general: m.general === true,
-    appToolId: m.appToolId ?? null, forMoments: m.forMoments ?? [], order: intOrNull(m.order) }));
+    appToolId: m.appToolId ?? null, forMoments: m.forMoments ?? [], forSituations: m.forSituations ?? [], order: intOrNull(m.order) }));
   const beats = off('HAS_BEAT', 'RehearsalBeat').map((b) => ({ id: b.id, text: b.text, order: intOrNull(b.order) }));
   return { version: COPE_AHEAD_VERSION, ownMax: doc.ownMax, moveOwnMax: doc.moveOwnMax, when: doc.when, copy: doc.copy,
     pullIf: doc.pullIf, after: doc.after, situations, hardMoments, moves, beats };
@@ -544,6 +546,25 @@ export function buildSkills(g) {
   return { version: SKILLS_VERSION, parentOf, fitsWhen, skills };
 }
 
+/**
+ * Official skill names by app tool id: `TherapyConcept.name` for every concept with an `appToolId` (the join
+ * key routing uses, schema/app-tool-ids.cypher). Two concepts on one tool: a `dbt_` concept first, then by id.
+ * Read only by the admin "Official DBT names" switch (src/lib/officialNames.ts).
+ */
+export function buildToolNames(g) {
+  const rank = (c) => [c.id.startsWith('dbt_') ? 0 : 1, c.id];
+  const better = (a, b) => { const [x, y] = [rank(a), rank(b)]; return x[0] - y[0] || asc(x[1], y[1]); };
+  const best = new Map();
+  for (const c of g.nodes('TherapyConcept').map((n) => n.props)) {
+    if (typeof c.appToolId !== 'string' || typeof c.name !== 'string' || !c.name.trim()) continue;
+    const prev = best.get(c.appToolId);
+    if (!prev || better(c, prev) < 0) best.set(c.appToolId, c);
+  }
+  const tools = {};
+  for (const id of [...best.keys()].sort(asc)) tools[id] = best.get(id).name.trim();
+  return { tools };
+}
+
 /** Files a graph may not have content for yet: missing from an export, the committed file is kept. */
 export const KEPT_WHEN_MISSING = ['wise-mind.json', 'cope-ahead.json', 'skills.json'];
 
@@ -565,6 +586,7 @@ export function buildSnapshots(exp) {
     'capacity.json': buildCapacity(g),
     'spine.json': buildSpine(g),
     'parts.json': buildParts(g),
+    'tool-names.json': buildToolNames(g),
     ...(wiseMind ? { 'wise-mind.json': wiseMind } : {}),
     ...(copeAhead ? { 'cope-ahead.json': copeAhead } : {}),
     ...(skills ? { 'skills.json': skills } : {}),

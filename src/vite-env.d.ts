@@ -3,6 +3,8 @@
 interface ImportMetaEnv {
   readonly VITE_FIREBASE_API_KEY: string
   readonly VITE_APP_CHECK_SITE_KEY?: string
+  /** Firebase uids who see the admin "Official DBT names" switch (comma-separated; src/lib/officialNames.ts). */
+  readonly VITE_ADMIN_UIDS?: string
   readonly VITE_FIREBASE_AUTH_DOMAIN: string
   readonly VITE_FIREBASE_PROJECT_ID: string
   readonly VITE_FIREBASE_STORAGE_BUCKET: string

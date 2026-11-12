@@ -13,13 +13,13 @@ const T = await importTs("src/data/tools.ts");
 const CA = JSON.parse(read("src/data/content/cope-ahead.json")).content;
 const ID = "0f8c2a9e-5b1d-4c3e-9a7f-2d6b8e4c1a03";
 /** The shape check.mjs holds every rendered Cope Ahead link to. */
-const HREF = /^#?\/tool\/cope-ahead(\?(first=[a-z][a-z0-9_]*(&part=[a-f0-9-]{36})?|part=[a-f0-9-]{36}))?$/i;
+const HREF = /^#?\/tool\/cope-ahead(\?(situationId=[a-z][a-z0-9_]*(&partId=[a-f0-9-]{36})?|partId=[a-f0-9-]{36}))?$/i;
 
-test("copeAheadLink: /tool/cope-ahead?first=<situationId>&part=<partId>, each left out when missing or malformed", () => {
-  assert.equal(E.copeAheadLink({ situationId: "conversation", partId: ID }), `/tool/cope-ahead?first=conversation&part=${ID}`);
-  assert.equal(E.copeAheadLink({ situationId: "someone" }), "/tool/cope-ahead?first=someone");
-  assert.equal(E.copeAheadLink({ situationId: "conversation", partId: null }), "/tool/cope-ahead?first=conversation");
-  assert.equal(E.copeAheadLink({ partId: ID }), `/tool/cope-ahead?part=${ID}`);
+test("copeAheadLink: /tool/cope-ahead?situationId=<id>&partId=<id> (the skill's context in), each left out when missing or malformed", () => {
+  assert.equal(E.copeAheadLink({ situationId: "conversation", partId: ID }), `/tool/cope-ahead?situationId=conversation&partId=${ID}`);
+  assert.equal(E.copeAheadLink({ situationId: "someone" }), "/tool/cope-ahead?situationId=someone");
+  assert.equal(E.copeAheadLink({ situationId: "conversation", partId: null }), "/tool/cope-ahead?situationId=conversation");
+  assert.equal(E.copeAheadLink({ partId: ID }), `/tool/cope-ahead?partId=${ID}`);
   assert.equal(E.copeAheadLink({}), "/tool/cope-ahead");
   assert.equal(E.copeAheadLink(), "/tool/cope-ahead");
   assert.equal(E.copeAheadLink({ situationId: "", partId: "" }), "/tool/cope-ahead");
@@ -31,7 +31,8 @@ test("copeAheadLink: /tool/cope-ahead?first=<situationId>&part=<partId>, each le
 
 test("parseCopeAheadEntry: an unknown situation is dropped; a part only if it looks like an id", () => {
   const q = (s) => E.parseCopeAheadEntry(s, CA);
-  assert.deepEqual(q(`?first=conversation&part=${ID}`), { firstSituationId: "conversation", presetPartId: ID });
+  assert.deepEqual(q(`?first=conversation&part=${ID}`), { firstSituationId: "conversation", presetPartId: ID }, "the old keys still read (the unrouted page)");
+  assert.deepEqual(q(`?situationId=conversation&partId=${ID}`), { firstSituationId: "conversation", presetPartId: ID });
   assert.deepEqual(q("first=someone"), { firstSituationId: "someone", presetPartId: null });
   assert.deepEqual(q(new URLSearchParams({ first: "someone", part: ID.toUpperCase() })), { firstSituationId: "someone", presetPartId: ID.toUpperCase() });
   assert.deepEqual(q(`?first=a_trip_to_mars&part=${ID}`), { firstSituationId: null, presetPartId: ID });

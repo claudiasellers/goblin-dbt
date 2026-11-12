@@ -70,6 +70,38 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
       return out;
     },
   },
+  // Cope Ahead (ER-05 on the skill runtime, docs/design/cope-ahead.md): the plan the person kept, on the keep step's
+  // *Keep this* (R4: `<field>Ids` / `<field>Own`). The ids the plan line is built from (src/lib/copeAheadPlan.ts
+  // `planLine`, so Me and the keep card say the same words): the situation, the hardest moment, whether the "If" is
+  // the pull (`forpullIds: ['pull']`), the pull, and one or two moves. Never a stored sentence, never a part.
+  cope_ahead_plan: {
+    kind: 'cope_ahead_plan', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'my_plans', slice: null,
+    owner: 'ER', many: true, maxItems: 10, editor: null, ownFields: ['situationOwn', 'momentOwn', 'movesOwn'],
+    validate: (v) => {
+      const o = obj(v);
+      const out: Record<string, unknown> = {};
+      const ids = (k: string, max: number, of?: readonly string[]) => {
+        if (o[k] === undefined) return;
+        out[k] = strArray(o[k], { max, item: (x) => str(x, { max: 40, pattern: OPTION_ID }) });
+        if (of && (out[k] as string[]).some((x) => !of.includes(x))) throw new ValidationError('Unexpected value');
+      };
+      ids('situationIds', 1);
+      ids('momentIds', 1);
+      ids('forpullIds', 1, ['pull']);
+      // The pull is plan content only when it is the If (`forpullIds: ['pull']`); otherwise it is this visit's
+      // ask-fresh answer (any pull, *Not sure* included) and is dropped before it is read.
+      if (o.forpullIds !== undefined) ids('pullIds', 1, ['fight', 'chase', 'hide', 'blank']);
+      ids('movesIds', 2);
+      if (o.situationOwn !== undefined) out.situationOwn = str(o.situationOwn, { max: 140 });
+      if (o.momentOwn !== undefined) out.momentOwn = str(o.momentOwn, { max: 140 });
+      if (o.movesOwn !== undefined) out.movesOwn = str(o.movesOwn, { max: 90 });
+      for (const k of Object.keys(o)) if (!/^(situation|moment|forpull|pull|moves)(Ids|Own)$/.test(k) || k === 'forpullOwn' || k === 'pullOwn') throw new ValidationError('Unexpected field');
+      if (!(out.forpullIds as string[] | undefined)?.length) delete out.pullIds;
+      const has = (k: string) => (Array.isArray(out[`${k}Ids`]) && (out[`${k}Ids`] as string[]).length > 0) || typeof out[`${k}Own`] === 'string';
+      if (!has('moves') || (!has('moment') && !(out.forpullIds as string[] | undefined)?.length)) throw new ValidationError('Nothing to keep');
+      return out;
+    },
+  },
   // Pros & cons card (DT-10, docs/design/pros-cons.md): the card the person kept on *Keep it in Me*, for one pull.
   // The runtime's keep (R4: `<field>Ids` / `<field>Own`): the pull, reasons not to further ahead (`long`), what acting
   // gives (`gives`; never asked for hurt myself), what holding off costs (`cost`) and gives (`keeps`). The field is

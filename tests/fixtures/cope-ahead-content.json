@@ -389,6 +389,7 @@
    "general": true,
    "appToolId": null,
    "forMoments": [],
+   "forSituations": [],
    "order": 0
   },
   {
@@ -404,6 +405,7 @@
    "general": true,
    "appToolId": null,
    "forMoments": [],
+   "forSituations": [],
    "order": 1
   },
   {
@@ -419,6 +421,7 @@
    "general": false,
    "appToolId": null,
    "forMoments": [],
+   "forSituations": [],
    "order": 2
   },
   {
@@ -433,6 +436,7 @@
    "general": false,
    "appToolId": null,
    "forMoments": [],
+   "forSituations": [],
    "order": 3
   },
   {
@@ -448,6 +452,7 @@
    "general": true,
    "appToolId": null,
    "forMoments": [],
+   "forSituations": [],
    "order": 4
   },
   {
@@ -462,6 +467,7 @@
    "general": false,
    "appToolId": null,
    "forMoments": [],
+   "forSituations": [],
    "order": 5
   },
   {
@@ -476,6 +482,7 @@
    "general": true,
    "appToolId": null,
    "forMoments": [],
+   "forSituations": [],
    "order": 6
   },
   {
@@ -490,6 +497,7 @@
    "general": false,
    "appToolId": null,
    "forMoments": [],
+   "forSituations": [],
    "order": 7
   },
   {
@@ -505,6 +513,7 @@
    "general": true,
    "appToolId": null,
    "forMoments": [],
+   "forSituations": [],
    "order": 8
   },
   {
@@ -518,6 +527,7 @@
    "general": false,
    "appToolId": null,
    "forMoments": [],
+   "forSituations": [],
    "order": 9
   },
   {
@@ -532,6 +542,7 @@
    "general": true,
    "appToolId": null,
    "forMoments": [],
+   "forSituations": [],
    "order": 10
   },
   {
@@ -545,6 +556,7 @@
    "general": false,
    "appToolId": null,
    "forMoments": [],
+   "forSituations": [],
    "order": 11
   },
   {
@@ -558,6 +570,7 @@
    "forMoments": [
     "might_hurt"
    ],
+   "forSituations": [],
    "order": 12
   },
   {
@@ -571,7 +584,96 @@
    "forMoments": [
     "might_hurt_self"
    ],
+   "forSituations": [],
    "order": 13
+  },
+  {
+   "id": "name_it",
+   "kind": "words",
+   "label": "Name what's happening",
+   "line": "name what's happening out loud",
+   "forPulls": [
+    "fight"
+   ],
+   "general": false,
+   "appToolId": null,
+   "forMoments": [],
+   "forSituations": [
+    "conversation",
+    "someone"
+   ],
+   "order": 14
+  },
+  {
+   "id": "validate_first",
+   "kind": "words",
+   "label": "Say “I can see this is hard for you too”",
+   "line": "say “I can see this is hard for you too”",
+   "forPulls": [
+    "fight",
+    "hide"
+   ],
+   "general": false,
+   "appToolId": null,
+   "forMoments": [],
+   "forSituations": [
+    "conversation",
+    "someone"
+   ],
+   "order": 15
+  },
+  {
+   "id": "tears_ok",
+   "kind": "words",
+   "label": "Say “I might cry, and I want to keep going”",
+   "line": "say “I might cry, and I want to keep going”",
+   "forPulls": [
+    "hide",
+    "blank"
+   ],
+   "general": false,
+   "appToolId": null,
+   "forMoments": [],
+   "forSituations": [
+    "conversation",
+    "someone"
+   ],
+   "order": 16
+  },
+  {
+   "id": "no_sorry",
+   "kind": "words",
+   "label": "Say “I understand” instead of an extra sorry",
+   "line": "say “I understand” instead of an extra sorry",
+   "forPulls": [
+    "hide"
+   ],
+   "general": false,
+   "appToolId": null,
+   "forMoments": [],
+   "forSituations": [
+    "conversation",
+    "someone"
+   ],
+   "order": 17
+  },
+  {
+   "id": "notes",
+   "kind": "action",
+   "label": "Look at the points I wrote down",
+   "line": "look at the points I wrote down",
+   "forPulls": [
+    "blank",
+    "hide"
+   ],
+   "general": false,
+   "appToolId": null,
+   "forMoments": [],
+   "forSituations": [
+    "conversation",
+    "work_school"
+   ],
+   "order": 18
   },
   {
    "id": "pause",
@@ -585,7 +687,8 @@
    "general": false,
    "appToolId": "pause",
    "forMoments": [],
-   "order": 14
+   "forSituations": [],
+   "order": 19
   },
   {
    "id": "five_senses",
@@ -600,7 +703,8 @@
    "general": true,
    "appToolId": "five-senses",
    "forMoments": [],
-   "order": 15
+   "forSituations": [],
+   "order": 20
   },
   {
    "id": "cool_down",
@@ -614,7 +718,8 @@
    "general": false,
    "appToolId": "cool-down",
    "forMoments": [],
-   "order": 16
+   "forSituations": [],
+   "order": 21
   },
   {
    "id": "urge_surfing",
@@ -628,7 +733,8 @@
    "general": false,
    "appToolId": "urge-surfing",
    "forMoments": [],
-   "order": 17
+   "forSituations": [],
+   "order": 22
   }
  ],
  "beats": [

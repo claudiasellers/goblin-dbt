@@ -24,8 +24,8 @@ payload = {
     "hardMoments": [{"id": mid, "label": label, "ifText": if_text, "order": i}
                     for i, (mid, label, if_text) in enumerate(HARD_MOMENTS)],
     "moves": [{"id": mid, "kind": kind, "label": label, "line": line, "forPulls": pulls, "general": general,
-               "appToolId": tool, "forMoments": for_moments, "order": i}
-              for i, (mid, kind, label, line, pulls, general, tool, for_moments) in enumerate(MOVES)],
+               "appToolId": tool, "forMoments": for_moments, "forSituations": for_sits, "order": i}
+              for i, (mid, kind, label, line, pulls, general, tool, for_moments, for_sits) in enumerate(MOVES)],
     "beats": [{"id": bid, "text": text, "order": i + 1} for i, (bid, text) in enumerate(BEATS)],
 }
 out = os.path.join(root, "tests/fixtures/cope-ahead-content.json")

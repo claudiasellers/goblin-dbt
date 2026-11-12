@@ -35,7 +35,7 @@ export const getCopeAheadContent = callable<unknown, CopeAheadContent>(
     const mRes = await tx.run(
       `MATCH (:TherapyConcept {id: 'dbt_cope_ahead'})-[:HAS_MOVE]->(m:CopeMove)
        RETURN m.id AS id, m.kind AS kind, m.label AS label, m.line AS line, m.forPulls AS forPulls,
-              m.general AS general, m.appToolId AS appToolId, m.forMoments AS forMoments, m.order AS order
+              m.general AS general, m.appToolId AS appToolId, m.forMoments AS forMoments, m.forSituations AS forSituations, m.order AS order
        ORDER BY m.order`);
     const bRes = await tx.run(
       `MATCH (:TherapyConcept {id: 'dbt_cope_ahead'})-[:HAS_BEAT]->(b:RehearsalBeat)
@@ -51,7 +51,7 @@ export const getCopeAheadContent = callable<unknown, CopeAheadContent>(
     const moves: CopeMoveItem[] = mRes.records.map((r) => ({
       id: r.get('id'), kind: r.get('kind'), label: r.get('label'), line: r.get('line'),
       forPulls: list(r.get('forPulls')) as CopeMoveItem['forPulls'], general: r.get('general') === true,
-      appToolId: (r.get('appToolId') as string | null) ?? null, forMoments: list(r.get('forMoments')), order: int(r.get('order')),
+      appToolId: (r.get('appToolId') as string | null) ?? null, forMoments: list(r.get('forMoments')), forSituations: list(r.get('forSituations')), order: int(r.get('order')),
     }));
     const beats: RehearsalBeatItem[] = bRes.records.map((r) => ({ id: r.get('id'), text: r.get('text'), order: int(r.get('order')) }));
     return {

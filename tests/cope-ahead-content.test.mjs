@@ -94,7 +94,13 @@ test("the doc's copy, as written", () => {
   assert.deepEqual([m.might_hurt.label, m.might_hurt.ifText], ["They might hurt me", "they start to frighten me"]);
   assert.deepEqual([m.might_hurt_self.label, m.might_hurt_self.ifText], ["I might hurt myself", "I feel like hurting myself"]);
   assert.equal(fixture.hardMoments.length, 23);
-  assert.equal(fixture.moves.length, 18);
+  assert.equal(fixture.moves.length, 23);
+  // DEAR MAN's cope-ahead moves, absorbed (ER-B2): the five new ones show only for these situations.
+  const sits = Object.fromEntries(fixture.moves.filter((x) => x.forSituations.length).map((x) => [x.id, x.forSituations]));
+  assert.deepEqual(sits, {
+    name_it: ["conversation", "someone"], validate_first: ["conversation", "someone"], tears_ok: ["conversation", "someone"],
+    no_sorry: ["conversation", "someone"], notes: ["conversation", "work_school"],
+  });
   assert.deepEqual(fixture.pullIf, { fight: "I want to say something sharp", chase: "I want to text them over and over", hide: "I want to disappear", blank: "I start to shut down" });
   assert.deepEqual(fixture.beats.map((b) => [b.order, b.id]), [[1, "arrive"], [2, "around"], [3, "moment"], [4, "notice"], [5, "plan"], [6, "through"], [7, "over"]]);
   assert.equal(fixture.beats[2].text, "Then it happens: {moment}.");

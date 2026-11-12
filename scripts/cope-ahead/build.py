@@ -13,6 +13,18 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 KINDS = ("body", "words", "action", "tool")
 
 
+def _dear_man_cope_ahead():
+    """DEAR MAN's CopeAhead moves (scripts/dear-man/content.py), for the SAME_MOVE_AS check."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("dear_man_content", os.path.join(ROOT, "scripts/dear-man/content.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.COPE_AHEAD
+
+
+DEAR_MAN_COPE_AHEAD = _dear_man_cope_ahead()
+
+
 def q(s): return json.dumps(s, ensure_ascii=False)  # Cypher accepts JSON-style double-quoted strings
 def js(o): return q(json.dumps(o, ensure_ascii=False))
 
@@ -47,13 +59,18 @@ def check():
     tools = tool_ids()
     ids = [m[0] for m in MOVES]
     assert len(set(ids)) == len(ids), "move ids are unique"
-    for mid, kind, label, line, pulls, general, tool, for_moments in MOVES:
+    for mid, kind, label, line, pulls, general, tool, for_moments, for_sits in MOVES:
         assert kind in KINDS, mid
         assert set(pulls) <= set(PULLS), (mid, pulls)
         assert (kind == "tool") == bool(tool), mid
         assert not tool or tool in tools, (mid, tool)
         assert all(m in DANGER for m in for_moments), (mid, "forMoments are danger moments")
         assert not (for_moments and (pulls or general)), (mid, "a danger move shows only for its moment")
+        assert set(for_sits) <= set(sids), (mid, for_sits)
+        assert not (for_sits and (general or for_moments)), (mid, "a situation-only move is never general or a danger move")
+    dm = {x["id"] for x in DEAR_MAN_COPE_AHEAD}
+    assert set(SAME_MOVE_AS) | set(SAME_MOVE_HELD) == dm and not set(SAME_MOVE_AS) & set(SAME_MOVE_HELD), "every DEAR MAN move linked or held"
+    assert set(SAME_MOVE_AS.values()) <= set(ids), "SAME_MOVE_AS names Cope Ahead moves"
     for d in DANGER:
         assert sum(d in m[7] for m in MOVES) == 1, (d, "exactly one move for each danger moment")
     assert [w[0] for w in WHEN] == ["today", "tomorrow", "this_week", "later"]
@@ -100,9 +117,14 @@ for i, (sid, label, after_name, feels, moments) in enumerate(SITUATIONS):
 
 A("\n// --- What you'll do (screen 4) ---")
 A("MATCH (:TherapyConcept {id: 'dbt_cope_ahead'})-[r:HAS_MOVE]->() DELETE r;")
-for i, (mid, kind, label, line, pulls, general, tool, for_moments) in enumerate(MOVES):
-    A(f"MERGE (n:CopeMove {{id: {q(mid)}}})\nSET n += {props({'kind': kind, 'label': label, 'line': line, 'forPulls': pulls, 'general': general, 'appToolId': tool, 'forMoments': for_moments, 'order': i, 'version': VERSION})};")
+for i, (mid, kind, label, line, pulls, general, tool, for_moments, for_sits) in enumerate(MOVES):
+    A(f"MERGE (n:CopeMove {{id: {q(mid)}}})\nSET n += {props({'kind': kind, 'label': label, 'line': line, 'forPulls': pulls, 'general': general, 'appToolId': tool, 'forMoments': for_moments, 'forSituations': for_sits, 'order': i, 'version': VERSION})};")
     A(f"MATCH (t:TherapyConcept {{id: 'dbt_cope_ahead'}}), (m:CopeMove {{id: {q(mid)}}})\nMERGE (t)-[:HAS_MOVE]->(m);")
+
+A("\n// --- DEAR MAN's cope-ahead moves, absorbed (D10): the same move, linked, never renamed or deleted ---")
+A("MATCH (:CopeAhead)-[r:SAME_MOVE_AS]->(:CopeMove) DELETE r;")
+for ca_id, move_id in SAME_MOVE_AS.items():
+    A(f"MATCH (c:CopeAhead {{id: {q(ca_id)}}}), (m:CopeMove {{id: {q(move_id)}}})\nMERGE (c)-[:SAME_MOVE_AS]->(m);")
 
 A("\n// --- The rehearsal (screen 5) ---")
 A("MATCH (:TherapyConcept {id: 'dbt_cope_ahead'})-[r:HAS_BEAT]->() DELETE r;")

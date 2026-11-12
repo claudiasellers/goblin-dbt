@@ -17,6 +17,9 @@ import { dismissCandidateRequest, partsOfMeCopy } from '../../lib/partsOfMe';
 import { partsMeOffCopy, partsOffCardShown } from '../../lib/partsSettings';
 import type { PartsContent } from '../../data/partsContentTypes';
 import { focusStepStart } from '../../lib/focusStart';
+import type { CopeAheadContent } from '../../data/copeAheadTypes';
+import { planCaFromKept, planLine } from '../../lib/copeAheadPlan';
+import { getCopeAheadContent } from '../../services/copeAhead';
 import { ForgetPerson } from './ForgetPerson';
 
 // Parts' callables load on demand, when a candidate is dismissed.
@@ -62,6 +65,16 @@ export function MeSection() {
     return () => { live = false; };
   }, []);
 
+  // A kept Cope Ahead plan (cope_ahead_plan) is ids: its words are composed here, as the keep card composed them.
+  const [cope, setCope] = useState<CopeAheadContent | null>(null);
+  const hasPlan = !!me?.areas.some((a) => a.items.some((i) => i.meta.kind === 'cope_ahead_plan'));
+  useEffect(() => {
+    if (!hasPlan || cope) return;
+    let live = true;
+    getCopeAheadContent().then((c) => { if (live) setCope(c); }).catch(() => { /* the title says enough */ });
+    return () => { live = false; };
+  }, [hasPlan, cope]);
+
   // Turned on from the card: the card (with focus on its switch) gives way to Parts of me, so focus goes
   // to the area's start, never <body> (the parts screens' stepFocus convention; only when focus was lost).
   const partsArrived = useCallback((el: HTMLElement | null) => { if (el) focusStepStart(el); }, []);
@@ -78,7 +91,7 @@ export function MeSection() {
   const ref = (i: MeItem) => ({ id: i.meta.id, label: i.label });
   // Parts of me joins (after My patterns, getMe's order) only with parts on and its copy signed off.
   const partsCopy = partsOn ? partsOfMeCopy(partsContent) : null;
-  // My plans (a rewritten nightmare, ER-15) and My people (IE-03) show once something is kept there; the order is getMe's.
+  // My plans (a rewritten nightmare, ER-15; a Cope Ahead plan, ER-05) and My people (IE-03) show once something is kept there; the order is getMe's.
   const shown: ProfileAreaId[] = [...PHASE_A_AREAS, 'my_people', 'my_plans', ...(partsCopy ? ['my_parts' as const] : [])];
   const areas = me.areas.filter((a) => shown.includes(a.id)).filter((a) => {
     if (a.id === 'my_patterns') return a.items.length > 0 || me.offers.length > 0;
@@ -107,7 +120,9 @@ export function MeSection() {
             <p className="text-sm font-medium text-[var(--color-text-primary)]">{i.title}</p>
             {i.meta.kind === 'pros_cons' && i.value
               ? <KeptProsCons value={i.value} />
-              : <p className="text-sm text-[var(--color-text-secondary)]">{fillToolName(i.summary, toolName)}</p>}
+              : <p className="text-sm text-[var(--color-text-secondary)]">{i.meta.kind === 'cope_ahead_plan'
+                ? (cope ? planLine(cope, planCaFromKept(i.value as Record<string, unknown> | undefined)).text : '')
+                : fillToolName(i.summary, toolName)}</p>}
             {i.meta.status === 'set_aside' && <p className="text-xs text-[var(--color-text-tertiary)]">Set aside</p>}
           </div>
           {i.meta.status === 'set_aside' && (
@@ -119,7 +134,7 @@ export function MeSection() {
           {i.label === 'Person' && (
             <ForgetPerson itemRef={ref(i)} after={after} />
           )}
-          {(i.label === 'OwnLine' || i.meta.kind === 'nightmare_script' || i.meta.kind === 'pros_cons' || i.label === 'Person') && i.meta.status === 'active' && (
+          {(i.label === 'OwnLine' || i.meta.kind === 'nightmare_script' || i.meta.kind === 'cope_ahead_plan' || i.meta.kind === 'pros_cons' || i.label === 'Person') && i.meta.status === 'active' && (
             <button type="button" onClick={() => { after(setAsideProfileItem(ref(i))).catch(() => { /* stays */ }); }}
               className="min-h-11 text-sm text-[var(--color-text-tertiary)] underline underline-offset-2">
               Set aside
