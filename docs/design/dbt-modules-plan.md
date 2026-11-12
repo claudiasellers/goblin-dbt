@@ -52,10 +52,9 @@ builds the piece if it's needed first.
    target isn't built), and every inbound edge from a skill already on the runtime exists at the source.
 4. **It records per §3 C1**, keeps profile items only per §3 C2, and every new label is registered in
    `functions/src/userdata/layers.ts`.
-5. **Its routing rows are authored** in `scripts/recommendations/content.py`, switched off and drafts,
-   ready for Claudia's sign-off. Turning them on is Claudia's call, never the lane's.
-6. **It passed the three gates** (§6), and Claudia signed off its copy where that content family is
-   sign-off gated.
+5. **Its routing rows are authored** in `scripts/recommendations/content.py`, in `SIGNED_OFF` and
+   switched on in the skill's own PR.
+6. **It passed the three gates** (§6). Its copy (witness lines included) ships in `SIGNED_OFF` in the same PR.
 7. **The old page is deleted** (if there was one), its tests carried as parity tests, and its old records
    still read correctly (§3 C8).
 8. **Docs updated:** the feature's row in `docs/README.md`, a Product Changelog entry, the PR's Deploy
@@ -80,7 +79,7 @@ the rest are not built. "Needs" names the runtime pieces from §3 C3 and the sha
 
 | ID | Feature (tool id) | Handouts | Today | Connects (in → out, main edges) | Needs | Saves |
 |---|---|---|---|---|---|---|
-| DT-01 | First, the body (`cool-down`; absorbs `five-senses`) | DT 1–3, 6 TIP | **On the runtime, part 1** (DT-B2, [`first-the-body.md`](first-the-body.md)): state tap (chest pain → `medical` banner; a pull → DT-02), one-tap self-check before cold (D4), Circuit Breaker cold / cool cloth, squeeze and drop, press, orient, find; the close asked in the flow (`askFresh: 'thenVsNow'`), one swap, then lower the demand with someone on screen; the fork. `CoolDown.tsx` kept, unrouted (C8). Part 2: Help me now and the other hosts, `CrisisState` / `Intervention` nodes and `microSteps.ts`, full medical screen, `five-senses` as orient, reps and fade | In: Help me now, too-much bailout, acute patterns, P2, OA, PS readiness, DEAR MAN debrief, Recover body gate, FTF blank, Cope Ahead / Meet a part / Two pulls. Out: DT-02, Help-me-now fork (PS, DEAR MAN, OA, DT-04, DT-06), kit people, CORE look-back | Whole-screen embeds `doseTimer`, `breathPacer`, `squeezeRelease`, `holdRing`, `orientFind`, `bodyCard`, `medicalScreen`; `$ctx` state; inline mode (`regulate`); mid-flow then-vs-now | `ext.run` + embed outputs; profile `body_flags`; reps per mode |
+| DT-01 | First, the body (`cool-down`; absorbs `five-senses`) | DT 1–3, 6 TIP | **On the runtime, part 1** (DT-B2, [`first-the-body.md`](first-the-body.md)): state tap (chest pain → `medical` banner; a pull → DT-02), Circuit Breaker cold / cool cloth (cold carries its caution line), squeeze and drop, press, orient, find; the close asked in the flow (`askFresh: 'thenVsNow'`), one swap, then lower the demand with someone on screen; the fork. `CoolDown.tsx` kept, unrouted (C8). Part 2: Help me now and the other hosts, `CrisisState` / `Intervention` nodes and `microSteps.ts`, `five-senses` as orient, reps and fade | In: Help me now, too-much bailout, acute patterns, P2, OA, PS readiness, DEAR MAN debrief, Recover body gate, FTF blank, Cope Ahead / Meet a part / Two pulls. Out: DT-02, Help-me-now fork (PS, DEAR MAN, OA, DT-04, DT-06), kit people, CORE look-back | Whole-screen embeds `doseTimer`, `breathPacer`, `squeezeRelease`, `holdRing`, `orientFind`, `bodyCard`; `$ctx` state; inline mode (`regulate`); mid-flow then-vs-now | `ext.run` + embed outputs; reps per mode |
 | DT-02 | Hold to wait (`pause`) | DT 4 STOP | **On the runtime** (DT-B1, [`hold-to-wait.md`](hold-to-wait.md)): pull (hurt myself → `safetyFirst` → `safety.open`, then *are you safe?*), hold, step back (phone down → `waitLock` + `hold_come_back`), observe, the pull's own moves, two-part close; flooded short path. `Pause.tsx` kept, unrouted (C8). Deferred: hold growth, own hold line, next-morning card, MF-01 card, host `enterAt`; the DT-10 replay is built (proceed step, `prosConsReplay`) | In: DT-01 urge state, OA, Recover *Don't send yet*, FTF fight/chase, IE composer, MF-04. Out: `safety.open` (hurt myself), MF-01 card, DT-10 replay, DT-05, kit, DT-06 park, IE The Ask / FAST | `holdRing`, `waitLock`, crisis slot, `safety.open`, two-part close, follow-up action | `ext.run`; spine `actedOnUrge`, `urgeIds` |
 | DT-03 | My crisis kit (`crisis-kit`) | DT IMPROVE 9, crisis survival | **None.** Safety batch | In: CORE-02 step 2, DT-01/02 closes, Help me now, CORE crisis screen. Out: DT-01 modes, DT-07, DT-06, DT-10, contacts | keep, profile reads, `cardDeck`, `voiceMemo` (D13), crisis slot | profile `kit_card` under `CrisisKit` |
 | DT-04 | Let it be (`let-it-be`; `turning-the-mind`, `willingness` entries) | DT 10–14 | **On the runtime, part 1** (DT-B4, [`let-it-be.md`](let-it-be.md)): changeability check (Tools entry), witness line, what's to accept, the still-happening check (`other_person` slot, Ending careful), the fight, willing or digging in with threat lines, willing hands, a statement on paper, grief, still in my hands, the close on the fight (in flow); stirred short path, flooded body first. Eight skills' planned exits flipped; routing rows renamed, off and drafts. Part 2: turning-the-mind card and reminders, `acceptance_target`, `willingness` entry, inline for IE-05 / Recover, witness embed | In: PS "nothing in yours", IE-05 Let go (inline), Recover *Let it land* (inline), ER-02 fits-can't-change, DT-01 fork, DT-06 reopen, DT-11. Out: WMP lines, IE FAST, ER values/PLEASE, DT-07, DT-01 | witness embed, `bodyCard`, `holdRing`, inline mode with `enterAt`, keep, follow-up action, `turnFork` | profile `acceptance_target`; reps |
@@ -103,7 +102,7 @@ the rest are not built. "Needs" names the runtime pieces from §3 C3 and the sha
 | IE-05 | Keep your self-respect (`fast`) | IE 7 | **Built 10 Nov 2026 (IE-B1)**: standalone review and Let go as two skills, `boundaryLine` embed (`docs/design/fast.md`); the strip, keep and follow-up wait as listed there. Before: **none** as a tool. Recover's Land exit has one boundary line and the `boundaryLocked` copy lock. 7 dead PS links | In: IE-01 refusal check, composers, Recover Land, PS ×7, debrief. Out: DT-04 (inline), WMP need elsewhere, IE-09, IE-02 | `boundaryLine` (copy), `fastStrip` (slot), DT-04 inline | `ext.run`; profile `boundary_line` |
 | IE-06 | Keep it warm (`give`) | IE 6, 6a | **None.** `/tool/give` hard-coded in Problem Solve; 10 dead PS links | In: IE-01 Mode B, IE-04 opener, IE-08, PS. Out: IE-01, IE-02, `check-the-facts` (guilt) | `giveLines`, validation-line picker (WMP `forOther` corpus), `bodyCard`, Check the Facts inline | `ext.run`; `Interaction{repair, break_return}` |
 | IE-07 | What matters most, how hard to push (`sizeIt`) | IE 4, 8 | **Partial.** DEAR MAN's priority reorder; no dime game | Embedded in IE-01, IE-04, IE-08, IE-11 | `sizeIt` embed (or a counting derive) | host's `ext.run` |
-| IE-08 | Ending a relationship that's hurting you (`ending-relationships`) | IE 13 | **Built 10 Nov 2026** on the runtime ([`ending-relationships.md`](ending-relationships.md)), unparked by Claudia ("build them now"): safety first every visit, the other-person resources, no scripts / rehearsal / check-ins in the safety branch, R15, quick exit, opt-in content-free check-ins, `after` re-entry; no routing rows by design; Gates 1–3 fixes in. **Listed** 11 Nov (Claudia: list now, a clinician tweaks it after; D14), and linked from Problem Solve and Rebel | In: People, IE-01 safety route, IE-11, DT-11. Out: CORE safety, `wise-mind`, DT-10, IE-02, `cope-ahead`, OA love urges | persist-nothing mode, quick exit, crisis slot, DT-10 inline | `ext.run` only when opted in; `Person.status` |
+| IE-08 | Ending a relationship that's hurting you (`ending-relationships`) | IE 13 | **Built 10 Nov 2026** on the runtime ([`ending-relationships.md`](ending-relationships.md)), unparked by Claudia ("build them now"): safety first every visit, the other-person resources, no scripts / rehearsal / check-ins in the safety branch, R15, quick exit, opt-in content-free check-ins, `after` re-entry; no routing rows by design; Gates 1–3 fixes in. **Listed** 11 Nov (D14), and linked from Problem Solve and Rebel | In: People, IE-01 safety route, IE-11, DT-11. Out: CORE safety, `wise-mind`, DT-10, IE-02, `cope-ahead`, OA love urges | persist-nothing mode, quick exit, crisis slot, DT-10 inline | `ext.run` only when opted in; `Person.status` |
 | IE-09 | Find your people (`finding-connection`) | IE 10–11 | **None.** 3 dead PS links | In: Let go *meet it elsewhere*, IE-08 after, People. Out: People, Recover | `predictOutcome` (liking variant), follow-up action | `Interaction{reach_out}` |
 | IE-10 | Notice them (`mindfulness-of-others`) | IE 12 | **None** | In: IE-01 *their side*, debrief, Recover v2. Out: IE-05 | `pileSort` (two columns), `personPicker`; runs where D3 says | `ext.run` |
 | IE-11 | When it didn't work (inside the debrief) | IE 9 | **Built 11 Nov 2026** inside `dear_man_debrief` ([`dear-man-debrief.md`](dear-man-debrief.md)): one chip from Handout 9's factors (`TroubleshootFactor`), its fix line and conditioned offers, the chain on *look at what happened first* | In: IE-01/04 outcome partly/no. Out: IE-02, IE-07, IE-12, IE-05, DT, `cope-ahead`, DT-04, IE-08 | one ask + conditioned offers (Check the Facts' pattern) | debrief's `ext.run` |
@@ -275,7 +274,6 @@ lands with F2 because two lanes need it in their first batch.
 | `breathPacer` | Exhale-weighted pacer, dizzy/tingly stop rule | `BreathOrb`, capacity `sigh`; **built** in DT-01 part 1 (`BodyEmbeds.tsx` over `src/lib/bodyModes.ts`) | DT | DT-B2 | DT-01, DT-07, P2 |
 | `squeezeRelease` | Squeeze on the in-breath, drop on the out-breath ×3 | FTF Shape blob; **built** in DT-01 part 1 (`BodyEmbeds.tsx` over `src/lib/bodyModes.ts`) | DT | DT-B2 | DT-01 |
 | `orientFind` | Eyes-open find-N with date, time and where you are on screen | `Orient`, capacity `orient`, `FiveSenses.tsx`; **built** in DT-01 part 1 (`BodyEmbeds.tsx` over `src/lib/bodyModes.ts`) | DT | DT-B2 | DT-01, DT-06, MF-01 later |
-| `medicalScreen` | One sheet of body flags, kept on a yes | new; DT-01 part 1 built the one-tap self-check as an **ask step**, not this embed (nothing kept) | DT | DT-B2 (one-tap self-check) / safety batch (full) | DT-01, every cold/exertion/breath mode |
 | `rebellionCard` | The rebellion on the square paper (wraps `PaperCard` unchanged, no keep), *against* the squeeze, *for* the function, then *When?* | `RebellionCard.tsx` | DT | DT-B1 | DT-11 (DT-03's kit menu card may reuse it) |
 | `waitLock` | Timestamp lock with a come-back, draft stays visible, never locks the send | `WaitLock.tsx`; **built** as an embed in DT-02 (`WaitLockEmbed.tsx`: plain wait, `clock={false}`, *I'm back* always there; `waited` · `back_early` + `durationSec`) | DT | DT-B1 | DT-02, IE composer |
 | `urgeWave` | The urge as a moving object animated by taps; axis-free trace at the close. Shares a motion engine with `waveRoom` | FTF Shape urge loop | DT (engine too) | DT-B3 (**built**: `urgeWave` + `waveTrace`, `UrgeWave.tsx` over `src/lib/urgeWave.ts`; 2D, the shared engine waits on ER-08) | DT-05, ER-08 visual |
@@ -351,9 +349,9 @@ doesn't exist), and switches to inline when it does. That switch is the owner's 
 | DEAR MAN graph (situations, options, barriers, anchors, debrief vocabulary) | new `scripts/dear-man/content.py` regenerating today's cypher | IE | — | Ids and labels kept exactly (IE-B1 proves token-equivalence: `build.py --prove`) |
 | Check the Facts lists (`Interpretation`, `Alternative`, threats, event kinds) | `scripts/skills/check_the_facts.py` | ER | IE, MF reuse by id or inline | — |
 | `Intervention` (body modes) and the migrated `microSteps.ts` | new `scripts/distress-tolerance/content.py` | DT | ER P2, IE body step use DT-01 inline | `microSteps.ts` is deleted when its content is in the graph |
-| Witness corpus (`ValidationLine`, hosts, function lines, `forOther`) | `scripts/witness/content.py` | WMP (no lane) | Each lane appends its hosts and lines in its own block, ids prefixed by tool | Drafts until Claudia adds them to `SIGNED_OFF`. A skill opening with a witness line must work with the line absent (the beat skips) |
+| Witness corpus (`ValidationLine`, hosts, function lines, `forOther`) | `scripts/witness/content.py` | WMP (no lane) | Each lane appends its hosts and lines in its own block, ids prefixed by tool | A lane adds its lines to `SIGNED_OFF` in the same PR. A skill opening with a witness line must work with the line absent (the beat skips) |
 | `FollowUpType` registry | `scripts/practice-spine/content.py` | CORE (no lane) | Each lane appends its types | Content-free notification text; the type names the tool that may schedule it |
-| Routing rows, concept tags, `PLANNED` | `scripts/recommendations/content.py` | CORE (no lane) | Each lane authors its tools' rows, off and drafts | Only Claudia signs off or switches on |
+| Routing rows, concept tags, `PLANNED` | `scripts/recommendations/content.py` | CORE (no lane) | Each lane authors its tools' rows, in `SIGNED_OFF` and on | Claudia can switch any row off |
 | Parts mappings | `scripts/parts/content.py` | Parts | Each lane maps its new ids | As today |
 | Kit cards, pros & cons, wise mind check, acceptance statements | Their skills (C3c) | DT / IE | Read through profile slices or inline | The safety plan (CORE-02) references kit cards by id, never copies them |
 | `Person`, `Interaction` | IE-03 | IE | DT, ER, WMP read through the `people` slice | Read-only outside IE |
@@ -371,8 +369,8 @@ Every lane holds to these. The clinical gate (§6, Gate 3) checks each one.
    questions (D1).
 3. **Direction is a hard filter.** Blank, freeze and dissociated states never get a calming-only move
    (cold, slow breathing, relaxation, eyes closed); flooded + blank gets a brief regulate, then orient, no
-   words. `CONTRAINDICATED_FOR` rows and body flags remove options; personal history never brings one back
-   (`user-profile.md` §6.2).
+   words. `CONTRAINDICATED_FOR` rows remove options; personal history never brings one back
+   (`user-profile.md` §6.2). Cold carries its caution line.
 4. **Danger options declare the crisis slot.** Any option that can carry danger has a `danger: 'self' |
    'other'` prop, and its step declares R6's slot with the matching variant (`other_person` for danger from
    someone else). The contract test enforces it, the way Cope Ahead's danger-variant test does.
@@ -380,17 +378,14 @@ Every lane holds to these. The clinical gate (§6, Gate 3) checks each one.
    before anything else, 100% of the time (a test per skill). A DT hold runs alongside resources, never
    instead of them.
 6. **People who are a risk.** Once IE-03 ships, `Person.risk = harm` removes asks, GIVE, rehearsal tiers
-   other than *practise leaving*, and ending scripts, server-side as well as in the flow. Before IE-03,
-   the safety question doesn't exist (D4).
+   other than *practise leaving*, and ending scripts, server-side as well as in the flow. IE-01's safety question is live (IE-B2).
 7. **Exclusions.** No food, alcohol, shopping or scrolling as soothing or distraction; no enumerated pros
    for self-harm; eating-disorder-safe wording (no amounts); no promised durations; no "makes you
    stronger".
-8. **The safety batch is paused** (Claudia, 10 Nov; `/mnt/project-files/handoffs/safety-plan-resume.md`).
-   Until it resumes: `safety.open` opens the interim crisis screen (D5); DT-03, the full medical screen,
-   IE-03's safe/risk fields and IE-01's safety question wait for it, except what D4 brings forward.
-   IE-08 does not wait (D14, Claudia 10 Nov): it builds now on the existing `other_person` banner and its DV
-   resources (911, then the DV Hotline, then 988), with R15 and a quick exit; fuller DV resources, SafetyPlan and discreet mode stay
-   with the safety batch. Built 10 Nov, listed 11 Nov with the clinician review to follow. Every lane PR that touches one of those lists it under *Waits on the safety batch*.
+8. **The crisis route and the danger-from-a-person route.** `safety.open` opens the interim crisis screen
+   (D5) until CORE-01 ships (`/mnt/project-files/handoffs/safety-plan-resume.md`). Danger from another
+   person opens the `other_person` banner (911, then the DV Hotline, then 988), with R15 and a quick exit
+   where the skill is IE-08 or its careful frame. Nothing else waits on a safety or clinician review.
 
 ### C7. Ownership
 
@@ -533,11 +528,11 @@ lanes, only the arrows in §5.4 hold anyone up.
 | Batch | Skills | Needs | Why this order |
 |---|---|---|---|
 | DT-B1 | **DT-11** Rebel without the wreckage (new; built, first PR); **DT-02** Hold to wait (replaces Pause); `waitLock`; behaviour urges + `self_harm` urge rows (C5) | F1 (DT-11 needs nothing more from the runtime, but merges and deploys after #55, whose own-words encryption C1 rule 7 needs from the first lane PR on; DT-02 needs R1, R6, R7, and `holdRing` from F2, so DT-02 lands after F2) | DT-11 is pure chips and Claudia's ask. DT-02 is the first whole-screen embed in a small flow and defines the urge vocabulary DT-05/10 use |
-| DT-B2 | **DT-10** Pros & cons (keep; inline; `prosConsReplay` into DT-02); **DT-01** First, the body (body-mode embeds, `Intervention` content, `microSteps.ts` into the graph, inline `regulate`, the Help-me-now fork as its hand-off step, the one-tap self-check if D4 says so). **Built:** DT-10 (#77); DT-01 part 1 (#81: the skill, five body embeds, the self-check, the in-flow close; the hosts, `Intervention` content, `microSteps.ts` and inline `regulate` are part 2) | F2 | DT-10 is the cleanest proof of keep. DT-01 is the heaviest and the most depended-on: half of ER, IE and WMP hand to it |
-| DT-B3 | **DT-05** Ride it out (`urgeWave`, slider gone, rows reactivated as drafts; **built** 11 Nov, [`ride-it-out.md`](ride-it-out.md)); **DT-06** Give your mind a job levels 0–2, the lid, returns, reopen (`lidShelf`, `cardDeck`) | DT-B2 (DT-01 as the bigger ×2 escalation), R5, R9 | Both need follow-ups and resume; DT-06 level 3 waits on ER-04 |
-| DT-B4 | **DT-04** Let it be, turning the mind, willingness (`bodyCard` in use, `turnFork`, inline `acceptance` for IE-05 and Recover; **part 1 built** 11 Nov, [`let-it-be.md`](let-it-be.md)) | witness lines for DT-04 signed off; `acceptance_target` kind | IE-05's full Let go and Recover's *Let it land* wait on it |
+| DT-B2 | **DT-10** Pros & cons (keep; inline; `prosConsReplay` into DT-02); **DT-01** First, the body (body-mode embeds, `Intervention` content, `microSteps.ts` into the graph, inline `regulate`, the Help-me-now fork as its hand-off step). **Built:** DT-10 (#77); DT-01 part 1 (#81: the skill, five body embeds, the in-flow close; the hosts, `Intervention` content, `microSteps.ts` and inline `regulate` are part 2) | F2 | DT-10 is the cleanest proof of keep. DT-01 is the heaviest and the most depended-on: half of ER, IE and WMP hand to it |
+| DT-B3 | **DT-05** Ride it out (`urgeWave`, slider gone, rows reactivated; **built** 11 Nov, [`ride-it-out.md`](ride-it-out.md)); **DT-06** Give your mind a job levels 0–2, the lid, returns, reopen (`lidShelf`, `cardDeck`) | DT-B2 (DT-01 as the bigger ×2 escalation), R5, R9 | Both need follow-ups and resume; DT-06 level 3 waits on ER-04 |
+| DT-B4 | **DT-04** Let it be, turning the mind, willingness (`bodyCard` in use, `turnFork`, inline `acceptance` for IE-05 and Recover; **part 1 built** 11 Nov, [`let-it-be.md`](let-it-be.md)) | `acceptance_target` kind | IE-05's full Let go and Recover's *Let it land* wait on it |
 | DT-B5 | **DT-07** Held, **DT-08** Thoughts passing through | D3, D13 | Need the runtime decision for MF practices and, for DT-07's voice, storage |
-| Safety batch | **DT-03** My crisis kit; the full **medical screen** | The safety batch resuming; CORE-02 | Ships as one release with CORE-01/02 |
+| Safety batch | **DT-03** My crisis kit | CORE-02 | Ships with CORE-01/02 |
 | Blocked | **DT-09** When it's a habit | CORE-04 `TargetBehavior`, D14 | §5.5 |
 
 ### 5.2 IE lane
@@ -547,10 +542,9 @@ lanes, only the arrows in §5.4 hold anyone up.
 | IE-B1 | **Built 10 Nov 2026** (`docs/design/fast.md`; token-equivalent, not byte-equivalent: `build.py --prove`). `scripts/dear-man/content.py` regenerating today's DEAR MAN cypher (no behaviour change); **IE-05** FAST standalone and Let go (`boundaryLine`; `fast` gets its `appToolId`, the 7 PS links resolve; Let go offers DT-04 as a `planned` exit until DT-B4) | F1 | Small, unblocks dead links, and the content source must exist before DEAR MAN can be ported |
 | IE-B2 | **Two PRs on the lane's one branch.** First, **built 11 Nov 2026** ([`people.md`](people.md)): `Person`, the `people` slice, the picker (`PersonPicker`, a component the second PR wraps as the `personPicker` embed) with D4's safety question in DEAR MAN's prep and its safety route, server refusal, *Done for now*, `ConfidenceCue`; Recover's `personId` waits for Recover to ask who (WMP's Recover v2). Second, **built 11 Nov 2026** ([`dear-man-debrief.md`](dear-man-debrief.md)): the debrief as `dear_man_debrief` with IE-11, the picker asked by the page before it (not an embed), the outcome screen, `Interaction`, refusal counters, `ask_outcome` on, Let go after a refused ask to be heard; the old end cards and silent check-in dropped. As planned: **IE-03** minimal (`Person`, `Interaction`, `personPicker` + `safetyGate` without the safety question unless D4; validators); **DEAR MAN debrief** as `dear_man_debrief` with **IE-11** (factor sort, conditioned offers), the outcome screen, the prep↔debrief link, `ask_outcome` switched on; fixes: *Done for now*, Body Reminder into the graph as `ConfidenceCue`; Recover passes `personId` | F2; `person` kind | The debrief is a linear chain that maps 1:1 onto steps, and it is where IE-11 lives |
 | IE-B3 | **IE-01 Mode A** one message (`messageComposer`, `predictOutcome`, `fastStrip`, `waitLock` from DT-B1, follow-up); **IE-07** `sizeIt` (R10); **IE-04** Say no; `wise_mind_check` (C3c) | IE-B2, DT-B1 | Say no is greenfield and forces the composer pieces Mode A reuses |
-| IE-B4 | **DEAR MAN prep** (Mode B) as `dear_man_prep` with the existing pieces wrapped, Mode C pocket card, Recover drops `boundaryLocked` and `tooHot`; **IE-06** Keep it warm; **IE-12** myths into the barrier step; IE-05 Let go switches to DT-04 inline | IE-B3, WMP `forOther` lines signed off (IE-06), DT-B4 (Let go), ER-B3 (Check the Facts inline for IE-06 repair; moved from ER-B1, 10 Nov) | DEAR MAN's whole page can be deleted only after this batch |
+| IE-B4 | **DEAR MAN prep** (Mode B) as `dear_man_prep` with the existing pieces wrapped, Mode C pocket card, Recover drops `boundaryLocked` and `tooHot`; **IE-06** Keep it warm; **IE-12** myths into the barrier step; IE-05 Let go switches to DT-04 inline | IE-B3, DT-B4 (Let go), ER-B3 (Check the Facts inline for IE-06 repair; moved from ER-B1, 10 Nov) | DEAR MAN's whole page can be deleted only after this batch |
 | IE-B5 | **IE-02** Rehearse it (`rehearsalStage`, 2D, ~30 scripts); **IE-09** Find your people; **IE-10** Notice them | D12, ER-B2 (Cope Ahead inline), D3 (IE-10) | |
 | IE-B6 | **Built 10 Nov 2026** ([`ending-relationships.md`](ending-relationships.md); R15 and the skill in one PR, the lane's one branch). **IE-08** Ending a relationship that's hurting you: R15 persist-nothing mode (its runtime PR first, reviewed against §R), quick exit, crisis slot with the `other_person` banner (911, then the DV Hotline, then 988; CrisisBanner stays the only file with numbers), `Person.status` only once IE-03 exists | F2; D14 decided (Claudia, 10 Nov: build now, on the existing banner and DV resources). DT-10 and Cope Ahead are `planned` exits until DT-B2 / ER-B2 make them inline | Unparked by Claudia. Its clinical gate (§6) reads every path as someone in danger from the other person: nothing kept unless they tap *save privately*, quick exit on every screen, never a plan to confront |
-| Safety batch | **IE-01's safety question** and IE-03 safe/risk (unless D4 brings them forward) | The safety batch resuming | |
 
 ### 5.3 ER lane
 
@@ -605,12 +599,11 @@ ER-B4 (ThingILike) ──► DT-06 level 3
 |---|---|---|
 | PR #54 merged | Everything | Claudia (merge) |
 | `user-profile.md` P1 (`kinds.ts`, `keepProfileItem`) | F2 and every keep | Profile thread (or the foundation lane, §4) |
-| The safety batch resuming (CORE-01/02) | DT-03, full medical screen, IE-01 safety question and IE-03 safe/risk (unless D4); `safety.open` moving off the interim screen. Not IE-08 any more (D14) | Paused by Claudia, 10 Nov |
+| CORE-01/02 (crisis route, safety plan) | DT-03; `safety.open` moving off the interim screen | CORE |
 | PR #48 (OA doors) | ER-B3 | Claudia (D7) |
 | PR #47 (`routing/ties-weights-safety-question`) | Nothing in these lanes; it belongs to the safety batch | Safety batch |
 | Local branch `dev/hold-to-wait` pushed | DT-B1 can reuse the phone prototype | Claudia |
 | CORE-04 `TargetBehavior` | DT-09 | CORE |
-| WMP `ValidationLine {forOther}` corpus signed off | IE-06 | WMP corpus, Claudia's sign-off |
 | CORE night mode | ER-13 | CORE |
 | D3 (skill runtime = MF practice runtime) | DT-07 body scan, DT-08, ER-08, IE-10 | Claudia |
 | Router thread (personal ranking) | Nothing waits; it reads C1 | Router thread |
@@ -623,7 +616,7 @@ Every lane PR passes three reviews before it goes to Claudia's merge queue. Each
 reviewer with fresh context (a separate Claude session given the diff, the screenshots and the checklist,
 never the author's conclusions), and posted on the PR as one review comment with its checklist ticked or
 each failure listed with a file and line. A failure is fixed in the PR and the gate re-run. Claudia's own
-look and sign-offs come after the three gates, not instead of them. Foundation PRs pass Gate 1 only (they
+look comes after the three gates, not instead of them. Foundation PRs pass Gate 1 only (they
 change nothing visible), plus Gate 2 for the harness itself.
 
 ### Gate 1: Plan and contract conformance
@@ -639,9 +632,9 @@ change nothing visible), plus Gate 2 for the harness itself.
 - [ ] Close kind declared in `functions/src/spine/tools.ts` and `src/lib/spine/close.ts`; follow-up types in the registry.
 - [ ] Ported tool: C8 rule followed (projection or reader fallback), old readers proven by tests, parity tests carried, id added to `playerTools.ts`.
 - [ ] New labels in `layers.ts` with constraints; export/delete covered; new callables in `functions/src/index.ts`, the endpoints fixture and the auth matrix.
-- [ ] Routing rows authored, off and drafts; new urge ids mapped for parts.
+- [ ] Routing rows authored, in `SIGNED_OFF` and on; new urge ids mapped for parts.
 - [ ] `npm test`, both builds, lint budget, Cypher lint and voice lint pass.
-- [ ] The PR description lists what waits on the safety batch, names affected lanes, updates this plan's tables, and ends with a Deploy section.
+- [ ] The PR description names affected lanes, updates this plan's tables, and ends with a Deploy section.
 
 ### Gate 2: UI design QC
 
@@ -662,13 +655,12 @@ room palettes where used, and side by side with the old page when it's a port.
 ### Gate 3: Clinical QC
 
 - [ ] **Linehan fidelity.** Each step maps to its handout or worksheet item (a table in the PR); nothing essential to the skill is dropped; any departure from the handout is named and justified against the PRD.
-- [ ] **Entry.** Routing rows (off) are on the right patterns and words; contraindications present; the no-band path is the standard path and the flooded path only comes from a carried or host band or Help me now (C6.2); blank and dissociated states get no calming-only move (C6.3).
+- [ ] **Entry.** Routing rows are on the right patterns and words; contraindications present; the no-band path is the standard path and the flooded path only comes from a carried or host band or Help me now (C6.2); blank and dissociated states get no calming-only move (C6.3).
 - [ ] **Exits.** Each exit matches the PRD's hand-off table and the Index §7b edges; nothing sends a person to a tool contraindicated for where they are.
-- [ ] **Safety.** Danger options open the crisis slot with the right variant; self-harm reaches `safety.open` first in every path (test named); overwhelm reaches P2 or DT-01; nothing locks; people at risk get the C6.6 limits once IE-03 exists; C6.7 exclusions hold; medical flags filter.
+- [ ] **Safety.** Danger options open the crisis slot with the right variant; self-harm reaches `safety.open` first in every path (test named); overwhelm reaches P2 or DT-01; nothing locks; people at risk get the C6.6 limits once IE-03 exists; C6.7 exclusions hold; cold carries its caution line.
 - [ ] **Copy against `voice.md`.** S1–S9 (state not trait; no neuro-jargon; no deterministic claims; no "moving on"; no effort-blame; no pathologising; self-compassion where shame is in play; neutral body words; crisis speech) and T1–T8 (second person, present; short sentences; plain words; options not commands; no failure mode; validate before directing; honest hedging; low load when acute). Plus the repo lint: no *should*, *just*, *but*, exclamation marks; witness lines ≤ 90 characters, ≤ 8 words when flooded.
 - [ ] **Claims.** No promised durations or outcomes; evidence grades in the content match the PRD's; nothing implies a single in-app dose does what the whole skills package does.
 - [ ] **Data.** Nothing stored pathologises or labels the person; ask-fresh rules hold; what's kept is what the person tapped to keep.
-- [ ] **Sign-off.** Copy that is sign-off gated is listed as drafts for Claudia, with the ids to add to `SIGNED_OFF`.
 
 ---
 
@@ -683,7 +675,7 @@ first lane PR on (§3 C1 rule 7).
 | D1 | With the capacity question out, what drives the PRDs' steady / stirred / flooded branches? | **No band = the standard path.** Flooded only from a carried reading, a host, or Help me now. No skill asks or infers a band |
 | D2 | New log labels the PRDs name per visit (`UrgeEpisode`, `FactCheck`, `RehearsalSession`, `SayNoSession`, `VulnerabilityCheck`, `ParkedItem`…) | **None.** `ToolSession` + `ext.run` + spine fields; a parked item is a follow-up plus its run. `Interaction` stays a label (it has its own lifecycle) |
 | D3 | Is the skill runtime also MF's practice runtime (DT-07 body scan, DT-08, ER-08, IE-10)? | **Yes.** One player; the MF practice pieces become embeds and runtime options |
-| D4 | Two live hazards in shipped tools: Circuit Breaker has no self-check before ice on the face, and DEAR MAN can build a confrontation plan for someone who is dangerous. Fix ahead of the paused safety batch? | **Yes, both, as small pieces inside the lanes:** a one-tap self-check in DT-B2, and IE-01's *Is it safe to bring hard things up with them?* in IE-B2 (with the `other_person` banner). The rest of the safety batch stays paused |
+| D4 | Two live hazards in shipped tools: Circuit Breaker's cold, and DEAR MAN can build a confrontation plan for someone who is dangerous | **Changed 12 Nov:** no medical screen; cold carries its caution line (the one-tap self-check DT-01 part 1 shipped is code and stays until a PR takes it out); IE-01's *Is it safe to bring hard things up with them?* in IE-B2 (with the `other_person` banner) |
 | D5 | What `safety.open` opens until CORE-01 ships | **The crisis banner as a full screen** (988, text line), with the host still underneath; DT-02's *hurt myself* chip on the first row. **Changed:** add a few non-US crisis numbers now (the banner stays the only file that holds numbers), ahead of CORE-01's full helpline list |
 | D6 | Tool ids | **`cool-down`** keeps DT-01 (signed-off rows stay; named "First, the body"; Circuit Breaker becomes its cold mode, **changed:** keeping the label "Circuit Breaker" on that mode); **`five-senses`** stays as an entry that starts DT-01 at orient; **`pause`** (named "Hold to wait"); **`urge-surfing`** (named "Ride it out"); **`let-it-be`** (routing's planned `radical-acceptance` renamed); **`mind-job`** (routing's `accepts` renamed); **`please-skill`** (named "Running low"; 13 graph refs already use it) |
 | D7 | PR #48 (OA doors, multi-feeling) | **Merge it as it is first**, then ER-B3 ports the merged page, keeping doors as an embed and multi-feeling as per-feeling sub-runs (R16) |
@@ -693,7 +685,7 @@ first lane PR on (§3 C1 rule 7).
 | D11 | DEAR MAN | **Three skills under the one `dear-man` id**: prep, one message, debrief |
 | D12 | IE-02's stage | **2D (den / Two pulls style) for v1**, fully scripted other-person turns. **Changed:** AI role-play for the other person is noted as a planned v2 |
 | D13 | Voice memos and photos (kit, acceptance statement, trusted voice, safe place) | **Not in v1.** Text only. **Changed:** media storage (with export and delete) is the first thing built after the modules |
-| D14 | Three features that need your clinical call before a lane starts them: DT-09's substance scope, ER-15 without a clinician, IE-08's DV specialist review | **Decided 10 Nov (later):** ER-15 and IE-08 **build now**, on the existing crisis banner and the `other_person` banner's DV resources, without waiting for the safety plan (ER-B6, IE-B6). IE-08 built 10 Nov; listed 11 Nov (Claudia: "move forward AND list it", a clinician makes the tweaks after). **DT-09 stays parked** |
-| D15 | Routing | **Lanes author rows off and as drafts; you sign off per tool** after its clinical gate |
-| D16 | Witness lines the skills open with (DT-04, DT-11, ER function lines, IE-06 `forOther`) | **Drafts, signed off by you per batch**; skills work with the line absent |
-| D17 | Who reviews | **Three independent Claude reviews per PR (§6), then you** for the final look and sign-offs, then your merge queue |
+| D14 | DT-09's substance scope, ER-15, IE-08 | ER-15 and IE-08 built and listed, on the crisis banner and the `other_person` banner's DV resources (ER-B6, IE-B6). **DT-09 stays parked** (substance scope) |
+| D15 | Routing | **Changed 12 Nov:** lanes author rows in `SIGNED_OFF` and switched on, in the skill's PR; you can switch any row off |
+| D16 | Witness lines the skills open with (DT-04, DT-11, ER function lines, IE-06 `forOther`) | **Changed 12 Nov:** ship in `SIGNED_OFF` with the skill; skills work with the line absent |
+| D17 | Who reviews | **Three independent Claude reviews per PR (§6), then you** for the final look, then your merge queue |
