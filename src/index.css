@@ -1063,6 +1063,102 @@ h1.uppercase, h2.uppercase {
 .tool-card__chevron { flex: none; color: var(--fam-text); }
 @media (prefers-reduced-motion: reduce) { .tool-card:active { transform: none; } }
 
+/* ── Do the Opposite: one door per DBT parent, and one section per feeling in the steps ──
+   --tint is presentation data (src/data/oppositeActionDoors.ts), only ever mixed into the room's own
+   surfaces and lips; text stays the room's ink, so every room keeps its contrast. */
+.oa-door {
+  --tint: var(--color-accent);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  min-height: 86px;
+  padding: 12px 14px 13px;
+  border: 0;
+  border-radius: 18px;
+  font: inherit;
+  text-align: left;
+  color: var(--color-text-primary);
+  background: color-mix(in srgb, var(--tint) 22%, var(--color-bg-card));
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--tint) 45%, var(--color-lip)), 0 12px 22px -16px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  cursor: pointer;
+  transition: transform 120ms var(--ease-default), box-shadow 120ms var(--ease-default), background-color 160ms var(--ease-default), opacity 160ms var(--ease-default);
+}
+.oa-door__name { font-family: var(--font-serif); font-size: 23px; line-height: 1.08; padding-right: 26px; }
+.oa-door__urge { font-size: 13.5px; line-height: 1.3; color: var(--color-text-secondary); }
+.oa-door:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 color-mix(in srgb, var(--tint) 45%, var(--color-lip)); }
+.oa-door[aria-pressed='true'] {
+  background: color-mix(in srgb, var(--tint) 40%, var(--color-bg-card));
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--tint) 60%, var(--color-lip)), inset 0 0 0 2px color-mix(in srgb, var(--tint) 70%, var(--color-text-primary));
+}
+/* On the stronger selected tint the secondary colour drops under 4.5:1 in the dark rooms (Gate 2, #89). */
+.oa-door[aria-pressed='true'] .oa-door__urge { color: var(--color-text-primary); }
+.oa-door:disabled { opacity: 0.45; cursor: default; }
+.oa-door:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }
+.oa-door--wide { min-height: 96px; flex-direction: row; align-items: center; justify-content: flex-start; gap: 14px; padding: 14px 18px; }
+.oa-door--wide .oa-door__name { font-size: 28px; padding-right: 0; }
+.oa-door__mark {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-text-primary);
+  color: var(--color-bg-primary);
+}
+.oa-rank {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  font-weight: 800;
+  background: var(--color-text-primary);
+  color: var(--color-bg-primary);
+}
+.oa-rank.is-empty { background: transparent; color: var(--color-text-secondary); border: 2px dashed color-mix(in srgb, var(--tint) 60%, var(--color-text-secondary)); }
+.oa-urge-row {
+  --tint: var(--color-accent);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 60px;
+  padding: 10px 2px;
+  border: 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+  background: none;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.35;
+  text-align: left;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+.oa-urge-row:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; border-radius: 10px; }
+.oa-dot { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--tint); }
+.oa-feeling {
+  --tint: var(--color-accent);
+  padding: 14px 14px 16px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--tint) 14%, var(--color-bg-elevated));
+}
+.oa-feeling__head { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; }
+.oa-feeling__name { font-family: var(--font-serif); font-size: 22px; line-height: 1.1; font-weight: 400; margin: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .oa-door:active:not(:disabled), .oa-door[aria-pressed='true'] { transform: none; }
+}
+
 /* "Something else in there too?": a dashed invitation to place another spot on the square. */
 .add-spot {
   display: flex;

@@ -29,7 +29,8 @@ test("every graph decision path preserves uncertainty and checks urge effectiven
     for (const effectiveness of ["helpful", "unhelpful", "unsure"]) {
       assert.equal(
         oppositeActionRoute(flow, "safe", fact, effectiveness),
-        fact === "unsure" || effectiveness === "unsure"
+        // ER-03 item 5 (D9): a feeling that doesn't fit with an urge that seems helpful is serving another goal: clarify.
+        fact === "unsure" || effectiveness === "unsure" || (fact === "not_fit" && effectiveness === "helpful")
           ? "clarify"
           : effectiveness === "unhelpful"
             ? "opposite"
@@ -168,4 +169,16 @@ test("all clinical branches have graph copy and unique choice IDs", () => {
     assert.ok(flow.copy[route]);
   for (const choices of Object.values(flow.choices))
     assert.equal(new Set(choices.map((c) => c.id)).size, choices.length);
+});
+
+test("the support route (danger, a boundary, not sure what's safe) shows the other-person resources and offers Ending careful, on every card and after an unsafe try", () => {
+  const src = readFileSync("src/pages/tools/OppositeAction.tsx", "utf8");
+  const block = src.slice(src.indexOf("const supportLinks"), src.indexOf("const toolLink"));
+  assert.match(block, /<CrisisBanner variant="other_person" compact \/>/);
+  assert.match(block, /\/tool\/ending-relationships\?frame=careful/);
+  assert.match(block, /toolLink\("pause"\)/);
+  // The safety card, both route cards, and the readout's *It felt unsafe* (its answer and the saved readout) all use
+  // it; Pause never stands alone.
+  assert.equal((src.match(/supportLinks\(\)/g) ?? []).length, 5);
+  assert.doesNotMatch(src.replace(block, ""), /toolLink\("pause"\)/);
 });

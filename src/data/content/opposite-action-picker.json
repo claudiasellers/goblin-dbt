@@ -1,0 +1,1092 @@
+{
+  "source": {
+    "file": "schema-replay-2026-10-06.json",
+    "exportedAt": "1970-01-01T00:00:00.000Z"
+  },
+  "content": {
+    "parents": [
+      {
+        "id": "anger",
+        "label": "Anger",
+        "acknowledgment": "Anger is mobilizing you to fight back or push against something that feels wrong. When the situation doesn't call for a fight, that energy needs somewhere else to go.",
+        "urges": [
+          {
+            "id": "anger-lash",
+            "label": "Lash out or say something cutting"
+          },
+          {
+            "id": "anger-stonewall",
+            "label": "Shut someone out"
+          },
+          {
+            "id": "anger-destroy",
+            "label": "Break or throw something"
+          },
+          {
+            "id": "anger-criticize",
+            "label": "Criticize or blame someone"
+          },
+          {
+            "id": "fire-back",
+            "label": "Fire back"
+          }
+        ],
+        "wordIds": [
+          "aggressive",
+          "angry",
+          "annoyed",
+          "betrayed",
+          "bitter",
+          "critical",
+          "disrespected",
+          "frustrated",
+          "furious",
+          "hostile",
+          "indignant",
+          "infuriated",
+          "judgmental",
+          "mad",
+          "provoked",
+          "resentful",
+          "victimized",
+          "violated"
+        ]
+      },
+      {
+        "id": "disgust",
+        "label": "Disgust",
+        "acknowledgment": "Disgust is pushing you to reject and distance yourself. When the reaction is stronger than the situation warrants, leaning in — even a little — can change the feeling.",
+        "urges": [
+          {
+            "id": "disgust-push",
+            "label": "Push this person or thing away"
+          },
+          {
+            "id": "disgust-leave",
+            "label": "Leave the situation"
+          },
+          {
+            "id": "disgust-judge",
+            "label": "Judge or condemn"
+          }
+        ],
+        "wordIds": [
+          "appalled",
+          "detestable",
+          "disapproving",
+          "disgusted",
+          "dismissive",
+          "nauseated",
+          "repelled",
+          "revolted"
+        ]
+      },
+      {
+        "id": "envy",
+        "label": "Envy",
+        "acknowledgment": "Envy is narrowing your focus to what someone else has and what you lack. Shifting toward what you have — and what you can build — opens it back up.",
+        "urges": [
+          {
+            "id": "envy-tear-down",
+            "label": "Tear them down (in your head or out loud)"
+          },
+          {
+            "id": "envy-compare",
+            "label": "Compare and despair"
+          },
+          {
+            "id": "envy-give-up",
+            "label": "Give up on your own goals"
+          }
+        ],
+        "wordIds": []
+      },
+      {
+        "id": "fear",
+        "label": "Fear",
+        "acknowledgment": "Fear is trying to keep you safe by pulling you away from the threat. When the threat isn't real, avoidance keeps the fear alive.",
+        "urges": [
+          {
+            "id": "fear-avoid",
+            "label": "Avoid it entirely"
+          },
+          {
+            "id": "fear-escape",
+            "label": "Run away or escape"
+          },
+          {
+            "id": "fear-cancel",
+            "label": "Cancel plans"
+          },
+          {
+            "id": "fear-freeze",
+            "label": "Freeze and do nothing"
+          }
+        ],
+        "wordIds": [
+          "anxious",
+          "fearful",
+          "fragile",
+          "frightened",
+          "hesitant",
+          "horrified",
+          "nervous",
+          "out_of_control",
+          "overwhelmed",
+          "persecuted",
+          "pressured",
+          "scared",
+          "shocked",
+          "stressed",
+          "threatened",
+          "vulnerable",
+          "worried"
+        ]
+      },
+      {
+        "id": "guilt",
+        "label": "Guilt",
+        "acknowledgment": "Guilt is urging you to make amends or punish yourself. When you didn't actually violate your values, the self-punishment is suffering without purpose.",
+        "urges": [
+          {
+            "id": "guilt-apologize",
+            "label": "Apologize again (or excessively)"
+          },
+          {
+            "id": "guilt-punish",
+            "label": "Punish yourself"
+          },
+          {
+            "id": "guilt-avoid",
+            "label": "Avoid the person you think you wronged"
+          }
+        ],
+        "wordIds": [
+          "guilty",
+          "remorseful"
+        ]
+      },
+      {
+        "id": "jealousy",
+        "label": "Jealousy",
+        "acknowledgment": "Jealousy is tightening your grip — urging you to monitor, control, and hold on tighter. Loosening that grip is what actually builds the trust you're craving.",
+        "urges": [
+          {
+            "id": "jealousy-check",
+            "label": "Check their phone, social media, or whereabouts"
+          },
+          {
+            "id": "jealousy-interrogate",
+            "label": "Interrogate or ask repeatedly"
+          },
+          {
+            "id": "jealousy-cling",
+            "label": "Cling or demand more attention"
+          },
+          {
+            "id": "check-profile",
+            "label": "Check their profile"
+          }
+        ],
+        "wordIds": [
+          "jealous"
+        ]
+      },
+      {
+        "id": "love",
+        "label": "Love",
+        "acknowledgment": "Love is pulling you toward connection. When someone is unavailable, harmful, or gone, each contact resets the clock. Distance is how this attachment fades.",
+        "urges": [
+          {
+            "id": "love-reach-out",
+            "label": "Text, call, or reach out to them"
+          },
+          {
+            "id": "love-stalk",
+            "label": "Check their social media"
+          },
+          {
+            "id": "love-proximity",
+            "label": "Go places they might be"
+          },
+          {
+            "id": "love-idealize",
+            "label": "Idealize them and ignore red flags"
+          },
+          {
+            "id": "text-again",
+            "label": "Text them again"
+          },
+          {
+            "id": "check-profile",
+            "label": "Check their profile"
+          }
+        ],
+        "wordIds": [
+          "intimate",
+          "loving",
+          "tender"
+        ]
+      },
+      {
+        "id": "sadness",
+        "label": "Sadness",
+        "acknowledgment": "Sadness is pulling you inward, away from the world. When the withdrawal becomes the thing keeping you stuck, small movements outward can shift everything.",
+        "urges": [
+          {
+            "id": "sad-bed",
+            "label": "Stay in bed and do nothing"
+          },
+          {
+            "id": "sad-isolate",
+            "label": "Cancel plans and isolate"
+          },
+          {
+            "id": "sad-give-up",
+            "label": "Give up on something that matters"
+          },
+          {
+            "id": "sad-scroll",
+            "label": "Scroll mindlessly or zone out"
+          },
+          {
+            "id": "pull-away",
+            "label": "Pull away from them"
+          },
+          {
+            "id": "go-quiet",
+            "label": "Go quiet on them"
+          }
+        ],
+        "wordIds": [
+          "abandoned",
+          "awful",
+          "depressed",
+          "despair",
+          "disappointed",
+          "disillusioned",
+          "dismayed",
+          "distant",
+          "empty",
+          "grief",
+          "helpless",
+          "hurt",
+          "isolated",
+          "let_down",
+          "lonely",
+          "powerless",
+          "sad",
+          "withdrawn"
+        ]
+      },
+      {
+        "id": "shame",
+        "label": "Shame",
+        "acknowledgment": "Shame is telling you to hide — that if people saw the real you, they'd reject you. When shame is lying about your worth, hiding feeds it. Visibility starves it.",
+        "urges": [
+          {
+            "id": "shame-hide",
+            "label": "Hide or disappear"
+          },
+          {
+            "id": "shame-secret",
+            "label": "Keep it secret"
+          },
+          {
+            "id": "shame-shrink",
+            "label": "Make yourself small"
+          },
+          {
+            "id": "shame-avoid-people",
+            "label": "Avoid people who might notice"
+          },
+          {
+            "id": "pull-away",
+            "label": "Pull away from them"
+          },
+          {
+            "id": "go-quiet",
+            "label": "Go quiet on them"
+          }
+        ],
+        "wordIds": [
+          "ashamed",
+          "embarrassed",
+          "excluded",
+          "exposed",
+          "humiliated",
+          "inadequate",
+          "inferior",
+          "insecure",
+          "insignificant",
+          "rejected",
+          "ridiculed",
+          "weak",
+          "worthless"
+        ]
+      }
+    ],
+    "words": {
+      "abandoned": {
+        "applicable": true,
+        "parent": "sadness",
+        "alternativeSkill": null
+      },
+      "accepted": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "aggressive": {
+        "applicable": true,
+        "parent": "anger",
+        "alternativeSkill": null
+      },
+      "amazed": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "anger": {
+        "applicable": false,
+        "parent": "anger",
+        "alternativeSkill": null
+      },
+      "angry": {
+        "applicable": true,
+        "parent": "anger",
+        "alternativeSkill": null
+      },
+      "annoyed": {
+        "applicable": true,
+        "parent": "anger",
+        "alternativeSkill": null
+      },
+      "anxious": {
+        "applicable": true,
+        "parent": "fear",
+        "alternativeSkill": null
+      },
+      "apathetic": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "please-skill"
+      },
+      "appalled": {
+        "applicable": true,
+        "parent": "disgust",
+        "alternativeSkill": null
+      },
+      "appreciative": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "aroused": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "ashamed": {
+        "applicable": true,
+        "parent": "shame",
+        "alternativeSkill": null
+      },
+      "astonished": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "at_ease": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "awe": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "awful": {
+        "applicable": true,
+        "parent": "sadness",
+        "alternativeSkill": null
+      },
+      "bad": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "name-it"
+      },
+      "balanced": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "betrayed": {
+        "applicable": true,
+        "parent": "anger",
+        "alternativeSkill": null
+      },
+      "bitter": {
+        "applicable": true,
+        "parent": "anger",
+        "alternativeSkill": null
+      },
+      "bored": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "please-skill"
+      },
+      "busy": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "calm": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "cheeky": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "chill": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "cold_shame": {
+        "applicable": false,
+        "parent": "shame",
+        "alternativeSkill": null
+      },
+      "comfortable": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "confident": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "confused": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "check-the-facts"
+      },
+      "content": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "courageous": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "cozy": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "creative": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "critical": {
+        "applicable": true,
+        "parent": "anger",
+        "alternativeSkill": null
+      },
+      "curious": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "depressed": {
+        "applicable": true,
+        "parent": "sadness",
+        "alternativeSkill": null
+      },
+      "despair": {
+        "applicable": true,
+        "parent": "sadness",
+        "alternativeSkill": null
+      },
+      "detestable": {
+        "applicable": true,
+        "parent": "disgust",
+        "alternativeSkill": null
+      },
+      "disappointed": {
+        "applicable": true,
+        "parent": "sadness",
+        "alternativeSkill": null
+      },
+      "disapproving": {
+        "applicable": true,
+        "parent": "disgust",
+        "alternativeSkill": null
+      },
+      "disgust": {
+        "applicable": false,
+        "parent": "disgust",
+        "alternativeSkill": null
+      },
+      "disgusted": {
+        "applicable": true,
+        "parent": "disgust",
+        "alternativeSkill": null
+      },
+      "disillusioned": {
+        "applicable": true,
+        "parent": "sadness",
+        "alternativeSkill": null
+      },
+      "dismayed": {
+        "applicable": true,
+        "parent": "sadness",
+        "alternativeSkill": null
+      },
+      "dismissive": {
+        "applicable": true,
+        "parent": "disgust",
+        "alternativeSkill": null
+      },
+      "disrespected": {
+        "applicable": true,
+        "parent": "anger",
+        "alternativeSkill": null
+      },
+      "distant": {
+        "applicable": true,
+        "parent": "sadness",
+        "alternativeSkill": null
+      },
+      "eager": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "embarrassed": {
+        "applicable": true,
+        "parent": "shame",
+        "alternativeSkill": null
+      },
+      "empty": {
+        "applicable": true,
+        "parent": "sadness",
+        "alternativeSkill": null
+      },
+      "energetic": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "excited": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "excluded": {
+        "applicable": true,
+        "parent": "shame",
+        "alternativeSkill": null
+      },
+      "exposed": {
+        "applicable": true,
+        "parent": "shame",
+        "alternativeSkill": null
+      },
+      "fear": {
+        "applicable": false,
+        "parent": "fear",
+        "alternativeSkill": null
+      },
+      "fearful": {
+        "applicable": true,
+        "parent": "fear",
+        "alternativeSkill": null
+      },
+      "fragile": {
+        "applicable": true,
+        "parent": "fear",
+        "alternativeSkill": null
+      },
+      "frightened": {
+        "applicable": true,
+        "parent": "fear",
+        "alternativeSkill": null
+      },
+      "frustrated": {
+        "applicable": true,
+        "parent": "anger",
+        "alternativeSkill": null
+      },
+      "furious": {
+        "applicable": true,
+        "parent": "anger",
+        "alternativeSkill": null
+      },
+      "good": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "grief": {
+        "applicable": true,
+        "parent": "sadness",
+        "alternativeSkill": null
+      },
+      "grounded": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "guilt": {
+        "applicable": false,
+        "parent": "guilt",
+        "alternativeSkill": null
+      },
+      "guilty": {
+        "applicable": true,
+        "parent": "guilt",
+        "alternativeSkill": null
+      },
+      "happy": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "helpless": {
+        "applicable": true,
+        "parent": "sadness",
+        "alternativeSkill": null
+      },
+      "hesitant": {
+        "applicable": true,
+        "parent": "fear",
+        "alternativeSkill": null
+      },
+      "hopeful": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "horrified": {
+        "applicable": true,
+        "parent": "fear",
+        "alternativeSkill": null
+      },
+      "hostile": {
+        "applicable": true,
+        "parent": "anger",
+        "alternativeSkill": null
+      },
+      "hot_shame": {
+        "applicable": false,
+        "parent": "shame",
+        "alternativeSkill": null
+      },
+      "humble": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "humiliated": {
+        "applicable": true,
+        "parent": "shame",
+        "alternativeSkill": null
+      },
+      "hurt": {
+        "applicable": true,
+        "parent": "sadness",
+        "alternativeSkill": null
+      },
+      "inadequate": {
+        "applicable": true,
+        "parent": "shame",
+        "alternativeSkill": null
+      },
+      "indifferent": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "please-skill"
+      },
+      "indignant": {
+        "applicable": true,
+        "parent": "anger",
+        "alternativeSkill": null
+      },
+      "inferior": {
+        "applicable": true,
+        "parent": "shame",
+        "alternativeSkill": null
+      },
+      "infuriated": {
+        "applicable": true,
+        "parent": "anger",
+        "alternativeSkill": null
+      },
+      "inquisitive": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "insecure": {
+        "applicable": true,
+        "parent": "shame",
+        "alternativeSkill": null
+      },
+      "insignificant": {
+        "applicable": true,
+        "parent": "shame",
+        "alternativeSkill": null
+      },
+      "inspired": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "interested": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "intimate": {
+        "applicable": true,
+        "parent": "love",
+        "alternativeSkill": null
+      },
+      "isolated": {
+        "applicable": true,
+        "parent": "sadness",
+        "alternativeSkill": null
+      },
+      "jealous": {
+        "applicable": true,
+        "parent": "jealousy",
+        "alternativeSkill": null
+      },
+      "joyful": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "judgmental": {
+        "applicable": true,
+        "parent": "anger",
+        "alternativeSkill": null
+      },
+      "let_down": {
+        "applicable": true,
+        "parent": "sadness",
+        "alternativeSkill": null
+      },
+      "lonely": {
+        "applicable": true,
+        "parent": "sadness",
+        "alternativeSkill": null
+      },
+      "love": {
+        "applicable": false,
+        "parent": "love",
+        "alternativeSkill": null
+      },
+      "loving": {
+        "applicable": true,
+        "parent": "love",
+        "alternativeSkill": null
+      },
+      "mad": {
+        "applicable": true,
+        "parent": "anger",
+        "alternativeSkill": null
+      },
+      "mellow": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "nauseated": {
+        "applicable": true,
+        "parent": "disgust",
+        "alternativeSkill": null
+      },
+      "nervous": {
+        "applicable": true,
+        "parent": "fear",
+        "alternativeSkill": null
+      },
+      "numb": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "body-scan"
+      },
+      "optimistic": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "out_of_control": {
+        "applicable": true,
+        "parent": "fear",
+        "alternativeSkill": null
+      },
+      "overwhelmed": {
+        "applicable": true,
+        "parent": "fear",
+        "alternativeSkill": null
+      },
+      "peaceful": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "perplexed": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "check-the-facts"
+      },
+      "persecuted": {
+        "applicable": true,
+        "parent": "fear",
+        "alternativeSkill": null
+      },
+      "playful": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "powerful": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "powerless": {
+        "applicable": true,
+        "parent": "sadness",
+        "alternativeSkill": null
+      },
+      "pressured": {
+        "applicable": true,
+        "parent": "fear",
+        "alternativeSkill": null
+      },
+      "proud": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "provoked": {
+        "applicable": true,
+        "parent": "anger",
+        "alternativeSkill": null
+      },
+      "rejected": {
+        "applicable": true,
+        "parent": "shame",
+        "alternativeSkill": null
+      },
+      "relaxed": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "remorseful": {
+        "applicable": true,
+        "parent": "guilt",
+        "alternativeSkill": null
+      },
+      "repelled": {
+        "applicable": true,
+        "parent": "disgust",
+        "alternativeSkill": null
+      },
+      "resentful": {
+        "applicable": true,
+        "parent": "anger",
+        "alternativeSkill": null
+      },
+      "respected": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "restful": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "revolted": {
+        "applicable": true,
+        "parent": "disgust",
+        "alternativeSkill": null
+      },
+      "ridiculed": {
+        "applicable": true,
+        "parent": "shame",
+        "alternativeSkill": null
+      },
+      "rushed": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "sad": {
+        "applicable": true,
+        "parent": "sadness",
+        "alternativeSkill": null
+      },
+      "sadness": {
+        "applicable": false,
+        "parent": "sadness",
+        "alternativeSkill": null
+      },
+      "satisfied": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "scared": {
+        "applicable": true,
+        "parent": "fear",
+        "alternativeSkill": null
+      },
+      "secure": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "sensitive": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "serene": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "shocked": {
+        "applicable": true,
+        "parent": "fear",
+        "alternativeSkill": null
+      },
+      "skeptical": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "check-the-facts"
+      },
+      "sleepy": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "please-skill"
+      },
+      "startled": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "stressed": {
+        "applicable": true,
+        "parent": "fear",
+        "alternativeSkill": null
+      },
+      "successful": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "surprised": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "sympathetic": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "tender": {
+        "applicable": true,
+        "parent": "love",
+        "alternativeSkill": null
+      },
+      "thankful": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "thoughtful": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "threatened": {
+        "applicable": true,
+        "parent": "fear",
+        "alternativeSkill": null
+      },
+      "tired": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "please-skill"
+      },
+      "trusting": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "unfocused": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "please-skill"
+      },
+      "valued": {
+        "applicable": false,
+        "parent": null,
+        "alternativeSkill": "mindfulness-emotions"
+      },
+      "victimized": {
+        "applicable": true,
+        "parent": "anger",
+        "alternativeSkill": null
+      },
+      "violated": {
+        "applicable": true,
+        "parent": "anger",
+        "alternativeSkill": null
+      },
+      "vulnerable": {
+        "applicable": true,
+        "parent": "fear",
+        "alternativeSkill": null
+      },
+      "weak": {
+        "applicable": true,
+        "parent": "shame",
+        "alternativeSkill": null
+      },
+      "withdrawn": {
+        "applicable": true,
+        "parent": "sadness",
+        "alternativeSkill": null
+      },
+      "worried": {
+        "applicable": true,
+        "parent": "fear",
+        "alternativeSkill": null
+      },
+      "worthless": {
+        "applicable": true,
+        "parent": "shame",
+        "alternativeSkill": null
+      }
+    }
+  }
+}

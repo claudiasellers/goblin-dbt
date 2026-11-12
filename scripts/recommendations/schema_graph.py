@@ -8,7 +8,7 @@ schema files actually use after A1-4's conversion:
   MATCH / MERGE node patterns                (:Label {prop: expr}), (v:Label), (), (:Label)
   MATCH path patterns                        (a)-[r:T|U]->(b), <-, undirected -[r:T]-
   MERGE (a)-[r:T {key: expr}]->(b)           key properties are part of the identity
-  WHERE a.p = x / a.p <> b.p / NOT a.p IN [..] joined by AND
+  WHERE a.p = x / a.p <> b.p / NOT a.p IN [..] / a.p IS [NOT] NULL joined by AND
   SET v.p = expr, v += {map}                 expr: literal, variable, variable.field
   SET v:Label:Other                          (adds labels; the skill runtime's clinical labels)
   WITH a, b                                  (pass-through of bound variables only)
@@ -468,6 +468,11 @@ def match(g, env, pattern):
 
 def where(env, cond):
     for part in re.split(r'\s+AND\s+', cond.strip()):
+        m = re.fullmatch(r'(\w+)\.(\w+)\s+IS\s+(NOT\s+)?NULL', part, re.S)
+        if m:
+            if (resolve(('ref', [m.group(1), m.group(2)]), env) is None) == bool(m.group(3)):
+                return False
+            continue
         m = re.fullmatch(r'NOT\s+(\w+)\.(\w+)\s+IN\s+(.+)', part, re.S)
         if m:
             val = resolve(('ref', [m.group(1), m.group(2)]), env)
