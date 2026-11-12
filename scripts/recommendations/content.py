@@ -184,6 +184,9 @@ CONCEPT_TAGS["say-no"] = {"concept": "dbt_saying_no", "side": "change", "skillKi
 # Pros & cons card (DT-10, appToolId 'pros-cons', docs/design/pros-cons.md) has none either, by design: it is made in
 # calm for a pull that keeps coming back, so a check-in state is the wrong moment to offer it. Its entries are the Tools
 # intent, Hold to wait's replay and later the kit (DT-03) and CORE-11's commitment step.
+# When it's a habit (DT-09, appToolId 'habit-plan', docs/design/habit-plan.md) has none either, by design: the plan is
+# made in calm for one behaviour, and the vocabulary has no word for a habit. Its entries are the Tools intent and Hold
+# to wait's and Ride it out's end cards for the use and check pulls (later CORE's target setup and the weekly review).
 # Ending a relationship that's hurting you (IE-08, appToolId 'ending-relationships',
 # docs/design/ending-relationships.md) has none either, by design (PRD: "No intent row"): ending a relationship is a
 # decision made at a calm time, never a card a feeling word earns, and a check-in that surfaced it unasked could be

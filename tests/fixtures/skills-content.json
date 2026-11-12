@@ -17905,6 +17905,2555 @@
    }
   },
   {
+   "id": "habit_plan",
+   "toolId": "habit-plan",
+   "version": "hp-v1",
+   "start": "what",
+   "accepts": [
+    "band"
+   ],
+   "ownMax": 60,
+   "emotionFields": [],
+   "copy": {
+    "what_title": "What do you keep going back to?",
+    "what_hint": "Pick one. A plan works best for one thing at a time.",
+    "what_own": "In my own words",
+    "harm_line": "Hurting yourself needs more care than a habit plan can give. Someone to talk to comes first.",
+    "heads_up_title": "Your body's loud right now.",
+    "heads_up_hint": "A plan is easier to make once things settle.",
+    "settle_line": "The plan will keep. Look after the next few minutes first.",
+    "medical_title": "Stopping alcohol, benzos or opioids all at once can be dangerous. A doctor can help you come off safely.",
+    "medical_title_own": "If this is alcohol, benzos or opioids: stopping all at once can be dangerous. A doctor can help you come off safely.",
+    "medical_hint": "Cutting down with a doctor's plan counts as a commitment too. Shaking, sweating, seeing things or a seizure after stopping: get help now.",
+    "eating_title": "This plan is about not bingeing or purging. It never means not eating.",
+    "eating_hint": "Regular meals help keep the pull down. A doctor or an eating disorder service can help with the rest.",
+    "span_title": "How long can you fully commit to not doing it?",
+    "span_title_sub": "How long can you commit to not doing it, or to a doctor's plan for cutting down?",
+    "span_hint": "Pick a stretch you know you can keep. When it ends, you can choose the next one.",
+    "lapse_title": "If you slip, what will you do first?",
+    "lapse_hint": "Planning for a slip isn't planning to slip. It stops one slip turning into giving up.",
+    "lapse_own": "Something else",
+    "burn_title": "What could you make harder to get to?",
+    "burn_hint": "Small changes that put distance between you and it. Pick what you'd do this week.",
+    "burn_own": "Something else",
+    "risky_title": "What tends to lead you back, without seeming to?",
+    "risky_hint": "Small choices that set it up. Naming them makes them easier to spot.",
+    "risky_own": "Something else",
+    "build_title": "When a craving comes, what will you turn to?",
+    "build_hint": "Pick one or two to have ready.",
+    "build_own": "Something else",
+    "imagine_title": "Practise it now, while it's calm.",
+    "imagine_step1": "Picture the thing you'd rather be doing.",
+    "imagine_step2": "Where are you? What can you see and hear?",
+    "imagine_step3": "Stay with it. This is the picture you'll reach for.",
+    "imagine_running": "Picturing",
+    "imagine_done": "That's the picture. Coming back to it makes it easier to find.",
+    "reinforce_title": "What do you get back when you're not doing it?",
+    "reinforce_hint": "Optional. These are worth remembering on a hard day.",
+    "reinforce_own": "Something else",
+    "card_title": "If you slip, this is your plan. Read it through once.",
+    "card_next": "Next",
+    "remind_title": "Want a check-in when the stretch ends?",
+    "remind_hint": "It won't say what the plan is about.",
+    "keep_title": "Keep this plan in Me?",
+    "keep_primary": "Next",
+    "end_kept": "It's in Me. All in on not doing it, and a plan ready if you slip. Both at once.",
+    "end_line": "All in on not doing it, and a plan ready if you slip. Both at once.",
+    "renew_title": "Your stretch is up. How did it go?",
+    "renew_hint": "Whatever happened, there's a next step.",
+    "slipped_title": "A slip isn't a relapse. Here's what you planned.",
+    "after_use_title": "After a break, your body can't take what it used to.",
+    "after_use_title_own": "If this was alcohol or drugs: after a break, your body can't take what it used to.",
+    "after_use_hint": "If you've used, try not to be alone, and get emergency help if someone's hard to wake or breathing slowly.",
+    "slipped_next": "Next",
+    "again_title": "What's the next stretch you can keep?",
+    "again_title_slip": "What stretch can you keep from here?",
+    "again_end_held": "You kept the last one. The next one starts now.",
+    "again_end_slip": "You're choosing it again. A slip is information, not who you are.",
+    "stop_line": "That's okay. Your plan stays here for when you're ready.",
+    "me_craving": "When a craving comes",
+    "me_slip": "If I slip",
+    "start": "Start",
+    "safety_open": "Talk to someone now",
+    "next": "Next",
+    "done": "Done"
+   },
+   "tables": {},
+   "derive": [],
+   "steps": [
+    {
+     "id": "what",
+     "kind": "ask",
+     "title": "what_title",
+     "fields": [
+      {
+       "id": "what",
+       "options": {
+        "list": "what"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "own": {
+        "hint": "what_own",
+        "countsAsPick": true
+       }
+      }
+     ],
+     "hint": "what_hint",
+     "next": [
+      {
+       "to": "harm",
+       "when": {
+        "eq": [
+         "$a.what",
+         "hurt"
+        ]
+       }
+      },
+      {
+       "to": "heads_up",
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       }
+      },
+      {
+       "to": "medical",
+       "when": {
+        "any": [
+         {
+          "in": [
+           "$a.what",
+           [
+            "drink",
+            "drugs"
+           ]
+          ]
+         },
+         {
+          "not": {
+           "in": [
+            "$a.what",
+            [
+             "drink",
+             "drugs",
+             "smoke",
+             "binge",
+             "gamble",
+             "spend",
+             "scroll",
+             "check",
+             "porn",
+             "hurt"
+            ]
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "to": "eating",
+       "when": {
+        "eq": [
+         "$a.what",
+         "binge"
+        ]
+       }
+      },
+      {
+       "to": "span",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "harm",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "harm_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "safetyFirst": {
+      "all": []
+     },
+     "next": [],
+     "offers": [
+      {
+       "exit": "crisis_kit",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "heads_up",
+     "kind": "ask",
+     "title": "heads_up_title",
+     "fields": [
+      {
+       "id": "heads_up",
+       "options": {
+        "list": "heads_up"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "heads_up_hint",
+     "next": [
+      {
+       "to": "settle",
+       "when": {
+        "eq": [
+         "$a.heads_up",
+         "settle"
+        ]
+       }
+      },
+      {
+       "to": "medical",
+       "when": {
+        "any": [
+         {
+          "in": [
+           "$a.what",
+           [
+            "drink",
+            "drugs"
+           ]
+          ]
+         },
+         {
+          "not": {
+           "in": [
+            "$a.what",
+            [
+             "drink",
+             "drugs",
+             "smoke",
+             "binge",
+             "gamble",
+             "spend",
+             "scroll",
+             "check",
+             "porn",
+             "hurt"
+            ]
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "to": "eating",
+       "when": {
+        "eq": [
+         "$a.what",
+         "binge"
+        ]
+       }
+      },
+      {
+       "to": "span",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "settle",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "settle_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "next": [],
+     "offers": [
+      {
+       "exit": "cool_down",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "urge_surfing",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "medical",
+     "kind": "ask",
+     "title": [
+      {
+       "when": {
+        "not": {
+         "in": [
+          "$a.what",
+          [
+           "drink",
+           "drugs",
+           "smoke",
+           "binge",
+           "gamble",
+           "spend",
+           "scroll",
+           "check",
+           "porn",
+           "hurt"
+          ]
+         ]
+        }
+       },
+       "key": "medical_title_own"
+      },
+      {
+       "key": "medical_title"
+      }
+     ],
+     "fields": [
+      {
+       "id": "medical",
+       "options": {
+        "list": "support"
+       },
+       "max": 1,
+       "required": false,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "medical_hint",
+     "next": [
+      {
+       "to": "span",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "eating",
+     "kind": "ask",
+     "title": "eating_title",
+     "fields": [
+      {
+       "id": "eating",
+       "options": {
+        "list": "support"
+       },
+       "max": 1,
+       "required": false,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "eating_hint",
+     "next": [
+      {
+       "to": "span",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "span",
+     "kind": "ask",
+     "title": [
+      {
+       "when": {
+        "in": [
+         "$a.what",
+         [
+          "drink",
+          "drugs"
+         ]
+        ]
+       },
+       "key": "span_title_sub"
+      },
+      {
+       "key": "span_title"
+      }
+     ],
+     "fields": [
+      {
+       "id": "span",
+       "options": {
+        "list": "span"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "span_hint",
+     "next": [
+      {
+       "to": "lapse",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "lapse",
+     "kind": "ask",
+     "title": "lapse_title",
+     "fields": [
+      {
+       "id": "lapse",
+       "options": {
+        "list": "lapse",
+        "where": {
+         "any": [
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "drink"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.drink",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "drugs"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.drugs",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "smoke"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.smoke",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "binge"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.binge",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "gamble"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.gamble",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "spend"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.spend",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "scroll"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.scroll",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "check"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.check",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "porn"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.porn",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "not": {
+              "in": [
+               "$a.what",
+               [
+                "drink",
+                "drugs",
+                "smoke",
+                "binge",
+                "gamble",
+                "spend",
+                "scroll",
+                "check",
+                "porn",
+                "hurt"
+               ]
+              ]
+             }
+            },
+            {
+             "eq": [
+              "$opt.other",
+              true
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "max": 3,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "own": {
+        "hint": "lapse_own",
+        "countsAsPick": true
+       }
+      }
+     ],
+     "hint": "lapse_hint",
+     "next": [
+      {
+       "to": "burn",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "burn",
+     "kind": "ask",
+     "title": "burn_title",
+     "fields": [
+      {
+       "id": "burn",
+       "options": {
+        "list": "burn",
+        "where": {
+         "any": [
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "drink"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.drink",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "drugs"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.drugs",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "smoke"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.smoke",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "binge"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.binge",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "gamble"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.gamble",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "spend"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.spend",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "scroll"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.scroll",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "check"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.check",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "porn"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.porn",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "not": {
+              "in": [
+               "$a.what",
+               [
+                "drink",
+                "drugs",
+                "smoke",
+                "binge",
+                "gamble",
+                "spend",
+                "scroll",
+                "check",
+                "porn",
+                "hurt"
+               ]
+              ]
+             }
+            },
+            {
+             "eq": [
+              "$opt.other",
+              true
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "max": 3,
+       "required": false,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "own": {
+        "hint": "burn_own",
+        "countsAsPick": true
+       }
+      }
+     ],
+     "hint": "burn_hint",
+     "next": [
+      {
+       "to": "risky",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "risky",
+     "kind": "ask",
+     "title": "risky_title",
+     "fields": [
+      {
+       "id": "risky",
+       "options": {
+        "list": "risky",
+        "where": {
+         "any": [
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "drink"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.drink",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "drugs"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.drugs",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "smoke"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.smoke",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "binge"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.binge",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "gamble"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.gamble",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "spend"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.spend",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "scroll"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.scroll",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "check"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.check",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "porn"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.porn",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "not": {
+              "in": [
+               "$a.what",
+               [
+                "drink",
+                "drugs",
+                "smoke",
+                "binge",
+                "gamble",
+                "spend",
+                "scroll",
+                "check",
+                "porn",
+                "hurt"
+               ]
+              ]
+             }
+            },
+            {
+             "eq": [
+              "$opt.other",
+              true
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "max": 3,
+       "required": false,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "own": {
+        "hint": "risky_own",
+        "countsAsPick": true
+       }
+      }
+     ],
+     "hint": "risky_hint",
+     "next": [
+      {
+       "to": "build",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "build",
+     "kind": "ask",
+     "title": "build_title",
+     "fields": [
+      {
+       "id": "build",
+       "options": {
+        "list": "build",
+        "where": {
+         "any": [
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "drink"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.drink",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "drugs"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.drugs",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "smoke"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.smoke",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "binge"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.binge",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "gamble"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.gamble",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "spend"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.spend",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "scroll"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.scroll",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "check"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.check",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.what",
+              "porn"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.porn",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "not": {
+              "in": [
+               "$a.what",
+               [
+                "drink",
+                "drugs",
+                "smoke",
+                "binge",
+                "gamble",
+                "spend",
+                "scroll",
+                "check",
+                "porn",
+                "hurt"
+               ]
+              ]
+             }
+            },
+            {
+             "eq": [
+              "$opt.other",
+              true
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "max": 2,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "own": {
+        "hint": "build_own",
+        "countsAsPick": true
+       }
+      }
+     ],
+     "hint": "build_hint",
+     "next": [
+      {
+       "to": "imagine",
+       "when": {
+        "has": [
+         "$a.build.ids",
+         "image"
+        ]
+       }
+      },
+      {
+       "to": "reinforce",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "imagine",
+     "kind": "embed",
+     "embed": "doseTimer",
+     "answerAs": "imagine",
+     "title": "imagine_title",
+     "props": {
+      "seconds": 30,
+      "step1": "imagine_step1",
+      "step2": "imagine_step2",
+      "step3": "imagine_step3",
+      "start": "start",
+      "running": "imagine_running",
+      "done": "imagine_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "reinforce",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "reinforce",
+     "kind": "ask",
+     "title": "reinforce_title",
+     "fields": [
+      {
+       "id": "reinforce",
+       "options": {
+        "list": "reinforce"
+       },
+       "max": 3,
+       "required": false,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "own": {
+        "hint": "reinforce_own",
+        "countsAsPick": true
+       }
+      }
+     ],
+     "hint": "reinforce_hint",
+     "next": [
+      {
+       "to": "card",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "card",
+     "kind": "embed",
+     "embed": "boundaryLine",
+     "answerAs": "card",
+     "title": "card_title",
+     "props": {
+      "field": "lapse",
+      "shape": "list",
+      "next": "card_next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "remind",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "remind",
+     "kind": "ask",
+     "title": "remind_title",
+     "fields": [
+      {
+       "id": "remind",
+       "options": {
+        "list": "remind"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "followUp": {
+      "type": "habit_renew",
+      "whenFrom": "span",
+      "when": {
+       "eq": [
+        "$a.remind",
+        "yes"
+       ]
+      }
+     },
+     "hint": "remind_hint",
+     "next": [
+      {
+       "to": "keep",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "keep",
+     "kind": "ask",
+     "title": "keep_title",
+     "fields": [
+      {
+       "id": "keepit",
+       "options": {
+        "list": "keepit"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "keep": {
+      "kind": "abstinence_plan",
+      "many": true,
+      "when": {
+       "eq": [
+        "$a.keepit",
+        "keep"
+       ]
+      },
+      "from": [
+       "what",
+       "span",
+       "lapse",
+       "burn",
+       "risky",
+       "build",
+       "reinforce"
+      ]
+     },
+     "primary": "keep_primary",
+     "next": [
+      {
+       "to": "end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "end",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.keepit",
+         "keep"
+        ]
+       },
+       "key": "end_kept"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "end_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "urge_surfing",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "pros_cons",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "renew",
+     "kind": "ask",
+     "title": "renew_title",
+     "fields": [
+      {
+       "id": "renew",
+       "options": {
+        "list": "renew"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "reopens": {
+      "after": "remind",
+      "again": [
+       "again"
+      ]
+     },
+     "clears": [
+      "renew",
+      "after_use",
+      "slipped",
+      "again_span"
+     ],
+     "hint": "renew_hint",
+     "next": [
+      {
+       "to": "after_use",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.renew",
+           "slip"
+          ]
+         },
+         {
+          "any": [
+           {
+            "in": [
+             "$a.what",
+             [
+              "drink",
+              "drugs"
+             ]
+            ]
+           },
+           {
+            "not": {
+             "in": [
+              "$a.what",
+              [
+               "drink",
+               "drugs",
+               "smoke",
+               "binge",
+               "gamble",
+               "spend",
+               "scroll",
+               "check",
+               "porn",
+               "hurt"
+              ]
+             ]
+            }
+           }
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "slipped",
+       "when": {
+        "eq": [
+         "$a.renew",
+         "slip"
+        ]
+       }
+      },
+      {
+       "to": "stop",
+       "when": {
+        "eq": [
+         "$a.renew",
+         "stop"
+        ]
+       }
+      },
+      {
+       "to": "again",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "after_use",
+     "kind": "ask",
+     "title": [
+      {
+       "when": {
+        "not": {
+         "in": [
+          "$a.what",
+          [
+           "drink",
+           "drugs",
+           "smoke",
+           "binge",
+           "gamble",
+           "spend",
+           "scroll",
+           "check",
+           "porn",
+           "hurt"
+          ]
+         ]
+        }
+       },
+       "key": "after_use_title_own"
+      },
+      {
+       "key": "after_use_title"
+      }
+     ],
+     "fields": [
+      {
+       "id": "after_use",
+       "options": {
+        "list": "ok_now"
+       },
+       "max": 1,
+       "required": false,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "medical",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "hint": "after_use_hint",
+     "next": [
+      {
+       "to": "slipped",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "slipped",
+     "kind": "embed",
+     "embed": "boundaryLine",
+     "answerAs": "slipped",
+     "title": "slipped_title",
+     "props": {
+      "field": "lapse",
+      "shape": "list",
+      "next": "slipped_next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "again",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "again",
+     "kind": "ask",
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$a.renew",
+         "slip"
+        ]
+       },
+       "key": "again_title_slip"
+      },
+      {
+       "key": "again_title"
+      }
+     ],
+     "fields": [
+      {
+       "id": "again_span",
+       "options": {
+        "list": "span"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "followUp": {
+      "type": "habit_renew",
+      "whenFrom": "again_span"
+     },
+     "hint": "span_hint",
+     "next": [
+      {
+       "to": "again_end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "again_end",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.renew",
+         "slip"
+        ]
+       },
+       "key": "again_end_slip"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "again_end_held"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "urge_surfing",
+       "when": {
+        "eq": [
+         "$a.renew",
+         "slip"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "id": "stop",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "stop_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "urge_surfing",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "pros_cons",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    }
+   ],
+   "exits": [
+    {
+     "id": "cool_down",
+     "toolId": "cool-down",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "crisis_kit",
+     "toolId": "crisis-kit",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "done",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": true
+    },
+    {
+     "id": "pros_cons",
+     "toolId": "pros-cons",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "safety_open",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": false,
+     "safety": true
+    },
+    {
+     "id": "urge_surfing",
+     "toolId": "urge-surfing",
+     "query": {},
+     "carry": [],
+     "done": false
+    }
+   ],
+   "options": {
+    "what": [
+     {
+      "value": "drink",
+      "label": "Drinking",
+      "urge": "use"
+     },
+     {
+      "value": "drugs",
+      "label": "Using drugs",
+      "urge": "use"
+     },
+     {
+      "value": "smoke",
+      "label": "Smoking or vaping",
+      "urge": "use"
+     },
+     {
+      "value": "binge",
+      "label": "Bingeing or purging",
+      "urge": "use"
+     },
+     {
+      "value": "gamble",
+      "label": "Gambling or betting",
+      "urge": "use"
+     },
+     {
+      "value": "spend",
+      "label": "Spending or buying",
+      "urge": "use"
+     },
+     {
+      "value": "scroll",
+      "label": "Scrolling or gaming for hours"
+     },
+     {
+      "value": "check",
+      "label": "Checking someone's page",
+      "urge": "check"
+     },
+     {
+      "value": "porn",
+      "label": "Porn, more than I want to"
+     },
+     {
+      "value": "hurt",
+      "label": "Hurting myself",
+      "urge": "self_harm"
+     }
+    ],
+    "heads_up": [
+     {
+      "value": "settle",
+      "label": "Look after the next few minutes first"
+     },
+     {
+      "value": "plan",
+      "label": "Make the plan anyway"
+     }
+    ],
+    "ok_now": [
+     {
+      "value": "ok",
+      "label": "I'm okay right now"
+     },
+     {
+      "value": "with",
+      "label": "Someone's with me"
+     }
+    ],
+    "support": [
+     {
+      "value": "have",
+      "label": "I've got support with this"
+     },
+     {
+      "value": "will",
+      "label": "I'll talk to someone about it"
+     }
+    ],
+    "span": [
+     {
+      "value": "hour",
+      "label": "The next hour"
+     },
+     {
+      "value": "tonight",
+      "label": "The rest of today"
+     },
+     {
+      "value": "few_days",
+      "label": "Three days"
+     },
+     {
+      "value": "this_week",
+      "label": "A week"
+     }
+    ],
+    "lapse": [
+     {
+      "value": "tell",
+      "label": "Tell someone I trust",
+      "drink": true,
+      "drugs": true,
+      "smoke": true,
+      "binge": true,
+      "gamble": true,
+      "spend": true,
+      "scroll": true,
+      "check": true,
+      "porn": true,
+      "other": true
+     },
+     {
+      "value": "body",
+      "label": "Look after my body: water, food, rest",
+      "drink": true,
+      "drugs": true,
+      "smoke": true,
+      "binge": true,
+      "gamble": true,
+      "spend": true,
+      "scroll": true,
+      "check": true,
+      "porn": true,
+      "other": true
+     },
+     {
+      "value": "next_meal",
+      "label": "Eat my next meal at the usual time",
+      "binge": true
+     },
+     {
+      "value": "recommit",
+      "label": "Recommit straight away",
+      "drink": true,
+      "drugs": true,
+      "smoke": true,
+      "gamble": true,
+      "spend": true,
+      "scroll": true,
+      "check": true,
+      "porn": true,
+      "other": true
+     },
+     {
+      "value": "chain",
+      "label": "Look at what led to it, the next day",
+      "drink": true,
+      "drugs": true,
+      "smoke": true,
+      "binge": true,
+      "gamble": true,
+      "spend": true,
+      "scroll": true,
+      "check": true,
+      "porn": true,
+      "other": true
+     },
+     {
+      "value": "rid",
+      "label": "Get rid of what's left",
+      "drink": true,
+      "drugs": true,
+      "smoke": true,
+      "gamble": true,
+      "spend": true,
+      "scroll": true,
+      "check": true,
+      "porn": true,
+      "other": true
+     },
+     {
+      "value": "kind",
+      "label": "Talk to myself like a friend would",
+      "drink": true,
+      "drugs": true,
+      "smoke": true,
+      "binge": true,
+      "gamble": true,
+      "spend": true,
+      "scroll": true,
+      "check": true,
+      "porn": true,
+      "other": true
+     }
+    ],
+    "burn": [
+     {
+      "value": "no_stock",
+      "label": "Stop keeping it in the house",
+      "drink": true,
+      "smoke": true
+     },
+     {
+      "value": "pour",
+      "label": "Pour away what's here, once it's safe to stop",
+      "drink": true
+     },
+     {
+      "value": "route",
+      "label": "Take a way home that doesn't pass the shop",
+      "drink": true,
+      "smoke": true
+     },
+     {
+      "value": "order",
+      "label": "Decide what I'll order instead when I'm out",
+      "drink": true
+     },
+     {
+      "value": "dealer",
+      "label": "Delete my dealer's number",
+      "drugs": true
+     },
+     {
+      "value": "stash",
+      "label": "Get rid of the stash",
+      "drugs": true,
+      "other": true
+     },
+     {
+      "value": "people",
+      "label": "Step back from people I use with",
+      "drugs": true,
+      "drink": true
+     },
+     {
+      "value": "cash",
+      "label": "Stop carrying spare cash",
+      "drugs": true,
+      "gamble": true
+     },
+     {
+      "value": "lighters",
+      "label": "Bin the lighters and spares",
+      "smoke": true
+     },
+     {
+      "value": "list",
+      "label": "Shop with a list, after eating",
+      "binge": true
+     },
+     {
+      "value": "bulk",
+      "label": "Buy single portions of the foods I binge on",
+      "binge": true
+     },
+     {
+      "value": "meals",
+      "label": "Eat regular meals so I'm not starving",
+      "binge": true
+     },
+     {
+      "value": "bank_block",
+      "label": "Turn on gambling blocks with my bank",
+      "gamble": true
+     },
+     {
+      "value": "exclude",
+      "label": "Self-exclude from betting sites and venues",
+      "gamble": true
+     },
+     {
+      "value": "cards",
+      "label": "Remove saved cards",
+      "gamble": true,
+      "spend": true
+     },
+     {
+      "value": "unsub",
+      "label": "Unsubscribe from shop emails",
+      "spend": true
+     },
+     {
+      "value": "shop_apps",
+      "label": "Delete the shopping apps",
+      "spend": true
+     },
+     {
+      "value": "wait",
+      "label": "Wait two days before buying anything I don't need today",
+      "spend": true
+     },
+     {
+      "value": "hide_app",
+      "label": "Delete or hide the app",
+      "scroll": true
+     },
+     {
+      "value": "limit",
+      "label": "Set a time limit on my phone",
+      "scroll": true
+     },
+     {
+      "value": "bedroom",
+      "label": "Charge my phone outside the bedroom",
+      "scroll": true,
+      "porn": true,
+      "check": true
+     },
+     {
+      "value": "mute",
+      "label": "Mute or block their profile",
+      "check": true
+     },
+     {
+      "value": "logout",
+      "label": "Log out of the app",
+      "check": true,
+      "scroll": true
+     },
+     {
+      "value": "history",
+      "label": "Delete the bookmark and search history",
+      "check": true,
+      "porn": true
+     },
+     {
+      "value": "blocker",
+      "label": "Install a content blocker",
+      "porn": true
+     },
+     {
+      "value": "easy",
+      "label": "Block or delete what makes it easy",
+      "other": true
+     },
+     {
+      "value": "routine",
+      "label": "Change the routine that leads there",
+      "other": true,
+      "binge": true,
+      "porn": true
+     },
+     {
+      "value": "tell",
+      "label": "Tell someone what I'm doing",
+      "other": true,
+      "drink": true,
+      "drugs": true,
+      "gamble": true
+     }
+    ],
+    "risky": [
+     {
+      "value": "spare",
+      "label": "Keeping some spare, in case",
+      "drink": true,
+      "drugs": true,
+      "smoke": true,
+      "other": true
+     },
+     {
+      "value": "near",
+      "label": "Going near the place, only to look",
+      "drink": true,
+      "drugs": true,
+      "gamble": true,
+      "spend": true,
+      "other": true
+     },
+     {
+      "value": "one",
+      "label": "Telling myself one won't hurt",
+      "drink": true,
+      "drugs": true,
+      "smoke": true,
+      "gamble": true,
+      "spend": true,
+      "scroll": true,
+      "check": true,
+      "porn": true,
+      "other": true
+     },
+     {
+      "value": "people",
+      "label": "Seeing people I do it with",
+      "drink": true,
+      "drugs": true,
+      "smoke": true,
+      "gamble": true,
+      "other": true
+     },
+     {
+      "value": "halt",
+      "label": "Being alone, tired or hungry",
+      "drink": true,
+      "drugs": true,
+      "smoke": true,
+      "binge": true,
+      "gamble": true,
+      "spend": true,
+      "scroll": true,
+      "check": true,
+      "porn": true,
+      "other": true
+     },
+     {
+      "value": "payday",
+      "label": "Payday, or having money spare",
+      "drink": true,
+      "drugs": true,
+      "gamble": true,
+      "spend": true,
+      "other": true
+     },
+     {
+      "value": "late",
+      "label": "Staying up late",
+      "scroll": true,
+      "porn": true,
+      "check": true,
+      "binge": true,
+      "drink": true,
+      "other": true
+     },
+     {
+      "value": "bad_news",
+      "label": "After an argument or bad news",
+      "drink": true,
+      "drugs": true,
+      "smoke": true,
+      "binge": true,
+      "gamble": true,
+      "spend": true,
+      "scroll": true,
+      "check": true,
+      "porn": true,
+      "other": true
+     },
+     {
+      "value": "phone_bed",
+      "label": "Taking my phone to bed",
+      "scroll": true,
+      "porn": true,
+      "check": true
+     }
+    ],
+    "build": [
+     {
+      "value": "image",
+      "label": "Picture something I'd rather be doing",
+      "drink": true,
+      "drugs": true,
+      "smoke": true,
+      "binge": true,
+      "gamble": true,
+      "spend": true,
+      "scroll": true,
+      "check": true,
+      "porn": true,
+      "other": true
+     },
+     {
+      "value": "cold",
+      "label": "Cold water, or hold something cold",
+      "drink": true,
+      "drugs": true,
+      "smoke": true,
+      "binge": true,
+      "gamble": true,
+      "spend": true,
+      "scroll": true,
+      "check": true,
+      "porn": true,
+      "other": true
+     },
+     {
+      "value": "ride",
+      "label": "Ride it out: watch it rise and fall",
+      "drink": true,
+      "drugs": true,
+      "smoke": true,
+      "binge": true,
+      "gamble": true,
+      "spend": true,
+      "scroll": true,
+      "check": true,
+      "porn": true,
+      "other": true
+     },
+     {
+      "value": "puzzle",
+      "label": "Give my mind a job: a puzzle, counting",
+      "drink": true,
+      "drugs": true,
+      "smoke": true,
+      "binge": true,
+      "gamble": true,
+      "spend": true,
+      "scroll": true,
+      "check": true,
+      "porn": true,
+      "other": true
+     },
+     {
+      "value": "move",
+      "label": "Get moving: a walk round the block",
+      "drink": true,
+      "drugs": true,
+      "smoke": true,
+      "gamble": true,
+      "spend": true,
+      "scroll": true,
+      "check": true,
+      "porn": true,
+      "other": true
+     },
+     {
+      "value": "text",
+      "label": "Text someone I trust",
+      "drink": true,
+      "drugs": true,
+      "smoke": true,
+      "binge": true,
+      "gamble": true,
+      "spend": true,
+      "scroll": true,
+      "check": true,
+      "porn": true,
+      "other": true
+     }
+    ],
+    "reinforce": [
+     {
+      "value": "money",
+      "label": "Money"
+     },
+     {
+      "value": "sleep",
+      "label": "Better sleep"
+     },
+     {
+      "value": "mornings",
+      "label": "Clear mornings"
+     },
+     {
+      "value": "trust",
+      "label": "People trusting me"
+     },
+     {
+      "value": "time",
+      "label": "Time for things I like"
+     },
+     {
+      "value": "health",
+      "label": "Feeling better in my body"
+     },
+     {
+      "value": "respect",
+      "label": "Respecting myself"
+     }
+    ],
+    "remind": [
+     {
+      "value": "yes",
+      "label": "Yes, check in with me"
+     },
+     {
+      "value": "no",
+      "label": "No thanks"
+     }
+    ],
+    "keepit": [
+     {
+      "value": "keep",
+      "label": "Keep it in Me"
+     },
+     {
+      "value": "not_now",
+      "label": "Not this time"
+     }
+    ],
+    "renew": [
+     {
+      "value": "held",
+      "label": "I kept to it"
+     },
+     {
+      "value": "slip",
+      "label": "I slipped"
+     },
+     {
+      "value": "stop",
+      "label": "I'm not ready to go again"
+     }
+    ]
+   }
+  },
+  {
    "id": "held",
    "toolId": "soothe",
    "version": "held-v1",
@@ -20648,6 +23197,18 @@
          "check"
         ]
        }
+      },
+      {
+       "exit": "habit_plan",
+       "when": {
+        "in": [
+         "$a.pull",
+         [
+          "use",
+          "check"
+         ]
+        ]
+       }
       }
      ]
     },
@@ -20899,6 +23460,13 @@
     {
      "id": "fast",
      "toolId": "fast",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "habit_plan",
+     "toolId": "habit-plan",
      "query": {},
      "carry": [],
      "done": false
@@ -40151,6 +42719,18 @@
        "when": {
         "all": []
        }
+      },
+      {
+       "exit": "habit_plan",
+       "when": {
+        "in": [
+         "$a.pull",
+         [
+          "use",
+          "check"
+         ]
+        ]
+       }
       }
      ]
     },
@@ -40238,6 +42818,18 @@
        "exit": "pros_cons",
        "when": {
         "all": []
+       }
+      },
+      {
+       "exit": "habit_plan",
+       "when": {
+        "in": [
+         "$a.pull",
+         [
+          "use",
+          "check"
+         ]
+        ]
        }
       }
      ]
@@ -40582,6 +43174,13 @@
      "query": {},
      "carry": [],
      "done": true
+    },
+    {
+     "id": "habit_plan",
+     "toolId": "habit-plan",
+     "query": {},
+     "carry": [],
+     "done": false
     },
     {
      "id": "pause",

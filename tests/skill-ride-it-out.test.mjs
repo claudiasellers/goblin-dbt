@@ -87,7 +87,8 @@ test("the trace is categorical samples in order: recorded as the step's out and 
   const t = run([out("read")], ctx(), s);
   assert.equal(t.stepId, "end");
   assert.equal(M.handoffLine(ctx(), M.stepOf(skill, "end"), t), "You watched it come down.", "the close asks whether they acted; the card doesn't say");
-  assert.deepEqual(offers(t), ["pros_cons"], "make a card for this pull (DT-10)");
+  assert.deepEqual(offers(t), ["pros_cons", "habit_plan"], "make a card for this pull (DT-10), or a habit plan for a check or use pull (DT-09)");
+  assert.deepEqual(offers(run([out("read")], ctx(), run([...PULL("send"), out("still_here", "ended_gone")]))), ["pros_cons"], "send: no habit plan");
   assert.ok(!M.stepOf(skill, "end").noClose, "the two-part close follows the end card");
 });
 

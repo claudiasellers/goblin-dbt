@@ -216,7 +216,8 @@ test("profile kinds (user-profile.md §4.2): a kept value never holds an ask-fre
   const { PROFILE_KINDS, checkValue } = await importTs("functions/src/profile/kinds.ts");
   const ok = { quiet_hours: { start: "22:00", end: "07:00" }, nightmare_script: { turnIds: ["door"], endingOwn: "I wake up" },
     cope_ahead_plan: { situationIds: ["conversation"], momentIds: ["go_blank"], movesIds: ["long_out"] },
-    pros_cons: { pullIds: ["send"], longIds: ["regret"], keepsOwn: "I want to say it right" }, person: { label: "Sam", role: "friend" } };
+    pros_cons: { pullIds: ["send"], longIds: ["regret"], keepsOwn: "I want to say it right" },
+    abstinence_plan: { whatIds: ["drink"], spanIds: ["tonight"], lapseIds: ["tell"], buildOwn: "Ring my sister" }, person: { label: "Sam", role: "friend" } };
   for (const [kind, def] of Object.entries(PROFILE_KINDS)) {
     assert.ok(ok[kind], `${kind}: add a valid value here`);
     for (const f of ["thenVsNow", "fitsFacts", "bandLevel", "urgeIds"]) {

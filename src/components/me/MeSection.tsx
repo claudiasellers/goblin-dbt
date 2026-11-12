@@ -10,6 +10,7 @@ import { fillToolName } from '../../lib/spine/todayCard';
 import { StillTrue } from './StillTrue';
 import { QuietHoursEditor } from './QuietHoursEditor';
 import { KeptProsCons } from './KeptProsCons';
+import { KeptHabitPlan } from './KeptHabitPlan';
 import { PatternOfferCard } from './PatternOfferCard';
 import { useUserProfile } from '../../contexts/UserProfileContext';
 import { getPartsContent } from '../../services/partsContent';
@@ -120,6 +121,8 @@ export function MeSection() {
             <p className="text-sm font-medium text-[var(--color-text-primary)]">{i.title}</p>
             {i.meta.kind === 'pros_cons' && i.value
               ? <KeptProsCons value={i.value} />
+              : i.meta.kind === 'abstinence_plan' && i.value
+              ? <KeptHabitPlan value={i.value} />
               : <p className="text-sm text-[var(--color-text-secondary)]">{i.meta.kind === 'cope_ahead_plan'
                 ? (cope ? planLine(cope, planCaFromKept(i.value as Record<string, unknown> | undefined)).text : '')
                 : fillToolName(i.summary, toolName)}</p>}
@@ -134,7 +137,7 @@ export function MeSection() {
           {i.label === 'Person' && (
             <ForgetPerson itemRef={ref(i)} after={after} />
           )}
-          {(i.label === 'OwnLine' || i.meta.kind === 'nightmare_script' || i.meta.kind === 'cope_ahead_plan' || i.meta.kind === 'pros_cons' || i.label === 'Person') && i.meta.status === 'active' && (
+          {(i.label === 'OwnLine' || i.meta.kind === 'nightmare_script' || i.meta.kind === 'cope_ahead_plan' || i.meta.kind === 'pros_cons' || i.meta.kind === 'abstinence_plan' || i.label === 'Person') && i.meta.status === 'active' && (
             <button type="button" onClick={() => { after(setAsideProfileItem(ref(i))).catch(() => { /* stays */ }); }}
               className="min-h-11 text-sm text-[var(--color-text-tertiary)] underline underline-offset-2">
               Set aside

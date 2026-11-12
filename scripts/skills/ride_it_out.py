@@ -117,6 +117,8 @@ SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
 CRISIS = [{"variant": "crisis", "when": {"any": [HURT, UNSAFE]}}]
 URGES = ["send", "check", "hurt", "hit", "leave", "use"]
 OWN_PULL = {"not": {"in": [a("pull"), URGES]}}
+# A use or check pull that keeps coming back as a habit: a plan made in calm (DT-09).
+HABIT_OFFER = {"exit": "habit_plan", "when": {"in": [a("pull"), ["use", "check"]]}}
 
 SAMPLES = ["still_here", "fading", "gone", "bigger"]
 
@@ -290,7 +292,7 @@ STEPS = [
         # Not now worked: the round passed. Straight to the end card (the wave has nothing new to draw).
         "id": "passed", "kind": "handoff", "complete": True, "crisis": CRISIS,
         "lines": [{"when": ALWAYS, "key": "end_passed"}],
-        "offers": [{"exit": "pros_cons", "when": ALWAYS}],
+        "offers": [{"exit": "pros_cons", "when": ALWAYS}, HABIT_OFFER],
         "done": "done", "links": [SAFETY_LINK],
     },
     {
@@ -299,8 +301,8 @@ STEPS = [
             {"when": {"any": [ended("ride", "ended_gone"), ended("again", "ended_gone")]}, "key": "end_gone"},
             {"when": ALWAYS, "key": "end_line"},
         ],
-        # A pull that keeps coming back: make it a card, for next time (DT-10).
-        "offers": [{"exit": "pros_cons", "when": ALWAYS}],
+        # A pull that keeps coming back: make it a card, for next time (DT-10), or a habit plan (DT-09).
+        "offers": [{"exit": "pros_cons", "when": ALWAYS}, HABIT_OFFER],
         "done": "done", "links": [SAFETY_LINK],
     },
     {
@@ -340,6 +342,7 @@ EXITS = [
     {"id": "cool_down", "toolId": "cool-down"},                          # DT-01 First, the body (bigger twice, flooded)
     {"id": "pause", "toolId": "pause"},                                  # DT-02 Hold to wait (bigger twice, flooded)
     {"id": "pros_cons", "toolId": "pros-cons"},                          # DT-10 a card for a pull that keeps coming back
+    {"id": "habit_plan", "toolId": "habit-plan"},                        # DT-09 When it's a habit (use, check)
     {"id": "crisis_kit", "toolId": "crisis-kit", "planned": True},       # DT-03 My crisis kit (safety batch)
     {"id": "safety_open", "toolId": None, "safety": True},               # safety.open (R6)
     {"id": "done", "done": True},

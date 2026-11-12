@@ -21,6 +21,7 @@ export const PLAYER_TOOLS: Readonly<Record<string, string>> = {
   'soothe': 'held',
   'thoughts-passing': 'thoughts_passing',
   'opposite-action': 'opposite_action',
+  'habit-plan': 'habit_plan',
 };
 
 /**

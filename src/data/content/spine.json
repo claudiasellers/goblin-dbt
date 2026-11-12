@@ -546,6 +546,57 @@
         "notification": "A check-in you asked for is ready."
       },
       {
+        "id": "habit_renew",
+        "ownerModule": "dt",
+        "tier": "practice",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/habit-plan?run={sourceSessionId}&at=renew&followUp={followUpId}",
+        "staleAfterHours": 48,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "How did it go? Whatever happened, there's a next step.",
+          "title": "Your stretch is up"
+        },
+        "choices": [
+          {
+            "id": "not_now",
+            "label": "Not now",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "chips": {
+            "few_days": {
+              "days": 3,
+              "kind": "at_local",
+              "time": "18:00"
+            },
+            "hour": {
+              "kind": "after",
+              "minutes": 60
+            },
+            "this_week": {
+              "days": 7,
+              "kind": "at_local",
+              "time": "18:00"
+            },
+            "tonight": {
+              "days": 0,
+              "kind": "at_local",
+              "time": "21:00"
+            }
+          },
+          "kind": "chip"
+        },
+        "notification": "A stretch you committed to is up."
+      },
+      {
         "id": "hold_come_back",
         "ownerModule": "dt",
         "tier": "practice",

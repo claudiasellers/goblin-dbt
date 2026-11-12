@@ -45,7 +45,7 @@ screen.
 | Own words | Cool my body down first · Ride it out |
 
 Moves into tools not built yet (My crisis kit DT-03, Held DT-07) are planned exits on the end card and are never
-chips until their tools ship. *Checking* offers Give your mind a job (DT-06, built 12 Nov) on the end card.
+chips until their tools ship. *Checking* offers Give your mind a job (DT-06, built 12 Nov) on the end card; *checking* and *use* also offer When it's a habit (DT-09, built 12 Nov).
 
 **The flooded short path.** No band is asked (C6.2). A carried flooded reading (`$ctx.band`: a hand-off's, else the person's own `band.current()`, ≤ 20 min) shows the flooded
 hold line, then the step back (two choices), then `settle`: *Your body's loud. Settle it first. The rest can wait, and Today will
@@ -103,7 +103,7 @@ page's `ext.dt.stepsDone` stays readable for old sessions (plan C7).
 | Inline entry from hosts (`enterAt`, `$ctx.urgeId`) | Not yet | The hosts (OA, Recover's *Don't send yet*, FTF, IE composer) wire it when they move to the runtime |
 | *Yes*: *Thanks for telling me. That's useful, not a failure.* · *No*: *Held.* after the close | Not shown (*Noted.*) | The close question is the spine's; a per-answer line needs a close-copy extension. Worth it for *Yes* first |
 | Behaviour urges' DBT parents | None | They're behaviours, not emotions |
-| Binge and buy as their own chips and urges (C5) | One *Use, drink, binge or buy* chip, urge `use` | Kept to six chips on one screen; Claudia, 11 Nov: one chip until DT-09 (C5 lists them separately; D14 parks DT-09) |
+| Binge and buy as their own chips and urges (C5) | One *Use, drink, binge or buy* chip, urge `use` | Kept to six chips on one screen; Claudia, 11 Nov: one chip until DT-09 (C5 lists them separately). DT-09 is built (12 Nov) and names the behaviour itself, so splitting binge and buy here is a follow-up |
 | MF-04's optional wise-mind check on Proceed | Not built | A link to Wise mind fits after the clinician pass; Wise mind has no inline entry yet |
 | Three steps back for the same person → The Ask leads | Not built | Needs IE-03 and a per-person read |
 | Witness lines per urge family (`StopFlow`) | One witness line | The witness corpus has no per-urge rows yet |
