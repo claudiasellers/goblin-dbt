@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
 import type { EmbedOutput, EmbedOutputSchema, EmbedPropSpec } from '../../data/skillTypes';
+import { BodyCard, BreathPacer, DoseTimer, OrientFind, SqueezeRelease } from './BodyEmbeds';
 import { BoundaryLine } from './BoundaryLine';
 import { HoldRingEmbed } from './HoldRingEmbed';
 import { PartsLine } from './PartsLine';
@@ -9,6 +10,7 @@ import { WitnessEmbed } from './WitnessEmbed';
 import { RebellionCard } from './RebellionCard';
 import { RescriptCard } from './RescriptCard';
 import { WaitLockEmbed } from './WaitLockEmbed';
+import { UrgeWave, WaveTrace } from './UrgeWave';
 import { DebriefWhoEmbed } from './DebriefWhoEmbed';
 import { MessageComposer } from './MessageComposer';
 
@@ -59,6 +61,13 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   debriefWho: DebriefWhoEmbed,
   prosConsCard: ProsConsCard,
   prosConsReplay: ProsConsReplay,
+  doseTimer: DoseTimer,
+  bodyCard: BodyCard,
+  breathPacer: BreathPacer,
+  squeezeRelease: SqueezeRelease,
+  orientFind: OrientFind,
+  urgeWave: UrgeWave,
+  waveTrace: WaveTrace,
   messageComposer: MessageComposer,
 };
 
@@ -74,6 +83,16 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   debriefWho: { ids: ['yes', 'a_bit', 'no', 'skip', 'general', 'not_shown'] },
   prosConsCard: { ids: ['read'], measures: ['durationSec'] },
   prosConsReplay: {},
+  doseTimer: { ids: ['done', 'partly', 'skipped'], measures: ['durationSec'] },
+  bodyCard: { ids: ['done', 'partly', 'skipped'], measures: ['durationSec'] },
+  breathPacer: { ids: ['done', 'partly', 'skipped', 'dizzy'], measures: ['durationSec'] },
+  squeezeRelease: { ids: ['done', 'partly', 'skipped'], measures: ['durationSec', 'doneCount'] },
+  orientFind: { ids: ['done', 'partly', 'skipped'], measures: ['doneCount'] },
+  urgeWave: {
+    ids: ['still_here', 'fading', 'gone', 'bigger', 'ended_gone', 'ended_bigger', 'ended_not_now', 'ended_left', 'ended_long'],
+    measures: ['durationSec', 'doneCount'],
+  },
+  waveTrace: { ids: ['read'] },
   messageComposer: { ids: ['copied', 'opened', 'dropped_sorry'] },
 };
 
@@ -96,6 +115,8 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     hint: { type: 'copy' },
     doneLabel: { type: 'copy', optional: true },
     next: { type: 'copy' },
+    /** `from_start`: the quiet way on shows before any try (a body mode with no hold to wait out, DT-01's press). */
+    wayOn: { type: 'enum', values: ['from_start'], optional: true },
   },
   witness: {
     moment: { type: 'id' },
@@ -183,5 +204,93 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     noProFor: { type: 'id' },
     noteFor: { type: 'id' },
     note: { type: 'copy' },
+  },
+  doseTimer: {
+    art: { type: 'enum', values: ['cold', 'none'], optional: true },
+    seconds: { type: 'int', min: 5, max: 300 },
+    leadIn: { type: 'int', min: 0, max: 5, optional: true },
+    step1: { type: 'copy', optional: true },
+    step2: { type: 'copy', optional: true },
+    step3: { type: 'copy', optional: true },
+    caution: { type: 'copy', optional: true },
+    start: { type: 'copy' },
+    running: { type: 'copy' },
+    lead: { type: 'copy', optional: true },
+    done: { type: 'copy' },
+    next: { type: 'copy' },
+  },
+  bodyCard: {
+    kind: { type: 'enum', values: ['hand_heart', 'wake', 'strong', 'still', 'press', 'willing'] },
+    cue: { type: 'copy', optional: true },
+    seconds: { type: 'int', min: 5, max: 300 },
+    step1: { type: 'copy', optional: true },
+    step2: { type: 'copy', optional: true },
+    step3: { type: 'copy', optional: true },
+    caution: { type: 'copy', optional: true },
+    start: { type: 'copy' },
+    running: { type: 'copy' },
+    done: { type: 'copy' },
+    next: { type: 'copy' },
+  },
+  breathPacer: {
+    seconds: { type: 'int', min: 30, max: 300 },
+    inSec: { type: 'int', min: 2, max: 6 },
+    outSec: { type: 'int', min: 3, max: 10 },
+    step1: { type: 'copy', optional: true },
+    step2: { type: 'copy', optional: true },
+    step3: { type: 'copy', optional: true },
+    caution: { type: 'copy', optional: true },
+    start: { type: 'copy' },
+    inLabel: { type: 'copy' },
+    outLabel: { type: 'copy' },
+    dizzy: { type: 'copy' },
+    done: { type: 'copy' },
+    next: { type: 'copy' },
+  },
+  squeezeRelease: {
+    rounds: { type: 'int', min: 1, max: 5 },
+    squeezeSec: { type: 'int', min: 3, max: 8 },
+    step1: { type: 'copy', optional: true },
+    step2: { type: 'copy', optional: true },
+    step3: { type: 'copy', optional: true },
+    caution: { type: 'copy', optional: true },
+    start: { type: 'copy' },
+    squeezeLabel: { type: 'copy' },
+    dropLabel: { type: 'copy' },
+    done: { type: 'copy' },
+    next: { type: 'copy' },
+  },
+  orientFind: {
+    variant: { type: 'enum', values: ['find', 'listen'] },
+    count: { type: 'int', min: 1, max: 5 },
+    here: { type: 'copy' },
+    task: { type: 'copy' },
+    foundLabel: { type: 'copy' },
+    done: { type: 'copy' },
+    next: { type: 'copy' },
+  },
+  urgeWave: {
+    checkSec: { type: 'int', min: 20, max: 180 },
+    maxChecks: { type: 'int', min: 1, max: 10 },
+    checkTitle: { type: 'copy' },
+    riding: { type: 'copy' },
+    still_here: { type: 'copy' },
+    fading: { type: 'copy' },
+    gone: { type: 'copy' },
+    bigger: { type: 'copy' },
+    /** Absent: no *not now* button (Ride it out's second ride). */
+    notNow: { type: 'copy', optional: true },
+    next: { type: 'copy' },
+    /** A first ride's field: this ride's object starts where that one left it. */
+    continueFrom: { type: 'field', optional: true },
+  },
+  waveTrace: {
+    rideField: { type: 'field' },
+    againField: { type: 'field', optional: true },
+    downLine: { type: 'copy' },
+    /** The down line when the trace rose first (a *bigger* tap); else `downLine`. */
+    riseLine: { type: 'copy', optional: true },
+    heldLine: { type: 'copy' },
+    next: { type: 'copy' },
   },
 };

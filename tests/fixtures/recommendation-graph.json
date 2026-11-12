@@ -486,6 +486,17 @@
    "direction": null,
    "addresses": []
   },
+  "dbt_radical_acceptance": {
+   "appToolId": "let-it-be",
+   "name": "Radical Acceptance",
+   "description": "Fully accepting reality as it is, without approval or resignation",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": "acceptance",
+   "skillKind": "hold",
+   "direction": "neutral",
+   "addresses": []
+  },
   "dbt_recovering_from_invalidation": {
    "appToolId": "recovering-from-invalidation",
    "name": "Recovering from Invalidation",
@@ -511,9 +522,9 @@
    "description": "Refusing a request clearly and kindly, sized by the facts, with a line ready for when they push",
    "whenToUse": null,
    "dbtBasis": null,
-   "side": null,
-   "skillKind": null,
-   "direction": null,
+   "side": "change",
+   "skillKind": "relational",
+   "direction": "neutral",
    "addresses": []
   },
   "dbt_stop": {
@@ -2390,6 +2401,31 @@
    "rationale": "Check the Facts on low-grade anger (planned); Do the Opposite's fits-the-facts step until then."
   },
   {
+   "id": "rf_acute_alarm_words_demand_say-no",
+   "conceptId": "dbt_saying_no",
+   "patternId": "acute_alarm",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.6,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "pressured"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "approved",
+   "rationale": "Pressure from someone's demands: Say no (IE-04) beside Problem Solve, so the person can turn the ask down instead of absorbing it."
+  },
+  {
    "id": "rf_acute_alarm_words_freeze_five-senses",
    "conceptId": "se_orienting",
    "patternId": "acute_alarm",
@@ -2714,6 +2750,31 @@
    "rationale": "Anticipatory anxiety needs rehearsal and evaluation: Cope Ahead, then Check the Facts (both planned); Do the Opposite (approach, fits-the-facts step) until then."
   },
   {
+   "id": "rf_chronic_vigilance_words_helpless_let-it-be",
+   "conceptId": "dbt_radical_acceptance",
+   "patternId": "chronic_vigilance",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.4,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "helpless"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": false,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Let it be (radical acceptance) leads for helplessness."
+  },
+  {
    "id": "rf_chronic_vigilance_words_helpless_problem-solve",
    "conceptId": "dbt_problem_solving",
    "patternId": "chronic_vigilance",
@@ -2736,32 +2797,7 @@
    "active": true,
    "version": "rf-v2",
    "reviewStatus": "approved",
-   "rationale": "Radical Acceptance (planned), then Problem Solve in micro-steps; Problem Solve leads until then."
-  },
-  {
-   "id": "rf_chronic_vigilance_words_helpless_radical-acceptance",
-   "conceptId": "dbt_radical_acceptance",
-   "patternId": "chronic_vigilance",
-   "bands": [
-    "steady",
-    "stirred"
-   ],
-   "priority": 0.4,
-   "direction": "neutral",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": "words",
-   "words": [
-    "helpless"
-   ],
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": false,
-   "version": "rf-v2",
-   "reviewStatus": "draft",
-   "rationale": "Planned: Radical Acceptance leads for helplessness."
+   "rationale": "Let it be (built, row off until signed off), then Problem Solve in micro-steps; Problem Solve leads until then."
   },
   {
    "id": "rf_chronic_vigilance_words_watchful_wise-mind",
@@ -2875,7 +2911,7 @@
    "active": false,
    "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Urge Surfing for the checking / reassurance urge, once it's rebuilt (DT-05)."
+   "rationale": "Ride it out (DT-05, rebuilt on the skill runtime) for the checking / reassurance urge; off until signed off."
   },
   {
    "id": "rf_conservation_freeze_addresses_recovering-from-invalidation",
@@ -2969,7 +3005,7 @@
    "rationale": "Flooded + blank: orient only (no Cool Down, D-02)."
   },
   {
-   "id": "rf_conservation_freeze_planned_radical-acceptance",
+   "id": "rf_conservation_freeze_planned_let-it-be",
    "conceptId": "dbt_radical_acceptance",
    "patternId": "conservation_freeze",
    "bands": [
@@ -2989,7 +3025,7 @@
    "active": false,
    "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Planned: Radical Acceptance after gentle movement for despair, grief, emptiness and numbness."
+   "rationale": "Let it be (radical acceptance) after gentle movement for despair, grief, emptiness and numbness."
   },
   {
    "id": "rf_dissociation_overmodulation_addresses_recovering-from-invalidation",
@@ -3263,9 +3299,9 @@
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
+   "reviewStatus": "approved",
    "rationale": "FAST as the alternative."
   },
   {
@@ -3438,6 +3474,33 @@
    "rationale": "Planned: GIVE (reaching towards people) leads for loneliness once built, Running low after it; Do the Opposite until then."
   },
   {
+   "id": "rf_reward_drive_low_words_fragile_let-it-be",
+   "conceptId": "dbt_radical_acceptance",
+   "patternId": "reward_drive_low",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.4,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "vulnerable",
+    "fragile",
+    "powerless"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": false,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Let it be (radical acceptance) leads."
+  },
+  {
    "id": "rf_reward_drive_low_words_fragile_problem-solve",
    "conceptId": "dbt_problem_solving",
    "patternId": "reward_drive_low",
@@ -3462,34 +3525,7 @@
    "active": true,
    "version": "rf-v2",
    "reviewStatus": "approved",
-   "rationale": "Radical Acceptance (planned), then Problem Solve in micro-steps; Problem Solve until then."
-  },
-  {
-   "id": "rf_reward_drive_low_words_fragile_radical-acceptance",
-   "conceptId": "dbt_radical_acceptance",
-   "patternId": "reward_drive_low",
-   "bands": [
-    "steady",
-    "stirred"
-   ],
-   "priority": 0.4,
-   "direction": "neutral",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": "words",
-   "words": [
-    "vulnerable",
-    "fragile",
-    "powerless"
-   ],
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": false,
-   "version": "rf-v2",
-   "reviewStatus": "draft",
-   "rationale": "Planned: Radical Acceptance leads."
+   "rationale": "Let it be (built, row off until signed off), then Problem Solve in micro-steps; Problem Solve until then."
   },
   {
    "id": "rf_rumination_loop_addresses_recovering-from-invalidation",
@@ -3989,9 +4025,9 @@
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
+   "reviewStatus": "approved",
    "rationale": "FAST (keep self-respect) as the alternative to Recover. Not violated (Claudia, 10 Nov, IE-B1): the review opens on what the person did, which reads as self-blame after a violation."
   },
   {

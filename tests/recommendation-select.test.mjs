@@ -136,7 +136,7 @@ test("#13 co-occurring blank pattern: nothing calming and no Do the Opposite (ac
   const sel = await cell("acute_alarm", "stirred", { blank: true, secondary: "dissociation_overmodulation" });
   assert.deepEqual(pickIds(sel), ["five-senses"]);
   assert.deepEqual(sel.filtered.filter((f) => f.reason !== "emotion_gate").map((f) => [f.toolId, f.reason]), [["cool-down", "direction"], ["opposite-action", "contraindicated"]]);
-  assert.deepEqual(sel.filtered.filter((f) => f.reason === "emotion_gate").map((f) => f.toolId).sort(), ["find-the-feeling", "five-senses", "opposite-action", "pause", "problem-solve", "recovering-from-invalidation"], "gated rows that didn't fire are logged (word rules too)");
+  assert.deepEqual(sel.filtered.filter((f) => f.reason === "emotion_gate").map((f) => f.toolId).sort(), ["find-the-feeling", "five-senses", "opposite-action", "pause", "problem-solve", "recovering-from-invalidation", "say-no"], "gated rows that didn't fire are logged (word rules too)");
 });
 
 test("#14 FTF flooded + blank → 5-4-3-2-1 only (no Cool Down, D-02)", async () => {

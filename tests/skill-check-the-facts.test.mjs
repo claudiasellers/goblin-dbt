@@ -176,9 +176,9 @@ test("handoffFor: the hand-off table, Done always there", () => {
     const step = M.stepOf(skill, "next");
     return [M.handoffLine(ctx(), step, s), s.offered.map((x) => skill.exits.find((e) => e.id === x).toolId)];
   };
-  assert.deepEqual(offered("fits", "saw"), [skill.copy.next_fits, ["problem-solve"]]);
-  assert.deepEqual(offered("fits", "said"), [skill.copy.next_fits, ["problem-solve", "dear-man"]]);
-  assert.deepEqual(offered("fits", "didnt"), [skill.copy.next_fits, ["problem-solve", "dear-man"]]);
+  assert.deepEqual(offered("fits", "saw"), [skill.copy.next_fits, ["problem-solve", "let-it-be"]]);
+  assert.deepEqual(offered("fits", "said"), [skill.copy.next_fits, ["problem-solve", "dear-man", "let-it-be"]]);
+  assert.deepEqual(offered("fits", "didnt"), [skill.copy.next_fits, ["problem-solve", "dear-man", "let-it-be"]]);
   assert.deepEqual(offered("partly", "said"), [skill.copy.next_partly, ["opposite-action", "problem-solve"]]);
   assert.deepEqual(offered("doesnt_fit", "said"), [skill.copy.next_no, ["opposite-action"]]);
   assert.deepEqual(offered("unsure", "said"), [skill.copy.next_unsure, ["wise-mind"]]);
@@ -254,15 +254,16 @@ test("v1.1 safety chips: danger from a person shows the other_person resources a
   assert.equal(M.runNext(c, s, next).stepId, "story");
 });
 
-test("v1.1 planned exits: the wave and let it be are written for fits and doesn't-fit, and never offered until they ship", () => {
+test("v1.1 exits: let it be is offered when it fits (DT-04 built); the wave is written for fits and doesn't-fit, and never offered until it ships", () => {
   const planned = skill.exits.filter((x) => x.planned).map((x) => x.toolId).sort();
-  assert.deepEqual(planned, ["let-it-be", "mindfulness-emotions"]);
+  assert.deepEqual(planned, ["mindfulness-emotions"]);
   const nextStep = M.stepOf(skill, "next");
   const offeredExits = nextStep.offers.map((o) => o.exit);
   assert.ok(offeredExits.includes("mindfulness_emotions") && offeredExits.includes("let_it_be"));
   for (const fits of ["fits", "doesnt_fit"]) {
     const s = run([...toFits("hurt", ["sad_gone"]), pick("fits", fits), next]);
-    assert.ok(!s.offered.includes("mindfulness_emotions") && !s.offered.includes("let_it_be"), fits);
+    assert.ok(!s.offered.includes("mindfulness_emotions"), fits);
+    assert.equal(s.offered.includes("let_it_be"), fits === "fits", fits);
   }
 });
 

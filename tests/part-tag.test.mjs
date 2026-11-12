@@ -106,7 +106,7 @@ test("hosts: every tool whose close asks then-vs-now or about the urge, minus Me
     .filter(([, k]) => dirFor(k.closeKind) !== null || k.closeKind === "urge").map(([id]) => id);
   const hosts = asks.filter((id) => !NEVER_HOSTS.includes(id));
   assert.deepEqual([...lib.TAG_ROW_TOOLS], hosts);
-  assert.deepEqual(hosts, ["cool-down", "five-senses", "pause", "urge-surfing", "alternate-rebellion", "find-the-feeling", "check-the-facts", "fast"], "the survey (Oct 2026), plus Check the Facts and Rebel without the wreckage and Keep your self-respect (Nov 2026)");
+  assert.deepEqual(hosts, ["cool-down", "five-senses", "pause", "urge-surfing", "let-it-be", "alternate-rebellion", "find-the-feeling", "check-the-facts", "fast"], "the survey (Oct 2026), plus Check the Facts, Rebel without the wreckage, Keep your self-respect and Let it be (Nov 2026)");
   // Every page that closes with a then-vs-now is a host or never one (a tool recording it by hand
   // without a then-vs-now close kind would fail here).
   for (const id of Object.keys(TOOL_CLOSE_KIND)) {
@@ -153,8 +153,12 @@ test("each host mounts PartTagSlot under its saved close; the slot is the only g
     assert.doesNotMatch(src, /<PartTagRow\b/, f);
     assert.doesNotMatch(src, /tagRowGate\(/, f);
   }
-  // Cool Down's Quieter is its one better answer; FTF's quieter / much map to better / much_better.
-  assert.match(read(pageOf("cool-down")), /\{ id: 'quieter', label: 'Quieter', thenVsNow: 'better' \}/);
+  // First, the body (cool-down) asks its close in the flow: Quieter is `better`, and the player's leaving card
+  // mounts the row with that answer once the close is saved. FTF's quieter / much map to better / much_better.
+  const fb = JSON.parse(read("tests/fixtures/skills-content.json")).skills.find((s) => s.id === "first_body");
+  assert.equal(fb.options.tvn_down.find((o) => o.value === "better").label, "Quieter");
+  assert.match(read("src/components/skillPlayer/SkillPlayer.tsx"),
+    /\{inFlowClose && <PartTagSlot toolId=\{skill\.toolId\} toolSessionId=\{toolSession\.id\} thenVsNow=\{inFlowClose\.thenVsNow\} saved=\{inFlowClose\.saved\} \/>\}/);
 });
 
 test("the row: no hard-coded words, after the close is saved, fire-and-forget writes", () => {

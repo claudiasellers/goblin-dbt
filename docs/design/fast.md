@@ -101,11 +101,11 @@ close offers the tag row, like Check the Facts.
 - `dbt_fast` has `appToolId: 'fast'` (`schema/app-tool-ids.cypher`), so Problem Solve's seven `fast` links
   (`schema/problem-solve-data.cypher` ×5, `problem-solve-barriers.cypher` ×2) open the tool with no Problem Solve
   change.
-- Two `RECOMMENDED_FOR` rows exist and are **off and drafts** (`BUILT_NOT_SIGNED_OFF` in
-  `scripts/recommendations/content.py`, D15). Concept tags: `change`, `relational`, `neutral`.
+- Two `RECOMMENDED_FOR` rows, **live since 12 Nov 2026** (connected by default, Claudia; `SIGNED_OFF` in
+  `scripts/recommendations/content.py`). Concept tags: `change`, `relational`, `neutral`.
 - Listed under Interpersonal Effectiveness for everyone (`src/data/tools.ts`, emoji 🪶).
 - Edges in `tests/fixtures/module-edges.json`: IE PRD IE-05 (fast → rehearse planned, dear-man, check-the-facts,
-  let-it-be planned), IE Arch #30 (→ Recover), #37 (→ finding-connection planned), #42 (problem-solve → fast).
+  let-it-be built 11 Nov), IE Arch #30 (→ Recover), #37 (→ finding-connection planned), #42 (problem-solve → fast).
 
 ## Departures from the PRD
 
@@ -141,10 +141,9 @@ The skill copy isn't gated on content sign-off (Check the Facts' precedent). For
   `not_today`, `another_time`, `space`, `another_way`. **Signed off as written (Claudia, 10 Nov 2026).** The
   clinical gate replaced two before this PR: *…when we can both talk calmly* (implies they weren't) and *That
   doesn't work for me, and that hasn't changed* (doesn't fit after their no to your ask).
-- **Routing rows:** `self-respect` (betrayed, disrespected) and `grievance` (bitter, resentful) stay **off and
-  drafts**. *Violated* is out of `self-respect` and the `victimized` row is deleted (Claudia, 10 Nov 2026, the
-  clinical gate's call): after a violation, a review that opens on what *you* did reads as self-blame. Switching
-  the two remaining rows on is a later call (drop them from `BUILT_NOT_SIGNED_OFF`, row by row).
+- **Routing rows:** `self-respect` (betrayed, disrespected) and `grievance` (bitter, resentful) are **live**
+  (12 Nov 2026: connected by default). *Violated* is out of `self-respect` and the `victimized` row is deleted (Claudia, 10 Nov 2026, the
+  clinical gate's call): after a violation, a review that opens on what *you* did reads as self-blame.
 - **`ADDRESSES` edges:** `dbt_fast` → cold shame, inferior, insignificant (Claudia, 10 Nov 2026), written from
   `fast.py` (`addresses` on `fast_review`; `build.py` rebuilds the set each load). Not the PRD's *unjustified
   guilt*: the graph has one guilt word, so the edge would claim all guilt. Live on load: Find the feeling's word

@@ -34,7 +34,7 @@ explicitly in `schema/app-tool-ids.cypher`). Listed under Distress Tolerance for
 |---|---|---|
 | It could change | Problem Solve | |
 | Someone I want to say something to | DEAR MAN; FAST (planned, IE-05) | |
-| It won't change | Let it be (planned, DT-04) | Nothing shows until DT-B4 flips it; Done is always there. Never with *Someone I'm scared of* (no radical acceptance of a situation with someone they fear) |
+| It won't change | Let it be (DT-04, built 11 Nov) | Done is always there. Never with *Someone I'm scared of* (no radical acceptance of a situation with someone they fear) |
 | Not right now | — | Done |
 | *Someone I'm scared of* was a squeeze | Ending a relationship (IE-08, built 10 Nov 2026; it asks about safety first) only | Never DEAR MAN, FAST or Let it be for someone they're scared of (decision D4, plan C6.6). The other-person resources show on every screen from 2 on |
 

@@ -14,12 +14,16 @@ import ending_relationships  # noqa: E402
 import hold_to_wait  # noqa: E402
 import dear_man_debrief  # noqa: E402
 import pros_cons  # noqa: E402
+import first_body  # noqa: E402
+import ride_it_out  # noqa: E402
+import let_it_be  # noqa: E402
 import say_no  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
 SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKILL, *fast.SKILLS, nightmare_rescript.SKILL, problem_solve.SKILL,
-          ending_relationships.SKILL, hold_to_wait.SKILL, dear_man_debrief.SKILL, pros_cons.SKILL, say_no.SKILL]
+          ending_relationships.SKILL, hold_to_wait.SKILL, dear_man_debrief.SKILL, pros_cons.SKILL, first_body.SKILL,
+          ride_it_out.SKILL, let_it_be.SKILL, say_no.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -45,6 +49,18 @@ EMBEDS = {
     # for this run's pull, replayed inside Hold to wait (reports nothing; its slot's record says it showed).
     "prosConsCard": {"ids": ["read"], "measures": ["durationSec"]},
     "prosConsReplay": {},
+    # DT-01's body modes (plan C3b, DT-owned; src/components/skillPlayer/BodyEmbeds.tsx): each reports done, partly or
+    # skipped and the seconds it ran (the breath pacer also `dizzy`: its stop rule); measurements, never ratings.
+    "doseTimer": {"ids": ["done", "partly", "skipped"], "measures": ["durationSec"]},
+    "bodyCard": {"ids": ["done", "partly", "skipped"], "measures": ["durationSec"]},
+    "breathPacer": {"ids": ["done", "partly", "skipped", "dizzy"], "measures": ["durationSec"]},
+    "squeezeRelease": {"ids": ["done", "partly", "skipped"], "measures": ["durationSec", "doneCount"]},
+    "orientFind": {"ids": ["done", "partly", "skipped"], "measures": ["doneCount"]},
+    # DT-05's wave (plan C3b `urgeWave`, DT-owned; src/lib/urgeWave.ts): the checks answered in order (categorical,
+    # plan C1 rule 2), then how the ride ended; and its trace at the close, read once.
+    "urgeWave": {"ids": ["still_here", "fading", "gone", "bigger", "ended_gone", "ended_bigger", "ended_not_now",
+                         "ended_left", "ended_long"], "measures": ["durationSec", "doneCount"]},
+    "waveTrace": {"ids": ["read"]},
     # IE-B3's message card (plan C3b `messageComposer`, IE-owned): the picks as one message, with the FAST strip (an
     # extra sorry, over-explaining) and the line to repeat; Copy and Open messages, never a send. Reports what was done.
     "messageComposer": {"ids": ["copied", "opened", "dropped_sorry"]},
@@ -67,6 +83,7 @@ EMBED_PROPS = {
         "hint": {"type": "copy"},
         "doneLabel": {"type": "copy", "optional": True},
         "next": {"type": "copy"},
+        "wayOn": {"type": "enum", "values": ["from_start"], "optional": True},
     },
     "witness": {
         "moment": {"type": "id"},
@@ -153,6 +170,91 @@ EMBED_PROPS = {
         "noProFor": {"type": "id"},
         "noteFor": {"type": "id"},
         "note": {"type": "copy"},
+    },
+    "doseTimer": {
+        "art": {"type": "enum", "values": ["cold", "none"], "optional": True},
+        "seconds": {"type": "int", "min": 5, "max": 300},
+        "leadIn": {"type": "int", "min": 0, "max": 5, "optional": True},
+        "step1": {"type": "copy", "optional": True},
+        "step2": {"type": "copy", "optional": True},
+        "step3": {"type": "copy", "optional": True},
+        "caution": {"type": "copy", "optional": True},
+        "start": {"type": "copy"},
+        "running": {"type": "copy"},
+        "lead": {"type": "copy", "optional": True},
+        "done": {"type": "copy"},
+        "next": {"type": "copy"},
+    },
+    "bodyCard": {
+        "kind": {"type": "enum", "values": ["hand_heart", "wake", "strong", "still", "press", "willing"]},
+        "cue": {"type": "copy", "optional": True},
+        "seconds": {"type": "int", "min": 5, "max": 300},
+        "step1": {"type": "copy", "optional": True},
+        "step2": {"type": "copy", "optional": True},
+        "step3": {"type": "copy", "optional": True},
+        "caution": {"type": "copy", "optional": True},
+        "start": {"type": "copy"},
+        "running": {"type": "copy"},
+        "done": {"type": "copy"},
+        "next": {"type": "copy"},
+    },
+    "breathPacer": {
+        "seconds": {"type": "int", "min": 30, "max": 300},
+        "inSec": {"type": "int", "min": 2, "max": 6},
+        "outSec": {"type": "int", "min": 3, "max": 10},
+        "step1": {"type": "copy", "optional": True},
+        "step2": {"type": "copy", "optional": True},
+        "step3": {"type": "copy", "optional": True},
+        "caution": {"type": "copy", "optional": True},
+        "start": {"type": "copy"},
+        "inLabel": {"type": "copy"},
+        "outLabel": {"type": "copy"},
+        "dizzy": {"type": "copy"},
+        "done": {"type": "copy"},
+        "next": {"type": "copy"},
+    },
+    "squeezeRelease": {
+        "rounds": {"type": "int", "min": 1, "max": 5},
+        "squeezeSec": {"type": "int", "min": 3, "max": 8},
+        "step1": {"type": "copy", "optional": True},
+        "step2": {"type": "copy", "optional": True},
+        "step3": {"type": "copy", "optional": True},
+        "caution": {"type": "copy", "optional": True},
+        "start": {"type": "copy"},
+        "squeezeLabel": {"type": "copy"},
+        "dropLabel": {"type": "copy"},
+        "done": {"type": "copy"},
+        "next": {"type": "copy"},
+    },
+    "orientFind": {
+        "variant": {"type": "enum", "values": ["find", "listen"]},
+        "count": {"type": "int", "min": 1, "max": 5},
+        "here": {"type": "copy"},
+        "task": {"type": "copy"},
+        "foundLabel": {"type": "copy"},
+        "done": {"type": "copy"},
+        "next": {"type": "copy"},
+    },
+    "urgeWave": {
+        "checkSec": {"type": "int", "min": 20, "max": 180},
+        "maxChecks": {"type": "int", "min": 1, "max": 10},
+        "checkTitle": {"type": "copy"},
+        "riding": {"type": "copy"},
+        "still_here": {"type": "copy"},
+        "fading": {"type": "copy"},
+        "gone": {"type": "copy"},
+        "bigger": {"type": "copy"},
+        "notNow": {"type": "copy", "optional": True},
+        "next": {"type": "copy"},
+        "continueFrom": {"type": "field", "optional": True},
+    },
+    "waveTrace": {
+        "rideField": {"type": "field"},
+        "againField": {"type": "field", "optional": True},
+        "downLine": {"type": "copy"},
+        "riseLine": {"type": "copy", "optional": True},
+        "heldLine": {"type": "copy"},
+        "next": {"type": "copy"},
     },
 }
 # Shared tables the graph supplies to every skill (never written here).

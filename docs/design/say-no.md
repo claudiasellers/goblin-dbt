@@ -135,4 +135,6 @@ Nothing is locked, at any band. One message (IE-01 Mode A) reuses the card.
 - **No "three nos in a row → GIVE" rule.** GIVE (IE-06) isn't built; it is recorded as planned in IE-B4.
 - **`wise_mind_check` moves to One message** (IE-B3's second PR), its first real consumer.
 - **No `IMPLEMENTS` edges** for the skill's steps; the concept `dbt_saying_no` is `PART_OF` interpersonal
-  effectiveness and joined by `appToolId` (`say-no`). No routing rows: Say no opens from Tools and its intent, like Ending a relationship.
+  effectiveness and joined by `appToolId` (`say-no`). One routing row,
+  live with the module (connected by default, 12 Nov): `rf_acute_alarm_words_demand_say-no`, *pressured* on Alarm
+  gets Say no as the swap beside Problem Solve (concept tags `change`, `relational`, `neutral`).
