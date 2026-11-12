@@ -109,8 +109,8 @@
     {
       "from": "src/pages/tools/ProblemSolve.tsx",
       "to": "give",
-      "state": "missing",
-      "note": "No such tool: a dead link today (IE-03 GIVE is not built). ER-12 Problem Solve port turns it into a planned exit."
+      "state": "built",
+      "note": "Keep it warm (IE-06), built 12 Nov 2026. The old page is unrouted; the skill's give exit is built."
     },
     {
       "from": "src/pages/tools/TwoPulls.tsx",

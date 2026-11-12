@@ -124,6 +124,7 @@ SIGNED_OFF = {
     "rf_social_threat_shame_words_ask-for-it_dear-man": "2026-11-12",
     "rf_reactive_aggression_words_grievance_fast": "2026-11-12",
     "rf_acute_alarm_words_demand_say-no": "2026-11-12",
+    "rf_rumination_loop_words_repair_give": "2026-11-12",
 }
 BANDS = ["steady", "stirred", "flooded"]
 
@@ -210,6 +211,14 @@ CONCEPT_TAGS["soothe"] = {"concept": "dbt_self_soothe", "side": "acceptance", "s
 # CONTRAINDICATED_FOR the vigilance + rumination and dissociation + rumination co-occurrences (their
 # contraindicatedTools list mindfulness_of_thoughts, schema/pattern-co-occurrence.cypher).
 CONCEPT_TAGS["thoughts-passing"] = {"concept": "dbt_mindfulness_current_thoughts", "side": "acceptance", "skillKind": "hold", "direction": "neutral"}
+# Keep it warm (IE-06, appToolId 'give', docs/design/give.md) has shipped on the skill runtime: out of PLANNED, tagged,
+# and one word row, live (12 Nov 2026): *remorseful* on replay, beside Check the Facts (facts first, then repair). The
+# review's two planned rows don't fit what was built and were dropped: *let down* already
+# has DEAR MAN beside Recover (a GIVE row there is a second relational card the diversity rule never shows), and
+# *lonely* / *isolated* asks for reaching out to people, which the skill doesn't do (it is for one person: something
+# they brought, a repair, a break and return, an ask). Its ways in are the Tools list and intent, the debrief's *shaky*
+# between you, Ending's *try to change it first* and Problem Solve's links.
+CONCEPT_TAGS["give"] = {"concept": "dbt_give", "side": "change", "skillKind": "relational", "direction": "neutral"}
 # Running low (ER-07, appToolId 'please-skill': routing's planned `running-low` renamed, docs/design/running-low.md) has
 # shipped on the skill runtime: out of PLANNED; it leads Low drive's default cell, Do the Opposite as its swap, live
 # (connected by default, 12 Nov 2026). Body-kind and neutral: it refills, never calms, so blank patterns keep it.
@@ -218,7 +227,6 @@ BUILT_NOT_SIGNED_OFF = {
 }
 # Ride it out (urge-surfing), Let it be and Give your mind a job are live (Claudia, 12 Nov 2026: default to connected).
 PLANNED = {
-    "give":               {"concept": "dbt_give",               "side": "change",     "skillKind": "relational", "direction": "neutral"},
 }
 CONCEPT_TAGS.update(PLANNED)
 INACTIVE_TOOLS.update({t: "not built yet (planned, Oct 2026 review)" for t in PLANNED})
@@ -361,8 +369,6 @@ WORD_RULES = [
      "why": "Hot shame: Cool Down (TIPP cold water triggers the dive reflex, slowing the heart and narrowing peripheral blood vessels), then Recover. Humiliated is a wound word, so Recover still leads it (R7)."},
     {"key": "self-worth", "pattern": "social_threat_shame", "tool": "check-the-facts", "priority": 1.5, "words": ["insecure", "inadequate", "inferior", "insignificant", "weak", "worthless"],
      "why": "Planned: Check the Facts beside Do the Opposite (unhiding) for shame about the self."},
-    {"key": "let-down", "pattern": "social_threat_shame", "tool": "give", "priority": 1.5, "words": ["let_down"],
-     "why": "Planned: GIVE (keep the relationship) as the alternative to Recover."},
     {"key": "ask-for-it", "pattern": "social_threat_shame", "tool": "dear-man", "priority": 1.5, "words": ["let_down", "excluded"], "beside": ["recovering-from-invalidation"],
      "why": "DEAR MAN (ask for what you need) as the alternative to Recover after a let-down or being left out: the person's own ask, after the picker and the safety question (IE-01, D4). Not rejected or humiliated: a wound to recover from first."},
     {"key": "self-respect", "pattern": "social_threat_shame", "tool": "fast", "priority": 1.5, "words": ["betrayed", "disrespected"],
@@ -384,6 +390,8 @@ WORD_RULES = [
      "why": "Give your mind a job (ACCEPTS) as the alternative."},
     {"key": "guilt", "pattern": "rumination_loop", "tool": "check-the-facts", "priority": 0.4, "words": ["guilty", "remorseful", "hesitant"],
      "why": "Planned: Check the Facts leads for guilt (is it justified?) and hesitation."},
+    {"key": "repair", "pattern": "rumination_loop", "tool": "give", "priority": WORD_NEXT, "words": ["remorseful"], "beside": ["check-the-facts"],
+     "why": "Keep it warm's repair (IE-06) beside Check the Facts for remorse: is the guilt justified, then repair with the person (one acknowledgement, one sorry). Its repair route asks whether some of it was yours first. Not guilty: guilt is often about the self, not someone to repair with."},
     {"key": "low-shame", "pattern": "rumination_loop", "tool": "recovering-from-invalidation", "priority": WORD_LEAD, "words": ["embarrassed", "ashamed", "victimized"],
      "why": "Low-energy shame: Recover (self-validation) first. The review's Cool Down isn't used on this side: the person marked low energy and Cool Down brings it down further."},
     {"key": "low-shame", "pattern": "rumination_loop", "tool": "soothe", "priority": 0.55, "words": ["embarrassed", "ashamed"], "beside": ["recovering-from-invalidation"],
@@ -397,8 +405,6 @@ WORD_RULES = [
      "why": "Let it be (radical acceptance) after gentle movement for despair, grief and emptiness; not for numbness, which needs the body first (12 Nov 2026: was a pattern row for all of Shut down)."},
     {"key": "fragile", "pattern": "reward_drive_low", "tool": "let-it-be", "priority": 0.4, "words": ["vulnerable", "fragile", "powerless"],
      "why": "Let it be (radical acceptance) leads."},
-    {"key": "connection", "pattern": "reward_drive_low", "tool": "give", "priority": 0.85, "words": ["lonely", "isolated"],
-     "why": "Planned: GIVE (reaching towards people) leads for loneliness once built, Running low after it; Do the Opposite until then."},
 ]
 
 # Planned pattern-level rows (no word gate): the review's intended first pick for the pattern.

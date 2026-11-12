@@ -317,6 +317,14 @@ test("DEAR MAN's word row (12 Nov, connected by default): let down or left out â
   }
 });
 
+test("Keep it warm's word row (12 Nov): remorseful â†’ Check the Facts, then the repair beside it; never guilty, never flooded", async () => {
+  for (const band of ["steady", "stirred"]) {
+    assert.deepEqual(pickIds(await cell("rumination_loop", band, { words: ["remorseful"] })), ["check-the-facts", "give"], band);
+  }
+  assert.ok(!pickIds(await cell("rumination_loop", "stirred", { words: ["guilty"] })).includes("give"), "guilty: often about the self");
+  assert.ok(!pickIds(await cell("rumination_loop", "flooded", { words: ["remorseful"] })).includes("give"), "flooded: body first");
+});
+
 test("a row reviewed to sit beside the lead fills the second card past the swap rule (12 Nov): Say no beside Problem Solve, Check the Facts beside Cope Ahead", async () => {
   assert.deepEqual(pickIds(await cell("acute_alarm", "stirred", { words: ["pressured"] })), ["problem-solve", "say-no"]);
   assert.deepEqual(pickIds(await cell("chronic_vigilance", "stirred", { words: ["anxious"] })), ["cope-ahead", "check-the-facts"]);

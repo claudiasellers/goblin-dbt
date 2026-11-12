@@ -59,6 +59,8 @@ const LazyFast = lazy(() => import('./tools/Fast').then((m) => ({ default: m.Fas
 function Fast() { return <Suspense fallback={<ToolLoading />}><LazyFast /></Suspense>; }
 const LazySayNo = lazy(() => import('./tools/SayNo').then((m) => ({ default: m.SayNo })));
 function SayNo() { return <Suspense fallback={<ToolLoading />}><LazySayNo /></Suspense>; }
+const LazyGive = lazy(() => import('./tools/Give').then((m) => ({ default: m.Give })));
+function Give() { return <Suspense fallback={<ToolLoading />}><LazyGive /></Suspense>; }
 // My crisis kit (DT-03): open it or make it, two skills under one tool id (docs/design/crisis-kit.md).
 const LazyCrisisKit = lazy(() => import('./tools/CrisisKit').then((m) => ({ default: m.CrisisKit })));
 function CrisisKit() { return <Suspense fallback={<ToolLoading />}><LazyCrisisKit /></Suspense>; }
@@ -75,6 +77,7 @@ const toolComponents: Record<string, React.ComponentType> = {
   'cope-ahead': CopeAhead,
   'fast': Fast,
   'say-no': SayNo,
+  'give': Give,
   'crisis-kit': CrisisKit,
   'recovering-from-invalidation': InvalidationRecovery,
   'find-the-feeling': FindTheFeeling,

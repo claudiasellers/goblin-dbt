@@ -303,6 +303,18 @@ export const tools: Tool[] = [
     bare: true,
   },
   {
+    // On the skill runtime (docs/design/give.md): who it's with first, then the skill.
+    id: 'give',
+    name: 'Keep it warm',
+    tagline: 'Their side first, a repair after a fight, or a break you come back from',
+    description: 'When someone brings something to you, start with their side, then yours. After a fight, own your part in one clear line. When it heats up, take a break and say when you\'ll be back. Before an ask, add a little warmth.',
+    whenToUse: 'When you\'re right and it keeps coming out as an attack, when someone came to you upset, or after a fight you want to repair.',
+    module: 'interpersonal-effectiveness',
+    dbtBasis: 'DBT IE Handouts 6 and 6a (GIVE)',
+    emoji: '🤝',
+    bare: true,
+  },
+  {
     // On the skill runtime (docs/design/ending-relationships.md). Safety first: nothing is saved before the
     // safety answer, and nothing at all in the safety branch unless the person saves it.
     id: 'ending-relationships',
@@ -395,6 +407,7 @@ export const allIntents: Intent[] = [
   { id: 'dreading', label: 'Something\'s coming up that I\'m dreading', toolId: 'cope-ahead', emoji: '🧭' },
   { id: 'torn', label: 'I\'m torn about what to do', toolId: 'wise-mind', emoji: '🪨' },
   { id: 'say-no', label: 'Say no to someone', toolId: 'say-no', emoji: '🙅' },
+  { id: 'give', label: 'Repair things after a fight, or keep it warm', toolId: 'give', emoji: '🤝' },
   { id: 'overreacting', label: 'I can\'t tell if I\'m overreacting', toolId: 'check-the-facts', emoji: '🔍' },
   { id: 'not-working', label: 'My skills aren\'t working', toolId: 'er-troubleshoot', emoji: '🧩' },
   { id: 'running-low', label: 'Everything feels like too much today', toolId: 'please-skill', emoji: '🔋' },
