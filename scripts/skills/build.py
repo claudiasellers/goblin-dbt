@@ -271,7 +271,7 @@ def check(skill):
                     assert not long, (w, "every starter fits the box (else it stops matching once written in)", long)
                 assert f["own"].get("max", skill["ownMax"]) <= skill["ownMax"], (w, "own max above the skill's", f)
             if "firstFrom" in o:
-                assert o["firstFrom"].startswith("$ctx."), (w, "firstFrom is a context ref", o)
+                assert o["firstFrom"].startswith(("$ctx.", "$d.")), (w, "firstFrom is a context or derived ref", o)
                 check_cond({"set": o["firstFrom"]}, fields, derived, w, accepts)
             if "list" in o:
                 for x in (x for x in skill["options"] if x[0] == o["list"] and x[3].get("danger")):
