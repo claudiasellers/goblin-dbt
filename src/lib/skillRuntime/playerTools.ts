@@ -27,7 +27,6 @@ export const PLAYER_TOOLS: Readonly<Record<string, string>> = {
   'values-clarification': 'values',
   'build-mastery': 'build_mastery',
   'finding-connection': 'finding_connection',
-  'emotion-guide': 'emotion_guide',
 };
 
 /**
@@ -42,6 +41,7 @@ export const PAGE_SKILLS: Readonly<Record<string, readonly string[]>> = {
   'give': ['give'],
   'mindfulness-of-others': ['notice_them'],
   'crisis-kit': ['crisis_kit_use', 'crisis_kit_build'],
+  'emotion-guide': ['emotion_guide', 'emotion_myths'],
 };
 
 /**

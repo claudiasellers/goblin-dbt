@@ -14292,6 +14292,657 @@
    }
   },
   {
+   "id": "emotion_myths",
+   "toolId": "emotion-guide",
+   "version": "em-v1",
+   "start": "myth",
+   "accepts": [
+    "band"
+   ],
+   "ownMax": 100,
+   "emotionFields": [],
+   "copy": {
+    "heads_up_title": "Your body's loud right now.",
+    "heads_up_hint": "Looking at a belief works better once it settles a little.",
+    "settle_line": "This will keep. First, the body.",
+    "myth_title": "Which belief about feelings sounds most like yours?",
+    "myth_hint": "Pick the closest. You can put it your own way too.",
+    "own_hint": "In your own words",
+    "look_title": "A belief can feel like a fact.",
+    "look_own": "Beliefs about feelings often feel like facts. You can hold this one up and look at it.",
+    "sits_label": "How does that sit with you?",
+    "end_title_some": "Some of it fits. That's worth keeping.",
+    "end_title_not_yet": "Not yet is fine. A belief that's been around a while takes more than one look.",
+    "end_title_unsure": "You don't have to decide now.",
+    "end_own": "This week, notice one time the belief shows up, and what the feeling was doing then.",
+    "safety_open": "Talk to someone now",
+    "done": "Done",
+    "look_myth_failing": "Feelings aren't grades. Having one says you're human, not that you're failing.",
+    "look_myth_past_it": "Feelings don't run on a schedule. Some take longer, and that isn't a fault.",
+    "look_myth_true": "A strong feeling shows how much something matters to you. It doesn't prove what happened.",
+    "look_myth_right_way": "People feel different things about the same moment. There isn't one correct feeling to have.",
+    "look_myth_weak": "Showing a feeling takes nerve. It also lets people know what you need.",
+    "look_myth_bad": "Painful feelings are signals. They can hurt without harming you, and they pass.",
+    "look_myth_out_of_control": "You can feel something strongly and still choose what you do.",
+    "look_myth_no_reason": "Every feeling comes from somewhere, even when the reason isn't clear yet.",
+    "look_myth_ignore": "Ignored feelings tend to come back louder. Noticing one is often what lets it settle.",
+    "look_myth_approval": "Your feelings are yours. Other people's opinions don't decide whether they're real.",
+    "look_myth_big": "Big reactions can get attention fast, and often cost a lot after. There are steadier ways to be heard.",
+    "try_myth_failing": "This week, notice the feeling and the effort you're making, side by side.",
+    "try_myth_past_it": "This week, try saying to yourself: it's still here, and that makes sense.",
+    "try_myth_true": "Next time it's strong, ask: what are the facts, apart from the feeling?",
+    "try_myth_right_way": "Next time a feeling seems wrong, try naming it without grading it.",
+    "try_myth_weak": "This week, try letting one safe person see one feeling, and notice what happens.",
+    "try_myth_bad": "Next time one shows up, try asking what it's telling you.",
+    "try_myth_out_of_control": "This week, notice one time you felt a lot and still chose what to do.",
+    "try_myth_no_reason": "When one seems to come from nowhere, try asking what happened right before.",
+    "try_myth_ignore": "Today, try noticing one feeling for a minute without pushing it away.",
+    "try_myth_approval": "Next time, try telling yourself: it makes sense that I feel this.",
+    "try_myth_big": "This week, try saying what you need in one clear sentence, once."
+   },
+   "tables": {},
+   "derive": [],
+   "steps": [
+    {
+     "id": "myth",
+     "kind": "ask",
+     "title": "myth_title",
+     "hint": "myth_hint",
+     "fields": [
+      {
+       "id": "myth",
+       "options": {
+        "list": "myth"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "own": {
+        "hint": "own_hint",
+        "countsAsPick": true,
+        "max": 100
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "heads_up",
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       }
+      },
+      {
+       "to": "look",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "heads_up",
+     "kind": "ask",
+     "title": "heads_up_title",
+     "hint": "heads_up_hint",
+     "fields": [
+      {
+       "id": "heads_up",
+       "options": {
+        "list": "heads_up"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "settle",
+       "when": {
+        "eq": [
+         "$a.heads_up",
+         "settle"
+        ]
+       }
+      },
+      {
+       "to": "look",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "settle",
+     "kind": "handoff",
+     "complete": true,
+     "noClose": true,
+     "title": "heads_up_title",
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "settle_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "cool_down",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "look",
+     "kind": "ask",
+     "title": "look_title",
+     "lines": [
+      {
+       "key": "look_myth_failing",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_failing"
+        ]
+       }
+      },
+      {
+       "key": "look_myth_past_it",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_past_it"
+        ]
+       }
+      },
+      {
+       "key": "look_myth_true",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_true"
+        ]
+       }
+      },
+      {
+       "key": "look_myth_right_way",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_right_way"
+        ]
+       }
+      },
+      {
+       "key": "look_myth_weak",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_weak"
+        ]
+       }
+      },
+      {
+       "key": "look_myth_bad",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_bad"
+        ]
+       }
+      },
+      {
+       "key": "look_myth_out_of_control",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_out_of_control"
+        ]
+       }
+      },
+      {
+       "key": "look_myth_no_reason",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_no_reason"
+        ]
+       }
+      },
+      {
+       "key": "look_myth_ignore",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_ignore"
+        ]
+       }
+      },
+      {
+       "key": "look_myth_approval",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_approval"
+        ]
+       }
+      },
+      {
+       "key": "look_myth_big",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_big"
+        ]
+       }
+      },
+      {
+       "key": "look_own",
+       "when": {
+        "own": "myth"
+       }
+      }
+     ],
+     "fields": [
+      {
+       "id": "sits",
+       "label": "sits_label",
+       "options": {
+        "list": "sits"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "end",
+     "kind": "handoff",
+     "complete": true,
+     "noClose": true,
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$a.sits",
+         "some"
+        ]
+       },
+       "key": "end_title_some"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.sits",
+         "not_yet"
+        ]
+       },
+       "key": "end_title_not_yet"
+      },
+      {
+       "key": "end_title_unsure"
+      }
+     ],
+     "lines": [
+      {
+       "key": "try_myth_failing",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_failing"
+        ]
+       }
+      },
+      {
+       "key": "try_myth_past_it",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_past_it"
+        ]
+       }
+      },
+      {
+       "key": "try_myth_true",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_true"
+        ]
+       }
+      },
+      {
+       "key": "try_myth_right_way",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_right_way"
+        ]
+       }
+      },
+      {
+       "key": "try_myth_weak",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_weak"
+        ]
+       }
+      },
+      {
+       "key": "try_myth_bad",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_bad"
+        ]
+       }
+      },
+      {
+       "key": "try_myth_out_of_control",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_out_of_control"
+        ]
+       }
+      },
+      {
+       "key": "try_myth_no_reason",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_no_reason"
+        ]
+       }
+      },
+      {
+       "key": "try_myth_ignore",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_ignore"
+        ]
+       }
+      },
+      {
+       "key": "try_myth_approval",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_approval"
+        ]
+       }
+      },
+      {
+       "key": "try_myth_big",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_big"
+        ]
+       }
+      },
+      {
+       "key": "end_own",
+       "when": {
+        "own": "myth"
+       }
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "check_the_facts",
+       "when": {
+        "in": [
+         "$a.myth",
+         [
+          "myth_true"
+         ]
+        ]
+       }
+      },
+      {
+       "exit": "emotion_guide",
+       "when": {
+        "in": [
+         "$a.myth",
+         [
+          "myth_failing",
+          "myth_right_way",
+          "myth_bad"
+         ]
+        ]
+       }
+      },
+      {
+       "exit": "find_the_feeling",
+       "when": {
+        "in": [
+         "$a.myth",
+         [
+          "myth_no_reason"
+         ]
+        ]
+       }
+      },
+      {
+       "exit": "let_it_be",
+       "when": {
+        "in": [
+         "$a.myth",
+         [
+          "myth_past_it"
+         ]
+        ]
+       }
+      },
+      {
+       "exit": "dear_man",
+       "when": {
+        "in": [
+         "$a.myth",
+         [
+          "myth_big"
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   ],
+   "exits": [
+    {
+     "id": "check_the_facts",
+     "toolId": "check-the-facts",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "cool_down",
+     "toolId": "cool-down",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "dear_man",
+     "toolId": "dear-man",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "done",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": true
+    },
+    {
+     "id": "emotion_guide",
+     "toolId": "emotion-guide",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "find_the_feeling",
+     "toolId": "find-the-feeling",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "let_it_be",
+     "toolId": "let-it-be",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "safety_open",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": false,
+     "safety": true
+    }
+   ],
+   "options": {
+    "myth": [
+     {
+      "value": "myth_failing",
+      "label": "Having this feeling means I'm failing"
+     },
+     {
+      "value": "myth_past_it",
+      "label": "I'm meant to be past this by now"
+     },
+     {
+      "value": "myth_true",
+      "label": "If I feel it this strongly, it must be true"
+     },
+     {
+      "value": "myth_right_way",
+      "label": "There's a right way to feel about everything"
+     },
+     {
+      "value": "myth_weak",
+      "label": "Letting people see I'm upset makes me weak"
+     },
+     {
+      "value": "myth_bad",
+      "label": "Painful feelings are bad for me"
+     },
+     {
+      "value": "myth_out_of_control",
+      "label": "Being emotional means being out of control"
+     },
+     {
+      "value": "myth_no_reason",
+      "label": "Some of my feelings make no sense"
+     },
+     {
+      "value": "myth_ignore",
+      "label": "Painful feelings are best ignored"
+     },
+     {
+      "value": "myth_approval",
+      "label": "If others don't approve of how I feel, I'm wrong to feel it"
+     },
+     {
+      "value": "myth_big",
+      "label": "Big reactions are the only way to get things to change"
+     }
+    ],
+    "heads_up": [
+     {
+      "value": "settle",
+      "label": "Settle my body first"
+     },
+     {
+      "value": "try",
+      "label": "Look anyway"
+     }
+    ],
+    "sits": [
+     {
+      "value": "some",
+      "label": "Some of it fits"
+     },
+     {
+      "value": "not_yet",
+      "label": "Not yet"
+     },
+     {
+      "value": "unsure",
+      "label": "Not sure"
+     }
+    ]
+   }
+  },
+  {
    "id": "ending_relationships",
    "toolId": "ending-relationships",
    "version": "ending-v1",
@@ -16645,8 +17296,7 @@
       "frame": "myths"
      },
      "carry": [],
-     "done": false,
-     "planned": true
+     "done": false
     },
     {
      "id": "five_senses",

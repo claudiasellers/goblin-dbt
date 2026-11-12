@@ -1543,7 +1543,7 @@ MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "er_troubleshoot:five_senses"}), (t:TherapyConcept {appToolId: "five-senses"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "er_troubleshoot:emotion_guide"})
-SET x += {skillId: "er_troubleshoot", exit: "emotion_guide", toolId: "emotion-guide", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{\"frame\": \"myths\"}", x.label = null;
+SET x += {skillId: "er_troubleshoot", exit: "emotion_guide", toolId: "emotion-guide", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"myths\"}", x.label = null;
 MATCH (s:Skill {id: "er_troubleshoot"}), (x:SkillExit {id: "er_troubleshoot:emotion_guide"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "er_troubleshoot:emotion_guide"}), (t:TherapyConcept {appToolId: "emotion-guide"})
@@ -22079,3 +22079,208 @@ SET o:SkillOption, o += {skillId: "emotion_guide", list: "heads_up", value: "try
 MATCH (s:Skill {id: "emotion_guide"}), (o:SkillOption {id: "emotion_guide:heads_up:try"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "heads_up", order: 1};
+
+// --- emotion_myths (em-v1) ---
+MERGE (s:Skill {id: "emotion_myths"})
+SET s += {toolId: "emotion-guide", version: "em-v1", contentVersion: "skills-v1", start: "myth", ownMax: 100, emotionFields: [], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"done\": \"Done\", \"end_own\": \"This week, notice one time the belief shows up, and what the feeling was doing then.\", \"end_title_not_yet\": \"Not yet is fine. A belief that's been around a while takes more than one look.\", \"end_title_some\": \"Some of it fits. That's worth keeping.\", \"end_title_unsure\": \"You don't have to decide now.\", \"heads_up_hint\": \"Looking at a belief works better once it settles a little.\", \"heads_up_title\": \"Your body's loud right now.\", \"look_myth_approval\": \"Your feelings are yours. Other people's opinions don't decide whether they're real.\", \"look_myth_bad\": \"Painful feelings are signals. They can hurt without harming you, and they pass.\", \"look_myth_big\": \"Big reactions can get attention fast, and often cost a lot after. There are steadier ways to be heard.\", \"look_myth_failing\": \"Feelings aren't grades. Having one says you're human, not that you're failing.\", \"look_myth_ignore\": \"Ignored feelings tend to come back louder. Noticing one is often what lets it settle.\", \"look_myth_no_reason\": \"Every feeling comes from somewhere, even when the reason isn't clear yet.\", \"look_myth_out_of_control\": \"You can feel something strongly and still choose what you do.\", \"look_myth_past_it\": \"Feelings don't run on a schedule. Some take longer, and that isn't a fault.\", \"look_myth_right_way\": \"People feel different things about the same moment. There isn't one correct feeling to have.\", \"look_myth_true\": \"A strong feeling shows how much something matters to you. It doesn't prove what happened.\", \"look_myth_weak\": \"Showing a feeling takes nerve. It also lets people know what you need.\", \"look_own\": \"Beliefs about feelings often feel like facts. You can hold this one up and look at it.\", \"look_title\": \"A belief can feel like a fact.\", \"myth_hint\": \"Pick the closest. You can put it your own way too.\", \"myth_title\": \"Which belief about feelings sounds most like yours?\", \"own_hint\": \"In your own words\", \"safety_open\": \"Talk to someone now\", \"settle_line\": \"This will keep. First, the body.\", \"sits_label\": \"How does that sit with you?\", \"try_myth_approval\": \"Next time, try telling yourself: it makes sense that I feel this.\", \"try_myth_bad\": \"Next time one shows up, try asking what it's telling you.\", \"try_myth_big\": \"This week, try saying what you need in one clear sentence, once.\", \"try_myth_failing\": \"This week, notice the feeling and the effort you're making, side by side.\", \"try_myth_ignore\": \"Today, try noticing one feeling for a minute without pushing it away.\", \"try_myth_no_reason\": \"When one seems to come from nowhere, try asking what happened right before.\", \"try_myth_out_of_control\": \"This week, notice one time you felt a lot and still chose what to do.\", \"try_myth_past_it\": \"This week, try saying to yourself: it's still here, and that makes sense.\", \"try_myth_right_way\": \"Next time a feeling seems wrong, try naming it without grading it.\", \"try_myth_true\": \"Next time it's strong, ask: what are the facts, apart from the feeling?\", \"try_myth_weak\": \"This week, try letting one safe person see one feeling, and notice what happens.\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+MATCH (t:TherapyConcept {id: "dbt_model_of_emotions"}), (s:Skill {id: "emotion_myths"})
+MERGE (t)-[:HAS_SKILL]->(s);
+MATCH (:SkillStep {skillId: "emotion_myths"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
+MATCH (:Skill {id: "emotion_myths"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
+MERGE (n:SkillStep {id: "emotion_myths:myth"})
+SET n += {skillId: "emotion_myths", step: "myth", kind: "ask", version: "em-v1"}, n.specJson = "{\"fields\": [{\"id\": \"myth\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"myth\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"own_hint\", \"max\": 100}, \"required\": true}], \"hint\": \"myth_hint\", \"title\": \"myth_title\"}";
+MATCH (s:Skill {id: "emotion_myths"}), (n:SkillStep {id: "emotion_myths:myth"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 0};
+MERGE (n:SkillStep {id: "emotion_myths:heads_up"})
+SET n += {skillId: "emotion_myths", step: "heads_up", kind: "ask", version: "em-v1"}, n.specJson = "{\"fields\": [{\"id\": \"heads_up\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"heads_up\"}, \"required\": true}], \"hint\": \"heads_up_hint\", \"title\": \"heads_up_title\"}";
+MATCH (s:Skill {id: "emotion_myths"}), (n:SkillStep {id: "emotion_myths:heads_up"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 1};
+MERGE (n:SkillStep {id: "emotion_myths:settle"})
+SET n += {skillId: "emotion_myths", step: "settle", kind: "handoff", version: "em-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"settle_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"heads_up_title\"}";
+MATCH (s:Skill {id: "emotion_myths"}), (n:SkillStep {id: "emotion_myths:settle"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 2};
+MERGE (n:SkillStep {id: "emotion_myths:look"})
+SET n += {skillId: "emotion_myths", step: "look", kind: "ask", version: "em-v1"}, n.specJson = "{\"fields\": [{\"id\": \"sits\", \"label\": \"sits_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"sits\"}, \"required\": true}], \"lines\": [{\"key\": \"look_myth_failing\", \"when\": {\"eq\": [\"$a.myth\", \"myth_failing\"]}}, {\"key\": \"look_myth_past_it\", \"when\": {\"eq\": [\"$a.myth\", \"myth_past_it\"]}}, {\"key\": \"look_myth_true\", \"when\": {\"eq\": [\"$a.myth\", \"myth_true\"]}}, {\"key\": \"look_myth_right_way\", \"when\": {\"eq\": [\"$a.myth\", \"myth_right_way\"]}}, {\"key\": \"look_myth_weak\", \"when\": {\"eq\": [\"$a.myth\", \"myth_weak\"]}}, {\"key\": \"look_myth_bad\", \"when\": {\"eq\": [\"$a.myth\", \"myth_bad\"]}}, {\"key\": \"look_myth_out_of_control\", \"when\": {\"eq\": [\"$a.myth\", \"myth_out_of_control\"]}}, {\"key\": \"look_myth_no_reason\", \"when\": {\"eq\": [\"$a.myth\", \"myth_no_reason\"]}}, {\"key\": \"look_myth_ignore\", \"when\": {\"eq\": [\"$a.myth\", \"myth_ignore\"]}}, {\"key\": \"look_myth_approval\", \"when\": {\"eq\": [\"$a.myth\", \"myth_approval\"]}}, {\"key\": \"look_myth_big\", \"when\": {\"eq\": [\"$a.myth\", \"myth_big\"]}}, {\"key\": \"look_own\", \"when\": {\"own\": \"myth\"}}], \"title\": \"look_title\"}";
+MATCH (s:Skill {id: "emotion_myths"}), (n:SkillStep {id: "emotion_myths:look"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 3};
+MERGE (n:SkillStep {id: "emotion_myths:end"})
+SET n += {skillId: "emotion_myths", step: "end", kind: "handoff", version: "em-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"try_myth_failing\", \"when\": {\"eq\": [\"$a.myth\", \"myth_failing\"]}}, {\"key\": \"try_myth_past_it\", \"when\": {\"eq\": [\"$a.myth\", \"myth_past_it\"]}}, {\"key\": \"try_myth_true\", \"when\": {\"eq\": [\"$a.myth\", \"myth_true\"]}}, {\"key\": \"try_myth_right_way\", \"when\": {\"eq\": [\"$a.myth\", \"myth_right_way\"]}}, {\"key\": \"try_myth_weak\", \"when\": {\"eq\": [\"$a.myth\", \"myth_weak\"]}}, {\"key\": \"try_myth_bad\", \"when\": {\"eq\": [\"$a.myth\", \"myth_bad\"]}}, {\"key\": \"try_myth_out_of_control\", \"when\": {\"eq\": [\"$a.myth\", \"myth_out_of_control\"]}}, {\"key\": \"try_myth_no_reason\", \"when\": {\"eq\": [\"$a.myth\", \"myth_no_reason\"]}}, {\"key\": \"try_myth_ignore\", \"when\": {\"eq\": [\"$a.myth\", \"myth_ignore\"]}}, {\"key\": \"try_myth_approval\", \"when\": {\"eq\": [\"$a.myth\", \"myth_approval\"]}}, {\"key\": \"try_myth_big\", \"when\": {\"eq\": [\"$a.myth\", \"myth_big\"]}}, {\"key\": \"end_own\", \"when\": {\"own\": \"myth\"}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": [{\"key\": \"end_title_some\", \"when\": {\"eq\": [\"$a.sits\", \"some\"]}}, {\"key\": \"end_title_not_yet\", \"when\": {\"eq\": [\"$a.sits\", \"not_yet\"]}}, {\"key\": \"end_title_unsure\"}]}";
+MATCH (s:Skill {id: "emotion_myths"}), (n:SkillStep {id: "emotion_myths:end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 4};
+MERGE (x:SkillExit {id: "emotion_myths:check_the_facts"})
+SET x += {skillId: "emotion_myths", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "emotion_myths"}), (x:SkillExit {id: "emotion_myths:check_the_facts"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "emotion_myths:check_the_facts"}), (t:TherapyConcept {appToolId: "check-the-facts"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "emotion_myths:emotion_guide"})
+SET x += {skillId: "emotion_myths", exit: "emotion_guide", toolId: "emotion-guide", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "emotion_myths"}), (x:SkillExit {id: "emotion_myths:emotion_guide"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "emotion_myths:emotion_guide"}), (t:TherapyConcept {appToolId: "emotion-guide"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "emotion_myths:find_the_feeling"})
+SET x += {skillId: "emotion_myths", exit: "find_the_feeling", toolId: "find-the-feeling", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "emotion_myths"}), (x:SkillExit {id: "emotion_myths:find_the_feeling"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "emotion_myths:find_the_feeling"}), (t:TherapyConcept {appToolId: "find-the-feeling"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "emotion_myths:let_it_be"})
+SET x += {skillId: "emotion_myths", exit: "let_it_be", toolId: "let-it-be", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "emotion_myths"}), (x:SkillExit {id: "emotion_myths:let_it_be"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "emotion_myths:let_it_be"}), (t:TherapyConcept {appToolId: "let-it-be"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "emotion_myths:dear_man"})
+SET x += {skillId: "emotion_myths", exit: "dear_man", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "emotion_myths"}), (x:SkillExit {id: "emotion_myths:dear_man"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "emotion_myths:dear_man"}), (t:TherapyConcept {appToolId: "dear-man"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "emotion_myths:cool_down"})
+SET x += {skillId: "emotion_myths", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "emotion_myths"}), (x:SkillExit {id: "emotion_myths:cool_down"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "emotion_myths:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "emotion_myths:safety_open"})
+SET x += {skillId: "emotion_myths", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "emotion_myths"}), (x:SkillExit {id: "emotion_myths:safety_open"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MERGE (x:SkillExit {id: "emotion_myths:done"})
+SET x += {skillId: "emotion_myths", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "emotion_myths"}), (x:SkillExit {id: "emotion_myths:done"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (a:SkillStep {id: "emotion_myths:myth"}), (b:SkillStep {id: "emotion_myths:heads_up"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
+MATCH (a:SkillStep {id: "emotion_myths:myth"}), (b:SkillStep {id: "emotion_myths:look"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "emotion_myths:myth"}), (x:SkillExit {id: "emotion_myths:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "myth", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "emotion_myths:heads_up"}), (b:SkillStep {id: "emotion_myths:settle"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.heads_up\", \"settle\"]}";
+MATCH (a:SkillStep {id: "emotion_myths:heads_up"}), (b:SkillStep {id: "emotion_myths:look"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "emotion_myths:heads_up"}), (x:SkillExit {id: "emotion_myths:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "heads_up", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "emotion_myths:settle"}), (x:SkillExit {id: "emotion_myths:cool_down"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "emotion_myths:settle"}), (x:SkillExit {id: "emotion_myths:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "emotion_myths:look"}), (b:SkillStep {id: "emotion_myths:end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "emotion_myths:look"}), (x:SkillExit {id: "emotion_myths:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "sits", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "emotion_myths:end"}), (x:SkillExit {id: "emotion_myths:check_the_facts"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"in\": [\"$a.myth\", [\"myth_true\"]]}}]";
+MATCH (a:SkillStep {id: "emotion_myths:end"}), (x:SkillExit {id: "emotion_myths:emotion_guide"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"in\": [\"$a.myth\", [\"myth_failing\", \"myth_right_way\", \"myth_bad\"]]}}]";
+MATCH (a:SkillStep {id: "emotion_myths:end"}), (x:SkillExit {id: "emotion_myths:find_the_feeling"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"in\": [\"$a.myth\", [\"myth_no_reason\"]]}}]";
+MATCH (a:SkillStep {id: "emotion_myths:end"}), (x:SkillExit {id: "emotion_myths:let_it_be"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 3}, r.rowsJson = "[{\"order\": 3, \"when\": {\"in\": [\"$a.myth\", [\"myth_past_it\"]]}}]";
+MATCH (a:SkillStep {id: "emotion_myths:end"}), (x:SkillExit {id: "emotion_myths:dear_man"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 4}, r.rowsJson = "[{\"order\": 4, \"when\": {\"in\": [\"$a.myth\", [\"myth_big\"]]}}]";
+MATCH (a:SkillStep {id: "emotion_myths:end"}), (x:SkillExit {id: "emotion_myths:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MERGE (o:SkillOption {id: "emotion_myths:myth:myth_failing"})
+SET o:SkillOption, o += {skillId: "emotion_myths", list: "myth", value: "myth_failing", label: "Having this feeling means I'm failing", version: "em-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "emotion_myths"}), (o:SkillOption {id: "emotion_myths:myth:myth_failing"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "myth", order: 0};
+MERGE (o:SkillOption {id: "emotion_myths:myth:myth_past_it"})
+SET o:SkillOption, o += {skillId: "emotion_myths", list: "myth", value: "myth_past_it", label: "I'm meant to be past this by now", version: "em-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "emotion_myths"}), (o:SkillOption {id: "emotion_myths:myth:myth_past_it"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "myth", order: 1};
+MERGE (o:SkillOption {id: "emotion_myths:myth:myth_true"})
+SET o:SkillOption, o += {skillId: "emotion_myths", list: "myth", value: "myth_true", label: "If I feel it this strongly, it must be true", version: "em-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "emotion_myths"}), (o:SkillOption {id: "emotion_myths:myth:myth_true"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "myth", order: 2};
+MERGE (o:SkillOption {id: "emotion_myths:myth:myth_right_way"})
+SET o:SkillOption, o += {skillId: "emotion_myths", list: "myth", value: "myth_right_way", label: "There's a right way to feel about everything", version: "em-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "emotion_myths"}), (o:SkillOption {id: "emotion_myths:myth:myth_right_way"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "myth", order: 3};
+MERGE (o:SkillOption {id: "emotion_myths:myth:myth_weak"})
+SET o:SkillOption, o += {skillId: "emotion_myths", list: "myth", value: "myth_weak", label: "Letting people see I'm upset makes me weak", version: "em-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "emotion_myths"}), (o:SkillOption {id: "emotion_myths:myth:myth_weak"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "myth", order: 4};
+MERGE (o:SkillOption {id: "emotion_myths:myth:myth_bad"})
+SET o:SkillOption, o += {skillId: "emotion_myths", list: "myth", value: "myth_bad", label: "Painful feelings are bad for me", version: "em-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "emotion_myths"}), (o:SkillOption {id: "emotion_myths:myth:myth_bad"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "myth", order: 5};
+MERGE (o:SkillOption {id: "emotion_myths:myth:myth_out_of_control"})
+SET o:SkillOption, o += {skillId: "emotion_myths", list: "myth", value: "myth_out_of_control", label: "Being emotional means being out of control", version: "em-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "emotion_myths"}), (o:SkillOption {id: "emotion_myths:myth:myth_out_of_control"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "myth", order: 6};
+MERGE (o:SkillOption {id: "emotion_myths:myth:myth_no_reason"})
+SET o:SkillOption, o += {skillId: "emotion_myths", list: "myth", value: "myth_no_reason", label: "Some of my feelings make no sense", version: "em-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "emotion_myths"}), (o:SkillOption {id: "emotion_myths:myth:myth_no_reason"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "myth", order: 7};
+MERGE (o:SkillOption {id: "emotion_myths:myth:myth_ignore"})
+SET o:SkillOption, o += {skillId: "emotion_myths", list: "myth", value: "myth_ignore", label: "Painful feelings are best ignored", version: "em-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "emotion_myths"}), (o:SkillOption {id: "emotion_myths:myth:myth_ignore"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "myth", order: 8};
+MERGE (o:SkillOption {id: "emotion_myths:myth:myth_approval"})
+SET o:SkillOption, o += {skillId: "emotion_myths", list: "myth", value: "myth_approval", label: "If others don't approve of how I feel, I'm wrong to feel it", version: "em-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "emotion_myths"}), (o:SkillOption {id: "emotion_myths:myth:myth_approval"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "myth", order: 9};
+MERGE (o:SkillOption {id: "emotion_myths:myth:myth_big"})
+SET o:SkillOption, o += {skillId: "emotion_myths", list: "myth", value: "myth_big", label: "Big reactions are the only way to get things to change", version: "em-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "emotion_myths"}), (o:SkillOption {id: "emotion_myths:myth:myth_big"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "myth", order: 10};
+MERGE (o:SkillOption {id: "emotion_myths:heads_up:settle"})
+SET o:SkillOption, o += {skillId: "emotion_myths", list: "heads_up", value: "settle", label: "Settle my body first", version: "em-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "emotion_myths"}), (o:SkillOption {id: "emotion_myths:heads_up:settle"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up", order: 11};
+MERGE (o:SkillOption {id: "emotion_myths:heads_up:try"})
+SET o:SkillOption, o += {skillId: "emotion_myths", list: "heads_up", value: "try", label: "Look anyway", version: "em-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "emotion_myths"}), (o:SkillOption {id: "emotion_myths:heads_up:try"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up", order: 12};
+MERGE (o:SkillOption {id: "emotion_myths:sits:some"})
+SET o:SkillOption, o += {skillId: "emotion_myths", list: "sits", value: "some", label: "Some of it fits", version: "em-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "emotion_myths"}), (o:SkillOption {id: "emotion_myths:sits:some"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "sits", order: 13};
+MERGE (o:SkillOption {id: "emotion_myths:sits:not_yet"})
+SET o:SkillOption, o += {skillId: "emotion_myths", list: "sits", value: "not_yet", label: "Not yet", version: "em-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "emotion_myths"}), (o:SkillOption {id: "emotion_myths:sits:not_yet"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "sits", order: 14};
+MERGE (o:SkillOption {id: "emotion_myths:sits:unsure"})
+SET o:SkillOption, o += {skillId: "emotion_myths", list: "sits", value: "unsure", label: "Not sure", version: "em-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "emotion_myths"}), (o:SkillOption {id: "emotion_myths:sits:unsure"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "sits", order: 15};
