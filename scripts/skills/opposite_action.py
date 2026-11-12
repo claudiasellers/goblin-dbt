@@ -96,6 +96,12 @@ COPY = {
     "prob_title": "The feeling fits, and so does acting on it",
     "prob_line": "Then the situation is the thing to work on.",
     "prob_excessive": "It fits, and it's bigger than the situation. Bring it down first, then work on the situation.",
+    # ER-B5: Check the Facts inline, on the clarify route. Its verdict picks where the feeling goes next.
+    "ctf_title": "Let's check the facts for this one",
+    "prob_title_checked": "You checked, and the feeling fits",
+    "clar_title_unsure": "Not knowing yet is a real answer",
+    "clar_unsure": "Doing the opposite can wait until you know more. One fact to find out is enough for now.",
+    "clar_left": "You can come back to the facts any time.",
     "repr_title": "When guilt or shame fits, repair is the opposite of hiding",
     "repr_line": "Owning it and making it right is the skill here.",
     "cue_title": "Let your body go first",
@@ -203,7 +209,7 @@ def _route_to(step):
 # Punish yourself that seems helpful goes to its own hand-off, whatever the fit (never "acting on it fits" or clarify).
 HELP_NEXT = [{"when": REPAIR, "to": "repr"}, {"when": {"all": [PUNISH, EQ("help", "helpful")]}, "to": "pun"},
              {"when": _route_to("prob"), "to": "prob"},
-             {"when": _route_to("cue"), "to": "cue"}, {"to": "clar"}]
+             {"when": _route_to("cue"), "to": "cue"}, {"to": "ctf"}]
 
 URGE_WHERE = {"has": ["$opt.parents", "$d.parent"]}
 # A cue: the urge's own, or the parent's (never with an urge that replaces them).
@@ -215,6 +221,9 @@ SIZE_WHERE = {"any": [{"all": [{"in": [a("urge"), URGE_IDS]}, {"eq": ["$opt.urge
 PUNISH_CRISIS = [{"variant": "crisis", "when": PUNISH}]
 DANGER_CRISIS = [{"variant": "other_person", "when": {"in": [a("safety"), ["danger", "unsure"]]}}]
 SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
+# Check the Facts inline (ER-B5): what it gave back, read on `checked` (`unsafe` first: the danger card wins).
+CHECKED = lambda v: {"has": ["$a.checked.ids", v]}  # noqa: E731
+CHECK_UNSAFE = {"any": [CHECKED("unsafe"), CHECKED("stopped")]}
 
 
 def handoff(step_id, title, lines, offers, each=True, crisis=None, no_close=False):
@@ -293,13 +302,31 @@ STEPS = [
         "fields": [{"id": "help", "options": {"list": "help"}, "max": 1, "required": True}],
         "next": HELP_NEXT,
     },
-    handoff("clar", "clar_title",
-            [{"when": {"all": [EQ("fits", "not_fit"), EQ("help", "helpful")]}, "key": "clar_not_fit"},
-             {"when": {"not": {"all": [EQ("fits", "not_fit"), EQ("help", "helpful")]}}, "key": "clar_line"}],
-            [{"exit": "check_the_facts", "when": ALWAYS}]),
-    handoff("prob", "prob_title",
-            [{"when": EQ("fits", "excessive"), "key": "prob_excessive"}, {"when": {"not": EQ("fits", "excessive")}, "key": "prob_line"}],
-            [{"exit": "cool_down", "when": EQ("fits", "excessive")}, {"exit": "problem_solve", "when": ALWAYS}]),
+    {
+        # ER-B5: the clarify route checks the facts here, inline, for this feeling (Check the Facts from what happened
+        # when it has fit statements for the feeling, else from the feeling, carried). Its verdict picks the route.
+        "id": "ctf", "kind": "embed", "embed": "inlineSkill", "each": "feel", "crisis": PUNISH_CRISIS, "title": "ctf_title",
+        "answerAs": "checked",
+        "props": {"skill": "check_the_facts", "enterAt": "event", "ctx": {"feelingId": "$each"}},
+        "next": [{"when": CHECK_UNSAFE, "to": "cdng"},
+                 {"when": {"any": [CHECKED("fits"), CHECKED("partly")]}, "to": "prob"},
+                 {"when": CHECKED("doesnt_fit"), "to": "cue"},
+                 {"to": "clar"}],
+    },
+    # A person hurt or threatened them, told to the check: this feeling's danger card (the whole run's is `dang`).
+    handoff("cdng", "danger_title", [{"when": ALWAYS, "key": "danger_line"}],
+            [{"exit": "ending", "when": ALWAYS}, {"exit": "pause", "when": ALWAYS}, SAFETY_LINK],
+            crisis=[{"variant": "other_person", "when": ALWAYS}], no_close=True),
+    handoff("clar", [{"when": CHECKED("unsure"), "key": "clar_title_unsure"}, {"key": "clar_title"}],
+            [{"when": CHECKED("unsure"), "key": "clar_unsure"},
+             {"when": {"all": [{"not": CHECKED("unsure")}, {"set": a("checked")}]}, "key": "clar_left"},
+             {"when": {"all": [{"not": {"set": a("checked")}}, EQ("fits", "not_fit"), EQ("help", "helpful")]}, "key": "clar_not_fit"},
+             {"when": {"all": [{"not": {"set": a("checked")}}, {"not": {"all": [EQ("fits", "not_fit"), EQ("help", "helpful")]}}]}, "key": "clar_line"}],
+            [{"exit": "check_the_facts", "when": {"not": CHECKED("unsure")}}, {"exit": "wise_mind", "when": CHECKED("unsure")}]),
+    handoff("prob", [{"when": {"any": [CHECKED("fits"), CHECKED("partly")]}, "key": "prob_title_checked"}, {"key": "prob_title"}],
+            [{"when": {"any": [EQ("fits", "excessive"), CHECKED("partly")]}, "key": "prob_excessive"},
+             {"when": {"not": {"any": [EQ("fits", "excessive"), CHECKED("partly")]}}, "key": "prob_line"}],
+            [{"exit": "cool_down", "when": {"any": [EQ("fits", "excessive"), CHECKED("partly")]}}, {"exit": "problem_solve", "when": ALWAYS}]),
     # *Punish yourself*, kept or "helpful": a kinder way to make it right, or riding the urge out; never a plan for it.
     handoff("pun", "pun_title", [{"when": ALWAYS, "key": "pun_line"}],
             [{"exit": "problem_solve", "when": ALWAYS}, {"exit": "ride", "when": ALWAYS}]),
@@ -447,6 +474,7 @@ EXITS = [
     {"id": "pause", "toolId": "pause"},                                            # not safe, not sure (DT-02)
     {"id": "ending", "toolId": "ending-relationships", "query": {"frame": "careful"}},  # danger from someone (IE-08)
     {"id": "er_troubleshoot", "toolId": "er-troubleshoot"},                        # the pull got stronger (ER-14)
+    {"id": "wise_mind", "toolId": "wise-mind"},                                    # not sure, after the check (ER-B5)
     {"id": "safety_open", "toolId": None, "safety": True},                         # safety.open (R6)
     {"id": "done", "done": True},
 ]

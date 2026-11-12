@@ -322,4 +322,19 @@ SKILL = {
     "options": options(),
     # Answers that become the session's emotions (setEmotionIds).
     "emotionFields": ["feel"],
+    # Inline (R8, ER-B5): the mini-card inside another skill (first host: Do the Opposite's clarify). The host hands it
+    # the feeling it's on; with one this skill has fit statements for it starts at what happened, else it asks for the
+    # feeling first (carried, never pre-selected). It gives back the verdict (`fits` · `partly` · `doesnt_fit` ·
+    # `unsure`), `unsafe` when a person hurt or threatened them (the host's own danger card, whatever the verdict) and
+    # `stopped` on the safe card. The verdict's ask-fresh `fitsFacts` stays on this run's own session (skill-runtime.md).
+    "accepts": ["feelingId"],
+    "inline": {
+        "enterAt": ["event"],
+        "returns": [],
+        "seed": {"feel": "$ctx.feelingId"},
+        "enterWhen": {"event": {"set": "$d.fitsParent"}},
+        "outcomes": ["fits", "partly", "doesnt_fit", "unsure"],
+        "ends": {"safe": "stopped"},
+        "flags": [{"id": "unsafe", "when": DANGER}, *({"id": v, "when": FITS_IS(v)} for v, _ in FITS)],
+    },
 }

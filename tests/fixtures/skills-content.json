@@ -2730,7 +2730,9 @@
    "toolId": "check-the-facts",
    "version": "cf-v1-2",
    "start": "feel",
-   "accepts": [],
+   "accepts": [
+    "feelingId"
+   ],
    "ownMax": 140,
    "emotionFields": [
     "feel"
@@ -4076,6 +4078,80 @@
      {
       "value": "this_week",
       "label": "Later this week"
+     }
+    ]
+   },
+   "inline": {
+    "enterAt": [
+     "event"
+    ],
+    "returns": [],
+    "seed": {
+     "feel": "$ctx.feelingId"
+    },
+    "enterWhen": {
+     "event": {
+      "set": "$d.fitsParent"
+     }
+    },
+    "outcomes": [
+     "fits",
+     "partly",
+     "doesnt_fit",
+     "unsure"
+    ],
+    "ends": {
+     "safe": "stopped"
+    },
+    "flags": [
+     {
+      "id": "unsafe",
+      "when": {
+       "in": [
+        "$a.event",
+        [
+         "threatened",
+         "hurt_me",
+         "unsafe"
+        ]
+       ]
+      }
+     },
+     {
+      "id": "fits",
+      "when": {
+       "eq": [
+        "$a.fits",
+        "fits"
+       ]
+      }
+     },
+     {
+      "id": "partly",
+      "when": {
+       "eq": [
+        "$a.fits",
+        "partly"
+       ]
+      }
+     },
+     {
+      "id": "doesnt_fit",
+      "when": {
+       "eq": [
+        "$a.fits",
+        "doesnt_fit"
+       ]
+      }
+     },
+     {
+      "id": "unsure",
+      "when": {
+       "eq": [
+        "$a.fits",
+        "unsure"
+       ]
+      }
      }
     ]
    }
@@ -33376,6 +33452,11 @@
     "prob_title": "The feeling fits, and so does acting on it",
     "prob_line": "Then the situation is the thing to work on.",
     "prob_excessive": "It fits, and it's bigger than the situation. Bring it down first, then work on the situation.",
+    "ctf_title": "Let's check the facts for this one",
+    "prob_title_checked": "You checked, and the feeling fits",
+    "clar_title_unsure": "Not knowing yet is a real answer",
+    "clar_unsure": "Doing the opposite can wait until you know more. One fact to find out is enough for now.",
+    "clar_left": "You can come back to the facts any time.",
     "repr_title": "When guilt or shame fits, repair is the opposite of hiding",
     "repr_line": "Owning it and making it right is the skill here.",
     "cue_title": "Let your body go first",
@@ -34414,6 +34495,92 @@
        }
       },
       {
+       "to": "ctf",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "ctf",
+     "kind": "embed",
+     "embed": "inlineSkill",
+     "each": "feel",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.urge",
+         "guilt-punish"
+        ]
+       }
+      }
+     ],
+     "title": "ctf_title",
+     "answerAs": "checked",
+     "props": {
+      "skill": "check_the_facts",
+      "enterAt": "event",
+      "ctx": {
+       "feelingId": "$each"
+      },
+      "outcomes": [
+       "fits",
+       "partly",
+       "doesnt_fit",
+       "unsure"
+      ]
+     },
+     "next": [
+      {
+       "to": "cdng",
+       "when": {
+        "any": [
+         {
+          "has": [
+           "$a.checked.ids",
+           "unsafe"
+          ]
+         },
+         {
+          "has": [
+           "$a.checked.ids",
+           "stopped"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "prob",
+       "when": {
+        "any": [
+         {
+          "has": [
+           "$a.checked.ids",
+           "fits"
+          ]
+         },
+         {
+          "has": [
+           "$a.checked.ids",
+           "partly"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "cue",
+       "when": {
+        "has": [
+         "$a.checked.ids",
+         "doesnt_fit"
+        ]
+       }
+      },
+      {
        "to": "clar",
        "when": null
       }
@@ -34421,13 +34588,105 @@
      "offers": []
     },
     {
-     "id": "clar",
+     "id": "cdng",
      "kind": "handoff",
-     "title": "clar_title",
+     "title": "danger_title",
      "lines": [
       {
        "when": {
+        "all": []
+       },
+       "key": "danger_line"
+      }
+     ],
+     "done": "done",
+     "complete": true,
+     "noClose": true,
+     "each": "feel",
+     "carryOn": "pred",
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "ending",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "pause",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "clar",
+     "kind": "handoff",
+     "title": [
+      {
+       "when": {
+        "has": [
+         "$a.checked.ids",
+         "unsure"
+        ]
+       },
+       "key": "clar_title_unsure"
+      },
+      {
+       "key": "clar_title"
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "has": [
+         "$a.checked.ids",
+         "unsure"
+        ]
+       },
+       "key": "clar_unsure"
+      },
+      {
+       "when": {
         "all": [
+         {
+          "not": {
+           "has": [
+            "$a.checked.ids",
+            "unsure"
+           ]
+          }
+         },
+         {
+          "set": "$a.checked"
+         }
+        ]
+       },
+       "key": "clar_left"
+      },
+      {
+       "when": {
+        "all": [
+         {
+          "not": {
+           "set": "$a.checked"
+          }
+         },
          {
           "eq": [
            "$a.fits",
@@ -34446,22 +34705,31 @@
       },
       {
        "when": {
-        "not": {
-         "all": [
-          {
-           "eq": [
-            "$a.fits",
-            "not_fit"
-           ]
-          },
-          {
-           "eq": [
-            "$a.help",
-            "helpful"
+        "all": [
+         {
+          "not": {
+           "set": "$a.checked"
+          }
+         },
+         {
+          "not": {
+           "all": [
+            {
+             "eq": [
+              "$a.fits",
+              "not_fit"
+             ]
+            },
+            {
+             "eq": [
+              "$a.help",
+              "helpful"
+             ]
+            }
            ]
           }
-         ]
-        }
+         }
+        ]
        },
        "key": "clar_line"
       }
@@ -34485,7 +34753,21 @@
       {
        "exit": "check_the_facts",
        "when": {
-        "all": []
+        "not": {
+         "has": [
+          "$a.checked.ids",
+          "unsure"
+         ]
+        }
+       }
+      },
+      {
+       "exit": "wise_mind",
+       "when": {
+        "has": [
+         "$a.checked.ids",
+         "unsure"
+        ]
        }
       }
      ]
@@ -34493,13 +34775,46 @@
     {
      "id": "prob",
      "kind": "handoff",
-     "title": "prob_title",
+     "title": [
+      {
+       "when": {
+        "any": [
+         {
+          "has": [
+           "$a.checked.ids",
+           "fits"
+          ]
+         },
+         {
+          "has": [
+           "$a.checked.ids",
+           "partly"
+          ]
+         }
+        ]
+       },
+       "key": "prob_title_checked"
+      },
+      {
+       "key": "prob_title"
+      }
+     ],
      "lines": [
       {
        "when": {
-        "eq": [
-         "$a.fits",
-         "excessive"
+        "any": [
+         {
+          "eq": [
+           "$a.fits",
+           "excessive"
+          ]
+         },
+         {
+          "has": [
+           "$a.checked.ids",
+           "partly"
+          ]
+         }
         ]
        },
        "key": "prob_excessive"
@@ -34507,9 +34822,19 @@
       {
        "when": {
         "not": {
-         "eq": [
-          "$a.fits",
-          "excessive"
+         "any": [
+          {
+           "eq": [
+            "$a.fits",
+            "excessive"
+           ]
+          },
+          {
+           "has": [
+            "$a.checked.ids",
+            "partly"
+           ]
+          }
          ]
         }
        },
@@ -34535,9 +34860,19 @@
       {
        "exit": "cool_down",
        "when": {
-        "eq": [
-         "$a.fits",
-         "excessive"
+        "any": [
+         {
+          "eq": [
+           "$a.fits",
+           "excessive"
+          ]
+         },
+         {
+          "has": [
+           "$a.checked.ids",
+           "partly"
+          ]
+         }
         ]
        }
       },
@@ -35870,6 +36205,13 @@
      "carry": [],
      "done": false,
      "safety": true
+    },
+    {
+     "id": "wise_mind",
+     "toolId": "wise-mind",
+     "query": {},
+     "carry": [],
+     "done": false
     }
    ],
    "options": {
