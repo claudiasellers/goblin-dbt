@@ -160,6 +160,18 @@ export function currentPick(ctx: RunContext, s: StateLike): string | null {
 }
 
 /**
+ * Where a per-pick step stands among the picks (R16), when there is more than one: which one this screen is about and
+ * its place (1 of 3), for the player's small header. Null on a once step or with a single pick.
+ */
+export function pickTrack(ctx: RunContext, s: StateLike): { label: string; index: number; count: number } | null {
+  const step = s.stepId ? ctx.skill.steps.find((x) => x.id === s.stepId) : undefined;
+  const pid = currentPick(ctx, s);
+  if (!step?.each || pid === null || typeof s.pick !== 'number') return null;
+  const count = s.answers[step.each]?.ids.length ?? 0;
+  return count > 1 ? { label: labelOfValue(ctx, step.each, pid), index: s.pick, count } : null;
+}
+
+/**
  * The answers as the current step sees them: on a per-pick step, its pick's answers under their plain field ids and
  * the pick as `$each`. Elsewhere, the answers as kept.
  */
@@ -730,8 +742,10 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { ke
   const recAnswers: Answers = {};
   for (const a of Array.isArray(r.answers) ? r.answers as Array<Record<string, unknown>> : []) {
     const fieldId = a.fieldId;
-    // A field, or a whole-screen embed's answer (`answerAs`: Do the Opposite's doors, the field its feelings repeat over).
-    if (typeof fieldId !== 'string' || !(fieldOf(ctx.skill, fieldId) || ctx.skill.steps.some((st) => st.answerAs === fieldId))) continue;
+    // A field, or the whole-screen embed's answer a per-pick step repeats over (`answerAs` named by an `each`: Do the
+    // Opposite's doors). Any other embed's report is its own visit's, never read back.
+    const repeatsOver = (id: string) => ctx.skill.steps.some((st) => st.answerAs === id) && ctx.skill.steps.some((st) => st.each === id);
+    if (typeof fieldId !== 'string' || !(fieldOf(ctx.skill, fieldId) || repeatsOver(fieldId))) continue;
     const pk = typeof a.pick === 'string' && ID.test(a.pick) && per.has(fieldId) ? a.pick : null;
     if (per.has(fieldId) && !pk) continue;
     const ids = Array.isArray(a.optionIds) ? (a.optionIds as unknown[]).filter((x): x is string => typeof x === 'string' && ID.test(x)) : [];
@@ -966,21 +980,34 @@ export function crisisFor(ctx: RunContext, step: StepDef, s: Pick<RunState, 'ans
 /** The ask-fresh answers this run carries (e.g. `fitsFacts`). */
 export function askFresh(ctx: RunContext, s: Pick<RunState, 'answers'> & Partial<Pick<RunState, 'path'>>): Partial<Record<NonNullable<FieldDef['askFresh']>, string>> {
   const out: Partial<Record<NonNullable<FieldDef['askFresh']>, string>> = {};
-  for (const f of allFields(ctx.skill)) {
-    const v = s.answers[f.id]?.ids[0];
-    if (f.askFresh && v) out[f.askFresh] = v;
-  }
-  // R16: a per-pick check is asked once per pick; the newest one on the path is the session's (newest wins).
+  // The newest answer on the path wins, per-pick (R16, `field@pick`) or not: a once step's check after the per-pick
+  // ones (Do the Opposite's then-vs-now after trying, after each feeling's in the body) is the session's.
   const per = perPickFields(ctx.skill);
   const done = new Set<string>();
   for (const entry of [...(s.path ?? [])].reverse()) {
     const { stepId, pick } = parseEntry(entry);
     const st = ctx.skill.steps.find((x) => x.id === stepId);
-    if (!st?.each || pick === null) continue;
-    const pid = s.answers[st.each]?.ids[pick];
+    if (!st) continue;
+    const pid = st.each && pick !== null ? s.answers[st.each]?.ids[pick] ?? null : null;
     for (const f of st.fields ?? []) {
-      if (!f.askFresh || done.has(f.askFresh) || !per.has(f.id) || !pid) continue;
-      const v = s.answers[`${f.id}@${pid}`]?.ids[0];
+      if (!f.askFresh || done.has(f.askFresh)) continue;
+      const key = per.has(f.id) ? (pid ? `${f.id}@${pid}` : null) : f.id;
+      const v = key ? s.answers[key]?.ids[0] : undefined;
+      if (v) { out[f.askFresh] = v; done.add(f.askFresh); }
+    }
+  }
+  // Answers the path doesn't show (a caller without one, a step that fell off the front of the capped path, an answer
+  // restored on resume): a plain field's own, else a per-pick field's for the last pick that has one.
+  for (const st of ctx.skill.steps) {
+    for (const f of st.fields ?? []) {
+      if (!f.askFresh || done.has(f.askFresh)) continue;
+      let v = s.answers[f.id]?.ids[0];
+      if (!v && per.has(f.id) && st.each) {
+        for (const pid of [...(s.answers[st.each]?.ids ?? [])].reverse()) {
+          v = s.answers[`${f.id}@${pid}`]?.ids[0];
+          if (v) break;
+        }
+      }
       if (v) { out[f.askFresh] = v; done.add(f.askFresh); }
     }
   }

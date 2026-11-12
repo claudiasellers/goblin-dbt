@@ -257,9 +257,14 @@ Added by ER-B3 (`docs/design/opposite-action-v3.md`, *Runtime pieces*; agreed wi
   (`tests/skill-runtime-back.test.mjs`).
 - **An embed that reports words** (`EmbedOutputSchema.emotions: n`): its ids are grid word ids; the machine keeps only
   words on the grid (`gridIds`), deduped, at most `n`, as the step's `answerAs` (Do the Opposite's `doorPicker`, the
-  field its feelings repeat over). Its done is a choice, not practice (no `markPracticed`). Resume reads an `answerAs`
-  answer back like a field's (before, only fields came back, so a reopened run lost the doors' words and every per-pick
-  answer). The real check is the projection's, against the graph.
+  field its feelings repeat over). Its done is a choice, not practice (no `markPracticed`). Resume reads back the `answerAs`
+  answer a per-pick step repeats over (an `each` names it) like a field's: before, only fields came back, so a reopened
+  run lost the doors' words and every per-pick answer. Any other embed's report stays its own visit's. The real check
+  is the projection's, against the graph.
+- **Ask-fresh, newest on the path wins** (`askFresh`), per-pick or not: a once step's check after the per-pick ones
+  (Do the Opposite's pull after trying, after each feeling's in the body) is the session's then-vs-now.
+- **Which pick a screen is about** (`pickTrack`): with more than one pick, the player shows a small header over a
+  per-pick step (*anxious · 1 of 2*; copy key `pick_of`), not a heading, so focus still lands on the title.
 - **A reopened visit's urges** are only the ones picked on that visit (`visitUrgeIds`: the run's, less those read back
   with it), as its emotion ids are none; the first visit counted them.
 - **Old links after a port** (`legacyLink` in `playerTools.ts`): a link the hand-built page still answers (Do the

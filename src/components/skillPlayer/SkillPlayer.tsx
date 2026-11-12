@@ -17,7 +17,7 @@ import { closeQuestion, closeKindFor } from '../../lib/spine/close';
 import { emotionIdsFromLink } from '../../lib/spine/toolLink';
 import {
   answersOf, askFresh, canGoOn, carried as carriedOf, carryOnOthers, labelOfValue, offersFor, contextIn, copyText, crisisFor, ctxAfterResume, seededFrom, stepLinks, emotionChoices, fieldLinks, fieldList, followUpFor,
-  handoffLine, initialRun, inlineResult, keepFor, opensSafety, optionGroups, ownMaxOf, persistence, pickedLabels, resumeRun, runEmotionIds, runNext, runRecord,
+  handoffLine, initialRun, inlineResult, keepFor, opensSafety, optionGroups, ownMaxOf, persistence, pickedLabels, pickTrack, resumeRun, runEmotionIds, runNext, runRecord,
   runUrgeIds,
   scope, shownFields, stepOf, titleSlots, visitUrgeIds,
   type Answer, type RunContext, type RunEvent, type RunState,
@@ -426,13 +426,22 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
     body = <AskStep ctx={ctx} step={step} st={st} send={send} onExit={leave} onShown={onShown} onPrimary={primary} busy={busy} />;
   }
 
+  // R16 with more than one pick: which one this screen is about, and its place (a small header, not a heading).
+  const track = !leaving ? pickTrack(ctx, st) : null;
   return (
     <div className="space-y-5" data-testid="skill-player" data-skill={skill.id} data-step={st.stepId}>
       {skill.quickExit && !inline && <QuickExit />}
       {/* safety.open sits over the step, which stays mounted (a hold keeps its time) and comes back as it was. P2 is
           modal too: under it the step is inert, so a step that moves on underneath can't take focus from the dialog. */}
       {safetyOpen && <SafetyOpen onBack={() => setSafetyOpen(false)} />}
-      <div key={leaving ? 'leaving' : st.stepId} hidden={safetyOpen} inert={safetyOpen || p2Open} className="space-y-4 motion-safe:animate-[stepEnter_300ms_ease-out]">{body}</div>
+      <div key={leaving ? 'leaving' : st.stepId} hidden={safetyOpen} inert={safetyOpen || p2Open} className="space-y-4 motion-safe:animate-[stepEnter_300ms_ease-out]">
+        {track && (
+          <p className={`${secondaryText} first-letter:uppercase`} data-testid="pick-track" aria-live="off">
+            {track.label} · {(skill.copy.pick_of ?? '{n} of {count}').replace('{n}', String(track.index + 1)).replace('{count}', String(track.count))}
+          </p>
+        )}
+        {body}
+      </div>
       {keptLine && keptLine.at === st.stepId && <p role="status" className={`${secondaryText} text-center`} data-testid="skill-kept">{keptLine.text}</p>}
       {saveNote && <p role="status" className={`${secondaryText} text-center`}>{skill.copy.save_failed ?? "That didn't save just now. You can carry on."}</p>}
       {inline && !safetyOpen && (
