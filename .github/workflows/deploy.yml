@@ -32,7 +32,7 @@ concurrency:
 jobs:
   deploy:
     if: github.ref == 'refs/heads/main' # a by-hand run from another branch never deploys
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, goblin] # Claudia's Mac mini; setup in docs/ci-runner.md
     timeout-minutes: 60
     env:
       VITE_FIREBASE_API_KEY: ${{ vars.VITE_FIREBASE_API_KEY }}
@@ -56,15 +56,7 @@ jobs:
       - uses: actions/setup-node@v4
         if: steps.plan.outputs.any == 'true'
         with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            functions/package-lock.json
-      - uses: actions/setup-python@v5
-        if: steps.plan.outputs.any == 'true'
-        with:
-          python-version: '3.12' # generator-freshness tests shell out to python3
+          node-version: 22 # no `cache:`: the Mac keeps ~/.npm between runs
 
       # Checked before anything runs, so a missing one never leaves a half-done deploy.
       - name: Check configuration
@@ -90,19 +82,15 @@ jobs:
           fi
           $ok
 
-      # Same gate as CI: nothing goes out that CI would fail.
+      # No test or lint here: the merge lane ran CI's checks on this PR on top of main before merging
+      # it, and CI runs them again on the push to main. Building is still a gate (and functions deploy
+      # what it builds).
       - name: Install
         if: steps.plan.outputs.any == 'true'
         run: npm ci && npm ci --prefix functions
       - name: Build
         if: steps.plan.outputs.any == 'true'
         run: npm run build && npm --prefix functions run build
-      - name: Test
-        if: steps.plan.outputs.any == 'true'
-        run: npm test
-      - name: Lint (no new errors)
-        if: steps.plan.outputs.any == 'true'
-        run: node scripts/ci/lint-budget.mjs
 
       - name: Git identity
         if: steps.plan.outputs.any == 'true'

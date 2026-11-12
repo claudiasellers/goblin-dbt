@@ -1,5 +1,7 @@
 # Tier-1 checks on every PR and push to main (D-12). No secrets: nothing here talks to
 # Firebase or Neo4j. Tier 2 (emulators + local Neo4j) runs on Claudia's machine.
+# Runs on the self-hosted runner on Claudia's Mac mini (label `goblin`; setup in docs/ci-runner.md),
+# not GitHub's paid minutes. The Mac's own python3 runs the generator-freshness tests.
 name: CI
 
 on:
@@ -16,20 +18,15 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, goblin]
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            functions/package-lock.json
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'   # generator-freshness tests shell out to python3
+          node-version: 22 # no `cache:`: the Mac keeps ~/.npm between runs
+      - name: Check the runner
+        run: node scripts/ci/runner-check.mjs
       - name: Install (root)
         run: npm ci
       - name: Install (functions)
