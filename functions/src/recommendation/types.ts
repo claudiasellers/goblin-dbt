@@ -167,6 +167,10 @@ export interface RoutingPolicy {
   fallbackConceptId: string;
   defaultBand: Band;
   floodedPatterns: string[];
+  /** rf-v2.1: each discriminating answer counts weight × this (absent → 2, the pre-rf-v2.1 scoring). */
+  answerWeight?: number;
+  /** rf-v2.1: 'words' breaks a pattern tie toward the person's words (absent → candidate order). */
+  tieBreak?: 'words' | null;
 }
 
 /** An ActivationPattern's display fields as stored (confidence is added by the engine). */
