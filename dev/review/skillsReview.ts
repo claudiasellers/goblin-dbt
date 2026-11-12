@@ -51,6 +51,7 @@ const SEEDS: Record<string, Record<string, string[]>> = {
   // Running low: sleep short and food skipped, so the readout drains Sleep and the fix screen lists real fixes.
   please_skill: { sleep: ['sleep_short'], food: ['food_skipped'], fix: ['fix_rest'], when: ['later'], remind: ['evening'] },
   good_things: { start: ['one'], energy: ['little'], pick: ['outside'], when: ['evening'], remind: ['yes'], kind: ['colour'], keepit: ['keep'], happened: ['yes'], compared: ['lighter'], mind: ['here'] },
+  values: { start: ['begin'], mine: ['honesty', 'friendship', 'calm'], kept: ['friendship'], focus: ['friendship'], step: ['friendship_1'], when: ['few_days'], remind: ['yes'], happened: ['yes'] },
 };
 
 /** The first option a field offers: a seed, an emotion id, or its list's first value (tables and profile options: none). */

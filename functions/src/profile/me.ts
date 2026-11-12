@@ -7,7 +7,7 @@ import { callable } from '../shared/callable';
 import { readTx } from '../shared/neo4j';
 import { int } from '../shared/values';
 import { metaFrom } from './meta';
-import { readProfileSlices, readProfileVersion, THING_LABELS, THING_OPTION } from './slices';
+import { readProfileSlices, readProfileVersion, THING_LABELS, THING_OPTION, VALUE_OPTION } from './slices';
 import type { ProfileAreaId, ProfileItemMeta } from './types';
 import { statsByPart } from '../parts/stats';
 import { readStatsRows } from '../parts/statsQueries';
@@ -180,7 +180,9 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
   const byArea = new Map<string, MeItem[]>();
   let staleCount = 0;
   let decrypt: ((v: unknown) => string | null) | null = null;
-  const unnamedThings: Array<{ ids: string[]; item: MeItem }> = [];
+  // Items named from the graph after the loop: a thing I like (the first label that resolves), values (every kept
+  // one, then their own words, joined).
+  const unnamedThings: Array<{ ids: string[]; item: MeItem; all?: boolean; own?: string }> = [];
   for (const r of itemsRes.records) {
     if (r.get('label') === 'Part' && !partsOn) continue;   // the query gates it too
     const p = r.get('p') as Record<string, unknown>;
@@ -189,6 +191,7 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
     let value: Record<string, unknown> | undefined;
     let summary = '';
     let thingIds: string[] | null = null;
+    let valueIds: { ids: string[]; own?: string } | null = null;
     if (p.valueJson) {
       try { value = JSON.parse(String(p.valueJson)); } catch { value = undefined; }
     }
@@ -218,6 +221,12 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
         if (ids.length) thingIds = ids;
       }
     }
+    // Values (ER-09): the ones kept for now, named from the graph after the loop, their own words last.
+    if (meta.kind === 'values' && value) {
+      const ids = (Array.isArray(value.keptIds) ? (value.keptIds as unknown[]) : []).filter((x): x is string => typeof x === 'string').slice(0, 3);
+      const own = typeof value.keptOwn === 'string' && value.keptOwn.trim() ? value.keptOwn.trim() : undefined;
+      valueIds = { ids: ids.map((id) => VALUE_OPTION + id), ...(own ? { own } : {}) };
+    }
     // A person (IE-03): the name they gave, never the safety answer (Me is not where that's asked or shown).
     if (meta.kind === 'person' && value) {
       summary = typeof value.label === 'string' ? value.label : '';
@@ -240,13 +249,18 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
       ...(part ? { part } : {}),
     };
     if (thingIds) unnamedThings.push({ ids: thingIds, item });
+    if (valueIds) unnamedThings.push({ ids: valueIds.ids, item, all: true, ...(valueIds.own ? { own: valueIds.own } : {}) });
     (byArea.get(meta.area) ?? byArea.set(meta.area, []).get(meta.area)!).push(item);
   }
   if (unnamedThings.length) {
     const labels = new Map<string, string>();
     const ids = [...new Set(unnamedThings.flatMap((t) => t.ids))];
-    for (const rec of (await tx.run(THING_LABELS, { ids })).records) labels.set(String(rec.get('id')), String(rec.get('label')));
-    for (const t of unnamedThings) t.item.summary = t.ids.map((id) => labels.get(id)).find((x) => !!x) ?? '';
+    if (ids.length) for (const rec of (await tx.run(THING_LABELS, { ids })).records) labels.set(String(rec.get('id')), String(rec.get('label')));
+    for (const t of unnamedThings) {
+      t.item.summary = t.all
+        ? [...t.ids.map((id) => labels.get(id)).filter((x): x is string => !!x), ...(t.own ? [t.own] : [])].join(' · ')
+        : t.ids.map((id) => labels.get(id)).find((x) => !!x) ?? '';
+    }
   }
   const { name } = await readProfileSlices(tx, uid, 'find-the-feeling', now);
   return {

@@ -630,6 +630,17 @@
    "direction": null,
    "addresses": []
   },
+  "dbt_values_priorities": {
+   "appToolId": "values-clarification",
+   "name": "Values and Priorities",
+   "description": "Naming what matters to you, keeping a few for now, and taking one small step in that direction",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": []
+  },
   "dbt_wise_mind": {
    "appToolId": "wise-mind",
    "name": "Wise Mind",

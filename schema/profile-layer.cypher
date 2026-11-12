@@ -54,6 +54,10 @@ MERGE (k:ProfileKind {id: "pros_cons"})
 SET k.area = "my_plans", k.label = "A pros & cons card", k.revisitAfterDays = null, k.stillTrueCopy = "", k.setAsideCopy = "Set aside. Hold to wait won't show it until you bring it back.", k.reviewStatus = "draft";
 MATCH (k:ProfileKind {id: "pros_cons"}), (a:ProfileArea {id: "my_plans"})
 MERGE (k)-[:IN_AREA]->(a);
+MERGE (k:ProfileKind {id: "values"})
+SET k.area = "about_me", k.label = "What matters to me", k.revisitAfterDays = 30, k.stillTrueCopy = "Are these still yours?", k.setAsideCopy = "Set aside. What matters to me won't offer them until you bring them back.", k.reviewStatus = "draft";
+MATCH (k:ProfileKind {id: "values"}), (a:ProfileArea {id: "about_me"})
+MERGE (k)-[:IN_AREA]->(a);
 MERGE (k:ProfileKind {id: "thing_i_like"})
 SET k.area = "my_words", k.label = "A thing I like", k.revisitAfterDays = null, k.stillTrueCopy = "", k.setAsideCopy = "Set aside. Good things won't offer it until you bring it back.", k.reviewStatus = "draft";
 MATCH (k:ProfileKind {id: "thing_i_like"}), (a:ProfileArea {id: "my_words"})

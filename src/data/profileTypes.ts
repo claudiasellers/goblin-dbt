@@ -63,7 +63,8 @@ export interface ProfileSlices {
     meta: ProfileItemMeta;
   }>;
   bodyFlags: null;
-  values: never[];
+  /** What matters to me (ER-09): the values kept for now (up to three), named; an own-words one has the id `own`. */
+  values: Array<{ id: string; label: string; meta: ProfileItemMeta }>;
   goals: never[];
   copeAheadPlans: never[];
   boundaryLines: never[];
@@ -166,7 +167,9 @@ export const PROFILE_NEEDS = {
   'check-the-facts': ['parts'],              // the tag row on its close (docs/design/check-the-facts.md, screen 3)
   'fast': ['parts'],                         // the tag row on its close (docs/design/fast.md)
   'say-no': ['people'],                      // the picker (IE-03), before the skill (docs/design/say-no.md)
-  'good-things': ['thingsILike', 'thingsILikePicks'],             // its pick step: the person's own things first (docs/design/good-things.md)
+  'good-things': ['thingsILike', 'thingsILikePicks'], 
+  'values-clarification': ['values'],         // the start screen (*Your values are here*) and a step for one kept before (docs/design/values.md)
+              // its pick step: the person's own things first (docs/design/good-things.md)
   // Wise mind's step back (parts on only): the person's parts in the room, with their names, shapes,
   // tender and safety flags. Empty while parts are off, so the tool shows its two-minds form.
   'wise-mind': ['parts'],

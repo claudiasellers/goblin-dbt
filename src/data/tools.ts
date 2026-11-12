@@ -256,6 +256,18 @@ export const tools: Tool[] = [
     emoji: '🌼',
     bare: true,
   },
+  {
+    // ER-09 on the skill runtime (docs/design/values.md): values and priorities, and one small step for one.
+    id: 'values-clarification',
+    name: 'What Matters to Me',
+    tagline: 'Find what matters to you, then take one small step for it',
+    description: 'Sort plain-word value cards, keep up to three for now, and pick one small step this week for one of them. Not sure yet is a full answer.',
+    whenToUse: 'When you\'re not sure what you care about, or a choice feels hard and you want a direction.',
+    module: 'emotion-regulation',
+    dbtBasis: 'DBT ER Handouts 17–18 (values and priorities)',
+    emoji: '🧭',
+    bare: true,
+  },
   // Interpersonal Effectiveness
   {
     id: 'dear-man',
@@ -396,6 +408,7 @@ export const allIntents: Intent[] = [
   { id: 'not-working', label: 'My skills aren\'t working', toolId: 'er-troubleshoot', emoji: '🧩' },
   { id: 'running-low', label: 'Everything feels like too much today', toolId: 'please-skill', emoji: '🔋' },
   { id: 'find-good', label: 'Find something good', toolId: 'good-things', emoji: '🌼' },
+  { id: 'what-matters', label: 'Work out what matters to me', toolId: 'values-clarification', emoji: '🧭' },
   { id: 'nightmares', label: 'The same nightmare keeps coming back', toolId: 'nightmare-rescript', emoji: '🌙' },
 ];
 
