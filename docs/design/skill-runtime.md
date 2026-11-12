@@ -342,7 +342,7 @@ wave (`mindfulness-emotions`) is a planned exit on the verdict card, and Let it 
   a tool needs a Today card that can link; tracked for ER-B3).
 - Not built: the **loop guard** ("you've checked this twice today") is an aggregate over past runs, which a
   live flow never reads (data layers); it waits for a server-side read the router or Today can own. The
-  **inline mini-card** moves to ER-B3, with its first host (Do the Opposite's *clarify*): an inline run gives
+  **inline mini-card** moves to ER-B5, with its first host (Do the Opposite's *clarify*): an inline run gives
   back as soon as it reaches a hand-off, so a danger chip would return to the host without the `safe` card's
   line, and that needs deciding with a real host, not ahead of one.
 - The `safe` card is `noClose`: leaving it closes the visit without the close question.

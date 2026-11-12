@@ -303,6 +303,13 @@ function FeelingSection({
   );
 }
 
+/** The support block's banner scrolls into view once, as it mounts (a stable ref: React calls it only on mount and unmount). */
+function showBanner(el: HTMLDivElement | null) {
+  if (!el) return;
+  const reduce = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  el.scrollIntoView?.({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
+}
+
 export function OppositeAction() {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -560,12 +567,6 @@ export function OppositeAction() {
       {toolLink("pause")}
     </div>
   );
-
-  function showBanner(el: HTMLDivElement | null) {
-    if (!el) return;
-    const reduce = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    el.scrollIntoView?.({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
-  }
 
   const toolLink = (id: string, label?: string) => {
     const normalized = id.replace(/^dbt_/, "").replace(/_/g, "-");
