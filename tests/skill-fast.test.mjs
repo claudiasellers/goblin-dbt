@@ -11,7 +11,7 @@ const { fastSkillFor } = await importTs("src/lib/fastSkill.ts");
 const content = JSON.parse(readFileSync("tests/fixtures/skills-content.json", "utf8"));
 const review = content.skills.find((s) => s.id === "fast_review");
 const letGo = content.skills.find((s) => s.id === "fast_let_go");
-const embedOutputs = { boundaryLine: { ids: ["copied"] } };
+const embedOutputs = { boundaryLine: { ids: ["copied"] }, inlineSkill: { ids: ["finished", "left", "stopped", "body", "unsafe"] } };
 const ctx = (skill, ctxIn = {}) => ({ skill, shared: content, carried: [], gridIds: new Set(), emotionLabel: (id) => id, embedOutputs, ctxIn });
 function run(skill, events, ctxIn = {}) {
   const c = ctx(skill, ctxIn);
@@ -98,7 +98,8 @@ test("Let go: a line, the card, then elsewhere with Recover; I don't need to say
   assert.deepEqual(s.offered, ["let_it_be", "recover"], "Let it be is built (DT-04); Finding connection is planned");
   assert.equal(M.handoffLine(ctx(letGo), M.stepOf(letGo, "elsewhere"), s), letGo.copy.elsewhere_line);
   const heard = run(letGo, [pick("line", first), next, copied], { frame: "let_go" });
-  assert.equal(M.handoffLine(ctx(letGo, { frame: "let_go" }), M.stepOf(letGo, "elsewhere"), heard), letGo.copy.elsewhere_line_no,
+  assert.equal(heard.stepId, "room", "after a host's no: the acknowledgement and Let it be here");
+  assert.equal(M.handoffLine(ctx(letGo, { frame: "let_go" }), M.stepOf(letGo, "room"), heard), letGo.copy.elsewhere_line_no,
     "the acknowledgement only after a host's no, never on a flooded entry where no one may have said no");
   const none = run(letGo, [pick("line", "none"), next]);
   assert.deepEqual(none.path, ["line", "elsewhere"]);
@@ -111,4 +112,49 @@ test("the page opens Let go for ?frame=let_go or a carried flooded reading, the 
   assert.equal(fastSkillFor(null, "stirred"), "fast_review");
   assert.equal(fastSkillFor(null, undefined), "fast_review");
   assert.equal(fastSkillFor("other", null), "fast_review");
+});
+
+test("Let go after a host's no (IE-B4): *make some room for it here* runs Let it be inline; where it ended picks the card", () => {
+  const c = { frame: "let_go" };
+  const at = run(letGo, [pick("line", "none"), next], c);
+  assert.equal(at.stepId, "room", "saying nothing still gets the acknowledgement and the offer");
+  assert.equal(M.handoffLine(ctx(letGo, c), M.stepOf(letGo, "room"), at), letGo.copy.elsewhere_line_none);
+  const later = run(letGo, [pick("line", "none"), next, pick("room", "later"), next], c);
+  assert.equal(later.stepId, "after");
+  assert.deepEqual(later.offered, ["recover"], "Recover; Finding connection is planned");
+  const accept = M.stepOf(letGo, "accept");
+  assert.deepEqual([accept.embed, accept.props.skill, accept.props.enterAt], ["inlineSkill", "let_it_be", "what"]);
+  const here = [pick("line", "none"), next, pick("room", "here"), next];
+  const end = (ids) => run(letGo, [...here, { type: "embedDone", output: { ids } }], c);
+  assert.equal(end(["finished"]).stepId, "after");
+  assert.equal(end(["left"]).stepId, "after", "going back early is fine: no close of its own");
+  for (const ids of [["finished", "unsafe"], ["stopped", "unsafe"], ["left", "unsafe"]]) {
+    const s = end(ids);
+    assert.equal(s.stepId, "unsafe", `never acceptance of ongoing harm: ${ids}`);
+    assert.equal(M.crisisFor(ctx(letGo, c), M.stepOf(letGo, "unsafe"), s)?.variant, "other_person");
+    assert.deepEqual(s.offered, ["safety_open", "ending_careful"]);
+  }
+  for (const ids of [["body"], ["finished", "body"]]) assert.equal(end(ids).stepId, "body", `grief too much or louder: ${ids}`);
+  assert.deepEqual(end(["body"]).offered, ["cool_down"]);
+  const flooded = run(letGo, [pick("line", "none"), next]);
+  assert.equal(flooded.stepId, "elsewhere", "a flooded entry with no frame keeps the link (Let it be asks about the body itself)");
+});
+
+test("Let it be runs inline from *what can't change*: its hand-offs become the host's outcome, the danger check a flag", () => {
+  const lib = content.skills.find((s) => s.id === "let_it_be");
+  assert.deepEqual(lib.inline.enterAt, ["what"]);
+  assert.equal(lib.inline.thenVsNowFrom, "close");
+  assert.deepEqual(lib.inline.ends, { still_stop: "stopped", too_much: "body", settle: "body", end: "finished" });
+  const c = { skill: lib, shared: content, carried: [], gridIds: new Set(), emotionLabel: (id) => id, embedOutputs: {}, ctxIn: {} };
+  const s0 = M.initialRun(lib, "what");
+  assert.equal(s0.stepId, "what");
+  let s = M.runNext(c, s0, own("what", "their no"));
+  s = M.runNext(c, s, next);
+  assert.equal(s.stepId, "still", "anything in their own words gets the danger check first");
+  const unsafe = M.runNext(c, s, pick("still", "sometimes"));
+  assert.deepEqual(M.inlineResult(c, unsafe).ids, ["finished", "unsafe"]);
+  assert.deepEqual(M.inlineResult(c, { ...unsafe, stepId: "still_stop" }).ids, ["stopped", "unsafe"]);
+  const safe = M.runNext(c, s, pick("still", "no"));
+  assert.deepEqual(M.inlineResult(c, safe).ids, ["finished"]);
+  assert.deepEqual(M.inlineResult(c, { ...s0, answers: { close: { ids: ["worse"], own: null } }, stepId: "end" }).ids, ["finished", "body"]);
 });

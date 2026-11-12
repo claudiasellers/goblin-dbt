@@ -375,4 +375,15 @@ SKILL = {
     "accepts": ["band"],
     "copy": COPY, "tables": {}, "derive": [], "steps": STEPS, "exits": EXITS, "options": options(),
     "emotionFields": [],
+    # R8, IE-B4: FAST's Let go runs it inline after a no, from *what can't change* (the no already says it can't,
+    # for now), so the danger check still comes first for anything about a person. A hand-off gives back at once, so
+    # its card is the host's to show: the ends and flags tell the host which (the crisis slot when anything but *no*
+    # was said to the danger check, the body when grief was too much or the fight got louder).
+    "inline": {
+        "enterAt": ["what"],
+        "returns": ["close"],
+        "thenVsNowFrom": "close",
+        "ends": {"still_stop": "stopped", "too_much": "body", "settle": "body", "end": "finished"},
+        "flags": [{"id": "unsafe", "when": STILL}, {"id": "body", "when": {"eq": [a("close"), "worse"]}}],
+    },
 }

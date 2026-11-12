@@ -57,6 +57,17 @@ movement) are `let-it-be` rows now, live since 12 Nov 2026 (Claudia: default to 
 word-gated (despair, grief, empty; not numb) and comes after gentle movement (`requiresPrior`).
 `schema/app-tool-ids.cypher` gives `dbt_radical_acceptance` its `appToolId`.
 
+## Inline in FAST's Let go (IE-B4, 12 Nov)
+
+After a host's no (`?frame=let_go`), Let go's acknowledgement asks *Do you want to make some room for it here, for a
+few minutes?* (*Not to agree with the no. Only to stop fighting what can't change today.*). *Yes, here* runs this
+skill inline (R8, the `inlineSkill` embed) from *what* (the no already says it can't change, for now), so the danger
+check still comes first for anything about a person. The skill's `inline` gives back `ends` (`still_stop` →
+`stopped`, `too_much` and `settle` → `body`, `end` → `finished`) and `flags` (`unsafe` while the danger check said
+anything but no; `body` when the fight got louder). Let go then shows its own card: `unsafe` or `stopped` → the
+`other_person` resources, `safety.open` and Ending (careful), no acceptance; `body` → First, the body; otherwise
+Recover. A flooded entry to Let go with no frame keeps Let it be as a link, since an inline run carries no band.
+
 ## Deferred (DT-04 part 2, with DT-B4's rest)
 
 - **Turning the mind**: the 60 s card (`turnFork`, the Stage fork with footprints), the *When will the fight come
@@ -64,7 +75,7 @@ word-gated (despair, grief, empty; not numb) and comes after gentle movement (`r
 - **The acceptance target** (`acceptance_target`, R4 keep): turns logged per target, *resting* after three quieter
   turns, the weekly review.
 - **Willingness as its own entry** (`willingness`, entering at the fight): needs a page-level `enterAt`.
-- **Inline mode** for FAST's Let go and Recover's *Let it land* (R8; IE-B4 switches them over).
+- **Inline mode** for Recover's *Let it land* (R8). FAST's Let go runs it inline since IE-B4 (below).
 - **The witness embed** (WMP lines with the 4 s receive hold): its lines are drafts awaiting sign-off (D16); the
   PRD's own line opens the `what` step until then.
 - Holding the statement 4 s, recording it in their own voice (D13), hand on heart as its own `PracticeSkill`, the

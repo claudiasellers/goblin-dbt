@@ -116,6 +116,16 @@ close offers the tag row, like Check the Facts.
 | `FastFlow`, `FastCheck`, `SelfRespectRepair` labels | Skill rows (`Skill`, `SkillStep`, `SkillOption`) | The runtime's model (skill-runtime.md); chips keep their clinical labels on `SkillOption` |
 | Byte-equivalent DEAR MAN regeneration | Token-equivalent | See below |
 
+
+## Let it be inside Let go (IE-B4, 12 Nov)
+
+After a host's no (`frame=let_go`), the line (or *I don't need to say anything*) leads to `room`: the
+acknowledgement, then *Do you want to make some room for it here, for a few minutes?* *Yes, here* runs Let it be
+inline from *what can't change* (`accept`, the `inlineSkill` embed); *Not now* goes to `after` (Recover). Where Let
+it be ended picks the card: its danger check said anything but no → `unsafe` (the `other_person` resources,
+`safety.open`, Ending in its careful frame); grief too much or the fight louder → `body` (First, the body);
+otherwise `after`. A flooded entry with no frame keeps `elsewhere`, with Let it be as a link (it asks about the body
+itself; an inline run carries no band). See [`let-it-be.md`](let-it-be.md) and [`skill-runtime.md`](skill-runtime.md).
 ## Not in this batch
 
 | What | Waits on |
@@ -124,7 +134,6 @@ close offers the tag row, like Check the Facts.
 | Saving the boundary line on the person (`Person.boundaries`) and the user's own *instead* line served at the next compose with that person | IE-03 People (IE-B2) and the keep action (R4, F2) |
 | Follow-up *next time with {label}*; the flooded *this is a tomorrow thing* follow-up | Follow-up action (R5, F2) and a `FollowUpType` row |
 | Rehearse it after the review | IE-02 (IE-B5); the exit is in place, planned |
-| Let it be inline in Let go | DT-04 (DT-B4); planned exit until then, inline in IE-B4 |
 | The Witness deck as a place to meet the need (Arch #30) | WMP's witness pieces (F2 `witness` embed) |
 | `SkillPractice` reps `self_respect` / `let_go` | The spine's reps from a run (F2) |
 | Let go for an unsafe or refusing person (`reason=unsafe`): start on *I don't need to say anything* and hide the other lines (the PRD's "step away without saying anything") | The safety batch / IE-03. No host links `frame=let_go` until then |

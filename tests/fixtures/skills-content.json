@@ -14338,6 +14338,13 @@
     "elsewhere_line_no": "You said what you needed, and that counts. It's a no for now. What you needed still matters, and it can be met somewhere else.",
     "elsewhere_line": "What you needed still matters. It can be met somewhere else.",
     "elsewhere_line_none": "Saying nothing is a choice too. What you needed still matters, and it can be met somewhere else.",
+    "room_title": "Do you want to make some room for it here, for a few minutes?",
+    "room_hint": "Not to agree with the no. Only to stop fighting what can't change today.",
+    "room_here": "Yes, here",
+    "room_later": "Not now",
+    "after_line": "Making room for it is something you can come back to. What you needed still matters.",
+    "unsafe_line": "Your safety comes first. You don't have to accept anything that's still hurting you. The people below can help, any time.",
+    "body_line": "That's a lot to carry. Your body first, then the rest can wait.",
     "next": "Next",
     "done": "Done",
     "card_copy": "Copy",
@@ -14368,6 +14375,25 @@
       }
      ],
      "next": [
+      {
+       "to": "room",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.line",
+           "none"
+          ]
+         },
+         {
+          "eq": [
+           "$ctx.frame",
+           "let_go"
+          ]
+         }
+        ]
+       }
+      },
       {
        "to": "elsewhere",
        "when": {
@@ -14400,11 +14426,193 @@
      },
      "next": [
       {
+       "to": "room",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "let_go"
+        ]
+       }
+      },
+      {
        "to": "elsewhere",
        "when": null
       }
      ],
      "offers": []
+    },
+    {
+     "id": "room",
+     "kind": "ask",
+     "title": "room_title",
+     "hint": "room_hint",
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.line",
+         "none"
+        ]
+       },
+       "key": "elsewhere_line_none"
+      },
+      {
+       "when": null,
+       "key": "elsewhere_line_no"
+      }
+     ],
+     "fields": [
+      {
+       "id": "room",
+       "options": {
+        "list": "room"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "accept",
+       "when": {
+        "eq": [
+         "$a.room",
+         "here"
+        ]
+       }
+      },
+      {
+       "to": "after",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "accept",
+     "kind": "embed",
+     "embed": "inlineSkill",
+     "answerAs": "accepted",
+     "props": {
+      "skill": "let_it_be",
+      "enterAt": "what"
+     },
+     "next": [
+      {
+       "to": "unsafe",
+       "when": {
+        "any": [
+         {
+          "has": [
+           "$a.accepted.ids",
+           "unsafe"
+          ]
+         },
+         {
+          "has": [
+           "$a.accepted.ids",
+           "stopped"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "body",
+       "when": {
+        "has": [
+         "$a.accepted.ids",
+         "body"
+        ]
+       }
+      },
+      {
+       "to": "after",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "after",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "set": "$a.accepted"
+       },
+       "key": "after_line"
+      },
+      {
+       "when": null,
+       "key": "elsewhere_line"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": [
+      {
+       "exit": "recover",
+       "when": null
+      },
+      {
+       "exit": "finding_connection",
+       "when": null
+      }
+     ]
+    },
+    {
+     "id": "unsafe",
+     "kind": "handoff",
+     "complete": true,
+     "noClose": true,
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "lines": [
+      {
+       "when": null,
+       "key": "unsafe_line"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": [
+      {
+       "exit": "safety_open",
+       "when": null
+      },
+      {
+       "exit": "ending_careful",
+       "when": null
+      }
+     ]
+    },
+    {
+     "id": "body",
+     "kind": "handoff",
+     "complete": true,
+     "noClose": true,
+     "lines": [
+      {
+       "when": null,
+       "key": "body_line"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": [
+      {
+       "exit": "cool_down",
+       "when": null
+      }
+     ]
     },
     {
      "id": "elsewhere",
@@ -14454,11 +14662,27 @@
    ],
    "exits": [
     {
+     "id": "cool_down",
+     "toolId": "cool-down",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
      "id": "done",
      "toolId": null,
      "query": {},
      "carry": [],
      "done": true
+    },
+    {
+     "id": "ending_careful",
+     "toolId": "ending-relationships",
+     "query": {
+      "frame": "careful"
+     },
+     "carry": [],
+     "done": false
     },
     {
      "id": "finding_connection",
@@ -14481,6 +14705,14 @@
      "query": {},
      "carry": [],
      "done": false
+    },
+    {
+     "id": "safety_open",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": false,
+     "safety": true
     }
    ],
    "options": {
@@ -14508,6 +14740,16 @@
      {
       "value": "not_argue",
       "label": "I've said how this lands. I won't argue about whether my feelings are real."
+     }
+    ],
+    "room": [
+     {
+      "value": "here",
+      "label": "Yes, here"
+     },
+     {
+      "value": "later",
+      "label": "Not now"
      }
     ]
    }
@@ -27157,6 +27399,45 @@
      {
       "value": "much_better",
       "label": "Much quieter"
+     }
+    ]
+   },
+   "inline": {
+    "enterAt": [
+     "what"
+    ],
+    "returns": [
+     "close"
+    ],
+    "thenVsNowFrom": "close",
+    "ends": {
+     "still_stop": "stopped",
+     "too_much": "body",
+     "settle": "body",
+     "end": "finished"
+    },
+    "flags": [
+     {
+      "id": "unsafe",
+      "when": {
+       "in": [
+        "$a.still",
+        [
+         "yes",
+         "sometimes",
+         "unsure"
+        ]
+       ]
+      }
+     },
+     {
+      "id": "body",
+      "when": {
+       "eq": [
+        "$a.close",
+        "worse"
+       ]
+      }
      }
     ]
    }

@@ -116,6 +116,9 @@ LETTER_OF = {v: letter for v, _label, letter in WHAT}
 OWN_WHAT = {"all": [{"own": "what"}, {"not": {"set": a("what") + ".ids"}}]}  # own words, no chip (`set` on the bare ref counts own words)
 
 
+AFTER_NO = {"eq": ["$ctx.frame", "let_go"]}  # a host's no (?frame=let_go), not a flooded entry
+
+
 def card(step_id, title, field, copyable, next_to="next"):
     props = {"field": field, "shape": "line" if copyable else "list", "next": "next"}
     if copyable:
@@ -232,6 +235,14 @@ LET_GO_COPY = {
     "elsewhere_line_no": "You said what you needed, and that counts. It's a no for now. What you needed still matters, and it can be met somewhere else.",
     "elsewhere_line": "What you needed still matters. It can be met somewhere else.",
     "elsewhere_line_none": "Saying nothing is a choice too. What you needed still matters, and it can be met somewhere else.",
+    # IE-B4: after a host's no, Let it be (DT-04) inline, here, instead of a link out.
+    "room_title": "Do you want to make some room for it here, for a few minutes?",
+    "room_hint": "Not to agree with the no. Only to stop fighting what can't change today.",
+    "room_here": "Yes, here",
+    "room_later": "Not now",
+    "after_line": "Making room for it is something you can come back to. What you needed still matters.",
+    "unsafe_line": "Your safety comes first. You don't have to accept anything that's still hurting you. The people below can help, any time.",
+    "body_line": "That's a lot to carry. Your body first, then the rest can wait.",
     "next": "Next",
     "done": "Done",
     **CARD_COPY,
@@ -260,9 +271,54 @@ LET_GO_STEPS = [
         "id": "line", "kind": "ask", "title": "line_title", "hint": "line_hint",
         "fields": [{"id": "line", "options": {"list": "line"}, "max": 1, "required": True,
                     "own": {"hint": "own_hint", "countsAsPick": True, "max": LINE_MAX}}],
-        "next": [{"when": is_("line", "none"), "to": "elsewhere"}, {"to": "card"}],
+        "next": [{"when": {"all": [is_("line", "none"), AFTER_NO]}, "to": "room"},
+                 {"when": is_("line", "none"), "to": "elsewhere"}, {"to": "card"}],
     },
-    card("card", "card_title", "line", True, next_to="elsewhere"),
+    {**card("card", "card_title", "line", True, next_to="elsewhere"),
+     "next": [{"when": AFTER_NO, "to": "room"}, {"to": "elsewhere"}]},
+    # After a host's no: the acknowledgement, then Let it be inline (R8) if they want it. A flooded entry with no frame
+    # keeps the hand-off below, with Let it be as a link (it asks about the body itself).
+    {
+        "id": "room", "kind": "ask", "title": "room_title", "hint": "room_hint",
+        "lines": [
+            {"when": is_("line", "none"), "key": "elsewhere_line_none"},
+            {"when": None, "key": "elsewhere_line_no"},
+        ],
+        "fields": [{"id": "room", "options": {"list": "room"}, "max": 1, "required": True}],
+        "next": [{"when": is_("room", "here"), "to": "accept"}, {"to": "after"}],
+    },
+    {
+        "id": "accept", "kind": "embed", "embed": "inlineSkill", "answerAs": "accepted",
+        "props": {"skill": "let_it_be", "enterAt": "what"},
+        "next": [
+            {"when": {"any": [{"has": ["$a.accepted.ids", "unsafe"]}, {"has": ["$a.accepted.ids", "stopped"]}]}, "to": "unsafe"},
+            {"when": {"has": ["$a.accepted.ids", "body"]}, "to": "body"},
+            {"to": "after"},
+        ],
+    },
+    {
+        "id": "after", "kind": "handoff", "complete": True,
+        "lines": [{"when": {"set": "$a.accepted"}, "key": "after_line"}, {"when": None, "key": "elsewhere_line"}],
+        "offers": [
+            {"exit": "recover", "when": None},
+            {"exit": "finding_connection", "when": None},
+        ],
+        "done": "done",
+    },
+    {
+        # Let it be's danger check said anything but no: never acceptance of ongoing harm (C6, its own safety rule).
+        "id": "unsafe", "kind": "handoff", "complete": True, "noClose": True,
+        "crisis": [{"variant": "other_person", "when": {"all": []}}],
+        "lines": [{"when": None, "key": "unsafe_line"}],
+        "offers": [{"exit": "safety_open", "when": None}, {"exit": "ending_careful", "when": None}],
+        "done": "done",
+    },
+    {
+        "id": "body", "kind": "handoff", "complete": True, "noClose": True,
+        "lines": [{"when": None, "key": "body_line"}],
+        "offers": [{"exit": "cool_down", "when": None}],
+        "done": "done",
+    },
     {
         "id": "elsewhere", "kind": "handoff", "complete": True,
         "lines": [
@@ -284,6 +340,9 @@ LET_GO_STEPS = [
 
 LET_GO_EXITS = [
     {"id": "let_it_be", "toolId": "let-it-be"},
+    {"id": "ending_careful", "toolId": "ending-relationships", "query": {"frame": "careful"}},
+    {"id": "cool_down", "toolId": "cool-down"},
+    {"id": "safety_open", "toolId": None, "safety": True},
     {"id": "recover", "toolId": "recovering-from-invalidation"},
     {"id": "finding_connection", "toolId": "finding-connection", "planned": True},
     {"id": "done", "done": True},
@@ -293,7 +352,8 @@ LET_GO = {
     "id": "fast_let_go", "toolId": TOOL_ID, "concept": CONCEPT, "version": "fast-let-go-v1", "start": "line",
     "ownMax": OWN_MAX, "accepts": ["frame"], "copy": LET_GO_COPY, "tables": {}, "derive": [],
     "steps": LET_GO_STEPS, "exits": LET_GO_EXITS,
-    "options": [("line", v, LINE_LABEL[v], {}, "BoundaryLine" if v != "none" else None) for v in SERVED_LINES],
+    "options": [("line", v, LINE_LABEL[v], {}, "BoundaryLine" if v != "none" else None) for v in SERVED_LINES]
+    + [("room", "here", LET_GO_COPY["room_here"], {}, None), ("room", "later", LET_GO_COPY["room_later"], {}, None)],
     "emotionFields": [],
 }
 
