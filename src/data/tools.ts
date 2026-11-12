@@ -309,7 +309,8 @@ export const tools: Tool[] = [
     bare: true,
   },
   {
-    // ER-10 on the skill runtime (docs/design/emotion-guide.md): the feeling card and its family ladder.
+    // ER-10 on the skill runtime (docs/design/emotion-guide.md): the feeling card and its family ladder; `?frame=myths`
+    // plays the myth cards (part 4), its second skill.
     id: 'emotion-guide',
     name: 'Know This Feeling',
     tagline: 'What a feeling is for, and a closer word for it',
@@ -319,6 +320,7 @@ export const tools: Tool[] = [
     dbtBasis: 'DBT ER Handouts 3–6 (what emotions do, the model of emotions, describing emotions)',
     emoji: '🔎',
     bare: true,
+    moreCards: [{ key: 'myths', name: 'Beliefs about feelings', tagline: 'Look at a belief that makes feelings harder', emoji: '🪞', query: 'frame=myths' }],
   },
   // Interpersonal Effectiveness
   {
@@ -517,6 +519,7 @@ export const allIntents: Intent[] = [
   { id: 'what-matters', label: 'Work out what matters to me', toolId: 'values-clarification', emoji: '🧭' },
   { id: 'one-thing', label: 'Get one thing done', toolId: 'build-mastery', emoji: '🪜' },
   { id: 'know-feeling', label: 'Get to know a feeling', toolId: 'emotion-guide', emoji: '🔎' },
+  { id: 'feeling-myths', label: 'A belief about feelings is in the way', toolId: 'emotion-guide', query: 'frame=myths', emoji: '🪞' },
   { id: 'nightmares', label: 'The same nightmare keeps coming back', toolId: 'nightmare-rescript', emoji: '🌙' },
 ];
 

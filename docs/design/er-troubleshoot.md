@@ -29,7 +29,7 @@ to the next check, except on *Did the feeling fit the facts?*, where not sure is
 | 4 | Is something around you rewarding the old way? | *People back off when I get angry*, *I get out of things when I go quiet*, *Someone steps in when I'm struggling* | The old way is doing a job; find another way to get it | Problem Solve |
 | 5 | Willing, or was part of you not up for it? | *Part of me wasn't up for it* | Willingness comes and goes; make room first | Let it be (`let-it-be`, built 11 Nov) |
 | 6 | Too much at once? | *Yes, a lot at once* | One skill gets buried; pick one thing | Problem Solve, or 5-4-3-2-1 (grounding) |
-| 7 | A belief in the way? (myths, ER Handout 3) | a myth chip or own words | A belief can feel like a fact | Myth cards (`emotion-guide`, planned) |
+| 7 | A belief in the way? (myths, ER Handout 3) | a myth chip or own words | A belief can feel like a fact | The myth cards (`emotion-guide`, `frame=myths`; hopelessness never: someone to talk to) |
 | — | Nothing stood out | | "That's information too … that isn't on you" | Missing links (`missing-links`, planned) |
 
 Planned moves are written as planned exits (plan C4.4): the edge is in the graph, the card doesn't show it,
@@ -86,9 +86,10 @@ linked by `hostSessionId`. No new label, no ask-fresh field, no profile write.
 - **All the way offers no tool.** The PRD's fix is a line ("try a smaller step, but all of it"); the skill to
   retry is the one that didn't help, which the skill can't know yet (no host id in context). Sending everyone
   to Do the Opposite was dropped: it's contraindicated for dissociation and wrong after Problem Solve.
-- **Two fix cards end on Done** (all the way, belief) and so does *nothing stood out*,
-  until the myth cards and missing links land (Running low and Let it be are built). Their lines and the nudge to try
-  again are the move meanwhile.
+- **The all the way card ends on Done** and so does *nothing stood out*, until missing links lands (Running low,
+  Let it be and the myth cards are built). Their lines and the nudge to try again are the move meanwhile. The belief
+  card offers the myth cards (`emotion-guide?frame=myths`, ER-10 part 4); hopelessness gets someone to talk to and
+  Done, never the cards.
 - **The check for reinforcers offers Problem Solve,** since the PRD's target is WMP behaviour-change content that
   doesn't exist as a tool. The line carries the explanation.
 - **`ToolSession` + `ext.run`, not a `SkillPractice` rep** (D2).

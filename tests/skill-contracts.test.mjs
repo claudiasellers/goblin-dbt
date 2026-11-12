@@ -82,7 +82,9 @@ for (const sk of fixture.skills) {
       // `mode` picks which of a tool's skills the page plays (DEAR MAN: debrief, one message, the prep); it isn't context.
       // `person` is the person picker's preset on a PersonFirstSkill page (a kept person whose safety answer is fresh
       // skips the picker; anyone else is asked), read by the page before the skill, never by the skill.
-      const pageKey = (key) => key === "mode" || (key === "person" && PERSON_FIRST_TOOLS.has(x.toolId));
+      // `frame` on Know this feeling picks which of its skills plays (the myth cards, Walk the wave: emotionGuideSkillFor).
+      const pageKey = (key) => key === "mode" || (key === "person" && PERSON_FIRST_TOOLS.has(x.toolId))
+        || (key === "frame" && x.toolId === "emotion-guide");
       for (const key of Object.keys(x.query)) if (!pageKey(key)) assert.ok(target.accepts.includes(key), `${x.id}: ${target.id} doesn't accept ${key}`);
     }
   });

@@ -53,6 +53,9 @@ COPY = {
     "belief_hint": "Beliefs about feelings can make a skill feel pointless before it starts.",
     "safety_open": "Talk to someone now",
     "fix_belief": "Beliefs like that can feel like facts. They're beliefs, and you can look at them.",
+    # One line per screen (handoffLine shows the first that holds): own words get fix_belief with the safety sentence.
+    "fix_belief_own": "Beliefs like that can feel like facts. They're beliefs, and you can look at them. If it's about "
+                      "hurting yourself or not wanting to be here, talk to someone now.",
     "fix_belief_heavy": "That sounds heavy to carry. After trying this much, it makes sense to feel it. You don't have to hold it alone.",
     # Nothing stood out.
     "none": "Nothing stood out this time. That's information too. Skills can take a few goes, and that isn't on you.",
@@ -154,10 +157,13 @@ def steps():
         fix("fix_env", "fix_env", ["problem_solve"]),
         fix("fix_will", "fix_will", ["let_it_be"], again=True),
         fix("fix_much", "fix_much", ["problem_solve", "five_senses"], again=True),
-        {**fix("fix_belief", [{"when": HOPELESS, "key": "fix_belief_heavy"}, {"when": ALWAYS, "key": "fix_belief"}],
+        {**fix("fix_belief", [{"when": HOPELESS, "key": "fix_belief_heavy"}, {"when": {"own": "belief"}, "key": "fix_belief_own"},
+                             {"when": ALWAYS, "key": "fix_belief"}],
                ["emotion_guide"], crisis=[{"variant": "crisis", "when": HOPELESS}]),
          # Hopelessness: someone to talk to, and Done; no myth cards and no reappraisal (voice.md S9, crisis speech).
-         "offers": [{"exit": "safety_open", "when": HOPELESS}, {"exit": "emotion_guide", "when": {"not": HOPELESS}}]},
+         # Own words aren't read: someone to talk to is offered beside the cards (gate 3, ER-10 part 4).
+         "offers": [{"exit": "safety_open", "when": {"any": [HOPELESS, {"own": "belief"}]}},
+                    {"exit": "emotion_guide", "when": {"not": HOPELESS}}]},
         fix("none", "none", ["missing_links"]),
     ]
     return out
@@ -170,8 +176,8 @@ EXITS = [
     {"id": "let_it_be", "toolId": "let-it-be"},             # DT-04 willingness (DT-B4)
     {"id": "mindfulness_emotions", "toolId": "mindfulness-emotions", "planned": True},  # ER-08 the wave (ER-B5)
     {"id": "five_senses", "toolId": "five-senses"},                          # orienting (DT-01's orient entry)
-    # ER-10 myth cards (part 4): Know this feeling is built, its myths frame isn't yet, so this waits on the frame.
-    {"id": "emotion_guide", "toolId": "emotion-guide", "planned": True, "query": {"frame": "myths"}},
+    # ER-10 myth cards (part 4): Know this feeling's second skill, on its myths frame.
+    {"id": "emotion_guide", "toolId": "emotion-guide", "query": {"frame": "myths"}},
     {"id": "missing_links", "toolId": "missing-links", "planned": True},     # CORE-11 (outside the lanes)
     {"id": "safety_open", "safety": True},                                   # safety.open (R6)
     {"id": "done", "done": True},

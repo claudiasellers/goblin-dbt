@@ -87,9 +87,17 @@ test("each fix offers its PRD move: planned tools are written and never shown", 
   assert.deepEqual(at("env", "env_get_out").offered, ["problem_solve"]);
   assert.deepEqual(at("will", "will_not").offered, ["let_it_be"], "Let it be (DT-04, built 11 Nov)");
   assert.deepEqual(at("much", "much_yes").offered, ["problem_solve", "five_senses"], "grounding, never cold, without DT-01's self-check");
-  assert.deepEqual(at("belief", "myth_failing").offered, [], "the myth cards (ER-10) are planned");
+  assert.deepEqual(at("belief", "myth_failing").offered, ["emotion_guide"], "the myth cards (ER-10 part 4), on their frame");
+  assert.deepEqual(skill.exits.find((x) => x.id === "emotion_guide").query, { frame: "myths" });
+  assert.deepEqual(at("belief", "myth_nothing").offered, ["safety_open"], "hopelessness: someone to talk to, never the myth cards");
+  // Own words aren't read: someone to talk to beside the myth cards, and a line naming it (gate 3, ER-10 part 4).
+  const ownFix = run([...upTo("belief"), { type: "own", fieldId: "belief", text: "words" }, next]);
+  assert.equal(ownFix.stepId, "fix_belief");
+  assert.deepEqual(M.offersFor(ctx(), M.stepOf(skill, "fix_belief"), ownFix), ["safety_open", "emotion_guide"]);
+  assert.match(M.handoffLine(ctx(), M.stepOf(skill, "fix_belief"), ownFix), /talk to someone now\.$/);
+  assert.equal(M.handoffLine(ctx(), M.stepOf(skill, "fix_belief"), run([...upTo("belief"), pick("belief", "myth_past_it"), next])), skill.copy.fix_belief);
   const planned = skill.exits.filter((x) => x.planned).map((x) => x.toolId).sort();
-  assert.deepEqual(planned, ["emotion-guide", "mindfulness-emotions", "missing-links"]);
+  assert.deepEqual(planned, ["mindfulness-emotions", "missing-links"]);
   // It fits: the situation, or making room for it (the wave planned, Let it be built), as Check the Facts' verdict table does.
   assert.deepEqual(M.stepOf(skill, "fix_fit").offers.map((o) => o.exit), ["problem_solve", "mindfulness_emotions", "let_it_be"]);
   assert.ok(!JSON.stringify(skill.exits).includes("cool-down"), "no cold-water exit");

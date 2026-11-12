@@ -68,6 +68,9 @@ function Rehearse() { return <Suspense fallback={<ToolLoading />}><LazyRehearse 
 // My crisis kit (DT-03): open it or make it, two skills under one tool id (docs/design/crisis-kit.md).
 const LazyCrisisKit = lazy(() => import('./tools/CrisisKit').then((m) => ({ default: m.CrisisKit })));
 function CrisisKit() { return <Suspense fallback={<ToolLoading />}><LazyCrisisKit /></Suspense>; }
+// Know this feeling (ER-10): the card, or the myth cards on `?frame=myths` (docs/design/emotion-guide.md).
+const LazyEmotionGuide = lazy(() => import('./tools/EmotionGuide').then((m) => ({ default: m.EmotionGuide })));
+function EmotionGuide() { return <Suspense fallback={<ToolLoading />}><LazyEmotionGuide /></Suspense>; }
 
 // Map tool IDs to their interactive components
 const toolComponents: Record<string, React.ComponentType> = {
@@ -85,6 +88,7 @@ const toolComponents: Record<string, React.ComponentType> = {
   'mindfulness-of-others': NoticeThem,
   'rehearse': Rehearse,
   'crisis-kit': CrisisKit,
+  'emotion-guide': EmotionGuide,
   'recovering-from-invalidation': InvalidationRecovery,
   'find-the-feeling': FindTheFeeling,
   'meet-a-part': MeetAPart,

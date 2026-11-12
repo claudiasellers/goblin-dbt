@@ -5,7 +5,8 @@ DBT Emotion Regulation Handouts 3–6: what emotions do, the model of emotions, 
 `emotion_guide` on the skill runtime. Listed under Emotion Regulation for everyone, with the Tools intent *Get to
 know a feeling*.
 
-Part 1 (this document, built 12 Nov 2026) is the feeling card and the ladder. Parts 2–4 are below under *Not yet*.
+Part 1 (built 12 Nov 2026) is the feeling card and the ladder; part 4 (built 12 Nov 2026) is the myth cards, below.
+Parts 2–3 are under *Not yet*.
 
 ## What it is for
 
@@ -73,6 +74,47 @@ who said no). Do the Opposite still lists all three, where the steps meet them. 
 phone / social media* stay: as recognition they are the feeling's own pulls, while the DT `check` urge is the act. The DT behaviour urges (send, check, hit, leave, use, self_harm) are
 never on the card either: only `kind: 'emotion'` urges reach it.
 
+## The myth cards (`scripts/skills/emotion_myths.py`, part 4)
+
+DBT ER Handout 3's myths about emotions, and It isn't working's belief check (H24). A second skill, `emotion_myths`,
+under the same tool: `?frame=myths` picks it (`emotionGuideSkillFor` in `src/lib/emotionGuide.ts`; the page
+`src/pages/tools/EmotionGuide.tsx` plays one skill or the other, the crisis kit's pattern, since the runtime has no
+conditional start). It's opened by It isn't working's belief card, a card on the tool's page (*Beliefs about
+feelings*) and the Tools intent *A belief about feelings is in the way*.
+
+The screens never say *myth*: a belief the person holds isn't called wrong. The card offers the other side to look
+at, and every answer to *How does that sit with you?* counts.
+
+1. **myth**: *Which belief about feelings sounds most like yours?* Eleven beliefs in plain words: It isn't working's
+   three (*Having this feeling means I'm failing*, *I'm meant to be past this by now*, *If I feel it this strongly,
+   it must be true*, same ids, so a later host can carry the pick) and eight of H3's. Own words count as the pick.
+2. **heads_up** (a carried flooded reading only): *Your body's loud right now.* The body first (First, the body) or
+   *Look anyway*. Never a lock.
+3. **look**: *A belief can feel like a fact.* The belief's other side (H3's challenge, paraphrased, no *should*),
+   or for own words a general line. Then *How does that sit with you?* with *Some of it fits*, *Not yet* or
+   *Not sure*. All three go on. The other sides keep DBT's point: a feeling may or may not fit the facts, so *it
+   must be true* is met with *strength alone can't tell you which*, never *it isn't true*.
+4. **end**: a title by answer (*Not yet is fine.*, then *A belief that's been around a while takes more than one look.*), one
+   small way to test the belief this week, and where that belief goes next, whatever the answer: *it must be true*
+   → Check the Facts; *failing*, *a right way to feel*, *painful feelings are bad*, *makes no sense* → Know this
+   feeling (offered as *What a feeling is for*; the card has what often sets it off); *past this by now* → Let it
+   be; *big reactions are the only way* → DEAR MAN; *out of control* → Hold to wait; *wrong to feel it if others
+   don't approve* → Recover. *Weak* and *best ignored* end on the test and Done.
+
+**Own words are never read**, so they can't raise the crisis slot. The look screen says *If it's about hurting
+yourself or not wanting to be here, talk to someone now.* and the end card offers someone to talk to beside Done
+(gate 3; It isn't working's belief card does the same for own words).
+
+**Hopelessness is not a myth card.** *Nothing will ever help me* isn't on the list. It isn't working sends it to
+someone to talk to and Done, and never here, because answering it with an opposing belief would argue with
+someone in pain.
+
+*Talk to someone now* on every screen. No close (close kind `none` for the tool), no keep, no follow-up, no routing
+rows. `emotionFields` is empty: a belief is not a feeling word.
+
+Not yet: carrying It isn't working's pick in, so the person doesn't choose twice. Exit queries can read an answer
+(`$a.belief`), but the skill can't start past its first step on a context value without a runtime change.
+
 ## The runtime additions (approved on the plan thread)
 
 - Two shared tables, `feelingOf` and `feelingGuideOf` ([`skill-runtime.md`](skill-runtime.md)), served by
@@ -98,8 +140,6 @@ never on the card either: only `kind: 'emotion'` urges reach it.
   after-effects), embedded by CORE-08.
 - Part 3, words everywhere: `FOUND_WORD` from more hosts, own words first, the card after naming in the check-in and
   Find the feeling.
-- Part 4, the myth cards (H2): It isn't working's *belief* check links here with `frame=myths`, written as a planned
-  exit until then.
 
 ## Tests
 
