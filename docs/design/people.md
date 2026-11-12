@@ -112,4 +112,4 @@ ships (`pickerCopy`); an older graph keeps the old role chips.
 ## Waits on the safety batch
 
 Region-appropriate DV resources and SafetyPlan (the banner is US-first today), discreet mode, and a hotline chat
-link. The clinician review of the safety route's wording joins IE-08's (D14).
+link.

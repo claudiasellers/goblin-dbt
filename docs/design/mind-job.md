@@ -88,7 +88,7 @@ a different kind of swap. `schema/app-tool-ids.cypher` gives `dbt_accepts` its `
 | Label: three word guesses from Find the feeling's signatures | A fixed short list, or own words | The FTF signature read isn't on the runtime |
 | Reopen in MF-01's reopen mode (outward first) | Straight to *What's in there?* | MF-01 isn't built |
 | Reopen time: *I'll choose later* | Not offered: the lid always books a time | A lid with no time is the avoidance the PRD warns about |
-| Entry from the rumination results, the kit, Problem Solve's rumination guard, DT-09 | Not wired | Their hosts aren't built, or the routing row is off until sign-off |
+| Entry from the rumination results, the kit, Problem Solve's rumination guard, DT-09 | Not wired | Their hosts aren't built yet |
 | The ladder starts where the last visit left off | The person picks the warmth each visit | Remembering needs a profile kind and the person's yes (part 2) |
 | Level 3 (ER-04 things I like) | Not offered | ER-04 isn't built |
 | Re-park: a heads-up after the third | *Not yet* always puts it back, with a new time | Counting needs part 2's record; nothing locks |
@@ -113,7 +113,7 @@ a different kind of swap. `schema/app-tool-ids.cypher` gives `dbt_accepts` its `
   per-emotion ceiling yet).
 - `skillKind: redirect` is shared with Rebel without the wreckage, so the diversity rule never pairs the two on one
   result.
-- The break families and the excluded ones; whether *something cold in my hand* needs the DT-01 self-check (it's a
-  cold object, not cold water).
+- The break families and the excluded ones; whether *something cold in my hand* needs First, the body's cold
+  caution line (it's a cold object, not cold water).
 - Whether the lid itself should check in first when the person is flooded (it goes straight to the hold now).
 - Louder on return goes to the body with no further question; whether it should also offer the lid.

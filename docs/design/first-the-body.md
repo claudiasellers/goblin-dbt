@@ -81,8 +81,6 @@ All three are documented in [`skill-runtime.md`](skill-runtime.md).
   the frontend) into them.
 - The hosts: Help me now (`HelpNowInterim`, entered as flooded), StateResult's *That feels like too much right now*,
   the inline `regulate` mode in other skills, and `five-senses` folded in as the orient mode.
-- The full medical screen, once per profile and editable in Me (`body_flags`), with the asthma, seizure and injury
-  flags. It belongs to the safety batch.
 - Reps per mode and the fade (*Your usual: press*), and the two-far-away-visits referral line. The referral is an
   aggregate over sessions, so it waits on the fade's read path.
 - The rhythm pulse under the hold ring, with its optional audio twin.
@@ -97,10 +95,10 @@ All three are documented in [`skill-runtime.md`](skill-runtime.md).
 | PRD | Built | Why |
 |---|---|---|
 | Pictograms on the state cards and cold steps | Plain short labels; the cold mode has the Circuit Breaker face art | No pictogram set exists yet. A design task, not a flow change |
-| Move burst (TIP-I) only if the medical screen is clear, never at night outside, with a metronome | Built for *Restless or buzzing* with no gate: *Go at your own pace. Slow down or stop if anything hurts.* Marching on the spot or stairs, indoors. No metronome | Claudia, 11 Nov: fitness apps suggest marching all the time; a pace line is enough. The pulse audio is part 2 |
+| Move burst (TIP-I) never at night outside, with a metronome | Built for *Restless or buzzing* with no gate: *Go at your own pace. Slow down or stop if anything hurts.* Marching on the spot or stairs, indoors. No metronome | Claudia, 11 Nov: fitness apps suggest marching all the time; a pace line is enough. The pulse audio is part 2 |
 | `wave_numb` state | Not a separate card | Frozen or numb covers it. A clinician can split it later |
-| Medical screen once per profile | A one-tap self-check every time cold is next (D4) | Nothing is stored yet, so asking each time is the safe default |
-| *Not sure* on the screen | Warns (a cool cloth, gently), doesn't block | As the PRD says. Kept as a question for the clinician pass |
+| Medical screen once per profile | No screen (D4, changed 12 Nov): cold carries its caution line. The one-tap self-check built here stays until a PR takes it out | — |
+| *Not sure* on the screen | Warns (a cool cloth, gently), doesn't block | As the PRD says |
 | Medical: the emergency number, *then orient* | The number and *Sit or lie down. Even if it eases, get it checked today.* No orient offer | Orienting reads as "carry on" after a possible cardiac event; Gate 3 asked for the line instead. Clinician pass |
 | Direction per state (up for frozen) | Stored as `regulation_down` for every state | The close kind is per tool. See the runtime change above |
 | Sound | The dose's end chime only (the deadline timer's); no rhythm pulse or audio twin | The PRD's pulse audio is off by default anyway |

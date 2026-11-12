@@ -16,6 +16,7 @@ import {
 } from '../services/neo4j';
 import { applyRoom, isPaletteId } from '../data/palettes';
 import { profileCache } from '../lib/profileCache';
+import { LAST_UID_KEY } from '../lib/authPhase';
 
 const PROFILE_CACHE_KEY = 'goblin-dbt-profile-cache';
 
@@ -32,6 +33,17 @@ function loadCachedProfile(userId: string): UserProfile | null {
     const raw = localStorage.getItem(`${PROFILE_CACHE_KEY}-${userId}`);
     // Defaults first: a cache written before a setting existed (e.g. partsEnabled) reads as its default.
     return raw ? { ...DEFAULT_PROFILE, ...(JSON.parse(raw) as Partial<UserProfile>) } : null;
+  } catch {
+    return null;
+  }
+}
+
+/** While auth resolves on a reload: the last signed-in person's cached profile, so their name and
+ * settings show at once instead of the defaults. Dropped if auth settles signed out. */
+function loadLastCachedProfile(): UserProfile | null {
+  try {
+    const uid = localStorage.getItem(LAST_UID_KEY);
+    return uid ? loadCachedProfile(uid) : null;
   } catch {
     return null;
   }
@@ -66,8 +78,8 @@ interface UserProfileProviderProps {
 }
 
 export function UserProfileProvider({ children }: UserProfileProviderProps) {
-  const { user } = useAuth();
-  const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE);
+  const { user, phase } = useAuth();
+  const [profile, setProfile] = useState<UserProfile>(() => loadLastCachedProfile() ?? DEFAULT_PROFILE);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const reminderIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -119,10 +131,10 @@ export function UserProfileProvider({ children }: UserProfileProviderProps) {
   useEffect(() => {
     if (user) {
       refreshProfile();
-    } else {
+    } else if (phase === 'signed_out') {
       setProfile(DEFAULT_PROFILE);
     }
-  }, [user, refreshProfile]);
+  }, [user, phase, refreshProfile]);
 
   const updateProfile = useCallback(
     async (updates: Partial<UserProfile>) => {
