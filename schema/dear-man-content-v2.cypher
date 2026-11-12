@@ -185,12 +185,12 @@ SET opt.elaboratePrompt = a.prompt;
 //    Each need is linked to the barriers it most often answers.
 // ============================================================
 UNWIND [
-  {id: 'need_permission', label: "That I'm allowed to ask",               sort: 1, barriers: ['barrier_guilty', 'barrier_no_right']},
-  {id: 'need_reaction',   label: "That their reaction isn't mine to fix", sort: 2, barriers: ['barrier_angry']},
+  {id: 'need_permission', label: "That I'm allowed to ask",               sort: 1, barriers: ['barrier_guilty', 'barrier_no_right', 'myth_deserve', 'myth_weak', 'myth_last']},
+  {id: 'need_reaction',   label: "That their reaction isn't mine to fix", sort: 2, barriers: ['barrier_angry', 'myth_matter']},
   {id: 'need_steady',     label: 'That I can stay steady',                sort: 3, barriers: ['barrier_emotional']},
   {id: 'need_imperfect',  label: "That I don't have to say it perfectly", sort: 4, barriers: ['barrier_dont_know']},
   {id: 'need_different',  label: 'That this time can be different',       sort: 5, barriers: ['barrier_tried_before']},
-  {id: 'need_matters',    label: 'That this is worth saying',             sort: 6, barriers: []}
+  {id: 'need_matters',    label: 'That this is worth saying',             sort: 6, barriers: ['myth_know']}
 ] AS n
 MERGE (need:DearManAnchorNeed {id: n.id})
 SET need.label = n.label, need.sortOrder = n.sort, need.barrierIds = n.barriers;
@@ -200,28 +200,31 @@ SET need.label = n.label, need.sortOrder = n.sort, need.barrierIds = n.barriers;
 //    (retags the original four, adds the rest)
 // ============================================================
 UNWIND [
-  {id: 'anchor_needs_valid',       label: 'My needs are valid',                                sort: 1,  needs: ['need_permission'],                   barriers: ['barrier_guilty', 'barrier_no_right']},
-  {id: 'anchor_allowed',           label: "I'm allowed to want this",                          sort: 2,  needs: ['need_permission'],                   barriers: ['barrier_guilty', 'barrier_no_right']},
-  {id: 'anchor_burden',            label: "Asking isn't a burden. Guessing is.",               sort: 3,  needs: ['need_permission'],                   barriers: ['barrier_guilty']},
-  {id: 'anchor_clear_is_kind',     label: 'Clear is kind',                                     sort: 4,  needs: ['need_permission', 'need_imperfect'], barriers: ['barrier_guilty', 'barrier_no_right']},
-  {id: 'anchor_their_feelings',    label: 'Their feelings are theirs to hold',                 sort: 5,  needs: ['need_reaction'],                     barriers: ['barrier_angry']},
-  {id: 'anchor_anger_not_verdict', label: "Their anger isn't a verdict on me",                 sort: 6,  needs: ['need_reaction'],                     barriers: ['barrier_angry']},
-  {id: 'anchor_hear_no',           label: 'I can hear a no and still be okay',                 sort: 7,  needs: ['need_reaction', 'need_different'],   barriers: ['barrier_angry', 'barrier_tried_before']},
-  {id: 'anchor_stay_kind_firm',    label: 'I can be kind and still not back down',             sort: 8,  needs: ['need_reaction', 'need_steady'],      barriers: ['barrier_angry', 'barrier_guilty']},
-  {id: 'anchor_stay_with',         label: 'I can stay with this',                              sort: 9,  needs: ['need_steady'],                       barriers: ['barrier_emotional']},
-  {id: 'anchor_tears_ok',          label: "Tears don't cancel the point",                      sort: 10, needs: ['need_steady'],                       barriers: ['barrier_emotional']},
-  {id: 'anchor_breathe_return',    label: 'Breathe, then come back to the ask',                sort: 11, needs: ['need_steady'],                       barriers: ['barrier_emotional', 'barrier_angry']},
-  {id: 'anchor_feet',              label: 'Feet on the floor. Say the thing.',                 sort: 12, needs: ['need_steady', 'need_imperfect'],     barriers: ['barrier_emotional', 'barrier_dont_know']},
-  {id: 'anchor_slow',              label: "I can go slow. I don't have to rush.",              sort: 13, needs: ['need_steady', 'need_imperfect'],     barriers: ['barrier_emotional', 'barrier_dont_know']},
-  {id: 'anchor_one_sentence',      label: 'One clear sentence is enough',                      sort: 14, needs: ['need_imperfect'],                    barriers: ['barrier_dont_know']},
-  {id: 'anchor_messy_ok',          label: 'Messy and honest beats polished and silent',        sort: 15, needs: ['need_imperfect'],                    barriers: ['barrier_dont_know', 'barrier_emotional']},
-  {id: 'anchor_wrote_it_down',     label: 'I wrote it down because it matters',                sort: 16, needs: ['need_imperfect', 'need_matters'],    barriers: ['barrier_dont_know']},
-  {id: 'anchor_this_time',         label: "This time, I'm asking differently",                 sort: 17, needs: ['need_different'],                    barriers: ['barrier_tried_before']},
-  {id: 'anchor_not_the_past',      label: "I'm here for this conversation, not the last five", sort: 18, needs: ['need_different'],                    barriers: ['barrier_tried_before']},
-  {id: 'anchor_one_ask',           label: 'One ask. This one.',                                sort: 19, needs: ['need_different', 'need_imperfect'],  barriers: ['barrier_tried_before', 'barrier_dont_know']},
-  {id: 'anchor_worth_saying',      label: 'This is worth saying',                              sort: 20, needs: ['need_matters'],                      barriers: []},
-  {id: 'anchor_matters_to_me',     label: "This matters to me, and that's reason enough",      sort: 21, needs: ['need_matters', 'need_permission'],   barriers: ['barrier_no_right']},
-  {id: 'anchor_future_me',         label: 'Future me will be glad I said it',                  sort: 22, needs: ['need_matters'],                      barriers: []}
+  {id: 'anchor_needs_valid',       label: 'My needs are valid',                                 sort: 1,  needs: ['need_permission'],                   barriers: ['barrier_guilty', 'barrier_no_right', 'myth_deserve', 'myth_last']},
+  {id: 'anchor_allowed',           label: "I'm allowed to want this",                           sort: 2,  needs: ['need_permission'],                   barriers: ['barrier_guilty', 'barrier_no_right', 'myth_deserve']},
+  {id: 'anchor_burden',            label: "Asking isn't a burden. Guessing is.",                sort: 3,  needs: ['need_permission'],                   barriers: ['barrier_guilty']},
+  {id: 'anchor_clear_is_kind',     label: 'Clear is kind',                                      sort: 4,  needs: ['need_permission', 'need_imperfect'], barriers: ['barrier_guilty', 'barrier_no_right']},
+  {id: 'anchor_their_feelings',    label: 'Their feelings are theirs to hold',                  sort: 5,  needs: ['need_reaction'],                     barriers: ['barrier_angry']},
+  {id: 'anchor_anger_not_verdict', label: "Their anger isn't a verdict on me",                  sort: 6,  needs: ['need_reaction'],                     barriers: ['barrier_angry']},
+  {id: 'anchor_hear_no',           label: 'I can hear a no and still be okay',                  sort: 7,  needs: ['need_reaction', 'need_different'],   barriers: ['barrier_angry', 'barrier_tried_before', 'myth_matter']},
+  {id: 'anchor_stay_kind_firm',    label: 'I can be kind and still not back down',              sort: 8,  needs: ['need_reaction', 'need_steady'],      barriers: ['barrier_angry', 'barrier_guilty']},
+  {id: 'anchor_stay_with',         label: 'I can stay with this',                               sort: 9,  needs: ['need_steady'],                       barriers: ['barrier_emotional']},
+  {id: 'anchor_tears_ok',          label: "Tears don't cancel the point",                       sort: 10, needs: ['need_steady'],                       barriers: ['barrier_emotional']},
+  {id: 'anchor_breathe_return',    label: 'Breathe, then come back to the ask',                 sort: 11, needs: ['need_steady'],                       barriers: ['barrier_emotional', 'barrier_angry']},
+  {id: 'anchor_feet',              label: 'Feet on the floor. Say the thing.',                  sort: 12, needs: ['need_steady', 'need_imperfect'],     barriers: ['barrier_emotional', 'barrier_dont_know']},
+  {id: 'anchor_slow',              label: "I can go slow. I don't have to rush.",               sort: 13, needs: ['need_steady', 'need_imperfect'],     barriers: ['barrier_emotional', 'barrier_dont_know']},
+  {id: 'anchor_one_sentence',      label: 'One clear sentence is enough',                       sort: 14, needs: ['need_imperfect'],                    barriers: ['barrier_dont_know']},
+  {id: 'anchor_messy_ok',          label: 'Messy and honest beats polished and silent',         sort: 15, needs: ['need_imperfect'],                    barriers: ['barrier_dont_know', 'barrier_emotional']},
+  {id: 'anchor_wrote_it_down',     label: 'I wrote it down because it matters',                 sort: 16, needs: ['need_imperfect', 'need_matters'],    barriers: ['barrier_dont_know']},
+  {id: 'anchor_this_time',         label: "This time, I'm asking differently",                  sort: 17, needs: ['need_different'],                    barriers: ['barrier_tried_before']},
+  {id: 'anchor_not_the_past',      label: "I'm here for this conversation, not the last five",  sort: 18, needs: ['need_different'],                    barriers: ['barrier_tried_before']},
+  {id: 'anchor_one_ask',           label: 'One ask. This one.',                                 sort: 19, needs: ['need_different', 'need_imperfect'],  barriers: ['barrier_tried_before', 'barrier_dont_know']},
+  {id: 'anchor_worth_saying',      label: 'This is worth saying',                               sort: 20, needs: ['need_matters'],                      barriers: []},
+  {id: 'anchor_matters_to_me',     label: "This matters to me, and that's reason enough",       sort: 21, needs: ['need_matters', 'need_permission'],   barriers: ['barrier_no_right']},
+  {id: 'anchor_future_me',         label: 'Future me will be glad I said it',                   sort: 22, needs: ['need_matters'],                      barriers: []},
+  {id: 'anchor_human',             label: 'Needing things is human, not weak',                  sort: 23, needs: ['need_permission'],                   barriers: ['myth_weak', 'myth_last']},
+  {id: 'anchor_this_ask',          label: 'Their no is about this ask, not about me',           sort: 24, needs: ['need_reaction'],                     barriers: ['myth_matter']},
+  {id: 'anchor_kinder_than_guess', label: 'Saying it clearly is kinder than hoping they guess', sort: 25, needs: ['need_permission', 'need_matters'],   barriers: ['myth_know']}
 ] AS a
 MERGE (p:DearManAnchorPhrase {id: a.id})
 SET p.label = a.label, p.sortOrder = a.sort, p.needIds = a.needs, p.barrierIds = a.barriers;

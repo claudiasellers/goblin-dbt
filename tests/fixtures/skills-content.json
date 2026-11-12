@@ -8424,6 +8424,7 @@
     "matters_hint": "If it gets tough, this is what you'll protect.",
     "hard_title": "What makes this hard?",
     "hard_hint": "Pick any that fit.",
+    "myth_label": "Any of these thoughts too?",
     "who_title": "Who might show up in this conversation?",
     "describe_title": "What happened? Say it the way a camera would see it.",
     "describe_hint": "Facts are harder to argue with than judgements.",
@@ -8504,6 +8505,11 @@
     "coach_barrier_tried_before": "If your mind pulls you to the last five times, come back to this conversation, this ask, now.",
     "coach_barrier_emotional": "If tears or a shaky voice come, take a breath. You can say this is hard to say and you want to get through it.",
     "coach_barrier_no_right": "If you start doubting yourself: you don't have to earn the right to need things. Asking clearly is respectful.",
+    "coach_myth_deserve": "You can feel undeserving and still ask. Wanting something is reason enough to say it.",
+    "coach_myth_weak": "Needing things is human. Saying it plainly takes steadiness.",
+    "coach_myth_matter": "Their no is about this ask, on this day. It isn't a ruling on you.",
+    "coach_myth_know": "People can care and still not guess. Saying it clearly gives them the chance.",
+    "coach_myth_last": "Your needs can sit next to theirs. Asking is how they get a place.",
     "fill_ask_specific_help": "What kind of help, and by when?",
     "fill_ask_flexibility": "What would that look like in practice?",
     "fill_ask_change_how": "What would you like to be different?",
@@ -8632,8 +8638,16 @@
        "own": {
         "hint": "own_line",
         "countsAsPick": true,
-        "max": 35
+        "max": 30
        }
+      },
+      {
+       "id": "myth",
+       "label": "myth_label",
+       "options": {
+        "list": "myth"
+       },
+       "max": 2
       }
      ],
      "crisis": [
@@ -9228,7 +9242,7 @@
        "own": {
         "hint": "own_line",
         "countsAsPick": true,
-        "max": 40
+        "max": 35
        }
       }
      ],
@@ -9245,6 +9259,51 @@
      "kind": "ask",
      "title": "mindful_title",
      "lines": [
+      {
+       "key": "coach_myth_deserve",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_deserve"
+        ]
+       }
+      },
+      {
+       "key": "coach_myth_weak",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_weak"
+        ]
+       }
+      },
+      {
+       "key": "coach_myth_matter",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_matter"
+        ]
+       }
+      },
+      {
+       "key": "coach_myth_know",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_know"
+        ]
+       }
+      },
+      {
+       "key": "coach_myth_last",
+       "when": {
+        "eq": [
+         "$a.myth",
+         "myth_last"
+        ]
+       }
+      },
       {
        "key": "coach_barrier_angry",
        "when": {
@@ -9423,7 +9482,7 @@
        "own": {
         "hint": "own_line",
         "countsAsPick": true,
-        "max": 40
+        "max": 35
        }
       }
      ],
@@ -9450,7 +9509,7 @@
        "own": {
         "hint": "own_line",
         "countsAsPick": true,
-        "max": 40
+        "max": 35
        }
       }
      ],
@@ -9808,6 +9867,28 @@
      {
       "value": "scared",
       "label": "I'm scared of what they'd do"
+     }
+    ],
+    "myth": [
+     {
+      "value": "myth_deserve",
+      "label": "I don't deserve it"
+     },
+     {
+      "value": "myth_weak",
+      "label": "Asking makes me look weak"
+     },
+     {
+      "value": "myth_matter",
+      "label": "If they say no, it means I don't matter"
+     },
+     {
+      "value": "myth_know",
+      "label": "They'd know if they cared"
+     },
+     {
+      "value": "myth_last",
+      "label": "My needs come last"
      }
     ],
     "describe": [
@@ -10404,6 +10485,28 @@
       "value": "anchor_future_me",
       "label": "Future me will be glad I said it",
       "needs": [
+       "need_matters"
+      ]
+     },
+     {
+      "value": "anchor_human",
+      "label": "Needing things is human, not weak",
+      "needs": [
+       "need_permission"
+      ]
+     },
+     {
+      "value": "anchor_this_ask",
+      "label": "Their no is about this ask, not about me",
+      "needs": [
+       "need_reaction"
+      ]
+     },
+     {
+      "value": "anchor_kinder_than_guess",
+      "label": "Saying it clearly is kinder than hoping they guess",
+      "needs": [
+       "need_permission",
        "need_matters"
       ]
      }

@@ -235,3 +235,25 @@ test("page: the prep plays on PersonFirstSkill (the picker and safety question f
   assert.match(read("src/lib/skillRuntime/playerTools.ts"), /'dear-man': \['dear_man_debrief', 'dear_man_one', 'dear_man_prep'\]/);
   assert.match(read("functions/src/skills/projections.ts"), /await projectDearManPrep\(tx, input\);/);
 });
+
+test("skill: IE-12's myths sit beside the barriers on *what's hard* (DearManBarrier kind myth, PRESENTS), up to two, optional", () => {
+  const f = step("hard").fields.find((x) => x.id === "myth");
+  assert.equal(f.max, 2);
+  assert.ok(!f.required, "a myth is never required");
+  assert.deepEqual(skill.options.myth.map((o) => o.value), ["myth_deserve", "myth_weak", "myth_matter", "myth_know", "myth_last"]);
+  const cypher = read("schema/dear-man-content.cypher");
+  for (const o of skill.options.myth) assert.match(cypher, new RegExp(`id: m.id[\\s\\S]*${o.value}|${o.value}`), `${o.value} is a DearManBarrier node`);
+});
+
+test("skill: a picked myth's coaching leads the anchor screen, ahead of a barrier's; none picked keeps the barrier's", () => {
+  const lines = step("mindful").lines;
+  const first = (answers) => lines.find((l) => !l.when || (l.when.eq && answers[l.when.eq[0].slice(3)] === l.when.eq[1]))?.key;
+  assert.equal(first({ hard: "barrier_angry", myth: "myth_matter" }), "coach_myth_matter");
+  assert.equal(first({ hard: "barrier_angry" }), "coach_barrier_angry");
+  assert.equal(first({}), "coach_default");
+  const s = play([
+    pick("situation", "address"), next, pick("matters", "relationship"), next, pick("hard", "barrier_angry"), pick("myth", "myth_deserve"), next,
+  ]);
+  assert.equal(s.stepId, "describe", "a myth never stops the plan");
+  for (const l of lines) assert.ok(skill.copy[l.key], `${l.key} has copy`);
+});

@@ -848,6 +848,12 @@ HELD = {
         "barrier_dont_know":    "A skill gap, not a protector.",
         "barrier_tried_before": "Experience, not a move; it can sit under any of them.",
         "barrier_emotional":    "A fear of flooding, read as a flood sign, not a move.",
+        # IE-12's myths (Handout 2a): beliefs about asking. Held until the parts mapping for them is reviewed.
+        "myth_deserve": "A belief about asking, not a move; mapping waits on review.",
+        "myth_weak":    "A belief about asking, not a move; mapping waits on review.",
+        "myth_matter":  "A belief about asking, not a move; mapping waits on review.",
+        "myth_know":    "An expectation of them; it comes with any move.",
+        "myth_last":    "A belief about asking, not a move; mapping waits on review.",
     },
     "BarrierSubResponse": {
         "cant-no-energy":               "Depletion, not a protective move.",
