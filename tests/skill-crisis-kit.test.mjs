@@ -253,3 +253,13 @@ test("the hosts open it: crisis routes with frame=crisis, Hold to wait's use pul
   const hold = all.find((s) => s.id === "hold_to_wait");
   assert.deepEqual(hold.exits.find((e) => e.id === "kit").query, {});
 });
+
+test("Make my crisis kit has its own card under Distress Tolerance beside the kit (Claudia, 12 Nov)", async () => {
+  const { tools, getToolsByModule } = await importTs("src/data/tools.ts");
+  const kit = tools.find((t) => t.id === "crisis-kit");
+  assert.ok(getToolsByModule("distress-tolerance").some((t) => t.id === "crisis-kit"));
+  assert.deepEqual(kit.moreCards.map((m) => [m.name, m.query]), [["Make my crisis kit", "frame=build"]]);
+  const page = readFileSync("src/pages/Tools.tsx", "utf8");
+  assert.match(page, /\(tool\.moreCards \?\? \[\]\)\.map\(m => <ToolCard key=\{`\$\{tool\.id\}:\$\{m\.key\}`\} tool=\{tool\} mode=\{m\} \/>\)/);
+  assert.match(readFileSync("src/components/ToolCard.tsx", "utf8"), /to=\{`\/tool\/\$\{tool\.id\}\$\{mode \? `\?\$\{mode\.query\}` : ''\}`\}/);
+});

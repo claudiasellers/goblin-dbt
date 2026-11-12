@@ -1,0 +1,716 @@
+{
+  "version": "safety-v1",
+  "flow": {
+    "version": "safety-v1",
+    "repeat": {
+      "afterNoHours": 12,
+      "afterOtherHours": 72
+    },
+    "answerRank": {
+      "no": 0,
+      "declined": 1,
+      "passing": 1,
+      "strong": 2,
+      "plan": 3,
+      "act": 4
+    },
+    "findAHelpline": {
+      "label": "Find A Helpline",
+      "url": "https://findahelpline.com"
+    },
+    "people": {
+      "heading": "People you can talk to",
+      "emergency": "Emergency: {number}",
+      "call": "Call",
+      "text": "Text",
+      "chat": "Chat",
+      "textBody": "Text {body} to {number}",
+      "allDay": "Any time, day or night",
+      "notIn": "Not in {country}?",
+      "pickCountry": "Where are you?",
+      "noLine": "We don't have a checked line for {country} yet. Find A Helpline lists the ones near you.",
+      "findLine": "Find a line near you",
+      "fromPlan": "Someone from your plan",
+      "unknownCountry": "Your local emergency number",
+      "emergencyOr": "Emergency: {number} or {alt}"
+    },
+    "header": {
+      "label": "Help & safety",
+      "plan": "My safety plan",
+      "makePlan": "Make a safety plan",
+      "people": "People you can talk to",
+      "say": "I'm thinking about hurting myself"
+    },
+    "question": {
+      "title": "Sometimes feelings like this come with thoughts of hurting yourself or not wanting to be alive. Is that part of it right now?",
+      "choices": [
+        {
+          "id": "no",
+          "label": "No"
+        },
+        {
+          "id": "passing",
+          "label": "Some passing thoughts"
+        },
+        {
+          "id": "strong",
+          "label": "Yes, strong thoughts"
+        },
+        {
+          "id": "plan",
+          "label": "I have a plan, or I've already done something"
+        },
+        {
+          "id": "declined",
+          "label": "I'd rather not say"
+        }
+      ],
+      "helpNowTitle": "Let's get you to people first. Which is closest right now?",
+      "saidTitle": "Thanks for saying it. Which is closest right now?",
+      "saidChoices": [
+        {
+          "id": "passing",
+          "label": "Some passing thoughts"
+        },
+        {
+          "id": "strong",
+          "label": "Strong thoughts"
+        },
+        {
+          "id": "plan",
+          "label": "I have a plan, or I've already done something"
+        },
+        {
+          "id": "declined",
+          "label": "I'd rather not say"
+        }
+      ]
+    },
+    "passing": {
+      "line": "Thanks for telling me. That's worth taking seriously, even when it's passing.",
+      "plan": "Your safety plan",
+      "makePlan": "Make a safety plan",
+      "makePlanSub": "Five minutes, whenever you're ready",
+      "people": "People you can talk to",
+      "continue": "Carry on"
+    },
+    "declined": {
+      "line": "That's okay. These are here if you want them."
+    },
+    "strong": {
+      "title": "You don't have to hold this on your own right now.",
+      "plan": "Open your plan",
+      "quickPlan": "Make a quick plan",
+      "quickPlanSub": "Three screens, about a minute",
+      "meansFirst": "First, one thing to make right now a bit safer.",
+      "whileYouDecide": "While you decide",
+      "fromYourPlan": "From your plan"
+    },
+    "quickPlan": {
+      "steps": [
+        {
+          "id": "sign",
+          "title": "One thing you're noticing right now that tells you it's a hard time",
+          "placeholder": "In your words"
+        },
+        {
+          "id": "do",
+          "title": "One thing you can do for the next ten minutes",
+          "placeholder": "In your words"
+        },
+        {
+          "id": "contact",
+          "title": "One person or line you'll contact",
+          "placeholder": "A name, or a line"
+        }
+      ],
+      "ownMax": 120,
+      "save": "Keep this",
+      "saved": "It's kept. It opens from Help & safety.",
+      "deviceSaved": "It's kept on this device."
+    },
+    "means": {
+      "title": "Is there anything nearby you might use to hurt yourself?",
+      "choices": [
+        {
+          "id": "yes",
+          "label": "Yes"
+        },
+        {
+          "id": "not_sure",
+          "label": "Not sure"
+        },
+        {
+          "id": "no",
+          "label": "No"
+        }
+      ],
+      "actionsTitle": "Which of these could you do?",
+      "actions": [
+        {
+          "id": "other_room",
+          "label": "Put it in another room"
+        },
+        {
+          "id": "give_someone",
+          "label": "Give it to someone"
+        },
+        {
+          "id": "lock_away",
+          "label": "Lock it away"
+        },
+        {
+          "id": "leave_room",
+          "label": "Leave the room myself"
+        },
+        {
+          "id": "cant_now",
+          "label": "I can't right now"
+        }
+      ],
+      "did": "I did it",
+      "calmTitle": "On a hard night, what would be safer out of reach? Who could keep it for you?",
+      "medsLine": "Keeping only a small amount of medicine at home, and the rest with someone you trust, makes a hard night safer.",
+      "firearm": "If there's a gun in the home, could someone else hold it for now, or could it be locked with the key kept elsewhere?"
+    },
+    "act": {
+      "title": "Have you already done something to hurt yourself, or taken something?",
+      "choices": [
+        {
+          "id": "yes",
+          "label": "Yes"
+        },
+        {
+          "id": "no",
+          "label": "No"
+        },
+        {
+          "id": "not_sure",
+          "label": "Not sure"
+        }
+      ],
+      "kindTitle": "Was it something you took, or an injury?",
+      "kinds": [
+        {
+          "id": "took",
+          "label": "Something I took or swallowed"
+        },
+        {
+          "id": "injury",
+          "label": "An injury"
+        },
+        {
+          "id": "not_sure",
+          "label": "Not sure"
+        }
+      ],
+      "medicalTitle": "If you're hurt or you've taken something, the emergency number is the right call, even if it feels like too much.",
+      "medicalLine": "Don't wait to see if it gets better.",
+      "tookLine": "Some things you take don't hurt at first and do harm hours later. Call now, even if you feel all right. Keep the packaging or the name of what you took.",
+      "poison": "Poison information",
+      "medicalChoices": [
+        {
+          "id": "got_help",
+          "label": "I've got help"
+        },
+        {
+          "id": "getting_help",
+          "label": "I'm getting help"
+        },
+        {
+          "id": "not_that_kind",
+          "label": "It's not that kind of hurt",
+          "showWhen": {
+            "act": "yes",
+            "kind": "injury"
+          }
+        }
+      ],
+      "firstAid": "Rinse it under cool running water and cover it with something clean. Press firmly on a cut until it stops. If it's deep or gaping, still bleeding after ten minutes of pressure, a burn bigger than your palm, or you feel faint, call the emergency number.",
+      "nextDay": "Tomorrow, when it's quieter, a look at what led up to this can help next time.",
+      "nextDayChoices": [
+        {
+          "id": "yes",
+          "label": "Remind me tomorrow"
+        },
+        {
+          "id": "no",
+          "label": "No thanks"
+        }
+      ]
+    },
+    "exit": {
+      "button": "I'm okay for now",
+      "title": "Before you go, which is closest?",
+      "choices": [
+        {
+          "id": "plan",
+          "label": "I'll use my plan"
+        },
+        {
+          "id": "contacted",
+          "label": "I've contacted someone"
+        },
+        {
+          "id": "stop",
+          "label": "I need to stop here"
+        }
+      ],
+      "back": "Back to where I was"
+    },
+    "checkin": {
+      "title": "Can I check in with you tomorrow morning?",
+      "choices": [
+        {
+          "id": "yes",
+          "label": "Yes"
+        },
+        {
+          "id": "no",
+          "label": "No thanks"
+        }
+      ]
+    },
+    "morning": {
+      "title": "How are you this morning?",
+      "choices": [
+        {
+          "id": "okay",
+          "label": "Doing okay"
+        },
+        {
+          "id": "hard",
+          "label": "Still hard"
+        },
+        {
+          "id": "not_safe",
+          "label": "I'm not safe"
+        }
+      ],
+      "okay": "Glad you're here.",
+      "hard": "Thanks for saying. Your plan, or something for the next few minutes.",
+      "twiceHard": "Two hard mornings in a row. A doctor, therapist or a non-crisis support line can help with this, and you don't have to be in crisis to call."
+    },
+    "signedOut": {
+      "saveToAccount": "Save this plan to your account so it's there next time?",
+      "save": "Save it",
+      "notNow": "Not now"
+    },
+    "cantTell": "Goblin can't judge how safe you are right now. The people on these lines are trained to help with that."
+  },
+  "flags": {
+    "clinical_referral_psychosis": "What you're going through sounds hard. A doctor or therapist can help make sense of it with you.",
+    "clinical_referral_severe_dissociation": "If feeling far away keeps happening, a doctor or therapist can help with it too.",
+    "clinical_referral_shutdown": "If this has gone on for a while, a doctor or therapist can help with it too.",
+    "crisis_self_harm": "People you can talk to are here, any time.",
+    "crisis_suicidal": "People you can talk to are here, any time."
+  },
+  "countries": [
+    {
+      "id": "AU",
+      "name": "Australia",
+      "emergency": "000",
+      "emergencyAlt": null,
+      "firearmPrompt": false,
+      "lines": [
+        {
+          "id": "au_lifeline",
+          "name": "Lifeline",
+          "kind": "crisis",
+          "phone": "13 11 14",
+          "sms": null,
+          "smsBody": null,
+          "chatUrl": "https://www.lifeline.org.au/crisis-chat/",
+          "hours": "24/7",
+          "languages": [
+            "en"
+          ]
+        },
+        {
+          "id": "au_lifeline_text",
+          "name": "Lifeline Text",
+          "kind": "text",
+          "phone": null,
+          "sms": "0477 13 11 14",
+          "smsBody": null,
+          "chatUrl": null,
+          "hours": "24/7",
+          "languages": [
+            "en"
+          ]
+        },
+        {
+          "id": "au_poisons",
+          "name": "Poisons Information Centre",
+          "kind": "poison",
+          "phone": "13 11 26",
+          "sms": null,
+          "smsBody": null,
+          "chatUrl": null,
+          "hours": "24/7",
+          "languages": [
+            "en"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CA",
+      "name": "Canada",
+      "emergency": "911",
+      "emergencyAlt": null,
+      "firearmPrompt": true,
+      "lines": [
+        {
+          "id": "ca_988",
+          "name": "9-8-8 Suicide Crisis Helpline",
+          "kind": "crisis",
+          "phone": "988",
+          "sms": "988",
+          "smsBody": null,
+          "chatUrl": null,
+          "hours": "24/7",
+          "languages": [
+            "en",
+            "fr"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DE",
+      "name": "Germany",
+      "emergency": "112",
+      "emergencyAlt": null,
+      "firearmPrompt": false,
+      "lines": [
+        {
+          "id": "de_telefonseelsorge",
+          "name": "TelefonSeelsorge",
+          "kind": "crisis",
+          "phone": "0800 111 0 111",
+          "sms": null,
+          "smsBody": null,
+          "chatUrl": "https://online.telefonseelsorge.de",
+          "hours": "24/7",
+          "languages": [
+            "de"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ES",
+      "name": "Spain",
+      "emergency": "112",
+      "emergencyAlt": null,
+      "firearmPrompt": false,
+      "lines": [
+        {
+          "id": "es_024",
+          "name": "024, Línea de atención a la conducta suicida",
+          "kind": "crisis",
+          "phone": "024",
+          "sms": null,
+          "smsBody": null,
+          "chatUrl": null,
+          "hours": "24/7",
+          "languages": [
+            "es"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "FR",
+      "name": "France",
+      "emergency": "112",
+      "emergencyAlt": "15",
+      "firearmPrompt": false,
+      "lines": [
+        {
+          "id": "fr_3114",
+          "name": "3114, numéro national de prévention du suicide",
+          "kind": "crisis",
+          "phone": "3114",
+          "sms": null,
+          "smsBody": null,
+          "chatUrl": null,
+          "hours": "24/7",
+          "languages": [
+            "fr"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "GB",
+      "name": "the UK",
+      "emergency": "999",
+      "emergencyAlt": null,
+      "firearmPrompt": false,
+      "lines": [
+        {
+          "id": "gb_samaritans",
+          "name": "Samaritans",
+          "kind": "crisis",
+          "phone": "116 123",
+          "sms": null,
+          "smsBody": null,
+          "chatUrl": null,
+          "hours": "24/7",
+          "languages": [
+            "en"
+          ]
+        },
+        {
+          "id": "gb_shout",
+          "name": "Shout",
+          "kind": "text",
+          "phone": null,
+          "sms": "85258",
+          "smsBody": "SHOUT",
+          "chatUrl": null,
+          "hours": "24/7",
+          "languages": [
+            "en"
+          ]
+        },
+        {
+          "id": "gb_nhs111",
+          "name": "NHS 111, mental health option (England, Scotland, Wales)",
+          "kind": "urgent",
+          "phone": "111",
+          "sms": null,
+          "smsBody": null,
+          "chatUrl": null,
+          "hours": "24/7",
+          "languages": [
+            "en"
+          ]
+        },
+        {
+          "id": "gb_lifeline_ni",
+          "name": "Lifeline (Northern Ireland)",
+          "kind": "crisis",
+          "phone": "0808 808 8000",
+          "sms": null,
+          "smsBody": null,
+          "chatUrl": null,
+          "hours": "24/7",
+          "languages": [
+            "en"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "IE",
+      "name": "Ireland",
+      "emergency": "112",
+      "emergencyAlt": "999",
+      "firearmPrompt": false,
+      "lines": [
+        {
+          "id": "ie_samaritans",
+          "name": "Samaritans",
+          "kind": "crisis",
+          "phone": "116 123",
+          "sms": null,
+          "smsBody": null,
+          "chatUrl": null,
+          "hours": "24/7",
+          "languages": [
+            "en"
+          ]
+        },
+        {
+          "id": "ie_text_about_it",
+          "name": "Text About It",
+          "kind": "text",
+          "phone": null,
+          "sms": "50808",
+          "smsBody": "HELLO",
+          "chatUrl": null,
+          "hours": "24/7",
+          "languages": [
+            "en"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "IN",
+      "name": "India",
+      "emergency": "112",
+      "emergencyAlt": null,
+      "firearmPrompt": false,
+      "lines": [
+        {
+          "id": "in_tele_manas",
+          "name": "Tele-MANAS",
+          "kind": "crisis",
+          "phone": "14416",
+          "sms": null,
+          "smsBody": null,
+          "chatUrl": null,
+          "hours": "24/7",
+          "languages": [
+            "en",
+            "hi"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "IT",
+      "name": "Italy",
+      "emergency": "112",
+      "emergencyAlt": null,
+      "firearmPrompt": false,
+      "lines": []
+    },
+    {
+      "id": "NL",
+      "name": "the Netherlands",
+      "emergency": "112",
+      "emergencyAlt": null,
+      "firearmPrompt": false,
+      "lines": [
+        {
+          "id": "nl_113",
+          "name": "113 Zelfmoordpreventie",
+          "kind": "crisis",
+          "phone": "0800 0113",
+          "sms": null,
+          "smsBody": null,
+          "chatUrl": "https://www.113.nl",
+          "hours": "24/7",
+          "languages": [
+            "nl"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "NZ",
+      "name": "New Zealand",
+      "emergency": "111",
+      "emergencyAlt": null,
+      "firearmPrompt": false,
+      "lines": [
+        {
+          "id": "nz_1737",
+          "name": "1737 Need to talk?",
+          "kind": "crisis",
+          "phone": "1737",
+          "sms": "1737",
+          "smsBody": null,
+          "chatUrl": null,
+          "hours": "24/7",
+          "languages": [
+            "en"
+          ]
+        },
+        {
+          "id": "nz_lifeline",
+          "name": "Lifeline Aotearoa",
+          "kind": "crisis",
+          "phone": "0800 543 354",
+          "sms": "4357",
+          "smsBody": null,
+          "chatUrl": null,
+          "hours": "24/7",
+          "languages": [
+            "en"
+          ]
+        },
+        {
+          "id": "nz_poisons",
+          "name": "National Poisons Centre",
+          "kind": "poison",
+          "phone": "0800 764 766",
+          "sms": null,
+          "smsBody": null,
+          "chatUrl": null,
+          "hours": "24/7",
+          "languages": [
+            "en"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SE",
+      "name": "Sweden",
+      "emergency": "112",
+      "emergencyAlt": null,
+      "firearmPrompt": false,
+      "lines": [
+        {
+          "id": "se_90101",
+          "name": "Självmordslinjen (Mind)",
+          "kind": "crisis",
+          "phone": "90101",
+          "sms": null,
+          "smsBody": null,
+          "chatUrl": "https://mind.se/hitta-hjalp/sjalvmordslinjen/",
+          "hours": "24/7",
+          "languages": [
+            "sv"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "US",
+      "name": "the United States",
+      "emergency": "911",
+      "emergencyAlt": null,
+      "firearmPrompt": true,
+      "lines": [
+        {
+          "id": "us_988",
+          "name": "988 Suicide & Crisis Lifeline",
+          "kind": "crisis",
+          "phone": "988",
+          "sms": "988",
+          "smsBody": null,
+          "chatUrl": "https://988lifeline.org/chat/",
+          "hours": "24/7",
+          "languages": [
+            "en",
+            "es"
+          ]
+        },
+        {
+          "id": "us_crisis_text",
+          "name": "Crisis Text Line",
+          "kind": "text",
+          "phone": null,
+          "sms": "741741",
+          "smsBody": "HOME",
+          "chatUrl": null,
+          "hours": "24/7",
+          "languages": [
+            "en"
+          ]
+        },
+        {
+          "id": "us_poison",
+          "name": "Poison Control",
+          "kind": "poison",
+          "phone": "1-800-222-1222",
+          "sms": null,
+          "smsBody": null,
+          "chatUrl": null,
+          "hours": "24/7",
+          "languages": [
+            "en",
+            "es"
+          ]
+        }
+      ]
+    }
+  ]
+}

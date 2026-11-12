@@ -62,7 +62,10 @@ test("CrisisBanner other_person: 911 first, the Hotline by call and text, 988 la
   assert.match(plain, /href="tel:988"[\s\S]*href="sms:741741\?body=HELLO"/);
   assert.doesNotMatch(plain, /911|88788|other_person/);
   // The numbers still live only in CrisisBanner.
-  const files = walk("src").filter((f) => /\.(ts|tsx|json)$/.test(f) && f !== join("src", "components", "safety", "CrisisBanner.tsx"));
+  // The safety route's helplines (CORE-01) are generated content from the graph (scripts/safety/content.py →
+  // src/data/content/safety.json), the other place numbers may live; no hand-written file carries one.
+  const files = walk("src").filter((f) => /\.(ts|tsx|json)$/.test(f) && f !== join("src", "components", "safety", "CrisisBanner.tsx")
+    && f !== join("src", "data", "content", "safety.json"));
   for (const f of files) assert.doesNotMatch(read(f), /\b911\b|7997233|88788|Domestic Violence Hotline/, f);
 });
 

@@ -11,6 +11,7 @@ import {
 import { legacyTools } from './legacy';
 import { resolveBand } from './band';
 import { selectRecommendations, type RoutingPick } from './select';
+import type { SafetyAsk } from '../safety/safetyAsk';
 import type {
   ActivationPatternResult, CheckInInput, CoOccurrence, EmotionEvidenceRow, GuidedActivityRecommendation,
   LegacyToolRow, PatternDetail, PatternSlice, ResponseEvidenceRow, Routing, RoutingConcept, RoutingPolicy, SafetyFlag,
@@ -26,10 +27,21 @@ export interface StateDeps {
   legacyTools(patternId: string): Promise<LegacyToolRow[]>;
   /** The safety seam (functions/src/safety/checkinSafetyFlag.ts). */
   safetyFlag(patternId: string, quadrant: string): Promise<SafetyFlag | undefined>;
+  /**
+   * The safety route (CORE-01, functions/src/safety/safetyAsk.ts): null while SafetyPolicy is off (or for
+   * a caller without it, the goldens), which leaves `safetyFlag` exactly as before. On: whether to ask the
+   * question, and the result's flag is a clinical referral only (no crisis banner from a pattern).
+   */
+  safetyRoute?(a: { quadrant: string; patternIds: string[]; emotionIds: string[]; band: string | null }): Promise<SafetyRouteResult | null>;
   /** E4-3: RoutingPolicy {id: 'checkin_result'} and its fallback concept (both null if not loaded). */
   routingPolicy(): Promise<{ policy: RoutingPolicy | null; fallback: RoutingConcept | null }>;
   /** E4-3: RECOMMENDED_FOR rows (+ concept tags, addresses, contraindications) for these patterns. */
   routingSlice(patternIds: string[]): Promise<PatternSlice[]>;
+}
+
+export interface SafetyRouteResult {
+  ask: SafetyAsk;
+  flag?: SafetyFlag;
 }
 
 export class PatternNotFoundError extends Error {
@@ -152,7 +164,18 @@ export async function getStateAndToolsHandler(input: CheckInInput, deps: StateDe
     };
   }
 
-  const safetyFlag = await deps.safetyFlag(pattern.id, input.quadrant);
+  const route = deps.safetyRoute
+    ? await deps.safetyRoute({
+      quadrant: input.quadrant,
+      patternIds: secondaryPattern ? [pattern.id, secondaryPattern.id] : [pattern.id],
+      emotionIds,
+      band,
+    })
+    : null;
+  const safetyFlag = route ? route.flag : await deps.safetyFlag(pattern.id, input.quadrant);
   const guidedActivity = guidedActivityFor(input.quadrant, pattern.id);
-  return { pattern, tools, safetyFlag, secondaryPattern, coOccurrence, guidedActivity, routing };
+  return {
+    pattern, tools, safetyFlag, secondaryPattern, coOccurrence, guidedActivity, routing,
+    ...(route ? { safetyAsk: route.ask } : {}),
+  };
 }

@@ -30,6 +30,31 @@ export function safetyFlagFor(quadrant: string, flags: readonly SafetyFlag[]): S
   return flags[0];
 }
 
+/**
+ * The safety route's flag (CORE-01, SafetyPolicy on): the pattern's first clinical referral, every
+ * unpleasant quadrant (the shutdown note was meant for low-unpleasant). Crisis flags are never returned:
+ * the question asks instead of a pattern raising the banner.
+ */
+export const REFERRAL_FLAG_QUERY = `
+  MATCH (p:ActivationPattern {id: $patternId})-[:TRIGGERS_SAFETY]->(sf:SafetyFlag)
+  WHERE sf.type = 'clinical_referral'
+  RETURN sf.id as id, sf.type as type, sf.trigger as trigger, sf.action as action, sf.userCopy as userCopy
+  ORDER BY sf.id
+  LIMIT 1
+`;
+
+export async function evaluateReferralFlag(tx: QueryRunner, patternId: string): Promise<SafetyFlag | undefined> {
+  const r = (await tx.run(REFERRAL_FLAG_QUERY, { patternId })).records[0];
+  if (!r) return undefined;
+  return {
+    id: r.get('id') as string,
+    type: r.get('type') as string,
+    trigger: r.get('trigger') as string,
+    action: r.get('action') as string,
+    userCopy: (r.get('userCopy') as string | null) ?? null,
+  };
+}
+
 export async function evaluateSafetyFlag(tx: QueryRunner, patternId: string, quadrant: string): Promise<SafetyFlag | undefined> {
   if (!checksSafety(quadrant)) return undefined;
   const res = await tx.run(SAFETY_FLAG_QUERY, { patternId });
