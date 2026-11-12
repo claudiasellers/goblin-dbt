@@ -3,14 +3,19 @@ import {
   useEffectEvent,
   useRef,
   useState,
+  type CSSProperties,
   type ReactNode,
 } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { getEmotionById, getEmotionByName } from "../../data/emotions";
 import { getToolById } from "../../data/tools";
 import { getMicroStepsForPattern, type MicroStep } from "../../data/microSteps";
-import { EmotionPicker } from "../../components/tools/EmotionPicker";
 import { ToolLoading } from "../../components/tools/ToolLoading";
+import { OppositeActionStart } from "../../components/tools/oppositeAction/OppositeActionStart";
+import { getOppositeActionPickerContent } from "../../services/oppositeActionPicker";
+import type { OppositeActionPickerContent } from "../../data/oppositeActionPickerTypes";
+import { OPPOSITE_ACTION_DOORS } from "../../data/oppositeActionDoors";
+import { addWords, orderUrges, type Pick } from "../../lib/oppositeActionPicker";
 import { HoldToConfirm } from "../../components/tools/oppositeAction/HoldToConfirm";
 import { UrgeScale } from "../../components/tools/oppositeAction/UrgeScale";
 import { TapCard } from "../../components/tools/oppositeAction/TapCardLoop";
@@ -260,6 +265,43 @@ function ProgressDots({ stage }: { stage: Stage }) {
   );
 }
 
+/** "Shame", "Shame and fear", "Shame, fear and guilt". */
+function listNames(names: string[]): string {
+  if (names.length < 2) return names[0] ?? "";
+  return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+}
+
+/** One feeling's section on a multi-feeling screen: its colour (presentation), name and word. */
+function FeelingSection({
+  label,
+  word,
+  rank,
+  style,
+  children,
+}: {
+  label: string;
+  word: string;
+  rank: number;
+  style?: CSSProperties;
+  children: ReactNode;
+}) {
+  const showWord = word && word.toLowerCase() !== label.toLowerCase();
+  return (
+    <section className="oa-feeling space-y-3" style={style} aria-label={label}>
+      <div className="oa-feeling__head">
+        <span className="oa-dot" aria-hidden="true" />
+        <h3 className="oa-feeling__name">{label}</h3>
+        {showWord && <span className={secondaryText}>{word.toLowerCase()}</span>}
+        <span className={`${secondaryText} ml-auto`}>
+          <span className="sr-only">Loudness rank </span>
+          {rank + 1}
+        </span>
+      </div>
+      {children}
+    </section>
+  );
+}
+
 export function OppositeAction() {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -277,18 +319,43 @@ export function OppositeAction() {
     () => !followUpId && idsFromState(location.state).length === 1,
   );
   const [data, setData] = useState<OppositeActionContent | null>(null);
-  const [draft, setDraft] = useState<Draft>(blank);
-  // The one emotion worked with is the session's when it opened without any (a hand-off's are kept).
+  /**
+   * One draft per feeling, loudest first; one session each is saved. The first is the lead: the
+   * single-feeling screens, a follow-up and the save state are about it. Shared answers (goal,
+   * safety, body cues, when, snag, outcome, note) are kept the same on every draft.
+   */
+  const [drafts, setDrafts] = useState<Draft[]>(() => [blank()]);
+  const draft = drafts[0];
+  const multi = drafts.length > 1;
+  const setDraft = (next: Draft | ((d: Draft) => Draft)) =>
+    setDrafts((ds) => [typeof next === "function" ? next(ds[0]) : next, ...ds.slice(1)]);
+  const [picker, setPicker] = useState<OppositeActionPickerContent | null>(null);
+  const [pickerFailed, setPickerFailed] = useState(false);
+  const [picks, setPicks] = useState<Pick[]>([]);
+  const [skipped, setSkipped] = useState<string[]>([]);
+  /** Feelings the quick check sent elsewhere (problem-solve, clarify): back from the body step restores them. */
+  const [setAside, setSetAside] = useState<Draft[]>([]);
+  // The emotions worked with are the session's when it opened without any (a hand-off's are kept).
   useEffect(() => {
-    toolSession.setEmotionIds(draft.emotionId ? [draft.emotionId] : []);
-  }, [draft.emotionId, toolSession]);
+    toolSession.setEmotionIds(drafts.map((d) => d.emotionId).filter(Boolean));
+  }, [drafts, toolSession]);
   const [error, setError] = useState("");
   const [saveState, setSaveState] = useState<
     "idle" | "saving" | "saved" | "error"
   >("idle");
   const [checkStep, setCheckStep] = useState(0);
-  const [customAction, setCustomAction] = useState(false);
-  const [stepOpen, setStepOpen] = useState(true);
+  /** Per feeling (by draft index): writing their own step, and whether the step list is open. */
+  const [customActs, setCustomActs] = useState<boolean[]>([]);
+  const [stepOpens, setStepOpens] = useState<boolean[]>([]);
+  const customAt = (i: number) => customActs[i] ?? false;
+  const stepOpenAt = (i: number) => stepOpens[i] ?? true;
+  const setCustomAt = (i: number, v: boolean) =>
+    setCustomActs((a) => Object.assign([...a], { [i]: v }));
+  const setStepOpenAt = (i: number, v: boolean) =>
+    setStepOpens((a) => Object.assign([...a], { [i]: v }));
+  /** Lead feeling only (the single-feeling screens); resets clear every feeling. */
+  const setCustomAction = (v: boolean) => (v ? setCustomAt(0, true) : setCustomActs([]));
+  const setStepOpen = (v: boolean) => (v ? setStepOpens([]) : setStepOpenAt(0, false));
   const [escapeStep, setEscapeStep] = useState<MicroStep | null>(null);
   const [dueWindow, setDueWindow] = useState("");
   const [cueHour, setCueHour] = useState(0);
@@ -325,14 +392,29 @@ export function OppositeAction() {
   const flow: OppositeActionFlow | undefined = data?.flow;
   const c = flow?.copy ?? {};
   const choices = flow?.choices ?? {};
+  /** What each feeling's screens need: its protocol (urges in the graph's order), urge and wording. */
+  const infoOf = (d: Draft) => {
+    const raw = data?.parents[d.parentId];
+    const protocol = raw
+      ? { ...raw, urges: orderUrges(raw.urges, picker?.parents.find((p) => p.id === d.parentId)?.urges) }
+      : undefined;
+    const urge = protocol?.urges.find((u) => u.id === d.urgeId);
+    const urgeLabel = d.urgeId === "custom" ? d.customUrge : (urge?.label ?? d.urgeLabel);
+    const emotion = getEmotionById(d.emotionId)?.name ?? "";
+    const tint = OPPOSITE_ACTION_DOORS.find((x) => x.parent === d.parentId)?.tint;
+    return {
+      protocol,
+      urge,
+      urgeLabel,
+      urgeText: urgePhrase(urgeLabel),
+      emotion,
+      parentLabel: protocol?.label ?? emotion,
+      examples: urge ?? protocol?.defaultOpposites,
+      style: (tint ? { ["--tint" as string]: tint } : undefined) as CSSProperties | undefined,
+    };
+  };
   const mapping = data?.emotions.find((e) => e.emotionId === draft.emotionId);
-  const protocol = data?.parents[draft.parentId];
-  const urge = protocol?.urges.find((u) => u.id === draft.urgeId);
-  const urgeLabel =
-    draft.urgeId === "custom"
-      ? draft.customUrge
-      : (urge?.label ?? draft.urgeLabel);
-  const urgeText = urgePhrase(urgeLabel);
+  const { protocol, urgeLabel, urgeText, emotion, examples } = infoOf(draft);
   // Parts on: "A part of you … right now." once an urge is picked, above what comes next (never for
   // "My urge is different": free text has no move).
   const unblend = useUnblendLine("oa", draft.urgeId && draft.urgeId !== "custom" ? draft.urgeId : null, stage === "urge");
@@ -345,9 +427,7 @@ export function OppositeAction() {
     },
     stage === "check" && checkStep === EFFECTIVENESS_STEP,
   );
-  const emotion = getEmotionById(draft.emotionId)?.name ?? "";
   const emotionLower = emotion.toLowerCase();
-  const examples = urge ?? protocol?.defaultOpposites;
   const later = draft.status === "planned" && draft.cueId !== "now";
   const anchors = { lowLabel: c.scaleLow, highLabel: c.scaleHigh };
   const holdCopy = {
@@ -358,12 +438,18 @@ export function OppositeAction() {
     doneLabel: c.bodyDone,
   };
 
+  /** Set a shared answer on every feeling (with one feeling: on it). */
   const change = <K extends keyof Draft>(key: K, value: Draft[K]) => {
-    setDraft((s) => ({ ...s, [key]: value }));
+    setDrafts((ds) => ds.map((s) => ({ ...s, [key]: value })));
     setSaveState("idle");
   };
   const patch = (values: Partial<Draft>) => {
-    setDraft((s) => ({ ...s, ...values }));
+    setDrafts((ds) => ds.map((s) => ({ ...s, ...values })));
+    setSaveState("idle");
+  };
+  /** Set one feeling's own answers. */
+  const patchAt = (i: number, values: Partial<Draft>) => {
+    setDrafts((ds) => ds.map((s, j) => (j === i ? { ...s, ...values } : s)));
     setSaveState("idle");
   };
   const go = (next: Stage) => {
@@ -427,8 +513,8 @@ export function OppositeAction() {
    * effectiveness are cleared and re-asked from the safety card: circumstances
    * may have changed since the last attempt.
    */
-  const restartFromSafety = (values: Partial<Draft>) => {
-    setDraft((s) => ({
+  const restartFromSafety = (values: Partial<Draft> | ((d: Draft) => Partial<Draft>)) => {
+    setDrafts((ds) => ds.map((s) => ({
       ...s,
       id: crypto.randomUUID(),
       safety: "",
@@ -445,8 +531,8 @@ export function OppositeAction() {
       outcome: "",
       missedReason: "",
       reflection: "",
-      ...values,
-    }));
+      ...(typeof values === "function" ? values(s) : values),
+    })));
     setEscapeStep(null);
     setDueWindow("");
     setFollowMode(false);
@@ -465,7 +551,7 @@ export function OppositeAction() {
         key={normalized}
         className={`${choiceButton} block`}
         to={`/tool/${normalized}`}
-        state={{ checkinEmotions: [draft.emotionId] }}
+        state={{ checkinEmotions: drafts.map((d) => d.emotionId).filter(Boolean) }}
       >
         {label ?? `Open ${tool.name}`} →
       </Link>
@@ -477,6 +563,7 @@ export function OppositeAction() {
   };
 
   // ── Content loading (ticket guards against stale responses) ──
+  /** Load the guided content for one to three words (loudest first) and start on the urge. */
   async function fetchContent(target: string[]) {
     const ticket = ++requestId.current;
     try {
@@ -484,26 +571,31 @@ export function OppositeAction() {
       if (ticket !== requestId.current) return;
       if (!result.flow || result.flow.version !== FLOW_VERSION)
         throw new Error("content");
-      const match = result.emotions.find((e) => e.emotionId === target[0]);
-      if (!match) throw new Error("content");
-      if (
-        match.applicable &&
-        (!match.dbtParent || !result.parents[match.dbtParent])
-      )
-        throw new Error("content");
+      const matches = target.map((id) => result.emotions.find((e) => e.emotionId === id));
+      if (matches.some((m) => !m)) throw new Error("content");
+      // Several feelings: only those Opposite Action works on (the picker only offers those).
+      const usable = target.length > 1 ? matches.filter((m) => m!.applicable) : matches;
+      if (!usable.length) throw new Error("content");
+      for (const m of usable)
+        if (m!.applicable && (!m!.dbtParent || !result.parents[m!.dbtParent]))
+          throw new Error("content");
+      const loaded = result.flow;
       setData(result);
-      setDraft({
-        ...blank(),
-        emotionId: target[0],
-        parentId: match.dbtParent ?? "",
-        contentVersion: result.flow.version,
-        sourceIds: result.flow.sourceIds,
-      });
+      setDrafts(
+        usable.map((m) => ({
+          ...blank(),
+          emotionId: m!.emotionId,
+          parentId: m!.dbtParent ?? "",
+          contentVersion: loaded.version,
+          sourceIds: loaded.sourceIds,
+        })),
+      );
+      setSetAside([]);
       toolSession.setUrgeIds([]);
       clearCheck("urge");
       setCheckStep(0);
-      setCustomAction(false);
-      setStepOpen(true);
+      setCustomActs([]);
+      setStepOpens([]);
       setEscapeStep(null);
       setDueWindow("");
       setFollowMode(false);
@@ -522,11 +614,14 @@ export function OppositeAction() {
       }
     }
   }
-  function startLoad() {
-    if (ids.length !== 1) return;
+  /** From the picker: the feelings, loudest first. */
+  function startWith(ordered: Pick[]) {
+    if (!ordered.length) return;
+    const target = ordered.map((p) => p.wordId);
+    setIds(target);
     setLoading(true);
     setError("");
-    void fetchContent(ids);
+    void fetchContent(target);
   }
 
   // Check-in handed us exactly one emotion: skip the picker.
@@ -535,6 +630,30 @@ export function OppositeAction() {
   });
   useEffect(() => {
     autoLoad();
+  }, []);
+
+  // The doors' content ships with the app; words handed over by the check-in arrive picked.
+  const seedPicks = useEffectEvent((content: OppositeActionPickerContent) => {
+    if (ids.length > 1) {
+      const r = addWords([], content, ids);
+      setPicks(r.picks);
+      setSkipped(r.skipped);
+    }
+  });
+  useEffect(() => {
+    let live = true;
+    getOppositeActionPickerContent()
+      .then((content) => {
+        if (!live) return;
+        setPicker(content);
+        seedPicks(content);
+      })
+      .catch(() => {
+        if (live) setPickerFailed(true);
+      });
+    return () => {
+      live = false;
+    };
   }, []);
 
   // Follow-up mode: ?followUp=<sessionId> resumes a saved plan.
@@ -563,7 +682,7 @@ export function OppositeAction() {
       delete hydrated.updatedAt;
       setData(result);
       setIds([saved.emotionId]);
-      setDraft(hydrated);
+      setDrafts([hydrated]);
       setCustomAction(hydrated.actionSize === "custom");
       setStepOpen(false);
       setFollowMode(true);
@@ -589,39 +708,54 @@ export function OppositeAction() {
    * the UI state, so "Saved" can never describe a payload that was not sent.
    */
   async function save(d: Draft = draft): Promise<Draft | null> {
-    if (!user || saveLock.current) return null;
-    const label =
-      d.urgeId === "custom"
-        ? d.customUrge
-        : (protocol?.urges.find((u) => u.id === d.urgeId)?.label ?? d.urgeLabel);
+    return (await saveMany([d]))?.[0] ?? null;
+  }
+
+  /**
+   * Save one session per feeling, in order (each is its own upsert, so a retry after a partial
+   * failure is safe). Resolves to the saved drafts (with their final dueAt) or null.
+   * A call made while another save is in flight returns null WITHOUT touching
+   * the UI state, so "Saved" can never describe a payload that was not sent.
+   */
+  async function saveMany(list: Draft[]): Promise<Draft[] | null> {
+    if (!user || saveLock.current || !list.length) return null;
     // Follow-up times are computed at save time, not when the chip was tapped.
-    let dueAt = d.dueAt;
-    if (d.status === "planned") {
-      if (d.cueId === "today" && dueWindow)
-        dueAt = dueAtFor(dueWindow as DueWindow).toISOString();
-      else if (d.cueId === "next_time") dueAt = dueAtForNextTime().toISOString();
-    }
-    const fresh: Draft = { ...d, dueAt };
-    const payload = toPayload(fresh, label);
-    if (!payload) return null;
+    const saved = list.map((d) => {
+      let dueAt = d.dueAt;
+      if (d.status === "planned") {
+        if (d.cueId === "today" && dueWindow)
+          dueAt = dueAtFor(dueWindow as DueWindow).toISOString();
+        else if (d.cueId === "next_time") dueAt = dueAtForNextTime().toISOString();
+      }
+      return { ...d, dueAt };
+    });
+    const payloads = saved.map((d) => toPayload(d, infoOf(d).urgeLabel));
+    if (payloads.some((p) => !p)) return null;
+    // The lead (loudest) feeling's session: the save state and the visit's link are about it.
+    const fresh = saved[0];
     saveLock.current = true;
     setSaveState("saving");
-    if (dueAt !== d.dueAt)
-      setDraft((s) => (s.id === d.id ? { ...s, dueAt } : s));
+    setDrafts((ds) =>
+      ds.map((s) => {
+        const f = saved.find((x) => x.id === s.id);
+        return f && f.dueAt !== s.dueAt ? { ...s, dueAt: f.dueAt } : s;
+      }),
+    );
     try {
-      await saveOppositeActionSession(payload);
-      if (draftId.current === d.id) setSaveState("saved");
+      for (const p of payloads) await saveOppositeActionSession(p!);
+      if (draftId.current === fresh.id) setSaveState("saved");
       refreshFollowUps?.();
       // PR-S4: link this visit to the saved session; practising it is a rep of opposite action.
       // (The server mirrors a plan's due time as FollowUp oa_plan in the same save.)
+      // With several feelings the visit links to the loudest one's session.
       void toolSession.close({
         status: "completed",
         detail: { kind: "opposite_action", id: fresh.id },
         ...(oaSkillIds(fresh.status) ? { skillIds: oaSkillIds(fresh.status) } : {}),
       });
-      return fresh;
+      return saved;
     } catch {
-      if (draftId.current === d.id) setSaveState("error");
+      if (draftId.current === fresh.id) setSaveState("error");
       return null;
     } finally {
       saveLock.current = false;
@@ -648,11 +782,15 @@ export function OppositeAction() {
 
   function startNew() {
     requestId.current += 1;
-    setDraft(blank());
+    setDrafts([blank()]);
     toolSession.setUrgeIds([]);
     clearCheck("identify");
     setData(null);
     setIds([]);
+    setPicks([]);
+    setSkipped([]);
+    setSetAside([]);
+    setCustomActs([]);
     setLoading(false);
     setSaveState("idle");
     setFollowMode(false);
@@ -689,6 +827,11 @@ export function OppositeAction() {
         resetPlan();
         resetBody();
         clearCheck("check");
+        if (setAside.length) {
+          const at = (d: Draft) => ids.indexOf(d.emotionId);
+          setDrafts((ds) => [...ds, ...setAside].sort((a, b) => at(a) - at(b)));
+          setSetAside([]);
+        }
         setCheckStep(CHECK_STEPS.length - 1);
         go("check");
         return;
@@ -757,54 +900,28 @@ export function OppositeAction() {
               </button>
             </Card>
           )}
-        {!(followUpId && !followBlocked && followStatus === "loading") && (
-          <>
-            <Card>
-              <p>
-                Pick one emotion to work with. We will name the urge, check the
-                facts, reset your body, and build a step you can try.
-              </p>
-              <p className={secondaryText}>
-                Mixed feelings are welcome. Start with the one whose urge is
-                causing the most trouble.
-              </p>
-            </Card>
-            <EmotionPicker
-              selectionMode="single"
-              selectedIds={ids}
-              onChange={(newIds) =>
-                setIds(
-                  newIds.length > ids.length
-                    ? [newIds[newIds.length - 1]]
-                    : newIds,
-                )
-              }
-              onContinue={startLoad}
+        {!(followUpId && !followBlocked && followStatus === "loading") &&
+          (picker && !(loading && !picks.length) ? (
+            <OppositeActionStart
+              content={picker}
+              picks={picks}
+              onPicks={setPicks}
+              skipped={skipped}
+              onSkipped={setSkipped}
+              onStart={startWith}
               loading={loading}
-              error={
-                error ||
-                (ids.length > 1
-                  ? "Choose one of your check-in emotions to focus on first."
-                  : null)
-              }
-              prompt="Which emotion do you want to work with?"
+              error={error}
             />
-            {ids.length > 1 && (
-              <div className="space-y-2">
-                {ids.map((id) => (
-                  <button
-                    type="button"
-                    className={choiceButton}
-                    key={id}
-                    onClick={() => setIds([id])}
-                  >
-                    Focus on {getEmotionById(id)?.name}
-                  </button>
-                ))}
-              </div>
-            )}
-          </>
-        )}
+          ) : pickerFailed ? (
+            <Card>
+              <p role="alert">The feelings could not load. Check your connection and try again.</p>
+              <button type="button" className={primaryButton} onClick={() => window.location.reload()}>
+                Try again
+              </button>
+            </Card>
+          ) : (
+            <ToolLoading label="Loading…" />
+          ))}
       </>
     );
   } else if (!flow || !mapping) {
@@ -826,6 +943,101 @@ export function OppositeAction() {
         {toolLink(mapping.alternativeSkill ?? "")}
         <button type="button" className={choiceButton} onClick={startNew}>
           Choose another emotion
+        </button>
+      </>
+    );
+  } else if (stage === "urge" && multi) {
+    const ready = drafts.every((d) => infoOf(d).urgeLabel.trim() && d.urgeBefore !== null);
+    content = (
+      <>
+        <p>One urge for each feeling. Having an urge does not mean you have acted on it.</p>
+        {!user && !authLoading && c.signedOutNote && (
+          <p className={secondaryText}>{c.signedOutNote}</p>
+        )}
+        {drafts.map((d, i) => {
+          const info = infoOf(d);
+          const select = (id: string) => {
+            if (id === d.urgeId) return;
+            patchAt(i, { urgeId: id, customUrge: "", urgeBefore: null, facts: "", effectiveness: "" });
+            setCheckStep(0);
+            // This visit's picks, one per feeling; "My urge is different" is free text, never an id.
+            toolSession.setUrgeIds(drafts.map((x, j) => (j === i ? id : x.urgeId)).filter((u) => u && u !== "custom"));
+            clearCheck("urge");
+          };
+          return (
+            <FeelingSection key={d.emotionId} label={info.parentLabel} word={info.emotion} rank={i} style={info.style}>
+              {info.protocol?.acknowledgment && (
+                <p className={secondaryText}>{info.protocol.acknowledgment}</p>
+              )}
+              <div className="space-y-2" role="group" aria-label={`${info.parentLabel}: ${c.urge ?? ""}`}>
+                {info.protocol?.urges.map((u) => (
+                  <button
+                    type="button"
+                    key={u.id}
+                    className={`${choiceButton} ${d.urgeId === u.id ? choiceSelected : ""}`}
+                    aria-pressed={d.urgeId === u.id}
+                    onClick={() => select(u.id)}
+                  >
+                    {d.urgeId === u.id && <span aria-hidden="true">✓ </span>}
+                    {u.label}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  className={`${choiceButton} ${d.urgeId === "custom" ? choiceSelected : ""}`}
+                  aria-pressed={d.urgeId === "custom"}
+                  onClick={() => select("custom")}
+                >
+                  {d.urgeId === "custom" && <span aria-hidden="true">✓ </span>}
+                  {c.urgeCustom}
+                </button>
+              </div>
+              {d.urgeId === "custom" && (
+                <Field
+                  label={c.urgeCustomPrompt}
+                  value={d.customUrge}
+                  rows={2}
+                  onChange={(v) => patchAt(i, { customUrge: v })}
+                />
+              )}
+              {!!d.urgeId && (
+                <div className={`space-y-4 ${enterAnimation}`}>
+                  <UrgeScale
+                    label={fill(c.urgeStrength, { urge: info.urgeText })}
+                    hint={i === 0 ? c.urgeStrengthHint : undefined}
+                    value={d.urgeBefore}
+                    onChange={(v) => patchAt(i, { urgeBefore: v })}
+                    {...anchors}
+                  />
+                  <details className="p-4 rounded-xl border border-[var(--color-border)]">
+                    <summary className="cursor-pointer min-h-11 flex items-center">
+                      {c.feelingOptional}
+                    </summary>
+                    <div className="pt-3">
+                      <UrgeScale
+                        label={fill(c.feelingNow, { emotion: info.emotion.toLowerCase() })}
+                        value={d.intensityBefore}
+                        allowClear
+                        onChange={(v) => patchAt(i, { intensityBefore: v })}
+                        {...anchors}
+                      />
+                    </div>
+                  </details>
+                </div>
+              )}
+            </FeelingSection>
+          );
+        })}
+        <button
+          type="button"
+          className={primaryButton}
+          disabled={!ready}
+          onClick={() => {
+            setCheckStep(0);
+            go("check");
+          }}
+        >
+          Continue
         </button>
       </>
     );
@@ -985,6 +1197,134 @@ export function OppositeAction() {
           }
         />
       );
+    } else if (multi && (checkStep === 2 || checkStep === 3)) {
+      // Fits the facts and helpfulness are about each feeling: one section per feeling, then Continue.
+      const facts = checkStep === 2;
+      const key = facts ? "facts" : "effectiveness";
+      const done = drafts.every((d) => !!d[key]);
+      card = (
+        <div
+          key={key}
+          className={`p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] space-y-4 ${enterAnimation}`}
+        >
+          <div className="flex items-center justify-between gap-3">
+            <button type="button" className={`${linkButton} -ml-2`} onClick={previous}>
+              ← Previous
+            </button>
+            <span className={secondaryText}>
+              <span className="sr-only">Question </span>
+              {checkStep + 1} / {CHECK_STEPS.length}
+            </span>
+          </div>
+          <h3 className="font-semibold text-lg">{facts ? c.factsQuestion : c.effectiveness}</h3>
+          {drafts.map((d, i) => {
+            const info = infoOf(d);
+            const valuesCheck =
+              facts && (d.parentId === "guilt" || d.parentId === "shame") ? c[`${d.parentId}Check`] : "";
+            return (
+              <FeelingSection key={d.emotionId} label={info.parentLabel} word={info.emotion} rank={i} style={info.style}>
+                {valuesCheck && <p className="text-sm">{valuesCheck}</p>}
+                <ChoiceList
+                  options={facts ? choices.facts : choices.effectiveness}
+                  value={d[key]}
+                  label={`${info.parentLabel}: ${facts ? c.factsQuestion : c.effectiveness}`}
+                  onSelect={(id) => patchAt(i, facts ? { facts: id, effectiveness: "" } : { effectiveness: id })}
+                />
+                {facts && (
+                  <details className="p-4 rounded-xl border border-[var(--color-border)]">
+                    <summary className="cursor-pointer min-h-11 flex items-center">
+                      {c.factsDetailToggle}
+                    </summary>
+                    <div className="space-y-4 pt-3">
+                      <p className={secondaryText}>{c.facts}</p>
+                      {!!info.protocol?.fitsTheFactsWhen.length && (
+                        <div>
+                          <p className="text-sm font-medium mb-2">{c.factsFitsHeading}</p>
+                          <ul className="list-disc pl-5 space-y-2">
+                            {info.protocol.fitsTheFactsWhen.map((item) => (
+                              <li key={item}>{item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      <Field
+                        label={c.factsObserve}
+                        placeholder={c.factsObservePlaceholder}
+                        value={d.observation}
+                        onChange={(v) => patchAt(i, { observation: v })}
+                      />
+                      <Field
+                        label={c.factsMeaning}
+                        value={d.interpretation}
+                        onChange={(v) => patchAt(i, { interpretation: v })}
+                      />
+                    </div>
+                  </details>
+                )}
+              </FeelingSection>
+            );
+          })}
+          <button
+            type="button"
+            className={primaryButton}
+            disabled={!done}
+            onClick={() => {
+              if (facts) {
+                setCheckStep(3);
+                return;
+              }
+              const allOpposite = drafts.every(
+                (d) => oppositeActionRoute(flow, d.safety, d.facts, d.effectiveness) === "opposite",
+              );
+              if (allOpposite) {
+                resetBody();
+                go("body");
+              } else setCheckStep(CHECK_RESULT);
+            }}
+          >
+            Continue
+          </button>
+        </div>
+      );
+    } else if (multi && checkStep === CHECK_RESULT) {
+      const routes = drafts.map((d) => oppositeActionRoute(flow, d.safety, d.facts, d.effectiveness));
+      const keep = drafts.filter((_, i) => routes[i] === "opposite");
+      card = (
+        <div className={`space-y-3 ${enterAnimation}`} key="result">
+          {drafts.map((d, i) => {
+            const info = infoOf(d);
+            return (
+              <FeelingSection key={d.emotionId} label={info.parentLabel} word={info.emotion} rank={i} style={info.style}>
+                <p className="font-semibold">{c[ROUTE_HEADING[routes[i]]]}</p>
+                <p>{c[routes[i]]}</p>
+                {routes[i] === "problem" && d.facts === "fits" && <p>{info.protocol?.fitsFactsGuidance}</p>}
+              </FeelingSection>
+            );
+          })}
+          {keep.length > 0 && (
+            <button
+              type="button"
+              className={primaryButton}
+              onClick={() => {
+                setSetAside(drafts.filter((d) => !keep.includes(d)));
+                setDrafts(keep);
+                resetBody();
+                go("body");
+              }}
+            >
+              Carry on with {listNames(keep.map((d) => infoOf(d).parentLabel.toLowerCase()))}
+            </button>
+          )}
+          {routes.includes("problem") && toolLink("problem-solve")}
+          <button type="button" className={choiceButton} onClick={recheck}>
+            Recheck
+          </button>
+          {routes.some((r) => r === "clarify" || r === "support") && toolLink("pause")}
+          <button type="button" className={linkButton} onClick={() => setCheckStep(CHECK_STEPS.length - 1)}>
+            ← Previous
+          </button>
+        </div>
+      );
     } else if (checkStep === 2) {
       const valuesCheck =
         draft.parentId === "guilt" || draft.parentId === "shame"
@@ -1120,14 +1460,22 @@ export function OppositeAction() {
       </>
     );
   } else if (stage === "body") {
-    const urgeCues = (urge?.somaticCues ?? []).map((s) => s.trim()).filter(Boolean);
-    const cueSource =
-      urge?.somaticReplace && urgeCues.length
-        ? urgeCues
-        : [...urgeCues, ...(protocol?.somaticCues ?? [])];
-    const cues = Array.from(
-      new Set(cueSource.map((s) => s.trim()).filter(Boolean)),
-    ).slice(0, 3);
+    /** A feeling's body cues: its urge's own first, then the parent's (unless the urge replaces them). */
+    const cuesOf = (d: Draft) => {
+      const info = infoOf(d);
+      const urgeCues = (info.urge?.somaticCues ?? []).map((s) => s.trim()).filter(Boolean);
+      const source =
+        info.urge?.somaticReplace && urgeCues.length
+          ? urgeCues
+          : [...urgeCues, ...(info.protocol?.somaticCues ?? [])];
+      return Array.from(new Set(source.map((s) => s.trim()).filter(Boolean)));
+    };
+    // One body reset for every feeling: take cues in turn, loudest feeling first, three at most.
+    const perFeeling = drafts.map(cuesOf);
+    const merged: string[] = [];
+    for (let k = 0; merged.length < 3 && perFeeling.some((l) => l.length > k); k++)
+      for (const l of perFeeling) if (l[k] && !merged.includes(l[k]) && merged.length < 3) merged.push(l[k]);
+    const cues = merged;
     const pickEscape = () => {
       const usable = (id: string) =>
         getMicroStepsForPattern(id).filter((s) => !s.requiresEnvironment);
@@ -1142,11 +1490,14 @@ export function OppositeAction() {
       const from = others.length ? others : base;
       setEscapeStep(from[Math.floor(Math.random() * from.length)] ?? null);
     };
+    // The body reset is shared: a cue done counts for every feeling.
     const markDone = (text: string) =>
-      setDraft((s) =>
-        s.bodyCues.includes(text)
-          ? s
-          : { ...s, bodyCues: [...s.bodyCues, text].slice(0, 6) },
+      setDrafts((ds) =>
+        ds.map((s) =>
+          s.bodyCues.includes(text)
+            ? s
+            : { ...s, bodyCues: [...s.bodyCues, text].slice(0, 6) },
+        ),
       );
     const needsBaseline = draft.urgeBefore === null;
     const escaped = escapeStep !== null || cues.length === 0;
@@ -1218,31 +1569,47 @@ export function OppositeAction() {
             )}
             {anyDone && (
               <div className={`space-y-4 ${enterAnimation}`}>
-                <UrgeScale
-                  label={fill(c.bodyRerate, { urge: urgeText })}
-                  value={draft.urgeAfterBody}
-                  onChange={(v) => change("urgeAfterBody", v)}
-                  {...anchors}
-                />
+                {multi ? (
+                  drafts.map((d, i) => {
+                    const info = infoOf(d);
+                    return (
+                      <FeelingSection key={d.emotionId} label={info.parentLabel} word={info.emotion} rank={i} style={info.style}>
+                        <UrgeScale
+                          label={fill(c.bodyRerate, { urge: info.urgeText })}
+                          value={d.urgeAfterBody}
+                          onChange={(v) => patchAt(i, { urgeAfterBody: v })}
+                          {...anchors}
+                        />
+                      </FeelingSection>
+                    );
+                  })
+                ) : (
+                  <UrgeScale
+                    label={fill(c.bodyRerate, { urge: urgeText })}
+                    value={draft.urgeAfterBody}
+                    onChange={(v) => change("urgeAfterBody", v)}
+                    {...anchors}
+                  />
+                )}
                 <p className={secondaryText}>{c.bodyNotice}</p>
                 <button
                   type="button"
                   className={primaryButton}
-                  disabled={draft.urgeAfterBody === null}
+                  disabled={drafts.some((d) => d.urgeAfterBody === null)}
                   onClick={() => {
-                    let hasStep = !!draft.action.trim();
-                    if (
-                      !hasStep &&
-                      examples?.small &&
-                      capacityDefaultSize(
-                        draft.urgeAfterBody ?? draft.urgeBefore ?? 0,
-                      ) === "small"
-                    ) {
-                      patch({ actionSize: "small", action: examples.small });
-                      setCustomAction(false);
-                      hasStep = true;
-                    }
-                    setStepOpen(!hasStep);
+                    // When the pull is strong, start each feeling on its small step (capacity-matched default).
+                    const next = drafts.map((d) => {
+                      const ex = infoOf(d).examples;
+                      return !d.action.trim() &&
+                        ex?.small &&
+                        capacityDefaultSize(d.urgeAfterBody ?? d.urgeBefore ?? 0) === "small"
+                        ? { ...d, actionSize: "small", action: ex.small }
+                        : d;
+                    });
+                    setDrafts(next);
+                    setSaveState("idle");
+                    setCustomActs([]);
+                    setStepOpens(next.map((d) => !d.action.trim()));
                     go("plan");
                   }}
                 >
@@ -1255,82 +1622,75 @@ export function OppositeAction() {
       </>
     );
   } else if (stage === "plan") {
-    const lowCapacity =
-      capacityDefaultSize(draft.urgeAfterBody ?? draft.urgeBefore ?? 0) ===
-      "small";
+    const lowCapOf = (d: Draft) =>
+      capacityDefaultSize(d.urgeAfterBody ?? d.urgeBefore ?? 0) === "small";
+    const lowCapacity = lowCapOf(draft);
     const sizeLabel = (size: string) =>
       size in SIZE_COPY ? c[SIZE_COPY[size as Size]] : c.stepOwn;
-    const sizeButton = (size: Size) =>
-      examples?.[size] ? (
-        <button
-          type="button"
-          key={size}
-          className={`${choiceButton} ${draft.actionSize === size && !customAction ? choiceSelected : ""}`}
-          aria-pressed={draft.actionSize === size && !customAction}
-          onClick={() => {
-            setCustomAction(false);
-            setStepOpen(false);
-            patch({ actionSize: size, action: examples[size] });
-          }}
-        >
-          <span className="block text-xs uppercase tracking-wide opacity-80">
-            {sizeLabel(size)}
-          </span>
-          <span className="block mt-1">{examples[size]}</span>
-        </button>
-      ) : null;
-    const hasStep = !!draft.action.trim();
-    const windows = (choices.dueWindow ?? []).filter(
-      (o) =>
-        !(o.id === "afternoon" && cueHour >= 15) &&
-        !(o.id === "evening" && cueHour >= 19),
-    );
-    const snag = !!draft.barrier && draft.barrier !== "none";
-    const ready =
-      hasStep &&
-      !!draft.cueId &&
-      (draft.cueId !== "today" || windows.some((o) => o.id === dueWindow));
-    const changeStep = () => {
-      setStepOpen(true);
-      setCustomAction(false);
-      if (customAction) patch({ actionSize: "", action: "" });
-    };
-    let stepPicker: ReactNode;
-    if (customAction) {
-      stepPicker = (
-        <div className="space-y-2">
-          <Field
-            label={c.stepOwnPrompt}
-            value={draft.action}
-            rows={2}
-            onChange={(v) => change("action", v)}
-          />
-          <button type="button" className={linkButton} onClick={changeStep}>
-            Change
-          </button>
-        </div>
-      );
-    } else if (!stepOpen && hasStep) {
-      stepPicker = (
-        <div className={`space-y-1 ${enterAnimation}`}>
-          <div className={`${choiceButton} ${choiceSelected}`} aria-live="polite">
+    /** One feeling's step picker (the single-feeling screen is feeling 0). */
+    const stepPickerFor = (i: number): ReactNode => {
+      const d = drafts[i];
+      const ex = infoOf(d).examples;
+      const custom = customAt(i);
+      const has = !!d.action.trim();
+      const sizeButton = (size: Size) =>
+        ex?.[size] ? (
+          <button
+            type="button"
+            key={size}
+            className={`${choiceButton} ${d.actionSize === size && !custom ? choiceSelected : ""}`}
+            aria-pressed={d.actionSize === size && !custom}
+            onClick={() => {
+              setCustomAt(i, false);
+              setStepOpenAt(i, false);
+              patchAt(i, { actionSize: size, action: ex[size] });
+            }}
+          >
             <span className="block text-xs uppercase tracking-wide opacity-80">
-              <span aria-hidden="true">✓ </span>
-              {sizeLabel(draft.actionSize)}
+              {sizeLabel(size)}
             </span>
-            <span className="block mt-1">{draft.action}</span>
-          </div>
-          <button type="button" className={linkButton} onClick={changeStep}>
-            Change
+            <span className="block mt-1">{ex[size]}</span>
           </button>
-        </div>
-      );
-    } else {
-      stepPicker = (
+        ) : null;
+      const changeStep = () => {
+        setStepOpenAt(i, true);
+        setCustomAt(i, false);
+        if (custom) patchAt(i, { actionSize: "", action: "" });
+      };
+      if (custom)
+        return (
+          <div className="space-y-2">
+            <Field
+              label={c.stepOwnPrompt}
+              value={d.action}
+              rows={2}
+              onChange={(v) => patchAt(i, { action: v })}
+            />
+            <button type="button" className={linkButton} onClick={changeStep}>
+              Change
+            </button>
+          </div>
+        );
+      if (!stepOpenAt(i) && has)
+        return (
+          <div className={`space-y-1 ${enterAnimation}`}>
+            <div className={`${choiceButton} ${choiceSelected}`} aria-live="polite">
+              <span className="block text-xs uppercase tracking-wide opacity-80">
+                <span aria-hidden="true">✓ </span>
+                {sizeLabel(d.actionSize)}
+              </span>
+              <span className="block mt-1">{d.action}</span>
+            </div>
+            <button type="button" className={linkButton} onClick={changeStep}>
+              Change
+            </button>
+          </div>
+        );
+      return (
         <div className="space-y-2">
           {sizeButton("small")}
           {sizeButton("medium")}
-          {lowCapacity && examples?.bigger ? (
+          {lowCapOf(d) && ex?.bigger ? (
             <details className="rounded-xl border border-[var(--color-border)] p-3">
               <summary className="cursor-pointer min-h-11 flex items-center">
                 {c.stepMore}
@@ -1344,29 +1704,61 @@ export function OppositeAction() {
             type="button"
             className={choiceButton}
             onClick={() => {
-              setCustomAction(true);
-              setStepOpen(false);
-              patch({ actionSize: "custom", action: "" });
+              setCustomAt(i, true);
+              setStepOpenAt(i, false);
+              patchAt(i, { actionSize: "custom", action: "" });
             }}
           >
             {c.stepOwn}
           </button>
         </div>
       );
-    }
+    };
+    /** Every feeling has a step chosen (or is writing its own). */
+    const stepsSet = drafts.every(
+      (d, i) => !!d.action.trim() && (!stepOpenAt(i) || customAt(i)),
+    );
+    const windows = (choices.dueWindow ?? []).filter(
+      (o) =>
+        !(o.id === "afternoon" && cueHour >= 15) &&
+        !(o.id === "evening" && cueHour >= 19),
+    );
+    const snag = !!draft.barrier && draft.barrier !== "none";
+    const ready =
+      stepsSet &&
+      !!draft.cueId &&
+      (draft.cueId !== "today" || windows.some((o) => o.id === dueWindow));
+    const bodyLines = drafts
+      .map((d) => ({ d, line: infoOf(d).protocol?.bodyOpposite }))
+      .filter((x) => !!x.line);
     content = (
       <>
         <p>{c.stepIntro}</p>
-        {lowCapacity && (
+        {(multi ? drafts.some(lowCapOf) : lowCapacity) && (
           <p className={`p-3 rounded-xl border border-[var(--color-border)] ${secondaryText}`}>
             {c.stepCapacity}
           </p>
         )}
-        {draft.urgeId === "custom" && (
-          <p className={secondaryText}>{c.customAction}</p>
+        {multi ? (
+          drafts.map((d, i) => {
+            const info = infoOf(d);
+            return (
+              <FeelingSection key={d.emotionId} label={info.parentLabel} word={info.emotion} rank={i} style={info.style}>
+                <p className={secondaryText}>Instead of: {info.urgeText}</p>
+                {d.urgeId === "custom" && <p className={secondaryText}>{c.customAction}</p>}
+                {stepPickerFor(i)}
+              </FeelingSection>
+            );
+          })
+        ) : (
+          <>
+            {draft.urgeId === "custom" && (
+              <p className={secondaryText}>{c.customAction}</p>
+            )}
+            {stepPickerFor(0)}
+          </>
         )}
-        {stepPicker}
-        {hasStep && (!stepOpen || customAction) && (
+        {stepsSet && (
           <div className={`space-y-2 ${enterAnimation}`}>
             <h3 className="font-semibold">{c.whenQuestion}</h3>
             <ChoiceList
@@ -1392,7 +1784,7 @@ export function OppositeAction() {
             />
           </div>
         )}
-        {hasStep && draft.cueId === "today" && (
+        {stepsSet && draft.cueId === "today" && (
           <div className={`space-y-2 ${enterAnimation}`}>
             <h3 className="font-semibold">{c.dueQuestion}</h3>
             <ChoiceList
@@ -1408,12 +1800,22 @@ export function OppositeAction() {
         )}
         {ready && (
           <div className={`space-y-4 ${enterAnimation}`}>
-            {protocol?.bodyOpposite && (
+            {bodyLines.length > 0 && (
               <Card>
                 <p className="text-xs uppercase tracking-wide text-[var(--color-accent)]">
                   {c.stepBodyLine}
                 </p>
-                <p>{protocol.bodyOpposite}</p>
+                {multi ? (
+                  <ul className="space-y-2">
+                    {bodyLines.map(({ d, line }) => (
+                      <li key={d.emotionId}>
+                        <span className="font-semibold">{infoOf(d).parentLabel}:</span> {line}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>{bodyLines[0].line}</p>
+                )}
               </Card>
             )}
             <details className="p-4 rounded-xl border border-[var(--color-border)]">
@@ -1460,7 +1862,18 @@ export function OppositeAction() {
     content = (
       <>
         <Card>
-          <h3 className="text-xl font-semibold">{draft.action}</h3>
+          {multi ? (
+            <ul className="space-y-3">
+              {drafts.map((d) => (
+                <li key={d.emotionId} className="oa-feeling" style={infoOf(d).style}>
+                  <p className="text-xs uppercase tracking-wide">{infoOf(d).parentLabel}</p>
+                  <p className="text-lg font-semibold mt-1">{d.action}</p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <h3 className="text-xl font-semibold">{draft.action}</h3>
+          )}
           {draft.bodyCues.length > 0 && (
             <div>
               <p className="text-xs uppercase tracking-wide text-[var(--color-accent)]">
@@ -1499,28 +1912,42 @@ export function OppositeAction() {
   } else if (stage === "reflect") {
     content = (
       <>
-        <UrgeScale
-          label={fill(c.reflectUrge, { urge: urgeText })}
-          value={draft.urgeAfter}
-          onChange={(v) => change("urgeAfter", v)}
-          {...anchors}
-        />
-        {draft.intensityBefore !== null && (
-          <details className="p-4 rounded-xl border border-[var(--color-border)]">
-            <summary className="cursor-pointer min-h-11 flex items-center">
-              {c.reflectFeeling}
-            </summary>
-            <div className="pt-3">
+        {drafts.map((d, i) => {
+          const info = infoOf(d);
+          const scales = (
+            <>
               <UrgeScale
-                label={fill(c.feelingAfter, { emotion: emotionLower })}
-                value={draft.intensityAfter}
-                allowClear
-                onChange={(v) => change("intensityAfter", v)}
+                label={fill(c.reflectUrge, { urge: info.urgeText })}
+                value={d.urgeAfter}
+                onChange={(v) => patchAt(i, { urgeAfter: v })}
                 {...anchors}
               />
-            </div>
-          </details>
-        )}
+              {d.intensityBefore !== null && (
+                <details className="p-4 rounded-xl border border-[var(--color-border)]">
+                  <summary className="cursor-pointer min-h-11 flex items-center">
+                    {c.reflectFeeling}
+                  </summary>
+                  <div className="pt-3">
+                    <UrgeScale
+                      label={fill(c.feelingAfter, { emotion: info.emotion.toLowerCase() })}
+                      value={d.intensityAfter}
+                      allowClear
+                      onChange={(v) => patchAt(i, { intensityAfter: v })}
+                      {...anchors}
+                    />
+                  </div>
+                </details>
+              )}
+            </>
+          );
+          return multi ? (
+            <FeelingSection key={d.emotionId} label={info.parentLabel} word={info.emotion} rank={i} style={info.style}>
+              {scales}
+            </FeelingSection>
+          ) : (
+            <div key={d.emotionId} className="space-y-5">{scales}</div>
+          );
+        })}
         <h3 className="font-semibold">{c.outcomeQuestion}</h3>
         <ChoiceList
           options={choices.outcome}
@@ -1549,7 +1976,7 @@ export function OppositeAction() {
         <button
           type="button"
           className={primaryButton}
-          disabled={draft.urgeAfter === null || !draft.outcome}
+          disabled={drafts.some((d) => d.urgeAfter === null) || !draft.outcome}
           onClick={() => {
             patch({ status: "practiced", missedReason: "" });
             go("summary");
@@ -1749,69 +2176,86 @@ export function OppositeAction() {
     );
   } else {
     const practiced = draft.status === "practiced";
-    const readout = urgeReadout(
-      draft.urgeBefore ?? 0,
-      draft.urgeAfterBody,
-      practiced ? draft.urgeAfter : null,
-      practiced ? draft.outcome : "",
-    );
     const unsafe = practiced && draft.outcome === "unsafe";
-    const drop = readout.to === null ? 0 : readout.drop;
-    const bigBars = readout.to !== null && drop >= 2;
-    const showEmotion =
-      practiced &&
-      !unsafe &&
-      draft.intensityBefore !== null &&
-      draft.intensityAfter !== null;
-    const bars = (size: "large" | "compact") => (
-      <UrgeBars
-        size={size}
-        pullLabel={fill(c.readoutPullTo, { urge: urgeText })}
-        from={readout.from}
-        to={readout.to}
-        fromLabel={c.readoutBefore}
-        toLabel={practiced ? c.readoutAfterTry : c.readoutAfterBody}
-      />
+    /** One feeling's urge readout (the single-feeling screen shows feeling 0's). */
+    const readoutOf = (d: Draft) => {
+      const info = infoOf(d);
+      const readout = urgeReadout(
+        d.urgeBefore ?? 0,
+        d.urgeAfterBody,
+        practiced ? d.urgeAfter : null,
+        practiced ? d.outcome : "",
+      );
+      const drop = readout.to === null ? 0 : readout.drop;
+      const bigBars = readout.to !== null && drop >= 2;
+      const showEmotion =
+        practiced && !unsafe && d.intensityBefore !== null && d.intensityAfter !== null;
+      const bars = (size: "large" | "compact") => (
+        <UrgeBars
+          size={size}
+          pullLabel={fill(c.readoutPullTo, { urge: info.urgeText })}
+          from={readout.from}
+          to={readout.to}
+          fromLabel={c.readoutBefore}
+          toLabel={practiced ? c.readoutAfterTry : c.readoutAfterBody}
+        />
+      );
+      const acted = fill(c.readoutActed, { level: d.urgeBefore ?? 0 });
+      const plannedText =
+        drop > 0
+          ? fill(c.readoutPlanned, {
+              from: d.urgeBefore ?? 0,
+              to: d.urgeAfterBody ?? 0,
+              urge: info.urgeText,
+            })
+          : c.readoutPlannedSame;
+      let body: ReactNode;
+      if (unsafe) {
+        body = <p role="alert" className="text-lg font-semibold">{c.readoutUnsafe}</p>;
+      } else if (practiced) {
+        body = bigBars ? (
+          <>
+            {bars("large")}
+            <p>{fill(c[readout.key], { urge: info.urgeText })}</p>
+            <p className="font-medium">{acted}</p>
+          </>
+        ) : (
+          <>
+            <p className="text-xl font-semibold leading-snug">{acted}</p>
+            <p>{fill(c[readout.key], { urge: info.urgeText })}</p>
+            {readout.to !== null && bars("compact")}
+          </>
+        );
+      } else {
+        body = bigBars ? (
+          <>
+            {bars("large")}
+            <p>{plannedText}</p>
+          </>
+        ) : (
+          <>
+            <p className="text-xl font-semibold leading-snug">{plannedText}</p>
+            {readout.to !== null && bars("compact")}
+          </>
+        );
+      }
+      return (
+        <>
+          {body}
+          {showEmotion && (
+            <p className={secondaryText}>
+              {info.emotion}: {d.intensityBefore} → {d.intensityAfter}.{" "}
+              {c.readoutEmotionLag}
+            </p>
+          )}
+        </>
+      );
+    };
+    const louder = drafts.some(
+      (d) =>
+        urgeReadout(d.urgeBefore ?? 0, d.urgeAfterBody, practiced ? d.urgeAfter : null, practiced ? d.outcome : "")
+          .key === "readoutUrgeHigher",
     );
-    const acted = fill(c.readoutActed, { level: draft.urgeBefore ?? 0 });
-    const plannedText =
-      drop > 0
-        ? fill(c.readoutPlanned, {
-            from: draft.urgeBefore ?? 0,
-            to: draft.urgeAfterBody ?? 0,
-            urge: urgeText,
-          })
-        : c.readoutPlannedSame;
-    let readoutBody: ReactNode;
-    if (unsafe) {
-      readoutBody = <p role="alert" className="text-lg font-semibold">{c.readoutUnsafe}</p>;
-    } else if (practiced) {
-      readoutBody = bigBars ? (
-        <>
-          {bars("large")}
-          <p>{fill(c[readout.key], { urge: urgeText })}</p>
-          <p className="font-medium">{acted}</p>
-        </>
-      ) : (
-        <>
-          <p className="text-xl font-semibold leading-snug">{acted}</p>
-          <p>{fill(c[readout.key], { urge: urgeText })}</p>
-          {readout.to !== null && bars("compact")}
-        </>
-      );
-    } else {
-      readoutBody = bigBars ? (
-        <>
-          {bars("large")}
-          <p>{plannedText}</p>
-        </>
-      ) : (
-        <>
-          <p className="text-xl font-semibold leading-snug">{plannedText}</p>
-          {readout.to !== null && bars("compact")}
-        </>
-      );
-    }
     const saveLabel =
       saveState === "saving"
         ? "Saving…"
@@ -1824,17 +2268,20 @@ export function OppositeAction() {
               : c.saveReflection;
     content = (
       <>
-        <Card className={enterAnimation}>
-          {readoutBody}
-          {showEmotion && (
-            <p className={secondaryText}>
-              {emotion}: {draft.intensityBefore} → {draft.intensityAfter}.{" "}
-              {c.readoutEmotionLag}
-            </p>
-          )}
-        </Card>
+        {multi && !unsafe ? (
+          drafts.map((d, i) => {
+            const info = infoOf(d);
+            return (
+              <FeelingSection key={d.emotionId} label={info.parentLabel} word={info.emotion} rank={i} style={info.style}>
+                {readoutOf(d)}
+              </FeelingSection>
+            );
+          })
+        ) : (
+          <Card className={enterAnimation}>{readoutOf(draft)}</Card>
+        )}
         {unsafe && toolLink("pause")}
-        {practiced && !unsafe && readout.key === "readoutUrgeHigher" && (
+        {practiced && !unsafe && louder && (
           <div className="space-y-2">
             <p className={secondaryText}>{c.readoutHigherTools}</p>
             {toolLink("cool-down")}
@@ -1843,16 +2290,23 @@ export function OppositeAction() {
         )}
         <Card>
           <dl className="space-y-3">
-            <div>
-              <dt className="text-xs uppercase tracking-wide">Emotion → urge</dt>
-              <dd>
-                {emotion} → {urgeLabel}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs uppercase tracking-wide">Step</dt>
-              <dd>{draft.action}</dd>
-            </div>
+            {drafts.map((d) => {
+              const info = infoOf(d);
+              return (
+                <div key={d.emotionId} className="space-y-3">
+                  <div>
+                    <dt className="text-xs uppercase tracking-wide">Emotion → urge</dt>
+                    <dd>
+                      {info.emotion} → {info.urgeLabel}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs uppercase tracking-wide">Step</dt>
+                    <dd>{d.action}</dd>
+                  </div>
+                </div>
+              );
+            })}
             {draft.cue && (
               <div>
                 <dt className="text-xs uppercase tracking-wide">When</dt>
@@ -1888,7 +2342,7 @@ export function OppositeAction() {
               type="button"
               className={primaryButton}
               disabled={saveState === "saving" || saveState === "saved"}
-              onClick={() => void save()}
+              onClick={() => void saveMany(drafts)}
             >
               {saveLabel}
             </button>
@@ -1937,10 +2391,10 @@ export function OppositeAction() {
             type="button"
             className={choiceButton}
             onClick={() =>
-              restartFromSafety({
-                urgeBefore: draft.urgeAfter ?? draft.urgeAfterBody ?? draft.urgeBefore,
-                intensityBefore: draft.intensityAfter ?? draft.intensityBefore,
-              })
+              restartFromSafety((d) => ({
+                urgeBefore: d.urgeAfter ?? d.urgeAfterBody ?? d.urgeBefore,
+                intensityBefore: d.intensityAfter ?? d.intensityBefore,
+              }))
             }
           >
             Practice again
@@ -1966,13 +2420,16 @@ export function OppositeAction() {
         </button>
         <ProgressDots stage={stage} />
       </div>
-      <h2
-        ref={heading}
-        tabIndex={-1}
-        className="text-xl font-semibold outline-none"
-      >
-        {TITLES[stage]}
-      </h2>
+      {/* The first screen titles itself (each of its views has its own question). */}
+      {stage !== "identify" && (
+        <h2
+          ref={heading}
+          tabIndex={-1}
+          className="text-xl font-semibold outline-none"
+        >
+          {TITLES[stage]}
+        </h2>
+      )}
       <fieldset disabled={saveState === "saving"} className="min-w-0 space-y-5">
         {content}
       </fieldset>
