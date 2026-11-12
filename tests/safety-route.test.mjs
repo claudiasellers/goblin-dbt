@@ -189,6 +189,10 @@ test("the switch on: the question decides, the result carries a referral flag at
 test("queries: ids and enums only; the policy defaults off; referrals only on the route", async () => {
   assert.match(ask.SAFETY_POLICY_QUERY, /coalesce\(p\.enabled, false\)/);
   assert.match(ask.SAFETY_HISTORY_QUERY, /\(:User \{id: \$uid\}\)-\[:HAS_SAFETY_CHECK\]->\(s:SafetyCheck\)/);
+  // `all`, `any`, `none`, `single` are Cypher keywords: never a variable name in these queries.
+  for (const q of [ask.SAFETY_HISTORY_QUERY, ask.SAFETY_ASK_GRAPH_QUERY, ask.SAFETY_POLICY_QUERY, rec.SAVE_SAFETY_CHECK_QUERY]) {
+    assert.doesNotMatch(q, /\bAS (all|any|none|single)\b/i);
+  }
   const flag = await importTs("functions/src/safety/checkinSafetyFlag.ts");
   assert.match(flag.REFERRAL_FLAG_QUERY, /WHERE sf\.type = 'clinical_referral'/);
   const q = read("functions/src/recommendation/queries.ts");

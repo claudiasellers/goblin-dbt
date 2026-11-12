@@ -91,10 +91,10 @@ export const SAFETY_ASK_GRAPH_QUERY = `
 export const SAFETY_HISTORY_QUERY = `
   OPTIONAL MATCH (:User {id: $uid})-[:HAS_SAFETY_CHECK]->(s:SafetyCheck)
   WITH s ORDER BY s.at DESC
-  WITH collect(s) AS all
-  RETURN CASE WHEN size(all) = 0 THEN null ELSE all[0].answer END AS lastAnswer,
-         CASE WHEN size(all) = 0 THEN null ELSE toString(all[0].at) END AS lastAt,
-         any(x IN all WHERE x.answer <> 'no') AS anyAboveNo
+  WITH collect(s) AS checks
+  RETURN CASE WHEN size(checks) = 0 THEN null ELSE checks[0].answer END AS lastAnswer,
+         CASE WHEN size(checks) = 0 THEN null ELSE toString(checks[0].at) END AS lastAt,
+         any(x IN checks WHERE x.answer <> 'no') AS anyAboveNo
 `;
 
 export async function safetyPolicyEnabled(tx: QueryRunner): Promise<boolean> {
