@@ -1,7 +1,7 @@
 {
   "source": {
     "file": "graph-content-only-2026-11-12.json",
-    "exportedAt": "2026-11-12T02:59:03.865Z"
+    "exportedAt": "2026-11-12T03:53:07.348Z"
   },
   "content": {
     "version": "skills-v1",
@@ -27109,96 +27109,96 @@
         "ownMax": 140,
         "emotionFields": [],
         "copy": {
-          "ask_title": "What are they asking for?",
+          "again_label": "Want me to ask how it went?",
+          "alt_label": "Something else you could offer (optional)",
           "ask_hint": "You're allowed to say no. You don't owe anyone a script.",
           "ask_own": "Something else",
-          "cool_down": "Settle my body first",
-          "talk_now": "Talk to someone now",
-          "pressure_title": "What do you think happens if you say no?",
-          "pressure_hint": "Pick any that fit.",
-          "enough_title": "No is enough.",
-          "enough_hint": "You don't have to explain, or be nice about it. Pick the line you'd use.",
-          "enough_card_title": "Your line",
-          "why_title": "What matters most to you here?",
-          "why_hint": "Pick the one that matters most.",
-          "firm_title": "A few questions to size it.",
-          "firm_hint": "Yes, no or not sure. There's no right answer.",
-          "level_hint": "From what you said.",
-          "nudge_label": "Does that sit right?",
+          "ask_title": "What are they asking for?",
           "compose_title": "Put your no together.",
-          "compose_title_warm": "Put your no together. A warm line first can help it land.",
-          "compose_title_self": "Put your no together. One reason at most, and no extra sorry.",
-          "compose_title_heads_up": "Keep it short, written, and about one thing.",
           "compose_title_flooded": "Your body's running hot. Your no can still go, short and plain.",
-          "opener_label": "A warm line first (optional)",
-          "no_label": "Your no",
-          "reason_label": "One reason (optional)",
-          "reason_hint": "You don't have to justify it. One reason at most.",
-          "alt_label": "Something else you could offer (optional)",
-          "own_line": "In my own words",
-          "message_title": "Here's your no.",
-          "repeat_label": "If they push, say it again:",
-          "sorry_line": "There's a sorry in there. You don't owe one for saying no.",
-          "drop_sorry": "Take the sorry out",
-          "explain_line": "One reason is enough. A long one can sound like it's up for debate.",
-          "copy": "Copy",
+          "compose_title_heads_up": "Keep it short, written, and about one thing.",
+          "compose_title_self": "Put your no together. One reason at most, and no extra sorry.",
+          "compose_title_warm": "Put your no together. A warm line first can help it land.",
+          "cool_down": "Settle my body first",
           "copied": "Copied",
-          "selected": "Selected. Copy it from here.",
-          "open_messages": "Open messages",
-          "next": "Next",
+          "copy": "Copy",
           "done": "Done",
-          "predict_title": "How do you think they'll take it?",
-          "sure_label": "How sure are you?",
-          "how_label": "How will you say it?",
-          "again_label": "Want me to ask how it went?",
-          "sent_line": "Your no is ready. When you say it is up to you.",
-          "sent_line_push": "If they push, say the same line again. You don't need a new reason.",
-          "sent_line_in_person": "Saying it out loud a couple of times first can help it come out steady.",
+          "drop_sorry": "Take the sorry out",
+          "enough_card_title": "Your line",
+          "enough_hint": "You don't have to explain, or be nice about it. Pick the line you'd use.",
           "enough_line": "Your safety comes first. Somewhere safe, then your line. The people below can help, any time.",
-          "said_title": "Did you say no?",
-          "held_title": "Did it hold when they pushed?",
-          "proud_title": "Are you proud of how you handled it?",
-          "proud_hint": "However it went.",
-          "held_line_proud": "You said no, and it held. That's the skill working.",
-          "held_line": "You said no, and it held.",
-          "no_push_line": "You said no, and they took it. Not every no gets pushed on.",
-          "gave_in_line": "That happens. Your line is still here if you want it again.",
-          "gave_in_guilt": "If guilt is what pulled you back, checking the facts can help. Guilt about a fair no often doesn't fit.",
-          "not_said_line": "Not this time. Your line is still here when you want it.",
-          "partly_line": "A maybe buys time. When you're ready, your no is still here.",
-          "level_yes_part": "The facts lean toward yes, or yes to part of it. It's still your call.",
-          "level_gentle": "Say no gently, or say not yet.",
-          "level_offer": "Say no, and offer something else if you want to.",
-          "level_firm": "Say no firmly, and hold it if they push.",
-          "level_firm_hold": "Say no firmly, and don't reconsider.",
+          "enough_title": "No is enough.",
+          "explain_line": "One reason is enough. A long one can sound like it's up for debate.",
           "f_cost_q": "Would saying yes cost you something you can't spare, like time, money or energy?",
-          "f_values_q": "Would saying yes go against what matters to you?",
           "f_fair_q": "Is it more than they have a right to ask of you?",
           "f_given_q": "Have you already given a lot in this relationship lately?",
           "f_later_q": "Would a yes now make things harder later, for you or for them?",
-          "picker_personWhoSayNo": "Who's asking?",
-          "picker_personNew": "Someone new",
-          "picker_personNameLabel": "What do you call them?",
-          "picker_personNameHint": "A nickname is fine. No real names needed.",
-          "picker_personRoleLabel": "Who are they to you?",
-          "picker_personKeepLine": "The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.",
-          "picker_personNoNameLine": "Without a name, nothing about them is kept.",
-          "picker_personSignedOutLine": "This stays on this screen only.",
-          "picker_personGoOn": "Go on",
+          "f_values_q": "Would saying yes go against what matters to you?",
+          "firm_hint": "Yes, no or not sure. There's no right answer.",
+          "firm_title": "A few questions to size it.",
+          "gave_in_guilt": "If guilt is what pulled you back, checking the facts can help. Guilt about a fair no often doesn't fit.",
+          "gave_in_line": "That happens. Your line is still here if you want it again.",
+          "held_line": "You said no, and it held.",
+          "held_line_proud": "You said no, and it held. That's the skill working.",
+          "held_title": "Did it hold when they pushed?",
+          "how_label": "How will you say it?",
+          "level_firm": "Say no firmly, and hold it if they push.",
+          "level_firm_hold": "Say no firmly, and don't reconsider.",
+          "level_gentle": "Say no gently, or say not yet.",
+          "level_hint": "From what you said.",
+          "level_offer": "Say no, and offer something else if you want to.",
+          "level_yes_part": "The facts lean toward yes, or yes to part of it. It's still your call.",
+          "message_title": "Here's your no.",
+          "next": "Next",
+          "no_label": "Your no",
+          "no_push_line": "You said no, and they took it. Not every no gets pushed on.",
+          "not_said_line": "Not this time. Your line is still here when you want it.",
+          "nudge_label": "Does that sit right?",
+          "open_messages": "Open messages",
+          "opener_label": "A warm line first (optional)",
+          "own_line": "In my own words",
+          "partly_line": "A maybe buys time. When you're ready, your no is still here.",
           "picker_personChanged": "Things changed with someone?",
           "picker_personChangedHint": "Pick who it is, and you'll be asked about them again.",
-          "picker_safeQuestion": "Is it safe to bring hard things up with {who}?",
-          "picker_safeYes": "Yes, mostly",
-          "picker_safeNo": "No",
-          "picker_safeUnsure": "Not sure",
-          "picker_riskQuestion": "Is it more that they might hurt or control you, or that it tends to go badly?",
-          "picker_riskHarm": "They might hurt or control me",
+          "picker_personGoOn": "Go on",
+          "picker_personKeepLine": "The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.",
+          "picker_personNameHint": "A nickname is fine. No real names needed.",
+          "picker_personNameLabel": "What do you call them?",
+          "picker_personNew": "Someone new",
+          "picker_personNoNameLine": "Without a name, nothing about them is kept.",
+          "picker_personRoleLabel": "Who are they to you?",
+          "picker_personSignedOutLine": "This stays on this screen only.",
+          "picker_personWhoSayNo": "Who's asking?",
           "picker_riskBadly": "It tends to go badly",
+          "picker_riskHarm": "They might hurt or control me",
+          "picker_riskQuestion": "Is it more that they might hurt or control you, or that it tends to go badly?",
           "picker_riskUnsaid": "I'd rather not say",
-          "picker_safetyRouteSayNoHeading": "With {who}, your safety comes first. Working out how to say no can wait.",
+          "picker_safeNo": "No",
+          "picker_safeQuestion": "Is it safe to bring hard things up with {who}?",
+          "picker_safeUnsure": "Not sure",
+          "picker_safeYes": "Yes, mostly",
+          "picker_safetyRouteBack": "This is about someone else",
           "picker_safetyRouteBody": "The people below can help you think it through, any time, and you don't have to be sure.",
           "picker_safetyRouteEnding": "Thinking about ending the relationship",
-          "picker_safetyRouteBack": "This is about someone else"
+          "picker_safetyRouteSayNoHeading": "With {who}, your safety comes first. Working out how to say no can wait.",
+          "predict_title": "How do you think they'll take it?",
+          "pressure_hint": "Pick any that fit.",
+          "pressure_title": "What do you think happens if you say no?",
+          "proud_hint": "However it went.",
+          "proud_title": "Are you proud of how you handled it?",
+          "reason_hint": "You don't have to justify it. One reason at most.",
+          "reason_label": "One reason (optional)",
+          "repeat_label": "If they push, say it again:",
+          "said_title": "Did you say no?",
+          "selected": "Selected. Copy it from here.",
+          "sent_line": "Your no is ready. When you say it is up to you.",
+          "sent_line_in_person": "Saying it out loud a couple of times first can help it come out steady.",
+          "sent_line_push": "If they push, say the same line again. You don't need a new reason.",
+          "sorry_line": "There's a sorry in there. You don't owe one for saying no.",
+          "sure_label": "How sure are you?",
+          "talk_now": "Talk to someone now",
+          "why_hint": "Pick the one that matters most.",
+          "why_title": "What matters most to you here?"
         },
         "tables": {
           "level": {
@@ -27211,8 +27211,6 @@
         },
         "derive": [
           {
-            "name": "level",
-            "kind": "count",
             "fields": [
               "f_cost",
               "f_values",
@@ -27220,19 +27218,19 @@
               "f_given",
               "f_later"
             ],
+            "kind": "count",
+            "name": "level",
+            "table": "level",
             "weights": {
-              "yes": 1,
-              "not_sure": 0.5,
+              "firmer": 1,
               "no": 0,
-              "softer": -1,
+              "not_sure": 0.5,
               "right": 0,
-              "firmer": 1
-            },
-            "table": "level"
+              "softer": -1,
+              "yes": 1
+            }
           },
           {
-            "name": "final",
-            "kind": "count",
             "fields": [
               "f_cost",
               "f_values",
@@ -27241,36 +27239,26 @@
               "f_later",
               "nudge"
             ],
+            "kind": "count",
+            "name": "final",
+            "table": "level",
             "weights": {
-              "yes": 1,
-              "not_sure": 0.5,
+              "firmer": 1,
               "no": 0,
-              "softer": -1,
+              "not_sure": 0.5,
               "right": 0,
-              "firmer": 1
-            },
-            "table": "level"
+              "softer": -1,
+              "yes": 1
+            }
           }
         ],
         "steps": [
           {
             "id": "ask",
             "kind": "ask",
-            "title": "ask_title",
-            "hint": "ask_hint",
             "fields": [
               {
                 "id": "asking",
-                "options": {
-                  "list": "asking"
-                },
-                "max": 1,
-                "required": true,
-                "own": {
-                  "hint": "ask_own",
-                  "countsAsPick": true,
-                  "max": 60
-                },
                 "links": [
                   {
                     "exit": "cool_down",
@@ -27282,9 +27270,21 @@
                       ]
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "list": "asking"
+                },
+                "own": {
+                  "countsAsPick": true,
+                  "hint": "ask_own",
+                  "max": 60
+                },
+                "required": true
               }
             ],
+            "hint": "ask_hint",
+            "title": "ask_title",
             "next": [
               {
                 "to": "pressure",
@@ -27296,19 +27296,6 @@
           {
             "id": "pressure",
             "kind": "ask",
-            "title": "pressure_title",
-            "hint": "pressure_hint",
-            "fields": [
-              {
-                "id": "pressure",
-                "options": {
-                  "list": "pressure"
-                },
-                "max": 3,
-                "swap": true,
-                "required": true
-              }
-            ],
             "crisis": [
               {
                 "variant": "other_person",
@@ -27320,6 +27307,19 @@
                 }
               }
             ],
+            "fields": [
+              {
+                "id": "pressure",
+                "max": 3,
+                "options": {
+                  "list": "pressure"
+                },
+                "required": true,
+                "swap": true
+              }
+            ],
+            "hint": "pressure_hint",
+            "title": "pressure_title",
             "next": [
               {
                 "to": "enough",
@@ -27359,18 +27359,6 @@
           {
             "id": "enough",
             "kind": "ask",
-            "title": "enough_title",
-            "hint": "enough_hint",
-            "fields": [
-              {
-                "id": "safe_line",
-                "options": {
-                  "list": "safe_line"
-                },
-                "max": 1,
-                "required": true
-              }
-            ],
             "crisis": [
               {
                 "variant": "other_person",
@@ -27392,6 +27380,18 @@
                 }
               }
             ],
+            "fields": [
+              {
+                "id": "safe_line",
+                "max": 1,
+                "options": {
+                  "list": "safe_line"
+                },
+                "required": true
+              }
+            ],
+            "hint": "enough_hint",
+            "title": "enough_title",
             "next": [
               {
                 "to": "safe_card",
@@ -27403,17 +27403,7 @@
           {
             "id": "safe_card",
             "kind": "embed",
-            "embed": "boundaryLine",
-            "title": "enough_card_title",
             "answerAs": "safe_copied",
-            "props": {
-              "field": "safe_line",
-              "shape": "line",
-              "copyLabel": "copy",
-              "copiedLabel": "copied",
-              "selectedLabel": "selected",
-              "next": "next"
-            },
             "crisis": [
               {
                 "variant": "other_person",
@@ -27435,6 +27425,16 @@
                 }
               }
             ],
+            "embed": "boundaryLine",
+            "props": {
+              "copiedLabel": "copied",
+              "copyLabel": "copy",
+              "field": "safe_line",
+              "next": "next",
+              "selectedLabel": "selected",
+              "shape": "line"
+            },
+            "title": "enough_card_title",
             "next": [
               {
                 "to": "safe_end",
@@ -27447,7 +27447,6 @@
             "id": "safe_end",
             "kind": "handoff",
             "complete": true,
-            "noClose": true,
             "crisis": [
               {
                 "variant": "other_person",
@@ -27456,13 +27455,14 @@
                 }
               }
             ],
+            "done": "done",
             "lines": [
               {
-                "when": null,
-                "key": "enough_line"
+                "key": "enough_line",
+                "when": null
               }
             ],
-            "done": "done",
+            "noClose": true,
             "next": [],
             "offers": [
               {
@@ -27493,18 +27493,18 @@
           {
             "id": "why",
             "kind": "ask",
-            "title": "why_title",
-            "hint": "why_hint",
             "fields": [
               {
                 "id": "why",
+                "max": 1,
                 "options": {
                   "list": "why"
                 },
-                "max": 1,
                 "required": true
               }
             ],
+            "hint": "why_hint",
+            "title": "why_title",
             "next": [
               {
                 "to": "firm",
@@ -27516,55 +27516,55 @@
           {
             "id": "firm",
             "kind": "ask",
-            "title": "firm_title",
-            "hint": "firm_hint",
             "fields": [
               {
                 "id": "f_cost",
                 "label": "f_cost_q",
+                "max": 1,
                 "options": {
                   "list": "factor"
                 },
-                "max": 1,
                 "required": true
               },
               {
                 "id": "f_values",
                 "label": "f_values_q",
+                "max": 1,
                 "options": {
                   "list": "factor"
                 },
-                "max": 1,
                 "required": true
               },
               {
                 "id": "f_fair",
                 "label": "f_fair_q",
+                "max": 1,
                 "options": {
                   "list": "factor"
                 },
-                "max": 1,
                 "required": true
               },
               {
                 "id": "f_given",
                 "label": "f_given_q",
+                "max": 1,
                 "options": {
                   "list": "factor"
                 },
-                "max": 1,
                 "required": true
               },
               {
                 "id": "f_later",
                 "label": "f_later_q",
+                "max": 1,
                 "options": {
                   "list": "factor"
                 },
-                "max": 1,
                 "required": true
               }
             ],
+            "hint": "firm_hint",
+            "title": "firm_title",
             "next": [
               {
                 "to": "level",
@@ -27576,6 +27576,18 @@
           {
             "id": "level",
             "kind": "ask",
+            "fields": [
+              {
+                "id": "nudge",
+                "label": "nudge_label",
+                "max": 1,
+                "options": {
+                  "list": "nudge"
+                },
+                "required": true
+              }
+            ],
+            "hint": "level_hint",
             "title": [
               {
                 "key": "level_firm_hold",
@@ -27623,18 +27635,6 @@
                 }
               }
             ],
-            "hint": "level_hint",
-            "fields": [
-              {
-                "id": "nudge",
-                "label": "nudge_label",
-                "options": {
-                  "list": "nudge"
-                },
-                "max": 1,
-                "required": true
-              }
-            ],
             "next": [
               {
                 "to": "compose",
@@ -27646,6 +27646,76 @@
           {
             "id": "compose",
             "kind": "ask",
+            "fields": [
+              {
+                "id": "opener",
+                "label": "opener_label",
+                "max": 1,
+                "options": {
+                  "list": "opener"
+                },
+                "own": {
+                  "countsAsPick": true,
+                  "hint": "own_line",
+                  "max": 60
+                }
+              },
+              {
+                "id": "no",
+                "label": "no_label",
+                "max": 1,
+                "options": {
+                  "list": "no",
+                  "where": {
+                    "any": [
+                      {
+                        "not": {
+                          "set": "$a.f_cost"
+                        }
+                      },
+                      {
+                        "has": [
+                          "$opt.levels",
+                          "$d.final"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "own": {
+                  "countsAsPick": true,
+                  "hint": "own_line",
+                  "max": 90
+                },
+                "required": true
+              },
+              {
+                "id": "reason",
+                "label": "reason_label",
+                "max": 1,
+                "options": {
+                  "list": "reason"
+                },
+                "own": {
+                  "countsAsPick": true,
+                  "hint": "reason_hint",
+                  "max": 90
+                }
+              },
+              {
+                "id": "alt",
+                "label": "alt_label",
+                "max": 1,
+                "options": {
+                  "list": "alt"
+                },
+                "own": {
+                  "countsAsPick": true,
+                  "hint": "own_line",
+                  "max": 60
+                }
+              }
+            ],
             "title": [
               {
                 "key": "compose_title_flooded",
@@ -27687,76 +27757,6 @@
                 "key": "compose_title"
               }
             ],
-            "fields": [
-              {
-                "id": "opener",
-                "label": "opener_label",
-                "options": {
-                  "list": "opener"
-                },
-                "max": 1,
-                "own": {
-                  "hint": "own_line",
-                  "countsAsPick": true,
-                  "max": 60
-                }
-              },
-              {
-                "id": "no",
-                "label": "no_label",
-                "options": {
-                  "list": "no",
-                  "where": {
-                    "any": [
-                      {
-                        "not": {
-                          "set": "$a.f_cost"
-                        }
-                      },
-                      {
-                        "has": [
-                          "$opt.levels",
-                          "$d.final"
-                        ]
-                      }
-                    ]
-                  }
-                },
-                "max": 1,
-                "required": true,
-                "own": {
-                  "hint": "own_line",
-                  "countsAsPick": true,
-                  "max": 90
-                }
-              },
-              {
-                "id": "reason",
-                "label": "reason_label",
-                "options": {
-                  "list": "reason"
-                },
-                "max": 1,
-                "own": {
-                  "hint": "reason_hint",
-                  "countsAsPick": true,
-                  "max": 90
-                }
-              },
-              {
-                "id": "alt",
-                "label": "alt_label",
-                "options": {
-                  "list": "alt"
-                },
-                "max": 1,
-                "own": {
-                  "hint": "own_line",
-                  "countsAsPick": true,
-                  "max": 60
-                }
-              }
-            ],
             "next": [
               {
                 "to": "message",
@@ -27768,24 +27768,24 @@
           {
             "id": "message",
             "kind": "embed",
-            "embed": "messageComposer",
-            "title": "message_title",
             "answerAs": "sent_how",
+            "embed": "messageComposer",
             "props": {
-              "field": "no",
-              "opener": "opener",
-              "reason": "reason",
               "alt": "alt",
-              "repeatLabel": "repeat_label",
-              "sorryLine": "sorry_line",
+              "copiedLabel": "copied",
+              "copyLabel": "copy",
               "dropSorry": "drop_sorry",
               "explainLine": "explain_line",
-              "copyLabel": "copy",
-              "copiedLabel": "copied",
-              "selectedLabel": "selected",
+              "field": "no",
+              "next": "next",
               "openLabel": "open_messages",
-              "next": "next"
+              "opener": "opener",
+              "reason": "reason",
+              "repeatLabel": "repeat_label",
+              "selectedLabel": "selected",
+              "sorryLine": "sorry_line"
             },
+            "title": "message_title",
             "next": [
               {
                 "to": "predict",
@@ -27797,33 +27797,33 @@
           {
             "id": "predict",
             "kind": "ask",
-            "title": "predict_title",
             "fields": [
               {
                 "id": "predict",
+                "max": 1,
                 "options": {
                   "list": "predict"
                 },
-                "max": 1,
                 "required": true
               },
               {
                 "id": "sure",
                 "label": "sure_label",
+                "max": 1,
                 "options": {
                   "list": "sure"
-                },
-                "max": 1
+                }
               },
               {
                 "id": "how",
                 "label": "how_label",
+                "max": 1,
                 "options": {
                   "list": "how"
-                },
-                "max": 1
+                }
               }
             ],
+            "title": "predict_title",
             "next": [
               {
                 "to": "sent",
@@ -27836,30 +27836,7 @@
             "id": "sent",
             "kind": "handoff",
             "complete": true,
-            "lines": [
-              {
-                "when": {
-                  "eq": [
-                    "$a.predict",
-                    "push"
-                  ]
-                },
-                "key": "sent_line_push"
-              },
-              {
-                "when": {
-                  "eq": [
-                    "$a.how",
-                    "in_person"
-                  ]
-                },
-                "key": "sent_line_in_person"
-              },
-              {
-                "when": null,
-                "key": "sent_line"
-              }
-            ],
+            "done": "done",
             "fields": [
               {
                 "id": "again",
@@ -27874,7 +27851,30 @@
               "type": "no_outcome",
               "whenFrom": "again"
             },
-            "done": "done",
+            "lines": [
+              {
+                "key": "sent_line_push",
+                "when": {
+                  "eq": [
+                    "$a.predict",
+                    "push"
+                  ]
+                }
+              },
+              {
+                "key": "sent_line_in_person",
+                "when": {
+                  "eq": [
+                    "$a.how",
+                    "in_person"
+                  ]
+                }
+              },
+              {
+                "key": "sent_line",
+                "when": null
+              }
+            ],
             "next": [],
             "offers": [
               {
@@ -27891,25 +27891,25 @@
           {
             "id": "said",
             "kind": "ask",
-            "reopens": {
-              "after": "sent"
-            },
             "clears": [
               "said",
               "held",
               "proud"
             ],
-            "title": "said_title",
             "fields": [
               {
                 "id": "said",
+                "max": 1,
                 "options": {
                   "list": "said"
                 },
-                "max": 1,
                 "required": true
               }
             ],
+            "reopens": {
+              "after": "sent"
+            },
+            "title": "said_title",
             "next": [
               {
                 "to": "not_said",
@@ -27939,17 +27939,17 @@
           {
             "id": "held",
             "kind": "ask",
-            "title": "held_title",
             "fields": [
               {
                 "id": "held",
+                "max": 1,
                 "options": {
                   "list": "held"
                 },
-                "max": 1,
                 "required": true
               }
             ],
+            "title": "held_title",
             "next": [
               {
                 "to": "gave_in",
@@ -27970,18 +27970,18 @@
           {
             "id": "proud",
             "kind": "ask",
-            "title": "proud_title",
-            "hint": "proud_hint",
             "fields": [
               {
                 "id": "proud",
+                "max": 1,
                 "options": {
                   "list": "proud"
                 },
-                "max": 1,
                 "required": true
               }
             ],
+            "hint": "proud_hint",
+            "title": "proud_title",
             "next": [
               {
                 "to": "held_end",
@@ -27994,31 +27994,31 @@
             "id": "held_end",
             "kind": "handoff",
             "complete": true,
+            "done": "done",
             "lines": [
               {
+                "key": "no_push_line",
                 "when": {
                   "eq": [
                     "$a.held",
                     "no_push"
                   ]
-                },
-                "key": "no_push_line"
+                }
               },
               {
+                "key": "held_line_proud",
                 "when": {
                   "eq": [
                     "$a.proud",
                     "yes"
                   ]
-                },
-                "key": "held_line_proud"
+                }
               },
               {
-                "when": null,
-                "key": "held_line"
+                "key": "held_line",
+                "when": null
               }
             ],
-            "done": "done",
             "next": [],
             "offers": [
               {
@@ -28036,17 +28036,17 @@
             "id": "gave_in",
             "kind": "handoff",
             "complete": true,
+            "done": "done",
             "lines": [
               {
-                "when": null,
-                "key": "gave_in_line"
+                "key": "gave_in_line",
+                "when": null
               },
               {
-                "when": null,
-                "key": "gave_in_guilt"
+                "key": "gave_in_guilt",
+                "when": null
               }
             ],
-            "done": "done",
             "next": [],
             "offers": [
               {
@@ -28063,13 +28063,13 @@
             "id": "not_said",
             "kind": "handoff",
             "complete": true,
+            "done": "done",
             "lines": [
               {
-                "when": null,
-                "key": "not_said_line"
+                "key": "not_said_line",
+                "when": null
               }
             ],
-            "done": "done",
             "next": [],
             "offers": []
           },
@@ -28077,13 +28077,13 @@
             "id": "partly",
             "kind": "handoff",
             "complete": true,
+            "done": "done",
             "lines": [
               {
-                "when": null,
-                "key": "partly_line"
+                "key": "partly_line",
+                "when": null
               }
             ],
-            "done": "done",
             "next": [],
             "offers": []
           }
