@@ -46,6 +46,10 @@ SIGNED_OFF = {
     "rf_social_threat_shame_words_self-worth_check-the-facts": "2026-11-12",
     "rf_reactive_aggression_words_grievance_check-the-facts": "2026-11-12",
     "rf_rumination_loop_words_guilt_check-the-facts": "2026-11-12",
+    # Same rule (12 Nov): FAST and Wise mind.
+    "rf_social_threat_shame_words_self-respect_fast": "2026-11-12",
+    "rf_reactive_aggression_words_grievance_fast": "2026-11-12",
+    "rf_chronic_vigilance_words_watchful_wise-mind": "2026-11-12",
     "rf_acute_alarm_backup_five-senses": "2026-10-05",
     "rf_acute_alarm_default_cool-down": "2026-10-05",
     "rf_acute_alarm_default_opposite-action": "2026-10-05",
@@ -129,8 +133,8 @@ NO_ROWS = {"dear-man": "IE-01's 'is it safe with them?' question ships with the 
 # app module yet, so its rows are written switched off (and the routing slice skips concepts without an
 # appToolId anyway). When a module ships: give the concept its appToolId (app-tool-ids.cypher), drop it
 # from PLANNED and its rows go live where the review put them. Wise mind's module has shipped (its
-# concept has appToolId 'wise-mind') but it stays here until Claudia signs off the watchful row: its row
-# is written switched off and stays a draft until then.
+# concept has appToolId 'wise-mind'): out of PLANNED, its watchful row live (Claudia, 12 Nov: default to connected).
+CONCEPT_TAGS["wise-mind"] = {"concept": "dbt_wise_mind", "side": "both", "skillKind": "naming", "direction": "neutral"}
 # Cope Ahead's module has shipped too (appToolId 'cope-ahead', docs/design/cope-ahead.md): it is out of
 # PLANNED, and its anticipatory row is live (Claudia, 12 Nov: default to connected).
 CONCEPT_TAGS["cope-ahead"] = {"concept": "dbt_cope_ahead", "side": "change", "skillKind": "change", "direction": "neutral"}
@@ -143,8 +147,12 @@ CONCEPT_TAGS["check-the-facts"] = {"concept": "dbt_check_facts", "side": "change
 # diversity rule could never set it beside Pause, and its one row could never show.
 CONCEPT_TAGS["alternate-rebellion"] = {"concept": "dbt_alternate_rebellion", "side": "acceptance", "skillKind": "redirect", "direction": "neutral"}
 # Keep your self-respect (FAST) has shipped on the skill runtime (appToolId 'fast', docs/design/fast.md, IE-B1):
-# out of PLANNED; its two word rows stay switched off and drafts until Claudia signs them off (D15).
-CONCEPT_TAGS["fast"] = {"concept": "dbt_fast", "side": "change", "skillKind": "relational", "direction": "neutral"}
+# out of PLANNED; its two word rows are live (Claudia, 12 Nov: default to connected). Its tags are what let them
+# show: it is always the alternative, to Recover (relational) on betrayed / disrespected and to Check the Facts
+# (change) on bitter / resentful, so it can be neither `relational` nor change-side, or the diversity rule
+# rejects it every time (as Rebel's `hold` did). skillKind `values` (the review asks what you stand for, F-A-S-T);
+# side `both` (the review, then Let go when nothing can be done).
+CONCEPT_TAGS["fast"] = {"concept": "dbt_fast", "side": "both", "skillKind": "values", "direction": "neutral"}
 
 # It isn't working (ER-14, appToolId 'er-troubleshoot', docs/design/er-troubleshoot.md) has no RECOMMENDED_FOR rows
 # by design: it answers "I did a skill and it didn't help", which no check-in state names. Its entries are skill
@@ -164,7 +172,6 @@ CONCEPT_TAGS["fast"] = {"concept": "dbt_fast", "side": "change", "skillKind": "r
 # drafts until Claudia signs them off (D15).
 CONCEPT_TAGS["let-it-be"] = {"concept": "dbt_radical_acceptance", "side": "acceptance", "skillKind": "hold", "direction": "neutral"}
 BUILT_NOT_SIGNED_OFF = {
-    "fast": "built on the skill runtime; its word rows go live on Claudia's sign-off, row by row (docs/design/fast.md)",
     # DT-05: the slider is gone (rebuilt as Ride it out on the skill runtime, DT-B3); its rows stay off and drafts.
     "let-it-be": "built on the skill runtime; its rows go live on Claudia's sign-off, row by row (docs/design/let-it-be.md)",
     "urge-surfing": "rebuilt on the skill runtime as Ride it out; its rows go live on Claudia's sign-off (docs/design/ride-it-out.md)",
@@ -172,7 +179,6 @@ BUILT_NOT_SIGNED_OFF = {
 PLANNED = {
     "running-low":        {"concept": "dbt_please",             "side": "both",       "skillKind": "body",       "direction": "neutral"},
     "accepts":            {"concept": "dbt_accepts",            "side": "acceptance", "skillKind": "hold",       "direction": "neutral"},
-    "wise-mind":          {"concept": "dbt_wise_mind",          "side": "both",       "skillKind": "naming",     "direction": "neutral"},
     "give":               {"concept": "dbt_give",               "side": "change",     "skillKind": "relational", "direction": "neutral"},
 }
 CONCEPT_TAGS.update(PLANNED)
@@ -297,7 +303,7 @@ WORD_RULES = [
     {"key": "worry", "pattern": "chronic_vigilance", "tool": "urge-surfing", "priority": WORD_NEXT, "words": ["worried"],
      "why": "Ride it out (DT-05, rebuilt on the skill runtime) for the checking / reassurance urge; off until signed off."},
     {"key": "watchful", "pattern": "chronic_vigilance", "tool": "wise-mind", "priority": WORD_NEXT, "words": WATCHFUL_WORDS,
-     "why": "Planned: Wise Mind as the alternative for suspicion and judgement."},
+     "why": "Wise Mind as the alternative for suspicion and judgement."},
     {"key": "helpless", "pattern": "chronic_vigilance", "tool": "problem-solve", "priority": WORD_LEAD, "words": ["helpless"],
      "why": "Let it be (built, row off until signed off), then Problem Solve in micro-steps; Problem Solve leads until then."},
     {"key": "helpless", "pattern": "chronic_vigilance", "tool": "let-it-be", "priority": 0.4, "words": ["helpless"],
