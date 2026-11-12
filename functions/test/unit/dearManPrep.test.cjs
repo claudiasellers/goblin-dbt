@@ -50,6 +50,9 @@ test('fields: the old prep\'s names, option ids only; own words become own and a
   assert.equal(f.situationType, 'ask', 'a practical ask about something that happened is counted as practical');
   assert.deepEqual(f.priorities, ['relationship']);
   assert.deepEqual(f.barriers, ['barrier_guilt'], 'lists: ids only (History humanizes each)');
+  assert.deepEqual(f.askThoughts, [], 'no thought picked');
+  assert.deepEqual(P.prepFields(run([ans('hard', 'barrier_guilt'), ans('thought', 'myth_deserve', 'myth_last')])).askThoughts, ['myth_deserve', 'myth_last'],
+    "IE-12's thoughts about asking are their own list, never in barriers");
   assert.equal(P.prepFields(run([{ fieldId: 'walk', optionIds: [], valueOwn: 'x' }])).walkAwayId, 'own');
   assert.deepEqual([f.describeId, f.assertId, f.anchorNeedId, f.anchorId, f.confidenceCueId, f.middleGroundId, f.walkAwayId],
     ['addr_broke_promise', 'addr_follow_through', 'need_permission', 'anchor_allowed', 'cue_feet', 'neg_sometimes', 'walk_later']);

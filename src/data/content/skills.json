@@ -9567,6 +9567,8 @@
           "matters_hint": "If it gets tough, this is what you'll protect.",
           "hard_title": "What makes this hard?",
           "hard_hint": "Pick any that fit.",
+          "thought_title": "Do any of these thoughts show up too?",
+          "thought_hint": "Pick up to two, or none.",
           "who_title": "Who might show up in this conversation?",
           "describe_title": "What happened? Say it the way a camera would see it.",
           "describe_hint": "Facts are harder to argue with than judgements.",
@@ -9647,6 +9649,13 @@
           "coach_barrier_tried_before": "If your mind pulls you to the last five times, come back to this conversation, this ask, now.",
           "coach_barrier_emotional": "If tears or a shaky voice come, take a breath. You can say this is hard to say and you want to get through it.",
           "coach_barrier_no_right": "If you start doubting yourself: you don't have to earn the right to need things. Asking clearly is respectful.",
+          "coach_myth_deserve": "Feeling undeserving makes sense. You can feel it and still ask, if you choose to.",
+          "coach_myth_weak": "Needing things is human. Saying it plainly takes steadiness.",
+          "coach_myth_matter": "A no can be about this ask, on this day. It doesn't decide what you're worth.",
+          "coach_myth_know": "Wanting them to know without asking is so human. People can care and still not guess.",
+          "coach_myth_sure": "Nobody gets to know the answer first. You can ask and find out.",
+          "coach_myth_alone": "Needing someone for this doesn't make you less.",
+          "coach_myth_last": "Your needs can sit next to theirs. Asking is how they get a place.",
           "fill_ask_specific_help": "What kind of help, and by when?",
           "fill_ask_flexibility": "What would that look like in practice?",
           "fill_ask_change_how": "What would you like to be different?",
@@ -9775,7 +9784,7 @@
                 "own": {
                   "hint": "own_line",
                   "countsAsPick": true,
-                  "max": 35
+                  "max": 30
                 }
               }
             ],
@@ -9800,6 +9809,28 @@
                   ]
                 }
               },
+              {
+                "to": "thought",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "thought",
+            "kind": "ask",
+            "title": "thought_title",
+            "hint": "thought_hint",
+            "fields": [
+              {
+                "id": "thought",
+                "options": {
+                  "list": "thought"
+                },
+                "max": 2
+              }
+            ],
+            "next": [
               {
                 "to": "who",
                 "when": {
@@ -10371,7 +10402,7 @@
                 "own": {
                   "hint": "own_line",
                   "countsAsPick": true,
-                  "max": 40
+                  "max": 35
                 }
               }
             ],
@@ -10388,6 +10419,69 @@
             "kind": "ask",
             "title": "mindful_title",
             "lines": [
+              {
+                "key": "coach_myth_deserve",
+                "when": {
+                  "eq": [
+                    "$a.thought",
+                    "myth_deserve"
+                  ]
+                }
+              },
+              {
+                "key": "coach_myth_weak",
+                "when": {
+                  "eq": [
+                    "$a.thought",
+                    "myth_weak"
+                  ]
+                }
+              },
+              {
+                "key": "coach_myth_matter",
+                "when": {
+                  "eq": [
+                    "$a.thought",
+                    "myth_matter"
+                  ]
+                }
+              },
+              {
+                "key": "coach_myth_know",
+                "when": {
+                  "eq": [
+                    "$a.thought",
+                    "myth_know"
+                  ]
+                }
+              },
+              {
+                "key": "coach_myth_last",
+                "when": {
+                  "eq": [
+                    "$a.thought",
+                    "myth_last"
+                  ]
+                }
+              },
+              {
+                "key": "coach_myth_sure",
+                "when": {
+                  "eq": [
+                    "$a.thought",
+                    "myth_sure"
+                  ]
+                }
+              },
+              {
+                "key": "coach_myth_alone",
+                "when": {
+                  "eq": [
+                    "$a.thought",
+                    "myth_alone"
+                  ]
+                }
+              },
               {
                 "key": "coach_barrier_angry",
                 "when": {
@@ -10566,7 +10660,7 @@
                 "own": {
                   "hint": "own_line",
                   "countsAsPick": true,
-                  "max": 40
+                  "max": 35
                 }
               }
             ],
@@ -10593,7 +10687,7 @@
                 "own": {
                   "hint": "own_line",
                   "countsAsPick": true,
-                  "max": 40
+                  "max": 35
                 }
               }
             ],
@@ -10951,6 +11045,36 @@
             {
               "value": "scared",
               "label": "I'm scared of what they'd do"
+            }
+          ],
+          "thought": [
+            {
+              "value": "myth_deserve",
+              "label": "I don't deserve it"
+            },
+            {
+              "value": "myth_weak",
+              "label": "Asking makes me look weak"
+            },
+            {
+              "value": "myth_matter",
+              "label": "If they say no, it means I don't matter"
+            },
+            {
+              "value": "myth_know",
+              "label": "They'd know if they cared"
+            },
+            {
+              "value": "myth_last",
+              "label": "My needs come last"
+            },
+            {
+              "value": "myth_sure",
+              "label": "I need to know they'll say yes first"
+            },
+            {
+              "value": "myth_alone",
+              "label": "If I can't fix it alone, I'm not good enough"
             }
           ],
           "describe": [
@@ -11547,6 +11671,28 @@
               "value": "anchor_future_me",
               "label": "Future me will be glad I said it",
               "needs": [
+                "need_matters"
+              ]
+            },
+            {
+              "value": "anchor_human",
+              "label": "Needing things is human, not weak",
+              "needs": [
+                "need_permission"
+              ]
+            },
+            {
+              "value": "anchor_this_ask",
+              "label": "A no to this ask isn't a no to me",
+              "needs": [
+                "need_different"
+              ]
+            },
+            {
+              "value": "anchor_kinder_than_guess",
+              "label": "Saying it clearly is kinder than hoping they guess",
+              "needs": [
+                "need_permission",
                 "need_matters"
               ]
             }

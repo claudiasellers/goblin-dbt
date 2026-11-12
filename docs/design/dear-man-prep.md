@@ -22,6 +22,7 @@ situation  what kind of conversation is it? (DEAR MAN's four; Recover's hand-off
            links: I've already had the conversation → the debrief; a carried flooded reading → Settle my body first
 matters    what matters most here? getting it · the relationship · my self-respect      (IE-07's ask column, one pick)
 hard       what makes this hard? (barriers, up to 3, own words)
+thought    do any of these thoughts show up too? (IE-12, up to 2, optional)
    ├─ I'm scared of what they'd do ─► scared: the other_person resources, safety.open, Ending (frame=careful); no plan,
    │                                  no close
    ├─ parts on ─► who: does a part of you have a stake in this? (the parts slice; partAnchor)
@@ -32,7 +33,7 @@ assert     what you're asking for (filtered by situation; heads_up drops asks to
            refused + address / pattern → FAST's Let go offered beside them)
    ├─ an ask with a blank ─► fill: the blank in a few words (two starters, own words)
 reinforce  what's in it for them (up to 2)
-mindful    what do you need to hear in that moment? (the coaching for the barrier picked first, as a line)
+mindful    what do you need to hear in that moment? (a thought's line first, else the barrier picked first's coaching)
 phrase     the line to hold on to (filtered by that need)
 confident  how you'll carry yourself (ConfidenceCue, optional)
 middle     what you'd settle for (the title follows what matters most)
@@ -55,6 +56,37 @@ Every option is DEAR MAN's own graph node (`PRESENTS` → `DearManSituationType`
 `DearManDescribeOption`, `DearManFeelingChip`, `DearManAssertOption`, `DearManReinforceOption`, `DearManAnchorNeed`,
 `DearManAnchorPhrase`, `ConfidenceCue`, `DearManNegotiateOption`), read from `scripts/dear-man/content.py` at build
 time. Labels are re-voiced in the skill where the graph's predate the house voice; the graph keeps its text.
+
+## The thoughts about asking (IE-12, built 12 Nov)
+
+After *What makes this hard?*, its own optional screen: *Do any of these thoughts show up too?* (up to two, or none).
+Seven chips: five from DBT IE Handout 2a's myths (*I don't deserve it*, *Asking makes me look weak*, *If they say no,
+it means I don't matter*, *My needs come last*, *If I can't fix it alone, I'm not good enough*), *I need to know
+they'll say yes first* (Handout 2a's *I have to know they'll say yes*), and the PRD's own *They'd know if they cared*
+(its *They should already know*, reworded to keep *should* out). The PRD's *saying no is mean* belongs to Say no
+(IE-04) and waits there. Each is a `DearManBarrier` node with `kind: 'myth'` (`MYTHS` in
+`scripts/dear-man/content.py`), so the old page's barrier query skips them (`kind IS NULL`); the screen never says
+*myth*. It's a screen of its own, not a second field under the barriers, so *I'm scared of what they'd do* keeps its
+banner right under it (Gate 2), and the scared path never reaches it.
+
+A picked thought's line leads the anchor screen, received and hedged rather than argued (*A no can be about this ask,
+on this day. It doesn't decide what you're worth.*). The graph tags each one onto the anchor need it answers: `need_permission` (deserve,
+weak, last, alone), `need_different` (matter, sure; with *I can hear a no and still be okay*) and `need_matters`
+(know). The skill doesn't steer the need step by those tags yet (ordering options by an overlap is a runtime change,
+part 2). Three new phrases: *Needing things is human, not weak*, *A no to this ask isn't a no to me*, *Saying it clearly is
+kinder than hoping they guess*. The phrase step filters by the need picked, so a thought reaches a phrase through its
+need. The projection keeps them as their own list, `askThoughts`, never inside `barriers`. Parts holds each one
+(`HELD`, a belief, not a protective move).
+
+Own-word caps went down so the longest record still fits ext's 4 KB: barriers 35 → 30 characters, reinforce, middle
+ground and walk-away 40 → 35.
+
+Part 2 (not built): IE-03's past results with this person on *if they say no it means I don't matter* (*Last three
+nos from them…*), the calm-time sort and the person's own counter lines (`own_counter_line`), WS1's pros and cons
+after *decided not to* twice, `MythCategory` and `IMPLEMENTS → dbt_dear_man`, the need step ordered by the thoughts
+picked, Check the Facts inline and `pileSort`. All land in IE-B5 (IE-03's results need its interaction history, the
+sort needs `pileSort` from ER-B4, Check the Facts inline needs ER-B5's inline mini-card, the ordering needs a
+`runtime:` PR); the Check the Facts and DT-10 edges stay deferred until then.
 
 ## The pocket card (`pocketCard`, Mode C)
 
@@ -122,5 +154,5 @@ content and projection stay; with the flag off nothing opens the skill.
 
 ## Still in IE-B4
 
-Recover drops `boundaryLocked` and `tooHot` (built 12 Nov, the second PR: [`recover-from-invalidation.md`](recover-from-invalidation.md)); IE-06 Keep it warm; IE-12's myths into the barrier step; Let go inline;
+Recover drops `boundaryLocked` and `tooHot` (built 12 Nov, the second PR: [`recover-from-invalidation.md`](recover-from-invalidation.md)); IE-06 Keep it warm (built 12 Nov, [`give.md`](give.md)); IE-12's thoughts about asking (built 12 Nov, above); Let go inline;
 then DEAR MAN's hand-built page can be deleted.
