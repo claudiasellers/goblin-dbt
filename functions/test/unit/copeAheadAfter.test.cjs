@@ -76,6 +76,7 @@ test('a close\'s schedule: another tool\'s session skips cope_ahead_after (like 
     please_fix: 'please-skill',
     good_thing: 'good-things',
     value_step: 'values-clarification',
+    mastery_step: 'build-mastery',
     reach_out_outcome: 'finding-connection',
   });
   const ending = { ...item, type: 'ending_after' };

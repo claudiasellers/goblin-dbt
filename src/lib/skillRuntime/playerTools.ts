@@ -25,6 +25,7 @@ export const PLAYER_TOOLS: Readonly<Record<string, string>> = {
   'please-skill': 'please_skill',
   'good-things': 'good_things',
   'values-clarification': 'values',
+  'build-mastery': 'build_mastery',
   'finding-connection': 'finding_connection',
 };
 

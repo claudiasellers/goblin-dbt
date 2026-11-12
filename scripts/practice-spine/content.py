@@ -201,6 +201,21 @@ FOLLOW_UP_TYPES = [
         "notification": "Your small step is ready to check.",
     },
     {
+        # Build mastery (ER-11, docs/design/build-mastery.md): the one step the person picked from a ladder, when they
+        # said (later today, tomorrow, a few days). The card reopens that visit at `back` (R9 `reopens`: *How did it
+        # go?* done · partly · not yet). Opening it is the resolution. Content-free: never names the area or the step.
+        "id": "mastery_step", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/build-mastery?run={sourceSessionId}&at=back&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"today": {"kind": "at_local", "days": 0, "time": "20:00"},
+                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
+                                             "few_days": {"kind": "at_local", "days": 3, "time": "18:00"}}},
+        "staleAfterHours": 72, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Your step", "body": "A step you picked to get one thing done. How did it go?"},
+        "choices": [{"id": "dismiss", "label": "Not yet", "status": "dismissed"}],
+        "notification": "Your step is ready to check.",
+    },
+    {
         # Find your people (IE-09, docs/design/find-your-people.md): the one small step towards people, checked when
         # the person said. The card reopens that visit at `back` (R9 `reopens`: *Did you do it?*, then how it went
         # against the prediction). Opening it is the resolution. Content-free: never names the step or anyone.

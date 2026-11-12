@@ -281,6 +281,18 @@ export const tools: Tool[] = [
     emoji: '🧭',
     bare: true,
   },
+  {
+    // ER-11 on the skill runtime (docs/design/build-mastery.md): the "I can" ladder, one thing that's hard but doable.
+    id: 'build-mastery',
+    name: 'Build Mastery',
+    tagline: 'One thing that\'s a stretch you can manage today',
+    description: 'Pick a part of life and one step on a three-rung ladder, from easier to harder. Done beats done well, and smaller is still mastery.',
+    whenToUse: 'When you want proof you can do hard things, or a big goal feels like too much.',
+    module: 'emotion-regulation',
+    dbtBasis: 'DBT ER Handout 19 (build mastery)',
+    emoji: '🪜',
+    bare: true,
+  },
   // Interpersonal Effectiveness
   {
     id: 'dear-man',
@@ -450,6 +462,7 @@ export const allIntents: Intent[] = [
   { id: 'running-low', label: 'Everything feels like too much today', toolId: 'please-skill', emoji: '🔋' },
   { id: 'find-good', label: 'Find something good', toolId: 'good-things', emoji: '🌼' },
   { id: 'what-matters', label: 'Work out what matters to me', toolId: 'values-clarification', emoji: '🧭' },
+  { id: 'one-thing', label: 'Get one thing done', toolId: 'build-mastery', emoji: '🪜' },
   { id: 'nightmares', label: 'The same nightmare keeps coming back', toolId: 'nightmare-rescript', emoji: '🌙' },
 ];
 

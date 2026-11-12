@@ -366,7 +366,8 @@ test("every dead link of the old page is a planned exit until its tool ships: re
   assert.ok(!planned.includes("let-it-be"), "Let it be shipped (DT-04)");
   assert.ok(!planned.includes("please-skill"), "Running low shipped (ER-07)");
   assert.ok(!planned.includes("give"), "Keep it warm shipped (IE-06)");
-  for (const t of ["dialectics", "build-mastery", "willingness", "turning-the-mind", "self-validate"]) {
+  assert.ok(!planned.includes("build-mastery"), "Build mastery shipped (ER-11)");
+  for (const t of ["dialectics", "willingness", "turning-the-mind", "self-validate"]) {
     assert.ok(planned.includes(t), t);
   }
   const tools = readFileSync("src/data/tools.ts", "utf8");

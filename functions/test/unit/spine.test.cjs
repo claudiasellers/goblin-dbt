@@ -237,6 +237,6 @@ test('startToolSession resolves a resume_skill or Ending check-in follow-up when
   await fns.startToolSession.run({ auth: auth(), data: { id: ID, toolId: 'dear-man', entry: 'today', followUpId: CI } });
   const q1 = f.calls[0].query;
   assert.match(q1, /f\.type IN \$openResolves AND f\.status = 'scheduled' THEN \[f\][\s\S]*SET x\.status = 'done', x\.resolvedAt = datetime\(\)/);
-  assert.deepEqual(f.calls[0].params.openResolves, ['resume_skill', 'nightmare_rehearse', 'ending_after', 'ending_again', 'ending_revisit', 'hold_come_back', 'ps_review', 'ask_outcome', 'no_outcome', 'ask_delayed', 'mind_job_back', 'lid_reopen', 'oa_try', 'habit_renew', 'please_fix', 'break_return', 'repair_outcome', 'good_thing', 'value_step', 'reach_out_outcome']);
+  assert.deepEqual(f.calls[0].params.openResolves, ['resume_skill', 'nightmare_rehearse', 'ending_after', 'ending_again', 'ending_revisit', 'hold_come_back', 'ps_review', 'ask_outcome', 'no_outcome', 'ask_delayed', 'mind_job_back', 'lid_reopen', 'oa_try', 'habit_renew', 'please_fix', 'break_return', 'repair_outcome', 'good_thing', 'value_step', 'mastery_step', 'reach_out_outcome']);
   assert.equal(f.calls[0].params.followUpKey, `u1:${CI}`);
 });

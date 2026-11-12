@@ -85,6 +85,41 @@ test("main already has the same content: nothing is pushed", () => {
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
+test("main moved and a newer merge changed the same content file: main's version stays", () => {
+  const { root, runner, other } = setup();
+  try {
+    // The snapshot changes a.json and b.json; a newer merge (newer graph content) changed b.json too.
+    write(runner, "src/data/content/b.json", "b from this run's older graph\n");
+    git(runner, "add", "-A");
+    git(runner, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "--amend", "--no-edit");
+    write(other, "src/data/content/b.json", "b from a newer merge\n");
+    commit(other, "a newer merge with newer content");
+    git(other, "push", "-q", "origin", "HEAD:main");
+    const newer = git(other, "rev-parse", "HEAD");
+
+    const lines = [];
+    const pushed = pushSnapshot({ cwd: runner, commit: "HEAD", log: { log: (m) => lines.push(m) } });
+    git(runner, "fetch", "-q");
+    assert.equal(git(runner, "rev-parse", `${pushed}^`), newer);
+    assert.equal(show(runner, "src/data/content/a.json"), "new a", "a file only the snapshot changed takes the snapshot's");
+    assert.equal(show(runner, "src/data/content/b.json"), "b from a newer merge", "never overwritten with older graph content");
+    assert.match(lines.join("\n"), /Left as main has them.*b\.json/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test("main moved and a newer merge changed every snapshot file: nothing is pushed", () => {
+  const { root, runner, other } = setup();
+  try {
+    write(other, "src/data/content/a.json", "a from a newer merge\n");
+    commit(other, "a newer merge with newer content");
+    git(other, "push", "-q", "origin", "HEAD:main");
+    const tip = git(other, "rev-parse", "HEAD");
+    assert.equal(pushSnapshot({ cwd: runner, commit: "HEAD", log: quiet }), null);
+    git(runner, "fetch", "-q");
+    assert.equal(git(runner, "rev-parse", "origin/main"), tip);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
 test("a snapshot commit that touches anything outside src/data/content is refused", () => {
   const { root, runner, other } = setup();
   try {
