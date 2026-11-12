@@ -6,7 +6,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { importTs } from "./lib/importTs.mjs";
-import { graph, fixtureDeps, withPolicyOn } from "./lib/recommendationFixture.mjs";
+import { graph, rawGraph, fixtureDeps, withPolicyOn } from "./lib/recommendationFixture.mjs";
 import { parseGrid, routingSummary, gridViaAliases, diffRouting, CANDIDATES } from "../scripts/lib/liveRoutingReport.mjs";
 
 const { getStateAndToolsHandler } = await importTs("functions/src/recommendation/handler.ts");
@@ -200,4 +200,15 @@ test("\"I can't tell — it's all too much\" reads as overwhelm, not crisis: it 
     assert.equal(withUnclear.pattern.id, alone.pattern.id, `${w.name}: the escape-hatch answer must not override the word`);
     assert.notEqual(withUnclear.safetyFlag?.type, "crisis", `${w.name}: "I can't tell" alone must not raise the crisis banner`);
   }
+});
+
+// Default to connected (12 Nov 2026): an active row the diversity rule always rejects is a draft in disguise. FAST is
+// the alternative to Recover (betrayed, disrespected) and to Check the Facts (bitter, resentful); Wise mind is the
+// alternative on the watchful words. Each must actually show, not only be active.
+test("the FAST and Wise mind rows show on the check-in result, not only sit active", async () => {
+  const live = rawGraph.routingPolicy.enabled ? rawGraph : withPolicyOn(rawGraph);
+  const shown = async (emotion) => (await run({ quadrant: "high-unpleasant", emotions: [emotion] }, live)).tools.map((t) => t.id);
+  for (const w of ["Betrayed", "Disrespected"]) assert.deepEqual(await shown(w), ["recovering-from-invalidation", "fast"], w);
+  for (const w of ["Bitter", "Resentful"]) assert.deepEqual(await shown(w), ["check-the-facts", "fast"], w);
+  for (const w of ["Skeptical", "Jealous", "Critical"]) assert.ok((await shown(w)).includes("wise-mind"), w);
 });

@@ -10538,23 +10538,16 @@
           "state_hint": "Tap the closest one.",
           "medical_line": "Sit or lie down. Even if it eases, get it checked today.",
           "urge_line": "First, a way to wait it out.",
-          "screen_title": "Cold on your face can slow your heart. Is any of this true for you?",
-          "screen_hint": "Heart trouble, a slow heart or heart medicine. Fainting. An eating disorder or very low weight. Pregnant. Raynaud's or a cold allergy. Drinking or using today.",
           "cold_near_title": "Is there cold water, or something cold, near you?",
           "cold_title": "Circuit Breaker: cold on your face.",
           "cold_step1": "Wet a cloth with cold water, or wrap a cold pack in a cloth.",
           "cold_step2": "Lean forward. Hold it on your forehead, eyes and upper cheeks.",
           "cold_step3": "Breathe out slowly, or hold your breath if that's comfortable.",
-          "cold_caution": "Never in a shower or a bath. Cold, not ice-cold.",
+          "cold_caution": "Skip this with heart trouble, fainting, an eating disorder, pregnancy, a cold allergy, or after drinking or using today. Never in a shower or a bath. Cold, not ice-cold.",
           "cold_start": "Tap when it's on",
           "cold_running": "Hold it there",
           "cold_lead": "Ready in",
           "cold_done": "Cold like that can slow your heart for a bit.",
-          "cool_title": "A cool cloth, gently.",
-          "cool_step1": "A cool cloth, not ice.",
-          "cool_step2": "Lean forward and rest it on your forehead and eyes.",
-          "cool_caution": "You weren't sure, so this one is short and gentle. Stop if anything feels wrong.",
-          "cool_done": "That's enough cold for now.",
           "move_title": "Move fast for a minute.",
           "move_step1": "Stand up and march on the spot, knees high.",
           "move_step2": "Or go up and down the stairs.",
@@ -10716,7 +10709,7 @@
                 }
               },
               {
-                "to": "screen",
+                "to": "cold_near",
                 "when": null
               }
             ],
@@ -10780,47 +10773,6 @@
             ]
           },
           {
-            "id": "screen",
-            "kind": "ask",
-            "title": "screen_title",
-            "hint": "screen_hint",
-            "fields": [
-              {
-                "id": "screen",
-                "options": {
-                  "list": "screen"
-                },
-                "max": 1,
-                "required": true,
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
-              }
-            ],
-            "next": [
-              {
-                "to": "squeeze",
-                "when": {
-                  "eq": [
-                    "$a.screen",
-                    "some"
-                  ]
-                }
-              },
-              {
-                "to": "cold_near",
-                "when": null
-              }
-            ],
-            "offers": []
-          },
-          {
             "id": "cold_near",
             "kind": "ask",
             "title": "cold_near_title",
@@ -10854,15 +10806,6 @@
                 }
               },
               {
-                "to": "cool",
-                "when": {
-                  "eq": [
-                    "$a.screen",
-                    "unsure"
-                  ]
-                }
-              },
-              {
                 "to": "cold",
                 "when": null
               }
@@ -10887,93 +10830,6 @@
               "running": "cold_running",
               "lead": "cold_lead",
               "done": "cold_done",
-              "next": "next"
-            },
-            "links": [
-              {
-                "exit": "safety_open",
-                "label": "safety_open",
-                "when": {
-                  "all": []
-                }
-              }
-            ],
-            "next": [
-              {
-                "to": "check2_here",
-                "when": {
-                  "all": [
-                    {
-                      "any": [
-                        {
-                          "set": "$a.check1"
-                        },
-                        {
-                          "set": "$a.check1_here"
-                        }
-                      ]
-                    },
-                    {
-                      "in": [
-                        "$a.state",
-                        [
-                          "frozen",
-                          "far_away"
-                        ]
-                      ]
-                    }
-                  ]
-                }
-              },
-              {
-                "to": "check2",
-                "when": {
-                  "any": [
-                    {
-                      "set": "$a.check1"
-                    },
-                    {
-                      "set": "$a.check1_here"
-                    }
-                  ]
-                }
-              },
-              {
-                "to": "check1_here",
-                "when": {
-                  "in": [
-                    "$a.state",
-                    [
-                      "frozen",
-                      "far_away"
-                    ]
-                  ]
-                }
-              },
-              {
-                "to": "check1",
-                "when": null
-              }
-            ],
-            "offers": []
-          },
-          {
-            "id": "cool",
-            "kind": "embed",
-            "embed": "doseTimer",
-            "answerAs": "cool",
-            "title": "cool_title",
-            "props": {
-              "art": "cold",
-              "seconds": 15,
-              "leadIn": 3,
-              "step1": "cool_step1",
-              "step2": "cool_step2",
-              "caution": "cool_caution",
-              "start": "cold_start",
-              "running": "cold_running",
-              "lead": "cold_lead",
-              "done": "cool_done",
               "next": "next"
             },
             "links": [
@@ -12506,20 +12362,6 @@
               "value": "medical",
               "label": "Chest pain or feeling faint",
               "danger": "medical"
-            }
-          ],
-          "screen": [
-            {
-              "value": "some",
-              "label": "Yes, one of these"
-            },
-            {
-              "value": "none",
-              "label": "None of these"
-            },
-            {
-              "value": "unsure",
-              "label": "Not sure"
             }
           ],
           "cold_near": [
