@@ -31,7 +31,8 @@
       "noLine": "We don't have a checked line for {country} yet. Find A Helpline lists the ones near you.",
       "findLine": "Find a line near you",
       "fromPlan": "Someone from your plan",
-      "unknownCountry": "Your local emergency number"
+      "unknownCountry": "Your local emergency number",
+      "emergencyOr": "Emergency: {number} or {alt}"
     },
     "header": {
       "label": "Help & safety",
@@ -64,8 +65,26 @@
           "label": "I'd rather not say"
         }
       ],
-      "helpNowTitle": "Let's get you to people first. Is it thoughts of hurting yourself, or something you've done?",
-      "headerTitle": "Thanks for saying it. Which is closest right now?"
+      "helpNowTitle": "Let's get you to people first. Which is closest right now?",
+      "saidTitle": "Thanks for saying it. Which is closest right now?",
+      "saidChoices": [
+        {
+          "id": "passing",
+          "label": "Some passing thoughts"
+        },
+        {
+          "id": "strong",
+          "label": "Strong thoughts"
+        },
+        {
+          "id": "plan",
+          "label": "I have a plan, or I've already done something"
+        },
+        {
+          "id": "declined",
+          "label": "I'd rather not say"
+        }
+      ]
     },
     "passing": {
       "line": "Thanks for telling me. That's worth taking seriously, even when it's passing.",
@@ -74,6 +93,9 @@
       "makePlanSub": "Five minutes, whenever you're ready",
       "people": "People you can talk to",
       "continue": "Carry on"
+    },
+    "declined": {
+      "line": "That's okay. These are here if you want them."
     },
     "strong": {
       "title": "You don't have to hold this on your own right now.",
@@ -88,7 +110,7 @@
       "steps": [
         {
           "id": "sign",
-          "title": "One thing you're noticing right now that tells you it's a hard night",
+          "title": "One thing you're noticing right now that tells you it's a hard time",
           "placeholder": "In your words"
         },
         {
@@ -147,8 +169,9 @@
         }
       ],
       "did": "I did it",
-      "calmTitle": "What could you put distance between you and, on a hard night? Who could hold it?",
-      "medsLine": "Keeping only a small amount of medicine at home, and the rest with someone you trust, makes a hard night safer."
+      "calmTitle": "On a hard night, what would be safer out of reach? Who could keep it for you?",
+      "medsLine": "Keeping only a small amount of medicine at home, and the rest with someone you trust, makes a hard night safer.",
+      "firearm": "If there's a gun in the home, could someone else hold it for now, or could it be locked with the key kept elsewhere?"
     },
     "act": {
       "title": "Have you already done something to hurt yourself, or taken something?",
@@ -182,8 +205,8 @@
         }
       ],
       "medicalTitle": "If you're hurt or you've taken something, the emergency number is the right call, even if it feels like too much.",
-      "medicalLine": "Don't wait to see if it gets better. Keep the packaging or the name of what you took.",
-      "tookLine": "Some things you take don't hurt at first and do harm hours later. Call now, even if you feel all right.",
+      "medicalLine": "Don't wait to see if it gets better.",
+      "tookLine": "Some things you take don't hurt at first and do harm hours later. Call now, even if you feel all right. Keep the packaging or the name of what you took.",
       "poison": "Poison information",
       "medicalChoices": [
         {
@@ -197,10 +220,13 @@
         {
           "id": "not_that_kind",
           "label": "It's not that kind of hurt",
-          "injuryOnly": true
+          "showWhen": {
+            "act": "yes",
+            "kind": "injury"
+          }
         }
       ],
-      "firstAid": "Clean it with water, press with something clean until it stops bleeding, and cover it. If it's deep, keeps bleeding or is near your eye, it's the emergency number.",
+      "firstAid": "Rinse it under cool running water and cover it with something clean. Press firmly on a cut until it stops. If it's deep or gaping, still bleeding after ten minutes of pressure, a burn bigger than your palm, or you feel faint, call the emergency number.",
       "nextDay": "Tomorrow, when it's quieter, a look at what led up to this can help next time.",
       "nextDayChoices": [
         {
@@ -270,7 +296,7 @@
       "save": "Save it",
       "notNow": "Not now"
     },
-    "cantTell": "Goblin can't tell how at risk someone is. The people on these lines can."
+    "cantTell": "Goblin can't judge how safe you are right now. The people on these lines are trained to help with that."
   },
   "flags": {
     "clinical_referral_psychosis": "What you're going through sounds hard. A doctor or therapist can help make sense of it with you.",
@@ -284,6 +310,7 @@
       "id": "AU",
       "name": "Australia",
       "emergency": "000",
+      "emergencyAlt": null,
       "firearmPrompt": false,
       "lines": [
         {
@@ -331,6 +358,7 @@
       "id": "CA",
       "name": "Canada",
       "emergency": "911",
+      "emergencyAlt": null,
       "firearmPrompt": true,
       "lines": [
         {
@@ -353,6 +381,7 @@
       "id": "DE",
       "name": "Germany",
       "emergency": "112",
+      "emergencyAlt": null,
       "firearmPrompt": false,
       "lines": [
         {
@@ -374,13 +403,29 @@
       "id": "ES",
       "name": "Spain",
       "emergency": "112",
+      "emergencyAlt": null,
       "firearmPrompt": false,
-      "lines": []
+      "lines": [
+        {
+          "id": "es_024",
+          "name": "024, Línea de atención a la conducta suicida",
+          "kind": "crisis",
+          "phone": "024",
+          "sms": null,
+          "smsBody": null,
+          "chatUrl": null,
+          "hours": "24/7",
+          "languages": [
+            "es"
+          ]
+        }
+      ]
     },
     {
       "id": "FR",
       "name": "France",
       "emergency": "112",
+      "emergencyAlt": "15",
       "firearmPrompt": false,
       "lines": [
         {
@@ -402,6 +447,7 @@
       "id": "GB",
       "name": "the UK",
       "emergency": "999",
+      "emergencyAlt": null,
       "firearmPrompt": false,
       "lines": [
         {
@@ -432,9 +478,22 @@
         },
         {
           "id": "gb_nhs111",
-          "name": "NHS 111 (mental health option)",
+          "name": "NHS 111, mental health option (England, Scotland, Wales)",
           "kind": "urgent",
           "phone": "111",
+          "sms": null,
+          "smsBody": null,
+          "chatUrl": null,
+          "hours": "24/7",
+          "languages": [
+            "en"
+          ]
+        },
+        {
+          "id": "gb_lifeline_ni",
+          "name": "Lifeline (Northern Ireland)",
+          "kind": "crisis",
+          "phone": "0808 808 8000",
           "sms": null,
           "smsBody": null,
           "chatUrl": null,
@@ -449,6 +508,7 @@
       "id": "IE",
       "name": "Ireland",
       "emergency": "112",
+      "emergencyAlt": "999",
       "firearmPrompt": false,
       "lines": [
         {
@@ -483,13 +543,30 @@
       "id": "IN",
       "name": "India",
       "emergency": "112",
+      "emergencyAlt": null,
       "firearmPrompt": false,
-      "lines": []
+      "lines": [
+        {
+          "id": "in_tele_manas",
+          "name": "Tele-MANAS",
+          "kind": "crisis",
+          "phone": "14416",
+          "sms": null,
+          "smsBody": null,
+          "chatUrl": null,
+          "hours": "24/7",
+          "languages": [
+            "en",
+            "hi"
+          ]
+        }
+      ]
     },
     {
       "id": "IT",
       "name": "Italy",
       "emergency": "112",
+      "emergencyAlt": null,
       "firearmPrompt": false,
       "lines": []
     },
@@ -497,13 +574,29 @@
       "id": "NL",
       "name": "the Netherlands",
       "emergency": "112",
+      "emergencyAlt": null,
       "firearmPrompt": false,
-      "lines": []
+      "lines": [
+        {
+          "id": "nl_113",
+          "name": "113 Zelfmoordpreventie",
+          "kind": "crisis",
+          "phone": "0800 0113",
+          "sms": null,
+          "smsBody": null,
+          "chatUrl": "https://www.113.nl",
+          "hours": "24/7",
+          "languages": [
+            "nl"
+          ]
+        }
+      ]
     },
     {
       "id": "NZ",
       "name": "New Zealand",
       "emergency": "111",
+      "emergencyAlt": null,
       "firearmPrompt": false,
       "lines": [
         {
@@ -551,13 +644,29 @@
       "id": "SE",
       "name": "Sweden",
       "emergency": "112",
+      "emergencyAlt": null,
       "firearmPrompt": false,
-      "lines": []
+      "lines": [
+        {
+          "id": "se_90101",
+          "name": "Självmordslinjen (Mind)",
+          "kind": "crisis",
+          "phone": "90101",
+          "sms": null,
+          "smsBody": null,
+          "chatUrl": "https://mind.se/hitta-hjalp/sjalvmordslinjen/",
+          "hours": "24/7",
+          "languages": [
+            "sv"
+          ]
+        }
+      ]
     },
     {
       "id": "US",
       "name": "the United States",
       "emergency": "911",
+      "emergencyAlt": null,
       "firearmPrompt": true,
       "lines": [
         {
@@ -584,8 +693,7 @@
           "chatUrl": null,
           "hours": "24/7",
           "languages": [
-            "en",
-            "es"
+            "en"
           ]
         },
         {

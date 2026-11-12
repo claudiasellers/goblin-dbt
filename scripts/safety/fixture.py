@@ -25,7 +25,8 @@ def payload():
         "version": C.VERSION,
         "flow": C.FLOW,
         "flags": {fid: p["userCopy"] for fid, p in sorted(C.FLAGS.items()) if "userCopy" in p},
-        "countries": [{"id": code, "name": name, "emergency": em, "firearmPrompt": fa, "lines": [line(l) for l in lines]}
+        "countries": [{"id": code, "name": name, "emergency": em, "emergencyAlt": C.EMERGENCY_ALT.get(code), "firearmPrompt": fa,
+                       "lines": [line(l) for l in lines]}
                       for code, name, em, fa, lines in sorted(C.COUNTRIES)],
     }
 

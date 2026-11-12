@@ -31,6 +31,8 @@ def check():
         assert phone or sms or chat, f"{lid}: no way to reach it"
         assert any(lid in c[4] for c in COUNTRIES), f"{lid}: no country lists it"
         assert chat is None or chat.startswith("https://"), lid
+    assert set(EMERGENCY_ALT) <= set(ids) and all(v.isdigit() for v in EMERGENCY_ALT.values())
+    assert {c["id"] for c in FLOW["question"]["saidChoices"]} <= set(ANSWER_RANK) and "no" not in {c["id"] for c in FLOW["question"]["saidChoices"]}
     assert set(ANSWER_RANK) == {c["id"] for c in FLOW["question"]["choices"]} | {"act"}
     assert set(FLAGS) <= {"crisis_suicidal", "crisis_self_harm", "clinical_referral_shutdown",
                           "clinical_referral_psychosis", "clinical_referral_severe_dissociation"}
@@ -91,7 +93,7 @@ for fid, props in FLAGS.items():
 A("\n// --- Countries and crisis lines (hand-curated; verifiedAt is the audit, never shown) ---")
 A("MATCH (:CrisisLine)-[r:COVERS]->(:Country) DELETE r;")
 for code, name, emergency, firearm, lines in COUNTRIES:
-    A(f"MERGE (c:Country {{id: {q(code)}}})\nSET c.name = {q(name)}, c.emergency = {q(emergency)}, c.firearmPrompt = {'true' if firearm else 'false'}, c.lineIds = {q(lines)};")
+    A(f"MERGE (c:Country {{id: {q(code)}}})\nSET c.name = {q(name)}, c.emergency = {q(emergency)}, c.emergencyAlt = {q(EMERGENCY_ALT.get(code))}, c.firearmPrompt = {'true' if firearm else 'false'}, c.lineIds = {q(lines)};")
 for lid, country, name, kind, phone, sms, body, chat, hours, langs, source in LINES:
     order = next(c[4] for c in COUNTRIES if c[0] == country).index(lid)
     A(f"MERGE (l:CrisisLine {{id: {q(lid)}}})\nSET l.name = {q(name)}, l.kind = {q(kind)}, l.phone = {q(phone)}, l.sms = {q(sms)}, "

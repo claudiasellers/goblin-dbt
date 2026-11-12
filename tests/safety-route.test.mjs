@@ -84,7 +84,8 @@ test("every country has an emergency number; every line a way to reach it; lines
   assert.equal(us.emergency, "911");
   for (const id of ["GB", "IE", "CA", "AU", "NZ"]) assert.ok(shipped.countries.find((c) => c.id === id)?.lines.some((l) => l.kind === "crisis"), id);
   // A country with only an emergency number: the route links Find A Helpline.
-  assert.deepEqual(shipped.countries.find((c) => c.id === "ES").lines, []);
+  assert.deepEqual(shipped.countries.find((c) => c.id === "IT").lines, []);
+  assert.equal(shipped.countries.find((c) => c.id === "FR").emergencyAlt, "15", "the medical number beside 112");
   assert.equal(shipped.flow.findAHelpline.url, "https://findahelpline.com");
 });
 
@@ -98,8 +99,10 @@ test("the question: five answers, plain; no pledge, no method words, nothing abo
 
 test("C: medical first; 'not that kind of hurt' only for an injury, never after something taken", () => {
   const act = shipped.flow.act;
-  assert.ok(act.medicalChoices.find((c) => c.id === "not_that_kind").injuryOnly);
-  assert.ok(act.medicalChoices.filter((c) => c.id !== "not_that_kind").every((c) => !c.injuryOnly));
+  assert.deepEqual(act.medicalChoices.find((c) => c.id === "not_that_kind").showWhen, { act: "yes", kind: "injury" });
+  assert.ok(act.medicalChoices.filter((c) => c.id !== "not_that_kind").every((c) => !c.showWhen));
+  assert.doesNotMatch(act.medicalLine, /took|packaging/, "the injury path never reads as something taken");
+  assert.ok(!shipped.flow.question.saidChoices.some((c) => c.id === "no"), "someone who said it isn't offered No");
   assert.match(act.tookLine, /hours later/);
   assert.deepEqual(shipped.flow.means.actions.map((a) => a.id), [...rec.MEANS_ACTIONS]);
   assert.deepEqual(shipped.flow.exit.choices.map((c) => c.id), ["plan", "contacted", "stop"]);

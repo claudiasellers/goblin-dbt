@@ -625,7 +625,7 @@ export function buildSafety(g) {
   const linesOf = new Map();
   for (const r of g.rels('COVERS', 'CrisisLine', 'Country')) pushTo(linesOf, r.b.props.id, r.a.props);
   const countries = g.nodes('Country').map((n) => n.props).sort((a, b) => asc(a.id, b.id)).map((c) => ({
-    id: c.id, name: c.name, emergency: c.emergency, firearmPrompt: c.firearmPrompt === true,
+    id: c.id, name: c.name, emergency: c.emergency, emergencyAlt: c.emergencyAlt ?? null, firearmPrompt: c.firearmPrompt === true,
     lines: (linesOf.get(c.id) ?? []).sort((a, b) => asc(a.order, b.order) || asc(a.id, b.id)).map((l) => ({
       id: l.id, name: l.name, kind: l.kind, phone: l.phone ?? null, sms: l.sms ?? null, smsBody: l.smsBody ?? null,
       chatUrl: l.chatUrl ?? null, hours: l.hours ?? null, languages: l.languages ?? [],

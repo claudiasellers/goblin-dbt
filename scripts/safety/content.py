@@ -55,6 +55,7 @@ PEOPLE = {
     "findLine": "Find a line near you",
     "fromPlan": "Someone from your plan",
     "unknownCountry": "Your local emergency number",
+    "emergencyOr": "Emergency: {number} or {alt}",
 }
 
 FLOW = {
@@ -76,8 +77,16 @@ FLOW = {
             {"id": "declined", "label": "I'd rather not say"},
         ],
         # Help me now's own wording (PRD CORE-07): the self-harm card opens the question, worded for that entry.
-        "helpNowTitle": "Let's get you to people first. Is it thoughts of hurting yourself, or something you've done?",
-        "headerTitle": "Thanks for saying it. Which is closest right now?",
+        "helpNowTitle": "Let's get you to people first. Which is closest right now?",
+        # *I'm thinking about hurting myself* (the header's item) and Help me now's card: the person has already said
+        # it, so there's no No, and only the say-it entry thanks them. The plain header button opens People first.
+        "saidTitle": "Thanks for saying it. Which is closest right now?",
+        "saidChoices": [
+            {"id": "passing", "label": "Some passing thoughts"},
+            {"id": "strong", "label": "Strong thoughts"},
+            {"id": "plan", "label": "I have a plan, or I've already done something"},
+            {"id": "declined", "label": "I'd rather not say"},
+        ],
     },
     "passing": {
         "line": "Thanks for telling me. That's worth taking seriously, even when it's passing.",
@@ -87,6 +96,8 @@ FLOW = {
         "people": "People you can talk to",
         "continue": "Carry on",
     },
+    # *I'd rather not say*: the passing screen's buttons, its own line (nothing was told).
+    "declined": {"line": "That's okay. These are here if you want them."},
     # B: the calm crisis screen. Order is fixed: people, plan, safer space, a body skill below, the exit.
     "strong": {
         "title": "You don't have to hold this on your own right now.",
@@ -99,7 +110,7 @@ FLOW = {
     },
     "quickPlan": {
         "steps": [
-            {"id": "sign", "title": "One thing you're noticing right now that tells you it's a hard night", "placeholder": "In your words"},
+            {"id": "sign", "title": "One thing you're noticing right now that tells you it's a hard time", "placeholder": "In your words"},
             {"id": "do", "title": "One thing you can do for the next ten minutes", "placeholder": "In your words"},
             {"id": "contact", "title": "One person or line you'll contact", "placeholder": "A name, or a line"},
         ],
@@ -120,10 +131,15 @@ FLOW = {
             {"id": "cant_now", "label": "I can't right now"},
         ],
         "did": "I did it",
-        "calmTitle": "What could you put distance between you and, on a hard night? Who could hold it?",
+        # The plan builder's version (CORE-02 step 6, calm only). medsLine and firearm are for building the plan,
+        # never shown at the moment of crisis.
+        "calmTitle": "On a hard night, what would be safer out of reach? Who could keep it for you?",
         "medsLine": "Keeping only a small amount of medicine at home, and the rest with someone you trust, makes a hard night safer.",
+        "firearm": "If there's a gun in the home, could someone else hold it for now, or could it be locked with the key kept elsewhere?",
     },
-    # C: a plan or an act. Medical first; no "not that kind of hurt" once anything was taken.
+    # C: a plan or an act. Medical first: on yes / not sure the emergency number and medicalTitle are the first thing on
+    # the screen, and kindTitle sits below them, never before. No "not that kind of hurt" once anything was taken, or
+    # when either answer was not sure (`showWhen`).
     "act": {
         "title": "Have you already done something to hurt yourself, or taken something?",
         "choices": [{"id": "yes", "label": "Yes"}, {"id": "no", "label": "No"}, {"id": "not_sure", "label": "Not sure"}],
@@ -134,15 +150,15 @@ FLOW = {
             {"id": "not_sure", "label": "Not sure"},
         ],
         "medicalTitle": "If you're hurt or you've taken something, the emergency number is the right call, even if it feels like too much.",
-        "medicalLine": "Don't wait to see if it gets better. Keep the packaging or the name of what you took.",
-        "tookLine": "Some things you take don't hurt at first and do harm hours later. Call now, even if you feel all right.",
+        "medicalLine": "Don't wait to see if it gets better.",
+        "tookLine": "Some things you take don't hurt at first and do harm hours later. Call now, even if you feel all right. Keep the packaging or the name of what you took.",
         "poison": "Poison information",
         "medicalChoices": [
             {"id": "got_help", "label": "I've got help"},
             {"id": "getting_help", "label": "I'm getting help"},
-            {"id": "not_that_kind", "label": "It's not that kind of hurt", "injuryOnly": True},
+            {"id": "not_that_kind", "label": "It's not that kind of hurt", "showWhen": {"act": "yes", "kind": "injury"}},
         ],
-        "firstAid": "Clean it with water, press with something clean until it stops bleeding, and cover it. If it's deep, keeps bleeding or is near your eye, it's the emergency number.",
+        "firstAid": "Rinse it under cool running water and cover it with something clean. Press firmly on a cut until it stops. If it's deep or gaping, still bleeding after ten minutes of pressure, a burn bigger than your palm, or you feel faint, call the emergency number.",
         "nextDay": "Tomorrow, when it's quieter, a look at what led up to this can help next time.",
         "nextDayChoices": [{"id": "yes", "label": "Remind me tomorrow"}, {"id": "no", "label": "No thanks"}],
     },
@@ -177,7 +193,7 @@ FLOW = {
         "save": "Save it",
         "notNow": "Not now",
     },
-    "cantTell": "Goblin can't tell how at risk someone is. The people on these lines can.",
+    "cantTell": "Goblin can't judge how safe you are right now. The people on these lines are trained to help with that.",
 }
 
 # ---- SafetyFlag rewrite ------------------------------------------------------------------------------
@@ -227,32 +243,35 @@ SOURCES = [
 
 # ---- Countries and lines ------------------------------------------------------------------------------
 CHECKED = "2026-11-12"
-# code, name, emergency number, firearmPrompt, lines (ids, in the order shown)
+# code, name, emergency number, firearmPrompt, lines (ids, in the order shown). EMERGENCY_ALT: a second number people
+# know as well (Ireland's 999) or the medical one (France's SAMU, 15), shown beside the first.
 COUNTRIES = [
     ("US", "the United States", "911", True, ["us_988", "us_crisis_text", "us_poison"]),
     ("CA", "Canada", "911", True, ["ca_988"]),
-    ("GB", "the UK", "999", False, ["gb_samaritans", "gb_shout", "gb_nhs111"]),
+    ("GB", "the UK", "999", False, ["gb_samaritans", "gb_shout", "gb_nhs111", "gb_lifeline_ni"]),
     ("IE", "Ireland", "112", False, ["ie_samaritans", "ie_text_about_it"]),
     ("AU", "Australia", "000", False, ["au_lifeline", "au_lifeline_text", "au_poisons"]),
     ("NZ", "New Zealand", "111", False, ["nz_1737", "nz_lifeline", "nz_poisons"]),
     ("FR", "France", "112", False, ["fr_3114"]),
     ("DE", "Germany", "112", False, ["de_telefonseelsorge"]),
+    ("ES", "Spain", "112", False, ["es_024"]),
+    ("NL", "the Netherlands", "112", False, ["nl_113"]),
+    ("SE", "Sweden", "112", False, ["se_90101"]),
+    ("IN", "India", "112", False, ["in_tele_manas"]),
     # Emergency number only: the route shows Find A Helpline for a line.
-    ("ES", "Spain", "112", False, []),
     ("IT", "Italy", "112", False, []),
-    ("NL", "the Netherlands", "112", False, []),
-    ("SE", "Sweden", "112", False, []),
-    ("IN", "India", "112", False, []),
 ]
+EMERGENCY_ALT = {"IE": "999", "FR": "15"}
 # id, country, name, kind, phone, sms, smsBody, chatUrl, hours, languages, source
 LINES = [
     ("us_988", "US", "988 Suicide & Crisis Lifeline", "crisis", "988", "988", None, "https://988lifeline.org/chat/", "24/7", ["en", "es"], "https://988lifeline.org"),
-    ("us_crisis_text", "US", "Crisis Text Line", "text", None, "741741", "HOME", None, "24/7", ["en", "es"], "https://www.crisistextline.org"),
+    ("us_crisis_text", "US", "Crisis Text Line", "text", None, "741741", "HOME", None, "24/7", ["en"], "https://www.crisistextline.org"),
     ("us_poison", "US", "Poison Control", "poison", "1-800-222-1222", None, None, None, "24/7", ["en", "es"], "https://www.poison.org"),
     ("ca_988", "CA", "9-8-8 Suicide Crisis Helpline", "crisis", "988", "988", None, None, "24/7", ["en", "fr"], "https://988.ca"),
     ("gb_samaritans", "GB", "Samaritans", "crisis", "116 123", None, None, None, "24/7", ["en"], "https://www.samaritans.org"),
     ("gb_shout", "GB", "Shout", "text", None, "85258", "SHOUT", None, "24/7", ["en"], "https://giveusashout.org"),
-    ("gb_nhs111", "GB", "NHS 111 (mental health option)", "urgent", "111", None, None, None, "24/7", ["en"], "https://111.nhs.uk"),
+    ("gb_nhs111", "GB", "NHS 111, mental health option (England, Scotland, Wales)", "urgent", "111", None, None, None, "24/7", ["en"], "https://111.nhs.uk"),
+    ("gb_lifeline_ni", "GB", "Lifeline (Northern Ireland)", "crisis", "0808 808 8000", None, None, None, "24/7", ["en"], "https://www.lifelinehelpline.info"),
     ("ie_samaritans", "IE", "Samaritans", "crisis", "116 123", None, None, None, "24/7", ["en"], "https://www.samaritans.org/ireland"),
     ("ie_text_about_it", "IE", "Text About It", "text", None, "50808", "HELLO", None, "24/7", ["en"], "https://text50808.ie"),
     ("au_lifeline", "AU", "Lifeline", "crisis", "13 11 14", None, None, "https://www.lifeline.org.au/crisis-chat/", "24/7", ["en"], "https://www.lifeline.org.au"),
@@ -262,6 +281,10 @@ LINES = [
     ("nz_lifeline", "NZ", "Lifeline Aotearoa", "crisis", "0800 543 354", "4357", None, None, "24/7", ["en"], "https://www.lifeline.org.nz"),
     ("nz_poisons", "NZ", "National Poisons Centre", "poison", "0800 764 766", None, None, None, "24/7", ["en"], "https://poisons.co.nz"),
     ("fr_3114", "FR", "3114, numéro national de prévention du suicide", "crisis", "3114", None, None, None, "24/7", ["fr"], "https://3114.fr"),
+    ("es_024", "ES", "024, Línea de atención a la conducta suicida", "crisis", "024", None, None, None, "24/7", ["es"], "https://www.sanidad.gob.es/linea024/home.htm"),
+    ("nl_113", "NL", "113 Zelfmoordpreventie", "crisis", "0800 0113", None, None, "https://www.113.nl", "24/7", ["nl"], "https://www.113.nl"),
+    ("se_90101", "SE", "Självmordslinjen (Mind)", "crisis", "90101", None, None, "https://mind.se/hitta-hjalp/sjalvmordslinjen/", "24/7", ["sv"], "https://mind.se"),
+    ("in_tele_manas", "IN", "Tele-MANAS", "crisis", "14416", None, None, None, "24/7", ["en", "hi"], "https://telemanas.mohfw.gov.in"),
     ("de_telefonseelsorge", "DE", "TelefonSeelsorge", "crisis", "0800 111 0 111", None, None, "https://online.telefonseelsorge.de", "24/7", ["de"], "https://www.telefonseelsorge.de"),
 ]
 LINE_KINDS = ["crisis", "text", "chat", "poison", "urgent", "youth", "lgbtq", "warmline"]

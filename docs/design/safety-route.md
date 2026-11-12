@@ -64,14 +64,19 @@ comes with PR 2.
 ## Helplines
 
 Hand-curated (open question 1's default), not ThroughLine: US (988 call / text / chat, Crisis Text Line, Poison Control),
-Canada (9-8-8), the UK (Samaritans, Shout, NHS 111), Ireland (Samaritans, Text About It), Australia (Lifeline call and
-text, Poisons Information Centre), New Zealand (1737, Lifeline Aotearoa, National Poisons Centre), France (3114),
-Germany (TelefonSeelsorge), and emergency numbers only for Spain, Italy, the Netherlands, Sweden and India, which link Find
-A Helpline. Every line carries `checkedAt` (looked up 12 Nov 2026) and **no `verifiedAt` until a person has confirmed it**
-with the service; `source` is the service's site. None of the three ships to the app. Crisis Text Line's keyword is
-`HOME` (their published one); CrisisBanner still says `HELLO` (both reach a counsellor; aligned when PR 4 retires the
-banner's crisis use). A country without a line shows its emergency number and Find A Helpline; an unknown country shows
-"your local emergency number" and Find A Helpline.
+Canada (9-8-8), the UK (Samaritans, Shout, NHS 111's mental health option for England, Scotland and Wales, Lifeline for
+Northern Ireland), Ireland (Samaritans, Text About It), Australia (Lifeline call and text, Poisons Information Centre),
+New Zealand (1737, Lifeline Aotearoa, National Poisons Centre), France (3114), Germany (TelefonSeelsorge), Spain (024),
+the Netherlands (113), Sweden (Självmordslinjen), India (Tele-MANAS), and Italy with its emergency number only (Find A
+Helpline for a line). `emergencyAlt` sits beside the emergency number where people know a second one (Ireland's 999)
+or the medical one matters (France's 15, SAMU).
+
+Every line carries `checkedAt` (looked up 12 Nov 2026) and no `verifiedAt` until a person has confirmed it with the
+service; `source` is the service's site; none of the three ships to the app. **A checked line shows.** The PRD's "no
+verified line → emergency number and Find A Helpline" reads, in this build, as "no line in the graph"; `verifiedAt` is
+the audit (target: every line ≤ 90 days), not a gate, because gating on it today would show no line anywhere. Crisis
+Text Line's keyword is `HOME` (their published one); CrisisBanner still says `HELLO` (both reach a counsellor; aligned
+when PR 4 retires the banner's crisis use). An unknown country shows "your local emergency number" and Find A Helpline.
 
 ## The five open questions (PRD), with the defaults built
 
