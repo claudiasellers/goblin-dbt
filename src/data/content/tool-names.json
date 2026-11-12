@@ -1,7 +1,7 @@
 {
   "source": {
-    "file": "tests/fixtures/recommendation-graph.json (from the schema files)",
-    "exportedAt": null
+    "file": "graph-content-only-2026-11-12.json",
+    "exportedAt": "2026-11-12T02:12:19.911Z"
   },
   "content": {
     "tools": {
@@ -20,6 +20,7 @@
       "nightmare-rescript": "Nightmare Protocol",
       "opposite-action": "Opposite Action",
       "pause": "STOP",
+      "please-skill": "PLEASE Skills",
       "problem-solve": "Problem Solving",
       "pros-cons": "Pros and Cons",
       "recovering-from-invalidation": "Recovering from Invalidation",
