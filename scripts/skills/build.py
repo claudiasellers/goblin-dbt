@@ -20,7 +20,7 @@ REF = re.compile(r"^\$(a|d|opt|ctx|p)\.[A-Za-z_][A-Za-z0-9_]*(\.(ids|own))?$")
 # may read only the ones its tool's PROFILE_NEEDS declares (checked there too).
 PROFILE_SLICES = {
     "name", "quietHours", "patterns", "ownLines", "savedLines", "people", "bodyFlags", "values", "goals",
-    "copeAheadPlans", "boundaryLines", "practicePrefs", "fadeLevels", "ownWords", "thingsILike", "crisisKit",
+    "copeAheadPlans", "boundaryLines", "practicePrefs", "fadeLevels", "ownWords", "thingsILike", "thingsILikePicks", "crisisKit",
     "safetyPlan", "country", "parts", "partDetail", "partAnchors", "den", "prosCons",
 }
 # Slices a field may list as options (src/data/skillTypes.ts ProfileOptionSlice).
@@ -189,6 +189,8 @@ def check(skill):
                 assert e.get("done") or e.get("toolId") in tools, (sid, e)
         for f in e.get("carry", []):
             assert f in fields, (sid, e)
+        if "label" in e:
+            assert e["label"] in copy and e.get("toolId"), (sid, "an exit's label is a copy key, on a tool exit", e)
         # A query value starting with `$` is read from the run when the exit is taken: `$a.<field>` (its first pick) or
         # `$ctx.<key>` (context in). A missing or non-id value is left out of the link.
         for k, v in e.get("query", {}).items():
@@ -408,6 +410,14 @@ def check(skill):
             f = next((f for s in skill["steps"] for f in s.get("fields", []) if f["id"] == inl["thenVsNowFrom"]), None)
             values = {x[1] for x in skill["options"] if f and x[0] == f["options"].get("list")}
             assert f and values and values <= THEN_VS_NOW, (sid, "the change check's options are then-vs-now answers", values)
+        outs = set(EMBEDS["inlineSkill"]["ids"])
+        handoffs = {s["id"] for s in skill["steps"] if s["kind"] == "handoff"}
+        for st_id, out in (inl.get("ends") or {}).items():
+            assert st_id in handoffs, (sid, "inline ends name hand-off steps", st_id)
+            assert out in outs - {"left", "unsafe"}, (sid, "inline ends give an outcome id", out)
+        for fl in inl.get("flags") or []:
+            assert fl["id"] in outs - {"finished", "left"}, (sid, "inline flags are output ids", fl)
+            check_cond(fl["when"], fields, derived, sid, accepts)
     per = skill.get("persist")
     if per:
         # R15: the session waits until the run leaves `after`, then writes nothing while `nothingWhen` holds.
@@ -497,6 +507,17 @@ ACTION_URGES = set(re.findall(r'\{id: "([a-z0-9_-]+)", label:', open(os.path.joi
 for sk in SKILLS:
     check(sk)
 
+# R8: an inline host's `inlineSkill` names a skill that declares `inline`, at one of its entries, under another tool.
+_by_id = {sk["id"]: sk for sk in SKILLS}
+for sk in SKILLS:
+    for st in sk["steps"]:
+        if st.get("embed") == "inlineSkill":
+            sub = _by_id.get(st["props"]["skill"])
+            w = (sk["id"], st["id"])
+            assert sub and sub.get("inline"), (w, "inlineSkill names a skill that runs inline", st["props"])
+            assert sub["id"] != sk["id"], (w, "a skill never runs itself inline")
+            assert st["props"].get("enterAt", sub["start"]) in sub["inline"]["enterAt"] + [sub["start"]], (w, "inlineSkill enters where the skill lets it", st["props"])
+
 
 def spec_of(step):
     """What the step node stores as specJson: the screen, without its transitions/offers (those are edges)."""
@@ -535,7 +556,7 @@ for sk in SKILLS:
         A(f"MATCH (s:Skill {{id: {q(sid)}}}), (n:SkillStep {{id: {q(nid)}}})\nMERGE (s)-[r:HAS_STEP]->(n)\nSET r += {{order: {i}}};")
     for e in sk["exits"]:
         nid = f"{sid}:{e['id']}"
-        A(f"MERGE (x:SkillExit {{id: {q(nid)}}})\nSET x += {props({'skillId': sid, 'exit': e['id'], 'toolId': e.get('toolId'), 'done': bool(e.get('done')), 'carry': e.get('carry', []), 'planned': bool(e.get('planned')), 'safety': bool(e.get('safety'))})}, x.queryJson = {js(e.get('query', {}))};")
+        A(f"MERGE (x:SkillExit {{id: {q(nid)}}})\nSET x += {props({'skillId': sid, 'exit': e['id'], 'toolId': e.get('toolId'), 'done': bool(e.get('done')), 'carry': e.get('carry', []), 'planned': bool(e.get('planned')), 'safety': bool(e.get('safety'))})}, x.queryJson = {js(e.get('query', {}))}, x.label = {q(e['label']) if e.get('label') else 'null'};")
         A(f"MATCH (s:Skill {{id: {q(sid)}}}), (x:SkillExit {{id: {q(nid)}}})\nMERGE (s)-[:HAS_EXIT]->(x);")
         if e.get("toolId"):
             A(f"MATCH (x:SkillExit {{id: {q(nid)}}}), (t:TherapyConcept {{appToolId: {q(e['toolId'])}}})\nMERGE (x)-[:OPENS]->(t);")

@@ -1453,6 +1453,17 @@ SET saying_no += {
 };
 
 
+// ER Handouts 17-18 (PRD ER-09): values and priorities; What matters to me (docs/design/values.md).
+MERGE (values_priorities:TherapyConcept {id: "dbt_values_priorities"})
+SET values_priorities += {
+  name: "Values and Priorities",
+  description: "Naming what matters to you, keeping a few for now, and taking one small step in that direction",
+  modality: "DBT",
+  module: "Emotion Regulation",
+  skill_type: "values"
+};
+
+
 // DT Handouts 8 and 8a (PRD DT-07): self-soothing with the five senses, hand on heart; Held (docs/design/held.md).
 MERGE (self_soothe:TherapyConcept {id: "dbt_self_soothe"})
 SET self_soothe += {
@@ -1482,6 +1493,17 @@ MERGE (dialectical_abstinence:TherapyConcept {id: "dbt_dialectical_abstinence"})
 SET dialectical_abstinence += {
   name: "Dialectical Abstinence",
   description: "Full commitment to not doing a behaviour, for a stretch you can keep, together with a plan for a slip so one slip doesn't become giving up",
+  modality: "DBT",
+  module: "Distress Tolerance",
+  skill_type: "crisis_survival"
+};
+
+// DT crisis survival skills gathered ahead of time (PRD DT-03; the coping step of Stanley–Brown's safety plan);
+// My crisis kit (docs/design/crisis-kit.md).
+MERGE (crisis_kit:TherapyConcept {id: "dbt_crisis_survival_kit"})
+SET crisis_kit += {
+  name: "Crisis Survival Kit",
+  description: "The person's own crisis survival skills, picked on a calmer day and handed back one card at a time when they can't think straight: body, distraction, self-soothe, encouragement, a safe place and reasons to get through",
   modality: "DBT",
   module: "Distress Tolerance",
   skill_type: "crisis_survival"

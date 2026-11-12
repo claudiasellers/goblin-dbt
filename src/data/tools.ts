@@ -150,6 +150,19 @@ export const tools: Tool[] = [
     emoji: '🌉',
     bare: true,
   },
+  {
+    // DT-03 on the skill runtime (docs/design/crisis-kit.md): two skills under one id. Opening it plays the kit one
+    // card at a time (a starter kit until the person makes their own); `?frame=build` makes it.
+    id: 'crisis-kit',
+    name: 'My crisis kit',
+    tagline: 'What helps, one card at a time',
+    description: 'Your own ideas from a calmer day, handed back when you can\'t think straight: something for your body, something to keep your hands busy, something soothing, words for you, a safe place and your reasons to get through. One card at a time.',
+    whenToUse: 'On a hard night when you can\'t remember what helps. Make it on a calmer day so it\'s ready.',
+    module: 'distress-tolerance',
+    dbtBasis: 'Crisis survival skills (DT Handouts 6–9a)',
+    emoji: '🧰',
+    bare: true,
+  },
   // Emotion Regulation
   {
     id: 'opposite-action',
@@ -232,6 +245,42 @@ export const tools: Tool[] = [
     emoji: '🌙',
     bare: true,
   },
+  {
+    // ER-07 on the skill runtime (docs/design/running-low.md): PLEASE, for a day when everything is too loud.
+    id: 'please-skill',
+    name: 'Running Low',
+    tagline: 'Check what your body is running on today',
+    description: 'Sleep, food, your body, last night and moving, one tap each. See which one is turning the volume up, and pick one small thing for it today.',
+    whenToUse: 'When everything feels like too much today and you don\'t know why.',
+    module: 'emotion-regulation',
+    dbtBasis: 'DBT ER Handout 20 (PLEASE)',
+    emoji: '🔋',
+    bare: true,
+  },
+  {
+    // ER-04 on the skill runtime (docs/design/good-things.md): accumulating positives, and the things I like list.
+    id: 'good-things',
+    name: 'Good Things',
+    tagline: 'Find one okay thing, or plan one good thing for today',
+    description: 'Notice one thing that\'s even a little okay and stay with it for a moment, or pick one small good thing to do today. Keep what helped in Things I like.',
+    whenToUse: 'When nothing sounds good, or when something is good and you want to keep it.',
+    module: 'emotion-regulation',
+    dbtBasis: 'DBT ER Handouts 15–16 (accumulating positives)',
+    emoji: '🌼',
+    bare: true,
+  },
+  {
+    // ER-09 on the skill runtime (docs/design/values.md): values and priorities, and one small step for one.
+    id: 'values-clarification',
+    name: 'What Matters to Me',
+    tagline: 'Find what matters to you, then take one small step for it',
+    description: 'Sort plain-word value cards, keep up to three for now, and pick one small step this week for one of them. Not sure yet is a full answer.',
+    whenToUse: 'When you\'re not sure what you care about, or a choice feels hard and you want a direction.',
+    module: 'emotion-regulation',
+    dbtBasis: 'DBT ER Handouts 17–18 (values and priorities)',
+    emoji: '🧭',
+    bare: true,
+  },
   // Interpersonal Effectiveness
   {
     id: 'dear-man',
@@ -275,6 +324,18 @@ export const tools: Tool[] = [
     module: 'interpersonal-effectiveness',
     dbtBasis: 'DBT IE Handouts 5 and 8 (DEAR MAN for saying no, how firm to be)',
     emoji: '🙅',
+    bare: true,
+  },
+  {
+    // On the skill runtime (docs/design/give.md): who it's with first, then the skill.
+    id: 'give',
+    name: 'Keep it warm',
+    tagline: 'Their side first, a repair after a fight, or a break you come back from',
+    description: 'When someone brings something to you, start with their side, then yours. After a fight, own your part in one clear line. When it heats up, take a break and say when you\'ll be back. Before an ask, add a little warmth.',
+    whenToUse: 'When you\'re right and it keeps coming out as an attack, when someone came to you upset, or after a fight you want to repair.',
+    module: 'interpersonal-effectiveness',
+    dbtBasis: 'DBT IE Handouts 6 and 6a (GIVE)',
+    emoji: '🤝',
     bare: true,
   },
   {
@@ -361,6 +422,8 @@ export const allIntents: Intent[] = [
   { id: 'blow-it-up', label: 'I want to blow it all up', toolId: 'alternate-rebellion', emoji: '🎸' },
   { id: 'reasons', label: 'Make a card for a pull that keeps coming back', toolId: 'pros-cons', emoji: '⚖️' },
   { id: 'habit-plan', label: 'Something I keep doing', toolId: 'habit-plan', emoji: '🌉' },
+  { id: 'crisis-kit', label: 'Open my crisis kit', toolId: 'crisis-kit', emoji: '🧰' },
+  { id: 'make-kit', label: 'Make my crisis kit for hard nights', toolId: 'crisis-kit', query: 'frame=build', emoji: '🧰' },
   { id: 'shift', label: 'Shift a feeling that isn\'t helping', toolId: 'opposite-action', emoji: '🔄' },
   { id: 'problem', label: 'Work through a problem', toolId: 'problem-solve', emoji: '🛠️' },
   { id: 'ask', label: 'Ask someone for what I need', toolId: 'dear-man', emoji: '🗣️' },
@@ -368,8 +431,12 @@ export const allIntents: Intent[] = [
   { id: 'dreading', label: 'Something\'s coming up that I\'m dreading', toolId: 'cope-ahead', emoji: '🧭' },
   { id: 'torn', label: 'I\'m torn about what to do', toolId: 'wise-mind', emoji: '🪨' },
   { id: 'say-no', label: 'Say no to someone', toolId: 'say-no', emoji: '🙅' },
+  { id: 'give', label: 'Repair things after a fight, or keep it warm', toolId: 'give', emoji: '🤝' },
   { id: 'overreacting', label: 'I can\'t tell if I\'m overreacting', toolId: 'check-the-facts', emoji: '🔍' },
   { id: 'not-working', label: 'My skills aren\'t working', toolId: 'er-troubleshoot', emoji: '🧩' },
+  { id: 'running-low', label: 'Everything feels like too much today', toolId: 'please-skill', emoji: '🔋' },
+  { id: 'find-good', label: 'Find something good', toolId: 'good-things', emoji: '🌼' },
+  { id: 'what-matters', label: 'Work out what matters to me', toolId: 'values-clarification', emoji: '🧭' },
   { id: 'nightmares', label: 'The same nightmare keeps coming back', toolId: 'nightmare-rescript', emoji: '🌙' },
 ];
 

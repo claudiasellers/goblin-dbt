@@ -65,9 +65,11 @@ export interface InlineReturn {
   answers: Record<string, Answer>;
   /** Reached its end (true) or the person went back early (false). */
   finished: boolean;
+  /** The outcome and flags the skill's `inline.ends` / `flags` give (the `inlineSkill` embed's output ids). */
+  ids: string[];
 }
 
-export function SkillPlayer({ skillId, mode = 'page', enterAt, hostSessionId, onReturn, resumeKeepsFresh, ctx, resumeRecord }: {
+export function SkillPlayer({ skillId, mode = 'page', enterAt, hostSessionId, onReturn, covered, resumeKeepsFresh, ctx, resumeRecord }: {
   skillId: string;
   /**
    * Page: context the page itself found before the run (DEAR MAN's debrief: the person picked on its own screen),
@@ -80,6 +82,8 @@ export function SkillPlayer({ skillId, mode = 'page', enterAt, hostSessionId, on
   /** Inline: the host's ToolSession id. */
   hostSessionId?: string;
   onReturn?: (r: InlineReturn) => void;
+  /** Inline: something sits over the host's step (its safety.open or P2), so the sub-run's clocks treat it as covered. */
+  covered?: boolean;
   /** The review page only (dev/skills-review.tsx): a resumed run keeps its ask-fresh answers, so every step shows. */
   resumeKeepsFresh?: boolean;
   /**
@@ -109,7 +113,7 @@ export function SkillPlayer({ skillId, mode = 'page', enterAt, hostSessionId, on
     if (!skill.inline || !hostSessionId) return null;
     return (
       <ToolSessionProvider toolId={skill.toolId} inside={{ hostSessionId }}>
-        <SkillRun skill={skill} content={content} inline={{ enterAt, onReturn }} />
+        <SkillRun skill={skill} content={content} inline={{ enterAt, onReturn, covered }} />
       </ToolSessionProvider>
     );
   }
@@ -146,7 +150,7 @@ function carriedFrom(search: string, state: unknown): string[] {
 }
 
 function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRecord }: {
-  skill: SkillDef; content: SkillsContent; inline?: { enterAt?: string; onReturn?: (r: InlineReturn) => void }; resumeKeepsFresh?: boolean;
+  skill: SkillDef; content: SkillsContent; inline?: { enterAt?: string; onReturn?: (r: InlineReturn) => void; covered?: boolean }; resumeKeepsFresh?: boolean;
   pageCtx?: Readonly<Record<string, string>>; resumeRecord?: Record<string, unknown> | null;
 }) {
   const toolSession = useToolSession();
@@ -318,6 +322,14 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
       if (!ok) setSaveNote(true);
     }
     send({ type: 'exit', exitId: exit.id });
+    // Inline (R8): a way out of the sub-run is a way out of the page. It never asks a close of its own (the
+    // leaving card would sit inside the host's screen, without the step's crisis slot): the sub-run closes as left
+    // early, and the page goes where the person asked.
+    if (inline) {
+      void toolSession.close({ status: 'exited_early' }).catch(() => { /* offline */ });
+      go(exit);
+      return;
+    }
     setLeaving(exit);
     // The close was asked in the flow (`askFresh: 'thenVsNow'`, DT-01): leave at once, the session closed with it.
     const asked = askFresh(ctx, st).thenVsNow as ThenVsNow | undefined;
@@ -348,7 +360,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
       void toolSession.close({ status: 'completed' });
       go(exit);
     });
-  }, [send, skill, st, step, ctx, scheduleStep, toolSession, go]);
+  }, [send, skill, st, step, ctx, scheduleStep, toolSession, go, inline]);
 
   const onShown = useCallback((record: string) => send({ type: 'shown', record }), [send]);
 
@@ -387,10 +399,10 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
   const giveBack = useCallback((finished: boolean) => {
     if (!inline || returned.current) return;
     returned.current = true;
-    const r = inlineResult(ctx, st);
+    const r = inlineResult(ctx, st, finished);
     const tvn = r?.thenVsNow as ThenVsNow | null | undefined;
     void toolSession.close({ status: finished ? 'completed' : 'exited_early', ...(tvn ? { thenVsNow: tvn } : {}) });
-    inline.onReturn?.({ answers: r?.answers ?? {}, finished });
+    inline.onReturn?.({ answers: r?.answers ?? {}, finished, ids: r?.ids ?? [finished ? 'finished' : 'left'] });
   }, [inline, ctx, st, toolSession]);
   useEffect(() => { if (inline && step.kind === 'handoff') giveBack(true); }, [inline, step.kind, giveBack]);
 
@@ -421,7 +433,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
   } else if (step.kind === 'handoff') {
     body = <HandoffCard ctx={ctx} step={step} st={st} send={send} onExit={leave} busy={busy} />;
   } else if (step.kind === 'embed') {
-    body = <EmbedStep ctx={ctx} step={step} st={st} send={send} onShown={onShown} onExit={leave} covered={safetyOpen || p2Open} />;
+    body = <EmbedStep ctx={ctx} step={step} st={st} send={send} onShown={onShown} onExit={leave} covered={safetyOpen || p2Open || !!inline?.covered} />;
   } else {
     body = <AskStep ctx={ctx} step={step} st={st} send={send} onExit={leave} onShown={onShown} onPrimary={primary} busy={busy} />;
   }
@@ -429,7 +441,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
   // R16 with more than one pick: which one this screen is about, and its place (a small header, not a heading).
   const track = !leaving ? pickTrack(ctx, st) : null;
   return (
-    <div className="space-y-5" data-testid="skill-player" data-skill={skill.id} data-step={st.stepId}>
+    <div className="space-y-5" data-testid={inline ? 'skill-player-inline' : 'skill-player'} data-skill={skill.id} data-step={st.stepId}>
       {skill.quickExit && !inline && <QuickExit />}
       {/* safety.open sits over the step, which stays mounted (a hold keeps its time) and comes back as it was. P2 is
           modal too: under it the step is inert, so a step that moves on underneath can't take focus from the dialog. */}
@@ -548,7 +560,8 @@ function EmbedStep({ ctx, step, st, send, onShown, onExit, covered }: {
   const done = (output: EmbedOutput) => {
     // Words picked (an `emotions` embed: Do the Opposite's doors) are a choice, not practice.
     const picksWords = !!EMBED_OUTPUTS[step.embed ?? '']?.emotions;
-    if (!picksWords && output.ids.length && !output.ids.includes('skipped')) toolSession.markPracticed();
+    // An inline run left early (`left`) isn't practice either.
+    if (!picksWords && output.ids.length && !output.ids.includes('skipped') && !output.ids.includes('left')) toolSession.markPracticed();
     send({ type: 'embedDone', output });
   };
   if (!Embed) return null;
@@ -684,7 +697,7 @@ function HandoffCard({ ctx, step, st, send, onExit, busy }: {
           <button key={x.id} type="button" className={i === 0 && !others.length ? primaryButton : choiceButton} data-exit={x.id}
             // Someone to talk to is never held back, not even for the moment a reminder takes to save.
             disabled={busy && !x.safety} aria-busy={busy && !x.safety} onClick={() => onExit(x)}>
-            {x.safety ? (c.safety_open ?? 'Talk to someone now') : getToolById(x.toolId!)?.name}
+            {x.safety ? (c.safety_open ?? 'Talk to someone now') : (x.label && c[x.label]) || getToolById(x.toolId!)?.name}
           </button>
         ))}
       </div>

@@ -81,7 +81,7 @@ test("nothing stood out: all seven answered no ends on the none card, which offe
 
 test("each fix offers its PRD move: planned tools are written and never shown", () => {
   const at = (check, value) => run([...upTo(check), pick(check, value), next]);
-  assert.deepEqual(at("body", "body_yes").offered, [], "Running low (ER-07) is planned");
+  assert.deepEqual(at("body", "body_yes").offered, ["please"], "Running low (ER-07, built 12 Nov)");
   assert.deepEqual(at("fit", "fit_yes").offered, ["problem_solve", "let_it_be"]);
   assert.deepEqual(at("way", "way_part").offered, [], "the line is the move: retry the same skill, smaller and all the way");
   assert.deepEqual(at("env", "env_get_out").offered, ["problem_solve"]);
@@ -89,7 +89,7 @@ test("each fix offers its PRD move: planned tools are written and never shown", 
   assert.deepEqual(at("much", "much_yes").offered, ["problem_solve", "five_senses"], "grounding, never cold, without DT-01's self-check");
   assert.deepEqual(at("belief", "myth_failing").offered, [], "the myth cards (ER-10) are planned");
   const planned = skill.exits.filter((x) => x.planned).map((x) => x.toolId).sort();
-  assert.deepEqual(planned, ["emotion-guide", "mindfulness-emotions", "missing-links", "please-skill"]);
+  assert.deepEqual(planned, ["emotion-guide", "mindfulness-emotions", "missing-links"]);
   // It fits: the situation, or making room for it (the wave planned, Let it be built), as Check the Facts' verdict table does.
   assert.deepEqual(M.stepOf(skill, "fix_fit").offers.map((o) => o.exit), ["problem_solve", "mindfulness_emotions", "let_it_be"]);
   assert.ok(!JSON.stringify(skill.exits).includes("cool-down"), "no cold-water exit");

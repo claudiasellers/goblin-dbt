@@ -43,9 +43,19 @@ KINDS = [
     # Pros & cons card (DT-10): a card the person kept for one pull. Never stale: theirs until they set it aside.
     ("pros_cons", "my_plans", "A pros & cons card", None,
      "", "Set aside. Hold to wait won't show it until you bring it back."),
+    # What matters to me (ER-09): the person's value sort and the few kept for now. Revisited monthly (PRD: a
+    # monthly *still yours?*, sampling, not declaring; values change and that's healthy).
+    ("values", "about_me", "What matters to me", 30,
+     "Are these still yours?", "Set aside. What matters to me won't offer them until you bring them back."),
+    # Good things (ER-04): something the person likes, kept from a good moment or a good thing that helped. Never stale.
+    ("thing_i_like", "my_words", "A thing I like", None,
+     "", "Set aside. Good things won't offer it until you bring it back."),
     # When it's a habit (DT-09): a plan the person kept for one behaviour. Never stale: theirs until they set it aside.
     ("abstinence_plan", "my_plans", "A habit plan", None,
      "", "Set aside. It stays out of the way until you bring it back."),
+    # My crisis kit (DT-03): one per person, kept on *Keep it*. Never stale: theirs until they set it aside or change it.
+    ("crisis_kit", "my_plans", "My crisis kit", None,
+     "", "Set aside. The kit opens with the starter cards until you bring it back."),
     # People (IE-03): someone the person named in DEAR MAN's picker. Never stale here: the safety question has its
     # own re-ask (90 days, or *Things changed*), asked in the flow, never as a Me "still true?".
     ("person", "my_people", "Someone in my life", None,

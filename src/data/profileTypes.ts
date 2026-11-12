@@ -13,7 +13,7 @@ export const PROFILE_AREAS: readonly ProfileAreaId[] = ['about_me', 'my_people',
 export const SLICE_IDS = [
   'name', 'quietHours', 'patterns', 'ownLines', 'savedLines',
   'people', 'bodyFlags', 'values', 'goals', 'copeAheadPlans', 'boundaryLines', 'practicePrefs',
-  'fadeLevels', 'ownWords', 'thingsILike', 'crisisKit', 'safetyPlan', 'country',
+  'fadeLevels', 'ownWords', 'thingsILike', 'thingsILikePicks', 'crisisKit', 'safetyPlan', 'country',
   'parts', 'partDetail', 'partAnchors', 'den', 'prosCons',
 ] as const;
 export type SliceId = (typeof SLICE_IDS)[number];
@@ -63,15 +63,30 @@ export interface ProfileSlices {
     meta: ProfileItemMeta;
   }>;
   bodyFlags: null;
-  values: never[];
+  /** What matters to me (ER-09): the values kept for now (up to three), named; an own-words one has the id `own`. */
+  values: Array<{ id: string; label: string; meta: ProfileItemMeta }>;
   goals: never[];
   copeAheadPlans: never[];
   boundaryLines: never[];
   practicePrefs: null;
   fadeLevels: Record<string, 0 | 1 | 2 | 3>;
   ownWords: never[];
-  thingsILike: never[];
-  crisisKit: null;
+  /**
+   * Things I like (ER-04, kind `thing_i_like`), active only, newest first: the id and what to call it (the person's own
+   * words, else the chip or catalogue option's label from the graph). Good things offers them first on its pick step.
+   */
+  thingsILike: Array<{ id: string; label: string; meta: ProfileItemMeta }>;
+  /** The catalogue ids of the things kept from a good thing done (`pickIds`): Good things drops their catalogue copy. */
+  thingsILikePicks: Array<{ id: string }>;
+  /**
+   * The kept crisis kit (DT-03, kind `crisis_kit`, one per person), active only, or null: per section the option ids
+   * and the person's own words as written (decrypted for them). The kit plays it one card at a time.
+   */
+  crisisKit: {
+    id: string; bodyIds: string[]; bodyOwn: string | null; handsIds: string[]; handsOwn: string | null;
+    sootheIds: string[]; sootheOwn: string | null; wordsIds: string[]; wordsOwn: string | null;
+    placeIds: string[]; placeOwn: string | null; reasonsIds: string[]; reasonsOwn: string | null; meta: ProfileItemMeta;
+  } | null;
   safetyPlan: null;
   country: null;
   /**
@@ -151,6 +166,7 @@ export const PROFILE_NEEDS = {
   // reads `parts`.
   'five-senses': ['parts'],
   'pause': ['parts', 'prosCons'],              // prosCons: the kept card for the pull (DT-10's replay, on proceed)
+  'crisis-kit': ['crisisKit', 'prosCons'],     // the kept kit and pros & cons cards, one card at a time (DT-03)
   'urge-surfing': ['parts'],
   'let-it-be': ['parts'],                    // the tag row on its in-flow close (docs/design/let-it-be.md)
   'mind-job': ['parts'],                     // the tag row on its in-flow close (docs/design/mind-job.md)
@@ -160,6 +176,9 @@ export const PROFILE_NEEDS = {
   'check-the-facts': ['parts'],              // the tag row on its close (docs/design/check-the-facts.md, screen 3)
   'fast': ['parts'],                         // the tag row on its close (docs/design/fast.md)
   'say-no': ['people'],                      // the picker (IE-03), before the skill (docs/design/say-no.md)
+  'good-things': ['thingsILike', 'thingsILikePicks'],             // its pick step: the person's own things first (docs/design/good-things.md)
+  'give': ['people'],                        // the picker (IE-03), before the skill (docs/design/give.md)
+  'values-clarification': ['values'],         // the start screen (*Your values are here*) and a step for one kept before (docs/design/values.md)
   // Wise mind's step back (parts on only): the person's parts in the room, with their names, shapes,
   // tender and safety flags. Empty while parts are off, so the tool shows its two-minds form.
   'wise-mind': ['parts'],

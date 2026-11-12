@@ -138,7 +138,7 @@ test("twice not quieter: lower the demand, then someone to talk to on the screen
   const someone = run([did()], ctx(), s);
   assert.equal(someone.stepId, "someone");
   assert.equal(M.crisisFor(ctx(), M.stepOf(skill, "someone"), someone)?.variant, "crisis");
-  assert.deepEqual(offers(someone), [], "the kit is planned: the banner is the way to someone");
+  assert.deepEqual(offers(someone), ["safety_open", "crisis_kit"], "someone to talk to first, then the kit (DT-03)");
 });
 
 test("chest pain or fainting: the emergency number, no body mode; a pull to do something: Hold to wait first", () => {
@@ -164,7 +164,7 @@ test("the fork: something can be done → Problem Solve, DEAR MAN, Do the Opposi
   assert.deepEqual(offers(end("park")), ["mind_job"], "Give your mind a job (DT-06, built)");
   assert.deepEqual(offers(end("through")), []);
   const planned = Object.fromEntries(skill.exits.map((e) => [e.id, !!e.planned]));
-  assert.deepEqual([planned.let_it_be, planned.mind_job, planned.crisis_kit], [false, false, true]);
+  assert.deepEqual([planned.let_it_be, planned.mind_job, planned.crisis_kit], [false, false, false], "the kit is built (DT-03)");
   assert.match(M.handoffLine(ctx(), M.stepOf(skill, "end"), end("through")), /You got through it/);
 });
 

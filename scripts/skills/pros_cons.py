@@ -279,7 +279,8 @@ STEPS = [
         # Not safe, not sure, or leaning towards hurting themselves: someone to talk to first (S9), no card.
         "id": "reach", "kind": "handoff", "complete": True, "noClose": True, "crisis": CRISIS,
         "lines": [{"when": ALWAYS, "key": "reach_line"}],
-        "offers": [{"exit": "crisis_kit", "when": ALWAYS}],
+        # People first, then the kit (DT-03): coping sits beside help, never before it (CORE-01's rule).
+        "offers": [{"exit": "safety_open", "when": ALWAYS}, {"exit": "crisis_kit", "when": ALWAYS}],
         "done": "done",
     },
 ]
@@ -288,7 +289,7 @@ EXITS = [
     {"id": "wise_mind", "toolId": "wise-mind"},                          # MF-04: torn, or leaning towards it
     {"id": "pause", "toolId": "pause"},                                  # DT-02 Hold to wait (flooded, settle first)
     {"id": "cool_down", "toolId": "cool-down"},                          # DT-01 First, the body
-    {"id": "crisis_kit", "toolId": "crisis-kit", "planned": True},       # DT-03 My crisis kit (safety batch)
+    {"id": "crisis_kit", "toolId": "crisis-kit", "query": {"frame": "crisis"}},       # DT-03 My crisis kit, opened from a crisis route (the banner on every card)
     {"id": "safety_open", "toolId": None, "safety": True},               # safety.open (R6)
     {"id": "done", "done": True},
 ]

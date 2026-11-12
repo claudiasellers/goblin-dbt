@@ -86,7 +86,7 @@ linted by the voice gate like every flow document; `specJson` holds no copy, onl
   parts step's question as a `partsLine` with `as: heading`), with `showWhen` and `record` (the name it's recorded
   under when it shows). Check the Facts' parts line is one.
 - **Exit** = where the skill can send you: another tool (`toolId`, `query`, `carry` which answers go
-  along as the hand-off's emotions) or `done`. Offer labels come from `src/data/tools.ts`, never the graph.
+  along as the hand-off's emotions) or `done`. Offer labels come from `src/data/tools.ts`, never the graph, unless the exit carries `label` (a copy key of the skill, DT-03: two exits into the same tool need their own names, *Open my kit* / *Make it yours*).
 
 ### Conditions (`src/lib/skillRuntime/conditions.ts`)
 
@@ -388,9 +388,9 @@ wave (`mindfulness-emotions`) is a planned exit on the verdict card, and Let it 
   a tool needs a Today card that can link; tracked for ER-B3).
 - Not built: the **loop guard** ("you've checked this twice today") is an aggregate over past runs, which a
   live flow never reads (data layers); it waits for a server-side read the router or Today can own. The
-  **inline mini-card** moves to ER-B5, with its first host (Do the Opposite's *clarify*): an inline run gives
-  back as soon as it reaches a hand-off, so a danger chip would return to the host without the `safe` card's
-  line, and that needs deciding with a real host, not ahead of one.
+  **inline mini-card** moves to ER-B5, with its first host (Do the Opposite's *clarify*). The danger-chip question
+  it waited on is answered by the inline outcome (IE-B4, below): the host hears where the run ended and branches to
+  its own crisis card.
 - The `safe` card is `noClose`: leaving it closes the visit without the close question.
 
 ## Moving the next skill
@@ -410,3 +410,24 @@ nightmare, Ending a relationship, Problem Solve, Cope Ahead (ER-B2, the first wi
 
 Good next candidates, in order: Problem Solve (already wants a save and a follow-up), Pause / *Hold to
 wait* (DT-02), the safety route (CORE-01, the plan's #1), then Do the Opposite's flow v3.
+
+## Inline runs inside a skill (R8, IE-B4)
+
+The first host of an inline run is another skill: FAST's Let go runs Let it be after a host's no. The pieces:
+
+- **The `inlineSkill` embed** (`src/components/skillPlayer/InlineSkillEmbed.tsx`, runtime-owned): a whole-screen
+  embed step whose props name the skill (`skill`, which must declare `inline`) and its entry (`enterAt`). It renders
+  the player in `mode="inline"` with the host's ToolSession as `hostSessionId`, so the sub-run is its own
+  ToolSession inside the host's visit, asks no close of its own and writes its change check as its then-vs-now.
+  `build.py` refuses a host that names a skill without `inline`, an entry it doesn't list, or itself.
+- **The outcome** (`inline.ends`, `inline.flags`; `inlineResult`): an inline run gives back the moment it reaches
+  a hand-off, so whatever that card would have shown (a crisis slot, its offers) is lost unless the host shows it.
+  The embed's output ids are the outcome for the hand-off it ended on (`ends`: `stopped`, `body`, `finished`; a step
+  not named is `finished`, *Back to where I was* is `left`), then each flag whose condition holds on the sub-run's
+  answers (`unsafe`, `body`). The host's transitions read them with `has` on `$a.<answerAs>.ids`. The ids are
+  fixed (`EMBED_OUTPUTS.inlineSkill`); `build.py` checks `ends` name hand-off steps and give outcome ids.
+- A way out of the sub-run (a link to another tool) leaves the page: the sub-run closes as left early and asks no
+  close of its own, which would sit inside the host's screen without the step's crisis slot.
+- What's not carried: context. An inline run starts with no context in (no band, frame or person), so a host
+  runs it only where its own context makes that safe (Let go only after a host's no and never flooded: it accepts the band for that).
+

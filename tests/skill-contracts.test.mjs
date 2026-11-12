@@ -18,6 +18,8 @@ const waitsForFrame = (x) => {
 };
 const CTX_KEYS = new Set(["urgeId", "personId", "frame", "enterAt", "situationId", "partId", "band", "returnTo", "emotionId", "refused", "feelingId"]);
 const EXT_MAX_BYTES = 4096;
+/** Tools whose page is PersonFirstSkill (the picker, then the skill): they read `?person=` themselves. */
+const PERSON_FIRST_TOOLS = new Set(["dear-man", "say-no", "give"]);
 
 const m = await importTs("src/lib/skillRuntime/machine.ts");
 const { validateExt, EXT_SCHEMAS, RUN_OWN_MAX } = await importTs("functions/src/spine/extSchemas.ts");
@@ -79,7 +81,10 @@ for (const sk of fixture.skills) {
       if (!target) continue; // a page not on the runtime yet: its own entry contract (tests per tool)
       if (x.planned && waitsForFrame(x)) continue; // never opened until its frame is built
       // `mode` picks which of a tool's skills the page plays (DEAR MAN: debrief, one message, the prep); it isn't context.
-      for (const key of Object.keys(x.query)) if (key !== "mode") assert.ok(target.accepts.includes(key), `${x.id}: ${target.id} doesn't accept ${key}`);
+      // `person` is the person picker's preset on a PersonFirstSkill page (a kept person whose safety answer is fresh
+      // skips the picker; anyone else is asked), read by the page before the skill, never by the skill.
+      const pageKey = (key) => key === "mode" || (key === "person" && PERSON_FIRST_TOOLS.has(x.toolId));
+      for (const key of Object.keys(x.query)) if (!pageKey(key)) assert.ok(target.accepts.includes(key), `${x.id}: ${target.id} doesn't accept ${key}`);
     }
   });
 
@@ -550,8 +555,20 @@ test("inline: starts only at a step it declares; returns its returns fields and 
   assert.equal(m.initialRun({ ...F2, inline: undefined }, "when").stepId, "who");
   const ctx = f2Ctx(null);
   const s = f2(ctx, [{ type: "pick", fieldId: "chip", value: "1h" }, { type: "next" }, { type: "pick", fieldId: "change", value: "better" }], m.initialRun(F2, "when"));
-  assert.deepEqual(m.inlineResult(ctx, s), { answers: { chip: { ids: ["1h"], own: null } }, thenVsNow: "better" });
+  assert.deepEqual(m.inlineResult(ctx, s), { answers: { chip: { ids: ["1h"], own: null } }, thenVsNow: "better", ids: ["finished"] });
   assert.equal(m.inlineResult({ ...ctx, skill: SKILL }, s), null, "not an inline skill");
+  assert.deepEqual(m.inlineResult(ctx, s, false).ids, ["left"], "went back early");
+});
+
+test("inline (IE-B4): the host hears where the sub-run ended (`ends`) and each flag that held, as the inlineSkill embed's ids", () => {
+  const ends = { ...F2, inline: { ...F2.inline, ends: { [F2.steps.at(-1).id]: "stopped" }, flags: [{ id: "unsafe", when: { eq: ["$a.change", "better"] } }, { id: "body", when: { eq: ["$a.change", "worse"] } }] } };
+  const ctx = { ...f2Ctx(null), skill: ends };
+  const s = f2(ctx, [{ type: "pick", fieldId: "chip", value: "1h" }, { type: "next" }, { type: "pick", fieldId: "change", value: "better" }], m.initialRun(ends, "when"));
+  assert.deepEqual(m.inlineResult(ctx, s).ids, ["finished", "unsafe"], "a step not named is finished; the flag that holds follows");
+  assert.deepEqual(m.inlineResult(ctx, { ...s, stepId: F2.steps.at(-1).id }).ids, ["stopped", "unsafe"]);
+  assert.deepEqual(m.inlineResult(ctx, s, false).ids, ["left", "unsafe"], "a flag still holds on the way back early");
+  // The registry: what the embed may report, both sides.
+  assert.deepEqual(EMBEDS_PY.inlineSkill.ids, ["finished", "left", "stopped", "body", "unsafe"]);
 });
 
 test("resume: the run's own answers read back at a step it reached; ask-fresh answers are asked again; another skill's record is ignored", () => {
@@ -766,7 +783,7 @@ test("own.seed: a chip writes its words into the open box to change; once the wo
 
 test("covered: P2 or safety.open over an embed step reaches the embed; a new step starts uncovered", () => {
   const player = read("src/components/skillPlayer/SkillPlayer.tsx");
-  assert.match(player, /covered=\{safetyOpen \|\| p2Open\}/);
+  assert.match(player, /covered=\{safetyOpen \|\| p2Open \|\| !!inline\?\.covered\}/, "an inline run is covered by its host's P2 too");
   assert.match(player, /inert=\{safetyOpen \|\| p2Open\}/, "under P2 the step is inert: nothing underneath takes focus from the dialog");
   assert.match(player, /onOpen=\{\(\) => setP2Open\(true\)\} onClose=\{\(\) => setP2Open\(false\)\}/);
   assert.match(player, /useEffect\(\(\) => \{ setP2Open\(false\); \}, \[st\.stepId\]\);/);

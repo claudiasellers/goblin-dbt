@@ -7,7 +7,7 @@ import { callable } from '../shared/callable';
 import { readTx } from '../shared/neo4j';
 import { int } from '../shared/values';
 import { metaFrom } from './meta';
-import { readProfileSlices, readProfileVersion } from './slices';
+import { readProfileSlices, readProfileVersion, THING_LABELS, THING_OPTION, VALUE_OPTION } from './slices';
 import type { ProfileAreaId, ProfileItemMeta } from './types';
 import { statsByPart } from '../parts/stats';
 import { readStatsRows } from '../parts/statsQueries';
@@ -180,6 +180,9 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
   const byArea = new Map<string, MeItem[]>();
   let staleCount = 0;
   let decrypt: ((v: unknown) => string | null) | null = null;
+  // Items named from the graph after the loop: a thing I like (the first label that resolves), values (every kept
+  // one, then their own words, joined).
+  const unnamedThings: Array<{ ids: string[]; item: MeItem; all?: boolean; own?: string }> = [];
   for (const r of itemsRes.records) {
     if (r.get('label') === 'Part' && !partsOn) continue;   // the query gates it too
     const p = r.get('p') as Record<string, unknown>;
@@ -187,6 +190,8 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
     if (meta.prompt === 'ask') staleCount++;
     let value: Record<string, unknown> | undefined;
     let summary = '';
+    let thingIds: string[] | null = null;
+    let valueIds: { ids: string[]; own?: string } | null = null;
     if (p.valueJson) {
       try { value = JSON.parse(String(p.valueJson)); } catch { value = undefined; }
     }
@@ -206,6 +211,26 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
     }
     // A habit plan: the behaviour in their words when they wrote it (picked behaviours are ids; the title says enough).
     if (meta.kind === 'abstinence_plan' && value && typeof value.whatOwn === 'string' && value.whatOwn.trim()) summary = value.whatOwn;
+    // A thing I like (ER-04): what they called it; a picked one is named from the graph after the loop.
+    if (meta.kind === 'thing_i_like' && value) {
+      const own = [value.kindOwn, value.pickOwn].find((x) => typeof x === 'string' && x.trim());
+      if (typeof own === 'string') summary = own;
+      else {
+        const ids = (['pick', 'kind'] as const).flatMap((f) => (Array.isArray(value![`${f}Ids`]) ? (value![`${f}Ids`] as unknown[]) : [])
+          .filter((x): x is string => typeof x === 'string').slice(0, 1).map((id) => THING_OPTION[f] + id));
+        if (ids.length) thingIds = ids;
+      }
+    }
+    // Values (ER-09): the ones kept for now, named from the graph after the loop, their own words last. None kept
+    // (*not sure yet*): the first few of the sort instead.
+    if (meta.kind === 'values' && value) {
+      const list = (k: string, n: number) => (Array.isArray(value![k]) ? (value![k] as unknown[]) : []).filter((x): x is string => typeof x === 'string').slice(0, n);
+      const word = (k: string) => (typeof value![k] === 'string' && (value![k] as string).trim() ? (value![k] as string).trim() : undefined);
+      const keptAny = list('keptIds', 3).length > 0 || !!word('keptOwn');
+      const ids = keptAny ? list('keptIds', 3) : list('mineIds', 3);
+      const own = keptAny ? word('keptOwn') : (ids.length < 3 ? word('mineOwn') : undefined);
+      valueIds = { ids: ids.map((id) => VALUE_OPTION + id), ...(own ? { own } : {}) };
+    }
     // A person (IE-03): the name they gave, never the safety answer (Me is not where that's asked or shown).
     if (meta.kind === 'person' && value) {
       summary = typeof value.label === 'string' ? value.label : '';
@@ -227,7 +252,19 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
       ...(p.toolId !== undefined ? { toolId: (p.toolId as string | null) ?? null } : {}),
       ...(part ? { part } : {}),
     };
+    if (thingIds) unnamedThings.push({ ids: thingIds, item });
+    if (valueIds) unnamedThings.push({ ids: valueIds.ids, item, all: true, ...(valueIds.own ? { own: valueIds.own } : {}) });
     (byArea.get(meta.area) ?? byArea.set(meta.area, []).get(meta.area)!).push(item);
+  }
+  if (unnamedThings.length) {
+    const labels = new Map<string, string>();
+    const ids = [...new Set(unnamedThings.flatMap((t) => t.ids))];
+    if (ids.length) for (const rec of (await tx.run(THING_LABELS, { ids })).records) labels.set(String(rec.get('id')), String(rec.get('label')));
+    for (const t of unnamedThings) {
+      t.item.summary = t.all
+        ? [...t.ids.map((id) => labels.get(id)).filter((x): x is string => !!x), ...(t.own ? [t.own] : [])].join(' · ')
+        : t.ids.map((id) => labels.get(id)).find((x) => !!x) ?? '';
+    }
   }
   const { name } = await readProfileSlices(tx, uid, 'find-the-feeling', now);
   return {

@@ -62,7 +62,7 @@ planned rows stay drafts until their tool ships. Switched off, the check-in rout
 - **Nervous**: kept with Anxious (On guard). The Google Sheet's dive-reflex note landed on Nervous's row
   by mistake; it belongs to Exposed.
 - **Low drive** never shows 5-4-3-2-1 (the review: not for vegetative states); its words get one card
-  (Do the Opposite) and the guided Micro win until Running low ships.
+  (Do the Opposite) and the guided Micro win until Running low ships. *(12 Nov: Running low leads Low drive, Do the Opposite the swap.)*
 - **Numb** with the "numb or disconnected" answer now lands on Shut down with Disconnected alongside
   (the graph's freeze + dissociation co-occurrence), so 5-4-3-2-1 alone; it was Disconnected.
 

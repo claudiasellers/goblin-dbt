@@ -28,10 +28,10 @@ test('getSkillContent: skills with their steps, jumps, offers, exits and options
       { skillId: 'check_the_facts', from: 'next', exit: 'opposite_action', rows: JSON.stringify([{ order: 2, when: { eq: ['$a.fits', 'partly'] } }]) },
     ];
     if (/HAS_EXIT/.test(q)) return [
-      { skillId: 'check_the_facts', id: 'done', toolId: null, query: '{}', carry: [], done: true, planned: false, safety: false },
-      { skillId: 'check_the_facts', id: 'wise_mind', toolId: 'wise-mind', query: JSON.stringify({ first: 'wm_q_next' }), carry: null, done: false, planned: false, safety: false },
-      { skillId: 'check_the_facts', id: 'let_it_be', toolId: 'let-it-be', query: '{}', carry: [], done: false, planned: true, safety: false },
-      { skillId: 'check_the_facts', id: 'help', toolId: null, query: '{}', carry: [], done: false, planned: false, safety: true },
+      { skillId: 'check_the_facts', id: 'done', toolId: null, query: '{}', carry: [], done: true, planned: false, safety: false, label: null },
+      { skillId: 'check_the_facts', id: 'wise_mind', toolId: 'wise-mind', query: JSON.stringify({ first: 'wm_q_next' }), carry: null, done: false, planned: false, safety: false, label: null },
+      { skillId: 'check_the_facts', id: 'let_it_be', toolId: 'let-it-be', query: '{}', carry: [], done: false, planned: true, safety: false, label: 'accept_it' },
+      { skillId: 'check_the_facts', id: 'help', toolId: null, query: '{}', carry: [], done: false, planned: false, safety: true, label: null },
     ];
     if (/HAS_OPTION/.test(q)) return [
       { skillId: 'check_the_facts', list: 'story', order: 0, value: 'sad_gone', label: "It's gone for good", props: JSON.stringify({ set: 'sadness', predicts: false }), forOwn: null, forStory: null },
@@ -58,6 +58,8 @@ test('getSkillContent: skills with their steps, jumps, offers, exits and options
   assert.equal(s.steps[1].done, 'done');
   assert.deepEqual(s.exits[1], { id: 'wise_mind', toolId: 'wise-mind', query: { first: 'wm_q_next' }, carry: [], done: false });
   assert.equal(s.exits[2].planned, true, 'a planned exit (tool not built) keeps its flag');
+  assert.equal(s.exits[2].label, 'accept_it', 'an exit\'s label (a copy key naming its offer) comes through');
+  assert.equal('label' in s.exits[1], false, 'no label, no key');
   assert.equal(s.exits[3].safety, true, 'safety.open keeps its flag');
   assert.deepEqual(s.options.alt.map((o) => o.for), ['sad_gone', '$own'], 'ALTERNATIVE_TO names the story; own-words alternatives are $own');
   assert.deepEqual(s.options.story[0], { value: 'sad_gone', label: "It's gone for good", set: 'sadness', predicts: false });

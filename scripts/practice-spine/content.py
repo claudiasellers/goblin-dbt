@@ -172,6 +172,51 @@ FOLLOW_UP_TYPES = [
         "notification": "A plan you made is ready.",
     },
     {
+        # Running low on the skill runtime (ER-07, ER-B4, docs/design/running-low.md): the PRD's evening check. The
+        # *Want me to ask tonight?* chip (on *Later today*) schedules it; its card reopens that visit's run at *Did
+        # the fix happen?* (`back`, a `reopens` step, R9). Opening it is the resolution, as for oa_try. It's about
+        # today only, so it goes stale overnight and has no missed path.
+        "id": "please_fix", "ownerModule": "er", "tier": "quality", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/please-skill?run={sourceSessionId}&at=back&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"evening": {"kind": "at_local", "days": 0, "time": "20:00"}}},
+        "staleAfterHours": 16, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "The one thing for today", "body": "The fix you picked in Running low. Did it happen?"},
+        "choices": [{"id": "dismiss", "label": "Not today", "status": "dismissed"}],
+        "notification": "Your check from Running low is ready.",
+    },
+    {
+        # What matters to me (ER-09, docs/design/values.md): the one small step for a value, checked when the person
+        # said (tomorrow, three days, a week; evenings). The card reopens that visit at `back` (R9 `reopens`: *Did it
+        # happen?*). Opening it is the resolution. Content-free: never names the value or the step.
+        "id": "value_step", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/values-clarification?run={sourceSessionId}&at=back&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
+                                             "few_days": {"kind": "at_local", "days": 3, "time": "18:00"},
+                                             "this_week": {"kind": "at_local", "days": 6, "time": "18:00"}}},
+        "staleAfterHours": 72, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Your small step", "body": "A step you picked for something that matters to you. Did it happen?"},
+        "choices": [{"id": "dismiss", "label": "Not this time", "status": "dismissed"}],
+        "notification": "Your small step is ready to check.",
+    },
+    {
+        # Good things (ER-04, docs/design/good-things.md): the one good thing the person picked for today, at the time
+        # they picked (now → an hour from now). The card reopens that visit at `back` (R9 `reopens`: *Did it happen?*,
+        # then lighter / same / heavier and where the mind was). Opening it is the resolution. Content-free (PRD).
+        "id": "good_thing", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/good-things?run={sourceSessionId}&at=back&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"hour": {"kind": "after", "minutes": 60},
+                                             "afternoon": {"kind": "at_local", "days": 0, "time": "16:00"},
+                                             "evening": {"kind": "at_local", "days": 0, "time": "20:00"},
+                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"}}},
+        "staleAfterHours": 24, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Your good thing", "body": "Something good you picked earlier. Did it happen?"},
+        "choices": [{"id": "dismiss", "label": "Not today", "status": "dismissed"}],
+        "notification": "Your good thing is ready to check.",
+    },
+    {
         # Cope Ahead (docs/design/cope-ahead.md, "Today, afterwards"): on the keep screen's "Want me to ask how
         # it went?" Yes, for the time from screen 1 (the chip is ext.ca.when). Scheduled only on the caller's
         # own cope-ahead ToolSession. Its Today card is the tool's own (cope-ahead.json's after_* lines, the
@@ -472,6 +517,36 @@ FOLLOW_UP_TYPES += [
         # about a refusal: a Today card or notification can be seen by the person it was for.
         "id": "no_outcome", "ownerModule": "ie", "tier": "quality", "resolveMode": "deeplink",
         "deepLinkTemplate": "/tool/say-no?run={sourceSessionId}&at=said&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"today": {"kind": "at_local", "days": 0, "time": "20:00"},
+                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "19:00"},
+                                             "this_week": {"kind": "at_local", "days": 4, "time": "19:00"}}},
+        "staleAfterHours": 120, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "How did it go?", "body": "A few taps, when you're ready."},
+        "choices": [{"id": "dismiss", "label": "No need", "status": "dismissed"}],
+        "notification": "How did it go?",
+    },
+    {
+        # Keep it warm (IE-06, IE-B4; docs/design/give.md): break and return. The return time the person said in their
+        # line is the card's time (unannounced breaks read as abandonment, so the time is the skill). Its card reopens
+        # that visit's run at *Did you go back?* (`back`, R9); opening it is the resolution (OPEN_RESOLVES). Session-
+        # bound: only a Keep it warm visit schedules one. The copy names no one and says nothing about a fight.
+        "id": "break_return", "ownerModule": "ie", "tier": "quality", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/give?run={sourceSessionId}&at=back&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"m30": {"kind": "after", "minutes": 30},
+                                             "m60": {"kind": "after", "minutes": 60},
+                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "10:00"}}},
+        "staleAfterHours": 48, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Time to go back?", "body": "When you're ready."},
+        "choices": [{"id": "dismiss", "label": "No need", "status": "dismissed"}],
+        "notification": "Time to go back?",
+    },
+    {
+        # Keep it warm's repair (IE-06): *Want me to ask how it went?* on the repair's sent card. Its card reopens the
+        # run at *Did you get to say it?* (`repaired`, R9). Session-bound; the copy names no one.
+        "id": "repair_outcome", "ownerModule": "ie", "tier": "quality", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/give?run={sourceSessionId}&at=repaired&followUp={followUpId}",
         "window": {"kind": "chip", "chips": {"today": {"kind": "at_local", "days": 0, "time": "20:00"},
                                              "tomorrow": {"kind": "at_local", "days": 1, "time": "19:00"},
                                              "this_week": {"kind": "at_local", "days": 4, "time": "19:00"}}},

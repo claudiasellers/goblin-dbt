@@ -732,6 +732,12 @@ h1.uppercase, h2.uppercase {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
+/* A heading or line a screen focuses as it opens (tabindex -1, never reached by Tab) is a landing spot for screen
+   readers, not a control. Chrome still marks that script focus as focus-visible, which drew a box round every
+   skill title. Roving widgets (the body figure) aren't headings, so they keep their ring. */
+:is(h1, h2, h3, h4, p)[tabindex="-1"]:focus-visible {
+  outline: none;
+}
 
 /* ── Screen-reader-only utility ── */
 .sr-only {

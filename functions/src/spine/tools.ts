@@ -24,6 +24,9 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   'pros-cons': { module: 'dt', closeKind: 'none' },
   // When it's a habit (DT-09, docs/design/habit-plan.md): a plan made in calm; its outcome is the habit_renew card.
   'habit-plan': { module: 'dt', closeKind: 'none' },
+  // My crisis kit (DT-03, docs/design/crisis-kit.md): opening it asks how it is now in the flow, once, after the cards
+  // (askFresh thenVsNow, no SessionClose after it); making it ends with no close.
+  'crisis-kit': { module: 'dt', closeKind: 'regulation_down' },
   // Rebel without the wreckage (DT-11): "And the urge to blow it up?", the acted answer on the destructive urge.
   'alternate-rebellion': { module: 'dt', closeKind: 'urge' },
   'problem-solve': { module: 'er', closeKind: 'plan' },
@@ -41,6 +44,15 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   // Rewrite the nightmare (ER-15, docs/design/nightmare-rescript.md): no close question ("how strong is it now?"
   // means nothing after rewriting a dream); its practice is the read-through reminders.
   'nightmare-rescript': { module: 'er', closeKind: 'none' },
+  // Running low (ER-07, docs/design/running-low.md): a body check and one fix for today. No close question (the
+  // fix happens later, if at all); its outcome is the evening card's *Did it happen?* (`please_fix`).
+  'please-skill': { module: 'er', closeKind: 'none' },
+  // Good things (ER-04, docs/design/good-things.md): no close question; *lighter · same · heavier* is asked on the
+  // `good_thing` card's visit, after the thing was done (asking right after picking it would mean nothing).
+  'good-things': { module: 'er', closeKind: 'none' },
+  // What matters to me (ER-09, docs/design/values.md): no close question; the outcome is the `value_step` card's
+  // *Did it happen?*, after the step (a then-vs-now would ask about a sort, which isn't a state change).
+  'values-clarification': { module: 'er', closeKind: 'none' },
   // These ask their own questions inside their flows; the spine adds none (PR-S4 wraps them).
   'opposite-action': { module: 'er', closeKind: 'regulation_down' },
   'dear-man': { module: 'ie', closeKind: 'none' },
@@ -50,6 +62,8 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   // after deciding to end a relationship isn't evidence of anything, and a quiet leave keeps the visit unseen.
   'ending-relationships': { module: 'ie', closeKind: 'none' },
   'say-no': { module: 'ie', closeKind: 'none' },
+  // Keep it warm (docs/design/give.md): no close question. How warm a repair felt is asked as its own outcome.
+  'give': { module: 'ie', closeKind: 'none' },
   'recovering-from-invalidation': { module: 'wmp', closeKind: 'none' },
   // Meet a part (docs/design/parts.md): "Further away … More here". Not in src/data/tools.ts yet.
   'meet-a-part': { module: 'mf', closeKind: 'orienting' },

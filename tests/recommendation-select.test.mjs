@@ -99,11 +99,19 @@ test("#7 dissociation (any band): 5-4-3-2-1 only, never OA, no flag", async () =
   }
 });
 
-test("#8 Low drive: Do the Opposite ('get active'), never 5-4-3-2-1 for vegetative states, never Cool Down or Pause", async () => {
-  const r = await run(lu({ emotions: ["Bored"], discriminatingAnswers: ans("lu_body_flat") }));
+test("#8 Low drive: Running low (PLEASE) + Do the Opposite ('get active'), never 5-4-3-2-1 for vegetative states, never Cool Down or Pause", async () => {
+  const r = await run(lu({ emotions: ["Sad"], discriminatingAnswers: ans("lu_body_flat") }));
   assert.equal(r.pattern.id, "reward_drive_low");
-  assert.deepEqual(ids(r), ["opposite-action"]);
+  assert.deepEqual(ids(r), ["please-skill", "opposite-action"]);
   assert.equal(r.guidedActivity.activityId, "micro-win");
+});
+
+test("#8b Low drive, nothing sounds good (bored, apathetic, indifferent): Running low + Good things (ER-04)", async () => {
+  for (const w of ["Bored", "Apathetic", "Indifferent"]) {
+    const r = await run(lu({ emotions: [w], discriminatingAnswers: ans("lu_body_flat") }));
+    assert.equal(r.pattern.id, "reward_drive_low", w);
+    assert.deepEqual(ids(r), ["please-skill", "good-things"], w);
+  }
 });
 
 test("#9 rumination steady: Problem Solve + 5-4-3-2-1", async () => {
@@ -315,6 +323,14 @@ test("DEAR MAN's word row (12 Nov, connected by default): let down or left out â
     const sel = await cell("social_threat_shame", "stirred", { words: [w] });
     assert.equal(sel.filtered.find((f) => f.toolId === "dear-man")?.reason, "emotion_gate", w);
   }
+});
+
+test("Keep it warm's word row (12 Nov): remorseful â†’ Check the Facts, then the repair beside it; never guilty, never flooded", async () => {
+  for (const band of ["steady", "stirred"]) {
+    assert.deepEqual(pickIds(await cell("rumination_loop", band, { words: ["remorseful"] })), ["check-the-facts", "give"], band);
+  }
+  assert.ok(!pickIds(await cell("rumination_loop", "stirred", { words: ["guilty"] })).includes("give"), "guilty: often about the self");
+  assert.ok(!pickIds(await cell("rumination_loop", "flooded", { words: ["remorseful"] })).includes("give"), "flooded: body first");
 });
 
 test("a row reviewed to sit beside the lead fills the second card past the swap rule (12 Nov): Say no beside Problem Solve, Check the Facts beside Cope Ahead", async () => {

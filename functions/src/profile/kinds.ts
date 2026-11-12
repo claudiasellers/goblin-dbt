@@ -126,6 +126,73 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
       return out;
     },
   },
+  // What matters to me (ER-09, docs/design/values.md): the person's value sort, one per person (a re-sort replaces
+  // it): `mine` (every card that sounded like them, or their own words) and `kept` (up to three for now; empty is
+  // *not sure yet*, a full answer). The runtime's keep (R4). Read back by the `values` slice (the kept ones, named
+  // there from the graph's SkillOptions or their words); revisited monthly in Me (*Are these still yours?*).
+  values: {
+    kind: 'values', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'about_me', slice: 'values',
+    owner: 'ER', many: false, maxItems: 1, editor: null, ownFields: ['mineOwn', 'keptOwn'],
+    validate: (v) => {
+      const o = obj(v);
+      const most = { mine: 30, kept: 3 } as const;
+      const out: Record<string, unknown> = {};
+      for (const f of ['mine', 'kept'] as const) {
+        const ids = o[`${f}Ids`];
+        const own = o[`${f}Own`];
+        if (ids !== undefined) out[`${f}Ids`] = strArray(ids, { max: most[f], item: (x) => str(x, { max: 40, pattern: OPTION_ID }) });
+        if (own !== undefined) out[`${f}Own`] = str(own, { max: 60 });
+      }
+      for (const k of Object.keys(o)) if (!/^(mine|kept)(Ids|Own)$/.test(k)) throw new ValidationError('Unexpected field');
+      const has = (k: string) => (Array.isArray(out[`${k}Ids`]) && (out[`${k}Ids`] as string[]).length > 0) || (typeof out[`${k}Own`] === 'string' && (out[`${k}Own`] as string).trim() !== '');
+      if (!has('mine')) throw new ValidationError('Nothing to keep');
+      return out;
+    },
+  },
+  // Good things (ER-04, docs/design/good-things.md): one thing the person likes, kept on *Keep it* (a found thing:
+  // `kind`, the chip, or a few words) or *Add it* (a good thing that left them lighter: `pick`, a catalogue id or a few
+  // words). The runtime's keep (R4: `<field>Ids` / `<field>Own`). Read back by the `thingsILike` slice, named there
+  // (own words, else the option's label from the graph), so the next visit can offer it first.
+  thing_i_like: {
+    kind: 'thing_i_like', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'my_words', slice: 'thingsILike',
+    owner: 'ER', many: true, maxItems: 60, editor: null, ownFields: ['kindOwn', 'pickOwn'],
+    validate: (v) => {
+      const o = obj(v);
+      const out: Record<string, unknown> = {};
+      for (const f of ['kind', 'pick'] as const) {
+        const ids = o[`${f}Ids`];
+        const own = o[`${f}Own`];
+        if (ids !== undefined) out[`${f}Ids`] = strArray(ids, { max: 1, item: (x) => str(x, { max: 40, pattern: OPTION_ID }) });
+        if (own !== undefined) out[`${f}Own`] = str(own, { max: 40 });
+      }
+      for (const k of Object.keys(o)) if (!/^(kind|pick)(Ids|Own)$/.test(k)) throw new ValidationError('Unexpected field');
+      const has = (k: string) => (Array.isArray(out[`${k}Ids`]) && (out[`${k}Ids`] as string[]).length > 0) || (typeof out[`${k}Own`] === 'string' && (out[`${k}Own`] as string).trim() !== '');
+      if (!has('kind') && !has('pick')) throw new ValidationError('Nothing to keep');
+      return out;
+    },
+  },
+  crisis_kit: {
+    // DT-03 My crisis kit (docs/design/crisis-kit.md): one per person (keeping it again replaces it), option ids and own
+    // words per section; the kit plays it one card at a time through the `crisisKit` slice.
+    kind: 'crisis_kit', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'my_plans', slice: 'crisisKit',
+    owner: 'DT', many: false, maxItems: 1, editor: null,
+    ownFields: ['bodyOwn', 'handsOwn', 'sootheOwn', 'wordsOwn', 'placeOwn', 'reasonsOwn'],
+    validate: (v) => {
+      const o = obj(v);
+      const out: Record<string, unknown> = {};
+      const most = { body: 3, hands: 3, soothe: 3, words: 3, place: 1, reasons: 4 } as const;
+      for (const f of Object.keys(most) as Array<keyof typeof most>) {
+        const ids = o[`${f}Ids`];
+        const own = o[`${f}Own`];
+        if (ids !== undefined) out[`${f}Ids`] = strArray(ids, { max: most[f], item: (x) => str(x, { max: 40, pattern: OPTION_ID }) });
+        if (own !== undefined) out[`${f}Own`] = str(own, { max: 80 });
+      }
+      for (const k of Object.keys(o)) if (!/^(body|hands|soothe|words|place|reasons)(Ids|Own)$/.test(k)) throw new ValidationError('Unexpected field');
+      const has = (Object.keys(most) as string[]).some((f) => ((out[`${f}Ids`] as string[] | undefined)?.length ?? 0) > 0 || !!out[`${f}Own`]);
+      if (!has) throw new ValidationError('A kit has at least one card');
+      return out;
+    },
+  },
   // When it's a habit (DT-09, docs/design/habit-plan.md): the plan the person kept on *Keep it in Me*, for one
   // behaviour (the minimal TargetBehavior until CORE-04 owns one). The runtime's keep (R4: `<field>Ids` / `<field>Own`):
   // the behaviour (`what`), the stretch committed to (`span`, the habit_renew chip), the lapse plan (`lapse`), bridges

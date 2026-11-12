@@ -75,7 +75,7 @@ test("not safe or not sure: straight to someone to talk to, nothing in its place
     const reach = M.stepOf(skill, "reach");
     assert.ok(reach.noClose);
     assert.equal(M.crisisFor(ctx(), reach, s)?.variant, "crisis", "the banner is the way to them");
-    assert.deepEqual(M.offersFor(ctx(), reach, s), [], "no second button competing with the banner; the kit is planned");
+    assert.deepEqual(M.offersFor(ctx(), reach, s), ["safety_open", "crisis_kit"], "someone to talk to first, then the kit (DT-03)");
     assert.match(M.handoffLine(ctx(), reach, s), /reach out to someone now/);
   }
   const safe = run([pick("pull", "hurt"), next, pick("safe", "safe"), next]);
@@ -95,15 +95,15 @@ test("hurt myself, safe for now: no phone-down step, and its own end card with n
     assert.equal(M.handoffLine(ctx(), card, s), "You gave it some room. If it comes back, your support is right here.");
     assert.equal(M.crisisFor(ctx(), card, s)?.variant, "crisis");
   }
-  assert.deepEqual(M.offersFor(ctx(), card, end("cool")), ["cool_down"]);
-  assert.deepEqual(M.offersFor(ctx(), card, end("heart")), ["held"], "Held (DT-07, built): a hand on the heart");
-  assert.deepEqual(M.offersFor(ctx(), card, end("call")), ["safety_open"], "the kit is planned");
+  assert.deepEqual(M.offersFor(ctx(), card, end("cool")), ["safety_open", "cool_down", "crisis_kit"], "someone to talk to, the move, then the kit (DT-03)");
+  assert.deepEqual(M.offersFor(ctx(), card, end("heart")), ["safety_open", "held", "crisis_kit"], "Held (DT-07, built): a hand on the heart; then the kit");
+  assert.deepEqual(M.offersFor(ctx(), card, end("call")), ["safety_open", "crisis_kit"], "the kit (DT-03) after someone to talk to");
   // Flooded and hurt: the step back, then this card (body first), never the settle card's close.
   const f = run([pick("pull", "hurt"), next, pick("safe", "safe"), next, HELD, pick("step_back", "sit"), next], FLOODED);
   assert.equal(f.stepId, "hurt_end");
   const fBack = run([pick("pull", "hurt"), next, pick("safe", "safe"), next, HELD, pick("step_back", "sit")], FLOODED);
   assert.equal(M.followUpFor(FLOODED, M.stepOf(skill, "step_back"), fBack), null, "no come-back after hurt myself: the safety answer is never carried");
-  assert.deepEqual(M.offersFor(FLOODED, card, f), ["cool_down"]);
+  assert.deepEqual(M.offersFor(FLOODED, card, f), ["safety_open", "cool_down", "crisis_kit"]);
   assert.match(M.handoffLine(FLOODED, card, f), /Settle it first/);
   assert.ok(M.stepOf(skill, "next").lines.every((l) => l.key !== "next_hurt"));
 });
@@ -185,11 +185,11 @@ test("the end card: the move's own line or the plain one, its tool as the one of
   assert.deepEqual(M.offersFor(ctx(), card, s2), []);
   assert.match(M.handoffLine(ctx(), card, s2), /Saving it for later is a choice/);
   assert.deepEqual(M.offersFor(ctx(), card, end("check", "phone_room")), ["mind_job", "habit_plan"], "Give your mind a job (DT-06, built); a habit plan (DT-09)");
-  assert.deepEqual(M.offersFor(ctx(), card, end("use", "ride")), ["urge_surfing", "habit_plan"], "use: a habit plan made in calm (DT-09)");
+  assert.deepEqual(M.offersFor(ctx(), card, end("use", "ride")), ["urge_surfing", "kit", "habit_plan"], "use: the kit (DT-03), a habit plan made in calm (DT-09)");
   assert.deepEqual(M.offersFor(ctx(), card, end("leave", "boundary")), ["fast"]);
   assert.deepEqual(M.offersFor(ctx(), card, end("hit", "rebel")), ["alternate_rebellion"]);
   const planned = new Set(skill.exits.filter((x) => x.planned).map((x) => x.id));
-  assert.deepEqual([...planned].sort(), ["crisis_kit"], "Held is built (DT-07)");
+  assert.deepEqual([...planned].sort(), [], "Held (DT-07) and the kit (DT-03) are built");
   for (const o of skill.options.move) assert.ok(!planned.has(o.handsOn), `${o.value}: no chip into a planned tool`);
 });
 
@@ -221,7 +221,7 @@ test("the player: safetyFirst opens the resources once per arrival; the run's ur
   assert.match(p, /toolSession\.setUrgeIds\(visitUrgeIds\(ctx, st, reopenUrges\.current\)\)/);
   assert.match(p, /contextFrom\(skill, location\.search, location\.state, band\.current\(\)\?\.value \?\? null, pageCtx\)/, "the person's own current reading is the carry");
   assert.match(p, /answerToolOutcome\(toolSession\.id, \{ dismissed: true \}\)/, "a noClose ending never reappears as Today's outcome card");
-  assert.match(p, /if \(!picksWords && output\.ids\.length && !output\.ids\.includes\('skipped'\)\) toolSession\.markPracticed\(\);/, "a held hold is practice (a picker embed's words are not)");
+  assert.match(p, /if \(!picksWords && output\.ids\.length && !output\.ids\.includes\('skipped'\) && !output\.ids\.includes\('left'\)\) toolSession\.markPracticed\(\);/, "a held hold is practice (a picker embed's words are not)");
   assert.match(p, /if \(resuming \|\| safetyAt\.current === st\.path\.length\) return;/);
   assert.match(p, /if \(opensSafety\(ctx, stepOf\(skill, st\.stepId\), st\)\) \{/);
   const w = readFileSync("src/components/skillPlayer/WaitLockEmbed.tsx", "utf8");

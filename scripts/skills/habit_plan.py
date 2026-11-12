@@ -278,7 +278,7 @@ STEPS = [
     ask("what", "what_title", "what_hint", field("what", "what", own="what_own"),
         [{"when": {"eq": [a("what"), "hurt"]}, "to": "harm"}, {"when": FLOODED, "to": "heads_up"}, *AFTER_WHAT]),
     # Hurting myself: the resources open over the card as it arrives (C6.5), the banner stays; no plan, no close.
-    {**handoff("harm", [{"when": ALWAYS, "key": "harm_line"}], [{"exit": "crisis_kit", "when": ALWAYS}],
+    {**handoff("harm", [{"when": ALWAYS, "key": "harm_line"}], [{"exit": "safety_open", "when": ALWAYS}, {"exit": "crisis_kit", "when": ALWAYS}],
                no_close=True, crisis=[{"variant": "crisis", "when": ALWAYS}]),
      "safetyFirst": ALWAYS},
     ask("heads_up", "heads_up_title", "heads_up_hint", field("heads_up", "heads_up"),
@@ -342,7 +342,7 @@ EXITS = [
     {"id": "urge_surfing", "toolId": "urge-surfing"},                    # DT-05 Ride it out
     {"id": "pros_cons", "toolId": "pros-cons"},                          # DT-10 a card for a pull that keeps coming back
     {"id": "cool_down", "toolId": "cool-down"},                          # DT-01 First, the body (flooded)
-    {"id": "crisis_kit", "toolId": "crisis-kit", "planned": True},       # DT-03 My crisis kit (safety batch)
+    {"id": "crisis_kit", "toolId": "crisis-kit", "query": {"frame": "crisis"}},       # DT-03 My crisis kit, opened from a crisis route (the banner on every card)
     {"id": "safety_open", "toolId": None, "safety": True},               # safety.open (R6)
     {"id": "done", "done": True},
 ]

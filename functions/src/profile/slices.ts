@@ -76,12 +76,35 @@ export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
     OPTIONAL MATCH (u)-[:HAS_DEN_SNAPSHOT]->(s:DenSnapshot)
     WITH parts, links, s ORDER BY s.takenAt DESC
     RETURN parts, links, collect(s {.id, takenAt: toString(s.takenAt)})[..36] AS snapshots`,
+  // The kept crisis kit (DT-03), one per person (its id is the kind), active only; own words decrypted in the resolver.
+  crisisKit: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'crisis_kit', status: 'active'})
+    RETURN p {.id, .kind, .area, .status, .source, .valueJson,
+              confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p LIMIT 1`,
   // Kept pros & cons cards (DT-10), active only, newest first; own words decrypted in the resolver.
   prosCons: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'pros_cons', status: 'active'})
     WITH p ORDER BY p.confirmedAt DESC, p.id LIMIT 12
     RETURN p {.id, .kind, .area, .status, .source, .valueJson,
               confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p`,
+  // Things I like (ER-04), active only, newest first; own words decrypted and ids named in the resolver.
+  thingsILike: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'thing_i_like', status: 'active'})
+    WITH p ORDER BY p.confirmedAt DESC, p.id LIMIT 60
+    RETURN p {.id, .kind, .area, .status, .source, .valueJson,
+              confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p`,
+  // What matters to me (ER-09): the one sort (one per person), active only.
+  values: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'values', status: 'active'})
+    RETURN p {.id, .kind, .area, .status, .source, .valueJson,
+              confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p LIMIT 1`,
+  // The same rows; the resolver keeps only the catalogue id a good thing done was kept as.
+  thingsILikePicks: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'thing_i_like', status: 'active'})
+    RETURN p {.id, .valueJson} AS p`,
 };
+
+/** A kept thing's picked ids, named by Good things' own options (graph content: `SkillOption`, never a copy). */
+export const THING_LABELS = `MATCH (o:SkillOption) WHERE o.id IN $ids RETURN o.id AS id, o.label AS label`;
+/** The `SkillOption` id a kept thing's field names (scripts/skills/good_things.py: `kind` chips, `pick` → `activity`). */
+export const THING_OPTION: Record<'kind' | 'pick', string> = { kind: 'good_things:kind:', pick: 'good_things:activity:' };
+/** The `SkillOption` id prefix a kept value names (scripts/skills/values.py: the `value` cards). */
+export const VALUE_OPTION = 'values:value:';
 
 /**
  * A stored person's value (profile/kinds.ts `person`), its label decrypted; null when it can't be read (a label that
@@ -120,9 +143,9 @@ const objs = (v: unknown): Record<string, unknown>[] =>
 type Resolver<K extends SliceId> = (tx: ManagedTransaction, uid: string, now: number) => Promise<ProfileSlices[K]>;
 
 const EMPTY: { [K in SliceId]?: () => ProfileSlices[K] } = {
-  bodyFlags: () => null, values: () => [], goals: () => [], copeAheadPlans: () => [],
+  bodyFlags: () => null, goals: () => [], copeAheadPlans: () => [],
   boundaryLines: () => [], practicePrefs: () => null, fadeLevels: () => ({}), ownWords: () => [],
-  thingsILike: () => [], crisisKit: () => null, safetyPlan: () => null, country: () => null,
+  crisisKit: () => null, safetyPlan: () => null, country: () => null,
 };
 
 const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
@@ -237,6 +260,69 @@ const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
       snapshots: objs(r.get('snapshots'))
         .filter((x) => typeof x.id === 'string' && typeof x.takenAt === 'string')
         .map((x) => ({ id: x.id as string, takenAt: x.takenAt as string })),
+    };
+  },
+  thingsILike: async (tx, uid, now) => {
+    const r = await tx.run(SLICE_QUERIES.thingsILike!, { uid });
+    if (!r.records.length) return [];
+    const decrypt = await ownDecrypter(tx, uid);
+    const rows = r.records.flatMap((rec) => {
+      const p = rec.get('p') as Record<string, unknown>;
+      try { return [{ p, v: JSON.parse(String(p.valueJson)) as Record<string, unknown> }]; } catch { return []; }
+    });
+    // Own words first (what the person called it), then the good thing they did. A thing found and kept only as a
+    // chip ("A colour") is no good thing to do today: it stays in Me, out of the pick list.
+    const optionIds = (v: Record<string, unknown>) => strings(v.pickIds).slice(0, 1).map((id) => THING_OPTION.pick + id);
+    const ids = [...new Set(rows.flatMap(({ v }) => optionIds(v)))];
+    const labels = new Map<string, string>();
+    if (ids.length) for (const rec of (await tx.run(THING_LABELS, { ids })).records) labels.set(String(rec.get('id')), String(rec.get('label')));
+    const out: ProfileSlices['thingsILike'] = [];
+    for (const { p, v } of rows) {
+      const own = (['kindOwn', 'pickOwn'] as const).map((k) => (typeof v[k] === 'string' ? decrypt(v[k]) : null)).find((x) => x && x.trim());
+      const label = own?.trim() || optionIds(v).map((id) => labels.get(id)).find((x) => !!x);
+      if (label) out.push({ id: String(p.id), label, meta: metaFrom(p, now) });
+    }
+    return out;
+  },
+  values: async (tx, uid, now) => {
+    const r = await tx.run(SLICE_QUERIES.values!, { uid });
+    if (!r.records.length) return [];
+    const p = r.records[0].get('p') as Record<string, unknown>;
+    let v: Record<string, unknown>;
+    try { v = JSON.parse(String(p.valueJson)) as Record<string, unknown>; } catch { return []; }
+    const ids = strings(v.keptIds).slice(0, 3);
+    const labels = new Map<string, string>();
+    if (ids.length) for (const rec of (await tx.run(THING_LABELS, { ids: ids.map((id) => VALUE_OPTION + id) })).records) labels.set(String(rec.get('id')), String(rec.get('label')));
+    const meta = metaFrom(p, now);
+    const out: ProfileSlices['values'] = [];
+    for (const id of ids) { const label = labels.get(VALUE_OPTION + id); if (label) out.push({ id, label, meta }); }
+    if (typeof v.keptOwn === 'string') {
+      const own = (await ownDecrypter(tx, uid))(v.keptOwn)?.trim();
+      if (own) out.push({ id: 'own', label: own, meta });
+    }
+    return out;
+  },
+  thingsILikePicks: async (tx, uid) => {
+    const r = await tx.run(SLICE_QUERIES.thingsILikePicks!, { uid });
+    const ids = new Set<string>();
+    for (const rec of r.records) {
+      try { for (const id of strings((JSON.parse(String((rec.get('p') as Record<string, unknown>).valueJson)) as Record<string, unknown>).pickIds).slice(0, 1)) ids.add(id); } catch { /* unreadable: skip */ }
+    }
+    return [...ids].map((id) => ({ id }));
+  },
+  crisisKit: async (tx, uid, now) => {
+    const r = await tx.run(SLICE_QUERIES.crisisKit!, { uid });
+    if (!r.records.length) return null;
+    const p = r.records[0].get('p') as Record<string, unknown>;
+    let v: Record<string, unknown>;
+    try { v = JSON.parse(String(p.valueJson)) as Record<string, unknown>; } catch { return null; }
+    const decrypt = await ownDecrypter(tx, uid);
+    const own = (k: string) => (typeof v[k] === 'string' ? decrypt(v[k]) : null);
+    return {
+      id: String(p.id), bodyIds: strings(v.bodyIds), bodyOwn: own('bodyOwn'), handsIds: strings(v.handsIds), handsOwn: own('handsOwn'),
+      sootheIds: strings(v.sootheIds), sootheOwn: own('sootheOwn'), wordsIds: strings(v.wordsIds), wordsOwn: own('wordsOwn'),
+      placeIds: strings(v.placeIds), placeOwn: own('placeOwn'), reasonsIds: strings(v.reasonsIds), reasonsOwn: own('reasonsOwn'),
+      meta: metaFrom(p, now),
     };
   },
   prosCons: async (tx, uid, now) => {

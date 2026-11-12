@@ -96,9 +96,10 @@ const pageOf = (id) => {
 /**
  * Tools that may never show the row although their close asks then-vs-now. Wise mind: its parts form
  * tags the parts the person placed itself (PartTag source `wise_mind`, docs/design/wise-mind.md), so a
- * close tag after it would ask the same thing twice. Two pulls: the visit is about two parts already.
+ * close tag after it would ask the same thing twice. Two pulls: the visit is about two parts already. My crisis kit
+ * (DT-03): often opened in a crisis; after the cards it asks about people, and nothing else.
  */
-const NEVER_HOSTS = ["meet-a-part", "two-pulls", "wise-mind"];
+const NEVER_HOSTS = ["meet-a-part", "two-pulls", "wise-mind", "crisis-kit"];
 
 test("hosts: every tool whose close asks then-vs-now or about the urge, minus Meet a part, Two pulls and Wise mind, each declaring parts", () => {
   // Derived from the close kinds, so a new tool with a then-vs-now or an urge close joins (or fails here).

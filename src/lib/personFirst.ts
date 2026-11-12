@@ -31,6 +31,17 @@ export function sayNoCtx(p: PickedPerson): Record<string, string> {
 }
 
 /**
+ * Keep it warm's context (docs/design/give.md): as Say no's, plus `refused: validation` once two or more asks to be
+ * heard by them have been turned down (PRD IE-06: then GIVE is for practical asks only, never a way to earn being
+ * heard). The count is the person's own (`Person.refusalsValidation`, written by the debrief on their answer).
+ */
+export function giveCtx(p: PickedPerson, people: readonly KeptPerson[] | null): Record<string, string> {
+  const kept = p.personId ? people?.find((k) => k.id === p.personId) : undefined;
+  const refused = ((kept as { refusalsValidation?: number | null } | undefined)?.refusalsValidation ?? 0) >= 2;
+  return { ...sayNoCtx(p), ...(refused ? { refused: 'validation' } : {}) };
+}
+
+/**
  * A reopened visit (`?run=`, R9: a card asking how it went) skips the picker only when the player will really reopen
  * the run, and never for someone now on the safety route (Gates 1 and 3). `reopens` is the player's own test
  * (`resumeRun(ctx, run, at) !== null`), so the two can't disagree. `skill` plays it; `safety` shows the safety screen

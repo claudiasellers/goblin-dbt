@@ -507,10 +507,16 @@ MERGE (c)-[:PART_OF]->(mod);
 MATCH (c:TherapyConcept {id: "dbt_self_soothe"}), (mod:TherapyConcept {id: "dbt_distress_tolerance"})
 MERGE (c)-[:PART_OF]->(mod);
 
+MATCH (c:TherapyConcept {id: "dbt_values_priorities"}), (mod:TherapyConcept {id: "dbt_emotion_regulation_module"})
+MERGE (c)-[:PART_OF]->(mod);
+
 MATCH (c:TherapyConcept {id: "dbt_mindfulness_current_thoughts"}), (mod:TherapyConcept {id: "dbt_distress_tolerance"})
 MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_dialectical_abstinence"}), (mod:TherapyConcept {id: "dbt_distress_tolerance"})
+MERGE (c)-[:PART_OF]->(mod);
+
+MATCH (c:TherapyConcept {id: "dbt_crisis_survival_kit"}), (mod:TherapyConcept {id: "dbt_distress_tolerance"})
 MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_turning_mind"}), (mod:TherapyConcept {id: "dbt_distress_tolerance"})

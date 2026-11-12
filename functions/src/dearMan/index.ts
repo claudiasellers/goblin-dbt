@@ -88,7 +88,7 @@ export const getDearManContent = onCall(
 
       // 5. Barriers + coaching
       const barrierResult = await session.run(`
-        MATCH (b:DearManBarrier)
+        MATCH (b:DearManBarrier) WHERE b.kind IS NULL
         OPTIONAL MATCH (c:DearManBarrierCoaching)-[:ADDRESSES]->(b)
         RETURN b.id AS barrierId, b.label AS barrierLabel,
                c.id AS coachingId, c.title AS coachingTitle, c.body AS coachingBody

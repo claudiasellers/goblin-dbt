@@ -286,7 +286,8 @@ STEPS = [
         "id": "someone", "kind": "handoff", "complete": True,
         "crisis": [{"variant": "crisis", "when": ALWAYS}],
         "lines": [{"when": ALWAYS, "key": "someone_line"}],
-        "offers": [{"exit": "crisis_kit", "when": ALWAYS}],
+        # People first, then the kit (DT-03): coping sits beside help, never before it (CORE-01's rule).
+        "offers": [{"exit": "safety_open", "when": ALWAYS}, {"exit": "crisis_kit", "when": ALWAYS}],
         "done": "done",
     },
     {
@@ -314,7 +315,7 @@ EXITS = [
     {"id": "opposite_action", "toolId": "opposite-action"},
     {"id": "let_it_be", "toolId": "let-it-be"},         # DT-04 (DT-B4): it's how things are
     {"id": "mind_job", "toolId": "mind-job"},           # DT-06 Give your mind a job: not right now, with a return
-    {"id": "crisis_kit", "toolId": "crisis-kit", "planned": True},       # DT-03 the kit's people (safety batch)
+    {"id": "crisis_kit", "toolId": "crisis-kit", "query": {"frame": "crisis"}},       # DT-03 My crisis kit, opened from a crisis route (the banner on every card)
     {"id": "safety_open", "toolId": None, "safety": True},               # safety.open (R6)
     {"id": "done", "done": True},
 ]
