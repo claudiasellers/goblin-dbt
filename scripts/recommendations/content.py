@@ -85,6 +85,7 @@ SIGNED_OFF = {
     "rf_rumination_loop_flooded_five-senses": "2026-10-05",
     "rf_reward_drive_low_default_opposite-action": "2026-10-05",
     "rf_reward_drive_low_default_please-skill": "2026-11-12",
+    "rf_reward_drive_low_words_flat_good-things": "2026-11-12",
     "rf_reward_drive_low_flooded_five-senses": "2026-10-05",
     "rf_conservation_freeze_default_five-senses": "2026-10-05",
     "rf_conservation_freeze_default_opposite-action": "2026-10-05",
@@ -223,6 +224,11 @@ CONCEPT_TAGS["give"] = {"concept": "dbt_give", "side": "change", "skillKind": "r
 # shipped on the skill runtime: out of PLANNED; it leads Low drive's default cell, Do the Opposite as its swap, live
 # (connected by default, 12 Nov 2026). Body-kind and neutral: it refills, never calms, so blank patterns keep it.
 CONCEPT_TAGS["please-skill"] = {"concept": "dbt_please", "side": "both", "skillKind": "body", "direction": "neutral"}
+# Good things (ER-04, appToolId 'good-things', docs/design/good-things.md): accumulating positives, a small good thing
+# done (behavioural activation by reward, not by opposite action). skillKind `redirect` (attention moved to something
+# okay, then something good), so it sits beside Running low (`body`) on a plain Low drive result. Direction up: never
+# on a flooded result (its row is DEFAULT_BANDS only), and fine on a blank one (blank drops only `down`).
+CONCEPT_TAGS["good-things"] = {"concept": "dbt_accumulate_positives", "side": "change", "skillKind": "redirect", "direction": "up"}
 BUILT_NOT_SIGNED_OFF = {
 }
 # Ride it out (urge-surfing), Let it be and Give your mind a job are live (Claudia, 12 Nov 2026: default to connected).
@@ -405,6 +411,8 @@ WORD_RULES = [
      "why": "Let it be (radical acceptance) after gentle movement for despair, grief and emptiness; not for numbness, which needs the body first (12 Nov 2026: was a pattern row for all of Shut down)."},
     {"key": "fragile", "pattern": "reward_drive_low", "tool": "let-it-be", "priority": 0.4, "words": ["vulnerable", "fragile", "powerless"],
      "why": "Let it be (radical acceptance) leads."},
+    {"key": "flat", "pattern": "reward_drive_low", "tool": "good-things", "priority": 1.5, "words": ["bored", "apathetic", "indifferent"],
+     "why": "Nothing sounds good (ER PRD ER-04): one small good thing, picked for the energy there is, as the second card after Running low; Do the Opposite stays for the rest of Low drive (12 Nov 2026, default to connected)."},
 ]
 
 # Planned pattern-level rows (no word gate): the review's intended first pick for the pattern.

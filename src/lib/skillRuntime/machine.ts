@@ -873,8 +873,10 @@ export function titleSlots(ctx: RunContext, step: StepDef, s: StateLike): Record
     // The person's own words, when the field has them, are what they said (a starter they changed included).
     if (f && a?.own?.trim()) { out[name] = a.own.trim(); continue; }
     const v = a?.ids[0];
+    // A kept item that's gone or set aside since (normalize dropped the pick) reads as the generic copy, never `{slot}`.
+    if (f && !v && f.options.profile && ctx.skill.copy.profile_unnamed) { out[name] = ctx.skill.copy.profile_unnamed; continue; }
     if (!f || !v) continue;
-    out[name] = f.options.emotions ? ctx.emotionLabel(v) : (ctx.skill.options[f.options.list ?? '']?.find((o) => o.value === v)?.label ?? v);
+    out[name] = f.options.emotions ? ctx.emotionLabel(v) : labelOfValue(ctx, src.labelOf, v);
   }
   return out;
 }
@@ -883,7 +885,11 @@ export function titleSlots(ctx: RunContext, step: StepDef, s: StateLike): Record
 export function labelOfValue(ctx: RunContext, fieldId: string, v: string): string {
   const f = fieldOf(ctx.skill, fieldId);
   if (!f || f.options.emotions || f.options.emotionsFrom) return ctx.emotionLabel(v);
-  return ctx.skill.options[f.options.list ?? '']?.find((o) => o.value === v)?.label ?? v;
+  const listed = ctx.skill.options[f.options.list ?? '']?.find((o) => o.value === v)?.label;
+  if (listed || !f.options.profile) return listed ?? v;
+  // A kept item (R3: a field listing a profile slice) is named by what the person kept, display only (the record keeps
+  // the id); one that's gone or set aside reads as the skill's generic copy, never its id.
+  return profileOptions(ctx, f.options.profile).find((o) => o.value === v)?.label ?? ctx.skill.copy.profile_unnamed ?? '';
 }
 
 /** The hand-off line: the first of the step's lines that holds. */

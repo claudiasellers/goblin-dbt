@@ -43,6 +43,9 @@ KINDS = [
     # Pros & cons card (DT-10): a card the person kept for one pull. Never stale: theirs until they set it aside.
     ("pros_cons", "my_plans", "A pros & cons card", None,
      "", "Set aside. Hold to wait won't show it until you bring it back."),
+    # Good things (ER-04): something the person likes, kept from a good moment or a good thing that helped. Never stale.
+    ("thing_i_like", "my_words", "A thing I like", None,
+     "", "Set aside. Good things won't offer it until you bring it back."),
     # When it's a habit (DT-09): a plan the person kept for one behaviour. Never stale: theirs until they set it aside.
     ("abstinence_plan", "my_plans", "A habit plan", None,
      "", "Set aside. It stays out of the way until you bring it back."),

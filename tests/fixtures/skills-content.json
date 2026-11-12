@@ -19120,6 +19120,1265 @@
    }
   },
   {
+   "id": "good_things",
+   "toolId": "good-things",
+   "version": "gt-v1",
+   "start": "start",
+   "accepts": [
+    "band",
+    "frame"
+   ],
+   "ownMax": 40,
+   "emotionFields": [],
+   "copy": {
+    "start_title": "Where do you want to start?",
+    "start_title_savour": "Where do you want to start?",
+    "start_hint": "A minute is enough.",
+    "heads_up_title": "Your body's loud right now.",
+    "heads_up_hint": "Good things land better once it settles a little.",
+    "settle_line": "This will keep. Look after the next few minutes first.",
+    "find_title": "Look around.",
+    "here": "You're here, and it's",
+    "find_task": "Find one thing that's even a little okay: a colour you like, something soft, a sound, a window. Cold water or something sour counts too.",
+    "find_found": "Found one",
+    "find_done": "That's the one.",
+    "stay_title": "Stay with it for a few seconds. Notice one thing you like about it.",
+    "stay_title_savour": "Stay with what's good for a few seconds. Notice one thing you like about it.",
+    "stay_label": "Start",
+    "stay_running": "Staying with it",
+    "stay_hint": "Let your eyes rest on it, or keep it in mind. Notice one thing you like about it. Let it be as big as it is; it doesn't have to last.",
+    "stay_done": "You noticed it. That counts.",
+    "name_title": "What was it?",
+    "name_hint": "Pick the closest, or name it in a few words.",
+    "name_own": "Name it",
+    "keepit_label": "Add it to Things I like?",
+    "name_end_kept": "It's in Things I like. A list like that grows slowly, one thing at a time.",
+    "name_end": "You found one. Noticing it is the practice.",
+    "energy_title": "How much energy have you got right now?",
+    "energy_hint": "Any answer works. There's something for each.",
+    "pick_title": "Pick one good thing.",
+    "pick_hint": "If nothing sounds good, that's part of feeling low. Pick the one that sounds least bad.",
+    "pick_own": "Something else",
+    "when_title": "When will you do it?",
+    "remind_label": "Want me to ask how it went?",
+    "set_title": "Your good thing: {pick}.",
+    "set_remind": "I'll ask how it went. Doing it counts, whether or not you enjoy it.",
+    "set_line": "Doing it counts, whether or not you enjoy it.",
+    "back_title": "Earlier you picked: {pick}.",
+    "happened_label": "Did it happen?",
+    "after_title": "Compared to before, how are you?",
+    "mind_label": "Was your mind mostly here, or somewhere else?",
+    "keep_more_title": "Add it to Things I like?",
+    "keep_more_hint": "Things that helped once are worth finding again.",
+    "after_end_title": "You gave it a go.",
+    "name_end_title": "Found one.",
+    "after_kept": "It's in Things I like.",
+    "after_lighter": "Something lifted. That's worth noticing.",
+    "after_flat": "Enjoying it comes later. Doing it is the rep.",
+    "after_mind": "If 'it won't last' or 'I don't deserve this' shows up next time, notice it and come back to what you're doing. That's part of the skill.",
+    "after_heavier": "That happens sometimes. It isn't a sign you did it wrong.",
+    "no_title": "That's okay.",
+    "no_line": "A smaller one tomorrow still counts.",
+    "no_low": "If energy's been low for a while, Running low looks at sleep, food and the body.",
+    "keep_primary": "Next",
+    "safety_open": "Talk to someone now",
+    "next": "Next",
+    "done": "Done",
+    "profile_unnamed": "something you like"
+   },
+   "tables": {},
+   "derive": [],
+   "steps": [
+    {
+     "id": "start",
+     "kind": "ask",
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "savour"
+        ]
+       },
+       "key": "start_title_savour"
+      },
+      {
+       "key": "start_title"
+      }
+     ],
+     "fields": [
+      {
+       "id": "start",
+       "options": {
+        "list": "start",
+        "where": {
+         "any": [
+          {
+           "not": {
+            "eq": [
+             "$opt.savour",
+             true
+            ]
+           }
+          },
+          {
+           "eq": [
+            "$ctx.frame",
+            "savour"
+           ]
+          }
+         ]
+        }
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "start_hint",
+     "next": [
+      {
+       "to": "heads_up",
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       }
+      },
+      {
+       "to": "stay",
+       "when": {
+        "eq": [
+         "$a.start",
+         "savour"
+        ]
+       }
+      },
+      {
+       "to": "find",
+       "when": {
+        "eq": [
+         "$a.start",
+         "find"
+        ]
+       }
+      },
+      {
+       "to": "energy",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "heads_up",
+     "kind": "ask",
+     "title": "heads_up_title",
+     "fields": [
+      {
+       "id": "heads_up",
+       "options": {
+        "list": "heads_up"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "heads_up_hint",
+     "next": [
+      {
+       "to": "settle",
+       "when": {
+        "eq": [
+         "$a.heads_up",
+         "settle"
+        ]
+       }
+      },
+      {
+       "to": "stay",
+       "when": {
+        "eq": [
+         "$a.start",
+         "savour"
+        ]
+       }
+      },
+      {
+       "to": "find",
+       "when": {
+        "eq": [
+         "$a.start",
+         "find"
+        ]
+       }
+      },
+      {
+       "to": "energy",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "settle",
+     "kind": "handoff",
+     "complete": true,
+     "title": "heads_up_title",
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "settle_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "next": [],
+     "offers": [
+      {
+       "exit": "cool_down",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "find",
+     "kind": "embed",
+     "embed": "orientFind",
+     "answerAs": "find",
+     "title": "find_title",
+     "props": {
+      "variant": "find",
+      "count": 1,
+      "here": "here",
+      "task": "find_task",
+      "foundLabel": "find_found",
+      "done": "find_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "stay",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "stay",
+     "kind": "embed",
+     "embed": "holdRing",
+     "answerAs": "stay",
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$a.start",
+         "savour"
+        ]
+       },
+       "key": "stay_title_savour"
+      },
+      {
+       "key": "stay_title"
+      }
+     ],
+     "props": {
+      "variant": "timed",
+      "seconds": 15,
+      "label": "stay_label",
+      "runningLabel": "stay_running",
+      "hint": "stay_hint",
+      "doneLabel": "stay_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "name",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "name",
+     "kind": "ask",
+     "title": "name_title",
+     "fields": [
+      {
+       "id": "kind",
+       "options": {
+        "list": "kind",
+        "where": {
+         "any": [
+          {
+           "not": {
+            "eq": [
+             "$opt.savour",
+             true
+            ]
+           }
+          },
+          {
+           "eq": [
+            "$a.start",
+            "savour"
+           ]
+          }
+         ]
+        }
+       },
+       "max": 1,
+       "required": true,
+       "own": {
+        "hint": "name_own",
+        "countsAsPick": true,
+        "max": 40
+       }
+      },
+      {
+       "id": "keepit",
+       "options": {
+        "list": "keepit"
+       },
+       "max": 1,
+       "required": true,
+       "label": "keepit_label",
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "keep": {
+      "kind": "thing_i_like",
+      "many": true,
+      "when": {
+       "eq": [
+        "$a.keepit",
+        "keep"
+       ]
+      },
+      "from": [
+       "kind"
+      ]
+     },
+     "primary": "keep_primary",
+     "hint": "name_hint",
+     "next": [
+      {
+       "to": "name_end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "name_end",
+     "kind": "handoff",
+     "complete": true,
+     "title": "name_end_title",
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.keepit",
+         "keep"
+        ]
+       },
+       "key": "name_end_kept"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "name_end"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": []
+    },
+    {
+     "id": "energy",
+     "kind": "ask",
+     "title": "energy_title",
+     "fields": [
+      {
+       "id": "energy",
+       "options": {
+        "list": "energy"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "energy_hint",
+     "next": [
+      {
+       "to": "pick",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "pick",
+     "kind": "ask",
+     "title": "pick_title",
+     "fields": [
+      {
+       "id": "pick",
+       "options": {
+        "list": "activity",
+        "where": {
+         "all": [
+          {
+           "any": [
+            {
+             "all": [
+              {
+               "eq": [
+                "$a.energy",
+                "none"
+               ]
+              },
+              {
+               "in": [
+                "$opt.energy",
+                [
+                 "none"
+                ]
+               ]
+              }
+             ]
+            },
+            {
+             "all": [
+              {
+               "eq": [
+                "$a.energy",
+                "little"
+               ]
+              },
+              {
+               "in": [
+                "$opt.energy",
+                [
+                 "none",
+                 "little"
+                ]
+               ]
+              }
+             ]
+            },
+            {
+             "all": [
+              {
+               "eq": [
+                "$a.energy",
+                "some"
+               ]
+              },
+              {
+               "in": [
+                "$opt.energy",
+                [
+                 "none",
+                 "little",
+                 "some"
+                ]
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "not": {
+            "has": [
+             "$p.thingsILikePicks.ids",
+             "$opt.value"
+            ]
+           }
+          }
+         ]
+        },
+        "profile": "thingsILike"
+       },
+       "max": 1,
+       "required": true,
+       "own": {
+        "hint": "pick_own",
+        "countsAsPick": true,
+        "max": 40
+       },
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "pick_hint",
+     "next": [
+      {
+       "to": "when",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "when",
+     "kind": "ask",
+     "title": "when_title",
+     "fields": [
+      {
+       "id": "when",
+       "options": {
+        "list": "when"
+       },
+       "max": 1,
+       "required": true
+      },
+      {
+       "id": "remind",
+       "options": {
+        "list": "remind"
+       },
+       "max": 1,
+       "required": false,
+       "label": "remind_label",
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "followUp": {
+      "type": "good_thing",
+      "whenFrom": "when",
+      "when": {
+       "eq": [
+        "$a.remind",
+        "yes"
+       ]
+      }
+     },
+     "next": [
+      {
+       "to": "set",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "set",
+     "kind": "handoff",
+     "complete": true,
+     "title": "set_title",
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.remind",
+         "yes"
+        ]
+       },
+       "key": "set_remind"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "set_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "titleSlots": {
+      "pick": {
+       "labelOf": "pick"
+      }
+     },
+     "next": [],
+     "offers": []
+    },
+    {
+     "id": "back",
+     "kind": "ask",
+     "title": "back_title",
+     "fields": [
+      {
+       "id": "happened",
+       "options": {
+        "list": "happened"
+       },
+       "max": 1,
+       "required": true,
+       "label": "happened_label",
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "reopens": {
+      "after": "when"
+     },
+     "clears": [
+      "happened",
+      "compared",
+      "mind",
+      "keep_more"
+     ],
+     "titleSlots": {
+      "pick": {
+       "labelOf": "pick"
+      }
+     },
+     "next": [
+      {
+       "to": "not_today",
+       "when": {
+        "eq": [
+         "$a.happened",
+         "no"
+        ]
+       }
+      },
+      {
+       "to": "after",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "after",
+     "kind": "ask",
+     "title": "after_title",
+     "fields": [
+      {
+       "id": "compared",
+       "options": {
+        "list": "compared"
+       },
+       "max": 1,
+       "required": true
+      },
+      {
+       "id": "mind",
+       "options": {
+        "list": "mind"
+       },
+       "max": 1,
+       "required": false,
+       "label": "mind_label",
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "keep_more",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.compared",
+           "lighter"
+          ]
+         },
+         {
+          "set": "$a.pick.ids"
+         },
+         {
+          "not": {
+           "any": [
+            {
+             "has": [
+              "$p.thingsILike.ids",
+              "$a.pick"
+             ]
+            },
+            {
+             "has": [
+              "$p.thingsILikePicks.ids",
+              "$a.pick"
+             ]
+            }
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "to": "after_end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "keep_more",
+     "kind": "ask",
+     "title": "keep_more_title",
+     "fields": [
+      {
+       "id": "keep_more",
+       "options": {
+        "list": "keep_more"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "keep": {
+      "kind": "thing_i_like",
+      "many": true,
+      "when": {
+       "eq": [
+        "$a.keep_more",
+        "keep"
+       ]
+      },
+      "from": [
+       "pick"
+      ]
+     },
+     "primary": "keep_primary",
+     "hint": "keep_more_hint",
+     "next": [
+      {
+       "to": "after_end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "after_end",
+     "kind": "handoff",
+     "complete": true,
+     "title": "after_end_title",
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.keep_more",
+         "keep"
+        ]
+       },
+       "key": "after_kept"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.compared",
+         "heavier"
+        ]
+       },
+       "key": "after_heavier"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.mind",
+         "elsewhere"
+        ]
+       },
+       "key": "after_mind"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.compared",
+         "lighter"
+        ]
+       },
+       "key": "after_lighter"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "after_flat"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "next": [],
+     "offers": [
+      {
+       "exit": "cool_down",
+       "when": {
+        "eq": [
+         "$a.compared",
+         "heavier"
+        ]
+       }
+      },
+      {
+       "exit": "please_skill",
+       "when": {
+        "eq": [
+         "$a.compared",
+         "heavier"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "id": "not_today",
+     "kind": "handoff",
+     "complete": true,
+     "title": "no_title",
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "no_line"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "no_low"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "next": [],
+     "offers": [
+      {
+       "exit": "please_skill",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    }
+   ],
+   "exits": [
+    {
+     "id": "cool_down",
+     "toolId": "cool-down",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "done",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": true
+    },
+    {
+     "id": "please_skill",
+     "toolId": "please-skill",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "safety_open",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": false,
+     "safety": true
+    }
+   ],
+   "options": {
+    "start": [
+     {
+      "value": "savour",
+      "label": "Stay with this good moment",
+      "savour": true
+     },
+     {
+      "value": "find",
+      "label": "Find one okay thing around me"
+     },
+     {
+      "value": "one",
+      "label": "Pick one good thing for today"
+     }
+    ],
+    "heads_up": [
+     {
+      "value": "settle",
+      "label": "Look after the next few minutes first"
+     },
+     {
+      "value": "try",
+      "label": "Try it anyway"
+     }
+    ],
+    "kind": [
+     {
+      "value": "moment",
+      "label": "A moment, or how I felt",
+      "savour": true
+     },
+     {
+      "value": "colour",
+      "label": "A colour"
+     },
+     {
+      "value": "texture",
+      "label": "Something soft or comfortable"
+     },
+     {
+      "value": "sound",
+      "label": "A sound"
+     },
+     {
+      "value": "taste",
+      "label": "A taste or smell"
+     },
+     {
+      "value": "view",
+      "label": "A view"
+     },
+     {
+      "value": "person",
+      "label": "A person"
+     },
+     {
+      "value": "pet",
+      "label": "An animal"
+     }
+    ],
+    "keepit": [
+     {
+      "value": "keep",
+      "label": "Keep it"
+     },
+     {
+      "value": "not_now",
+      "label": "Not this time"
+     }
+    ],
+    "energy": [
+     {
+      "value": "none",
+      "label": "Hardly any"
+     },
+     {
+      "value": "little",
+      "label": "A little"
+     },
+     {
+      "value": "some",
+      "label": "Some"
+     }
+    ],
+    "activity": [
+     {
+      "value": "song",
+      "label": "Put on a song you like",
+      "energy": "none"
+     },
+     {
+      "value": "sun",
+      "label": "Sit by a window, or in a patch of sun",
+      "energy": "none"
+     },
+     {
+      "value": "photos",
+      "label": "Look at a photo of a place or a day you liked",
+      "energy": "none"
+     },
+     {
+      "value": "laugh",
+      "label": "Watch one clip that's made you laugh before",
+      "energy": "none"
+     },
+     {
+      "value": "scent",
+      "label": "Smell something you like: soap, coffee, a candle",
+      "energy": "none"
+     },
+     {
+      "value": "curious",
+      "label": "Read about something you're curious about, for ten minutes",
+      "energy": "little"
+     },
+     {
+      "value": "warm",
+      "label": "A warm shower or bath",
+      "energy": "little"
+     },
+     {
+      "value": "animal",
+      "label": "Spend a few minutes with an animal",
+      "energy": "little"
+     },
+     {
+      "value": "message",
+      "label": "Send a message to someone you like",
+      "energy": "little"
+     },
+     {
+      "value": "outside",
+      "label": "Step outside for five minutes",
+      "energy": "little"
+     },
+     {
+      "value": "make",
+      "label": "Make something for ten minutes",
+      "energy": "little"
+     },
+     {
+      "value": "read",
+      "label": "Read a few pages of something you enjoy",
+      "energy": "little"
+     },
+     {
+      "value": "plant",
+      "label": "Water a plant, or stand in a garden",
+      "energy": "little"
+     },
+     {
+      "value": "walk",
+      "label": "A short walk somewhere you like",
+      "energy": "some"
+     },
+     {
+      "value": "dance",
+      "label": "Dance to one song",
+      "energy": "some"
+     },
+     {
+      "value": "see",
+      "label": "Call or see someone you're easy with",
+      "energy": "some"
+     },
+     {
+      "value": "place",
+      "label": "Go somewhere you like being: a park, a library, a bench",
+      "energy": "some"
+     }
+    ],
+    "when": [
+     {
+      "value": "hour",
+      "label": "Now"
+     },
+     {
+      "value": "afternoon",
+      "label": "This afternoon"
+     },
+     {
+      "value": "evening",
+      "label": "This evening"
+     },
+     {
+      "value": "tomorrow",
+      "label": "Tomorrow"
+     }
+    ],
+    "remind": [
+     {
+      "value": "yes",
+      "label": "Yes, ask me"
+     },
+     {
+      "value": "no",
+      "label": "No thanks"
+     }
+    ],
+    "happened": [
+     {
+      "value": "yes",
+      "label": "Yes"
+     },
+     {
+      "value": "partly",
+      "label": "Partly"
+     },
+     {
+      "value": "no",
+      "label": "Not today"
+     }
+    ],
+    "compared": [
+     {
+      "value": "lighter",
+      "label": "Lighter"
+     },
+     {
+      "value": "same",
+      "label": "About the same"
+     },
+     {
+      "value": "heavier",
+      "label": "Heavier"
+     }
+    ],
+    "mind": [
+     {
+      "value": "here",
+      "label": "Mostly here"
+     },
+     {
+      "value": "partly",
+      "label": "Partly"
+     },
+     {
+      "value": "elsewhere",
+      "label": "Somewhere else"
+     }
+    ],
+    "keep_more": [
+     {
+      "value": "keep",
+      "label": "Add it"
+     },
+     {
+      "value": "not_now",
+      "label": "Not this time"
+     }
+    ]
+   }
+  },
+  {
    "id": "habit_plan",
    "toolId": "habit-plan",
    "version": "hp-v1",
@@ -26671,8 +27930,7 @@
      "toolId": "good-things",
      "query": {},
      "carry": [],
-     "done": false,
-     "planned": true
+     "done": false
     },
     {
      "id": "please_skill",
