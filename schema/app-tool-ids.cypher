@@ -32,7 +32,8 @@ UNWIND [
   {c: "dbt_radical_acceptance", t: "let-it-be"},
   {c: "dbt_accepts", t: "mind-job"},
   {c: "dbt_saying_no", t: "say-no"},
-  {c: "dbt_self_soothe", t: "soothe"}
+  {c: "dbt_self_soothe", t: "soothe"},
+  {c: "dbt_mindfulness_current_thoughts", t: "thoughts-passing"}
 ] AS row
 MATCH (c:TherapyConcept {id: row.c})
 SET c.appToolId = row.t;

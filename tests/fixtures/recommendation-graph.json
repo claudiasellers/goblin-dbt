@@ -448,6 +448,17 @@
     "perplexed"
    ]
   },
+  "dbt_mindfulness_current_thoughts": {
+   "appToolId": "thoughts-passing",
+   "name": "Mindfulness of Current Thoughts",
+   "description": "Observing a thought as a thought, an event that comes and goes, not a fact or a command",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": "acceptance",
+   "skillKind": "hold",
+   "direction": "neutral",
+   "addresses": []
+  },
   "dbt_nightmare_protocol": {
    "appToolId": "nightmare-rescript",
    "name": "Nightmare Protocol",

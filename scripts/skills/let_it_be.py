@@ -305,6 +305,9 @@ STEPS = [
             {"exit": "fast", "when": {"eq": [a("hands_still"), "boundary"]}},
             {"exit": "good_things", "when": {"eq": [a("hands_still"), "small"]}},
             {"exit": "please_skill", "when": {"eq": [a("hands_still"), "body"]}},
+            # The willful threat (PRD DT-04 step 3) as a thought to watch, not argue with (DT-08).
+            # Not after Louder: the body first (First, the body above).
+            {"exit": "thoughts", "when": {"all": [{"set": a("threat")}, {"not": {"eq": [a("close"), "worse"]}}]}},
         ],
         "done": "done", "links": [SAFETY_LINK],
     },
@@ -334,6 +337,7 @@ STEPS[[s["id"] for s in STEPS].index("close")]["fields"][0]["askFresh"] = "thenV
 
 EXITS = [
     {"id": "problem_solve", "toolId": "problem-solve"},                  # ER-12: check what can change first
+    {"id": "thoughts", "toolId": "thoughts-passing"},                    # DT-08: the threat as a thought
     {"id": "ending", "toolId": "ending-relationships", "query": {"frame": "careful"}},  # IE-08, still happening
     {"id": "recover", "toolId": "recovering-from-invalidation"},         # meet the need somewhere else (WMP)
     {"id": "fast", "toolId": "fast"},                                    # IE-05 a line to hold your ground
