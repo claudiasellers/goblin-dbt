@@ -95,7 +95,7 @@ const mockNote = 'text-[11px] uppercase tracking-wide text-[var(--color-text-ter
 
 /**
  * What the host shows once a card or step hands back (Today drops the card, DEAR MAN goes on): the host's
- * next thing takes focus, as TodayStack and DearMan.tsx move it, so focus never falls to the page.
+ * next thing takes focus, as TodayStack moves it, so focus never falls to the page.
  */
 function HostNext({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLParagraphElement>(null);

@@ -90,6 +90,4 @@ test("CheckIn sends band source, FTF blank and the surface; DEAR MAN's debrief n
   assert.match(ci, /\.\.\.\(ftfBlank\.current \? \{ blank: true \} : \{\}\)/);
   assert.match(ci, /surface: 'checkin'/);
   assert.match(read("src/pages/tools/FindTheFeeling.tsx"), /blank: state\.pull === 'blank'/);
-  const dm = read("src/pages/tools/DearMan.tsx");
-  assert.doesNotMatch(dm, /surface: 'dear_man_debrief'|recommendationCards/);
 });

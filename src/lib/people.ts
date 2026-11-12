@@ -96,12 +96,9 @@ export function pickerCopy(c: Partial<Record<string, string>> | null | undefined
   return c as PersonPickerCopy;
 }
 
-/** The safety route screen's copy (DearManSafetyCopy). */
-export const PERSON_SAFETY_ROUTE_COPY = ['safetyRouteHeading', 'safetyRouteBody', 'safetyRouteEnding', 'safetyRouteBack'] as const;
-
 /**
  * The picker's answer folded back into the list it was picked from, for this visit (the mounted `people` slice
- * doesn't reload after a keep or edit). A kept person answered again carries the new answer, dated now when it was
+ * doesn't reload after a keep or edit; PersonFirstSkill keeps it for the visit). A kept person answered again carries the new answer, dated now when it was
  * asked (stale before, or changed); a newly kept person goes first. Without this, *This is about someone else* would
  * offer the old answer, a fresh *Yes, mostly* for someone just named as dangerous.
  */

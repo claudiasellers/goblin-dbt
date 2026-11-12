@@ -11118,7 +11118,19 @@
               {
                 "to": "who",
                 "when": {
-                  "set": "$p.parts"
+                  "all": [
+                    {
+                      "set": "$p.parts"
+                    },
+                    {
+                      "not": {
+                        "eq": [
+                          "$ctx.band",
+                          "flooded"
+                        ]
+                      }
+                    }
+                  ]
                 }
               },
               {

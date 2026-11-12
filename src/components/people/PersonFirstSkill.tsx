@@ -11,7 +11,7 @@ import { resumeRun, type RunContext } from '../../lib/skillRuntime/machine';
 import { emotions } from '../../data/emotions';
 import { presetPerson } from '../../lib/dearManDebrief';
 import { personFirstPickerCopy, personFirstSafetyCopy, recordedPersonCtx, reopenGate, resumeAfterPicker, RUN_ID } from '../../lib/personFirst';
-import type { KeptPerson, PickedPerson } from '../../lib/people';
+import { withAnswer, type KeptPerson, type PickedPerson } from '../../lib/people';
 
 /**
  * A skill that asks who first (DEAR MAN's debrief and One message, Say no; people.md): the person picker, with the safety question
@@ -47,6 +47,10 @@ export function PersonFirstSkill({ skillId, toolId, questionKey, headingKey, ctx
   const [runCtx, setRunCtx] = useState<RunContext | null>(null);
   const [picked, setPicked] = useState<PickedPerson | null>(null);
   const [pickerKey, setPickerKey] = useState(0);
+  // The answers given this visit, folded into the kept list (withAnswer): the mounted slice doesn't reload after a keep
+  // or edit, so without this *This is about someone else* would offer the old answer, a fresh *Yes, mostly* for
+  // someone just named as dangerous (D4).
+  const [answered, setAnswered] = useState<KeptPerson[] | null>(null);
 
   const [attempt, setAttempt] = useState(0);
   useEffect(() => {
@@ -84,8 +88,9 @@ export function PersonFirstSkill({ skillId, toolId, questionKey, headingKey, ctx
   // A link's person: kept, answer fresh, not the safety route (else the picker asks). Dropped once the picker is used.
   const [openedAt] = useState(() => Date.now());
   const [usePreset, setUsePreset] = useState(true);
-  const preset = useMemo(() => (settled && usePreset ? presetPerson(profile.slices?.people ?? null, q.get('person'), openedAt) : null),
-    [settled, usePreset, profile.slices, q, openedAt]);
+  const people = answered ?? profile.slices?.people ?? null;
+  const preset = useMemo(() => (settled && usePreset ? presetPerson(people, q.get('person'), openedAt) : null),
+    [settled, usePreset, people, q, openedAt]);
 
   // Fail closed (Gate 3): never the skill without who it's with and the safety question.
   if (copyFailed) return <ToolLoadError onRetry={() => { setCopyFailed(false); setCopy(null); setAttempt((n) => n + 1); }} />;
@@ -105,9 +110,9 @@ export function PersonFirstSkill({ skillId, toolId, questionKey, headingKey, ctx
 
   if (!who) {
     return (
-      <PersonPicker key={pickerKey} people={profile.slices?.people ?? null} copy={pickerCopy}
+      <PersonPicker key={pickerKey} people={people} copy={pickerCopy}
         signedIn={profile.status !== 'signed-out' && profile.status !== 'error'}
-        onDone={setPicked} />
+        onDone={(p) => { setAnswered(withAnswer(people, p, new Date().toISOString())); setPicked(p); }} />
     );
   }
   if (who.route === 'safety') {
@@ -116,5 +121,5 @@ export function PersonFirstSkill({ skillId, toolId, questionKey, headingKey, ctx
         onBack={() => { setPicked(null); setUsePreset(false); setPickerKey((k) => k + 1); }} />
     );
   }
-  return <SkillPlayer skillId={skillId} ctx={ctxFor(who, profile.slices?.people ?? null)} {...(reopening ? { resumeRecord: resumeAfterPicker(checked, who) } : {})} />;
+  return <SkillPlayer skillId={skillId} ctx={ctxFor(who, people)} {...(reopening ? { resumeRecord: resumeAfterPicker(checked, who) } : {})} />;
 }

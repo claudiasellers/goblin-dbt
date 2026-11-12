@@ -4,7 +4,7 @@
 // what the ways in carry. The projection is pinned in functions/test/unit/dearManPrep.test.cjs.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { importTs } from "./lib/importTs.mjs";
 
 const read = (f) => readFileSync(f, "utf8");
@@ -145,6 +145,9 @@ test("skill: parts on with a kept part: who might show up comes after the barrie
   assert.equal(s.stepId, "who");
   const off = play([pick("situation", "ask"), next, pick("matters", "objective"), next, next, next]);
   assert.equal(off.stepId, "describe");
+  // Never on a carried flooded reading (the old page's showCopeAhead rule).
+  const flooded = play([pick("situation", "ask"), next, pick("matters", "objective"), next, next, next], ctx({ band: "flooded" }, { parts: [{ id: "p1", name: "the worrier" }] }));
+  assert.equal(flooded.stepId, "describe");
 });
 
 test("skill: the debrief is one quiet link from the first screen (the old page's entry choice)", () => {
@@ -218,6 +221,7 @@ test("page: the prep's ways in carry ids only (Recover: the situation, the feeli
   const handoff = { source: "recovering-from-invalidation", emotionId: "dismissed", emotionName: "Dismissed", needLabel: "To be heard", intensity: 6, band: "stirred", bandAt: "2026-11-12T09:55:00Z", waitMinutes: 0, oneMessageOnly: false };
   assert.deepEqual(PREP.prepEntryCtx({ dearManHandoff: handoff }, now), { situationId: "address", feelingId: "feel_dismissed", band: "stirred" });
   assert.deepEqual(PREP.prepEntryCtx({ dearManHandoff: { ...handoff, bandAt: "2026-11-12T09:00:00Z" } }, now), { situationId: "address", feelingId: "feel_dismissed" }, "a stale band isn't carried");
+  assert.equal(PREP.prepEntryCtx({ dearManHandoff: { ...handoff, band: "flooded" } }, now).band, "flooded", "a fresh flooded reading from Recover is carried, never dropped");
   assert.deepEqual(PREP.prepEntryCtx({ checkinEmotions: ["Hurt", "Angry"] }, now), { feelingId: "feel_hurt" });
   assert.deepEqual(PREP.prepEntryCtx(null, now), {});
   for (const v of Object.values(PREP.prepEntryCtx({ dearManHandoff: handoff }, now))) assert.match(v, /^[a-z_]+$/);
@@ -227,10 +231,14 @@ test("page: the prep's ways in carry ids only (Recover: the situation, the feeli
     { situationId: "address", personId: "none", frame: "heads_up" });
 });
 
-test("page: the prep plays on PersonFirstSkill (the picker and safety question first); the hand-built page stays for an old ?resume= draft", () => {
+test("page: the prep plays on PersonFirstSkill (the picker and safety question first); the hand-built page is gone, an old ?resume= link opens this", () => {
   const page = read("src/components/tools/dearMan/DearManPrepSkill.tsx");
   assert.match(page, /<PersonFirstSkill skillId="dear_man_prep" toolId="dear-man" questionKey="personWho" headingKey="safetyRouteHeading"/);
-  assert.equal(PREP.PREP_ON_PLAYER, true, "rolling back is flipping this");
+  const dm = read("src/pages/tools/DearMan.tsx");
+  assert.match(dm, /return <Suspense fallback=\{<ToolLoading \/>\}><LazyDearManPrepSkill \/><\/Suspense>;\n\}/, "no mode, any query (?resume= too): the prep skill");
+  assert.doesNotMatch(dm, /peekResumeToken|resumeLink|<DearManPrep \/>|PREP_ON_PLAYER/);
+  assert.match(dm, /useEffect\(\(\) => \{ if \(resumeId\) dropResumeToken\(resumeId\); \}, \[resumeId\]\);/, "an old link's draft (own words) doesn't stay on the device");
+  assert.ok(!existsSync("src/lib/dearManResume.ts"), "the hand-built prep's resume draft went with it");
   for (const k of ["picker_personWho", "picker_safetyRouteHeading", "picker_safeQuestion", "picker_riskHarm"]) assert.ok(skill.copy[k], k);
   assert.match(read("src/lib/skillRuntime/playerTools.ts"), /'dear-man': \['dear_man_debrief', 'dear_man_one', 'dear_man_prep'\]/);
   assert.match(read("functions/src/skills/projections.ts"), /await projectDearManPrep\(tx, input\);/);

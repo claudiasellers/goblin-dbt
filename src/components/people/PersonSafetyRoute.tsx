@@ -8,7 +8,7 @@ import { linkButton, secondaryText } from '../tools/oppositeAction/styles';
 
 /**
  * The safety route (IE-03 + D4, PRD IE-01 step 0): someone who might hurt or control the person, or *I'd rather
- * not say*. No plan to bring things up with them is offered (plan C6.6, and saveDearManSession refuses one); the
+ * not say*. No plan to bring things up with them is offered (plan C6.6, and the prep writes none: saveDearManSession refused one, its projection writes nothing); the
  * other-person resources (CrisisBanner's other_person variant: it holds the numbers), and Ending a relationship
  * that's hurting you in its safety branch (`?frame=careful`), offered and never pushed. *This is about someone
  * else* goes back to the picker. Nothing locks: the person can leave by any route, Quick exit included (the other

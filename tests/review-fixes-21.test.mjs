@@ -36,9 +36,3 @@ test("'come back later' chips schedule once per tap, and the outcome card stays 
   assert.match(readFileSync("src/contexts/TodayContext.tsx", "utf8"), /\.catch\(\(\) => \{ if \(live\) setData\(\(prev\) => \(prev && prev\.uid === uid \? prev :/);
 });
 
-test("DEAR MAN pass-through keeps a flooded hand-off from Recover and the resume note", () => {
-  const d = readFileSync("src/pages/tools/DearMan.tsx", "utf8");
-  assert.match(d, /if \(h\.band && h\.bandAt && fresh\) \{/);
-  assert.doesNotMatch(d, /fresh && h\.band !== 'flooded'/);
-  assert.match(d, /setResumeNote\(\(n\) => \(n && n\.phase === 'check' \? \{ \.\.\.n, phase: t\.phase \} : n\)\);/);
-});
