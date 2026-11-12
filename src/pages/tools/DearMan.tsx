@@ -1,6 +1,7 @@
-import { Suspense, lazy, useState } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ToolLoading } from '../../components/tools/ToolLoading';
+import { dropResumeToken } from '../../lib/resumeToken';
 
 const LazyDearManOne = lazy(() => import('../../components/tools/dearMan/DearManOne').then((m) => ({ default: m.DearManOne })));
 const LazyDearManDebrief = lazy(() => import('../../components/tools/dearMan/DearManDebrief').then((m) => ({ default: m.DearManDebrief })));
@@ -10,11 +11,14 @@ const LazyDearManPrepSkill = lazy(() => import('../../components/tools/dearMan/D
  * DEAR MAN's page: the prep (`dear_man_prep`, docs/design/dear-man-prep.md), the debrief (`?mode=debrief`,
  * docs/design/dear-man-debrief.md) or One message (`?mode=one`, docs/design/one-message.md), each on the skill player
  * after who it's with. The mode is read once: a link to another mode is a new visit (ToolPage keys the session by
- * location). The hand-built prep is gone (IE-B4); an old `?resume=` link from it opens the prep fresh.
+ * location). The hand-built prep is gone (IE-B4); an old `?resume=` link from it opens the prep fresh, and its
+ * device-only draft (own words) is dropped then, as opening it used to.
  */
 export function DearMan() {
   const { search } = useLocation();
   const [mode] = useState(() => new URLSearchParams(search).get('mode'));
+  const [resumeId] = useState(() => new URLSearchParams(search).get('resume'));
+  useEffect(() => { if (resumeId) dropResumeToken(resumeId); }, [resumeId]);
   if (mode === 'debrief') return <Suspense fallback={<ToolLoading />}><LazyDearManDebrief /></Suspense>;
   if (mode === 'one') return <Suspense fallback={<ToolLoading />}><LazyDearManOne /></Suspense>;
   return <Suspense fallback={<ToolLoading />}><LazyDearManPrepSkill /></Suspense>;

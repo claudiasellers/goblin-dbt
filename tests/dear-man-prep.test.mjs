@@ -145,6 +145,9 @@ test("skill: parts on with a kept part: who might show up comes after the barrie
   assert.equal(s.stepId, "who");
   const off = play([pick("situation", "ask"), next, pick("matters", "objective"), next, next, next]);
   assert.equal(off.stepId, "describe");
+  // Never on a carried flooded reading (the old page's showCopeAhead rule).
+  const flooded = play([pick("situation", "ask"), next, pick("matters", "objective"), next, next, next], ctx({ band: "flooded" }, { parts: [{ id: "p1", name: "the worrier" }] }));
+  assert.equal(flooded.stepId, "describe");
 });
 
 test("skill: the debrief is one quiet link from the first screen (the old page's entry choice)", () => {
@@ -218,6 +221,7 @@ test("page: the prep's ways in carry ids only (Recover: the situation, the feeli
   const handoff = { source: "recovering-from-invalidation", emotionId: "dismissed", emotionName: "Dismissed", needLabel: "To be heard", intensity: 6, band: "stirred", bandAt: "2026-11-12T09:55:00Z", waitMinutes: 0, oneMessageOnly: false };
   assert.deepEqual(PREP.prepEntryCtx({ dearManHandoff: handoff }, now), { situationId: "address", feelingId: "feel_dismissed", band: "stirred" });
   assert.deepEqual(PREP.prepEntryCtx({ dearManHandoff: { ...handoff, bandAt: "2026-11-12T09:00:00Z" } }, now), { situationId: "address", feelingId: "feel_dismissed" }, "a stale band isn't carried");
+  assert.equal(PREP.prepEntryCtx({ dearManHandoff: { ...handoff, band: "flooded" } }, now).band, "flooded", "a fresh flooded reading from Recover is carried, never dropped");
   assert.deepEqual(PREP.prepEntryCtx({ checkinEmotions: ["Hurt", "Angry"] }, now), { feelingId: "feel_hurt" });
   assert.deepEqual(PREP.prepEntryCtx(null, now), {});
   for (const v of Object.values(PREP.prepEntryCtx({ dearManHandoff: handoff }, now))) assert.match(v, /^[a-z_]+$/);
@@ -232,7 +236,8 @@ test("page: the prep plays on PersonFirstSkill (the picker and safety question f
   assert.match(page, /<PersonFirstSkill skillId="dear_man_prep" toolId="dear-man" questionKey="personWho" headingKey="safetyRouteHeading"/);
   const dm = read("src/pages/tools/DearMan.tsx");
   assert.match(dm, /return <Suspense fallback=\{<ToolLoading \/>\}><LazyDearManPrepSkill \/><\/Suspense>;\n\}/, "no mode, any query (?resume= too): the prep skill");
-  assert.doesNotMatch(dm, /ResumeToken|resumeLink|<DearManPrep \/>|PREP_ON_PLAYER/);
+  assert.doesNotMatch(dm, /peekResumeToken|resumeLink|<DearManPrep \/>|PREP_ON_PLAYER/);
+  assert.match(dm, /useEffect\(\(\) => \{ if \(resumeId\) dropResumeToken\(resumeId\); \}, \[resumeId\]\);/, "an old link's draft (own words) doesn't stay on the device");
   assert.ok(!existsSync("src/lib/dearManResume.ts"), "the hand-built prep's resume draft went with it");
   for (const k of ["picker_personWho", "picker_safetyRouteHeading", "picker_safeQuestion", "picker_riskHarm"]) assert.ok(skill.copy[k], k);
   assert.match(read("src/lib/skillRuntime/playerTools.ts"), /'dear-man': \['dear_man_debrief', 'dear_man_one', 'dear_man_prep'\]/);

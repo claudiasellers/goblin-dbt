@@ -74,6 +74,26 @@ test("a kept person with a fresh harm answer is the safety route again, without 
   assert.equal(p.personId, kept().id);
 });
 
+test("an answer given this visit replaces the mounted list's: no stale safe answer after Things changed", () => {
+  const iso = new Date(NOW).toISOString();
+  const k = kept();
+  const harm = { personId: k.id, label: k.label, role: k.role, safe: "no", risk: "harm", route: "safety" };
+  const [after] = people.withAnswer([k], harm, iso);
+  assert.equal(after.risk, "harm");
+  assert.equal(after.safeAskedAt, iso);
+  assert.equal(people.pickedKept(after).route, "safety", "picked again: the safety route, not the old yes");
+  assert.equal(people.withAnswer([k], people.pickedKept(k), iso)[0].safeAskedAt, k.safeAskedAt);
+  const fresh = people.withAnswer([k], { personId: "new-id", label: "Jo", role: "boss", safe: "yes", risk: "none", route: "ok" }, iso);
+  assert.deepEqual(fresh.map((x) => x.id), ["new-id", k.id]);
+  assert.deepEqual(people.withAnswer([k], { ...harm, personId: null }, iso), [k]);
+  // Every skill that asks who first (the prep, the debrief, One message, Say no, Give) keeps the visit's answers:
+  // *This is about someone else* after the safety route offers the new answer, never the old fresh yes.
+  const first = read("src/components/people/PersonFirstSkill.tsx");
+  assert.match(first, /const people = answered \?\? profile\.slices\?\.people \?\? null;/);
+  assert.match(first, /onDone=\{\(p\) => \{ setAnswered\(withAnswer\(people, p, new Date\(\)\.toISOString\(\)\)\); setPicked\(p\); \}\}/);
+  assert.match(first, /presetPerson\(people, q\.get\('person'\), openedAt\)/);
+});
+
 test("what gets kept: only someone named, only signed in; the screen's keep line names them first", () => {
   const d = { personId: null, label: "  Sam ", role: "parent" };
   const iso = "2026-11-11T12:00:00.000Z";

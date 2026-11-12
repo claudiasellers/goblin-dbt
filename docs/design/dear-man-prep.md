@@ -157,6 +157,26 @@ nothing in the app calls them. Kept for ports still open: `src/lib/dearManHurt.t
 and `src/lib/copeAhead.ts` with `CopeAheadStep` (Cope Ahead's hand-built page and the parts review use them).
 The old page's source pins went with it; what they guarded on the skill is pinned in `tests/dear-man-prep.test.mjs`.
 
+What the old page did that the skill now does too (Gate 3 on the deletion):
+- **The visit's answers.** `PersonFirstSkill` folds each answer given this visit into the kept list (`withAnswer`,
+  restored from the old page). Without that, *This is about someone else* after a harm answer offered the old fresh
+  *Yes*, and the prep ran for someone just named as dangerous. This holds for every person-first skill.
+- **No plan with someone on the safety route.** The projection writes nothing then, as `saveDearManSession` refused.
+- **Scared of them.** *I'm scared of what they'd do* sets the person's `safetyRecheckAt`, as Say no and Give do, so
+  the next visit asks again.
+- **Flooded.** *Who might show up* (parts) is skipped on a carried flooded reading, as `showCopeAhead` did.
+- **Much quieter.** A P2 reread of *much quieter* drops the carried band, so the heads-up never says it's still loud
+  (R3; the player does this for every skill).
+- **Old drafts.** An old `?resume=` link drops its device draft as it opens, as the old page did.
+
+No per-step parity test against the old page (C8.5): it is deleted, and what its pins guarded that still matters is
+pinned on the skill (never a lock, scared, Rehearse it, `ask_outcome`, Let go after a refusal, the carried band).
+`copeReady` / `copeExt` in `src/lib/copeAhead.ts` are kept with that file (only tests read them now) for the parts
+review's DEAR MAN surface until the parts port decides it.
+
+Not carried: the *Carried over* card from Recover (the situation and feeling chips are offered instead), and Recover's
+word kept as own words when no chip matches.
+
 ## Still in IE-B4
 
 Recover drops `boundaryLocked` and `tooHot` (built 12 Nov, the second PR: [`recover-from-invalidation.md`](recover-from-invalidation.md)); IE-06 Keep it warm (built 12 Nov, [`give.md`](give.md)); IE-12's thoughts about asking (built 12 Nov, above); Let go inline (built 12 Nov, [`fast.md`](fast.md));

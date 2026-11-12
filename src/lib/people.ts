@@ -95,3 +95,28 @@ export function pickerCopy(c: Partial<Record<string, string>> | null | undefined
   for (const k of PERSON_PICKER_COPY) if (typeof c[k] !== 'string' || !c[k]) return null;
   return c as PersonPickerCopy;
 }
+
+/**
+ * The picker's answer folded back into the list it was picked from, for this visit (the mounted `people` slice
+ * doesn't reload after a keep or edit; PersonFirstSkill keeps it for the visit). A kept person answered again carries the new answer, dated now when it was
+ * asked (stale before, or changed); a newly kept person goes first. Without this, *This is about someone else* would
+ * offer the old answer, a fresh *Yes, mostly* for someone just named as dangerous.
+ */
+export function withAnswer(people: readonly KeptPerson[] | null, p: PickedPerson, nowIso: string): KeptPerson[] | null {
+  if (!p.personId) return people ? [...people] : null;
+  const list = people ?? [];
+  const old = list.find((k) => k.id === p.personId);
+  if (old) {
+    const changed = old.safe !== p.safe || old.risk !== p.risk;
+    const asked = changed || needsSafetyAsk(old, Date.parse(nowIso));
+    return list.map((k) => (k.id === p.personId
+      ? { ...k, safe: p.safe, risk: p.risk, safeAskedAt: asked ? nowIso : k.safeAskedAt }
+      : k));
+  }
+  if (!p.label) return [...list];
+  const meta = {
+    id: p.personId, kind: 'person', area: 'my_people', status: 'active', source: 'user',
+    confirmedAt: nowIso, revisitAt: null, prompt: 'none',
+  } as KeptPerson['meta'];
+  return [{ id: p.personId, label: p.label, role: p.role, safe: p.safe, risk: p.risk, safeAskedAt: nowIso, refusalsValidation: 0, safetyRecheckAt: null, meta }, ...list];
+}

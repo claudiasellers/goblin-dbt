@@ -102,7 +102,7 @@ test('not as far as the card: nothing written', async () => {
   assert.equal(P.prepReachedCard({ path: 'card' }), false);
 });
 
-test('nobody, the safety route or a malformed id links no one; another skill\'s run is not a prep', async () => {
+test('nobody or a malformed id links no one; the safety route writes no plan; another skill\'s run is not a prep', async () => {
   const none = fakeTx();
   await P.projectDearManPrep(none, input(run(PLAN, { personId: 'none' })));
   assert.equal(none.calls.some((c) => c.query === D.PERSON_RISK_QUERY), false);
@@ -110,7 +110,7 @@ test('nobody, the safety route or a malformed id links no one; another skill\'s 
   for (const risk of ['harm', 'unstated']) {
     const unsafe = fakeTx((q) => (q === D.PERSON_RISK_QUERY ? [{ v: JSON.stringify({ risk }) }] : undefined));
     await P.projectDearManPrep(unsafe, input(run(PLAN, { personId: PERSON })));
-    assert.equal(writes(unsafe)[0].params.personKey, null, risk);
+    assert.equal(writes(unsafe).length, 0, `${risk}: no plan with someone on the safety route (D4)`);
   }
   const bad = fakeTx();
   await P.projectDearManPrep(bad, input(run(PLAN, { personId: 'not-a-uuid' })));
@@ -118,4 +118,16 @@ test('nobody, the safety route or a malformed id links no one; another skill\'s 
   const other = fakeTx();
   await P.projectDearManPrep(other, input({ ...run(PLAN), skillId: 'dear_man_one' }));
   assert.equal(other.calls.length, 0);
+});
+
+test('scared of what they\'d do: no plan, and the person\'s safety answer goes stale (safetyRecheckAt)', async () => {
+  const scaredRun = run([ans('situation', 'ask'), ans('matters', 'objective'), ans('hard', 'scared')], { personId: PERSON }, ['situation', 'matters', 'hard', 'scared']);
+  assert.equal(P.prepScared(scaredRun), true);
+  const tx = fakeTx();
+  await P.projectDearManPrep(tx, input(scaredRun));
+  assert.deepEqual(tx.calls.map((c) => c.query), [D.SAFETY_RECHECK]);
+  assert.equal(tx.calls[0].params.personKey, `u1:${PERSON}`);
+  const nobody = fakeTx();
+  await P.projectDearManPrep(nobody, input(run([ans('hard', 'scared')], { personId: 'none' }, ['hard', 'scared'])));
+  assert.equal(nobody.calls.length, 0, 'nobody kept: nothing to mark');
 });

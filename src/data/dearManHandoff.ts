@@ -26,7 +26,8 @@ export interface DearManHandoff {
   waitCopy?: WaitLockCopy;
   /**
    * The ProtectedHurt id picked on Recover's angry-part card. Absent after "Not sure" or "Not now", or
-   * when no card showed. DEAR MAN offers its felt phrase as the first "I felt" chip (src/lib/dearManHurt.ts).
+   * when no card showed. Not carried into DEAR MAN's prep skill yet (docs/design/dear-man-prep.md, Not yet; the chip
+   * rules are src/lib/dearManHurt.ts).
    */
   hurtId?: string;
 }
