@@ -37,9 +37,12 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
   assert.deepEqual(types.PROFILE_NEEDS.witness, ["name", "ownLines", "savedLines"], "R16");
   assert.deepEqual(types.PROFILE_NEEDS["five-senses"], ["parts"], "the tag row on its close");
   assert.deepEqual(types.PROFILE_NEEDS.pause, ["parts", "prosCons"], "the tag row on its urge close; the kept card's replay (DT-10)");
-  // The kept pros & cons cards (DT-10): only Hold to wait replays them; Me reads every kept item through getMe.
+  // The kept pros & cons cards (DT-10): Hold to wait replays them and the crisis kit (DT-03) plays them as cards; Me
+  // reads every kept item through getMe.
+  assert.deepEqual(types.PROFILE_NEEDS["crisis-kit"], ["crisisKit", "prosCons"], "the kept kit and pros & cons cards (DT-03)");
   for (const [consumer, needs] of Object.entries(types.PROFILE_NEEDS)) {
-    if (consumer !== "pause") assert.ok(!needs.includes("prosCons"), `${consumer} reads prosCons`);
+    if (!["pause", "crisis-kit"].includes(consumer)) assert.ok(!needs.includes("prosCons"), `${consumer} reads prosCons`);
+    if (consumer !== "crisis-kit") assert.ok(!needs.includes("crisisKit"), `${consumer} reads crisisKit`);
   }
   assert.deepEqual(types.PROFILE_NEEDS["urge-surfing"], ["parts"], "the tag row on its urge close");
   assert.deepEqual(types.PROFILE_NEEDS["check-the-facts"], ["parts"], "the tag row on its close");

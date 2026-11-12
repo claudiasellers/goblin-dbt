@@ -496,6 +496,9 @@ SAFETY_COPY = {"id": "dear_man_safety_copy",
     "safetyRouteSayNoHeading": "With {who}, your safety comes first. Working out how to say no can wait.",
     "personWhoOne": "Who's the message for?",
     "safetyRouteOneHeading": "A message to {who} can wait. Your safety comes first.",
+    # Keep it warm (IE-06, IE-B4; docs/design/give.md): PRD, keeping it warm isn't your job with someone who isn't safe.
+    "personWhoGive": "Who's it with?",
+    "safetyRouteGiveHeading": "Keeping it warm isn't your job with {who}. Your safety comes first.",
     # The prep's saved screen: when it is, so "How did it go?" comes after (the ask_outcome follow-up). Names no one.
     "askOutcomeQuestion": "When is the conversation? I can ask how it went, after.",
     "askOutcomeToday": "Later today",

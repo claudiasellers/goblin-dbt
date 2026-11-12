@@ -1498,6 +1498,17 @@ SET dialectical_abstinence += {
   skill_type: "crisis_survival"
 };
 
+// DT crisis survival skills gathered ahead of time (PRD DT-03; the coping step of Stanley–Brown's safety plan);
+// My crisis kit (docs/design/crisis-kit.md).
+MERGE (crisis_kit:TherapyConcept {id: "dbt_crisis_survival_kit"})
+SET crisis_kit += {
+  name: "Crisis Survival Kit",
+  description: "The person's own crisis survival skills, picked on a calmer day and handed back one card at a time when they can't think straight: body, distraction, self-soothe, encouragement, a safe place and reasons to get through",
+  modality: "DBT",
+  module: "Distress Tolerance",
+  skill_type: "crisis_survival"
+};
+
 
 // ============================================================
 // MINDFULNESS AS CROSS-MODALITY CONCEPT

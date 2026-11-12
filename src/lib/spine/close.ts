@@ -18,6 +18,9 @@ export const TOOL_CLOSE_KIND: Record<string, { module: SpineModule; closeKind: C
   'thoughts-passing': { module: 'dt', closeKind: 'regulation_down' },
   'pros-cons': { module: 'dt', closeKind: 'none' },
   'habit-plan': { module: 'dt', closeKind: 'none' },
+  // My crisis kit (DT-03, docs/design/crisis-kit.md): opening it asks how it is now in the flow, once, after the cards
+  // (askFresh thenVsNow, no SessionClose after it); making it ends with no close.
+  'crisis-kit': { module: 'dt', closeKind: 'regulation_down' },
   'alternate-rebellion': { module: 'dt', closeKind: 'urge' },
   'problem-solve': { module: 'er', closeKind: 'plan' },
   'cope-ahead': { module: 'er', closeKind: 'none' },
@@ -33,6 +36,7 @@ export const TOOL_CLOSE_KIND: Record<string, { module: SpineModule; closeKind: C
   'fast': { module: 'ie', closeKind: 'regulation_down' },
   'ending-relationships': { module: 'ie', closeKind: 'none' },
   'say-no': { module: 'ie', closeKind: 'none' },
+  'give': { module: 'ie', closeKind: 'none' },
   'recovering-from-invalidation': { module: 'wmp', closeKind: 'none' },
   'meet-a-part': { module: 'mf', closeKind: 'orienting' },
   'two-pulls': { module: 'mf', closeKind: 'orienting' },

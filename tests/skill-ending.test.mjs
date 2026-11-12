@@ -150,7 +150,7 @@ test("IE Handout 13: harmful, interfering, hard right now, not sure; not destruc
   assert.equal(run(toDecide("hard")).stepId, "try_first");
   const change = run([...toDecide("hard"), ...answer("try", "try")]);
   assert.equal(change.stepId, "change");
-  assert.deepEqual(change.offered, ["dear_man", "problem_solve"], "GIVE is planned (IE-06)");
+  assert.deepEqual(change.offered, ["dear_man", "give", "problem_solve"], "Keep it warm shipped (IE-06)");
   assert.equal(run([...toDecide("hard"), ...answer("try", "still")]).stepId, "decide");
   // Not sure: wise mind as a link (pros and cons planned); the decision's title says it's OK not to know.
   const unsure = run([...safe, pick("what", "unsure")]);

@@ -251,6 +251,51 @@
         "notification": "Ready to look back?"
       },
       {
+        "id": "break_return",
+        "ownerModule": "ie",
+        "tier": "quality",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/give?run={sourceSessionId}&at=back&followUp={followUpId}",
+        "staleAfterHours": 48,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "When you're ready.",
+          "title": "Time to go back?"
+        },
+        "choices": [
+          {
+            "id": "dismiss",
+            "label": "No need",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "chips": {
+            "m30": {
+              "kind": "after",
+              "minutes": 30
+            },
+            "m60": {
+              "kind": "after",
+              "minutes": 60
+            },
+            "tomorrow": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "10:00"
+            }
+          },
+          "kind": "chip"
+        },
+        "notification": "Time to go back?"
+      },
+      {
         "id": "check_fact",
         "ownerModule": "er",
         "tier": "quality",
@@ -1359,6 +1404,53 @@
           "minutes": 60
         },
         "notification": "A check-in you asked for is ready."
+      },
+      {
+        "id": "repair_outcome",
+        "ownerModule": "ie",
+        "tier": "quality",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/give?run={sourceSessionId}&at=repaired&followUp={followUpId}",
+        "staleAfterHours": 120,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "A few taps, when you're ready.",
+          "title": "How did it go?"
+        },
+        "choices": [
+          {
+            "id": "dismiss",
+            "label": "No need",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "chips": {
+            "this_week": {
+              "days": 4,
+              "kind": "at_local",
+              "time": "19:00"
+            },
+            "today": {
+              "days": 0,
+              "kind": "at_local",
+              "time": "20:00"
+            },
+            "tomorrow": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "19:00"
+            }
+          },
+          "kind": "chip"
+        },
+        "notification": "How did it go?"
       },
       {
         "id": "resume_skill",

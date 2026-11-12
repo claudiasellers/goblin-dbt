@@ -5007,6 +5007,1144 @@
         }
       },
       {
+        "id": "crisis_kit_build",
+        "toolId": "crisis-kit",
+        "version": "kit-v1",
+        "start": "body",
+        "accepts": [
+          "band",
+          "frame"
+        ],
+        "ownMax": 80,
+        "emotionFields": [],
+        "copy": {
+          "body_title": "Let's make your kit. What helps your body when it's loud?",
+          "body_hint": "Pick up to three, or skip. You can change it any time.",
+          "heads_up_title": "Your body's loud right now. A kit is easier to make on a calmer day.",
+          "heads_up_hint": "You can open a starter kit now, settle first, or keep making it.",
+          "settle_line": "The kit can wait for a steadier moment.",
+          "hands_title": "What keeps your hands and head busy?",
+          "hands_hint": "Something that takes a bit of attention. Up to three, or skip.",
+          "soothe_title": "What feels soothing?",
+          "soothe_hint": "Pick by what you can touch, smell, hear or see. Up to three, or skip.",
+          "words_title": "What would you want to hear on a hard night?",
+          "words_hint": "Pick up to three, or write one in your own words. Your words count most.",
+          "place_title": "Is there a place you go to in your mind that feels safe?",
+          "place_hint": "Somewhere real or made up. Describe it if you like. Skip it if this isn't for you.",
+          "reasons_title": "What are your reasons to get through a hard night?",
+          "reasons_hint": "Pick what's true, or write your own. Skip it if you like.",
+          "own": "In my words",
+          "place_own": "Describe it",
+          "keep_title": "Keep this kit? It opens from Help me now and from Tools.",
+          "keep_title_has": "Keep this kit? It replaces the one you have now.",
+          "keep_hint": "Your pros & cons cards go in by themselves.",
+          "keep_primary": "Next",
+          "end_kept": "It's kept. Try one card on an ordinary hard day this week, so it feels familiar when you need it.",
+          "end_not_kept": "That's fine. You can make it whenever you like.",
+          "end_empty": "Nothing picked this time. The starter kit is there whenever you need it.",
+          "end_line": "It opens one card at a time.",
+          "open_kit": "Open my kit",
+          "cold_caution": "Skip this with heart trouble, fainting, an eating disorder, pregnancy, a cold allergy, or after drinking or using today. Never in a shower or a bath. Cold, not ice-cold.",
+          "safety_open": "Talk to someone now",
+          "next": "Next",
+          "done": "Done"
+        },
+        "tables": {},
+        "derive": [],
+        "steps": [
+          {
+            "id": "body",
+            "kind": "ask",
+            "title": "body_title",
+            "hint": "body_hint",
+            "fields": [
+              {
+                "id": "body",
+                "options": {
+                  "list": "body"
+                },
+                "max": 3,
+                "required": false,
+                "own": {
+                  "hint": "own",
+                  "countsAsPick": true
+                },
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "heads_up",
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "flooded"
+                  ]
+                }
+              },
+              {
+                "to": "hands",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "heads_up",
+            "kind": "ask",
+            "title": "heads_up_title",
+            "hint": "heads_up_hint",
+            "fields": [
+              {
+                "id": "heads_up",
+                "options": {
+                  "list": "heads_up"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "settle",
+                "when": {
+                  "in": [
+                    "$a.heads_up",
+                    [
+                      "open",
+                      "settle"
+                    ]
+                  ]
+                }
+              },
+              {
+                "to": "hands",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "hands",
+            "kind": "ask",
+            "title": "hands_title",
+            "hint": "hands_hint",
+            "fields": [
+              {
+                "id": "hands",
+                "options": {
+                  "list": "hands"
+                },
+                "max": 3,
+                "required": false,
+                "own": {
+                  "hint": "own",
+                  "countsAsPick": true
+                },
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "soothe",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "soothe",
+            "kind": "ask",
+            "title": "soothe_title",
+            "hint": "soothe_hint",
+            "fields": [
+              {
+                "id": "soothe",
+                "options": {
+                  "list": "soothe"
+                },
+                "max": 3,
+                "required": false,
+                "own": {
+                  "hint": "own",
+                  "countsAsPick": true
+                },
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "words",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "words",
+            "kind": "ask",
+            "title": "words_title",
+            "hint": "words_hint",
+            "fields": [
+              {
+                "id": "words",
+                "options": {
+                  "list": "words"
+                },
+                "max": 3,
+                "required": false,
+                "own": {
+                  "hint": "own",
+                  "countsAsPick": true
+                },
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "place",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "place",
+            "kind": "ask",
+            "title": "place_title",
+            "hint": "place_hint",
+            "fields": [
+              {
+                "id": "place",
+                "options": {
+                  "list": "place"
+                },
+                "max": 1,
+                "required": false,
+                "own": {
+                  "hint": "place_own",
+                  "countsAsPick": true
+                },
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "reasons",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "reasons",
+            "kind": "ask",
+            "title": "reasons_title",
+            "hint": "reasons_hint",
+            "fields": [
+              {
+                "id": "reasons",
+                "options": {
+                  "list": "reasons"
+                },
+                "max": 4,
+                "required": false,
+                "own": {
+                  "hint": "own",
+                  "countsAsPick": true
+                },
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "keep",
+                "when": {
+                  "any": [
+                    {
+                      "set": "$a.body"
+                    },
+                    {
+                      "set": "$a.hands"
+                    },
+                    {
+                      "set": "$a.soothe"
+                    },
+                    {
+                      "set": "$a.words"
+                    },
+                    {
+                      "set": "$a.place"
+                    },
+                    {
+                      "set": "$a.reasons"
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "end",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "keep",
+            "kind": "ask",
+            "hint": "keep_hint",
+            "title": [
+              {
+                "when": {
+                  "set": "$p.crisisKit"
+                },
+                "key": "keep_title_has"
+              },
+              {
+                "key": "keep_title"
+              }
+            ],
+            "fields": [
+              {
+                "id": "keepit",
+                "options": {
+                  "list": "keepit"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "keep": {
+              "kind": "crisis_kit",
+              "many": false,
+              "from": [
+                "body",
+                "hands",
+                "soothe",
+                "words",
+                "place",
+                "reasons"
+              ],
+              "when": {
+                "eq": [
+                  "$a.keepit",
+                  "keep"
+                ]
+              }
+            },
+            "primary": "keep_primary",
+            "next": [
+              {
+                "to": "end",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "end",
+            "kind": "handoff",
+            "complete": true,
+            "noClose": true,
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.keepit",
+                    "keep"
+                  ]
+                },
+                "key": "end_kept"
+              },
+              {
+                "when": {
+                  "not": {
+                    "any": [
+                      {
+                        "set": "$a.body"
+                      },
+                      {
+                        "set": "$a.hands"
+                      },
+                      {
+                        "set": "$a.soothe"
+                      },
+                      {
+                        "set": "$a.words"
+                      },
+                      {
+                        "set": "$a.place"
+                      },
+                      {
+                        "set": "$a.reasons"
+                      }
+                    ]
+                  }
+                },
+                "key": "end_empty"
+              },
+              {
+                "when": {
+                  "set": "$a.keepit"
+                },
+                "key": "end_not_kept"
+              },
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "end_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "next": [],
+            "offers": [
+              {
+                "exit": "open_kit",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
+          },
+          {
+            "id": "settle",
+            "kind": "handoff",
+            "complete": true,
+            "noClose": true,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "settle_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "next": [],
+            "offers": [
+              {
+                "exit": "open_kit",
+                "when": {
+                  "all": []
+                }
+              },
+              {
+                "exit": "cool_down",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
+          }
+        ],
+        "exits": [
+          {
+            "id": "cool_down",
+            "toolId": "cool-down",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "done",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": true
+          },
+          {
+            "id": "open_kit",
+            "toolId": "crisis-kit",
+            "query": {},
+            "carry": [],
+            "done": false,
+            "label": "open_kit"
+          },
+          {
+            "id": "safety_open",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": false,
+            "safety": true
+          }
+        ],
+        "options": {
+          "body": [
+            {
+              "value": "cold",
+              "label": "Cold water on my face",
+              "how": "Cold water on your face or wrists, or hold something cold (not ice straight on skin). About thirty seconds.",
+              "starter": true,
+              "caution": "cold_caution",
+              "section": "body"
+            },
+            {
+              "value": "breath_out",
+              "label": "Breathing out longer than in",
+              "how": "Breathe in for four, out for six. Five times, slowly. Dizzy or tingly? Stop and breathe normally.",
+              "starter": true,
+              "section": "body"
+            },
+            {
+              "value": "squeeze",
+              "label": "Squeezing and letting go",
+              "how": "Squeeze your fists, shoulders and legs tight for five seconds, then let go. Three times.",
+              "starter": true,
+              "section": "body"
+            },
+            {
+              "value": "march",
+              "label": "Marching on the spot",
+              "how": "March on the spot for a minute, at a pace that feels okay.",
+              "starter": false,
+              "section": "body"
+            },
+            {
+              "value": "feet",
+              "label": "Pressing my feet into the floor",
+              "how": "Press your feet into the floor and feel it push back. Ten slow breaths.",
+              "starter": false,
+              "section": "body"
+            }
+          ],
+          "hands": [
+            {
+              "value": "count",
+              "label": "Counting back in threes",
+              "how": "Count back from 100 in threes. Lose count? Pick any number and carry on.",
+              "starter": true,
+              "section": "hands"
+            },
+            {
+              "value": "colours",
+              "label": "Finding five blue things",
+              "how": "Look around for five blue things and name each one, out loud if you can.",
+              "starter": true,
+              "section": "hands"
+            },
+            {
+              "value": "tidy",
+              "label": "Tidying something small",
+              "how": "One drawer, one bag, one shelf. Five minutes.",
+              "starter": false,
+              "section": "hands"
+            },
+            {
+              "value": "puzzle",
+              "label": "A puzzle or a game I know",
+              "how": "Something that takes some thinking, not too much.",
+              "starter": false,
+              "section": "hands"
+            },
+            {
+              "value": "sing",
+              "label": "Singing along to a song",
+              "how": "Pick one you know every word of, and sing it through.",
+              "starter": false,
+              "section": "hands"
+            },
+            {
+              "value": "rewatch",
+              "label": "Something I've watched before",
+              "how": "A show you know well, one episode. Nothing new for now.",
+              "starter": false,
+              "section": "hands"
+            }
+          ],
+          "soothe": [
+            {
+              "value": "warm",
+              "label": "Holding something warm",
+              "how": "A mug, a hot water bottle, a warm towel. Warm, not hot.",
+              "starter": true,
+              "section": "soothe"
+            },
+            {
+              "value": "hand_heart",
+              "label": "A hand on my heart",
+              "how": "One hand on your chest. Notice the warmth for a minute.",
+              "starter": true,
+              "section": "soothe"
+            },
+            {
+              "value": "soft",
+              "label": "Something soft",
+              "how": "A blanket, a jumper, a pet. Let it take some of the weight.",
+              "starter": false,
+              "section": "soothe"
+            },
+            {
+              "value": "smell",
+              "label": "A smell I like",
+              "how": "Soap, hand cream, a jumper that smells like someone you love.",
+              "starter": false,
+              "section": "soothe"
+            },
+            {
+              "value": "sound",
+              "label": "A sound that calms me",
+              "how": "Rain sounds, a playlist, a voice you like.",
+              "starter": false,
+              "section": "soothe"
+            },
+            {
+              "value": "look",
+              "label": "Something to look at",
+              "how": "The sky, a photo, a plant. Look at it slowly, one detail at a time.",
+              "starter": false,
+              "section": "soothe"
+            }
+          ],
+          "words": [
+            {
+              "value": "minute",
+              "label": "You're getting through this minute.",
+              "starter": true,
+              "section": "words"
+            },
+            {
+              "value": "before",
+              "label": "You've got through nights like this before.",
+              "starter": false,
+              "section": "words"
+            },
+            {
+              "value": "feeling",
+              "label": "This is a feeling. It isn't the whole of you.",
+              "starter": true,
+              "section": "words"
+            },
+            {
+              "value": "next",
+              "label": "You only have to do the next small thing.",
+              "starter": false,
+              "section": "words"
+            },
+            {
+              "value": "wave",
+              "label": "Feelings rise and fall, even the big ones.",
+              "starter": false,
+              "section": "words"
+            },
+            {
+              "value": "trying",
+              "label": "You're doing your best with something hard.",
+              "starter": false,
+              "section": "words"
+            },
+            {
+              "value": "ask",
+              "label": "It's okay to ask for help tonight.",
+              "starter": false,
+              "section": "words"
+            }
+          ],
+          "place": [
+            {
+              "value": "beach",
+              "label": "A beach",
+              "section": "place"
+            },
+            {
+              "value": "woods",
+              "label": "A forest or a park",
+              "section": "place"
+            },
+            {
+              "value": "room",
+              "label": "A room I love",
+              "section": "place"
+            },
+            {
+              "value": "with",
+              "label": "Somewhere with someone I trust",
+              "section": "place"
+            },
+            {
+              "value": "made_up",
+              "label": "Somewhere I've made up",
+              "section": "place"
+            }
+          ],
+          "reasons": [
+            {
+              "value": "tomorrow",
+              "label": "Seeing what tomorrow's like",
+              "section": "reasons"
+            },
+            {
+              "value": "people",
+              "label": "People I care about",
+              "section": "reasons"
+            },
+            {
+              "value": "pet",
+              "label": "My pet",
+              "section": "reasons"
+            },
+            {
+              "value": "looking_forward",
+              "label": "Something I'm looking forward to",
+              "section": "reasons"
+            },
+            {
+              "value": "prove",
+              "label": "Showing myself I can",
+              "section": "reasons"
+            },
+            {
+              "value": "still_want",
+              "label": "Things I still want to do",
+              "section": "reasons"
+            }
+          ],
+          "heads_up": [
+            {
+              "value": "open",
+              "label": "Open a starter kit now"
+            },
+            {
+              "value": "settle",
+              "label": "Settle my body first"
+            },
+            {
+              "value": "go",
+              "label": "Keep making it"
+            }
+          ],
+          "keepit": [
+            {
+              "value": "keep",
+              "label": "Keep it"
+            },
+            {
+              "value": "not_now",
+              "label": "Not this time"
+            }
+          ]
+        }
+      },
+      {
+        "id": "crisis_kit_use",
+        "toolId": "crisis-kit",
+        "version": "kit-v1",
+        "start": "deck",
+        "accepts": [
+          "band",
+          "frame"
+        ],
+        "ownMax": 80,
+        "emotionFields": [],
+        "copy": {
+          "deck_title": "One card at a time.",
+          "deck_starter": "A few to start with. You can make the kit yours later.",
+          "deck_another": "Another card",
+          "deck_done": "That's enough for now",
+          "sec_body": "For your body",
+          "sec_hands": "Keep your hands busy",
+          "sec_soothe": "Something soothing",
+          "sec_words": "Words for you",
+          "sec_place": "Your safe place",
+          "sec_reasons": "Your reasons to get through tonight",
+          "sec_pros_cons": "Your pros & cons card",
+          "place_how": "Picture it. What can you see there? What can you hear? You can come back from it whenever you like.",
+          "words_how": "Read it slowly, twice.",
+          "reasons_label": "You wrote these on a calmer day.",
+          "cold_caution": "Skip this with heart trouble, fainting, an eating disorder, pregnancy, a cold allergy, or after drinking or using today. Never in a shower or a bath. Cold, not ice-cold.",
+          "close_title": "Compared with when you opened it?",
+          "harder_line": "That happens, and it's worth saying. Someone to talk to, or something for your body, could come next.",
+          "reach_title": "Is there anyone you could call or text, even for a few minutes?",
+          "reach_line": "You don't have to explain everything. Hearing a voice can help.",
+          "reach_make": "When things are calmer, you can make the kit your own.",
+          "make_kit": "Make it yours",
+          "safety_open": "Talk to someone now",
+          "done": "Done"
+        },
+        "tables": {},
+        "derive": [],
+        "steps": [
+          {
+            "id": "deck",
+            "kind": "embed",
+            "embed": "kitDeck",
+            "answerAs": "deck",
+            "title": "deck_title",
+            "crisis": [
+              {
+                "variant": "crisis",
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "crisis"
+                  ]
+                }
+              }
+            ],
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "props": {
+              "fromSkill": "crisis_kit_build",
+              "prosSkill": "pros_cons",
+              "starter": "deck_starter",
+              "another": "deck_another",
+              "enough": "deck_done",
+              "secBody": "sec_body",
+              "secHands": "sec_hands",
+              "secSoothe": "sec_soothe",
+              "secWords": "sec_words",
+              "secPlace": "sec_place",
+              "secReasons": "sec_reasons",
+              "secProsCons": "sec_pros_cons",
+              "placeHow": "place_how",
+              "wordsHow": "words_how",
+              "reasonsLabel": "reasons_label"
+            },
+            "next": [
+              {
+                "to": "close",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "close",
+            "kind": "ask",
+            "title": "close_title",
+            "crisis": [
+              {
+                "variant": "crisis",
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "crisis"
+                  ]
+                }
+              }
+            ],
+            "fields": [
+              {
+                "id": "close",
+                "options": {
+                  "list": "tvn"
+                },
+                "max": 1,
+                "required": true,
+                "askFresh": "thenVsNow",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "harder",
+                "when": {
+                  "eq": [
+                    "$a.close",
+                    "worse"
+                  ]
+                }
+              },
+              {
+                "to": "reach",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "harder",
+            "kind": "handoff",
+            "complete": true,
+            "noClose": true,
+            "crisis": [
+              {
+                "variant": "crisis",
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "crisis"
+                  ]
+                }
+              }
+            ],
+            "title": "reach_title",
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "harder_line"
+              },
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "reach_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "next": [],
+            "offers": [
+              {
+                "exit": "safety_open",
+                "when": {
+                  "all": []
+                }
+              },
+              {
+                "exit": "cool_down",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
+          },
+          {
+            "id": "reach",
+            "kind": "handoff",
+            "complete": true,
+            "noClose": true,
+            "crisis": [
+              {
+                "variant": "crisis",
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "crisis"
+                  ]
+                }
+              }
+            ],
+            "title": "reach_title",
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "reach_line"
+              },
+              {
+                "when": {
+                  "all": [
+                    {
+                      "not": {
+                        "set": "$p.crisisKit"
+                      }
+                    },
+                    {
+                      "not": {
+                        "set": "$ctx.frame"
+                      }
+                    }
+                  ]
+                },
+                "key": "reach_make"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "next": [],
+            "offers": [
+              {
+                "exit": "safety_open",
+                "when": {
+                  "all": []
+                }
+              },
+              {
+                "exit": "make_kit",
+                "when": {
+                  "all": [
+                    {
+                      "not": {
+                        "set": "$p.crisisKit"
+                      }
+                    },
+                    {
+                      "not": {
+                        "set": "$ctx.frame"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "exits": [
+          {
+            "id": "cool_down",
+            "toolId": "cool-down",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "done",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": true
+          },
+          {
+            "id": "make_kit",
+            "toolId": "crisis-kit",
+            "query": {
+              "frame": "build"
+            },
+            "carry": [],
+            "done": false,
+            "label": "make_kit"
+          },
+          {
+            "id": "safety_open",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": false,
+            "safety": true
+          }
+        ],
+        "options": {
+          "tvn": [
+            {
+              "value": "much_better",
+              "label": "Much easier"
+            },
+            {
+              "value": "better",
+              "label": "A bit easier"
+            },
+            {
+              "value": "same",
+              "label": "About the same"
+            },
+            {
+              "value": "worse",
+              "label": "Harder"
+            }
+          ]
+        }
+      },
+      {
         "id": "dear_man_debrief",
         "toolId": "dear-man",
         "version": "dm-debrief-v1",
@@ -6743,10 +7881,12 @@
           {
             "id": "give",
             "toolId": "give",
-            "query": {},
+            "query": {
+              "situationId": "repair",
+              "person": "$ctx.personId"
+            },
             "carry": [],
-            "done": false,
-            "planned": true
+            "done": false
           },
           {
             "id": "let_it_be",
@@ -11841,8 +12981,7 @@
             "toolId": "give",
             "query": {},
             "carry": [],
-            "done": false,
-            "planned": true
+            "done": false
           },
           {
             "id": "let_it_be",
@@ -15409,6 +16548,12 @@
             "next": [],
             "offers": [
               {
+                "exit": "safety_open",
+                "when": {
+                  "all": []
+                }
+              },
+              {
                 "exit": "crisis_kit",
                 "when": {
                   "all": []
@@ -15551,10 +16696,11 @@
           {
             "id": "crisis_kit",
             "toolId": "crisis-kit",
-            "query": {},
+            "query": {
+              "frame": "crisis"
+            },
             "carry": [],
-            "done": false,
-            "planned": true
+            "done": false
           },
           {
             "id": "dear_man",
@@ -15722,6 +16868,2258 @@
             {
               "value": "through",
               "label": "I needed to get through it"
+            }
+          ]
+        }
+      },
+      {
+        "id": "give",
+        "toolId": "give",
+        "version": "give-v1",
+        "start": "what",
+        "accepts": [
+          "personId",
+          "frame",
+          "band",
+          "situationId",
+          "refused"
+        ],
+        "ownMax": 140,
+        "emotionFields": [],
+        "copy": {
+          "situation_title": "What's going on with them?",
+          "situation_title_flooded": "Your body's running hot. A break you come back from can be the kind move right now.",
+          "situation_hint": "Pick the one closest.",
+          "cool_down": "Settle my body first",
+          "next": "Next",
+          "done": "Done",
+          "copy": "Copy",
+          "copied": "Copied",
+          "selected": "Selected. Copy it from here.",
+          "open_messages": "Open messages",
+          "stirred_line": "This is a lot to hold. Your side matters too, and it gets its turn.",
+          "brought_title": "What did they bring to you?",
+          "their_title": "First, their side.",
+          "their_hint": "Their feeling can make sense even when you see the facts differently.",
+          "validate_label": "One line for how they feel",
+          "interested_label": "One question to ask them",
+          "own_line": "In my own words",
+          "yours_title": "Then yours. You can hear them and still disagree.",
+          "stance_label": "Where are you with it?",
+          "angry_check_label": "Are you safe with them right now?",
+          "mine_label": "Something of yours to say (optional)",
+          "card_title": "Your lines for the conversation.",
+          "card_theirs": "First, theirs",
+          "card_steady": "Stay steady",
+          "card_mine": "Then mine",
+          "card_prev": "Back",
+          "card_next_card": "Next card",
+          "card_stance": "Where I stand",
+          "card_heats": "If it heats up: I need half an hour. I'm coming back to this.",
+          "card_finish": "Let them finish before you answer.",
+          "brought_line": "Their feeling first, then yours. You don't have to agree with them to be kind.",
+          "brought_line_disagree": "You can take their feeling seriously and still see it your way. Both can be true.",
+          "fight_title": "Before the repair: did it get physical, or are you scared of them now?",
+          "fight_hint": "However it went, you can answer honestly here.",
+          "scared_line": "Someone's safety comes before any repair. The people above can help, any time, whichever side of it you're on.",
+          "guilt_title": "Looking back, was some of it yours?",
+          "guilt_hint": "Feeling bad and having done something wrong aren't always the same thing.",
+          "check_facts": "Check the facts first",
+          "guilt_unsure_line": "If you're not sure it was yours, checking the facts first can help.",
+          "unsure_title": "Not sure is a fair answer. What would you like to do?",
+          "ack_title": "One clear acknowledgement, for what you did. One sorry is enough.",
+          "ack_title_unsure": "If some of it was yours, one acknowledgement for that part. One sorry is enough.",
+          "ack_label": "What you'd own",
+          "r_validate_label": "A line for how it was for them (optional)",
+          "r_ask_label": "One question about what would help (optional)",
+          "r_commit_label": "Something you'll do differently (optional)",
+          "repair_msg_title": "Here's your repair.",
+          "repair_explain": "Keep it to what you did. A long explanation can sound like an excuse.",
+          "repair_again_label": "Want me to ask how it went?",
+          "repair_sent_line": "Your repair is ready. When you say it is up to you.",
+          "repair_sent_heads_up": "With them, short and in writing can be kinder for you both.",
+          "no_sorry_title": "What would you say, without a sorry?",
+          "no_sorry_title_unsure": "Something warm, without a sorry. What would you say?",
+          "no_sorry_hint": "You don't owe an apology for having a need, or for a fair no.",
+          "no_sorry_card_title": "Your line",
+          "no_sorry_line": "Warm and steady. You can care about them and not apologise for what wasn't yours.",
+          "repaired_title": "Did you get to say it?",
+          "between_title": "How are things between you now?",
+          "repaired_line": "You owned your part, and things feel okay again.",
+          "repaired_line_shaky": "Repairs often take more than one go. Your part was the acknowledgement, and you did it.",
+          "repaired_not_yet": "Not yet. Your words are still here when you're ready.",
+          "repaired_not_ready": "You said your part. When they're ready to hear it is theirs.",
+          "break_title": "Say when you'll come back. A return time helps a break feel less like leaving.",
+          "break_len_label": "How long?",
+          "break_line_label": "What you'll say",
+          "break_card_title": "Your line",
+          "break_set_line": "Something that settles you can help more than the argument on replay. There'll be a card here when it's time.",
+          "back_title": "Did you go back to it?",
+          "back_hint": "Any answer is fine here.",
+          "still_ok_title": "How are things between you now?",
+          "back_line": "You came back when you said you would. That's what helps a break feel safe.",
+          "back_line_shaky": "You came back when you said you would. If it still feels raw, a repair can come next.",
+          "more_title": "That's okay. When will you go back?",
+          "more_line": "There'll be a card here then.",
+          "no_return_line": "Not going back to it is an answer too. You can choose what happens next with them.",
+          "not_safe_label": "If it isn't safe",
+          "refused_line": "You came back. That part was yours, and you did it. They may need longer.",
+          "gentle_title": "What would keep it warm while you ask?",
+          "gentle_title_heads_up": "Short and plain with them, and a little warmth. What would help?",
+          "refused_line_ask": "With them, this works best for practical asks. Being heard is something they haven't been able to give lately.",
+          "swap_label": "Gentle: any sharp words to swap?",
+          "g_question_label": "Interested: one question to ask them",
+          "g_validate_label": "Validate: one line for their side",
+          "manner_label": "Easy manner: how it sounds",
+          "soft_title": "Easy manner starts in the body.",
+          "soft_step1": "Let your hands rest open, palms up.",
+          "soft_step2": "Soften your face and jaw.",
+          "soft_step3": "Breathe out slowly once.",
+          "soft_start": "Start",
+          "soft_running": "Open hands, soft face",
+          "soft_done": "Done",
+          "gentle_card_title": "Take these into your ask.",
+          "card_say": "Say",
+          "card_how": "How",
+          "card_ask_them": "Ask about them",
+          "gentle_line": "The warmth goes in around the ask. The ask itself stays clear.",
+          "picker_personWhoGive": "Who's it with?",
+          "picker_personNew": "Someone new",
+          "picker_personNameLabel": "What do you call them?",
+          "picker_personNameHint": "A nickname is fine. No real names needed.",
+          "picker_personRoleLabel": "Who are they to you?",
+          "picker_personKeepLine": "The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.",
+          "picker_personNoNameLine": "Without a name, nothing about them is kept.",
+          "picker_personSignedOutLine": "This stays on this screen only.",
+          "picker_personGoOn": "Go on",
+          "picker_personChanged": "Things changed with someone?",
+          "picker_personChangedHint": "Pick who it is, and you'll be asked about them again.",
+          "picker_safeQuestion": "Is it safe to bring hard things up with {who}?",
+          "picker_safeYes": "Yes, mostly",
+          "picker_safeNo": "No",
+          "picker_safeUnsure": "Not sure",
+          "picker_riskQuestion": "Is it more that they might hurt or control you, or that it tends to go badly?",
+          "picker_riskHarm": "They might hurt or control me",
+          "picker_riskBadly": "It tends to go badly",
+          "picker_riskUnsaid": "I'd rather not say",
+          "picker_safetyRouteGiveHeading": "Keeping it warm isn't your job with {who}. Your safety comes first.",
+          "picker_safetyRouteBody": "The people below can help you think it through, any time, and you don't have to be sure.",
+          "picker_safetyRouteEnding": "Thinking about ending the relationship",
+          "picker_safetyRouteBack": "This is about someone else"
+        },
+        "tables": {},
+        "derive": [],
+        "steps": [
+          {
+            "id": "what",
+            "kind": "ask",
+            "title": [
+              {
+                "key": "situation_title_flooded",
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "flooded"
+                  ]
+                }
+              },
+              {
+                "key": "situation_title"
+              }
+            ],
+            "lines": [
+              {
+                "when": {
+                  "not": {
+                    "eq": [
+                      "$ctx.band",
+                      "flooded"
+                    ]
+                  }
+                },
+                "key": "situation_hint"
+              }
+            ],
+            "fields": [
+              {
+                "id": "situation",
+                "options": {
+                  "list": "situation",
+                  "where": {
+                    "any": [
+                      {
+                        "not": {
+                          "eq": [
+                            "$ctx.band",
+                            "flooded"
+                          ]
+                        }
+                      },
+                      {
+                        "eq": [
+                          "$opt.flooded",
+                          true
+                        ]
+                      }
+                    ]
+                  },
+                  "firstFrom": "$ctx.situationId"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "cool_down",
+                    "label": "cool_down",
+                    "when": {
+                      "eq": [
+                        "$ctx.band",
+                        "flooded"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "break",
+                "when": {
+                  "any": [
+                    {
+                      "eq": [
+                        "$a.situation",
+                        "heated"
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$ctx.band",
+                        "flooded"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "brought",
+                "when": {
+                  "eq": [
+                    "$a.situation",
+                    "brought"
+                  ]
+                }
+              },
+              {
+                "to": "fight",
+                "when": {
+                  "eq": [
+                    "$a.situation",
+                    "repair"
+                  ]
+                }
+              },
+              {
+                "to": "gentle",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "brought",
+            "kind": "ask",
+            "title": "brought_title",
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "stirred"
+                  ]
+                },
+                "key": "stirred_line"
+              }
+            ],
+            "fields": [
+              {
+                "id": "brought",
+                "options": {
+                  "list": "brought"
+                },
+                "max": 1,
+                "required": true
+              },
+              {
+                "id": "angry_ok",
+                "label": "angry_check_label",
+                "options": {
+                  "list": "angry_ok"
+                },
+                "max": 1,
+                "required": true,
+                "showWhen": {
+                  "eq": [
+                    "$a.brought",
+                    "angry"
+                  ]
+                }
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.angry_ok",
+                    "scared"
+                  ]
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "scared",
+                "when": {
+                  "eq": [
+                    "$a.angry_ok",
+                    "scared"
+                  ]
+                }
+              },
+              {
+                "to": "theirs",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "theirs",
+            "kind": "ask",
+            "title": "their_title",
+            "hint": "their_hint",
+            "fields": [
+              {
+                "id": "validate",
+                "label": "validate_label",
+                "options": {
+                  "list": "validate",
+                  "where": {
+                    "has": [
+                      "$opt.about",
+                      "$a.brought"
+                    ]
+                  }
+                },
+                "max": 1,
+                "required": true,
+                "own": {
+                  "hint": "own_line",
+                  "countsAsPick": true,
+                  "max": 36
+                }
+              },
+              {
+                "id": "interested",
+                "label": "interested_label",
+                "options": {
+                  "list": "interested",
+                  "where": {
+                    "has": [
+                      "$opt.about",
+                      "$a.brought"
+                    ]
+                  }
+                },
+                "max": 1
+              }
+            ],
+            "next": [
+              {
+                "to": "yours",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "yours",
+            "kind": "ask",
+            "title": "yours_title",
+            "fields": [
+              {
+                "id": "stance",
+                "label": "stance_label",
+                "options": {
+                  "list": "stance"
+                },
+                "max": 1,
+                "required": true
+              },
+              {
+                "id": "mine",
+                "label": "mine_label",
+                "options": {
+                  "list": "mine",
+                  "where": {
+                    "all": [
+                      {
+                        "has": [
+                          "$opt.stance",
+                          "$a.stance"
+                        ]
+                      },
+                      {
+                        "has": [
+                          "$opt.about",
+                          "$a.brought"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "max": 1,
+                "showWhen": {
+                  "set": "$a.stance"
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "b_card",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "b_card",
+            "kind": "embed",
+            "embed": "pocketCard",
+            "title": "card_title",
+            "answerAs": "b_card_how",
+            "props": {
+              "say": [
+                "validate",
+                "interested"
+              ],
+              "steady": [
+                "stance"
+              ],
+              "push": [
+                "mine"
+              ],
+              "sayLabel": "card_theirs",
+              "steadyLabel": "card_steady",
+              "pushLabel": "card_mine",
+              "labelAField": "stance",
+              "labelA": "card_stance",
+              "steadyNoteA": "card_finish",
+              "steadyNoteB": "card_heats",
+              "prevLabel": "card_prev",
+              "nextCardLabel": "card_next_card",
+              "copyLabel": "copy",
+              "copiedLabel": "copied",
+              "selectedLabel": "selected",
+              "next": "next"
+            },
+            "next": [
+              {
+                "to": "b_end",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "b_end",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.stance",
+                    "disagree"
+                  ]
+                },
+                "key": "brought_line_disagree"
+              },
+              {
+                "when": null,
+                "key": "brought_line"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": [
+              {
+                "exit": "one_message",
+                "when": null
+              },
+              {
+                "exit": "fast",
+                "when": {
+                  "eq": [
+                    "$a.stance",
+                    "disagree"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "fight",
+            "kind": "ask",
+            "title": "fight_title",
+            "hint": "fight_hint",
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "stirred"
+                  ]
+                },
+                "key": "stirred_line"
+              }
+            ],
+            "fields": [
+              {
+                "id": "fight",
+                "options": {
+                  "list": "fight"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "in": [
+                    "$a.fight",
+                    [
+                      "physical",
+                      "scared"
+                    ]
+                  ]
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "scared",
+                "when": {
+                  "in": [
+                    "$a.fight",
+                    [
+                      "physical",
+                      "scared"
+                    ]
+                  ]
+                }
+              },
+              {
+                "to": "guilt",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "scared",
+            "kind": "handoff",
+            "complete": true,
+            "noClose": true,
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "lines": [
+              {
+                "when": null,
+                "key": "scared_line"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": [
+              {
+                "exit": "safety_open",
+                "when": null
+              },
+              {
+                "exit": "ending_careful",
+                "when": null
+              }
+            ]
+          },
+          {
+            "id": "guilt",
+            "kind": "ask",
+            "title": "guilt_title",
+            "hint": "guilt_hint",
+            "fields": [
+              {
+                "id": "guilt",
+                "options": {
+                  "list": "guilt"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
+            "next": [
+              {
+                "to": "no_sorry",
+                "when": {
+                  "eq": [
+                    "$a.guilt",
+                    "not_mine"
+                  ]
+                }
+              },
+              {
+                "to": "unsure",
+                "when": {
+                  "eq": [
+                    "$a.guilt",
+                    "unsure"
+                  ]
+                }
+              },
+              {
+                "to": "owning",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "unsure",
+            "kind": "ask",
+            "title": "unsure_title",
+            "hint": "guilt_unsure_line",
+            "fields": [
+              {
+                "id": "unsure",
+                "options": {
+                  "list": "unsure"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "check_the_facts",
+                    "label": "check_facts",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "no_sorry",
+                "when": {
+                  "eq": [
+                    "$a.unsure",
+                    "warm"
+                  ]
+                }
+              },
+              {
+                "to": "owning",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "owning",
+            "kind": "ask",
+            "hint": "repair_explain",
+            "title": [
+              {
+                "key": "ack_title_unsure",
+                "when": {
+                  "eq": [
+                    "$a.guilt",
+                    "unsure"
+                  ]
+                }
+              },
+              {
+                "key": "ack_title"
+              }
+            ],
+            "fields": [
+              {
+                "id": "ack",
+                "label": "ack_label",
+                "options": {
+                  "list": "ack"
+                },
+                "max": 1,
+                "required": true,
+                "own": {
+                  "hint": "own_line",
+                  "countsAsPick": true,
+                  "max": 36
+                }
+              },
+              {
+                "id": "r_validate",
+                "label": "r_validate_label",
+                "options": {
+                  "list": "r_validate"
+                },
+                "max": 1
+              },
+              {
+                "id": "commit",
+                "label": "r_commit_label",
+                "options": {
+                  "list": "commit"
+                },
+                "max": 1
+              },
+              {
+                "id": "r_ask",
+                "label": "r_ask_label",
+                "options": {
+                  "list": "r_ask"
+                },
+                "max": 1
+              }
+            ],
+            "next": [
+              {
+                "to": "r_msg",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "r_msg",
+            "kind": "embed",
+            "embed": "messageComposer",
+            "title": "repair_msg_title",
+            "answerAs": "repair_how",
+            "props": {
+              "parts": [
+                "ack",
+                "r_validate",
+                "commit",
+                "r_ask"
+              ],
+              "field": "ack",
+              "copyLabel": "copy",
+              "copiedLabel": "copied",
+              "selectedLabel": "selected",
+              "openLabel": "open_messages",
+              "next": "next"
+            },
+            "next": [
+              {
+                "to": "r_sent",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "r_sent",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "heads_up"
+                  ]
+                },
+                "key": "repair_sent_heads_up"
+              },
+              {
+                "when": null,
+                "key": "repair_sent_line"
+              }
+            ],
+            "fields": [
+              {
+                "id": "again",
+                "label": "repair_again_label",
+                "max": 1,
+                "options": {
+                  "list": "again"
+                }
+              }
+            ],
+            "followUp": {
+              "type": "repair_outcome",
+              "whenFrom": "again"
+            },
+            "done": "done",
+            "next": [],
+            "offers": [
+              {
+                "exit": "rehearse",
+                "when": null
+              }
+            ]
+          },
+          {
+            "id": "no_sorry",
+            "kind": "ask",
+            "title": [
+              {
+                "key": "no_sorry_title_unsure",
+                "when": {
+                  "eq": [
+                    "$a.guilt",
+                    "unsure"
+                  ]
+                }
+              },
+              {
+                "key": "no_sorry_title"
+              }
+            ],
+            "lines": [
+              {
+                "when": {
+                  "not": {
+                    "eq": [
+                      "$a.guilt",
+                      "unsure"
+                    ]
+                  }
+                },
+                "key": "no_sorry_hint"
+              }
+            ],
+            "fields": [
+              {
+                "id": "no_sorry",
+                "options": {
+                  "list": "no_sorry"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
+            "next": [
+              {
+                "to": "ns_card",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "ns_card",
+            "kind": "embed",
+            "embed": "boundaryLine",
+            "title": "no_sorry_card_title",
+            "answerAs": "ns_copied",
+            "props": {
+              "field": "no_sorry",
+              "shape": "line",
+              "copyLabel": "copy",
+              "copiedLabel": "copied",
+              "selectedLabel": "selected",
+              "next": "next"
+            },
+            "next": [
+              {
+                "to": "ns_end",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "ns_end",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": null,
+                "key": "no_sorry_line"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": [
+              {
+                "exit": "fast",
+                "when": null
+              }
+            ]
+          },
+          {
+            "id": "repaired",
+            "kind": "ask",
+            "reopens": {
+              "after": "r_sent"
+            },
+            "clears": [
+              "repaired",
+              "between"
+            ],
+            "title": "repaired_title",
+            "fields": [
+              {
+                "id": "repaired",
+                "options": {
+                  "list": "repaired"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.repaired",
+                    "unsafe"
+                  ]
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "scared",
+                "when": {
+                  "eq": [
+                    "$a.repaired",
+                    "unsafe"
+                  ]
+                }
+              },
+              {
+                "to": "r_later",
+                "when": {
+                  "eq": [
+                    "$a.repaired",
+                    "not_yet"
+                  ]
+                }
+              },
+              {
+                "to": "r_wait",
+                "when": {
+                  "eq": [
+                    "$a.repaired",
+                    "wait"
+                  ]
+                }
+              },
+              {
+                "to": "between",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "between",
+            "kind": "ask",
+            "title": "between_title",
+            "fields": [
+              {
+                "id": "between",
+                "options": {
+                  "list": "between"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.between",
+                    "unsafe"
+                  ]
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "scared",
+                "when": {
+                  "eq": [
+                    "$a.between",
+                    "unsafe"
+                  ]
+                }
+              },
+              {
+                "to": "r_end",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "r_end",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "in": [
+                    "$a.between",
+                    [
+                      "shaky",
+                      "no"
+                    ]
+                  ]
+                },
+                "key": "repaired_line_shaky"
+              },
+              {
+                "when": null,
+                "key": "repaired_line"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": [
+              {
+                "exit": "fast_let_go",
+                "when": {
+                  "eq": [
+                    "$a.between",
+                    "no"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "r_later",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": null,
+                "key": "repaired_not_yet"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": []
+          },
+          {
+            "id": "r_wait",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": null,
+                "key": "repaired_not_ready"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": [
+              {
+                "exit": "fast_let_go",
+                "when": null
+              }
+            ]
+          },
+          {
+            "id": "break",
+            "kind": "ask",
+            "title": "break_title",
+            "fields": [
+              {
+                "id": "break_len",
+                "label": "break_len_label",
+                "options": {
+                  "list": "break_len"
+                },
+                "max": 1,
+                "required": true,
+                "showWhen": {
+                  "not": {
+                    "eq": [
+                      "$a.not_safe",
+                      "unsafe"
+                    ]
+                  }
+                }
+              },
+              {
+                "id": "break_line",
+                "label": "break_line_label",
+                "options": {
+                  "list": "break_line",
+                  "where": {
+                    "eq": [
+                      "$opt.len",
+                      "$a.break_len"
+                    ]
+                  }
+                },
+                "max": 1,
+                "required": true,
+                "showWhen": {
+                  "all": [
+                    {
+                      "set": "$a.break_len"
+                    },
+                    {
+                      "not": {
+                        "eq": [
+                          "$a.not_safe",
+                          "unsafe"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "not_safe",
+                "label": "not_safe_label",
+                "options": {
+                  "list": "not_safe"
+                },
+                "max": 1
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.not_safe",
+                    "unsafe"
+                  ]
+                }
+              }
+            ],
+            "followUp": {
+              "type": "break_return",
+              "whenFrom": "break_len"
+            },
+            "next": [
+              {
+                "to": "scared",
+                "when": {
+                  "eq": [
+                    "$a.not_safe",
+                    "unsafe"
+                  ]
+                }
+              },
+              {
+                "to": "b_line",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "b_line",
+            "kind": "embed",
+            "embed": "boundaryLine",
+            "title": "break_card_title",
+            "answerAs": "break_copied",
+            "props": {
+              "field": "break_line",
+              "shape": "line",
+              "copyLabel": "copy",
+              "copiedLabel": "copied",
+              "selectedLabel": "selected",
+              "next": "next"
+            },
+            "next": [
+              {
+                "to": "b_set",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "b_set",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": null,
+                "key": "break_set_line"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": [
+              {
+                "exit": "cool_down",
+                "when": null
+              }
+            ]
+          },
+          {
+            "id": "back",
+            "kind": "ask",
+            "reopens": {
+              "after": "break",
+              "again": [
+                "more"
+              ]
+            },
+            "clears": [
+              "back",
+              "still_ok",
+              "more"
+            ],
+            "title": "back_title",
+            "hint": "back_hint",
+            "fields": [
+              {
+                "id": "back",
+                "options": {
+                  "list": "back"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.back",
+                    "unsafe"
+                  ]
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "scared",
+                "when": {
+                  "eq": [
+                    "$a.back",
+                    "unsafe"
+                  ]
+                }
+              },
+              {
+                "to": "more",
+                "when": {
+                  "eq": [
+                    "$a.back",
+                    "not_yet"
+                  ]
+                }
+              },
+              {
+                "to": "refused",
+                "when": {
+                  "eq": [
+                    "$a.back",
+                    "they_didnt"
+                  ]
+                }
+              },
+              {
+                "to": "no_back",
+                "when": {
+                  "eq": [
+                    "$a.back",
+                    "not_going"
+                  ]
+                }
+              },
+              {
+                "to": "still_ok",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "still_ok",
+            "kind": "ask",
+            "title": "still_ok_title",
+            "fields": [
+              {
+                "id": "still_ok",
+                "options": {
+                  "list": "between"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.still_ok",
+                    "unsafe"
+                  ]
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "scared",
+                "when": {
+                  "eq": [
+                    "$a.still_ok",
+                    "unsafe"
+                  ]
+                }
+              },
+              {
+                "to": "back_end",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "back_end",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "in": [
+                    "$a.still_ok",
+                    [
+                      "shaky",
+                      "no"
+                    ]
+                  ]
+                },
+                "key": "back_line_shaky"
+              },
+              {
+                "when": null,
+                "key": "back_line"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": [
+              {
+                "exit": "give_repair",
+                "when": {
+                  "in": [
+                    "$a.still_ok",
+                    [
+                      "shaky",
+                      "no"
+                    ]
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "more",
+            "kind": "ask",
+            "title": "more_title",
+            "fields": [
+              {
+                "id": "more",
+                "options": {
+                  "list": "break_len"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
+            "followUp": {
+              "type": "break_return",
+              "whenFrom": "more"
+            },
+            "next": [
+              {
+                "to": "more_set",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "more_set",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": null,
+                "key": "more_line"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": []
+          },
+          {
+            "id": "refused",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": null,
+                "key": "refused_line"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": [
+              {
+                "exit": "fast_let_go",
+                "when": null
+              }
+            ]
+          },
+          {
+            "id": "no_back",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": null,
+                "key": "no_return_line"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": [
+              {
+                "exit": "fast_let_go",
+                "when": null
+              }
+            ]
+          },
+          {
+            "id": "gentle",
+            "kind": "ask",
+            "title": [
+              {
+                "key": "gentle_title_heads_up",
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "heads_up"
+                  ]
+                }
+              },
+              {
+                "key": "gentle_title"
+              }
+            ],
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$ctx.refused",
+                    "validation"
+                  ]
+                },
+                "key": "refused_line_ask"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "stirred"
+                  ]
+                },
+                "key": "stirred_line"
+              }
+            ],
+            "fields": [
+              {
+                "id": "swap",
+                "label": "swap_label",
+                "options": {
+                  "list": "swap"
+                },
+                "max": 2
+              },
+              {
+                "id": "g_question",
+                "label": "g_question_label",
+                "options": {
+                  "list": "g_question"
+                },
+                "max": 1
+              },
+              {
+                "id": "g_validate",
+                "label": "g_validate_label",
+                "options": {
+                  "list": "g_validate"
+                },
+                "max": 1
+              },
+              {
+                "id": "manner",
+                "label": "manner_label",
+                "options": {
+                  "list": "manner"
+                },
+                "max": 1
+              }
+            ],
+            "next": [
+              {
+                "to": "soft",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "soft",
+            "kind": "embed",
+            "embed": "bodyCard",
+            "title": "soft_title",
+            "answerAs": "soft_how",
+            "props": {
+              "kind": "willing",
+              "seconds": 20,
+              "step1": "soft_step1",
+              "step2": "soft_step2",
+              "step3": "soft_step3",
+              "start": "soft_start",
+              "running": "soft_running",
+              "done": "soft_done",
+              "next": "next"
+            },
+            "next": [
+              {
+                "to": "g_card",
+                "when": {
+                  "any": [
+                    {
+                      "set": "$a.swap"
+                    },
+                    {
+                      "set": "$a.g_question"
+                    },
+                    {
+                      "set": "$a.g_validate"
+                    },
+                    {
+                      "set": "$a.manner"
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "g_end",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "g_card",
+            "kind": "embed",
+            "embed": "pocketCard",
+            "title": "gentle_card_title",
+            "answerAs": "g_card_how",
+            "props": {
+              "say": [
+                "g_validate"
+              ],
+              "steady": [
+                "manner",
+                "swap"
+              ],
+              "push": [
+                "g_question"
+              ],
+              "steadyNoteA": "card_finish",
+              "sayLabel": "card_say",
+              "steadyLabel": "card_how",
+              "pushLabel": "card_ask_them",
+              "prevLabel": "card_prev",
+              "nextCardLabel": "card_next_card",
+              "copyLabel": "copy",
+              "copiedLabel": "copied",
+              "selectedLabel": "selected",
+              "next": "next"
+            },
+            "next": [
+              {
+                "to": "g_end",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "g_end",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": null,
+                "key": "gentle_line"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": [
+              {
+                "exit": "fast_let_go",
+                "when": {
+                  "eq": [
+                    "$ctx.refused",
+                    "validation"
+                  ]
+                }
+              },
+              {
+                "exit": "one_message",
+                "when": null
+              }
+            ]
+          }
+        ],
+        "exits": [
+          {
+            "id": "check_the_facts",
+            "toolId": "check-the-facts",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "cool_down",
+            "toolId": "cool-down",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "done",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": true
+          },
+          {
+            "id": "ending_careful",
+            "toolId": "ending-relationships",
+            "query": {
+              "frame": "careful"
+            },
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "fast",
+            "toolId": "fast",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "fast_let_go",
+            "toolId": "fast",
+            "query": {
+              "frame": "let_go"
+            },
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "give_repair",
+            "toolId": "give",
+            "query": {
+              "situationId": "repair",
+              "person": "$ctx.personId"
+            },
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "one_message",
+            "toolId": "dear-man",
+            "query": {
+              "mode": "one",
+              "person": "$ctx.personId"
+            },
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "rehearse",
+            "toolId": "rehearse",
+            "query": {},
+            "carry": [],
+            "done": false,
+            "planned": true
+          },
+          {
+            "id": "safety_open",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": false,
+            "safety": true
+          }
+        ],
+        "options": {
+          "situation": [
+            {
+              "value": "brought",
+              "label": "They brought something to me"
+            },
+            {
+              "value": "repair",
+              "label": "We had a fight and I want to repair it"
+            },
+            {
+              "value": "heated",
+              "label": "It's heating up and I need a break",
+              "flooded": true
+            },
+            {
+              "value": "before_ask",
+              "label": "I want to ask for something and keep it warm"
+            }
+          ],
+          "brought": [
+            {
+              "value": "complaint",
+              "label": "A complaint about me"
+            },
+            {
+              "value": "request",
+              "label": "A request"
+            },
+            {
+              "value": "upset",
+              "label": "They're upset about something else"
+            },
+            {
+              "value": "angry",
+              "label": "They're angry at me"
+            }
+          ],
+          "validate": [
+            {
+              "value": "v_hear",
+              "label": "I can hear this has been hard for you.",
+              "about": [
+                "complaint",
+                "request",
+                "upset",
+                "angry"
+              ]
+            },
+            {
+              "value": "v_sense",
+              "label": "It makes sense you'd feel that way.",
+              "about": [
+                "complaint",
+                "angry",
+                "upset"
+              ]
+            },
+            {
+              "value": "v_matter",
+              "label": "I can tell this matters to you.",
+              "about": [
+                "request",
+                "complaint"
+              ]
+            },
+            {
+              "value": "v_lot",
+              "label": "That sounds like a lot.",
+              "about": [
+                "upset"
+              ]
+            },
+            {
+              "value": "v_angry",
+              "label": "I get why you're angry.",
+              "about": [
+                "angry",
+                "complaint"
+              ]
+            },
+            {
+              "value": "v_told",
+              "label": "I'm glad you told me.",
+              "about": [
+                "complaint",
+                "request",
+                "upset",
+                "angry"
+              ]
+            }
+          ],
+          "interested": [
+            {
+              "value": "q_like",
+              "label": "What's it been like for you?",
+              "about": [
+                "complaint",
+                "angry",
+                "upset"
+              ]
+            },
+            {
+              "value": "q_help",
+              "label": "What would help from your side?",
+              "about": [
+                "request",
+                "upset",
+                "complaint"
+              ]
+            },
+            {
+              "value": "q_more",
+              "label": "Can you tell me more?",
+              "about": [
+                "complaint",
+                "request",
+                "upset",
+                "angry"
+              ]
+            },
+            {
+              "value": "q_need",
+              "label": "What do you need from me right now?",
+              "about": [
+                "upset",
+                "angry",
+                "request"
+              ]
+            }
+          ],
+          "stance": [
+            {
+              "value": "agree",
+              "label": "I mostly agree with them"
+            },
+            {
+              "value": "partly",
+              "label": "I agree with some of it"
+            },
+            {
+              "value": "disagree",
+              "label": "I see it differently"
+            },
+            {
+              "value": "unsure",
+              "label": "I'm not sure yet"
+            }
+          ],
+          "mine": [
+            {
+              "value": "m_sorry",
+              "label": "I'm sorry for my part in it.",
+              "stance": [
+                "agree",
+                "partly"
+              ],
+              "about": [
+                "complaint",
+                "angry"
+              ]
+            },
+            {
+              "value": "m_my_side",
+              "label": "I see it a bit differently, and I'd like to tell you how.",
+              "stance": [
+                "partly",
+                "disagree"
+              ],
+              "about": [
+                "complaint",
+                "request",
+                "upset",
+                "angry"
+              ]
+            },
+            {
+              "value": "m_think",
+              "label": "Can I think about it and come back to you?",
+              "stance": [
+                "partly",
+                "disagree",
+                "unsure"
+              ],
+              "about": [
+                "complaint",
+                "request",
+                "upset",
+                "angry"
+              ]
+            },
+            {
+              "value": "m_yes",
+              "label": "Yes, I can do that.",
+              "stance": [
+                "agree"
+              ],
+              "about": [
+                "request"
+              ]
+            },
+            {
+              "value": "m_other",
+              "label": "I can't do that, and I'd like to help another way.",
+              "stance": [
+                "partly",
+                "disagree"
+              ],
+              "about": [
+                "request"
+              ]
+            }
+          ],
+          "fight": [
+            {
+              "value": "no",
+              "label": "No"
+            },
+            {
+              "value": "physical",
+              "label": "It got physical",
+              "danger": "other"
+            },
+            {
+              "value": "scared",
+              "label": "I'm scared of them",
+              "danger": "other"
+            }
+          ],
+          "guilt": [
+            {
+              "value": "mine",
+              "label": "Yes, I did something I regret"
+            },
+            {
+              "value": "partly",
+              "label": "Some of it was mine"
+            },
+            {
+              "value": "not_mine",
+              "label": "No. I feel bad, and I don't think I did wrong"
+            },
+            {
+              "value": "unsure",
+              "label": "I'm not sure"
+            }
+          ],
+          "ack": [
+            {
+              "value": "a_said",
+              "label": "I'm sorry for what I said."
+            },
+            {
+              "value": "a_voice",
+              "label": "I'm sorry I raised my voice."
+            },
+            {
+              "value": "a_handled",
+              "label": "I didn't handle that well, and I'm sorry."
+            },
+            {
+              "value": "a_hurt",
+              "label": "I'm sorry I hurt you."
+            }
+          ],
+          "r_validate": [
+            {
+              "value": "rv_hurt",
+              "label": "I can see it hurt."
+            },
+            {
+              "value": "rv_sense",
+              "label": "It makes sense you're upset with me."
+            },
+            {
+              "value": "rv_hard",
+              "label": "That must have been hard to hear."
+            }
+          ],
+          "r_ask": [
+            {
+              "value": "ra_help",
+              "label": "What would help now?"
+            },
+            {
+              "value": "ra_need",
+              "label": "Is there something you need from me?"
+            },
+            {
+              "value": "ra_ready",
+              "label": "Can we talk about it when you're ready?"
+            }
+          ],
+          "no_sorry": [
+            {
+              "value": "ns_care",
+              "label": "I care about us, and I'd like to sort this out."
+            },
+            {
+              "value": "ns_didnt_like",
+              "label": "I didn't like how that went between us."
+            },
+            {
+              "value": "ns_calmer",
+              "label": "Can we talk when we're both calmer?"
+            }
+          ],
+          "again": [
+            {
+              "value": "today",
+              "label": "This evening"
+            },
+            {
+              "value": "tomorrow",
+              "label": "Tomorrow"
+            },
+            {
+              "value": "this_week",
+              "label": "In a few days"
+            }
+          ],
+          "repaired": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "not_yet",
+              "label": "Not yet"
+            },
+            {
+              "value": "wait",
+              "label": "They weren't ready to hear it"
+            },
+            {
+              "value": "unsafe",
+              "label": "I don't feel safe with them",
+              "danger": "other"
+            }
+          ],
+          "not_safe": [
+            {
+              "value": "unsafe",
+              "label": "I don't feel safe with them",
+              "danger": "other"
+            }
+          ],
+          "between": [
+            {
+              "value": "yes",
+              "label": "Okay"
+            },
+            {
+              "value": "shaky",
+              "label": "A bit shaky"
+            },
+            {
+              "value": "no",
+              "label": "Not okay yet"
+            },
+            {
+              "value": "unsafe",
+              "label": "I don't feel safe with them",
+              "danger": "other"
+            }
+          ],
+          "break_len": [
+            {
+              "value": "m30",
+              "label": "Half an hour"
+            },
+            {
+              "value": "m60",
+              "label": "An hour"
+            },
+            {
+              "value": "tomorrow",
+              "label": "Till tomorrow"
+            }
+          ],
+          "break_line": [
+            {
+              "value": "l_30",
+              "label": "I need a break. I'm coming back to this in half an hour.",
+              "len": "m30"
+            },
+            {
+              "value": "l_60",
+              "label": "I need a break. I'm coming back to this in an hour.",
+              "len": "m60"
+            },
+            {
+              "value": "l_tom",
+              "label": "I need a break. Can we pick this up tomorrow?",
+              "len": "tomorrow"
+            },
+            {
+              "value": "c_30",
+              "label": "This matters to me, and I want to do it properly. Back in half an hour.",
+              "len": "m30"
+            },
+            {
+              "value": "c_60",
+              "label": "This matters to me, and I want to do it properly. Back in an hour.",
+              "len": "m60"
+            },
+            {
+              "value": "c_tom",
+              "label": "This matters to me, and I want to do it properly. Can we talk tomorrow?",
+              "len": "tomorrow"
+            }
+          ],
+          "back": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "not_yet",
+              "label": "Not yet"
+            },
+            {
+              "value": "they_didnt",
+              "label": "They didn't want to"
+            },
+            {
+              "value": "not_going",
+              "label": "I'm not going back to it for now"
+            },
+            {
+              "value": "unsafe",
+              "label": "I don't feel safe going back",
+              "danger": "other"
+            }
+          ],
+          "angry_ok": [
+            {
+              "value": "safe",
+              "label": "Yes"
+            },
+            {
+              "value": "scared",
+              "label": "I'm scared of how angry they are",
+              "danger": "other"
+            }
+          ],
+          "unsure": [
+            {
+              "value": "own_part",
+              "label": "Own the part I'm sure of"
+            },
+            {
+              "value": "warm",
+              "label": "Say something warm, without a sorry"
+            }
+          ],
+          "commit": [
+            {
+              "value": "rc_break",
+              "label": "Next time I'll take a break before it gets that heated."
+            },
+            {
+              "value": "rc_gentle",
+              "label": "I'll say it more gently next time."
+            },
+            {
+              "value": "rc_check",
+              "label": "I'll check in with you first next time."
+            }
+          ],
+          "swap": [
+            {
+              "value": "s_always",
+              "label": "Swap \"You always…\" for \"Sometimes…\""
+            },
+            {
+              "value": "s_never",
+              "label": "Swap \"You never…\" for \"It's been a while since…\""
+            },
+            {
+              "value": "s_why",
+              "label": "Swap \"Why do you…\" for \"I noticed…\""
+            },
+            {
+              "value": "s_if",
+              "label": "Swap \"If you don't…\" for \"I'd like…\""
+            }
+          ],
+          "g_question": [
+            {
+              "value": "gq_been",
+              "label": "How's this been for you?"
+            },
+            {
+              "value": "gq_work",
+              "label": "What would work for you?"
+            },
+            {
+              "value": "gq_think",
+              "label": "What do you think?"
+            }
+          ],
+          "g_validate": [
+            {
+              "value": "gv_busy",
+              "label": "I know you've got a lot on."
+            },
+            {
+              "value": "gv_too",
+              "label": "I know this matters to you too."
+            },
+            {
+              "value": "gv_try",
+              "label": "I know you've been trying."
+            }
+          ],
+          "manner": [
+            {
+              "value": "lighter",
+              "label": "A lighter opener"
+            },
+            {
+              "value": "warmth",
+              "label": "A bit of warmth"
+            },
+            {
+              "value": "plain",
+              "label": "Keep it plain"
             }
           ]
         }
@@ -17196,6 +20594,12 @@
             },
             "next": [],
             "offers": [
+              {
+                "exit": "safety_open",
+                "when": {
+                  "all": []
+                }
+              },
               {
                 "exit": "crisis_kit",
                 "when": {
@@ -18908,10 +22312,11 @@
           {
             "id": "crisis_kit",
             "toolId": "crisis-kit",
-            "query": {},
+            "query": {
+              "frame": "crisis"
+            },
             "carry": [],
-            "done": false,
-            "planned": true
+            "done": false
           },
           {
             "id": "done",
@@ -22262,7 +25667,7 @@
                 }
               },
               {
-                "exit": "crisis_kit",
+                "exit": "kit",
                 "when": {
                   "eq": [
                     "$a.pull",
@@ -22408,6 +25813,12 @@
             "next": [],
             "offers": [
               {
+                "exit": "safety_open",
+                "when": {
+                  "all": []
+                }
+              },
+              {
                 "exit": "cool_down",
                 "when": {
                   "any": [
@@ -22423,15 +25834,6 @@
                         "flooded"
                       ]
                     }
-                  ]
-                }
-              },
-              {
-                "exit": "safety_open",
-                "when": {
-                  "eq": [
-                    "$a.move",
-                    "call"
                   ]
                 }
               },
@@ -22493,6 +25895,12 @@
             "next": [],
             "offers": [
               {
+                "exit": "safety_open",
+                "when": {
+                  "all": []
+                }
+              },
+              {
                 "exit": "crisis_kit",
                 "when": {
                   "all": []
@@ -22519,10 +25927,11 @@
           {
             "id": "crisis_kit",
             "toolId": "crisis-kit",
-            "query": {},
+            "query": {
+              "frame": "crisis"
+            },
             "carry": [],
-            "done": false,
-            "planned": true
+            "done": false
           },
           {
             "id": "dear_man",
@@ -22558,6 +25967,13 @@
             "query": {
               "frame": "hurt"
             },
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "kit",
+            "toolId": "crisis-kit",
+            "query": {},
             "carry": [],
             "done": false
           },
@@ -36909,9 +40325,10 @@
             "id": "give",
             "toolId": "give",
             "query": {},
-            "carry": [],
-            "done": false,
-            "planned": true
+            "carry": [
+              "feel"
+            ],
+            "done": false
           },
           {
             "id": "let_it_be",
@@ -40510,6 +43927,12 @@
             "next": [],
             "offers": [
               {
+                "exit": "safety_open",
+                "when": {
+                  "all": []
+                }
+              },
+              {
                 "exit": "crisis_kit",
                 "when": {
                   "all": []
@@ -40529,10 +43952,11 @@
           {
             "id": "crisis_kit",
             "toolId": "crisis-kit",
-            "query": {},
+            "query": {
+              "frame": "crisis"
+            },
             "carry": [],
-            "done": false,
-            "planned": true
+            "done": false
           },
           {
             "id": "done",
@@ -43248,6 +46672,12 @@
             "next": [],
             "offers": [
               {
+                "exit": "safety_open",
+                "when": {
+                  "all": []
+                }
+              },
+              {
                 "exit": "cool_down",
                 "when": {
                   "all": []
@@ -43315,6 +46745,12 @@
             "next": [],
             "offers": [
               {
+                "exit": "safety_open",
+                "when": {
+                  "all": []
+                }
+              },
+              {
                 "exit": "crisis_kit",
                 "when": {
                   "all": []
@@ -43334,10 +46770,11 @@
           {
             "id": "crisis_kit",
             "toolId": "crisis-kit",
-            "query": {},
+            "query": {
+              "frame": "crisis"
+            },
             "carry": [],
-            "done": false,
-            "planned": true
+            "done": false
           },
           {
             "id": "done",

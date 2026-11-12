@@ -364,7 +364,7 @@ EXITS = [
     {"id": "cool_down", "toolId": "cool-down"},
     {"id": "pause", "toolId": "pause"},
     {"id": "dear_man", "toolId": "dear-man"},
-    {"id": "give", "toolId": "give", "planned": True},
+    {"id": "give", "toolId": "give"},  # IE-06 Keep it warm (built 12 Nov)
     {"id": "problem_solve", "toolId": "problem-solve"},
     {"id": "cope_ahead", "toolId": "cope-ahead", "query": {"situationId": "conversation"}},
     {"id": "rehearse", "toolId": "rehearse", "planned": True},

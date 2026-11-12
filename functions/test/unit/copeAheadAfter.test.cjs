@@ -71,6 +71,7 @@ test('a close\'s schedule: another tool\'s session skips cope_ahead_after (like 
     ending_after: 'ending-relationships', ending_again: 'ending-relationships', ending_revisit: 'ending-relationships', ask_outcome: 'dear-man', no_outcome: 'say-no',
     ask_delayed: 'dear-man',
     oa_try: 'opposite-action',
+    break_return: 'give', repair_outcome: 'give',
     habit_renew: 'habit-plan',
     please_fix: 'please-skill',
     good_thing: 'good-things',

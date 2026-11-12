@@ -25,7 +25,7 @@ it, and a plan ready if you slip. Both at once.**
 | Step | What the person sees | PRD DT-09 |
 |---|---|---|
 | `what` | *What do you keep going back to?* Nine behaviours or their own words (60 characters), plus *Hurting myself* → `harm` | Step 1 |
-| `harm` | `safetyFirst` (the resources open over the card), the crisis banner, *Hurting yourself needs more care than a habit plan can give. Someone to talk to comes first.* No plan, no close | Step 1: self-harm belongs to CORE, never here; voice.md S9 |
+| `harm` | `safetyFirst` (the resources open over the card), the crisis banner, *Hurting yourself needs more care than a habit plan can give. Someone to talk to comes first.* Offers *Talk to someone now*, then My crisis kit (`frame=crisis`, DT-03). No plan, no close | Step 1: self-harm belongs to CORE, never here; voice.md S9 |
 | `heads_up` | A carried flooded reading: *Your body's loud right now.* Two choices (T8): *Look after the next few minutes first* → `settle` (First, the body, Ride it out) · *Make the plan anyway* | Capacity: flooded → DT-01 |
 | `medical` | Drink, drugs or own words (which could be a substance; worded *If this is alcohol, benzos or opioids: …*): *Stopping alcohol, benzos or opioids all at once can be dangerous. A doctor can help you come off safely.* (*Cutting down with a doctor's plan counts as a commitment too. Shaking, sweating, seeing things or a seizure after stopping: get help now.*) One optional tap: *I've got support with this* · *I'll talk to someone about it* | Step 7, the medical heads-up |
 | `eating` | Bingeing or purging: *This plan is about not bingeing or purging. It never means not eating.* Regular meals, and a doctor or eating disorder service. The same optional tap | Step 1, eating |
