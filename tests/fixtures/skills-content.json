@@ -7868,7 +7868,9 @@
     {
      "id": "finding_connection",
      "toolId": "finding-connection",
-     "query": {},
+     "query": {
+      "frame": "elsewhere"
+     },
      "carry": [],
      "done": false
     },
@@ -13123,7 +13125,9 @@
     {
      "id": "finding_connection",
      "toolId": "finding-connection",
-     "query": {},
+     "query": {
+      "frame": "elsewhere"
+     },
      "carry": [],
      "done": false
     },
@@ -14741,7 +14745,9 @@
     {
      "id": "finding_connection",
      "toolId": "finding-connection",
-     "query": {},
+     "query": {
+      "frame": "elsewhere"
+     },
      "carry": [],
      "done": false
     },
@@ -15386,12 +15392,14 @@
    "version": "fc-v1",
    "start": "start",
    "accepts": [
-    "band"
+    "band",
+    "frame"
    ],
    "ownMax": 60,
    "emotionFields": [],
    "copy": {
     "start_title": "Where do you want to start?",
+    "start_elsewhere": "This is about other people in your life, not the one this was about.",
     "start_hint": "Feeling cut off from people is common, and it can shift in small steps. Pick the one that feels most possible.",
     "heads_up_title": "Your body's loud right now.",
     "heads_up_hint": "Reaching out lands better once it settles a little.",
@@ -15399,11 +15407,13 @@
     "step_title": "Pick one small step.",
     "step_hint": "Smallest first. A small one done counts for more than a big one planned.",
     "step_low": "The smallest ones for now. Bigger ones are here on a steadier day.",
+    "step_smaller": "The smallest ones. Any of these counts.",
     "step_own": "Something else",
     "predict_title": "Before you do it: how do you think it'll go?",
+    "predict_solo_title": "Before you do it: how do you think it'll go?",
     "predict_hint": "A guess is enough. You'll check it afterwards.",
     "liking_label": "If you talk to someone, how much do you think they'll like you?",
-    "picture_title": "Picture doing it, for a few seconds.",
+    "picture_title": "Picture it for a few seconds: {step}.",
     "picture_label": "Start",
     "picture_running": "Picturing it",
     "picture_hint": "Where you are, the first thing you do or say, and you doing it anyway if it feels awkward.",
@@ -15413,19 +15423,21 @@
     "set_title": "Your step: {step}.",
     "set_remind": "I'll ask how it went. Doing it is the experiment; how it goes is information, not a verdict about you.",
     "set_line": "Doing it is the experiment. How it goes is information, not a verdict about you.",
-    "back_title": "Earlier you picked: {step}.",
+    "back_title": "Earlier you picked: {step}. Your guess: {guess}.",
     "happened_label": "Did you do it?",
     "went_title": "How did it go?",
+    "went_solo_title": "How did it go?",
     "liked_label": "How much did they seem to like you?",
     "gap_title": "You did it.",
     "gap_better_title": "It went better than you predicted.",
     "gap_same_title": "It went about how you predicted.",
+    "gap_hard_title": "That was hard, and you did it.",
     "gap_worse_title": "It went worse than you predicted.",
     "gap_no_answer_title": "No response yet.",
     "gap_better": "That gap is worth noticing.",
     "gap_worse": "One try is information, not a verdict about you.",
     "gap_no_answer": "People miss messages, get busy, forget. It says little about you.",
-    "gap_liked": "They seemed to like you more than you guessed. Most people guess low on that.",
+    "gap_liked": "They seemed to like you more than you guessed. People often guess low on that.",
     "gap_line": "Each try tells you a bit more about how people actually respond.",
     "again_title": "Not yet is fine.",
     "again_hint": "The step is still here.",
@@ -15433,6 +15445,7 @@
     "not_doing_line": "Deciding not to is allowed. Your step is here when you want it.",
     "leave_line": "It'll keep. Come back to it any time.",
     "safety_open": "Talk to someone now",
+    "hurt_link": "I might hurt myself",
     "next": "Next",
     "done": "Done"
    },
@@ -15460,6 +15473,17 @@
          }
         }
        ]
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "elsewhere"
+        ]
+       },
+       "key": "start_elsewhere"
       }
      ],
      "hint": "start_hint",
@@ -15575,15 +15599,37 @@
           {
            "any": [
             {
-             "not": {
-              "in": [
-               "$ctx.band",
-               [
-                "stirred",
-                "flooded"
-               ]
-              ]
-             }
+             "all": [
+              {
+               "not": {
+                "any": [
+                 {
+                  "in": [
+                   "$ctx.band",
+                   [
+                    "stirred",
+                    "flooded"
+                   ]
+                  ]
+                 },
+                 {
+                  "eq": [
+                   "$ctx.frame",
+                   "low"
+                  ]
+                 }
+                ]
+               }
+              },
+              {
+               "not": {
+                "eq": [
+                 "$a.again",
+                 "smaller"
+                ]
+               }
+              }
+             ]
             },
             {
              "eq": [
@@ -15617,21 +15663,79 @@
      "lines": [
       {
        "when": {
-        "in": [
-         "$ctx.band",
-         [
-          "stirred",
-          "flooded"
-         ]
+        "eq": [
+         "$a.again",
+         "smaller"
+        ]
+       },
+       "key": "step_smaller"
+      },
+      {
+       "when": {
+        "any": [
+         {
+          "in": [
+           "$ctx.band",
+           [
+            "stirred",
+            "flooded"
+           ]
+          ]
+         },
+         {
+          "eq": [
+           "$ctx.frame",
+           "low"
+          ]
+         }
         ]
        },
        "key": "step_low"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "step_hint"
       }
      ],
-     "hint": "step_hint",
      "next": [
       {
        "to": "predict",
+       "when": {
+        "any": [
+         {
+          "in": [
+           "$a.step",
+           [
+            "around_hello",
+            "like_reply",
+            "like_online",
+            "like_go",
+            "talk_reply",
+            "talk_question",
+            "talk_extra",
+            "talk_true",
+            "talk_start",
+            "friend_thought",
+            "friend_owe",
+            "friend_follow",
+            "friend_invite",
+            "join_help",
+            "join_go"
+           ]
+          ]
+         },
+         {
+          "not": {
+           "set": "$a.step.ids"
+          }
+         }
+        ]
+       }
+      },
+      {
+       "to": "predict_solo",
        "when": null
       }
      ],
@@ -15679,11 +15783,92 @@
      "offers": []
     },
     {
+     "id": "predict_solo",
+     "kind": "ask",
+     "title": "predict_solo_title",
+     "fields": [
+      {
+       "id": "predict",
+       "options": {
+        "list": "how",
+        "where": {
+         "any": [
+          {
+           "any": [
+            {
+             "in": [
+              "$a.step",
+              [
+               "around_hello",
+               "like_reply",
+               "like_online",
+               "like_go",
+               "talk_reply",
+               "talk_question",
+               "talk_extra",
+               "talk_true",
+               "talk_start",
+               "friend_thought",
+               "friend_owe",
+               "friend_follow",
+               "friend_invite",
+               "join_help",
+               "join_go"
+              ]
+             ]
+            },
+            {
+             "not": {
+              "set": "$a.step.ids"
+             }
+            }
+           ]
+          },
+          {
+           "not": {
+            "eq": [
+             "$opt.value",
+             "no_answer"
+            ]
+           }
+          }
+         ]
+        }
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "predict_hint",
+     "next": [
+      {
+       "to": "picture",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
      "id": "picture",
      "kind": "embed",
      "embed": "holdRing",
      "answerAs": "picture",
      "title": "picture_title",
+     "hint": "picture_hint",
+     "titleSlots": {
+      "step": {
+       "labelOf": "step"
+      }
+     },
      "props": {
       "variant": "timed",
       "seconds": 15,
@@ -15836,6 +16021,9 @@
      "titleSlots": {
       "step": {
        "labelOf": "step"
+      },
+      "guess": {
+       "labelOf": "predict"
       }
      },
      "next": [
@@ -15859,6 +16047,40 @@
       },
       {
        "to": "went",
+       "when": {
+        "any": [
+         {
+          "in": [
+           "$a.step",
+           [
+            "around_hello",
+            "like_reply",
+            "like_online",
+            "like_go",
+            "talk_reply",
+            "talk_question",
+            "talk_extra",
+            "talk_true",
+            "talk_start",
+            "friend_thought",
+            "friend_owe",
+            "friend_follow",
+            "friend_invite",
+            "join_help",
+            "join_go"
+           ]
+          ]
+         },
+         {
+          "not": {
+           "set": "$a.step.ids"
+          }
+         }
+        ]
+       }
+      },
+      {
+       "to": "went_solo",
        "when": null
       }
      ],
@@ -15897,6 +16119,104 @@
       }
      ],
      "next": [
+      {
+       "to": "gap_hard",
+       "when": {
+        "in": [
+         "$a.went",
+         [
+          "badly",
+          "no_answer"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "gap",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "went_solo",
+     "kind": "ask",
+     "title": "went_solo_title",
+     "fields": [
+      {
+       "id": "went",
+       "options": {
+        "list": "went",
+        "where": {
+         "any": [
+          {
+           "any": [
+            {
+             "in": [
+              "$a.step",
+              [
+               "around_hello",
+               "like_reply",
+               "like_online",
+               "like_go",
+               "talk_reply",
+               "talk_question",
+               "talk_extra",
+               "talk_true",
+               "talk_start",
+               "friend_thought",
+               "friend_owe",
+               "friend_follow",
+               "friend_invite",
+               "join_help",
+               "join_go"
+              ]
+             ]
+            },
+            {
+             "not": {
+              "set": "$a.step.ids"
+             }
+            }
+           ]
+          },
+          {
+           "not": {
+            "eq": [
+             "$opt.value",
+             "no_answer"
+            ]
+           }
+          }
+         ]
+        }
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "gap_hard",
+       "when": {
+        "in": [
+         "$a.went",
+         [
+          "badly",
+          "no_answer"
+         ]
+        ]
+       }
+      },
       {
        "to": "gap",
        "when": null
@@ -15980,22 +16300,6 @@
            {
             "eq": [
              "$a.went",
-             "badly"
-            ]
-           }
-          ]
-         },
-         {
-          "all": [
-           {
-            "eq": [
-             "$a.predict",
-             "no_answer"
-            ]
-           },
-           {
-            "eq": [
-             "$a.went",
              "mixed"
             ]
            }
@@ -16020,6 +16324,29 @@
         ]
        },
        "key": "gap_better_title"
+      },
+      {
+       "when": {
+        "any": [
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.predict",
+             "badly"
+            ]
+           },
+           {
+            "eq": [
+             "$a.went",
+             "badly"
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       "key": "gap_hard_title"
       },
       {
        "when": {
@@ -16149,51 +16476,61 @@
        "when": {
         "any": [
          {
-          "all": [
+          "any": [
            {
-            "eq": [
-             "$a.predict",
-             "mixed"
+            "all": [
+             {
+              "eq": [
+               "$a.predict",
+               "mixed"
+              ]
+             },
+             {
+              "eq": [
+               "$a.went",
+               "badly"
+              ]
+             }
             ]
            },
            {
-            "eq": [
-             "$a.went",
-             "badly"
+            "all": [
+             {
+              "eq": [
+               "$a.predict",
+               "well"
+              ]
+             },
+             {
+              "eq": [
+               "$a.went",
+               "badly"
+              ]
+             }
+            ]
+           },
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.predict",
+               "well"
+              ]
+             },
+             {
+              "eq": [
+               "$a.went",
+               "mixed"
+              ]
+             }
             ]
            }
           ]
          },
          {
-          "all": [
-           {
-            "eq": [
-             "$a.predict",
-             "well"
-            ]
-           },
-           {
-            "eq": [
-             "$a.went",
-             "badly"
-            ]
-           }
-          ]
-         },
-         {
-          "all": [
-           {
-            "eq": [
-             "$a.predict",
-             "well"
-            ]
-           },
-           {
-            "eq": [
-             "$a.went",
-             "mixed"
-            ]
-           }
+          "eq": [
+           "$a.went",
+           "badly"
           ]
          }
         ]
@@ -16317,7 +16654,477 @@
            {
             "eq": [
              "$a.went",
+             "mixed"
+            ]
+           }
+          ]
+         },
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.predict",
+             "no_answer"
+            ]
+           },
+           {
+            "eq": [
+             "$a.went",
+             "well"
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       "key": "gap_better"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "gap_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "next": [],
+     "offers": [
+      {
+       "exit": "recover",
+       "when": {
+        "eq": [
+         "$a.went",
+         "badly"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "id": "gap_hard",
+     "kind": "handoff",
+     "complete": true,
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$a.went",
+         "no_answer"
+        ]
+       },
+       "key": "gap_no_answer_title"
+      },
+      {
+       "when": {
+        "any": [
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.predict",
              "badly"
+            ]
+           },
+           {
+            "eq": [
+             "$a.went",
+             "mixed"
+            ]
+           }
+          ]
+         },
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.predict",
+             "badly"
+            ]
+           },
+           {
+            "eq": [
+             "$a.went",
+             "well"
+            ]
+           }
+          ]
+         },
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.predict",
+             "mixed"
+            ]
+           },
+           {
+            "eq": [
+             "$a.went",
+             "well"
+            ]
+           }
+          ]
+         },
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.predict",
+             "no_answer"
+            ]
+           },
+           {
+            "eq": [
+             "$a.went",
+             "mixed"
+            ]
+           }
+          ]
+         },
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.predict",
+             "no_answer"
+            ]
+           },
+           {
+            "eq": [
+             "$a.went",
+             "well"
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       "key": "gap_better_title"
+      },
+      {
+       "when": {
+        "any": [
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.predict",
+             "badly"
+            ]
+           },
+           {
+            "eq": [
+             "$a.went",
+             "badly"
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       "key": "gap_hard_title"
+      },
+      {
+       "when": {
+        "any": [
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.predict",
+             "badly"
+            ]
+           },
+           {
+            "eq": [
+             "$a.went",
+             "badly"
+            ]
+           }
+          ]
+         },
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.predict",
+             "mixed"
+            ]
+           },
+           {
+            "eq": [
+             "$a.went",
+             "mixed"
+            ]
+           }
+          ]
+         },
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.predict",
+             "well"
+            ]
+           },
+           {
+            "eq": [
+             "$a.went",
+             "well"
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       "key": "gap_same_title"
+      },
+      {
+       "when": {
+        "any": [
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.predict",
+             "mixed"
+            ]
+           },
+           {
+            "eq": [
+             "$a.went",
+             "badly"
+            ]
+           }
+          ]
+         },
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.predict",
+             "well"
+            ]
+           },
+           {
+            "eq": [
+             "$a.went",
+             "badly"
+            ]
+           }
+          ]
+         },
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.predict",
+             "well"
+            ]
+           },
+           {
+            "eq": [
+             "$a.went",
+             "mixed"
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       "key": "gap_worse_title"
+      },
+      {
+       "key": "gap_title"
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.went",
+         "no_answer"
+        ]
+       },
+       "key": "gap_no_answer"
+      },
+      {
+       "when": {
+        "any": [
+         {
+          "any": [
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.predict",
+               "mixed"
+              ]
+             },
+             {
+              "eq": [
+               "$a.went",
+               "badly"
+              ]
+             }
+            ]
+           },
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.predict",
+               "well"
+              ]
+             },
+             {
+              "eq": [
+               "$a.went",
+               "badly"
+              ]
+             }
+            ]
+           },
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.predict",
+               "well"
+              ]
+             },
+             {
+              "eq": [
+               "$a.went",
+               "mixed"
+              ]
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "eq": [
+           "$a.went",
+           "badly"
+          ]
+         }
+        ]
+       },
+       "key": "gap_worse"
+      },
+      {
+       "when": {
+        "any": [
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.liking",
+             "not_much"
+            ]
+           },
+           {
+            "eq": [
+             "$a.liked",
+             "some"
+            ]
+           }
+          ]
+         },
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.liking",
+             "not_much"
+            ]
+           },
+           {
+            "eq": [
+             "$a.liked",
+             "a_lot"
+            ]
+           }
+          ]
+         },
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.liking",
+             "some"
+            ]
+           },
+           {
+            "eq": [
+             "$a.liked",
+             "a_lot"
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       "key": "gap_liked"
+      },
+      {
+       "when": {
+        "any": [
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.predict",
+             "badly"
+            ]
+           },
+           {
+            "eq": [
+             "$a.went",
+             "mixed"
+            ]
+           }
+          ]
+         },
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.predict",
+             "badly"
+            ]
+           },
+           {
+            "eq": [
+             "$a.went",
+             "well"
+            ]
+           }
+          ]
+         },
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.predict",
+             "mixed"
+            ]
+           },
+           {
+            "eq": [
+             "$a.went",
+             "well"
             ]
            }
           ]
@@ -16369,7 +17176,7 @@
      "links": [
       {
        "exit": "safety_open",
-       "label": "safety_open",
+       "label": "hurt_link",
        "when": {
         "all": []
        }
@@ -16581,7 +17388,7 @@
      },
      {
       "value": "around_together",
-      "label": "Go somewhere people do a thing together, and stay twenty minutes",
+      "label": "Go somewhere people do a thing together, and stay a while",
       "area": "around",
       "tier": 3
      },
@@ -16677,6 +17484,13 @@
       "small": true
      },
      {
+      "value": "join_look",
+      "label": "Look at what's on near you this week",
+      "area": "join",
+      "tier": 1,
+      "small": true
+     },
+     {
       "value": "join_sign",
       "label": "Sign up for one thing",
       "area": "join",
@@ -16690,7 +17504,7 @@
      },
      {
       "value": "join_go",
-      "label": "Go once, and stay to the end",
+      "label": "Go once. Staying a while counts, and so does leaving early",
       "area": "join",
       "tier": 3
      }
@@ -38862,7 +39676,7 @@
     "l_dialectics": "Find the middle path",
     "l_please_skill": "Look after the basics first",
     "l_build_mastery": "Build a small win",
-    "l_finding_connection": "Find someone to lean on",
+    "l_finding_connection": "Take one small step towards people",
     "l_self_validate": "Validate yourself",
     "l_others": "This part is about them. Work out what to say with DEAR MAN",
     "l_missing_links": "Find what got in the way"

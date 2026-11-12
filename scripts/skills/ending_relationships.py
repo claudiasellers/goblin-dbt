@@ -369,7 +369,7 @@ EXITS = [
     {"id": "cope_ahead", "toolId": "cope-ahead", "query": {"situationId": "conversation"}},
     {"id": "rehearse", "toolId": "rehearse", "planned": True},
     {"id": "opposite_action", "toolId": "opposite-action"},
-    {"id": "finding_connection", "toolId": "finding-connection"},  # IE-09 Find your people (built 12 Nov)
+    {"id": "finding_connection", "toolId": "finding-connection", "query": {"frame": "elsewhere"}},  # IE-09 Find your people (built 12 Nov): other people, not this one
     {"id": "let_it_be", "toolId": "let-it-be"},
     {"id": "safety_open", "toolId": None, "safety": True},
     {"id": "done", "done": True},

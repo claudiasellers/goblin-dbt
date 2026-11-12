@@ -129,7 +129,7 @@ COPY = {
     "l_dialectics": "Find the middle path",
     "l_please_skill": "Look after the basics first",
     "l_build_mastery": "Build a small win",
-    "l_finding_connection": "Find someone to lean on",
+    "l_finding_connection": "Take one small step towards people",
     "l_self_validate": "Validate yourself",
     "l_others": "This part is about them. Work out what to say with DEAR MAN",
     "l_missing_links": "Find what got in the way",

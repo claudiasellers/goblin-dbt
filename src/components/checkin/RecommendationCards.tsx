@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { fromCheckIn } from '../../lib/spine/toolLink';
-import type { RecommendationCard } from '../../lib/recommendation';
+import { cardHref, type RecommendationCard } from '../../lib/recommendation';
 import { familyForTool } from '../../data/skillFamilies';
 import { useOfficialNames } from '../../hooks/useOfficialNames';
 
@@ -46,7 +46,7 @@ export function RecommendationCards({ cards, variant = 'standard', checkInId, ch
               </p>
             )}
             <Link
-              to={`/tool/${tool.id}`}
+              to={cardHref(tool.id, activationPatternId)}
               state={fromCheckIn(checkInId, checkinEmotions, activationPatternId, { slot: card.slot, ruleId: card.ruleId ?? undefined })}
               onClick={() => onOpen?.(tool.id, card.slot)}
               className={compact

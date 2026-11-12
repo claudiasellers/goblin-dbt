@@ -348,7 +348,7 @@ LET_GO_EXITS = [
     {"id": "cool_down", "toolId": "cool-down"},
     {"id": "safety_open", "toolId": None, "safety": True},
     {"id": "recover", "toolId": "recovering-from-invalidation"},
-    {"id": "finding_connection", "toolId": "finding-connection"},  # IE-09 Find your people (built 12 Nov)
+    {"id": "finding_connection", "toolId": "finding-connection", "query": {"frame": "elsewhere"}},  # IE-09 Find your people (built 12 Nov): other people, not this one
     {"id": "done", "done": True},
 ]
 
