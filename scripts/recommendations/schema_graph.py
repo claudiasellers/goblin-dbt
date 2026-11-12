@@ -11,6 +11,7 @@ schema files actually use after A1-4's conversion:
   WHERE a.p = x / a.p <> b.p / NOT a.p IN [..] / a.p IS [NOT] NULL joined by AND
   SET v.p = expr, v += {map}                 expr: literal, variable, variable.field
   SET v:Label:Other                          (adds labels; the skill runtime's clinical labels)
+  REMOVE v.p, w.q                            (properties only)
   WITH a, b                                  (pass-through of bound variables only)
   DELETE r
 
@@ -567,6 +568,13 @@ def run_statement(g, stmt):
         elif kw == 'WITH' and re.fullmatch(r'\w+(\s*,\s*\w+)*', body):
             keep = [v.strip() for v in body.split(',')]
             rows = [{k: r[k] for k in keep} for r in rows]
+        elif kw == 'REMOVE':
+            for r in rows:
+                for item in split_top(body):
+                    m = re.fullmatch(r'\s*(\w+)\.(\w+)\s*', item)
+                    if not m:
+                        raise Unsupported(f'REMOVE {item[:40]}')
+                    r[m.group(1)].props.pop(m.group(2), None)
         elif kw == 'DELETE':
             doomed = {id(r[v.strip()]) for r in rows for v in body.split(',')}
             g.relationships = [x for x in g.relationships if id(x) not in doomed]
