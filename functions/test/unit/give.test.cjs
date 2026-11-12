@@ -49,7 +49,7 @@ test('fields: option ids only; the kind comes from which afterwards was answered
   for (const v of ['physical', 'scared']) assert.equal(G.giveFields(run([ans('fight', v)])).hurt, true, v);
   assert.equal(G.giveFields(run([ans('fight', 'no')])).hurt, false);
   assert.equal(G.giveFields(run([ans('brought', 'angry'), ans('angry_ok', 'scared')])).hurt, true);
-  for (const r of [[ans('back', 'unsafe')], [ans('back', 'yes'), ans('still_ok', 'unsafe')], [ans('repaired', 'yes'), ans('between', 'unsafe')]]) {
+  for (const r of [[ans('back', 'unsafe')], [ans('back', 'yes'), ans('still_ok', 'unsafe')], [ans('repaired', 'yes'), ans('between', 'unsafe')], [ans('repaired', 'unsafe')], [ans('situation', 'heated'), ans('not_safe', 'unsafe')]]) {
     const f = G.giveFields(run(r));
     assert.deepEqual([f.hurt, f.kind, f.outcome], [true, null, null], 'not safe with them: nothing logged');
   }

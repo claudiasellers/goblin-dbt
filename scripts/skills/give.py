@@ -68,6 +68,8 @@ UNSAFE_BACK = is_("back", "unsafe")
 UNSAFE_BETWEEN = is_("between", "unsafe")
 UNSAFE_STILL = is_("still_ok", "unsafe")
 UNSAFE_ANGRY = is_("angry_ok", "scared")
+UNSAFE_REPAIRED = is_("repaired", "unsafe")
+UNSAFE_BREAK = is_("not_safe", "unsafe")
 OTHER_PERSON = [{"variant": "other_person", "when": HURT}]
 
 PICKER_KEYS = [
@@ -159,7 +161,7 @@ COPY = {
     "more_title": "That's okay. When will you go back?",
     "more_line": "There'll be a card here then.",
     "no_return_line": "Not going back to it is an answer too. You can choose what happens next with them.",
-    "not_safe_link": "I don't feel safe with them",
+    "not_safe_label": "If it isn't safe",
     "refused_line": "You came back. That part was yours, and you did it. They may need longer.",
     # --- Before an ask: GIVE's four rows ---
     "gentle_title": "What would keep it warm while you ask?",
@@ -264,7 +266,7 @@ NO_SORRY = [
 ]
 # The repair_outcome card's window chips (scripts/practice-spine/content.py). No chip: no card.
 AGAIN = [("today", "This evening"), ("tomorrow", "Tomorrow"), ("this_week", "In a few days")]
-REPAIRED = [("yes", "Yes"), ("not_yet", "Not yet"), ("wait", "They weren't ready to hear it")]
+REPAIRED = [("yes", "Yes"), ("not_yet", "Not yet"), ("wait", "They weren't ready to hear it"), ("unsafe", "I don't feel safe with them")]
 BETWEEN = [("yes", "Okay"), ("shaky", "A bit shaky"), ("no", "Not okay yet"), ("unsafe", "I don't feel safe with them")]
 # The break_return card's window chips: the line says the same time.
 BREAK_LEN = [
@@ -336,7 +338,7 @@ STEPS = [
         "id": "theirs", "kind": "ask", "title": "their_title", "hint": "their_hint",
         "fields": [
             {"id": "validate", "label": "validate_label", "options": {"list": "validate", "where": BROUGHT_WHERE}, "max": 1,
-             "required": True, "own": {"hint": "own_line", "countsAsPick": True, "max": 40}},
+             "required": True, "own": {"hint": "own_line", "countsAsPick": True, "max": 36}},
             {"id": "interested", "label": "interested_label", "options": {"list": "interested", "where": BROUGHT_WHERE}, "max": 1},
         ],
         "next": [{"to": "yours"}],
@@ -398,7 +400,7 @@ STEPS = [
         "title": [{"key": "ack_title_unsure", "when": is_("guilt", "unsure")}, {"key": "ack_title"}],
         "fields": [
             {"id": "ack", "label": "ack_label", "options": {"list": "ack"}, "max": 1, "required": True,
-             "own": {"hint": "own_line", "countsAsPick": True, "max": 40}},
+             "own": {"hint": "own_line", "countsAsPick": True, "max": 36}},
             {"id": "r_validate", "label": "r_validate_label", "options": {"list": "r_validate"}, "max": 1},
             {"id": "commit", "label": "r_commit_label", "options": {"list": "commit"}, "max": 1},
             {"id": "r_ask", "label": "r_ask_label", "options": {"list": "r_ask"}, "max": 1},
@@ -444,7 +446,8 @@ STEPS = [
         "id": "repaired", "kind": "ask", "reopens": {"after": "r_sent"}, "clears": ["repaired", "between"],
         "title": "repaired_title",
         "fields": [{"id": "repaired", "options": {"list": "repaired"}, "max": 1, "required": True}],
-        "next": [{"when": is_("repaired", "not_yet"), "to": "r_later"},
+        "crisis": [{"variant": "other_person", "when": UNSAFE_REPAIRED}],
+        "next": [{"when": UNSAFE_REPAIRED, "to": "scared"}, {"when": is_("repaired", "not_yet"), "to": "r_later"},
                  {"when": is_("repaired", "wait"), "to": "r_wait"}, {"to": "between"}],
     },
     {
@@ -473,13 +476,17 @@ STEPS = [
         "id": "break", "kind": "ask", "title": "break_title",
         "fields": [
             {"id": "break_len", "label": "break_len_label", "options": {"list": "break_len"}, "max": 1, "required": True,
-             "links": [{"exit": "safety_open", "label": "not_safe_link", "when": ALWAYS}]},
+             "showWhen": {"not": UNSAFE_BREAK}},
             {"id": "break_line", "label": "break_line_label", "options": {"list": "break_line", "where": LEN_WHERE}, "max": 1,
-             "required": True, "showWhen": {"set": a("break_len")}},
+             "required": True, "showWhen": {"all": [{"set": a("break_len")}, {"not": UNSAFE_BREAK}]}},
+            # A way out for someone who isn't safe with them: the answer is recorded (the projection makes their
+            # safety answer stale) and the run takes the safety branch; no card is booked (no window picked).
+            {"id": "not_safe", "label": "not_safe_label", "options": {"list": "not_safe"}, "max": 1},
         ],
+        "crisis": [{"variant": "other_person", "when": UNSAFE_BREAK}],
         # The time the line says is the card's time.
         "followUp": {"type": "break_return", "whenFrom": "break_len"},
-        "next": [{"to": "b_line"}],
+        "next": [{"when": UNSAFE_BREAK, "to": "scared"}, {"to": "b_line"}],
     },
     {
         "id": "b_line", "kind": "embed", "embed": "boundaryLine", "title": "break_card_title", "answerAs": "break_copied",
@@ -597,7 +604,8 @@ def options():
     out += [("r_ask", v, l, {}, None) for v, l in R_ASK]
     out += [("no_sorry", v, l, {}, None) for v, l in NO_SORRY]
     out += [("again", v, l, {}, None) for v, l in AGAIN]
-    out += [("repaired", v, l, {}, None) for v, l in REPAIRED]
+    out += [("repaired", v, l, {"danger": "other"} if v == "unsafe" else {}, None) for v, l in REPAIRED]
+    out += [("not_safe", "unsafe", "I don't feel safe with them", {"danger": "other"}, None)]
     out += [("between", v, l, {"danger": "other"} if v == "unsafe" else {}, None) for v, l in BETWEEN]
     out += [("break_len", v, l, {}, None) for v, l in BREAK_LEN]
     out += [("break_line", v, l, {"len": ln}, None) for v, l, ln in BREAK_LINE]

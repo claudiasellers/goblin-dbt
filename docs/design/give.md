@@ -41,7 +41,8 @@ what ─┬─ brought (angry → safe with them? scared ─► scared) ─► t
       ├─ heated ──► break ─► b_line (boundaryLine) ─► b_set
       └─ before_ask ─► gentle ─► soft (bodyCard willing) ─► g_card (pocketCard) ─► g_end
 
-repair_outcome card ─► repaired ─┬─ yes ─► between ─┬─ unsafe ─► scared
+repair_outcome card ─► repaired ─┬─ unsafe ─► scared
+                                 ├─ yes ─► between ─┬─ unsafe ─► scared
                                  │                  └─ else ─► r_end (not okay → Let go)
                                  ├─ not yet ─► r_later
                                  └─ they weren't ready ─► r_wait (Let go)
@@ -102,8 +103,9 @@ abandonment, PRD KB §4.6.) How long (half an hour, an hour, till tomorrow), the
 the boundary card. The `break_return` card comes at that time and reopens the run at *Did you go back?*: yes → *How are
 things between you now?* (shaky or not okay → the repair, with the person); not yet → another time and another card;
 they didn't want to → *You came back. That part was yours, and you did it.* and FAST's Let go; *I'm not going back to
-it for now* → an end with no card. Every one of these visits, and the break screen itself (a quiet link), has a way
-out for someone who isn't safe with them: *I don't feel safe going back* / *with them* → `scared`, the safety answer
+it for now* → an end with no card. Every one of these visits (both cards' first screens included), and the break screen itself (*If it isn't safe*, which
+hides the time and books no card), has a way out for someone who isn't safe with them: *I don't feel safe going back* /
+*with them* → `scared`, the safety answer
 made stale, nothing logged. The pocket card's break line says when: *I need half an hour. I'm coming back to this.* The PRD's 20 minutes is half an
 hour here: the server's window list has 30 and 60 (`m30`, `m60`), and 20 minutes is the low end of what the break
 needs anyway.

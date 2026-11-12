@@ -15818,7 +15818,7 @@
           "more_title": "That's okay. When will you go back?",
           "more_line": "There'll be a card here then.",
           "no_return_line": "Not going back to it is an answer too. You can choose what happens next with them.",
-          "not_safe_link": "I don't feel safe with them",
+          "not_safe_label": "If it isn't safe",
           "refused_line": "You came back. That part was yours, and you did it. They may need longer.",
           "gentle_title": "What would keep it warm while you ask?",
           "gentle_title_heads_up": "Short and plain with them, and a little warmth. What would help?",
@@ -16073,7 +16073,7 @@
                 "own": {
                   "hint": "own_line",
                   "countsAsPick": true,
-                  "max": 40
+                  "max": 36
                 }
               },
               {
@@ -16429,7 +16429,7 @@
                 "own": {
                   "hint": "own_line",
                   "countsAsPick": true,
-                  "max": 40
+                  "max": 36
                 }
               },
               {
@@ -16645,7 +16645,27 @@
                 "required": true
               }
             ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.repaired",
+                    "unsafe"
+                  ]
+                }
+              }
+            ],
             "next": [
+              {
+                "to": "scared",
+                "when": {
+                  "eq": [
+                    "$a.repaired",
+                    "unsafe"
+                  ]
+                }
+              },
               {
                 "to": "r_later",
                 "when": {
@@ -16795,15 +16815,14 @@
                 },
                 "max": 1,
                 "required": true,
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "not_safe_link",
-                    "when": {
-                      "all": []
-                    }
+                "showWhen": {
+                  "not": {
+                    "eq": [
+                      "$a.not_safe",
+                      "unsafe"
+                    ]
                   }
-                ]
+                }
               },
               {
                 "id": "break_line",
@@ -16820,7 +16839,38 @@
                 "max": 1,
                 "required": true,
                 "showWhen": {
-                  "set": "$a.break_len"
+                  "all": [
+                    {
+                      "set": "$a.break_len"
+                    },
+                    {
+                      "not": {
+                        "eq": [
+                          "$a.not_safe",
+                          "unsafe"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "not_safe",
+                "label": "not_safe_label",
+                "options": {
+                  "list": "not_safe"
+                },
+                "max": 1
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.not_safe",
+                    "unsafe"
+                  ]
                 }
               }
             ],
@@ -16829,6 +16879,15 @@
               "whenFrom": "break_len"
             },
             "next": [
+              {
+                "to": "scared",
+                "when": {
+                  "eq": [
+                    "$a.not_safe",
+                    "unsafe"
+                  ]
+                }
+              },
               {
                 "to": "b_line",
                 "when": null
@@ -17722,6 +17781,18 @@
             {
               "value": "wait",
               "label": "They weren't ready to hear it"
+            },
+            {
+              "value": "unsafe",
+              "label": "I don't feel safe with them",
+              "danger": "other"
+            }
+          ],
+          "not_safe": [
+            {
+              "value": "unsafe",
+              "label": "I don't feel safe with them",
+              "danger": "other"
             }
           ],
           "between": [

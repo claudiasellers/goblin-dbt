@@ -134,7 +134,7 @@ test("skill: the repair_outcome card reopens the run at *Did you get to say it?*
   assert.deepEqual(skill.options.again.map((o) => o.value), ["today", "tomorrow", "this_week"]);
   assert.deepEqual(step("repaired").reopens, { after: "r_sent" });
   assert.deepEqual(step("repaired").clears, ["repaired", "between"]);
-  assert.deepEqual(step("repaired").next.map((n) => n.to), ["r_later", "r_wait", "between"]);
+  assert.deepEqual(step("repaired").next.map((n) => n.to), ["scared", "r_later", "r_wait", "between"]);
   assert.deepEqual(M.offersFor(ctx(), step("r_wait"), ans({ repaired: "wait" })), ["fast_let_go"]);
   assert.deepEqual(exitOf("fast_let_go").query, { frame: "let_go" });
   assert.deepEqual(M.offersFor(ctx(), step("r_end"), ans({ between: "no" })), ["fast_let_go"]);
@@ -153,8 +153,12 @@ test("skill: break and return: the line says the time, the card comes at that ti
   assert.deepEqual(step("back").next.map((n) => n.to), ["scared", "more", "refused", "no_back", "still_ok"]);
   assert.deepEqual(M.offersFor(ctx(), step("refused"), ans({})), ["fast_let_go"]);
   assert.equal(step("no_back").followUp, undefined, "not going back: no card after it");
-  // The break screen keeps a quiet way out for someone who isn't safe with them.
-  assert.deepEqual(M.fieldLinks(ctx(), step("break").fields[0], s).map((l) => [l.exit.id, l.label]), [["safety_open", skill.copy.not_safe_link]]);
+  // The break screen keeps a way out for someone who isn't safe with them: recorded, the safety branch, no card.
+  const unsafe = play([pick("situation", "heated"), next, pick("not_safe", "unsafe")]);
+  assert.equal(M.crisisFor(ctx(), step("break"), unsafe)?.variant, "other_person");
+  assert.deepEqual(M.shownFields(ctx(), step("break"), unsafe).map((f) => f.id), ["not_safe"], "no time to pick: no card booked");
+  assert.equal(M.canGoOn(ctx(), unsafe), true);
+  assert.equal(play([next], ctx(), unsafe).stepId, "scared");
   assert.deepEqual(step("more").followUp, { type: "break_return", whenFrom: "more" });
   assert.deepEqual(M.offersFor(ctx(), step("back_end"), ans({ still_ok: "shaky" })), ["give_repair"]);
   assert.deepEqual(M.offersFor(ctx(), step("back_end"), ans({ still_ok: "yes" })), []);
@@ -169,7 +173,7 @@ test("skill: break and return: the line says the time, the card comes at that ti
 });
 
 test("skill: every visit a card reopens has a way out for *I don't feel safe with them*: the resources, no repair, no close", () => {
-  for (const [st, field, value] of [["back", "back", "unsafe"], ["between", "between", "unsafe"], ["still_ok", "still_ok", "unsafe"]]) {
+  for (const [st, field, value] of [["back", "back", "unsafe"], ["repaired", "repaired", "unsafe"], ["between", "between", "unsafe"], ["still_ok", "still_ok", "unsafe"]]) {
     const o = skill.options[step(st).fields[0].options.list].find((x) => x.value === value);
     assert.equal(o.danger, "other", st);
     assert.equal(M.crisisFor(ctx(), step(st), ans({ [field]: value }))?.variant, "other_person", st);

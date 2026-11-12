@@ -11,7 +11,7 @@ import type { ProjectionInput } from '../skills/projections';
  *     the `repair_outcome` card's visit answered *Did you get to say it?*, `kind: 'break_return'` when the
  *     `break_return` card's visit answered *Did you go back?*; `WITH` the person, ids only, never their words;
  *   - any answer that says it isn't safe with them (*It got physical* or *I'm scared of them* after a fight, *I'm
- *     scared of how angry they are*, *I don't feel safe going back* / *with them* on a card's visit): that person's
+ *     scared of how angry they are*, *I don't feel safe going back* / *with them* on a card's visit or the break screen): that person's
  *     safety answer goes stale (`safetyRecheckAt`), so the next visit with them asks the safety question again (as
  *     Say no's *scared*), and nothing is logged for the visit.
  *
@@ -49,7 +49,7 @@ export function giveFields(run: Record<string, unknown>) {
   const repaired = one('repaired');
   const back = one('back');
   const hurt = ['physical', 'scared'].includes(one('fight') ?? '') || one('angry_ok') === 'scared'
-    || [one('back'), one('between'), one('still_ok')].includes('unsafe');
+    || [one('back'), one('between'), one('still_ok'), one('repaired'), one('not_safe')].includes('unsafe');
   const kind: 'repair' | 'break_return' | null = hurt ? null : repaired ? 'repair' : back ? 'break_return' : null;
   return {
     kind,
