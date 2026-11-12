@@ -293,6 +293,8 @@ export interface Intent {
   label: string;
   toolId: string;
   emoji: string;
+  /** A mode of the tool the intent opens (`mode=one`: DEAR MAN's One message). */
+  query?: string;
 }
 
 /**
@@ -312,6 +314,7 @@ export const allIntents: Intent[] = [
   { id: 'shift', label: 'Shift a feeling that isn\'t helping', toolId: 'opposite-action', emoji: '🔄' },
   { id: 'problem', label: 'Work through a problem', toolId: 'problem-solve', emoji: '🛠️' },
   { id: 'ask', label: 'Ask someone for what I need', toolId: 'dear-man', emoji: '🗣️' },
+  { id: 'one_message', label: 'Send someone one clear message', toolId: 'dear-man', query: 'mode=one', emoji: '✉️' },
   { id: 'dreading', label: 'Something\'s coming up that I\'m dreading', toolId: 'cope-ahead', emoji: '🧭' },
   { id: 'torn', label: 'I\'m torn about what to do', toolId: 'wise-mind', emoji: '🪨' },
   { id: 'say-no', label: 'Say no to someone', toolId: 'say-no', emoji: '🙅' },

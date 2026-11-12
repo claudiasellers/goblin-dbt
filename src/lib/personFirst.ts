@@ -73,5 +73,18 @@ export function resumeAfterPicker(run: Readonly<Record<string, unknown>> | null,
   return run && was && picked.personId === was ? { ...run } : null;
 }
 
+/**
+ * What a reopened run (`reopenGate` → `skill`) carries into the reopened visit: the person and the frame the first
+ * visit recorded, so the reopened visit's own record still names them (a second *Not yet* reopens with the safety
+ * check, and its projection links the person; Gate 1). Only those two, and only as the record has them.
+ */
+export function recordedPersonCtx(run: Readonly<Record<string, unknown>> | null): Record<string, string> {
+  const ctx = run?.ctx && typeof run.ctx === 'object' ? run.ctx as Record<string, unknown> : {};
+  const out: Record<string, string> = {};
+  if (typeof ctx.personId === 'string' && (ctx.personId === 'none' || RUN_ID.test(ctx.personId))) out.personId = ctx.personId;
+  if (ctx.frame === 'heads_up') out.frame = 'heads_up';
+  return out;
+}
+
 /** A `?run=` value the player can reopen (a session id). */
 export const RUN_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

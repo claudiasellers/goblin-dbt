@@ -42,7 +42,7 @@ export function Tools() {
           {intents.map(intent => (
             <li key={intent.id}>
               <Link
-                to={`/tool/${intent.toolId}`}
+                to={`/tool/${intent.toolId}${intent.query ? `?${intent.query}` : ''}`}
                 className="flex items-center gap-3 min-h-14 px-4 py-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-card)] text-[var(--color-text-primary)] font-medium lift-card"
               >
                 <span className="text-xl" aria-hidden="true">{intent.emoji}</span>

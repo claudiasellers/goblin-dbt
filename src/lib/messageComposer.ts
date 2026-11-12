@@ -25,10 +25,10 @@ export function sorryCount(text: string): number {
 }
 
 // An apology that stands as its own clause: "I'm (so) sorry", "Sorry about this", "My apologies", "I apologise",
-// "Sorry to say / hear that", "Sorry to bother / disappoint you", "Sorry to let you down". Only a whole clause is
+// "Sorry to say / hear that", "Sorry to bother / disappoint you", "Sorry to let you down", "Sorry to ask / to bring this up". Only a whole clause is
 // ever taken out, so the person's own words around it are never cut into ("I'm sorry that's how it is", "I'm not
 // sorry", "Sorry for the late reply" stay as written).
-const APOLOGY = String.raw`(?:(?:I['’]?m|I am)\s+(?:(?:so|really|very|truly|terribly)\s+)*sorry|(?:(?:so|really|very)\s+)?sorry|(?:my\s+)?apologies|I\s+apologi[sz]e)(?:\s+(?:about|for)\s+(?:this|that)|\s+to\s+(?:say|hear)(?:\s+(?:this|that|it))?|\s+to\s+(?:bother|disappoint)(?:\s+you)?|\s+to\s+let\s+you\s+down)?`;
+const APOLOGY = String.raw`(?:(?:I['’]?m|I am)\s+(?:(?:so|really|very|truly|terribly)\s+)*sorry|(?:(?:so|really|very)\s+)?sorry|(?:my\s+)?apologies|I\s+apologi[sz]e)(?:\s+(?:about|for)\s+(?:this|that)|\s+to\s+(?:say|hear)(?:\s+(?:this|that|it))?|\s+to\s+(?:bother|disappoint)(?:\s+you)?|\s+to\s+let\s+you\s+down|\s+to\s+(?:ask|raise\s+(?:this|it)|bring\s+(?:this|it)\s+up))?`;
 const WHOLE = new RegExp(`^${APOLOGY}$`, 'i');
 // "Sorry but I can't": the apology and its "but" go, the rest stays.
 const LEADS = new RegExp(`^${APOLOGY}\\s+but\\s+(.+)$`, 'i');

@@ -16,7 +16,7 @@ const waitsForFrame = (x) => {
   const target = fixture.skills.find((t) => t.toolId === x.toolId);
   return !!target && typeof x.query?.frame === "string" && !target.accepts.includes("frame");
 };
-const CTX_KEYS = new Set(["urgeId", "personId", "frame", "enterAt", "situationId", "partId", "band", "returnTo"]);
+const CTX_KEYS = new Set(["urgeId", "personId", "frame", "enterAt", "situationId", "partId", "band", "returnTo", "emotionId", "refused"]);
 const EXT_MAX_BYTES = 4096;
 
 const m = await importTs("src/lib/skillRuntime/machine.ts");

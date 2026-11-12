@@ -26,6 +26,7 @@ import { CertaintyDial, CompassionBreak, SecurityPrime, ValidationPick } from '.
 import { LetItLand, MustPrefer, OppositeStep, ParkIt, type ExitResult } from '../../components/tools/invalidationRecovery/exits';
 import type { DearManHandoff } from '../../data/dearManHandoff';
 import { withBand } from '../../lib/dearManSafety';
+import { ONE_MESSAGE_PATH, oneMessageState } from '../../lib/dearManOne';
 import { FollowUps, RepsRing, SkillCard, UrgeWave } from '../../components/tools/invalidationRecovery/closeout';
 import { useToolSession } from '../../hooks/useToolSession';
 import { useUnblendLine } from '../../hooks/useUnblendLine';
@@ -355,6 +356,11 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
               finishLabel={handoff ? c.ask.finish : c.follow.finish}
               onNext={() => dispatch({ type: 'go', step: 'follow' })}
               onFinished={endIntensity => {
+                if (handoff?.oneMessageOnly) {
+                  // The pull was to chase: One message (IE-01 Mode A), with the word they picked and the band.
+                  navigate(ONE_MESSAGE_PATH, { state: { skillCtx: oneMessageState(withBand({ ...handoff, intensity: endIntensity ?? handoff.intensity }, g)) } });
+                  return;
+                }
                 if (handoff) {
                   // Hand over the close rating (DEAR MAN re-gates if it went back up) and the card's hurt.
                   navigate('/tool/dear-man', { state: { dearManHandoff: withBand({

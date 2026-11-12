@@ -72,6 +72,16 @@
       "state": "built"
     },
     {
+      "from": "src/components/tools/dearMan/DearManOne.tsx",
+      "to": "dear-man",
+      "state": "built"
+    },
+    {
+      "from": "src/lib/dearManOne.ts",
+      "to": "dear-man",
+      "state": "built"
+    },
+    {
       "from": "src/pages/tools/InvalidationRecovery.tsx",
       "to": "dear-man",
       "state": "built"

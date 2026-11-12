@@ -494,6 +494,8 @@ SAFETY_COPY = {"id": "dear_man_safety_copy",
     # Say no (IE-04, IE-B3; docs/design/say-no.md): the picker's question and the safety screen's heading.
     "personWhoSayNo": "Who's asking?",
     "safetyRouteSayNoHeading": "With {who}, your safety comes first. Working out how to say no can wait.",
+    "personWhoOne": "Who's the message for?",
+    "safetyRouteOneHeading": "A message to {who} can wait. Your safety comes first.",
     # The prep's saved screen: when it is, so "How did it go?" comes after (the ask_outcome follow-up). Names no one.
     "askOutcomeQuestion": "When is the conversation? I can ask how it went, after.",
     "askOutcomeToday": "Later today",

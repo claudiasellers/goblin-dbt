@@ -8,7 +8,8 @@ import type { EmbedProps } from './embeds';
 
 /**
  * The message card (plan C3b `messageComposer`, IE-owned; docs/design/say-no.md): the run's picks as one message on
- * the keepsake paper, in a fixed order (`opener`, `field`, `reason`, `alt`; the optional ones drop out), with the FAST
+ * the keepsake paper, in the skill's `parts` order (One message) or a fixed one (`opener`, `field`, `reason`, `alt`;
+ * the optional ones drop out), with the FAST
  * strip under it (DBT IE Handout 7): an apology found in it gets a line and *take the sorry out*, a long reason gets
  * a line. The line to repeat if they push is the main field on its own. Copy, and Open messages where the device has
  * one: the app never sends on the person's behalf, and nothing is locked (any band). Reports `copied`, `opened` and
@@ -17,7 +18,9 @@ import type { EmbedProps } from './embeds';
 export function MessageComposer({ props, picked, onShown, onDone }: EmbedProps) {
   const text = (k: string) => (typeof props[k] === 'string' ? (props[k] as string) : '');
   const of = (k: string) => (typeof props[k] === 'string' ? picked?.[props[k] as string] : undefined);
-  const composed = composeMessage([of('opener'), of('field'), of('reason'), of('alt')]);
+  // The parts in the order they're said: the skill's `parts` (One message), else opener, the line, reason, something else.
+  const order = Array.isArray(props.parts) ? (props.parts as unknown[]).filter((x): x is string => typeof x === 'string') : null;
+  const composed = composeMessage(order ? order.map((f) => picked?.[f]) : [of('opener'), of('field'), of('reason'), of('alt')]);
   const [dropped, setDropped] = useState(false);
   const message = dropped ? dropSorry(composed) : composed;
   // The line to repeat follows the message: once the sorry is out, it's out of both.
@@ -61,12 +64,13 @@ export function MessageComposer({ props, picked, onShown, onDone }: EmbedProps) 
       <PaperCard label={message}>
         <p ref={lineRef} className={paperLine}>{message}</p>
       </PaperCard>
-      {(sorry > 0 || longReason) && (
+      {/* The sorry line only with something to do about it (Gate 2): the button that takes it out. */}
+      {((sorry > 0 && canDrop) || longReason) && (
         <div className="rounded-xl border border-[var(--color-border)] px-4 py-3 space-y-2" data-testid="fast-strip">
-          {sorry > 0 && text('sorryLine') && (
+          {sorry > 0 && canDrop && text('sorryLine') && (
             <>
               <p className="text-sm text-[var(--color-text-secondary)]">{text('sorryLine')}</p>
-              {text('dropSorry') && canDrop && (
+              {text('dropSorry') && (
                 <button type="button" className={secondaryButton}
                   onClick={() => { done.current.add('dropped_sorry'); setDropped(true); setCopied(false); setStatus(''); }}>
                   {text('dropSorry')}

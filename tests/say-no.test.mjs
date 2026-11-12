@@ -190,7 +190,7 @@ test("page: who's asking first, the safety route never reaches the skill; a reop
   const page = read("src/pages/tools/SayNo.tsx");
   assert.match(page, /<PersonFirstSkill skillId="say_no" toolId="say-no" questionKey="personWhoSayNo" headingKey="safetyRouteSayNoHeading"/);
   const pfs = read("src/components/people/PersonFirstSkill.tsx");
-  assert.match(pfs, /if \(reopen\.kind === 'skill'\) return <SkillPlayer skillId=\{skillId\} resumeRecord=\{checked\} \/>;/, "a reopened run plays only once it has loaded, the record the gate checked");
+  assert.match(pfs, /if \(reopen\.kind === 'skill'\) return <SkillPlayer skillId=\{skillId\} ctx=\{recordedPersonCtx\(checked\)\} resumeRecord=\{checked\} \/>;/, "a reopened run plays only once it has loaded, the record the gate checked");
   assert.match(pfs, /resumeRecord: resumeAfterPicker\(checked, who\)/, "after the picker: the same person reopens, anyone else is fresh");
   const player = read("src/components/skillPlayer/SkillPlayer.tsx");
   assert.match(player, /\(resumeRecord !== undefined \? Promise\.resolve\(resumeRecord\) : getSkillRun\(resumeFrom\.run, skill\.toolId\)\)/, "no second read");

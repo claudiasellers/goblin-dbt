@@ -50,10 +50,10 @@ test("rows are drafts until signed off; the policy can only be enabled once ever
   }
 });
 
-test("D-02 defaults kept: Urge Surfing switched off, no DEAR MAN rows, Pause active; planned tools are written switched off", () => {
+test("D-02 defaults kept: Urge Surfing switched off, DEAR MAN's one word row, Pause active; planned tools are written switched off", () => {
   const planned = ["dbt_accepts", "dbt_give", "dbt_please", "dbt_radical_acceptance"];
   for (const r of rows) {
-    assert.notEqual(r.conceptId, "dbt_dear_man", r.id);
+    if (r.conceptId === "dbt_dear_man") assert.deepEqual([r.id, r.active, r.reviewStatus, r.words], ["rf_social_threat_shame_words_ask-for-it_dear-man", true, "approved", ["let_down", "excluded"]], "DEAR MAN's one word row, live (12 Nov)");
     const off = r.conceptId === "urge_surfing" || planned.includes(r.conceptId);
     assert.equal(r.active, !off, r.id);
   }

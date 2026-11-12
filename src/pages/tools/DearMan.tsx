@@ -88,19 +88,22 @@ const textareaClass = `${inputClass} resize-none`;
 // Cope ahead's step loads on demand: fetched once its gate holds (copeShown, prefetched below before its
 // phase), in its own Suspense with nothing in its place.
 const loadCope = () => import('../../components/parts/CopeAheadStep');
+const LazyDearManOne = lazy(() => import('../../components/tools/dearMan/DearManOne').then((m) => ({ default: m.DearManOne })));
 const LazyDearManDebrief = lazy(() => import('../../components/tools/dearMan/DearManDebrief').then((m) => ({ default: m.DearManDebrief })));
 const LazyCopeAheadStep = lazy(() => loadCope().then((m) => ({ default: m.CopeAheadStep })));
 function CopeAheadStep(p: ComponentProps<typeof LazyCopeAheadStep>) { return <Suspense fallback={null}><LazyCopeAheadStep {...p} /></Suspense>; }
 
 /**
- * DEAR MAN's page: the prep (this file), or the debrief (`?mode=debrief`, docs/design/dear-man-debrief.md): who it was
- * with, then the `dear_man_debrief` skill on the skill player. The mode is read once: a link to the other mode is a
+ * DEAR MAN's page: the prep (this file), the debrief (`?mode=debrief`, docs/design/dear-man-debrief.md), or One message
+ * (`?mode=one`, docs/design/one-message.md): who it was with, then that skill on the skill player. The mode is read once: a link to the other mode is a
  * new visit (ToolPage keys the session by location).
  */
 export function DearMan() {
   const { search } = useLocation();
   const [mode] = useState(() => new URLSearchParams(search).get('mode'));
-  return mode === 'debrief' ? <Suspense fallback={<ToolLoading />}><LazyDearManDebrief /></Suspense> : <DearManPrep />;
+  if (mode === 'debrief') return <Suspense fallback={<ToolLoading />}><LazyDearManDebrief /></Suspense>;
+  if (mode === 'one') return <Suspense fallback={<ToolLoading />}><LazyDearManOne /></Suspense>;
+  return <DearManPrep />;
 }
 
 function DearManPrep() {

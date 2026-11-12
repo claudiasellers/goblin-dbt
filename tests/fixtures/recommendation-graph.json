@@ -4033,6 +4033,35 @@
    "rationale": "Nothing was named (somatic skip): offer to find the word as the alternative (R9)."
   },
   {
+   "id": "rf_social_threat_shame_words_ask-for-it_dear-man",
+   "conceptId": "dbt_dear_man",
+   "patternId": "social_threat_shame",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 1.5,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "let_down",
+    "excluded"
+   ],
+   "beside": [
+    "recovering-from-invalidation"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "approved",
+   "rationale": "DEAR MAN (ask for what you need) as the alternative to Recover after a let-down or being left out: the person's own ask, after the picker and the safety question (IE-01, D4). Not rejected or humiliated: a wound to recover from first."
+  },
+  {
    "id": "rf_social_threat_shame_words_exposed_cool-down",
    "conceptId": "dbt_tipp",
    "patternId": "social_threat_shame",

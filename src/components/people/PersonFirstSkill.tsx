@@ -10,11 +10,11 @@ import { getSkillRun, getSkillsContent } from '../../services/skills';
 import { resumeRun, type RunContext } from '../../lib/skillRuntime/machine';
 import { emotions } from '../../data/emotions';
 import { presetPerson } from '../../lib/dearManDebrief';
-import { personFirstPickerCopy, personFirstSafetyCopy, reopenGate, resumeAfterPicker, RUN_ID } from '../../lib/personFirst';
-import type { PickedPerson } from '../../lib/people';
+import { personFirstPickerCopy, personFirstSafetyCopy, recordedPersonCtx, reopenGate, resumeAfterPicker, RUN_ID } from '../../lib/personFirst';
+import type { KeptPerson, PickedPerson } from '../../lib/people';
 
 /**
- * A skill that asks who first (DEAR MAN's debrief, Say no; people.md): the person picker, with the safety question
+ * A skill that asks who first (DEAR MAN's debrief and One message, Say no; people.md): the person picker, with the safety question
  * when the answer isn't fresh, then the skill on the player in this same visit (one ToolSession: a `followUp` link's
  * card resolves on it). Someone on the safety route gets the safety screen with the skill's heading and never the
  * skill (D4). A link naming a kept person whose answer is fresh skips the picker (`?person=`). A reopened run
@@ -33,7 +33,8 @@ export function PersonFirstSkill({ skillId, toolId, questionKey, headingKey, ctx
   questionKey: string;
   /** The safety screen's heading, as a `picker_<key>` of the skill's copy. */
   headingKey: string;
-  ctxFor: (p: PickedPerson) => Record<string, string>;
+  /** The skill's context for the person picked; the kept people list too, for what's counted on them (refusals). */
+  ctxFor: (p: PickedPerson, people: readonly KeptPerson[] | null) => Record<string, string>;
 }) {
   const { search } = useLocation();
   const [q] = useState(() => new URLSearchParams(search));
@@ -93,7 +94,7 @@ export function PersonFirstSkill({ skillId, toolId, questionKey, headingKey, ctx
   const pickerCopy = personFirstPickerCopy(copy, questionKey);
   const safetyCopy = personFirstSafetyCopy(copy, headingKey);
   if (!pickerCopy || !safetyCopy) return <ToolLoadError onRetry={() => { setCopy(null); setAttempt((n) => n + 1); }} />;
-  if (reopen.kind === 'skill') return <SkillPlayer skillId={skillId} resumeRecord={checked} />;
+  if (reopen.kind === 'skill') return <SkillPlayer skillId={skillId} ctx={recordedPersonCtx(checked)} resumeRecord={checked} />;
   if (reopen.kind === 'safety') {
     return (
       <PersonSafetyRoute copy={safetyCopy} label={reopen.person.label}
@@ -115,5 +116,5 @@ export function PersonFirstSkill({ skillId, toolId, questionKey, headingKey, ctx
         onBack={() => { setPicked(null); setUsePreset(false); setPickerKey((k) => k + 1); }} />
     );
   }
-  return <SkillPlayer skillId={skillId} ctx={ctxFor(who)} {...(reopening ? { resumeRecord: resumeAfterPicker(checked, who) } : {})} />;
+  return <SkillPlayer skillId={skillId} ctx={ctxFor(who, profile.slices?.people ?? null)} {...(reopening ? { resumeRecord: resumeAfterPicker(checked, who) } : {})} />;
 }
