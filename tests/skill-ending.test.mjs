@@ -240,7 +240,7 @@ test("after: the pull back is expected; going back isn't failure; I don't feel s
   };
   const pull = at("pull", "this_week");
   assert.equal(pull.stepId, "after_next");
-  assert.deepEqual(pull.offered, ["opposite_action", "let_it_be"], "finding connection is planned; let it be is built (DT-04)");
+  assert.deepEqual(pull.offered, ["opposite_action", "finding_connection", "let_it_be"], "Find your people (IE-09) and Let it be (DT-04) are built");
   assert.match(M.handoffLine(ctx(), step("after_next"), pull), /pull back is expected/);
   assert.match(M.handoffLine(ctx(), step("after_next"), at("went_back")), /Going back happens/);
   const unsafeNow = at("unsafe");

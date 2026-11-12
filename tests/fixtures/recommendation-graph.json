@@ -394,6 +394,17 @@
    "direction": null,
    "addresses": []
   },
+  "dbt_building_relationships": {
+   "appToolId": "finding-connection",
+   "name": "Building Relationships",
+   "description": "Finding people and keeping friendships going, one small step at a time, with a prediction checked against what happened",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": "change",
+   "skillKind": "relational",
+   "direction": "up",
+   "addresses": []
+  },
   "dbt_check_facts": {
    "appToolId": "check-the-facts",
    "name": "Check the Facts",
@@ -3618,6 +3629,33 @@
    "version": "rf-v2",
    "reviewStatus": "approved",
    "rationale": "Flooded + blank: orient only (no Cool Down, D-02)."
+  },
+  {
+   "id": "rf_reward_drive_low_words_cut-off_finding-connection",
+   "conceptId": "dbt_building_relationships",
+   "patternId": "reward_drive_low",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.5,
+   "direction": "up",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "lonely",
+    "isolated"
+   ],
+   "beside": [],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "approved",
+   "rationale": "Cut off from people (vocabulary: reach towards them): Find your people (IE-09) leads with one small step, the smallest only on a stirred reading, and Running low (the pattern's own lead) stays beside it. A word that names the missing people asks for people first."
   },
   {
    "id": "rf_reward_drive_low_words_flat_good-things",

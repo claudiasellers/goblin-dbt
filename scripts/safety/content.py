@@ -287,6 +287,9 @@ LINES = [
     ("in_tele_manas", "IN", "Tele-MANAS", "crisis", "14416", None, None, None, "24/7", ["en", "hi"], "https://telemanas.mohfw.gov.in"),
     ("de_telefonseelsorge", "DE", "TelefonSeelsorge", "crisis", "0800 111 0 111", None, None, "https://online.telefonseelsorge.de", "24/7", ["de"], "https://www.telefonseelsorge.de"),
 ]
+# Lines a person has confirmed with the service (called, or confirmed in writing): line id → the day. A content
+# edit, so a reload never erases the audit; take a line out (or move its day) when its details change.
+VERIFIED = {}
 LINE_KINDS = ["crisis", "text", "chat", "poison", "urgent", "youth", "lgbtq", "warmline"]
 
 # ---- The switch ---------------------------------------------------------------------------------------

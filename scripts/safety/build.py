@@ -36,6 +36,7 @@ def check():
     assert set(ANSWER_RANK) == {c["id"] for c in FLOW["question"]["choices"]} | {"act"}
     assert set(FLAGS) <= {"crisis_suicidal", "crisis_self_harm", "clinical_referral_shutdown",
                           "clinical_referral_psychosis", "clinical_referral_severe_dissociation"}
+    assert set(VERIFIED) <= set(line_ids), "VERIFIED names a line that isn't there"
     if POLICY["enabled"]:
         assert REVIEW_STATUS != "draft" or APPROVED_TO_SHIP, "the switch is on while the copy is a draft"
     text = json.dumps(FLOW, ensure_ascii=False)
@@ -101,7 +102,7 @@ for lid, country, name, kind, phone, sms, body, chat, hours, langs, source in LI
     order = next(c[4] for c in COUNTRIES if c[0] == country).index(lid)
     A(f"MERGE (l:CrisisLine {{id: {q(lid)}}})\nSET l.name = {q(name)}, l.kind = {q(kind)}, l.phone = {q(phone)}, l.sms = {q(sms)}, "
       f"l.smsBody = {q(body)}, l.chatUrl = {q(chat)}, l.hours = {q(hours)}, l.languages = {q(langs)}, l.source = {q(source)}, "
-      f"l.checkedAt = {q(CHECKED)}, l.verifiedAt = null, l.order = {order};")
+      f"l.checkedAt = {q(CHECKED)}, l.verifiedAt = {q(VERIFIED.get(lid))}, l.order = {order};")
     A(f"MATCH (l:CrisisLine {{id: {q(lid)}}}), (c:Country {{id: {q(country)}}})\nMERGE (l)-[:COVERS]->(c);")
 
 A("\n// --- The switch ---")

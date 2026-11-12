@@ -72,7 +72,7 @@ Helpline for a line). `emergencyAlt` sits beside the emergency number where peop
 or the medical one matters (France's 15, SAMU).
 
 Every line carries `checkedAt` (looked up 12 Nov 2026) and no `verifiedAt` until a person has confirmed it with the
-service; `source` is the service's site; none of the three ships to the app. **A checked line shows.** The PRD's "no
+service (recorded in `content.py`'s `VERIFIED`, so a reload never erases it); `source` is the service's site; none of the three ships to the app. **A checked line shows.** The PRD's "no
 verified line → emergency number and Find A Helpline" reads, in this build, as "no line in the graph"; `verifiedAt` is
 the audit (target: every line ≤ 90 days), not a gate, because gating on it today would show no line anywhere. Crisis
 Text Line's keyword is `HOME` (their published one); CrisisBanner still says `HELLO` (both reach a counsellor; aligned
