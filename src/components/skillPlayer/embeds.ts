@@ -22,6 +22,7 @@ import { BatteryRead } from './BatteryRead';
 import { KitDeck } from './KitDeck';
 import { InlineSkillEmbed } from './InlineSkillEmbed';
 import { TwoColumns } from './TwoColumns';
+import { RehearsalStage } from './RehearsalStage';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -90,6 +91,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   pocketCard: PocketCard,
   batteryRead: BatteryRead,
   twoColumns: TwoColumns,
+  rehearsalStage: RehearsalStage,
   kitDeck: KitDeck,
   inlineSkill: InlineSkillEmbed,
 };
@@ -127,6 +129,7 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   pocketCard: { ids: ['seen_all', 'copied'] },
   batteryRead: { ids: ['read'] },
   twoColumns: { ids: ['read'] },
+  rehearsalStage: { ids: ['again', 'acknowledge', 'name', 'middle', 'turn', 'break', 'done', 'aloud', 'finished', 'stopped', 'lost_it', 'left'], measures: ['doneCount'] },
   kitDeck: { ids: ['body', 'hands', 'soothe', 'words', 'place', 'reasons', 'pros_cons', 'starter'], measures: ['durationSec', 'doneCount'] },
   inlineSkill: { ids: ['finished', 'left', 'stopped', 'body', 'unsafe'] },
 };
@@ -195,6 +198,20 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     rightLabel: { type: 'copy' },
     foot: { type: 'field', optional: true },
     footLabel: { type: 'copy', optional: true },
+    next: { type: 'copy' },
+  },
+  rehearsalStage: {
+    fromSkill: { type: 'id' },
+    kind: { type: 'field' },
+    tier: { type: 'field' },
+    line: { type: 'field' },
+    aloud: { type: 'copy' },
+    inHead: { type: 'copy' },
+    yourMove: { type: 'copy' },
+    stop: { type: 'copy' },
+    you: { type: 'copy' },
+    them: { type: 'copy' },
+    endLine: { type: 'copy' },
     next: { type: 'copy' },
   },
   boundaryLine: {
