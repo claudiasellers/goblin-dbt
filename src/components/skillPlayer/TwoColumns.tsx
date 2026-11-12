@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useId } from 'react';
 import { PaperCard } from '../shared/PaperCard';
 import { primaryButton } from '../tools/oppositeAction/styles';
 import type { EmbedProps } from './embeds';
@@ -22,21 +22,21 @@ export function TwoColumns({ props, picked, onShown, onDone }: EmbedProps) {
   const right = items('right');
   const foot = items('foot');
   const any = left.length + right.length > 0;
+  const uid = useId();
   useEffect(() => { if (any) onShown(); }, [any, onShown]);
   const next = <button type="button" className={primaryButton} onClick={() => onDone?.({ ids: any ? ['read'] : [] })}>{text('next')}</button>;
   // Nothing to show (content drift): never strand the person on a whole-screen embed.
   if (!any) return <div className="flex justify-center">{next}</div>;
 
-  const label = [
-    `${text('leftLabel')}: ${left.join(', ')}`,
-    `${text('rightLabel')}: ${right.join(', ')}`,
-    ...(foot.length && text('footLabel') ? [`${text('footLabel')}: ${foot.join(', ')}`] : []),
-  ].join('. ');
-  const column = (heading: string, lines: readonly string[]) => (
+  // A short name for the group; each list is named by its heading, so nothing is read twice (Gate 2).
+  const label = `${text('leftLabel')} and ${text('rightLabel')}`;
+  const column = (side: string, heading: string, lines: readonly string[]) => (
     <div className="min-w-0 space-y-2">
-      <p className="text-sm text-[var(--color-text-secondary)]">{heading}</p>
-      <ul className="space-y-2">
-        {lines.map((l, i) => <li key={i} className="font-serif text-base leading-snug text-[var(--color-text-primary)]">{l}</li>)}
+      <p id={`${uid}-${side}`} className="text-sm text-[var(--color-text-secondary)]">{heading}</p>
+      <ul aria-labelledby={`${uid}-${side}`} className="divide-y divide-[var(--color-border)]">
+        {lines.map((l, i) => (
+          <li key={i} className="py-2 font-serif text-base leading-snug text-[var(--color-text-primary)] [overflow-wrap:anywhere] first:pt-0 last:pb-0">{l}</li>
+        ))}
       </ul>
     </div>
   );
@@ -45,8 +45,8 @@ export function TwoColumns({ props, picked, onShown, onDone }: EmbedProps) {
     <div className="space-y-5" data-testid="two-columns">
       <PaperCard label={label} compact>
         <div className="grid grid-cols-2 gap-4">
-          {column(text('leftLabel'), left)}
-          {column(text('rightLabel'), right)}
+          {column('left', text('leftLabel'), left)}
+          {column('right', text('rightLabel'), right)}
         </div>
         {foot.length > 0 && text('footLabel') ? (
           <p className="border-t border-[var(--color-border)] pt-3 font-serif text-base leading-snug text-[var(--color-text-primary)]">
