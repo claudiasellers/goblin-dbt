@@ -96,11 +96,16 @@ COPY = {
     "tier_flooded": "The easy version, or practising a way out, for now.",
     # --- The stage ---
     "stage_title": "Say it.",
-    "stage_hint": "Out loud if you can. Nobody's listening.",
+    "stage_hint": "Out loud if you can, or in your head.",
     "aloud": "I said it out loud",
     "in_head": "I said it in my head",
     "your_move": "What do you do?",
-    "stop": "Stop",
+    "stop": "Stop practising",
+    # What their figure does, read to a screen reader with their line (the stage shows it as a pose).
+    "pose_closer": "steps closer",
+    "pose_arms": "arms folded",
+    "pose_turn_away": "turns away",
+    "pose_still": "goes still",
     "you": "You",
     "them": "Them",
     "end_line": "That's the conversation.",
@@ -151,23 +156,26 @@ TIER = [
     ("leave", "Practise leaving: a calm way out", True, True),
 ]
 TIER_FOR_BAND = {"all": [{"any": [{"not": FLOODED}, {"eq": ["$opt.flooded", True]}]},
-                         {"any": [{"not": STIRRED}, {"eq": ["$opt.stirred", True]}]}]}
+                         {"any": [{"not": STIRRED}, {"eq": ["$opt.stirred", True]}]},
+                         # *It tends to go badly* (heads_up): no hardest version with them (as the prep drops asks to be heard).
+                         {"any": [{"not": HEADS_UP}, {"eq": ["$opt.stirred", True]}]}]}
 
-# Your moves (PRD step 6), each a letter of DEAR MAN, GIVE or FAST. `says` is what your figure says.
+# Your moves (PRD step 6), each a DEAR MAN, GIVE or FAST move, or the walk-away point. `says` is what your figure says.
 MOVE = [
     ("again", "Say it again", "M", None),                                           # broken record: your line again
     ("acknowledge", "Acknowledge, then come back", "V+M", "I hear you. And this still matters to me."),
-    ("name", "Name what's happening", "H5a", "I notice we keep moving away from it."),
+    ("name", "Name what's happening", "M", "I notice we keep moving away from it."),
     ("middle", "Offer a middle", "N", "Could we find something in between?"),
     ("turn", "Ask what would work for them", "N", "What would work for you?"),
-    ("break", "Step out, come back later", "FAST", "I'm going to take a break and come back to this."),
-    ("done", "End the conversation", "FAST", "I'm done with this conversation for now."),
+    ("break", "Step out, come back later", "walk_away", "I'm going to take a break and come back to this."),
+    ("done", "End the conversation", "walk_away", "I'm done with this conversation for now."),
     ("lost_it", "I'd lose it here", None, None),                                    # ends the stage at once → ifthen
 ]
 EASY_MOVES = ["again", "acknowledge", "turn", "done"]
 REAL_MOVES = ["again", "acknowledge", "middle", "turn", "break"]
 HARD_MOVES = ["again", "acknowledge", "name", "break", "done", "lost_it"]
-LEAVE_MOVES = ["break", "done"]
+# Practising leaving starts from the step-out line; *Say it again* holds it while they push.
+LEAVE_MOVES = ["again", "break", "done"]
 
 # The scripts (PRD step 5): their three replies per kind and tier, plain and never abusive. A line in brackets is
 # what they do. Poses: open, neutral, closer, arms, turn_away, still.
@@ -175,31 +183,39 @@ SCRIPTS = {
     ("ask", "easy"): [("What do you need?", "open"), ("Okay, that makes sense.", "open"), ("Sure, I can do that.", "open")],
     ("ask", "realistic"): [("Can we talk about this later?", "turn_away"), ("I don't know if I can do all of that.", "neutral"),
                            ("I could do part of it.", "open")],
-    ("ask", "hardest"): [("No. That's not happening.", "arms"), ("You always want something from me.", "closer"),
+    ("ask", "hardest"): [("No. That's not happening.", "arms"), ("You always want something from me.", "arms"),
                          ("(They go quiet and look away.)", "still")],
     ("say_no", "easy"): [("Oh. Is there a reason?", "neutral"), ("Okay, I'll ask someone else.", "open"), ("Fair enough.", "open")],
     ("say_no", "realistic"): [("Come on, it's only this once.", "closer"), ("I really thought I could count on you.", "neutral"),
                               ("Fine. Maybe next time?", "open")],
-    ("say_no", "hardest"): [("You can't be serious.", "arms"), ("After everything I've done for you?", "closer"),
+    ("say_no", "hardest"): [("You can't be serious.", "arms"), ("After everything I've done for you?", "still"),
                             ("(They turn away and go quiet.)", "turn_away")],
     ("boundary", "easy"): [("I didn't know it bothered you.", "neutral"), ("Okay. I'll try.", "open"), ("Thanks for telling me.", "open")],
-    ("boundary", "realistic"): [("You're making a big deal out of nothing.", "arms"), ("I'll think about it.", "neutral"),
+    ("boundary", "realistic"): [("I didn't think it was a big deal.", "arms"), ("I'll think about it.", "neutral"),
                                 ("I can try, sometimes.", "open")],
-    ("boundary", "hardest"): [("Who are you to tell me what to do?", "closer"), ("You're too sensitive.", "arms"),
+    ("boundary", "hardest"): [("Who are you to tell me what to do?", "arms"), ("I don't see why it matters so much.", "turn_away"),
                               ("(They fold their arms and say nothing.)", "still")],
     ("address", "easy"): [("Oh, what happened?", "open"), ("I didn't realise. I'm sorry.", "neutral"), ("Let's sort it out.", "open")],
     ("address", "realistic"): [("This isn't a good time.", "turn_away"), ("That's not how I remember it.", "arms"),
                                ("Okay, maybe I could have handled it better.", "neutral")],
-    ("address", "hardest"): [("Here we go again.", "arms"), ("What about what you did?", "closer"),
+    ("address", "hardest"): [("Here we go again.", "arms"), ("What about what you did?", "arms"),
                              ("(They look at their phone and don't answer.)", "turn_away")],
     ("repair", "easy"): [("Thanks for saying that.", "open"), ("I was upset, yes.", "neutral"), ("Okay. I appreciate it.", "open")],
     ("repair", "realistic"): [("Sorry doesn't really fix it.", "arms"), ("I need a bit of time.", "turn_away"),
                               ("Okay. Let's see how it goes.", "neutral")],
-    ("repair", "hardest"): [("It's too late for that.", "arms"), ("You always say that.", "closer"), ("(They walk away.)", "turn_away")],
-    # Practise leaving, whatever the kind: a calm way out (PRD: exit line, step-out move).
-    ("any", "leave"): [("Wait, we're not finished.", "closer"), ("Come on, sit back down.", "arms"), ("(They keep talking.)", "neutral")],
+    ("repair", "hardest"): [("It's too late for that.", "arms"), ("You always say that.", "still"), ("(They walk away.)", "turn_away")],
+    # Practise leaving, whatever the kind: a calm way out (PRD: exit line, step-out move). Pressure to stay, never
+    # blocking the way (Gate 2): nobody steps closer in this script or the hardest ones.
+    ("any", "leave"): [("Can we keep going?", "neutral"), ("I'd rather finish this now.", "neutral"), ("(They keep talking.)", "neutral")],
 }
 MOVES_FOR = {"easy": EASY_MOVES, "realistic": REAL_MOVES, "hardest": HARD_MOVES, "leave": LEAVE_MOVES}
+# Per kind: a repair never repeats the apology (FAST: no extra apologies), and a firm no is not traded for a middle.
+NOT_FOR_KIND = {"repair": {"again"}, "say_no": {"middle"}}
+
+
+def moves_for(kind, tier):
+    return [m for m in MOVES_FOR[tier] if m not in NOT_FOR_KIND.get(kind, set())]
+
 
 READY = [("sure", "Sure"), ("think_so", "I think so"), ("not_sure", "Not sure")]
 TVN = [("worse", "Harder"), ("same", "About the same"), ("better", "Easier"), ("much_better", "Much easier")]
@@ -211,7 +227,10 @@ IFTHEN = [
     ("done", "End the conversation"),
 ]
 STOPPED = has("stage", "stopped")
-WENT_HARD = {"any": [has("stage", "lost_it"), {"all": [is_("tier", "hardest"), {"not": STOPPED}]}]}
+PRACTISED = {"any": [has("stage", "finished"), has("stage", "stepped_out"), has("stage", "lost_it")]}
+# After the hardest version, unless they stopped (finished or stepped out), or *I'd lose it here* on any.
+WENT_HARD = {"any": [has("stage", "lost_it"), {"all": [is_("tier", "hardest"), PRACTISED]}]}
+WORSE = is_("close", "worse")
 
 
 def ask(sid, title, hint, fields, nxt, **extra):
@@ -236,6 +255,7 @@ STAGE_PROPS = {
     "fromSkill": ID, "kind": "kind", "tier": "tier", "line": "line",
     "aloud": "aloud", "inHead": "in_head", "yourMove": "your_move", "stop": "stop", "you": "you", "them": "them",
     "endLine": "end_line", "next": "next",
+    "poseCloser": "pose_closer", "poseArms": "pose_arms", "poseTurnAway": "pose_turn_away", "poseStill": "pose_still",
 }
 
 STEPS = [
@@ -249,12 +269,15 @@ STEPS = [
     {"id": "stage", "kind": "embed", "embed": "rehearsalStage", "answerAs": "stage", "title": "stage_title",
      "hint": "stage_hint", "props": STAGE_PROPS, "links": [SAFETY_LINK],
      "next": [{"when": WENT_HARD, "to": "ifthen"}, {"to": "close"}]},
-    ask("ifthen", "ifthen_title", "ifthen_hint", [field("ifthen", "ifthen")], [{"to": "close"}]),
-    ask("close", "close_title", None, [field("close", "tvn", askFresh="thenVsNow")], [{"to": "ready"}],
-        lines=[{"when": STOPPED, "key": "close_stopped"}, {"when": ALWAYS, "key": "close_done"}]),
+    # Optional: someone who just said they'd lose it isn't made to pick a plan to go on.
+    ask("ifthen", "ifthen_title", "ifthen_hint", [field("ifthen", "ifthen", required=False)], [{"to": "close"}]),
+    ask("close", "close_title", None, [field("close", "tvn", askFresh="thenVsNow")],
+        # Harder: no *could you say it for real?*; the end card settles the body.
+        [{"when": WORSE, "to": "end"}, {"to": "ready"}],
+        lines=[{"when": STOPPED, "key": "close_stopped"}, {"when": PRACTISED, "key": "close_done"}]),
     ask("ready", "ready_title", None, [field("ready", "ready")], [{"to": "end"}]),
     {"id": "end", "kind": "handoff", "complete": True, "done": "done", "next": [],
-     "title": [{"key": "end_plan_title", "when": {"set": a("ifthen")}}, {"key": "end_title"}],
+     "title": [{"key": "end_plan_title", "when": {"all": [{"set": a("ifthen")}, {"not": WORSE}]}}, {"key": "end_title"}],
      "titleSlots": {"plan": {"labelOf": "ifthen"}},
      "lines": [
          {"when": is_("close", "worse"), "key": "end_harder"},
@@ -264,7 +287,7 @@ STEPS = [
      "offers": [
          {"exit": "cool_down", "when": is_("close", "worse")},
          {"exit": "plan", "when": {"not": is_("close", "worse")}},
-         {"exit": "cope_ahead", "when": {"set": a("ifthen")}},
+         {"exit": "cope_ahead", "when": {"all": [{"set": a("ifthen")}, {"not": WORSE}]}},
          {"exit": "again", "when": ALWAYS},
      ],
      "links": [SAFETY_LINK]},
@@ -288,7 +311,7 @@ def options():
     for (kind, tier), turns in SCRIPTS.items():
         for n, (text, pose) in enumerate(turns, 1):
             out.append(("turn", f"{kind}_{tier}_{n}", text, {"kind": kind, "tier": tier, "n": n, "pose": pose,
-                                                            "moves": ",".join(MOVES_FOR[tier])}, None))
+                                                            "moves": ",".join(moves_for(kind, tier))}, None))
     out += [("ifthen", v, label, {}, None) for v, label in IFTHEN]
     out += [("tvn", v, label, {}, None) for v, label in TVN]
     out += [("ready", v, label, {}, None) for v, label in READY]

@@ -309,7 +309,7 @@ STEPS = [
         # PRD step 5: rehearse it (IE-02, planned), then cope ahead for their likely reaction.
         "id": "ahead", "kind": "handoff", "complete": True,
         "lines": [{"when": None, "key": "ahead_line"}],
-        "offers": [{"exit": "cope_ahead", "when": None}, {"exit": "rehearse", "when": None}],
+        "offers": [{"exit": "cope_ahead", "when": None}, {"exit": "rehearse", "when": {"not": IS("what", "harms")}}],
         "done": "done",
     },
     {

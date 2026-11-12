@@ -384,7 +384,7 @@ STEPS = [
         "id": "fix", "kind": "handoff", "complete": True,
         "lines": [{"when": is_("factor", f), "key": f"fix_{f}"} for f in FACTOR_FIX],
         "offers": [
-            {"exit": "rehearse", "when": is_("factor", "no_words")},
+            {"exit": "rehearse", "when": {"all": [is_("factor", "no_words"), {"not": has("moment", "tp_escalated")}]}},
             {"exit": "cope_ahead", "when": {"in": [a("factor"), ["no_words", "feelings"]]}},
             {"exit": "check_the_facts", "when": is_("factor", "belief")},
             {"exit": "thoughts", "when": is_("factor", "belief")},                # DT-08: the worry as a thought

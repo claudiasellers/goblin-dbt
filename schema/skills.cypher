@@ -5602,7 +5602,7 @@ MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": null}]";
 MATCH (a:SkillStep {id: "ending_relationships:ahead"}), (x:SkillExit {id: "ending_relationships:rehearse"})
 MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": null}]";
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"not\": {\"eq\": [\"$a.what\", \"harms\"]}}}]";
 MATCH (a:SkillStep {id: "ending_relationships:after"}), (b:SkillStep {id: "ending_relationships:after_unsafe"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.after\", \"unsafe\"]}";
@@ -7623,7 +7623,7 @@ MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"all\": [{\"has\": [\"$a.moment.ids\", \"tp_defensive\"]}, {\"not\": {\"has\": [\"$a.moment.ids\", \"tp_escalated\"]}}, {\"not\": {\"has\": [\"$a.moment.ids\", \"tp_gave_in\"]}}, {\"not\": {\"in\": [\"$a.between\", [\"no\", \"unsafe\"]]}}]}}]";
 MATCH (a:SkillStep {id: "dear_man_debrief:fix"}), (x:SkillExit {id: "dear_man_debrief:rehearse"})
 MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"eq\": [\"$a.factor\", \"no_words\"]}}]";
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": [{\"eq\": [\"$a.factor\", \"no_words\"]}, {\"not\": {\"has\": [\"$a.moment.ids\", \"tp_escalated\"]}}]}}]";
 MATCH (a:SkillStep {id: "dear_man_debrief:fix"}), (x:SkillExit {id: "dear_man_debrief:cope_ahead"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"in\": [\"$a.factor\", [\"no_words\", \"feelings\"]]}}]";
@@ -21922,7 +21922,7 @@ SET r += {list: "not_knowing", order: 58};
 
 // --- rehearse (rh-v1) ---
 MERGE (s:Skill {id: "rehearse"})
-SET s += {toolId: "rehearse", version: "rh-v1", contentVersion: "skills-v1", start: "kind", ownMax: 90, emotionFields: [], accepts: ["personId", "band", "situationId", "frame"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"again_offer\": \"Practise again\", \"aloud\": \"I said it out loud\", \"close_done\": \"You practised it. That counts.\", \"close_stopped\": \"You stopped. That counts too.\", \"close_title\": \"Saying it for real feels…\", \"cool_down\": \"Settle my body first\", \"cope_offer\": \"Plan for the hardest moment\", \"done\": \"Done\", \"end_harder\": \"Saying it for real feels harder right now. Settle your body first, or leave it for today.\", \"end_line\": \"That's the conversation.\", \"end_not_sure\": \"Another practice can help. Pick a harder version when you're ready.\", \"end_plan_title\": \"For the hard moment: {plan}.\", \"end_ready\": \"The real conversation is yours to choose. Planning it can help.\", \"end_title\": \"That's the practice.\", \"ifthen_hint\": \"One thing you can do in the moment.\", \"ifthen_title\": \"If it goes that way for real, what will you do?\", \"in_head\": \"I said it in my head\", \"kind_flooded\": \"Practising works better once your body settles. The easy version is here if you want it now.\", \"kind_title\": \"What's the conversation?\", \"line_hint\": \"Your words. You can change them any time.\", \"line_title\": \"What's the first thing you'll say?\", \"next\": \"Next\", \"own_words\": \"Something else\", \"picker_personChanged\": \"Things changed with someone?\", \"picker_personChangedHint\": \"Pick who it is, and you'll be asked about them again.\", \"picker_personGoOn\": \"Go on\", \"picker_personKeepLine\": \"The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.\", \"picker_personNameHint\": \"A nickname is fine. No real names needed.\", \"picker_personNameLabel\": \"What do you call them?\", \"picker_personNew\": \"Someone new\", \"picker_personNoNameLine\": \"Without a name, nothing about them is kept.\", \"picker_personRoleLabel\": \"Who are they to you?\", \"picker_personSignedOutLine\": \"This stays on this screen only.\", \"picker_personWhoRehearse\": \"Who's the conversation with?\", \"picker_riskBadly\": \"It tends to go badly\", \"picker_riskHarm\": \"They might hurt or control me\", \"picker_riskQuestion\": \"Is it more that they might hurt or control you, or that it tends to go badly?\", \"picker_riskUnsaid\": \"I'd rather not say\", \"picker_safeNo\": \"No\", \"picker_safeQuestion\": \"Is it safe to bring hard things up with {who}?\", \"picker_safeUnsure\": \"Not sure\", \"picker_safeYes\": \"Yes, mostly\", \"picker_safetyRouteBack\": \"This is about someone else\", \"picker_safetyRouteBody\": \"The people below can help you think it through, any time, and you don't have to be sure.\", \"picker_safetyRouteEnding\": \"Thinking about ending the relationship\", \"picker_safetyRouteRehearseHeading\": \"With {who}, your safety comes before any practice conversation.\", \"plan_offer\": \"Plan the conversation\", \"ready_title\": \"Could you say it for real?\", \"safety_open\": \"Talk to someone now\", \"stage_hint\": \"Out loud if you can. Nobody's listening.\", \"stage_title\": \"Say it.\", \"stop\": \"Stop\", \"them\": \"Them\", \"tier_flooded\": \"The easy version, or practising a way out, for now.\", \"tier_heads_up\": \"With them, practising a calm way out can help too.\", \"tier_hint\": \"You choose how hard. Stopping always counts.\", \"tier_title\": \"How will they respond?\", \"you\": \"You\", \"your_move\": \"What do you do?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "rehearse", version: "rh-v1", contentVersion: "skills-v1", start: "kind", ownMax: 90, emotionFields: [], accepts: ["personId", "band", "situationId", "frame"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"again_offer\": \"Practise again\", \"aloud\": \"I said it out loud\", \"close_done\": \"You practised it. That counts.\", \"close_stopped\": \"You stopped. That counts too.\", \"close_title\": \"Saying it for real feels…\", \"cool_down\": \"Settle my body first\", \"cope_offer\": \"Plan for the hardest moment\", \"done\": \"Done\", \"end_harder\": \"Saying it for real feels harder right now. Settle your body first, or leave it for today.\", \"end_line\": \"That's the conversation.\", \"end_not_sure\": \"Another practice can help. Pick a harder version when you're ready.\", \"end_plan_title\": \"For the hard moment: {plan}.\", \"end_ready\": \"The real conversation is yours to choose. Planning it can help.\", \"end_title\": \"That's the practice.\", \"ifthen_hint\": \"One thing you can do in the moment.\", \"ifthen_title\": \"If it goes that way for real, what will you do?\", \"in_head\": \"I said it in my head\", \"kind_flooded\": \"Practising works better once your body settles. The easy version is here if you want it now.\", \"kind_title\": \"What's the conversation?\", \"line_hint\": \"Your words. You can change them any time.\", \"line_title\": \"What's the first thing you'll say?\", \"next\": \"Next\", \"own_words\": \"Something else\", \"picker_personChanged\": \"Things changed with someone?\", \"picker_personChangedHint\": \"Pick who it is, and you'll be asked about them again.\", \"picker_personGoOn\": \"Go on\", \"picker_personKeepLine\": \"The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.\", \"picker_personNameHint\": \"A nickname is fine. No real names needed.\", \"picker_personNameLabel\": \"What do you call them?\", \"picker_personNew\": \"Someone new\", \"picker_personNoNameLine\": \"Without a name, nothing about them is kept.\", \"picker_personRoleLabel\": \"Who are they to you?\", \"picker_personSignedOutLine\": \"This stays on this screen only.\", \"picker_personWhoRehearse\": \"Who's the conversation with?\", \"picker_riskBadly\": \"It tends to go badly\", \"picker_riskHarm\": \"They might hurt or control me\", \"picker_riskQuestion\": \"Is it more that they might hurt or control you, or that it tends to go badly?\", \"picker_riskUnsaid\": \"I'd rather not say\", \"picker_safeNo\": \"No\", \"picker_safeQuestion\": \"Is it safe to bring hard things up with {who}?\", \"picker_safeUnsure\": \"Not sure\", \"picker_safeYes\": \"Yes, mostly\", \"picker_safetyRouteBack\": \"This is about someone else\", \"picker_safetyRouteBody\": \"The people below can help you think it through, any time, and you don't have to be sure.\", \"picker_safetyRouteEnding\": \"Thinking about ending the relationship\", \"picker_safetyRouteRehearseHeading\": \"With {who}, your safety comes before any practice conversation.\", \"plan_offer\": \"Plan the conversation\", \"pose_arms\": \"arms folded\", \"pose_closer\": \"steps closer\", \"pose_still\": \"goes still\", \"pose_turn_away\": \"turns away\", \"ready_title\": \"Could you say it for real?\", \"safety_open\": \"Talk to someone now\", \"stage_hint\": \"Out loud if you can, or in your head.\", \"stage_title\": \"Say it.\", \"stop\": \"Stop practising\", \"them\": \"Them\", \"tier_flooded\": \"The easy version, or practising a way out, for now.\", \"tier_heads_up\": \"With them, practising a calm way out can help too.\", \"tier_hint\": \"You choose how hard. Stopping always counts.\", \"tier_title\": \"How will they respond?\", \"you\": \"You\", \"your_move\": \"What do you do?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "dbt_behavioral_rehearsal"}), (s:Skill {id: "rehearse"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "rehearse"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
@@ -21938,22 +21938,22 @@ MATCH (s:Skill {id: "rehearse"}), (n:SkillStep {id: "rehearse:line"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 1};
 MERGE (n:SkillStep {id: "rehearse:tier"})
-SET n += {skillId: "rehearse", step: "tier", kind: "ask", version: "rh-v1"}, n.specJson = "{\"fields\": [{\"id\": \"tier\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"tier\", \"where\": {\"all\": [{\"any\": [{\"not\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"eq\": [\"$opt.flooded\", true]}]}, {\"any\": [{\"not\": {\"eq\": [\"$ctx.band\", \"stirred\"]}}, {\"eq\": [\"$opt.stirred\", true]}]}]}}, \"required\": true}], \"hint\": \"tier_hint\", \"lines\": [{\"key\": \"tier_flooded\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"tier_heads_up\", \"when\": {\"eq\": [\"$ctx.frame\", \"heads_up\"]}}], \"title\": \"tier_title\"}";
+SET n += {skillId: "rehearse", step: "tier", kind: "ask", version: "rh-v1"}, n.specJson = "{\"fields\": [{\"id\": \"tier\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"tier\", \"where\": {\"all\": [{\"any\": [{\"not\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"eq\": [\"$opt.flooded\", true]}]}, {\"any\": [{\"not\": {\"eq\": [\"$ctx.band\", \"stirred\"]}}, {\"eq\": [\"$opt.stirred\", true]}]}, {\"any\": [{\"not\": {\"eq\": [\"$ctx.frame\", \"heads_up\"]}}, {\"eq\": [\"$opt.stirred\", true]}]}]}}, \"required\": true}], \"hint\": \"tier_hint\", \"lines\": [{\"key\": \"tier_flooded\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"tier_heads_up\", \"when\": {\"eq\": [\"$ctx.frame\", \"heads_up\"]}}], \"title\": \"tier_title\"}";
 MATCH (s:Skill {id: "rehearse"}), (n:SkillStep {id: "rehearse:tier"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 2};
 MERGE (n:SkillStep {id: "rehearse:stage"})
-SET n += {skillId: "rehearse", step: "stage", kind: "embed", version: "rh-v1"}, n.specJson = "{\"answerAs\": \"stage\", \"embed\": \"rehearsalStage\", \"hint\": \"stage_hint\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"aloud\": \"aloud\", \"endLine\": \"end_line\", \"fromSkill\": \"rehearse\", \"inHead\": \"in_head\", \"kind\": \"kind\", \"line\": \"line\", \"next\": \"next\", \"stop\": \"stop\", \"them\": \"them\", \"tier\": \"tier\", \"you\": \"you\", \"yourMove\": \"your_move\"}, \"title\": \"stage_title\"}";
+SET n += {skillId: "rehearse", step: "stage", kind: "embed", version: "rh-v1"}, n.specJson = "{\"answerAs\": \"stage\", \"embed\": \"rehearsalStage\", \"hint\": \"stage_hint\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"aloud\": \"aloud\", \"endLine\": \"end_line\", \"fromSkill\": \"rehearse\", \"inHead\": \"in_head\", \"kind\": \"kind\", \"line\": \"line\", \"next\": \"next\", \"poseArms\": \"pose_arms\", \"poseCloser\": \"pose_closer\", \"poseStill\": \"pose_still\", \"poseTurnAway\": \"pose_turn_away\", \"stop\": \"stop\", \"them\": \"them\", \"tier\": \"tier\", \"you\": \"you\", \"yourMove\": \"your_move\"}, \"title\": \"stage_title\"}";
 MATCH (s:Skill {id: "rehearse"}), (n:SkillStep {id: "rehearse:stage"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 3};
 MERGE (n:SkillStep {id: "rehearse:ifthen"})
-SET n += {skillId: "rehearse", step: "ifthen", kind: "ask", version: "rh-v1"}, n.specJson = "{\"fields\": [{\"id\": \"ifthen\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"ifthen\"}, \"required\": true}], \"hint\": \"ifthen_hint\", \"title\": \"ifthen_title\"}";
+SET n += {skillId: "rehearse", step: "ifthen", kind: "ask", version: "rh-v1"}, n.specJson = "{\"fields\": [{\"id\": \"ifthen\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"ifthen\"}, \"required\": false}], \"hint\": \"ifthen_hint\", \"title\": \"ifthen_title\"}";
 MATCH (s:Skill {id: "rehearse"}), (n:SkillStep {id: "rehearse:ifthen"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 4};
 MERGE (n:SkillStep {id: "rehearse:close"})
-SET n += {skillId: "rehearse", step: "close", kind: "ask", version: "rh-v1"}, n.specJson = "{\"fields\": [{\"askFresh\": \"thenVsNow\", \"id\": \"close\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"tvn\"}, \"required\": true}], \"lines\": [{\"key\": \"close_stopped\", \"when\": {\"has\": [\"$a.stage.ids\", \"stopped\"]}}, {\"key\": \"close_done\", \"when\": {\"all\": []}}], \"title\": \"close_title\"}";
+SET n += {skillId: "rehearse", step: "close", kind: "ask", version: "rh-v1"}, n.specJson = "{\"fields\": [{\"askFresh\": \"thenVsNow\", \"id\": \"close\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"tvn\"}, \"required\": true}], \"lines\": [{\"key\": \"close_stopped\", \"when\": {\"has\": [\"$a.stage.ids\", \"stopped\"]}}, {\"key\": \"close_done\", \"when\": {\"any\": [{\"has\": [\"$a.stage.ids\", \"finished\"]}, {\"has\": [\"$a.stage.ids\", \"stepped_out\"]}, {\"has\": [\"$a.stage.ids\", \"lost_it\"]}]}}], \"title\": \"close_title\"}";
 MATCH (s:Skill {id: "rehearse"}), (n:SkillStep {id: "rehearse:close"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 5};
@@ -21963,7 +21963,7 @@ MATCH (s:Skill {id: "rehearse"}), (n:SkillStep {id: "rehearse:ready"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 6};
 MERGE (n:SkillStep {id: "rehearse:end"})
-SET n += {skillId: "rehearse", step: "end", kind: "handoff", version: "rh-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"end_harder\", \"when\": {\"eq\": [\"$a.close\", \"worse\"]}}, {\"key\": \"end_not_sure\", \"when\": {\"eq\": [\"$a.ready\", \"not_sure\"]}}, {\"key\": \"end_ready\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"title\": [{\"key\": \"end_plan_title\", \"when\": {\"set\": \"$a.ifthen\"}}, {\"key\": \"end_title\"}], \"titleSlots\": {\"plan\": {\"labelOf\": \"ifthen\"}}}";
+SET n += {skillId: "rehearse", step: "end", kind: "handoff", version: "rh-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"end_harder\", \"when\": {\"eq\": [\"$a.close\", \"worse\"]}}, {\"key\": \"end_not_sure\", \"when\": {\"eq\": [\"$a.ready\", \"not_sure\"]}}, {\"key\": \"end_ready\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"title\": [{\"key\": \"end_plan_title\", \"when\": {\"all\": [{\"set\": \"$a.ifthen\"}, {\"not\": {\"eq\": [\"$a.close\", \"worse\"]}}]}}, {\"key\": \"end_title\"}], \"titleSlots\": {\"plan\": {\"labelOf\": \"ifthen\"}}}";
 MATCH (s:Skill {id: "rehearse"}), (n:SkillStep {id: "rehearse:end"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 7};
@@ -22022,7 +22022,7 @@ MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "tier", label: "safety_open"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "rehearse:stage"}), (b:SkillStep {id: "rehearse:ifthen"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "{\"any\": [{\"has\": [\"$a.stage.ids\", \"lost_it\"]}, {\"all\": [{\"eq\": [\"$a.tier\", \"hardest\"]}, {\"not\": {\"has\": [\"$a.stage.ids\", \"stopped\"]}}]}]}";
+SET r += {order: 0}, r.whenJson = "{\"any\": [{\"has\": [\"$a.stage.ids\", \"lost_it\"]}, {\"all\": [{\"eq\": [\"$a.tier\", \"hardest\"]}, {\"any\": [{\"has\": [\"$a.stage.ids\", \"finished\"]}, {\"has\": [\"$a.stage.ids\", \"stepped_out\"]}, {\"has\": [\"$a.stage.ids\", \"lost_it\"]}]}]}]}";
 MATCH (a:SkillStep {id: "rehearse:stage"}), (b:SkillStep {id: "rehearse:close"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 1}, r.whenJson = "null";
@@ -22035,9 +22035,12 @@ SET r += {order: 0}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "rehearse:ifthen"}), (x:SkillExit {id: "rehearse:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "ifthen", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "rehearse:close"}), (b:SkillStep {id: "rehearse:end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.close\", \"worse\"]}";
 MATCH (a:SkillStep {id: "rehearse:close"}), (b:SkillStep {id: "rehearse:ready"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "null";
+SET r += {order: 1}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "rehearse:close"}), (x:SkillExit {id: "rehearse:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "close", label: "safety_open"}, r.whenJson = "{\"all\": []}";
@@ -22055,7 +22058,7 @@ MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"not\": {\"eq\": [\"$a.close\", \"worse\"]}}}]";
 MATCH (a:SkillStep {id: "rehearse:end"}), (x:SkillExit {id: "rehearse:cope_ahead"})
 MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"set\": \"$a.ifthen\"}}]";
+SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"all\": [{\"set\": \"$a.ifthen\"}, {\"not\": {\"eq\": [\"$a.close\", \"worse\"]}}]}}]";
 MATCH (a:SkillStep {id: "rehearse:end"}), (x:SkillExit {id: "rehearse:again"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 3}, r.rowsJson = "[{\"order\": 3, \"when\": {\"all\": []}}]";
@@ -22193,7 +22196,7 @@ MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:move:acknowledge
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "move", order: 25};
 MERGE (o:SkillOption {id: "rehearse:move:name"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "move", value: "name", label: "Name what's happening", version: "rh-v1"}, o.propsJson = "{\"letter\": \"H5a\", \"says\": \"I notice we keep moving away from it.\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "move", value: "name", label: "Name what's happening", version: "rh-v1"}, o.propsJson = "{\"letter\": \"M\", \"says\": \"I notice we keep moving away from it.\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:move:name"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "move", order: 26};
@@ -22208,12 +22211,12 @@ MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:move:turn"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "move", order: 28};
 MERGE (o:SkillOption {id: "rehearse:move:break"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "move", value: "break", label: "Step out, come back later", version: "rh-v1"}, o.propsJson = "{\"letter\": \"FAST\", \"says\": \"I'm going to take a break and come back to this.\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "move", value: "break", label: "Step out, come back later", version: "rh-v1"}, o.propsJson = "{\"letter\": \"walk_away\", \"says\": \"I'm going to take a break and come back to this.\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:move:break"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "move", order: 29};
 MERGE (o:SkillOption {id: "rehearse:move:done"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "move", value: "done", label: "End the conversation", version: "rh-v1"}, o.propsJson = "{\"letter\": \"FAST\", \"says\": \"I'm done with this conversation for now.\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "move", value: "done", label: "End the conversation", version: "rh-v1"}, o.propsJson = "{\"letter\": \"walk_away\", \"says\": \"I'm done with this conversation for now.\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:move:done"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "move", order: 30};
@@ -22258,7 +22261,7 @@ MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:ask_hardest
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 38};
 MERGE (o:SkillOption {id: "rehearse:turn:ask_hardest_2"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "ask_hardest_2", label: "You always want something from me.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"ask\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 2, \"pose\": \"closer\", \"tier\": \"hardest\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "ask_hardest_2", label: "You always want something from me.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"ask\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 2, \"pose\": \"arms\", \"tier\": \"hardest\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:ask_hardest_2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 39};
@@ -22283,17 +22286,17 @@ MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:say_no_easy
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 43};
 MERGE (o:SkillOption {id: "rehearse:turn:say_no_realistic_1"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "say_no_realistic_1", label: "Come on, it's only this once.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"say_no\", \"moves\": \"again,acknowledge,middle,turn,break\", \"n\": 1, \"pose\": \"closer\", \"tier\": \"realistic\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "say_no_realistic_1", label: "Come on, it's only this once.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"say_no\", \"moves\": \"again,acknowledge,turn,break\", \"n\": 1, \"pose\": \"closer\", \"tier\": \"realistic\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:say_no_realistic_1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 44};
 MERGE (o:SkillOption {id: "rehearse:turn:say_no_realistic_2"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "say_no_realistic_2", label: "I really thought I could count on you.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"say_no\", \"moves\": \"again,acknowledge,middle,turn,break\", \"n\": 2, \"pose\": \"neutral\", \"tier\": \"realistic\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "say_no_realistic_2", label: "I really thought I could count on you.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"say_no\", \"moves\": \"again,acknowledge,turn,break\", \"n\": 2, \"pose\": \"neutral\", \"tier\": \"realistic\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:say_no_realistic_2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 45};
 MERGE (o:SkillOption {id: "rehearse:turn:say_no_realistic_3"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "say_no_realistic_3", label: "Fine. Maybe next time?", version: "rh-v1"}, o.propsJson = "{\"kind\": \"say_no\", \"moves\": \"again,acknowledge,middle,turn,break\", \"n\": 3, \"pose\": \"open\", \"tier\": \"realistic\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "say_no_realistic_3", label: "Fine. Maybe next time?", version: "rh-v1"}, o.propsJson = "{\"kind\": \"say_no\", \"moves\": \"again,acknowledge,turn,break\", \"n\": 3, \"pose\": \"open\", \"tier\": \"realistic\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:say_no_realistic_3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 46};
@@ -22303,7 +22306,7 @@ MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:say_no_hard
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 47};
 MERGE (o:SkillOption {id: "rehearse:turn:say_no_hardest_2"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "say_no_hardest_2", label: "After everything I've done for you?", version: "rh-v1"}, o.propsJson = "{\"kind\": \"say_no\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 2, \"pose\": \"closer\", \"tier\": \"hardest\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "say_no_hardest_2", label: "After everything I've done for you?", version: "rh-v1"}, o.propsJson = "{\"kind\": \"say_no\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 2, \"pose\": \"still\", \"tier\": \"hardest\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:say_no_hardest_2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 48};
@@ -22328,7 +22331,7 @@ MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:boundary_ea
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 52};
 MERGE (o:SkillOption {id: "rehearse:turn:boundary_realistic_1"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "boundary_realistic_1", label: "You're making a big deal out of nothing.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"boundary\", \"moves\": \"again,acknowledge,middle,turn,break\", \"n\": 1, \"pose\": \"arms\", \"tier\": \"realistic\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "boundary_realistic_1", label: "I didn't think it was a big deal.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"boundary\", \"moves\": \"again,acknowledge,middle,turn,break\", \"n\": 1, \"pose\": \"arms\", \"tier\": \"realistic\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:boundary_realistic_1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 53};
@@ -22343,12 +22346,12 @@ MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:boundary_re
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 55};
 MERGE (o:SkillOption {id: "rehearse:turn:boundary_hardest_1"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "boundary_hardest_1", label: "Who are you to tell me what to do?", version: "rh-v1"}, o.propsJson = "{\"kind\": \"boundary\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 1, \"pose\": \"closer\", \"tier\": \"hardest\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "boundary_hardest_1", label: "Who are you to tell me what to do?", version: "rh-v1"}, o.propsJson = "{\"kind\": \"boundary\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 1, \"pose\": \"arms\", \"tier\": \"hardest\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:boundary_hardest_1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 56};
 MERGE (o:SkillOption {id: "rehearse:turn:boundary_hardest_2"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "boundary_hardest_2", label: "You're too sensitive.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"boundary\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 2, \"pose\": \"arms\", \"tier\": \"hardest\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "boundary_hardest_2", label: "I don't see why it matters so much.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"boundary\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 2, \"pose\": \"turn_away\", \"tier\": \"hardest\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:boundary_hardest_2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 57};
@@ -22393,7 +22396,7 @@ MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:address_har
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 65};
 MERGE (o:SkillOption {id: "rehearse:turn:address_hardest_2"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "address_hardest_2", label: "What about what you did?", version: "rh-v1"}, o.propsJson = "{\"kind\": \"address\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 2, \"pose\": \"closer\", \"tier\": \"hardest\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "address_hardest_2", label: "What about what you did?", version: "rh-v1"}, o.propsJson = "{\"kind\": \"address\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 2, \"pose\": \"arms\", \"tier\": \"hardest\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:address_hardest_2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 66};
@@ -22403,62 +22406,62 @@ MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:address_har
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 67};
 MERGE (o:SkillOption {id: "rehearse:turn:repair_easy_1"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_easy_1", label: "Thanks for saying that.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"again,acknowledge,turn,done\", \"n\": 1, \"pose\": \"open\", \"tier\": \"easy\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_easy_1", label: "Thanks for saying that.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"acknowledge,turn,done\", \"n\": 1, \"pose\": \"open\", \"tier\": \"easy\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:repair_easy_1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 68};
 MERGE (o:SkillOption {id: "rehearse:turn:repair_easy_2"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_easy_2", label: "I was upset, yes.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"again,acknowledge,turn,done\", \"n\": 2, \"pose\": \"neutral\", \"tier\": \"easy\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_easy_2", label: "I was upset, yes.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"acknowledge,turn,done\", \"n\": 2, \"pose\": \"neutral\", \"tier\": \"easy\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:repair_easy_2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 69};
 MERGE (o:SkillOption {id: "rehearse:turn:repair_easy_3"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_easy_3", label: "Okay. I appreciate it.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"again,acknowledge,turn,done\", \"n\": 3, \"pose\": \"open\", \"tier\": \"easy\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_easy_3", label: "Okay. I appreciate it.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"acknowledge,turn,done\", \"n\": 3, \"pose\": \"open\", \"tier\": \"easy\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:repair_easy_3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 70};
 MERGE (o:SkillOption {id: "rehearse:turn:repair_realistic_1"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_realistic_1", label: "Sorry doesn't really fix it.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"again,acknowledge,middle,turn,break\", \"n\": 1, \"pose\": \"arms\", \"tier\": \"realistic\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_realistic_1", label: "Sorry doesn't really fix it.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"acknowledge,middle,turn,break\", \"n\": 1, \"pose\": \"arms\", \"tier\": \"realistic\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:repair_realistic_1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 71};
 MERGE (o:SkillOption {id: "rehearse:turn:repair_realistic_2"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_realistic_2", label: "I need a bit of time.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"again,acknowledge,middle,turn,break\", \"n\": 2, \"pose\": \"turn_away\", \"tier\": \"realistic\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_realistic_2", label: "I need a bit of time.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"acknowledge,middle,turn,break\", \"n\": 2, \"pose\": \"turn_away\", \"tier\": \"realistic\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:repair_realistic_2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 72};
 MERGE (o:SkillOption {id: "rehearse:turn:repair_realistic_3"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_realistic_3", label: "Okay. Let's see how it goes.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"again,acknowledge,middle,turn,break\", \"n\": 3, \"pose\": \"neutral\", \"tier\": \"realistic\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_realistic_3", label: "Okay. Let's see how it goes.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"acknowledge,middle,turn,break\", \"n\": 3, \"pose\": \"neutral\", \"tier\": \"realistic\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:repair_realistic_3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 73};
 MERGE (o:SkillOption {id: "rehearse:turn:repair_hardest_1"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_hardest_1", label: "It's too late for that.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 1, \"pose\": \"arms\", \"tier\": \"hardest\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_hardest_1", label: "It's too late for that.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"acknowledge,name,break,done,lost_it\", \"n\": 1, \"pose\": \"arms\", \"tier\": \"hardest\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:repair_hardest_1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 74};
 MERGE (o:SkillOption {id: "rehearse:turn:repair_hardest_2"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_hardest_2", label: "You always say that.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 2, \"pose\": \"closer\", \"tier\": \"hardest\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_hardest_2", label: "You always say that.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"acknowledge,name,break,done,lost_it\", \"n\": 2, \"pose\": \"still\", \"tier\": \"hardest\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:repair_hardest_2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 75};
 MERGE (o:SkillOption {id: "rehearse:turn:repair_hardest_3"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_hardest_3", label: "(They walk away.)", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"again,acknowledge,name,break,done,lost_it\", \"n\": 3, \"pose\": \"turn_away\", \"tier\": \"hardest\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "repair_hardest_3", label: "(They walk away.)", version: "rh-v1"}, o.propsJson = "{\"kind\": \"repair\", \"moves\": \"acknowledge,name,break,done,lost_it\", \"n\": 3, \"pose\": \"turn_away\", \"tier\": \"hardest\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:repair_hardest_3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 76};
 MERGE (o:SkillOption {id: "rehearse:turn:any_leave_1"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "any_leave_1", label: "Wait, we're not finished.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"any\", \"moves\": \"break,done\", \"n\": 1, \"pose\": \"closer\", \"tier\": \"leave\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "any_leave_1", label: "Can we keep going?", version: "rh-v1"}, o.propsJson = "{\"kind\": \"any\", \"moves\": \"again,break,done\", \"n\": 1, \"pose\": \"neutral\", \"tier\": \"leave\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:any_leave_1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 77};
 MERGE (o:SkillOption {id: "rehearse:turn:any_leave_2"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "any_leave_2", label: "Come on, sit back down.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"any\", \"moves\": \"break,done\", \"n\": 2, \"pose\": \"arms\", \"tier\": \"leave\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "any_leave_2", label: "I'd rather finish this now.", version: "rh-v1"}, o.propsJson = "{\"kind\": \"any\", \"moves\": \"again,break,done\", \"n\": 2, \"pose\": \"neutral\", \"tier\": \"leave\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:any_leave_2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 78};
 MERGE (o:SkillOption {id: "rehearse:turn:any_leave_3"})
-SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "any_leave_3", label: "(They keep talking.)", version: "rh-v1"}, o.propsJson = "{\"kind\": \"any\", \"moves\": \"break,done\", \"n\": 3, \"pose\": \"neutral\", \"tier\": \"leave\"}";
+SET o:SkillOption, o += {skillId: "rehearse", list: "turn", value: "any_leave_3", label: "(They keep talking.)", version: "rh-v1"}, o.propsJson = "{\"kind\": \"any\", \"moves\": \"again,break,done\", \"n\": 3, \"pose\": \"neutral\", \"tier\": \"leave\"}";
 MATCH (s:Skill {id: "rehearse"}), (o:SkillOption {id: "rehearse:turn:any_leave_3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "turn", order: 79};

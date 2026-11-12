@@ -11,7 +11,7 @@ const M = await importTs("src/lib/skillRuntime/machine.ts");
 const R = await importTs("src/lib/rehearsal.ts");
 const content = JSON.parse(readFileSync("tests/fixtures/skills-content.json", "utf8"));
 const skill = content.skills.find((s) => s.id === "rehearse");
-const OUT = { rehearsalStage: { ids: ["again", "acknowledge", "name", "middle", "turn", "break", "done", "aloud", "finished", "stopped", "lost_it", "left"], measures: ["doneCount"] } };
+const OUT = { rehearsalStage: { ids: ["again", "acknowledge", "name", "middle", "turn", "break", "done", "aloud", "finished", "stopped", "lost_it", "stepped_out"], measures: ["doneCount"] } };
 const ctx = (ctxIn = {}) => ({ skill, shared: content, carried: [], gridIds: new Set(), emotionLabel: (x) => x, ctxIn, embedOutputs: OUT, profile: null });
 const pick = (fieldId, value) => ({ type: "pick", fieldId, value });
 const next = { type: "next" };
@@ -63,6 +63,7 @@ test("how they'll respond: chosen by the person, band-gated, practising a way ou
   assert.deepEqual(values(t, "tier"), ["easy", "realistic", "hardest", "leave"]);
   assert.deepEqual(values(t, "tier", ctx({ band: "stirred" })), ["easy", "realistic", "leave"], "stirred: no hardest");
   assert.deepEqual(values(t, "tier", ctx({ band: "flooded" })), ["easy", "leave"], "flooded: the easy version only, and leaving");
+  assert.deepEqual(values(t, "tier", ctx({ frame: "heads_up" })), ["easy", "realistic", "leave"], "it tends to go badly: no hardest version with them");
   assert.equal(skill.copy[M.stepOf(skill, "tier").hint], "You choose how hard. Stopping always counts.");
   assert.equal(line(t, ctx({ frame: "heads_up" })), "With them, practising a calm way out can help too.");
   const fl = ctx({ band: "flooded" });
@@ -84,8 +85,16 @@ test("the scripts: three plain replies for every kind and tier, practising a way
       }
     }
     assert.equal(R.scriptFor(turns, kind, "leave").length, 3, "practise leaving, whatever the kind");
-    assert.deepEqual(R.scriptFor(turns, kind, "leave")[0].moves, ["break", "done"], "a way out only");
+    // Practising leaving holds the exit through their push (Gate 1): *Say it again* repeats the step-out line.
+    assert.deepEqual(R.scriptFor(turns, kind, "leave")[0].moves, ["again", "break", "done"], "a way out, held");
+    // Nobody steps closer on the hardest version or the way out (Gate 2: no physical-intimidation cue).
+    for (const t of [...R.scriptFor(turns, kind, "hardest"), ...R.scriptFor(turns, kind, "leave")]) assert.notEqual(t.pose, "closer", t.value);
   }
+  // A repair never repeats the apology (FAST: no extra apologies); a firm no isn't traded for a middle.
+  for (const t of R.scriptFor(turns, "repair", "realistic")) assert.ok(!t.moves.includes("again"), t.value);
+  for (const t of R.scriptFor(turns, "say_no", "realistic")) assert.ok(!t.moves.includes("middle"), t.value);
+  // No line that re-invalidates (Recover's whole subject).
+  for (const t of turns) assert.doesNotMatch(t.label, /too sensitive|big deal out of nothing|overreact/i, t.label);
   // Never abusive (PRD step 5): no slurs, threats or swearing; nothing about hurting anyone.
   for (const t of turns) assert.doesNotMatch(t.label, /\b(hurt|hit|kill|stupid|idiot|hate|shut up|damn|hell)\b/i, t.label);
   assert.ok(R.scriptFor(turns, "ask", "hardest").some((t) => t.moves.includes("lost_it")), "*I'd lose it here* on the hardest version");
@@ -110,7 +119,7 @@ test("the stage (pure): say it, their reply, your move; Stop and leaving end it;
   s = R.finished(s, turns);
   assert.deepEqual(R.stageOutput(s), { ids: ["again", "acknowledge", "aloud", "finished"], doneCount: 3 });
   const left = R.moved(R.said(R.startStage("No."), turns, false), mv("break"), "No.");
-  assert.equal(left.end, "left");
+  assert.equal(left.end, "stepped_out");
   assert.deepEqual(R.stageOutput(R.stopped(R.startStage("No."))), { ids: ["stopped"], doneCount: 0 }, "Stop counts at any point");
   const lost = R.moved(R.said(R.startStage("No."), R.scriptFor(skill.options.turn, "ask", "hardest"), false), mv("lost_it"), "No.");
   assert.deepEqual(R.stageOutput(lost).ids, ["lost_it"]);
@@ -140,12 +149,23 @@ test("the close: stopping counts; then could you say it for real; the way on", (
   assert.equal(line(end), "The real conversation is yours to choose. Planning it can help.");
   assert.deepEqual(offers(end), ["plan", "again"]);
   assert.equal(line(run([pick("ready", "not_sure"), next], ctx(), ready)), "Another practice can help. Pick a harder version when you're ready.");
-  const harder = run([pick("close", "worse"), next, pick("ready", "not_sure"), next], ctx(), done);
+  const harder = run([pick("close", "worse"), next], ctx(), done);
+  assert.equal(harder.stepId, "end", "harder: no *could you say it for real?*");
   assert.match(line(harder), /^Saying it for real feels harder right now/);
   assert.deepEqual(offers(harder), ["cool_down", "again"], "harder: settle first, never plan it now");
   const plan = run([stage(["lost_it"]), pick("ifthen", "break"), next, pick("close", "same"), next, pick("ready", "sure"), next], ctx(), toStage());
   assert.equal(title(plan), "For the hard moment: Step out and come back later.");
   assert.deepEqual(offers(plan), ["plan", "cope_ahead", "again"]);
+  // Losing it, a plan, then harder: settle first; no plan, no *For the hard moment* (Gate 2).
+  const lostWorse = run([stage(["lost_it"]), pick("ifthen", "break"), next, pick("close", "worse"), next], ctx(), toStage());
+  assert.deepEqual(offers(lostWorse), ["cool_down", "again"]);
+  assert.equal(title(lostWorse), "That's the practice.");
+  // The if-then is optional: someone who'd lose it isn't made to pick a plan to go on.
+  assert.equal(run([stage(["lost_it"]), next], ctx(), toStage()).stepId, "close");
+  // Practising leaving and stepping out count as practice (`stepped_out`, never the player's inline `left`).
+  assert.equal(line(run([stage(["break", "stepped_out"])], ctx(), toStage("ask", "leave"))), "You practised it. That counts.");
+  // The content-drift fallback reports nothing: neither line claims what didn't happen.
+  assert.equal(line(run([{ type: "embedDone", output: { ids: [], doneCount: 0 } }], ctx(), toStage())), null);
   assert.deepEqual(skill.exits.find((e) => e.id === "again").query, { situationId: "$a.kind", person: "$ctx.personId" });
   assert.deepEqual(M.exitQuery(ctx({ personId: "none" }), skill.exits.find((e) => e.id === "again"), toStage("repair")), { situationId: "repair" });
 });

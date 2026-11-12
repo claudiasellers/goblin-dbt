@@ -9515,9 +9515,21 @@
               {
                 "exit": "rehearse",
                 "when": {
-                  "eq": [
-                    "$a.factor",
-                    "no_words"
+                  "all": [
+                    {
+                      "eq": [
+                        "$a.factor",
+                        "no_words"
+                      ]
+                    },
+                    {
+                      "not": {
+                        "has": [
+                          "$a.moment.ids",
+                          "tp_escalated"
+                        ]
+                      }
+                    }
                   ]
                 }
               },
@@ -15375,7 +15387,14 @@
               },
               {
                 "exit": "rehearse",
-                "when": null
+                "when": {
+                  "not": {
+                    "eq": [
+                      "$a.what",
+                      "harms"
+                    ]
+                  }
+                }
               }
             ]
           },
@@ -52454,11 +52473,15 @@
           "tier_heads_up": "With them, practising a calm way out can help too.",
           "tier_flooded": "The easy version, or practising a way out, for now.",
           "stage_title": "Say it.",
-          "stage_hint": "Out loud if you can. Nobody's listening.",
+          "stage_hint": "Out loud if you can, or in your head.",
           "aloud": "I said it out loud",
           "in_head": "I said it in my head",
           "your_move": "What do you do?",
-          "stop": "Stop",
+          "stop": "Stop practising",
+          "pose_closer": "steps closer",
+          "pose_arms": "arms folded",
+          "pose_turn_away": "turns away",
+          "pose_still": "goes still",
           "you": "You",
           "them": "Them",
           "end_line": "That's the conversation.",
@@ -52649,6 +52672,24 @@
                             ]
                           }
                         ]
+                      },
+                      {
+                        "any": [
+                          {
+                            "not": {
+                              "eq": [
+                                "$ctx.frame",
+                                "heads_up"
+                              ]
+                            }
+                          },
+                          {
+                            "eq": [
+                              "$opt.stirred",
+                              true
+                            ]
+                          }
+                        ]
                       }
                     ]
                   }
@@ -52714,7 +52755,11 @@
               "you": "you",
               "them": "them",
               "endLine": "end_line",
-              "next": "next"
+              "next": "next",
+              "poseCloser": "pose_closer",
+              "poseArms": "pose_arms",
+              "poseTurnAway": "pose_turn_away",
+              "poseStill": "pose_still"
             },
             "links": [
               {
@@ -52745,12 +52790,26 @@
                           ]
                         },
                         {
-                          "not": {
-                            "has": [
-                              "$a.stage.ids",
-                              "stopped"
-                            ]
-                          }
+                          "any": [
+                            {
+                              "has": [
+                                "$a.stage.ids",
+                                "finished"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$a.stage.ids",
+                                "stepped_out"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$a.stage.ids",
+                                "lost_it"
+                              ]
+                            }
+                          ]
                         }
                       ]
                     }
@@ -52775,7 +52834,7 @@
                   "list": "ifthen"
                 },
                 "max": 1,
-                "required": true,
+                "required": false,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -52832,12 +52891,40 @@
               },
               {
                 "when": {
-                  "all": []
+                  "any": [
+                    {
+                      "has": [
+                        "$a.stage.ids",
+                        "finished"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$a.stage.ids",
+                        "stepped_out"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$a.stage.ids",
+                        "lost_it"
+                      ]
+                    }
+                  ]
                 },
                 "key": "close_done"
               }
             ],
             "next": [
+              {
+                "to": "end",
+                "when": {
+                  "eq": [
+                    "$a.close",
+                    "worse"
+                  ]
+                }
+              },
               {
                 "to": "ready",
                 "when": null
@@ -52885,7 +52972,19 @@
               {
                 "key": "end_plan_title",
                 "when": {
-                  "set": "$a.ifthen"
+                  "all": [
+                    {
+                      "set": "$a.ifthen"
+                    },
+                    {
+                      "not": {
+                        "eq": [
+                          "$a.close",
+                          "worse"
+                        ]
+                      }
+                    }
+                  ]
                 }
               },
               {
@@ -52957,7 +53056,19 @@
               {
                 "exit": "cope_ahead",
                 "when": {
-                  "set": "$a.ifthen"
+                  "all": [
+                    {
+                      "set": "$a.ifthen"
+                    },
+                    {
+                      "not": {
+                        "eq": [
+                          "$a.close",
+                          "worse"
+                        ]
+                      }
+                    }
+                  ]
                 }
               },
               {
@@ -53165,7 +53276,7 @@
             {
               "value": "name",
               "label": "Name what's happening",
-              "letter": "H5a",
+              "letter": "M",
               "says": "I notice we keep moving away from it."
             },
             {
@@ -53183,13 +53294,13 @@
             {
               "value": "break",
               "label": "Step out, come back later",
-              "letter": "FAST",
+              "letter": "walk_away",
               "says": "I'm going to take a break and come back to this."
             },
             {
               "value": "done",
               "label": "End the conversation",
-              "letter": "FAST",
+              "letter": "walk_away",
               "says": "I'm done with this conversation for now."
             },
             {
@@ -53267,7 +53378,7 @@
               "kind": "ask",
               "tier": "hardest",
               "n": 2,
-              "pose": "closer",
+              "pose": "arms",
               "moves": "again,acknowledge,name,break,done,lost_it"
             },
             {
@@ -53313,7 +53424,7 @@
               "tier": "realistic",
               "n": 1,
               "pose": "closer",
-              "moves": "again,acknowledge,middle,turn,break"
+              "moves": "again,acknowledge,turn,break"
             },
             {
               "value": "say_no_realistic_2",
@@ -53322,7 +53433,7 @@
               "tier": "realistic",
               "n": 2,
               "pose": "neutral",
-              "moves": "again,acknowledge,middle,turn,break"
+              "moves": "again,acknowledge,turn,break"
             },
             {
               "value": "say_no_realistic_3",
@@ -53331,7 +53442,7 @@
               "tier": "realistic",
               "n": 3,
               "pose": "open",
-              "moves": "again,acknowledge,middle,turn,break"
+              "moves": "again,acknowledge,turn,break"
             },
             {
               "value": "say_no_hardest_1",
@@ -53348,7 +53459,7 @@
               "kind": "say_no",
               "tier": "hardest",
               "n": 2,
-              "pose": "closer",
+              "pose": "still",
               "moves": "again,acknowledge,name,break,done,lost_it"
             },
             {
@@ -53389,7 +53500,7 @@
             },
             {
               "value": "boundary_realistic_1",
-              "label": "You're making a big deal out of nothing.",
+              "label": "I didn't think it was a big deal.",
               "kind": "boundary",
               "tier": "realistic",
               "n": 1,
@@ -53420,16 +53531,16 @@
               "kind": "boundary",
               "tier": "hardest",
               "n": 1,
-              "pose": "closer",
+              "pose": "arms",
               "moves": "again,acknowledge,name,break,done,lost_it"
             },
             {
               "value": "boundary_hardest_2",
-              "label": "You're too sensitive.",
+              "label": "I don't see why it matters so much.",
               "kind": "boundary",
               "tier": "hardest",
               "n": 2,
-              "pose": "arms",
+              "pose": "turn_away",
               "moves": "again,acknowledge,name,break,done,lost_it"
             },
             {
@@ -53510,7 +53621,7 @@
               "kind": "address",
               "tier": "hardest",
               "n": 2,
-              "pose": "closer",
+              "pose": "arms",
               "moves": "again,acknowledge,name,break,done,lost_it"
             },
             {
@@ -53529,7 +53640,7 @@
               "tier": "easy",
               "n": 1,
               "pose": "open",
-              "moves": "again,acknowledge,turn,done"
+              "moves": "acknowledge,turn,done"
             },
             {
               "value": "repair_easy_2",
@@ -53538,7 +53649,7 @@
               "tier": "easy",
               "n": 2,
               "pose": "neutral",
-              "moves": "again,acknowledge,turn,done"
+              "moves": "acknowledge,turn,done"
             },
             {
               "value": "repair_easy_3",
@@ -53547,7 +53658,7 @@
               "tier": "easy",
               "n": 3,
               "pose": "open",
-              "moves": "again,acknowledge,turn,done"
+              "moves": "acknowledge,turn,done"
             },
             {
               "value": "repair_realistic_1",
@@ -53556,7 +53667,7 @@
               "tier": "realistic",
               "n": 1,
               "pose": "arms",
-              "moves": "again,acknowledge,middle,turn,break"
+              "moves": "acknowledge,middle,turn,break"
             },
             {
               "value": "repair_realistic_2",
@@ -53565,7 +53676,7 @@
               "tier": "realistic",
               "n": 2,
               "pose": "turn_away",
-              "moves": "again,acknowledge,middle,turn,break"
+              "moves": "acknowledge,middle,turn,break"
             },
             {
               "value": "repair_realistic_3",
@@ -53574,7 +53685,7 @@
               "tier": "realistic",
               "n": 3,
               "pose": "neutral",
-              "moves": "again,acknowledge,middle,turn,break"
+              "moves": "acknowledge,middle,turn,break"
             },
             {
               "value": "repair_hardest_1",
@@ -53583,7 +53694,7 @@
               "tier": "hardest",
               "n": 1,
               "pose": "arms",
-              "moves": "again,acknowledge,name,break,done,lost_it"
+              "moves": "acknowledge,name,break,done,lost_it"
             },
             {
               "value": "repair_hardest_2",
@@ -53591,8 +53702,8 @@
               "kind": "repair",
               "tier": "hardest",
               "n": 2,
-              "pose": "closer",
-              "moves": "again,acknowledge,name,break,done,lost_it"
+              "pose": "still",
+              "moves": "acknowledge,name,break,done,lost_it"
             },
             {
               "value": "repair_hardest_3",
@@ -53601,25 +53712,25 @@
               "tier": "hardest",
               "n": 3,
               "pose": "turn_away",
-              "moves": "again,acknowledge,name,break,done,lost_it"
+              "moves": "acknowledge,name,break,done,lost_it"
             },
             {
               "value": "any_leave_1",
-              "label": "Wait, we're not finished.",
+              "label": "Can we keep going?",
               "kind": "any",
               "tier": "leave",
               "n": 1,
-              "pose": "closer",
-              "moves": "break,done"
+              "pose": "neutral",
+              "moves": "again,break,done"
             },
             {
               "value": "any_leave_2",
-              "label": "Come on, sit back down.",
+              "label": "I'd rather finish this now.",
               "kind": "any",
               "tier": "leave",
               "n": 2,
-              "pose": "arms",
-              "moves": "break,done"
+              "pose": "neutral",
+              "moves": "again,break,done"
             },
             {
               "value": "any_leave_3",
@@ -53628,7 +53739,7 @@
               "tier": "leave",
               "n": 3,
               "pose": "neutral",
-              "moves": "break,done"
+              "moves": "again,break,done"
             }
           ],
           "ifthen": [
