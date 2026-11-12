@@ -218,7 +218,7 @@ test("wiring: the cards, the projection, the Tools intent and the player's skill
   assert.equal(delayed.deepLinkTemplate, "/tool/dear-man?mode=one&run={sourceSessionId}&at=back&followUp={followUpId}");
   assert.doesNotMatch(JSON.stringify([delayed.copy, delayed.notification]), /message|send|\{label\}|\{who\}/i, "tech safety: the card says nothing about who or what");
   assert.match(read("functions/src/spine/copeAheadAfter.ts"), /ask_delayed: 'dear-man'/);
-  assert.match(read("functions/src/spine/toolSession.ts"), /'ask_delayed'\] as const/);
+  assert.match(read("functions/src/spine/toolSession.ts"), /'ask_delayed'[^\]]*\] as const/);
   assert.match(read("functions/src/skills/projections.ts"), /'dear-man': projectDearMan,/);
   assert.match(read("src/lib/skillRuntime/playerTools.ts"), /'dear-man': \['dear_man_debrief', 'dear_man_one'\]/);
   const T = await importTs("src/data/tools.ts");

@@ -209,14 +209,12 @@ test("every screen has talk to someone now but the reach card, whose banner is t
   }
 });
 
-test("routing: urge-surfing's row is built, switched off and a draft until Claudia signs it off", () => {
-  const src = readFileSync("scripts/recommendations/content.py", "utf8");
-  assert.match(src, /"urge-surfing": "rebuilt on the skill runtime as Ride it out/);
+test("routing: urge-surfing's row is live (12 Nov 2026, default to connected)", () => {
   const cy = readFileSync("schema/recommended-for.cypher", "utf8");
   const rows = cy.split("\n").filter((l) => /\{id: "rf_[^"]*_urge-surfing"/.test(l));
   assert.ok(rows.length >= 1, "the worried row is there");
   for (const l of rows) {
-    assert.match(l, /active: false/, l);
-    assert.match(l, /review: "draft"/, l);
+    assert.match(l, /active: true/, l);
+    assert.match(l, /review: "approved"/, l);
   }
 });

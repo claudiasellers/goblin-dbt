@@ -18,6 +18,7 @@ import pros_cons  # noqa: E402
 import first_body  # noqa: E402
 import ride_it_out  # noqa: E402
 import let_it_be  # noqa: E402
+import mind_job  # noqa: E402
 import say_no  # noqa: E402
 import dear_man_one  # noqa: E402
 
@@ -25,7 +26,7 @@ import dear_man_one  # noqa: E402
 CONTENT_VERSION = "skills-v1"
 SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKILL, *fast.SKILLS, nightmare_rescript.SKILL, problem_solve.SKILL,
           ending_relationships.SKILL, cope_ahead.SKILL, hold_to_wait.SKILL, dear_man_debrief.SKILL, pros_cons.SKILL, first_body.SKILL,
-          ride_it_out.SKILL, let_it_be.SKILL, say_no.SKILL, dear_man_one.SKILL]
+          ride_it_out.SKILL, let_it_be.SKILL, mind_job.SKILL, say_no.SKILL, dear_man_one.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -68,6 +69,9 @@ EMBEDS = {
     "urgeWave": {"ids": ["still_here", "fading", "gone", "bigger", "ended_gone", "ended_bigger", "ended_not_now",
                          "ended_left", "ended_long"], "measures": ["durationSec", "doneCount"]},
     "waveTrace": {"ids": ["read"]},
+    # DT-06's lid (plan C3b `lidShelf`, DT-owned; src/components/skillPlayer/LidShelf.tsx): put it in, hold the lid
+    # shut. `shut` when the hold finished, `partly` after a release, `skipped` when the way past came first.
+    "lidShelf": {"ids": ["shut", "partly", "skipped"], "measures": ["durationSec"]},
     # IE-B3's message card (plan C3b `messageComposer`, IE-owned): the picks as one message, with the FAST strip (an
     # extra sorry, over-explaining) and the line to repeat; Copy and Open messages, never a send. Reports what was done.
     "messageComposer": {"ids": ["copied", "opened", "dropped_sorry"]},
@@ -289,6 +293,17 @@ EMBED_PROPS = {
         "riseLine": {"type": "copy", "optional": True},
         "heldLine": {"type": "copy"},
         "next": {"type": "copy"},
+    },
+    "lidShelf": {
+        "containerField": {"type": "field"},
+        "put": {"type": "copy"},
+        "hold": {"type": "copy"},
+        "holding": {"type": "copy"},
+        "hint": {"type": "copy"},
+        "holdSec": {"type": "int", "min": 1, "max": 10},
+        "done": {"type": "copy"},
+        "next": {"type": "copy"},
+        "skip": {"type": "copy"},
     },
 }
 # Shared tables the graph supplies to every skill (never written here).

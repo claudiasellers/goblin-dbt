@@ -50,16 +50,20 @@ test("rows are drafts until signed off; the policy can only be enabled once ever
   }
 });
 
-test("D-02 defaults kept: Urge Surfing switched off, DEAR MAN's one word row, Pause active; planned tools are written switched off", () => {
-  const planned = ["dbt_accepts", "dbt_give", "dbt_please", "dbt_radical_acceptance"];
+test("DEAR MAN's one word row, Pause active; planned tools are written switched off; built tools live (default to connected, 12 Nov 2026)", () => {
+  const planned = ["dbt_give", "dbt_please"];
   for (const r of rows) {
     if (r.conceptId === "dbt_dear_man") assert.deepEqual([r.id, r.active, r.reviewStatus, r.words], ["rf_social_threat_shame_words_ask-for-it_dear-man", true, "approved", ["let_down", "excluded"]], "DEAR MAN's one word row, live (12 Nov)");
-    const off = r.conceptId === "urge_surfing" || planned.includes(r.conceptId);
+    const off = planned.includes(r.conceptId);
     assert.equal(r.active, !off, r.id);
   }
-  assert.deepEqual([...new Set(rows.filter((r) => !r.active).map((r) => r.conceptId))].sort(), [...planned, "urge_surfing"].sort());
+  assert.deepEqual([...new Set(rows.filter((r) => !r.active).map((r) => r.conceptId))].sort(), [...planned].sort());
+  for (const c of ["urge_surfing", "dbt_radical_acceptance", "dbt_accepts", "dbt_fast", "dbt_wise_mind"]) {
+    const live = rows.filter((r) => r.conceptId === c);
+    assert.ok(live.length && live.every((r) => r.active && r.reviewStatus === "approved"), c);
+  }
   // Default to connected (12 Nov 2026): built tools' rows are signed off and live.
-  for (const c of planned.filter((x) => x !== "dbt_wise_mind" && x !== "dbt_cope_ahead" && x !== "dbt_check_facts" && x !== "dbt_fast" && x !== "dbt_radical_acceptance")) assert.ok(!graph.concepts[c]?.appToolId, `${c} has no app module yet`);
+  for (const c of planned.filter((x) => x !== "dbt_wise_mind" && x !== "dbt_cope_ahead" && x !== "dbt_check_facts" && x !== "dbt_fast" && x !== "dbt_radical_acceptance" && x !== "dbt_accepts")) assert.ok(!graph.concepts[c]?.appToolId, `${c} has no app module yet`);
   assert.equal(graph.concepts.dbt_wise_mind.appToolId, "wise-mind");
   const wise = rows.filter((r) => r.conceptId === "dbt_wise_mind");
   assert.deepEqual(wise.map((r) => [r.id, r.active, r.reviewStatus]), [["rf_chronic_vigilance_words_watchful_wise-mind", true, "approved"]]);
@@ -86,11 +90,12 @@ test("D-02 defaults kept: Urge Surfing switched off, DEAR MAN's one word row, Pa
   assert.equal(graph.concepts.dbt_saying_no.appToolId, "say-no");
   const no = rows.filter((r) => r.conceptId === "dbt_saying_no");
   assert.deepEqual(no.map((r) => [r.id, r.active, r.reviewStatus, r.words]), [["rf_acute_alarm_words_demand_say-no", true, "approved", ["pressured"]]]);
-  // Let it be (docs/design/let-it-be.md, DT-04; D6 renamed radical-acceptance): built, its three rows off and drafts.
+  // Let it be (docs/design/let-it-be.md, DT-04; D6 renamed radical-acceptance): built, its three rows live.
   assert.equal(graph.concepts.dbt_radical_acceptance.appToolId, "let-it-be");
   const lb = rows.filter((r) => r.conceptId === "dbt_radical_acceptance");
   assert.equal(lb.length, 3);
-  assert.ok(lb.every((r) => r.active === false && r.reviewStatus === "draft"), "Let it be rows stay off and drafts");
+  assert.ok(lb.every((r) => r.active === true && r.reviewStatus === "approved"), "Let it be rows live (12 Nov 2026)");
+  assert.ok(lb.find((r) => r.patternId === "conservation_freeze" || r.id.startsWith("rf_conservation_freeze"))?.words?.length, "Let it be on Shut down is word-gated (not numb)");
   assert.ok(rows.some((r) => tool(r) === "pause" && r.active));
 });
 
@@ -103,7 +108,7 @@ test("tags (WMP-04 v0 side, skillKind, direction) on the 13 app-tool concepts; D
     "dear-man": ["change", "relational", "neutral"], "recovering-from-invalidation": ["both", "relational", "neutral"],
     "wise-mind": ["both", "naming", "neutral"], "cope-ahead": ["change", "change", "neutral"],
     "check-the-facts": ["change", "change", "neutral"], "alternate-rebellion": ["acceptance", "redirect", "neutral"], fast: ["both", "values", "neutral"],
-    "say-no": ["change", "relational", "neutral"], "let-it-be": ["acceptance", "hold", "neutral"],
+    "say-no": ["change", "relational", "neutral"], "let-it-be": ["acceptance", "hold", "neutral"], "mind-job": ["acceptance", "redirect", "neutral"],
   });
   for (const id of Object.keys(tags)) assert.ok(toolIds.includes(id), id);
 });

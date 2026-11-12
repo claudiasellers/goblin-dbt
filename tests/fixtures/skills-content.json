@@ -11776,7 +11776,7 @@
     "fork_hint": "Any answer is fine.",
     "end_change": "Then it's worth a look, while you're steadier.",
     "end_accept": "That's a heavy thing to carry. You don't have to solve it right now.",
-    "end_park": "Then it can wait. You can come back to it when you choose.",
+    "end_park": "Then it can wait, with a time to come back to it.",
     "end_through": "You got through it. That's the skill.",
     "safety_open": "Talk to someone now",
     "next": "Next",
@@ -13467,8 +13467,7 @@
      "toolId": "mind-job",
      "query": {},
      "carry": [],
-     "done": false,
-     "planned": true
+     "done": false
     },
     {
      "id": "opposite_action",
@@ -14838,8 +14837,7 @@
      "toolId": "mind-job",
      "query": {},
      "carry": [],
-     "done": false,
-     "planned": true
+     "done": false
     },
     {
      "id": "safety_open",
@@ -17103,6 +17101,2216 @@
      }
     ]
    }
+  },
+  {
+   "id": "mind_job",
+   "toolId": "mind-job",
+   "version": "mj-v1",
+   "start": "what",
+   "accepts": [
+    "band"
+   ],
+   "ownMax": 36,
+   "emotionFields": [],
+   "copy": {
+    "what_title": "What would help right now?",
+    "what_hint": "Each one comes back to it, so nothing's pushed away for good.",
+    "heads_up_title": "Your body's loud right now.",
+    "heads_up_hint": "You can settle your body first, or try a short find task.",
+    "settle_line": "Body first. Your mind's job is here when you're ready.",
+    "warmth_title": "What kind of job?",
+    "warmth_hint": "Some days the warmer ones are harder. Any is fine.",
+    "task_find_title": "Something to find. Pick one.",
+    "task_like_title": "Something you like. Pick one.",
+    "task_good_title": "Something good. Pick one.",
+    "do_title": "Eyes open.",
+    "here": "You're here, and it's",
+    "found": "Found one",
+    "found_sound": "Heard it",
+    "found_one": "Got it",
+    "find_done": "That's it.",
+    "t_blue": "Find five blue things around you. Tap for each one.",
+    "t_sound": "Listen for the farthest sound you can hear.",
+    "t_round": "Find three round things.",
+    "t_edges": "Find four things with straight edges.",
+    "t_look": "Find one thing you like the look of.",
+    "t_soft": "Find something soft. Touch it if you can.",
+    "t_hum": "Listen for a sound you don't mind.",
+    "t_made": "Find something you chose or made.",
+    "t_liked": "Find something that reminds you of a kind moment.",
+    "t_ahead": "Find something that's part of a plan you're looking forward to, even a small one.",
+    "stay_title": "Stay with it for a few seconds.",
+    "stay_step1": "Let your eyes rest on it, or keep it in mind.",
+    "stay_step2": "Notice one thing you like about it.",
+    "stay_start": "Start",
+    "stay_running": "Staying with it",
+    "stay_done": "That's it.",
+    "how_title": "How was that?",
+    "how_hint": "Too much goes cooler. More goes warmer.",
+    "back_title": "Back. Is it louder, the same, quieter?",
+    "fork_title": "Can anything be done about it right now?",
+    "louder_line": "It got louder. That happens. Let's look after your body first.",
+    "too_much_line": "That was a lot. Let's look after your body first.",
+    "end_change": "Then let's look at what can be done.",
+    "end_cant": "Then the fight with it can ease. Let it be is for that.",
+    "end_gone": "It's gone for now. You gave your mind a job and came back to check. That's the skill.",
+    "end_later": "Then put it away for later, with a time to come back.",
+    "break_title": "What could you do for a while?",
+    "break_hint": "Something that takes your hands or your attention.",
+    "break_own": "Something else that doesn't hurt you",
+    "break_when_title": "When do you want to come back to it?",
+    "break_when_hint": "You'll get a check-in then.",
+    "break_line": "Take your time. When you're back, there'll be a check-in.",
+    "lid_pick_title": "Put it in something. Pick one.",
+    "lid_pick_hint": "It stays on the shelf until you open it.",
+    "lid_title": "Put it in, then hold the lid shut.",
+    "lid_put": "Put it in",
+    "lid_hold": "Hold the lid shut",
+    "lid_holding": "Holding",
+    "lid_hold_hint": "Press and hold until the lid is shut. If it keeps going after a tap, tap again to stop.",
+    "lid_done": "It's shut, and on the shelf.",
+    "lid_label_title": "Want to give it a label?",
+    "lid_label_hint": "Skipping is fine.",
+    "lid_label_own": "In my words",
+    "lid_when_title": "When will you open it again?",
+    "lid_when_hint": "It'll keep until then.",
+    "lid_line": "It's on the shelf. It'll keep until you open it.",
+    "reopen_title": "It's still on the shelf. Open it for a few minutes?",
+    "reopen_hint": "You can put it back.",
+    "opened_title": "Take the lid off. What's in there?",
+    "opened_hint": "Pick the closest.",
+    "reopen_fork_title": "Can anything be done about it?",
+    "repark_title": "When will you open it?",
+    "repark_hint": "It's okay to wait. If it keeps coming back, someone can look at it with you.",
+    "reopen_change": "Then let's look at what can be done.",
+    "reopen_facts": "Checking the facts can show how big it is now.",
+    "reopen_cant": "Then the fight with it can ease. Let it be is for that.",
+    "reopen_gone": "Then it can go. You opened it, and that's enough.",
+    "reopen_skip": "Then it can go. You came back to check, and that's enough.",
+    "re_heads_title": "Your body's loud right now.",
+    "re_heads_hint": "It can stay shut until you're steadier.",
+    "lid_skip": "Leave it open for now",
+    "safety_open": "Talk to someone now",
+    "next": "Next",
+    "done": "Done"
+   },
+   "tables": {},
+   "derive": [],
+   "steps": [
+    {
+     "id": "what",
+     "kind": "ask",
+     "title": "what_title",
+     "fields": [
+      {
+       "id": "what",
+       "options": {
+        "list": "what"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "what_hint",
+     "next": [
+      {
+       "to": "lid_pick",
+       "when": {
+        "eq": [
+         "$a.what",
+         "lid"
+        ]
+       }
+      },
+      {
+       "to": "heads_up",
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       }
+      },
+      {
+       "to": "break",
+       "when": {
+        "eq": [
+         "$a.what",
+         "break"
+        ]
+       }
+      },
+      {
+       "to": "warmth",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "heads_up",
+     "kind": "ask",
+     "title": "heads_up_title",
+     "fields": [
+      {
+       "id": "heads_up",
+       "options": {
+        "list": "heads_up"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "heads_up_hint",
+     "next": [
+      {
+       "to": "settle",
+       "when": {
+        "eq": [
+         "$a.heads_up",
+         "body"
+        ]
+       }
+      },
+      {
+       "to": "to_find",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "warmth",
+     "kind": "ask",
+     "title": "warmth_title",
+     "fields": [
+      {
+       "id": "warmth",
+       "options": {
+        "list": "warmth"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "warmth_hint",
+     "next": [
+      {
+       "to": "to_find",
+       "when": {
+        "eq": [
+         "$a.warmth",
+         "find"
+        ]
+       }
+      },
+      {
+       "to": "to_like",
+       "when": {
+        "eq": [
+         "$a.warmth",
+         "like"
+        ]
+       }
+      },
+      {
+       "to": "to_good",
+       "when": {
+        "eq": [
+         "$a.warmth",
+         "good"
+        ]
+       }
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "to_find",
+     "kind": "ask",
+     "title": "task_find_title",
+     "fields": [
+      {
+       "id": "to_find",
+       "options": {
+        "list": "task_find",
+        "where": {
+         "any": [
+          {
+           "not": {
+            "eq": [
+             "$ctx.band",
+             "flooded"
+            ]
+           }
+          },
+          {
+           "eq": [
+            "$opt.calm",
+            true
+           ]
+          }
+         ]
+        }
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "do_blue",
+       "when": {
+        "eq": [
+         "$a.to_find",
+         "blue"
+        ]
+       }
+      },
+      {
+       "to": "do_sound",
+       "when": {
+        "eq": [
+         "$a.to_find",
+         "sound"
+        ]
+       }
+      },
+      {
+       "to": "do_round",
+       "when": {
+        "eq": [
+         "$a.to_find",
+         "round"
+        ]
+       }
+      },
+      {
+       "to": "do_edges",
+       "when": {
+        "eq": [
+         "$a.to_find",
+         "edges"
+        ]
+       }
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "to_like",
+     "kind": "ask",
+     "title": "task_like_title",
+     "fields": [
+      {
+       "id": "to_like",
+       "options": {
+        "list": "task_like"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "do_look",
+       "when": {
+        "eq": [
+         "$a.to_like",
+         "look"
+        ]
+       }
+      },
+      {
+       "to": "do_soft",
+       "when": {
+        "eq": [
+         "$a.to_like",
+         "soft"
+        ]
+       }
+      },
+      {
+       "to": "do_hum",
+       "when": {
+        "eq": [
+         "$a.to_like",
+         "hum"
+        ]
+       }
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "to_good",
+     "kind": "ask",
+     "title": "task_good_title",
+     "fields": [
+      {
+       "id": "to_good",
+       "options": {
+        "list": "task_good"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "do_made",
+       "when": {
+        "eq": [
+         "$a.to_good",
+         "made"
+        ]
+       }
+      },
+      {
+       "to": "do_liked",
+       "when": {
+        "eq": [
+         "$a.to_good",
+         "liked"
+        ]
+       }
+      },
+      {
+       "to": "do_ahead",
+       "when": {
+        "eq": [
+         "$a.to_good",
+         "ahead"
+        ]
+       }
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "do_blue",
+     "kind": "embed",
+     "embed": "orientFind",
+     "answerAs": "do_blue",
+     "title": "do_title",
+     "props": {
+      "variant": "find",
+      "count": 5,
+      "here": "here",
+      "task": "t_blue",
+      "foundLabel": "found",
+      "done": "find_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "how_find",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "do_sound",
+     "kind": "embed",
+     "embed": "orientFind",
+     "answerAs": "do_sound",
+     "title": "do_title",
+     "props": {
+      "variant": "listen",
+      "count": 1,
+      "here": "here",
+      "task": "t_sound",
+      "foundLabel": "found_sound",
+      "done": "find_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "how_find",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "do_round",
+     "kind": "embed",
+     "embed": "orientFind",
+     "answerAs": "do_round",
+     "title": "do_title",
+     "props": {
+      "variant": "find",
+      "count": 3,
+      "here": "here",
+      "task": "t_round",
+      "foundLabel": "found",
+      "done": "find_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "how_find",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "do_edges",
+     "kind": "embed",
+     "embed": "orientFind",
+     "answerAs": "do_edges",
+     "title": "do_title",
+     "props": {
+      "variant": "find",
+      "count": 4,
+      "here": "here",
+      "task": "t_edges",
+      "foundLabel": "found",
+      "done": "find_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "how_find",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "do_look",
+     "kind": "embed",
+     "embed": "orientFind",
+     "answerAs": "do_look",
+     "title": "do_title",
+     "props": {
+      "variant": "find",
+      "count": 1,
+      "here": "here",
+      "task": "t_look",
+      "foundLabel": "found",
+      "done": "find_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "how_like",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "do_soft",
+     "kind": "embed",
+     "embed": "orientFind",
+     "answerAs": "do_soft",
+     "title": "do_title",
+     "props": {
+      "variant": "find",
+      "count": 1,
+      "here": "here",
+      "task": "t_soft",
+      "foundLabel": "found",
+      "done": "find_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "how_like",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "do_hum",
+     "kind": "embed",
+     "embed": "orientFind",
+     "answerAs": "do_hum",
+     "title": "do_title",
+     "props": {
+      "variant": "listen",
+      "count": 1,
+      "here": "here",
+      "task": "t_hum",
+      "foundLabel": "found_sound",
+      "done": "find_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "how_like",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "do_made",
+     "kind": "embed",
+     "embed": "orientFind",
+     "answerAs": "do_made",
+     "title": "do_title",
+     "props": {
+      "variant": "find",
+      "count": 1,
+      "here": "here",
+      "task": "t_made",
+      "foundLabel": "found",
+      "done": "find_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "stay",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "do_liked",
+     "kind": "embed",
+     "embed": "orientFind",
+     "answerAs": "do_liked",
+     "title": "do_title",
+     "props": {
+      "variant": "find",
+      "count": 1,
+      "here": "here",
+      "task": "t_liked",
+      "foundLabel": "found",
+      "done": "find_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "stay",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "do_ahead",
+     "kind": "embed",
+     "embed": "orientFind",
+     "answerAs": "do_ahead",
+     "title": "do_title",
+     "props": {
+      "variant": "find",
+      "count": 1,
+      "here": "here",
+      "task": "t_ahead",
+      "foundLabel": "found_one",
+      "done": "find_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "stay",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "stay",
+     "kind": "embed",
+     "embed": "bodyCard",
+     "answerAs": "stay",
+     "title": "stay_title",
+     "props": {
+      "kind": "still",
+      "seconds": 10,
+      "step1": "stay_step1",
+      "step2": "stay_step2",
+      "start": "stay_start",
+      "running": "stay_running",
+      "done": "stay_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "how_good",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "how_find",
+     "kind": "ask",
+     "title": "how_title",
+     "fields": [
+      {
+       "id": "how_find",
+       "options": {
+        "list": "how",
+        "where": {
+         "any": [
+          {
+           "not": {
+            "eq": [
+             "$ctx.band",
+             "flooded"
+            ]
+           }
+          },
+          {
+           "eq": [
+            "$opt.calm",
+            true
+           ]
+          }
+         ]
+        }
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "how_hint",
+     "next": [
+      {
+       "to": "back",
+       "when": {
+        "eq": [
+         "$a.how_find",
+         "enough"
+        ]
+       }
+      },
+      {
+       "to": "too_much",
+       "when": {
+        "eq": [
+         "$a.how_find",
+         "too_much"
+        ]
+       }
+      },
+      {
+       "to": "to_like",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.how_find",
+           "more"
+          ]
+         },
+         {
+          "not": {
+           "eq": [
+            "$ctx.band",
+            "flooded"
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "to": "to_find",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "how_like",
+     "kind": "ask",
+     "title": "how_title",
+     "fields": [
+      {
+       "id": "how_like",
+       "options": {
+        "list": "how"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "how_hint",
+     "next": [
+      {
+       "to": "back",
+       "when": {
+        "eq": [
+         "$a.how_like",
+         "enough"
+        ]
+       }
+      },
+      {
+       "to": "to_find",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.how_like",
+           "too_much"
+          ]
+         },
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.how_like",
+             "more"
+            ]
+           },
+           {
+            "eq": [
+             "$ctx.band",
+             "flooded"
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "to_good",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.how_like",
+           "more"
+          ]
+         },
+         {
+          "not": {
+           "eq": [
+            "$ctx.band",
+            "flooded"
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "to": "to_like",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "how_good",
+     "kind": "ask",
+     "title": "how_title",
+     "fields": [
+      {
+       "id": "how_good",
+       "options": {
+        "list": "how"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "how_hint",
+     "next": [
+      {
+       "to": "back",
+       "when": {
+        "eq": [
+         "$a.how_good",
+         "enough"
+        ]
+       }
+      },
+      {
+       "to": "to_like",
+       "when": {
+        "eq": [
+         "$a.how_good",
+         "too_much"
+        ]
+       }
+      },
+      {
+       "to": "to_find",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.how_good",
+           "more"
+          ]
+         },
+         {
+          "eq": [
+           "$ctx.band",
+           "flooded"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "to_good",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "back",
+     "kind": "ask",
+     "title": "back_title",
+     "fields": [
+      {
+       "id": "back",
+       "options": {
+        "list": "tvn"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "askFresh": "thenVsNow"
+      }
+     ],
+     "next": [
+      {
+       "to": "louder",
+       "when": {
+        "eq": [
+         "$a.back",
+         "worse"
+        ]
+       }
+      },
+      {
+       "to": "fork",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "fork",
+     "kind": "ask",
+     "title": "fork_title",
+     "fields": [
+      {
+       "id": "fork",
+       "options": {
+        "list": "fork"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "lid_pick",
+       "when": {
+        "eq": [
+         "$a.fork",
+         "later"
+        ]
+       }
+      },
+      {
+       "to": "end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "end",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.fork",
+         "change"
+        ]
+       },
+       "key": "end_change"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.fork",
+         "cant"
+        ]
+       },
+       "key": "end_cant"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.fork",
+         "gone"
+        ]
+       },
+       "key": "end_gone"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "problem_solve",
+       "when": {
+        "eq": [
+         "$a.fork",
+         "change"
+        ]
+       }
+      },
+      {
+       "exit": "dear_man",
+       "when": {
+        "eq": [
+         "$a.fork",
+         "change"
+        ]
+       }
+      },
+      {
+       "exit": "let_it_be",
+       "when": {
+        "eq": [
+         "$a.fork",
+         "cant"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "id": "louder",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "louder_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "next": [],
+     "offers": [
+      {
+       "exit": "cool_down",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "too_much",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "too_much_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "next": [],
+     "offers": [
+      {
+       "exit": "cool_down",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "settle",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "settle_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "next": [],
+     "offers": [
+      {
+       "exit": "cool_down",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "break",
+     "kind": "ask",
+     "title": "break_title",
+     "fields": [
+      {
+       "id": "break",
+       "options": {
+        "list": "break"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "own": {
+        "hint": "break_own",
+        "countsAsPick": true
+       }
+      }
+     ],
+     "hint": "break_hint",
+     "next": [
+      {
+       "to": "break_at",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "break_at",
+     "kind": "ask",
+     "title": "break_when_title",
+     "fields": [
+      {
+       "id": "break_at",
+       "options": {
+        "list": "break_when"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "break_when_hint",
+     "followUp": {
+      "type": "mind_job_back",
+      "whenFrom": "break_at"
+     },
+     "next": [
+      {
+       "to": "break_ok",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "break_ok",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "break_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "next": [],
+     "offers": []
+    },
+    {
+     "id": "lid_pick",
+     "kind": "ask",
+     "title": "lid_pick_title",
+     "fields": [
+      {
+       "id": "lid_pick",
+       "options": {
+        "list": "lid_pick"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "lid_pick_hint",
+     "next": [
+      {
+       "to": "lid_shut",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "lid_shut",
+     "kind": "embed",
+     "embed": "lidShelf",
+     "answerAs": "lid_shut",
+     "title": "lid_title",
+     "props": {
+      "containerField": "lid_pick",
+      "put": "lid_put",
+      "hold": "lid_hold",
+      "holding": "lid_holding",
+      "hint": "lid_hold_hint",
+      "holdSec": 3,
+      "done": "lid_done",
+      "next": "next",
+      "skip": "lid_skip"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "lid_name",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "lid_name",
+     "kind": "ask",
+     "title": "lid_label_title",
+     "fields": [
+      {
+       "id": "lid_name",
+       "options": {
+        "list": "label"
+       },
+       "max": 1,
+       "required": false,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "own": {
+        "hint": "lid_label_own",
+        "countsAsPick": true
+       }
+      }
+     ],
+     "hint": "lid_label_hint",
+     "next": [
+      {
+       "to": "lid_when",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "lid_when",
+     "kind": "ask",
+     "title": "lid_when_title",
+     "fields": [
+      {
+       "id": "lid_when",
+       "options": {
+        "list": "lid_when"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "lid_when_hint",
+     "followUp": {
+      "type": "lid_reopen",
+      "whenFrom": "lid_when"
+     },
+     "next": [
+      {
+       "to": "lid_end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "lid_end",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "lid_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "next": [],
+     "offers": []
+    },
+    {
+     "id": "reopen",
+     "kind": "ask",
+     "title": "reopen_title",
+     "fields": [
+      {
+       "id": "reopen",
+       "options": {
+        "list": "reopen"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "reopen_hint",
+     "reopens": {
+      "after": "lid_when",
+      "again": [
+       "repark"
+      ]
+     },
+     "clears": [
+      "reopen",
+      "re_heads",
+      "opened",
+      "can_do",
+      "repark"
+     ],
+     "next": [
+      {
+       "to": "repark",
+       "when": {
+        "eq": [
+         "$a.reopen",
+         "not_yet"
+        ]
+       }
+      },
+      {
+       "to": "lid_off",
+       "when": {
+        "eq": [
+         "$a.reopen",
+         "gone"
+        ]
+       }
+      },
+      {
+       "to": "re_heads",
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       }
+      },
+      {
+       "to": "opened",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "re_heads",
+     "kind": "ask",
+     "title": "re_heads_title",
+     "fields": [
+      {
+       "id": "re_heads",
+       "options": {
+        "list": "re_heads"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "re_heads_hint",
+     "next": [
+      {
+       "to": "settle",
+       "when": {
+        "eq": [
+         "$a.re_heads",
+         "body"
+        ]
+       }
+      },
+      {
+       "to": "repark",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "opened",
+     "kind": "ask",
+     "title": "opened_title",
+     "fields": [
+      {
+       "id": "opened",
+       "options": {
+        "list": "label"
+       },
+       "max": 1,
+       "required": false,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "opened_hint",
+     "next": [
+      {
+       "to": "can_do",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "can_do",
+     "kind": "ask",
+     "title": "reopen_fork_title",
+     "fields": [
+      {
+       "id": "can_do",
+       "options": {
+        "list": "reopen_fork"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "lid_off",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "repark",
+     "kind": "ask",
+     "title": "repark_title",
+     "fields": [
+      {
+       "id": "repark",
+       "options": {
+        "list": "lid_when"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "repark_hint",
+     "followUp": {
+      "type": "lid_reopen",
+      "whenFrom": "repark"
+     },
+     "next": [
+      {
+       "to": "lid_end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "lid_off",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.reopen",
+         "gone"
+        ]
+       },
+       "key": "reopen_skip"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.can_do",
+         "change"
+        ]
+       },
+       "key": "reopen_change"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.can_do",
+         "facts"
+        ]
+       },
+       "key": "reopen_facts"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.can_do",
+         "cant"
+        ]
+       },
+       "key": "reopen_cant"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.can_do",
+         "gone"
+        ]
+       },
+       "key": "reopen_gone"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "next": [],
+     "offers": [
+      {
+       "exit": "problem_solve",
+       "when": {
+        "eq": [
+         "$a.can_do",
+         "change"
+        ]
+       }
+      },
+      {
+       "exit": "check_the_facts",
+       "when": {
+        "eq": [
+         "$a.can_do",
+         "facts"
+        ]
+       }
+      },
+      {
+       "exit": "let_it_be",
+       "when": {
+        "eq": [
+         "$a.can_do",
+         "cant"
+        ]
+       }
+      }
+     ]
+    }
+   ],
+   "exits": [
+    {
+     "id": "check_the_facts",
+     "toolId": "check-the-facts",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "cool_down",
+     "toolId": "cool-down",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "dear_man",
+     "toolId": "dear-man",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "done",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": true
+    },
+    {
+     "id": "let_it_be",
+     "toolId": "let-it-be",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "problem_solve",
+     "toolId": "problem-solve",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "safety_open",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": false,
+     "safety": true
+    }
+   ],
+   "options": {
+    "what": [
+     {
+      "value": "loop",
+      "label": "My mind won't stop"
+     },
+     {
+      "value": "break",
+      "label": "A break from it for a while"
+     },
+     {
+      "value": "lid",
+      "label": "Put it away until later"
+     }
+    ],
+    "heads_up": [
+     {
+      "value": "body",
+      "label": "My body first"
+     },
+     {
+      "value": "find",
+      "label": "A short find task"
+     }
+    ],
+    "warmth": [
+     {
+      "value": "find",
+      "label": "Something to find"
+     },
+     {
+      "value": "like",
+      "label": "Something I like"
+     },
+     {
+      "value": "good",
+      "label": "Something good"
+     }
+    ],
+    "task_find": [
+     {
+      "value": "blue",
+      "label": "Five blue things",
+      "level": "find",
+      "calm": true
+     },
+     {
+      "value": "sound",
+      "label": "The farthest sound",
+      "level": "find",
+      "calm": true
+     },
+     {
+      "value": "round",
+      "label": "Three round things",
+      "level": "find"
+     },
+     {
+      "value": "edges",
+      "label": "Four things with straight edges",
+      "level": "find"
+     }
+    ],
+    "task_like": [
+     {
+      "value": "look",
+      "label": "One thing I like the look of",
+      "level": "like"
+     },
+     {
+      "value": "soft",
+      "label": "Something soft",
+      "level": "like"
+     },
+     {
+      "value": "hum",
+      "label": "A sound I don't mind",
+      "level": "like"
+     }
+    ],
+    "task_good": [
+     {
+      "value": "made",
+      "label": "Something I chose or made",
+      "level": "good"
+     },
+     {
+      "value": "liked",
+      "label": "Something that reminds me of a kind moment",
+      "level": "good"
+     },
+     {
+      "value": "ahead",
+      "label": "Something for a plan I'm looking forward to",
+      "level": "good"
+     }
+    ],
+    "how": [
+     {
+      "value": "too_much",
+      "label": "Too much",
+      "calm": true
+     },
+     {
+      "value": "right",
+      "label": "About right"
+     },
+     {
+      "value": "more",
+      "label": "Could do more"
+     },
+     {
+      "value": "enough",
+      "label": "That's enough for now",
+      "calm": true
+     }
+    ],
+    "tvn": [
+     {
+      "value": "worse",
+      "label": "Louder"
+     },
+     {
+      "value": "same",
+      "label": "About the same"
+     },
+     {
+      "value": "better",
+      "label": "Quieter"
+     },
+     {
+      "value": "much_better",
+      "label": "Much quieter"
+     }
+    ],
+    "fork": [
+     {
+      "value": "change",
+      "label": "Yes, something can be done"
+     },
+     {
+      "value": "cant",
+      "label": "No, it can't be changed"
+     },
+     {
+      "value": "later",
+      "label": "Not now. Put it away for later"
+     },
+     {
+      "value": "gone",
+      "label": "It's gone for now"
+     }
+    ],
+    "break": [
+     {
+      "value": "move",
+      "label": "Move my body",
+      "family": "Activities"
+     },
+     {
+      "value": "hands",
+      "label": "Something with my hands",
+      "family": "Activities"
+     },
+     {
+      "value": "kind",
+      "label": "One small kind thing for someone",
+      "family": "Contributing"
+     },
+     {
+      "value": "feeling",
+      "label": "A different feeling on purpose: a song I love",
+      "family": "Emotions"
+     },
+     {
+      "value": "cold",
+      "label": "Something cold in my hand",
+      "family": "Sensations"
+     }
+    ],
+    "break_when": [
+     {
+      "value": "m5",
+      "label": "5 minutes"
+     },
+     {
+      "value": "m15",
+      "label": "15 minutes"
+     },
+     {
+      "value": "m30",
+      "label": "30 minutes"
+     },
+     {
+      "value": "m60",
+      "label": "When I'm done (about an hour)"
+     }
+    ],
+    "lid_pick": [
+     {
+      "value": "jar",
+      "label": "A jar"
+     },
+     {
+      "value": "tin",
+      "label": "A tin"
+     },
+     {
+      "value": "box",
+      "label": "A box"
+     }
+    ],
+    "label": [
+     {
+      "value": "worry",
+      "label": "A worry"
+     },
+     {
+      "value": "said",
+      "label": "Something someone said"
+     },
+     {
+      "value": "did",
+      "label": "Something I did"
+     },
+     {
+      "value": "feeling",
+      "label": "A feeling"
+     },
+     {
+      "value": "unnamed",
+      "label": "Nothing to name yet"
+     }
+    ],
+    "lid_when": [
+     {
+      "value": "tonight",
+      "label": "Tonight"
+     },
+     {
+      "value": "tomorrow",
+      "label": "Tomorrow"
+     },
+     {
+      "value": "few_days",
+      "label": "In a few days"
+     }
+    ],
+    "reopen": [
+     {
+      "value": "open",
+      "label": "Open it"
+     },
+     {
+      "value": "not_yet",
+      "label": "Not yet"
+     },
+     {
+      "value": "gone",
+      "label": "It's gone"
+     }
+    ],
+    "re_heads": [
+     {
+      "value": "body",
+      "label": "My body first"
+     },
+     {
+      "value": "later",
+      "label": "Put it back for now"
+     }
+    ],
+    "reopen_fork": [
+     {
+      "value": "change",
+      "label": "Yes, something can be done"
+     },
+     {
+      "value": "facts",
+      "label": "It might not be as big as it felt"
+     },
+     {
+      "value": "cant",
+      "label": "No, it can't be changed"
+     },
+     {
+      "value": "gone",
+      "label": "It's gone now"
+     }
+    ]
+   },
+   "resumeAt": [
+    "back"
+   ]
   },
   {
    "id": "nightmare_rescript",

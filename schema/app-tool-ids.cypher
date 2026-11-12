@@ -30,6 +30,7 @@ UNWIND [
   {c: "dbt_ending_relationships", t: "ending-relationships"},
   {c: "dbt_pros_cons", t: "pros-cons"},
   {c: "dbt_radical_acceptance", t: "let-it-be"},
+  {c: "dbt_accepts", t: "mind-job"},
   {c: "dbt_saying_no", t: "say-no"}
 ] AS row
 MATCH (c:TherapyConcept {id: row.c})

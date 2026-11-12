@@ -192,11 +192,11 @@ test("the links that waited on it now open it: First, the body's fork, Check the
   }
 });
 
-test("routing: the three rows are let-it-be now (D6), switched off and drafts until signed off", () => {
+test("routing: the three rows are let-it-be now (D6), live (12 Nov 2026, default to connected)", () => {
   const cy = readFileSync("schema/recommended-for.cypher", "utf8");
   assert.doesNotMatch(cy, /_radical-acceptance"/);
   const rows = cy.split("\n").filter((l) => /\{id: "rf_[^"]*_let-it-be"/.test(l));
   assert.equal(rows.length, 3);
-  for (const l of rows) { assert.match(l, /active: false/); assert.match(l, /review: "draft"/); }
+  for (const l of rows) { assert.match(l, /active: true/); assert.match(l, /review: "approved"/); }
   assert.match(readFileSync("schema/app-tool-ids.cypher", "utf8"), /\{c: "dbt_radical_acceptance", t: "let-it-be"\}/);
 });

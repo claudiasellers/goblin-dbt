@@ -53,7 +53,8 @@ answer is recorded as asked (`no` / `yes` / `sometimes` / `unsure`), never who.
 ## Routing
 
 The three planned `radical-acceptance` rows (helpless; vulnerable / fragile / powerless; despair after gentle
-movement) are `let-it-be` rows now, built, switched off and drafts (`BUILT_NOT_SIGNED_OFF`).
+movement) are `let-it-be` rows now, live since 12 Nov 2026 (Claudia: default to connected). The Shut down row is
+word-gated (despair, grief, empty; not numb) and comes after gentle movement (`requiresPrior`).
 `schema/app-tool-ids.cypher` gives `dbt_radical_acceptance` its `appToolId`.
 
 ## Deferred (DT-04 part 2, with DT-B4's rest)
