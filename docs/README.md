@@ -135,7 +135,7 @@ Waves follow the index: 1 safety floor and platform, 2 validation and the transf
 | 64 | MF-09 | Doing mind, being mind | spec only | |
 | 65 | ER-14 | It isn't working (ER troubleshooting) | shipped | On the runtime (PRs #58, #67): [er-troubleshoot.md](design/er-troubleshoot.md) |
 | 66 | WMP-09 | Where am I swinging? | spec only | |
-| 67 | IE-12 | What gets in the way (myths) | partial | DEAR MAN's barrier coaching |
+| 67 | IE-12 | What gets in the way (myths) | built (part 1) | DEAR MAN's prep: barriers, then the thoughts about asking ([design/dear-man-prep.md](design/dear-man-prep.md)) |
 | 68 | MF-10 | Join in (participate) | spec only | |
 | 69 | WMP-10 | Change the pattern with them | spec only | |
 | 70 | ER-15 | Rewrite the nightmare | shipped | On the runtime (PR #69), unparked 10 Nov (D14): [nightmare-rescript.md](design/nightmare-rescript.md) |

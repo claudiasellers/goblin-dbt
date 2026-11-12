@@ -70,9 +70,10 @@ they'll say yes first* (Handout 2a's *I have to know they'll say yes*), and the 
 banner right under it (Gate 2), and the scared path never reaches it.
 
 A picked thought's line leads the anchor screen, received and hedged rather than argued (*A no can be about this ask,
-on this day. It doesn't decide what you're worth.*). The anchor needs carry them: `need_permission` (deserve, weak,
-last, alone), `need_different` (matter, sure; with *I can hear a no and still be okay*) and `need_matters` (know).
-Three new phrases: *Needing things is human, not weak*, *A no to this ask isn't a no to me*, *Saying it clearly is
+on this day. It doesn't decide what you're worth.*). The graph tags each one onto the anchor need it answers: `need_permission` (deserve,
+weak, last, alone), `need_different` (matter, sure; with *I can hear a no and still be okay*) and `need_matters`
+(know). The skill doesn't steer the need step by those tags yet (ordering options by an overlap is a runtime change,
+part 2). Three new phrases: *Needing things is human, not weak*, *A no to this ask isn't a no to me*, *Saying it clearly is
 kinder than hoping they guess*. The phrase step filters by the need picked, so a thought reaches a phrase through its
 need. The projection keeps them as their own list, `askThoughts`, never inside `barriers`. Parts holds each one
 (`HELD`, a belief, not a protective move).
@@ -82,7 +83,10 @@ ground and walk-away 40 → 35.
 
 Part 2 (not built): IE-03's past results with this person on *if they say no it means I don't matter* (*Last three
 nos from them…*), the calm-time sort and the person's own counter lines (`own_counter_line`), WS1's pros and cons
-after *decided not to* twice, `MythCategory` and `IMPLEMENTS → dbt_dear_man`, Check the Facts inline and `pileSort`.
+after *decided not to* twice, `MythCategory` and `IMPLEMENTS → dbt_dear_man`, the need step ordered by the thoughts
+picked, Check the Facts inline and `pileSort`. All land in IE-B5 (IE-03's results need its interaction history, the
+sort needs `pileSort` from ER-B4, Check the Facts inline needs ER-B5's inline mini-card, the ordering needs a
+`runtime:` PR); the Check the Facts and DT-10 edges stay deferred until then.
 
 ## The pocket card (`pocketCard`, Mode C)
 
