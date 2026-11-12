@@ -42,6 +42,8 @@ export interface SaveCheckInRequest {
   coOccurrenceLabel?: string;
   guidedActivityId?: string;
   safetyFlagId?: string;
+  /** CORE-01: the safety route's visit the check-in asked before its result. */
+  safetyCheckId?: string;
   resultShown?: boolean;
   nextAction?: CheckInNextAction;
   embeddedToolSessionIds?: string[];
@@ -73,6 +75,8 @@ export interface CheckInState {
   capacity?: CapacityReading | null;
   discriminatingAnswers?: Array<{ questionId: string; responseId: string }>;
   embeddedToolSessionIds?: string[];
+  /** The safety route's visit asked before the result (CORE-01). */
+  safetyCheckId?: string | null;
   /** The square's spots (grid check-ins): sent only when two or more hold words. */
   spots?: Array<{ point: { x: number; y: number } | null; words: string[] }>;
 }
@@ -125,6 +129,7 @@ export function buildCheckInPayload(s: CheckInState, result: ResultLike | null, 
   if (s.capacity) req.capacity = s.capacity;
   if (s.discriminatingAnswers?.length) req.discriminatingAnswers = s.discriminatingAnswers;
   if (s.embeddedToolSessionIds?.length) req.embeddedToolSessionIds = s.embeddedToolSessionIds;
+  if (s.safetyCheckId) req.safetyCheckId = s.safetyCheckId;
   const spots = s.source === 'grid' ? spotsFor(s.spots) : undefined;
   if (spots) req.spots = spots;
   if (result) {

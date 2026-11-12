@@ -199,7 +199,7 @@ export function LowEnergyStateResult({
       {has('clinical_note') && (
         <div className="mb-6 p-4 rounded-xl bg-[var(--color-q-hp-bg)] border border-[var(--color-q-hp-border)]">
           <p className="text-[var(--color-q-hp-text)] text-sm">
-            <strong>Note:</strong> If this feeling persists, consider reaching out to a mental health professional.
+            <strong>Note:</strong> {result.safetyFlag?.userCopy || 'If this feeling persists, consider reaching out to a mental health professional.'}
           </p>
         </div>
       )}
