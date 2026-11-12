@@ -60,7 +60,12 @@ UNWIND [
   {id: 'anger-lash',     replace: false, cues: ['Open your hands, palms up']},
   {id: 'anger-destroy',  replace: false, cues: ['Open your hands, palms up']},
   {id: 'love-reach-out', replace: false, cues: ['Put your phone face-down and your hands in your lap']},
-  {id: 'jealousy-check', replace: false, cues: ['Put your phone face-down and your hands in your lap']}
+  {id: 'jealousy-check', replace: false, cues: ['Put your phone face-down and your hands in your lap']},
+  {id: 'text-again',     replace: false, cues: ['Put your phone face-down and your hands in your lap']},
+  {id: 'check-profile',  replace: false, cues: ['Put your phone face-down and your hands in your lap']},
+  {id: 'pull-away',      replace: false, cues: ['Turn toward the room and lift your eyes']},
+  {id: 'fire-back',      replace: false, cues: ['Open your hands, palms up']},
+  {id: 'go-quiet',       replace: false, cues: ['Unclench your jaw and let your shoulders drop']}
 ] AS o
 MATCH (u:ActionUrge {id: o.id})
 SET u.somaticCues = o.cues, u.somaticReplace = o.replace

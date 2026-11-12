@@ -237,6 +237,23 @@ SET u.label = urge.label, u.small = urge.small, u.medium = urge.medium, u.bigger
 MERGE (c)-[:HAS_ACTION_URGE]->(u);
 
 
+// --- INTERPERSONAL urges (ER-03 item 8: the urges Recover's design record asks for) ---
+// What a hurt pulls toward with one person. One node per urge, listed under every parent it belongs to; after each
+// parent's own urges (`order`). Each is mapped for parts in scripts/parts/content.py.
+UNWIND [
+  {id: "text-again", label: "Text them again", small: "Write it in your notes, not to them", medium: "Put the phone in another room for an hour, then decide", bigger: "Leave it unsent today and do something that needs your hands", order: 10, parents: ["love", "sadness"]},
+  {id: "check-profile", label: "Check their profile", small: "Wait ten minutes before you look", medium: "Mute them for today", bigger: "Take the app off your home screen for the week", order: 11, parents: ["jealousy", "sadness"]},
+  {id: "pull-away", label: "Pull away from them", small: "Send one ordinary message back", medium: "Keep one plan with them", bigger: "Tell them a little of what has been going on", order: 12, parents: ["shame", "sadness"]},
+  {id: "fire-back", label: "Fire back", small: "Wait ten breaths before you answer", medium: "Write it out, then send only the calm part", bigger: "Say what you need without the dig", order: 13, parents: ["anger"]},
+  {id: "go-quiet", label: "Go quiet on them", small: "Send one line: I need a minute, I'll come back to this", medium: "Come back to it later today, as you said", bigger: "Say plainly what upset you", order: 14, parents: ["anger", "shame"]}
+] AS urge
+MERGE (u:ActionUrge {id: urge.id})
+SET u.label = urge.label, u.small = urge.small, u.medium = urge.medium, u.bigger = urge.bigger, u.order = urge.order, u.interpersonal = true
+WITH u, urge
+UNWIND urge.parents AS parent
+MATCH (c:EmotionRegulationContent {dbtParent: parent})
+MERGE (c)-[:HAS_ACTION_URGE]->(u);
+
 // ============================================================
 // 3. PER-EMOTION OA PROPERTIES + HAS_REGULATION_CONTENT
 //    Sets oppositeActionApplicable, oaClinicalNote,

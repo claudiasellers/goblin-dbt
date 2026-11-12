@@ -25,6 +25,14 @@
           {
             "id": "anger-criticize",
             "label": "Criticize or blame someone"
+          },
+          {
+            "id": "fire-back",
+            "label": "Fire back"
+          },
+          {
+            "id": "go-quiet",
+            "label": "Go quiet on them"
           }
         ],
         "wordIds": [
@@ -178,6 +186,10 @@
           {
             "id": "jealousy-cling",
             "label": "Cling or demand more attention"
+          },
+          {
+            "id": "check-profile",
+            "label": "Check their profile"
           }
         ],
         "wordIds": [
@@ -204,6 +216,10 @@
           {
             "id": "love-idealize",
             "label": "Idealize them and ignore red flags"
+          },
+          {
+            "id": "text-again",
+            "label": "Text them again"
           }
         ],
         "wordIds": [
@@ -232,6 +248,18 @@
           {
             "id": "sad-scroll",
             "label": "Scroll mindlessly or zone out"
+          },
+          {
+            "id": "text-again",
+            "label": "Text them again"
+          },
+          {
+            "id": "check-profile",
+            "label": "Check their profile"
+          },
+          {
+            "id": "pull-away",
+            "label": "Pull away from them"
           }
         ],
         "wordIds": [
@@ -275,6 +303,14 @@
           {
             "id": "shame-avoid-people",
             "label": "Avoid people who might notice"
+          },
+          {
+            "id": "pull-away",
+            "label": "Pull away from them"
+          },
+          {
+            "id": "go-quiet",
+            "label": "Go quiet on them"
           }
         ],
         "wordIds": [
