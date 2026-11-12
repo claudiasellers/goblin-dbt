@@ -229,6 +229,30 @@ HOT_CHOICES = [("edge", "Take the edge off (about 30 seconds)"), ("ready", "I'm 
 # The ask_outcome card's window chips (scripts/practice-spine/content.py).
 WHEN = [("today", "Later today"), ("tomorrow", "Tomorrow"), ("this_week", "This week"), ("unsure", "Not sure")]
 
+# IE-07's "ask" column (DBT IE Handout 8): how hard to push on this ask. Five yes / not sure / no questions, each phrased
+# so *yes* leans toward asking firmly (capability, priorities, rights, timing, homework). A counting derive (R10); the
+# screen names the level, never a score, and a softer / firmer nudge counts one step. Not on a carried flooded reading.
+ASK_LEVELS = ["hint", "gentle", "plain", "firm", "firm_hold"]
+ASK_LEVEL_LINES = {
+    "hint": "The facts lean toward waiting, or a light first mention. It's still your call.",
+    "gentle": "Ask gently, and a no is something you can take for now.",
+    "plain": "Ask plainly, and listen to what they say.",
+    "firm": "Ask firmly, and keep asking if they push back.",
+    "firm_hold": "Ask firmly, and hold to it.",
+}
+ASK_FACTORS = [
+    ("s_able", "s_able_q", "Can they actually give you this?"),
+    ("s_matters", "s_matters_q", "Does it matter a lot to you right now?"),
+    ("s_right", "s_right_q", "Is it fair to ask this of them?"),
+    ("s_timing", "s_timing_q", "Is this a good time to ask?"),
+    ("s_ready", "s_ready_q", "Do you know what you want, and have the facts straight?"),
+]
+ASK_WEIGHTS = {"yes": 1, "not_sure": 0.5, "no": 0, "softer": -1, "right": 0, "firmer": 1}
+ASK_TABLE = {"-1": "hint", "1.5": "gentle", "2.5": "plain", "3.5": "firm", "4.5": "firm_hold"}
+SIZE_ANSWERS = [("yes", "Yes"), ("not_sure", "Not sure"), ("no", "No")]
+NUDGE = [("right", "That fits"), ("softer", "A bit softer"), ("firmer", "A bit firmer")]
+ASK_SIZED = {"set": "$a.s_able"}
+
 COPY = {
     "situation_title": "What kind of conversation is this?",
     "situation_title_heads_up": DM.SAFETY_COPY["badlyHeadsUp"] + " What kind of conversation is this?",
@@ -266,6 +290,12 @@ COPY = {
     "middle_title_self_respect": "Your self-respect comes first, so notice any pressure to agree to what doesn't sit right. What middle ground could you live with?",
     "walk_title": "What won't you accept?",
     "walk_hint": "Knowing this ahead makes it easier to stop or step away.",
+    "size_title": "How hard to push on this ask?",
+    "size_hint": "Yes, no or not sure. There's no right answer.",
+    "level_hint": "From what you said.",
+    "nudge_label": "Does that sit right?",
+    **{q: text for _, q, text in ASK_FACTORS},
+    **{f"ask_level_{k}": v for k, v in ASK_LEVEL_LINES.items()},
     "card_title": "Your plan, on three cards.",
     "card_say": "Say it",
     "card_steady": "Stay steady",
@@ -388,13 +418,26 @@ STEPS = [
                     "own": {"hint": "own_line", "countsAsPick": True, "max": 70},
                     "links": [{"exit": "let_go", "label": "let_go",
                                "when": {"all": [REFUSED, {"in": [a("situation"), HEARD_SITUATIONS]}]}}]}],
-        "next": [{"when": {"in": [a("assert"), sorted(FILL)]}, "to": "fill"}, {"to": "reinforce"}],
+        "next": [{"when": {"in": [a("assert"), sorted(FILL)]}, "to": "fill"}, {"when": FLOODED, "to": "reinforce"}, {"to": "size"}],
     },
     {
         "id": "fill", "kind": "ask",
         "title": [{"key": f"fill_{k}", "when": is_("assert", k)} for k in FILL] + [{"key": "fill_title"}],
         "fields": [{"id": "fill", "options": {"list": "fill", "where": {"eq": ["$opt.assert", "$a.assert"]}}, "max": 1, "required": True,
                     "own": {"hint": "own_line", "countsAsPick": True, "max": 30, "open": True, "seed": True}}],
+        "next": [{"when": FLOODED, "to": "reinforce"}, {"to": "size"}],
+    },
+    # --- How hard to push (IE-07, "ask" column) ---
+    {
+        "id": "size", "kind": "ask", "title": "size_title", "hint": "size_hint",
+        "fields": [{"id": f, "label": q, "options": {"list": "size_answer"}, "max": 1, "required": True} for f, q, _ in ASK_FACTORS],
+        "next": [{"to": "level"}],
+    },
+    {
+        "id": "level", "kind": "ask",
+        "title": [{"key": f"ask_level_{k}", "when": {"eq": ["$d.ask_level", k]}} for k in reversed(ASK_LEVELS)],
+        "hint": "level_hint",
+        "fields": [{"id": "nudge", "label": "nudge_label", "options": {"list": "nudge"}, "max": 1, "required": True}],
         "next": [{"to": "reinforce"}],
     },
     {
@@ -425,6 +468,8 @@ STEPS = [
     {
         "id": "middle", "kind": "ask",
         "title": [{"key": f"middle_title_{k}", "when": is_("matters", k)} for k, _ in MATTERS] + [{"key": "middle_title"}],
+        # The level they sized (after the nudge), as a reminder above the middle ground.
+        "lines": [{"key": f"ask_level_{k}", "when": {"all": [ASK_SIZED, {"eq": ["$d.ask_final", k]}]}} for k in reversed(ASK_LEVELS)],
         "fields": [{"id": "middle", "options": {"list": "middle"}, "max": 1,
                     "own": {"hint": "own_line", "countsAsPick": True, "max": 35}}],
         "next": [{"to": "walk"}],
@@ -506,6 +551,8 @@ def options():
     out += [("confident", v, l, {}, ("ConfidenceCue", v)) for v, l in CUES]
     out += [("middle", v, l, {}, ("DearManNegotiateOption", v)) for v, l in MIDDLE]
     out += [("walk", v, l, {}, ("DearManNegotiateOption", v)) for v, l in WALK]
+    out += [("size_answer", v, l, {}, None) for v, l in SIZE_ANSWERS]
+    out += [("nudge", v, l, {}, None) for v, l in NUDGE]
     out += [("hot", v, l, {}, None) for v, l in HOT_CHOICES]
     out += [("when", v, l, {}, None) for v, l in WHEN]
     return out
@@ -514,6 +561,11 @@ def options():
 SKILL = {
     "id": ID, "toolId": TOOL_ID, "concept": CONCEPT, "version": VERSION, "start": "situation", "ownMax": OWN_MAX,
     "accepts": ["personId", "frame", "band", "refused", "situationId", "feelingId"], "copy": COPY,
-    "tables": {}, "derive": [],
+    "tables": {"ask_level": ASK_TABLE},
+    "derive": [
+        {"name": "ask_level", "kind": "count", "fields": [f for f, _, _ in ASK_FACTORS], "weights": ASK_WEIGHTS, "table": "ask_level"},
+        {"name": "ask_final", "kind": "count", "fields": [f for f, _, _ in ASK_FACTORS] + ["nudge"], "weights": ASK_WEIGHTS,
+         "table": "ask_level"},
+    ],
     "steps": STEPS, "exits": EXITS, "options": options(), "emotionFields": ["express"],
 }
