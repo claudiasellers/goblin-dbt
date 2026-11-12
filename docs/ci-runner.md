@@ -30,6 +30,21 @@ then run the install script again.
 
 CI's first step, `scripts/ci/runner-check.mjs`, names anything missing.
 
+## Disk space
+
+The Mac had about 18 GB free (96% full) when the runner went on. Every job starts with *Free disk space*,
+which stops the job with a plain error under 5 GB free (a warning under 10), and ends with
+`scripts/ci/runner-tidy.sh`, whatever happened:
+
+- removes the job's `node_modules`, `functions/node_modules`, `dist`, `functions/lib` and the deploy's
+  graph export (`backups/`); the next `npm ci` restores them from `~/.npm` in about a minute;
+- keeps only the newest Node of each major in the runner's tool cache (`_work/_tool/node`);
+- clears the npm cache (`~/.npm/_cacache`) once it passes 3 GB;
+- deletes runner diagnostics (`_diag`) older than two weeks.
+
+It never touches anything else, including the Firebase emulator downloads (`~/.cache/firebase/emulators`),
+which only the hand-run Tier 2 uses. If a job stops on space: `du -sh ~/actions-runner/goblin-dbt/_work ~/.npm ~/.cache/firebase`.
+
 ## Day to day
 
 - Status: https://github.com/claudiasellers/goblin-dbt/settings/actions/runners (Idle / Active / Offline).
