@@ -4,6 +4,7 @@ import { projectDearManDebrief } from '../dearMan/debriefProjection';
 import { projectDearManOne } from '../dearMan/oneProjection';
 import { projectDearManPrep } from '../dearMan/prepProjection';
 import { projectSayNo } from '../sayNo/projection';
+import { projectOppositeAction } from '../oppositeAction/projection';
 
 /**
  * The projection hook (docs/design/dbt-modules-plan.md C3a R14, C8.2): for a tool that moved onto the skill
@@ -39,6 +40,9 @@ export const PROJECTIONS: Readonly<Record<string, Projection>> = {
   'dear-man': projectDearMan,
   // Say no (IE-B3): the Interaction {kind: 'no'} once they've said how it went; a re-ask of the safety question.
   'say-no': projectSayNo,
+  // Do the Opposite (ER-B3): one OppositeActionSession v3 per feeling that reached its step, for the parts stats and
+  // trails; a reopened visit (oa_try) moves them on to practiced or missed.
+  'opposite-action': projectOppositeAction,
 };
 
 /**
@@ -50,6 +54,9 @@ export const OFF_PHONE_SKILLS: Readonly<Record<string, { toolId: string; happene
   // Say no's afterwards (the no_outcome card reopens the run at *Did you say no?*): said is the rep. The first visit,
   // which never asks it, keeps the close's own rep (`unansweredKeepsOwn`).
   say_no: { toolId: 'say-no', happenedField: 'said', yes: 'yes', unansweredKeepsOwn: true },
+  // Do the Opposite's later visit (the oa_try card reopens the run at *Did you get to try it?*): tried is the rep, and
+  // a plan not tried logs none (the hand-built page's `oaSkillIds('missed')`). The first visit keeps the close's own.
+  opposite_action: { toolId: 'opposite-action', happenedField: 'tried', yes: 'yes', unansweredKeepsOwn: true },
 };
 
 /** The rep a run's close logs: off the phone (it happened), none (it didn't), or the close's own (null). */

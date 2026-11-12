@@ -25,7 +25,7 @@ export const TOOL_CLOSE_KIND: Record<string, { module: SpineModule; closeKind: C
   'check-the-facts': { module: 'er', closeKind: 'regulation_down' },
   'er-troubleshoot': { module: 'er', closeKind: 'none' },
   'nightmare-rescript': { module: 'er', closeKind: 'none' },
-  'opposite-action': { module: 'er', closeKind: 'none' },
+  'opposite-action': { module: 'er', closeKind: 'regulation_down' },
   'dear-man': { module: 'ie', closeKind: 'none' },
   'fast': { module: 'ie', closeKind: 'regulation_down' },
   'ending-relationships': { module: 'ie', closeKind: 'none' },

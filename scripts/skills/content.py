@@ -24,13 +24,15 @@ import dear_man_one  # noqa: E402
 import held  # noqa: E402
 import thoughts_passing  # noqa: E402
 import dear_man_prep  # noqa: E402
+import opposite_action  # noqa: E402
 import habit_plan  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
 SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKILL, *fast.SKILLS, nightmare_rescript.SKILL, problem_solve.SKILL,
           ending_relationships.SKILL, cope_ahead.SKILL, hold_to_wait.SKILL, dear_man_debrief.SKILL, pros_cons.SKILL, first_body.SKILL,
-          ride_it_out.SKILL, let_it_be.SKILL, mind_job.SKILL, say_no.SKILL, dear_man_one.SKILL, held.SKILL, thoughts_passing.SKILL, dear_man_prep.SKILL, habit_plan.SKILL]
+          ride_it_out.SKILL, let_it_be.SKILL, mind_job.SKILL, say_no.SKILL, dear_man_one.SKILL, held.SKILL, thoughts_passing.SKILL, dear_man_prep.SKILL,
+          opposite_action.SKILL, habit_plan.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -79,6 +81,11 @@ EMBEDS = {
     # IE-B3's message card (plan C3b `messageComposer`, IE-owned): the picks as one message, with the FAST strip (an
     # extra sorry, over-explaining) and the line to repeat; Copy and Open messages, never a send. Reports what was done.
     "messageComposer": {"ids": ["copied", "opened", "dropped_sorry"]},
+    # ER-03's doors (#48, src/components/tools/oppositeAction/OppositeActionStart.tsx): up to three grid words, loudest
+    # first. `emotions`: its ids are grid word ids (the machine keeps only words on the grid, at most this many).
+    "doorPicker": {"emotions": 3},
+    # Do the Opposite's step card (a slot): each feeling's chosen step, read from the run's labels. Reports nothing.
+    "oaSteps": {},
     # IE-B4's pocket card (plan C3b `pocketCard`, IE-01 Mode C): the plan on three cards (say it, stay steady, if they
     # push back), read through one at a time, no input. Reports whether every card was seen and whether it was copied.
     "pocketCard": {"ids": ["seen_all", "copied"]},
@@ -91,6 +98,8 @@ EMBED_PROPS = {
     "partsLine": {"promptId": {"type": "id"}, "as": {"type": "enum", "values": ["line", "heading"], "optional": True}},
     "partLater": {},
     "debriefWho": {},
+    "doorPicker": {},
+    "oaSteps": {},
     # The card's three cards each list their fields' picks in order; `fill` / `detail`: a pick of `fill` with a
     # [blank] reads `detail`'s words in its place (DEAR MAN's asks).
     "pocketCard": {
@@ -150,6 +159,8 @@ EMBED_PROPS = {
         "copiedLabel": {"type": "copy", "optional": True},
         "selectedLabel": {"type": "copy", "optional": True},
         "next": {"type": "copy"},
+        # The way on before the line is copied (Recover's *I don't need to say anything*); `next` once it is.
+        "skipLabel": {"type": "copy", "optional": True},
     },
     "messageComposer": {
         "field": {"type": "field"},

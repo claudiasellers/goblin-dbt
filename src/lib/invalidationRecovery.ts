@@ -48,8 +48,9 @@ export function certaintyZone(pct: number, repeated: boolean, g: Pick<RecoveryGa
   return 'check';
 }
 
-export type LockReason = 'unsafe' | 'refused' | 'deliberate' | 'tooHot';
-export interface ExitOption { id: ExitId; lock: LockReason | null; recommended: boolean }
+export type LockReason = 'unsafe' | 'refused' | 'deliberate';
+/** `hot`: the ask is open, with a heads-up that it may come out louder than meant (IE-B4: never a lock). */
+export interface ExitOption { id: ExitId; lock: LockReason | null; recommended: boolean; hot: boolean }
 
 export interface RouteInput {
   state: Pick<InvalidationEvent, 'id' | 'protocol' | 'highRisk'>;
@@ -63,8 +64,10 @@ export interface RouteInput {
 
 /**
  * Order the exits for this moment. The first usable one is recommended.
- * Asking is hard-locked for unsafe people, after two refusals, or against deliberate
- * caricature; otherwise it is soft-locked until intensity is at or under askMax.
+ * Asking is locked only for unsafe people, after two refusals, or against deliberate
+ * caricature. Above askMax it stays open, never first, with a heads-up (`hot`) and the body first on offer;
+ * the DEAR MAN skill it opens cools down too (One message's cooling screen for chase, the prep's hot step
+ * otherwise). IE-B4 dropped the soft lock.
  */
 export function routeExits(r: RouteInput): ExitOption[] {
   const hardLock: LockReason | null =
@@ -72,8 +75,7 @@ export function routeExits(r: RouteInput): ExitOption[] {
       : r.asks >= 2 ? 'refused'
         : r.state.highRisk && r.zone === 'real' ? 'deliberate'
           : null;
-  const askLock: LockReason | null = hardLock ?? (r.intensityNow > r.gates.askMax ? 'tooHot' : null);
-  const tooHot = r.intensityNow > r.gates.askMax;
+  const hot = r.intensityNow > r.gates.askMax;
 
   let order: ExitId[];
   // A hard-locked ask stays visible (with its reason) so the user knows why it isn't offered.
@@ -82,10 +84,13 @@ export function routeExits(r: RouteInput): ExitOption[] {
   else if (r.state.id === 'stewing') order = ['park', 'land', 'ask'];
   else if (r.state.protocol === 'diminished_self') order = ['opposite', 'land', 'ask'];
   else if (r.state.protocol === 'attachment_alarm') order = ['opposite', 'ask', 'land'];
-  else if (r.pull === 'fight') order = tooHot ? ['opposite', 'ask', 'land'] : ['ask', 'opposite', 'land'];
+  else if (r.pull === 'fight') order = ['ask', 'opposite', 'land'];
   else order = ['ask', 'land', 'opposite'];
+  // Hot: the ask stays open, never first, so the recommendation and the heads-up never sit on the same card. Chase
+  // leads with its opposite action (waiting); every other pull with the next exit in its order.
+  if (!hardLock && hot && order[0] === 'ask') order = r.pull === 'chase' ? ['opposite', 'ask', 'land'] : [order[1], 'ask', ...order.slice(2)];
 
-  const options = order.map(id => ({ id, lock: id === 'ask' ? askLock : null, recommended: false }));
+  const options = order.map(id => ({ id, lock: id === 'ask' ? hardLock : null, recommended: false, hot: id === 'ask' && !hardLock && hot }));
   const first = options.find(o => !o.lock);
   if (first) first.recommended = true;
   return options;

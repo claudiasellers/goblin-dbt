@@ -160,10 +160,9 @@ export const saveInvalidationRecoverySession = onCall(
           { highRisk: rec.get('highRisk') === true, lowArousal: rec.get('lowArousal') === true },
           flow.gates,
         );
-        const ratingBeforeExit = data.readings[data.readings.length - 2];
-        const askTooHot = data.exitId === 'ask' && ratingBeforeExit > flow.gates.askMax;
+        // Asking above askMax is allowed since IE-B4 (a heads-up, never a lock); deliberate caricature still refuses it.
         const askDeliberate = data.exitId === 'ask' && data.zone === 'real' && rec.get('highRisk') === true;
-        if (data.gate !== expectedGate || askTooHot || askDeliberate) {
+        if (data.gate !== expectedGate || askDeliberate) {
           throw new HttpsError('invalid-argument', 'Session does not match the protocol');
         }
 

@@ -41,26 +41,48 @@ export function stepPaths(skill: SkillDef): Record<string, string[]> {
   return paths;
 }
 
-/** The first option a field offers: an emotion id, or its list's first value (tables and profile options: none). */
+/**
+ * Answers a review seeds where the first option would show an empty screen: a word for an `emotions` embed (the
+ * per-pick steps repeat over it), and per-pick picks whose lists filter on the one before (Do the Opposite: the
+ * urge's own cues and steps). Dev only; a review shows the screen, not a real person's run.
+ */
+const SEEDS: Record<string, Record<string, string[]>> = {
+  opposite_action: { feel: ['anxious'], urge: ['fear-escape'], fits: ['not_fit'], help: ['unhelpful'], size: ['fear-escape:small'] },
+};
+
+/** The first option a field offers: a seed, an emotion id, or its list's first value (tables and profile options: none). */
 function firstOption(skill: SkillDef, f: NonNullable<SkillDef['steps'][number]['fields']>[number]): string | null {
+  const seed = SEEDS[skill.id];
+  if (seed?.[f.id]) return seed[f.id][0];
   const o = f.options as { emotions?: string[]; list?: string };
   if (o.emotions?.length) return o.emotions[0];
-  if (o.list) return skill.options[o.list]?.[0]?.value ?? null;
-  return null;
+  const list = o.list ? skill.options[o.list] ?? [] : [];
+  // A list filtered on the seeded urge (its cues): the first option that names it.
+  const urge = seed?.urge?.[0];
+  const forUrge = urge ? list.find((x) => Array.isArray(x.urges) && (x.urges as string[]).includes(urge)) : undefined;
+  return forUrge?.value ?? list[0]?.value ?? null;
 }
 
 /** The run record that opens `stepId` with the answers its path would have given (each field's first option). */
 export function reviewRun(skill: SkillDef, stepId: string) {
-  const path = stepPaths(skill)[stepId] ?? [skill.start];
-  const answers: { fieldId: string; optionIds: string[] }[] = [];
-  for (const id of path.slice(0, -1)) {
+  const raw = stepPaths(skill)[stepId] ?? [skill.start];
+  const seed = SEEDS[skill.id] ?? {};
+  const answers: { fieldId: string; optionIds: string[]; pick?: string }[] = [];
+  // R16: a per-pick step is on the path with its pick's index, and its answers carry the pick (the first seeded word).
+  const path = raw.map((id) => (skill.steps.find((s) => s.id === id)?.each ? `${id}:0` : id));
+  for (const id of raw.slice(0, -1)) {
     const st = skill.steps.find((s) => s.id === id);
+    const pick = st?.each ? seed[st.each]?.[0] : undefined;
+    if (st?.each && !pick) continue;
+    if (st?.answerAs && seed[st.answerAs]) answers.push({ fieldId: st.answerAs, optionIds: seed[st.answerAs] });
     for (const f of st?.fields ?? []) {
       const v = firstOption(skill, f);
-      if (v) answers.push({ fieldId: f.id, optionIds: [v] });
+      if (v) answers.push({ fieldId: f.id, optionIds: [v], ...(pick ? { pick } : {}) });
     }
   }
-  return { skillId: skill.id, versionId: skill.version, path, answers };
+  // A `reopens` step is where a reopened run starts, never on its record: the record stops at the step before it.
+  const reopens = !!skill.steps.find((s) => s.id === stepId)?.reopens;
+  return { skillId: skill.id, versionId: skill.version, path: reopens ? path.slice(0, -1) : path, answers };
 }
 
 /** Steps in the order a person would meet them (path length, then the skill's own order); unreachable ones last. */

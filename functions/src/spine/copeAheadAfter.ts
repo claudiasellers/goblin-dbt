@@ -34,6 +34,8 @@ export const FOLLOW_UP_SESSION_TOOL: Readonly<Record<string, string>> = {
   // Say no's "How did it go?" (IE-B3, docs/design/say-no.md): only from a Say no visit that made its no.
   no_outcome: 'say-no',
   ask_delayed: 'dear-man',
+  // Do the Opposite's plan for later (ER-B3): only from a Do the Opposite visit.
+  oa_try: 'opposite-action',
   // When it's a habit's renewal (DT-09, docs/design/habit-plan.md): only from a habit-plan visit (it reopens that run).
   habit_renew: 'habit-plan',
 };

@@ -335,17 +335,17 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
           {step === 'them' && <ThemStep c={c} initial={pre} onDone={(safe, asks) => advance({ safe, asks })} />}
 
           {step === 'route' && state && pull && (
-            <RouteStep c={c} exits={exits} now={now} askMax={g.askMax} chasing={pull.id === 'chase'}
+            <RouteStep c={c} exits={exits} now={now} chasing={pull.id === 'chase'}
               options={routeExits({ state, pull: pull.id, intensityNow: now, safe: d.safe ?? 'no', asks: d.asks ?? 2, zone: d.zone, gates: g })}
-              unlockLabel={needsOrienting(pull.id) ? c.route.unlockOrient : c.route.unlockBreathe}
+              settleLabel={needsOrienting(pull.id) ? c.route.firstOrient : c.route.firstBreathe}
               onPick={exitId => advance({ exitId })}
-              onUnlock={() => dispatch({ type: 'go', step: needsOrienting(pull.id) ? 'orient' : 'unlock', patch: { rerateTo: 'route' } })} />
+              onSettle={() => dispatch({ type: 'go', step: needsOrienting(pull.id) ? 'orient' : 'unlock', patch: { rerateTo: 'route' } })} />
           )}
 
           {step === 'exit' && state && pull && need && (
             <ExitStep c={c} exitId={d.exitId} exit={exits.find(x => x.id === d.exitId)} pull={pull.id}
               need={need} social={social} feeling={emotionName}
-              tooHot={now > g.askMax} waitMinutes={waitMinutes}
+              waitMinutes={waitMinutes}
               chaseMinutes={g.chaseWaitMinutes} renderHold={renderHold}
               onDone={r => advance(withSkills(...r.skills))} />
           )}
@@ -474,11 +474,11 @@ function ThemStep({ c, initial, onDone }: { c: Copy; initial: FlowData | null; o
   );
 }
 
-function RouteStep({ c, exits, options, now, askMax, chasing, unlockLabel, onPick, onUnlock }: {
-  c: Copy; exits: InvalidationRecoveryContent['exits']; options: ReturnType<typeof routeExits>; now: number; askMax: number; chasing: boolean;
-  unlockLabel: string; onPick: (id: ExitId) => void; onUnlock: () => void;
+function RouteStep({ c, exits, options, now, chasing, settleLabel, onPick, onSettle }: {
+  c: Copy; exits: InvalidationRecoveryContent['exits']; options: ReturnType<typeof routeExits>; now: number; chasing: boolean;
+  settleLabel: string; onPick: (id: ExitId) => void; onSettle: () => void;
 }) {
-  const lockText = (reason: LockReason) => fill(c.locks[reason], { max: askMax, now });
+  const lockText = (reason: LockReason) => c.locks[reason] as string;
   return (
     <>
       <StepTitle title={c.route.title} sub={fill(c.route.sub, { now })} />
@@ -489,7 +489,7 @@ function RouteStep({ c, exits, options, now, askMax, chasing, unlockLabel, onPic
           const reasonId = `lock-${o.id}`;
           return (
             <div key={o.id} className="space-y-1.5">
-              <button type="button" aria-disabled={Boolean(o.lock)} aria-describedby={o.lock ? reasonId : undefined}
+              <button type="button" aria-disabled={Boolean(o.lock)} aria-describedby={o.lock ? reasonId : o.hot ? `hot-${o.id}` : undefined}
                 onClick={() => { if (!o.lock) onPick(o.id); }}
                 className={`w-full text-left p-4 rounded-2xl border flex gap-3 items-start ${
                   o.lock ? 'bg-[var(--color-bg-secondary)] border-[var(--color-border)] cursor-not-allowed'
@@ -502,7 +502,9 @@ function RouteStep({ c, exits, options, now, askMax, chasing, unlockLabel, onPic
                 </span>
                 {o.lock && <span aria-hidden="true" className="mt-1">🔒</span>}
               </button>
-              {o.lock === 'tooHot' && <button type="button" className={linkButton} onClick={onUnlock}>{unlockLabel} →</button>}
+              {/* Never a lock (IE-B4): the ask stays open, with a heads-up; settling first is an offer beside it. */}
+              {o.hot && <p id={`hot-${o.id}`} className={`${secondaryText} px-1`}>{c.route.hot}</p>}
+              {o.hot && <button type="button" className={linkButton} onClick={onSettle}>{settleLabel} <span aria-hidden="true">→</span></button>}
             </div>
           );
         })}
@@ -511,10 +513,10 @@ function RouteStep({ c, exits, options, now, askMax, chasing, unlockLabel, onPic
   );
 }
 
-function ExitStep({ c, exitId, exit, pull, need, social, feeling, tooHot, waitMinutes, chaseMinutes, renderHold, onDone }: {
+function ExitStep({ c, exitId, exit, pull, need, social, feeling, waitMinutes, chaseMinutes, renderHold, onDone }: {
   c: Copy; exitId: ExitId | null; exit: InvalidationRecoveryContent['exits'][number] | undefined; pull: FlowData['pull'] & string;
   need: InvalidationRecoveryContent['needs'][number]; social: InvalidationRecoveryContent['social'];
-  feeling: string; tooHot: boolean; waitMinutes: number; chaseMinutes: number;
+  feeling: string; waitMinutes: number; chaseMinutes: number;
   renderHold: (text: string, onComplete: () => void, done: boolean) => ReactNode; onDone: (r: ExitResult) => void;
 }) {
   if (!exitId || !exit) return null;
@@ -537,7 +539,7 @@ function ExitStep({ c, exitId, exit, pull, need, social, feeling, tooHot, waitMi
           <button type="button" className={primaryButton} onClick={() => onDone({ skills: ['request'] })}>{c.ask.cta}</button>
         </div>
       )}
-      {exitId === 'land' && <LetItLand c={c.land} pull={pull} tooHot={tooHot} elsewhere={{ ...social[need.social], social: need.social }} onDone={onDone} />}
+      {exitId === 'land' && <LetItLand c={c.land} pull={pull} elsewhere={{ ...social[need.social], social: need.social }} onDone={onDone} />}
       {exitId === 'opposite' && <OppositeStep c={c.opposite} wait={c.wait} pull={pull} chaseMinutes={chaseMinutes} renderHold={renderHold} onDone={onDone} />}
       {exitId === 'park' && <ParkIt c={c.park} onDone={onDone} />}
       {exitId === 'prefer' && <MustPrefer c={c.prefer} onDone={onDone} />}

@@ -199,9 +199,14 @@ describe("5. Naming a specific part in the moment.", () => {
 
   test("the moment's hosts never read a part's name", async () => {
     const { PROFILE_NEEDS } = await importTs("functions/src/profile/types.ts");
-    for (const host of ["recovering-from-invalidation", "opposite-action"]) {
-      assert.ok(!PROFILE_NEEDS[host].some((s) => /^part/.test(s)), `${host} reads ${PROFILE_NEEDS[host]}`);
-    }
+    assert.ok(!PROFILE_NEEDS["recovering-from-invalidation"].some((s) => /^part/.test(s)), "Recover reads no parts");
+    // Do the Opposite on the skill player (ER-B3) reads `parts` for the tag row on its close only ("Was this a part you
+    // know?", after the moment, as Check the Facts and Find the feeling do); its in-the-moment lines (the hand-built
+    // page's unblend and goal lines) read none, and never partDetail.
+    assert.deepEqual([...PROFILE_NEEDS["opposite-action"]], ["parts"]);
+    assert.doesNotMatch(code("src/pages/tools/OppositeAction.tsx"), /useProfileContext|slices\??\.parts|partDetail/);
+    assert.ok(!JSON.stringify(JSON.parse(read("src/data/content/skills.json")).content.skills.find((x) => x.id === "opposite_action")).includes("{name}"),
+      "no step of the skill names a part");
     for (const f of ["src/lib/unblendLine.ts", "src/hooks/useUnblendLine.ts", "src/lib/oaGoalLine.ts", "src/lib/angryPart.ts", "src/lib/angryPartCopy.ts"]) {
       assert.doesNotMatch(code(f), /useProfileContext|slices\??\.parts|partDetail|\.part\.name|partName/, f);
     }

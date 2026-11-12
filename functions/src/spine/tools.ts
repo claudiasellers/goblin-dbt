@@ -42,7 +42,7 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   // means nothing after rewriting a dream); its practice is the read-through reminders.
   'nightmare-rescript': { module: 'er', closeKind: 'none' },
   // These ask their own questions inside their flows; the spine adds none (PR-S4 wraps them).
-  'opposite-action': { module: 'er', closeKind: 'none' },
+  'opposite-action': { module: 'er', closeKind: 'regulation_down' },
   'dear-man': { module: 'ie', closeKind: 'none' },
   // Keep your self-respect (docs/design/fast.md), on the skill runtime: "Compared to when you started, it's…".
   'fast': { module: 'ie', closeKind: 'regulation_down' },

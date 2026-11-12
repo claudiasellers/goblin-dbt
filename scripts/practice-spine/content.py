@@ -155,6 +155,23 @@ FOLLOW_UP_TYPES = [
         "notification": "A step you planned is ready.",
     },
     {
+        # Do the Opposite on the skill runtime (ER-03, ER-B3, docs/design/opposite-action-v3.md): a plan for later.
+        # The *When will you try it?* chips schedule it; its card reopens that visit's run at *Did you get to try it?*
+        # (`back`, a `reopens` step, R9). Opening it is the resolution, as for ps_review. oa_plan (above) stays for
+        # the plans the hand-built page saved.
+        "id": "oa_try", "ownerModule": "er", "tier": "quality", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/opposite-action?run={sourceSessionId}&at=back&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"hour": {"kind": "after", "minutes": 60},
+                                             "evening": {"kind": "at_local", "days": 0, "time": "20:00"},
+                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
+                                             "this_week": {"kind": "at_local", "days": 4, "time": "18:00"}}},
+        "staleAfterHours": 168, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": True},
+        "enabled": True,
+        "copy": {"title": "A plan you made is ready", "body": "The step you picked in Do the Opposite. Did you get to try it?"},
+        "choices": [{"id": "dismiss", "label": "Not any more", "status": "dismissed"}],
+        "notification": "A plan you made is ready.",
+    },
+    {
         # Cope Ahead (docs/design/cope-ahead.md, "Today, afterwards"): on the keep screen's "Want me to ask how
         # it went?" Yes, for the time from screen 1 (the chip is ext.ca.when). Scheduled only on the caller's
         # own cope-ahead ToolSession. Its Today card is the tool's own (cope-ahead.json's after_* lines, the

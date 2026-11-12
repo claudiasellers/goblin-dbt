@@ -15,6 +15,8 @@ import { UrgeWave, WaveTrace } from './UrgeWave';
 import { DebriefWhoEmbed } from './DebriefWhoEmbed';
 import { LidShelf } from './LidShelf';
 import { MessageComposer } from './MessageComposer';
+import { DoorPickerEmbed } from './DoorPickerEmbed';
+import { OaStepsEmbed } from './OaStepsEmbed';
 import { PocketCard } from './PocketCard';
 
 /**
@@ -43,6 +45,8 @@ export interface EmbedProps {
    * out. For an embed that shows something the person kept (Hold to wait's pros & cons replay); read-only.
    */
   profile?: Readonly<Record<string, unknown>> | null;
+  /** The grid words a link or hand-off carried in (ids only, R16): Do the Opposite's doors pre-tick them. */
+  carried?: readonly string[];
   onShown: () => void;
   onDone?: (output: EmbedOutput) => void;
   /**
@@ -77,6 +81,8 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   waveTrace: WaveTrace,
   lidShelf: LidShelf,
   messageComposer: MessageComposer,
+  doorPicker: DoorPickerEmbed,
+  oaSteps: OaStepsEmbed,
   pocketCard: PocketCard,
 };
 
@@ -108,6 +114,8 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   waveTrace: { ids: ['read'] },
   lidShelf: { ids: ['shut', 'partly', 'skipped'], measures: ['durationSec'] },
   messageComposer: { ids: ['copied', 'opened', 'dropped_sorry'] },
+  doorPicker: { emotions: 3 },
+  oaSteps: {},
   pocketCard: { ids: ['seen_all', 'copied'] },
 };
 
@@ -160,6 +168,7 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     copiedLabel: { type: 'copy', optional: true },
     selectedLabel: { type: 'copy', optional: true },
     next: { type: 'copy' },
+    skipLabel: { type: 'copy', optional: true },
   },
   messageComposer: {
     field: { type: 'field' },
@@ -359,6 +368,8 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     heldLine: { type: 'copy' },
     next: { type: 'copy' },
   },
+  doorPicker: {},
+  oaSteps: {},
   lidShelf: {
     /** The field whose pick is the container: `jar` · `tin` · `box` (its id; anything else draws a jar). */
     containerField: { type: 'field' },

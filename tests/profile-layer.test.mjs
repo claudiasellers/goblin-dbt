@@ -30,7 +30,7 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
   }
   assert.deepEqual(types.PROFILE_NEEDS["recovering-from-invalidation"], ["name"]);
   assert.deepEqual(types.PROFILE_NEEDS["find-the-feeling"], ["name", "parts"], "the tag row on its close");
-  assert.deepEqual(types.PROFILE_NEEDS["opposite-action"], []);
+  assert.deepEqual(types.PROFILE_NEEDS["opposite-action"], ["parts"], "the tag row on its close (ER-B3 port)");
   assert.deepEqual(types.PROFILE_NEEDS["cool-down"], ["parts"], "the tag row on its close");
   assert.deepEqual(types.PROFILE_NEEDS.checkin, ["patterns"], "R20: consumer is `checkin`");
   assert.deepEqual(types.PROFILE_NEEDS.today, ["quietHours", "parts"], "parts: the check-back card's name (part-checkback)");
@@ -65,7 +65,7 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
     if (consumer === "meet-a-part") continue;
     if (consumer !== "dear-man" && consumer !== "cope-ahead") assert.ok(!needs.includes("partAnchors"), `${consumer} reads partAnchors`);
     assert.ok(!needs.includes("partDetail"), `${consumer} reads partDetail before its phase`);
-    if (needs.includes("parts")) assert.ok(["today", "cool-down", "five-senses", "pause", "urge-surfing", "let-it-be", "mind-job", "soothe", "thoughts-passing", "alternate-rebellion", "find-the-feeling", "check-the-facts", "fast", "dear-man", "cope-ahead", "two-pulls", "wise-mind"].includes(consumer), `${consumer} reads parts but is neither Today, a tag-row host, DEAR MAN's cope ahead (or Cope Ahead's), Two pulls nor Wise mind's step back`);
+    if (needs.includes("parts")) assert.ok(["today", "cool-down", "five-senses", "pause", "urge-surfing", "let-it-be", "mind-job", "soothe", "thoughts-passing", "alternate-rebellion", "find-the-feeling", "check-the-facts", "opposite-action", "fast", "dear-man", "cope-ahead", "two-pulls", "wise-mind"].includes(consumer), `${consumer} reads parts but is neither Today, a tag-row host, DEAR MAN's cope ahead (or Cope Ahead's), Two pulls nor Wise mind's step back`);
   }
   assert.deepEqual(types.PROFILE_AREAS, ["about_me", "my_people", "my_body", "my_words", "my_plans", "my_patterns", "my_parts", "my_progress"]);
   for (const s of types.SLICE_IDS) assert.ok(!layers.isAskFreshField(s), `${s} is ask-fresh`);

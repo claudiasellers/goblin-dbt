@@ -84,7 +84,7 @@ test('Problem Solve on the skill player: the run\'s barrier answer (field sub) r
     [], 'only the sub field');
   // The match leans on runRecord writing fieldId, then optionIds (src/lib/skillRuntime/machine.ts).
   const machine = fs.readFileSync(path.resolve(__dirname, '../../../src/lib/skillRuntime/machine.ts'), 'utf8');
-  assert.match(machine, /\.map\(\(\[fieldId, a\]\) => \(\{ fieldId, optionIds: a\.ids\.slice\(0, 12\)/, 'runRecord: fieldId first, then optionIds');
+  assert.match(machine, /return \{ fieldId, optionIds: a\.ids\.slice\(0, 12\)/, 'runRecord: fieldId first, then optionIds');
   assert.equal(require('../../lib/parts/sessionMoves').PS_RUN_SUB, '"fieldId":"sub","optionIds":["');
 });
 
