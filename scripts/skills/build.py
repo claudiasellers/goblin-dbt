@@ -189,6 +189,8 @@ def check(skill):
                 assert e.get("done") or e.get("toolId") in tools, (sid, e)
         for f in e.get("carry", []):
             assert f in fields, (sid, e)
+        if "label" in e:
+            assert e["label"] in copy and e.get("toolId"), (sid, "an exit's label is a copy key, on a tool exit", e)
         # A query value starting with `$` is read from the run when the exit is taken: `$a.<field>` (its first pick) or
         # `$ctx.<key>` (context in). A missing or non-id value is left out of the link.
         for k, v in e.get("query", {}).items():
@@ -535,7 +537,7 @@ for sk in SKILLS:
         A(f"MATCH (s:Skill {{id: {q(sid)}}}), (n:SkillStep {{id: {q(nid)}}})\nMERGE (s)-[r:HAS_STEP]->(n)\nSET r += {{order: {i}}};")
     for e in sk["exits"]:
         nid = f"{sid}:{e['id']}"
-        A(f"MERGE (x:SkillExit {{id: {q(nid)}}})\nSET x += {props({'skillId': sid, 'exit': e['id'], 'toolId': e.get('toolId'), 'done': bool(e.get('done')), 'carry': e.get('carry', []), 'planned': bool(e.get('planned')), 'safety': bool(e.get('safety'))})}, x.queryJson = {js(e.get('query', {}))};")
+        A(f"MERGE (x:SkillExit {{id: {q(nid)}}})\nSET x += {props({'skillId': sid, 'exit': e['id'], 'toolId': e.get('toolId'), 'done': bool(e.get('done')), 'carry': e.get('carry', []), 'planned': bool(e.get('planned')), 'safety': bool(e.get('safety'))})}, x.queryJson = {js(e.get('query', {}))}, x.label = {q(e['label']) if e.get('label') else 'null'};")
         A(f"MATCH (s:Skill {{id: {q(sid)}}}), (x:SkillExit {{id: {q(nid)}}})\nMERGE (s)-[:HAS_EXIT]->(x);")
         if e.get("toolId"):
             A(f"MATCH (x:SkillExit {{id: {q(nid)}}}), (t:TherapyConcept {{appToolId: {q(e['toolId'])}}})\nMERGE (x)-[:OPENS]->(t);")

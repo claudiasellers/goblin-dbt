@@ -684,7 +684,7 @@ function HandoffCard({ ctx, step, st, send, onExit, busy }: {
           <button key={x.id} type="button" className={i === 0 && !others.length ? primaryButton : choiceButton} data-exit={x.id}
             // Someone to talk to is never held back, not even for the moment a reminder takes to save.
             disabled={busy && !x.safety} aria-busy={busy && !x.safety} onClick={() => onExit(x)}>
-            {x.safety ? (c.safety_open ?? 'Talk to someone now') : getToolById(x.toolId!)?.name}
+            {x.safety ? (c.safety_open ?? 'Talk to someone now') : (x.label && c[x.label]) || getToolById(x.toolId!)?.name}
           </button>
         ))}
       </div>

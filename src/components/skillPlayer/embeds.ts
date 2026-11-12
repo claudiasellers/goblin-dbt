@@ -19,6 +19,7 @@ import { DoorPickerEmbed } from './DoorPickerEmbed';
 import { OaStepsEmbed } from './OaStepsEmbed';
 import { PocketCard } from './PocketCard';
 import { BatteryRead } from './BatteryRead';
+import { KitDeck } from './KitDeck';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -86,6 +87,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   oaSteps: OaStepsEmbed,
   pocketCard: PocketCard,
   batteryRead: BatteryRead,
+  kitDeck: KitDeck,
 };
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
@@ -120,6 +122,7 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   oaSteps: {},
   pocketCard: { ids: ['seen_all', 'copied'] },
   batteryRead: { ids: ['read'] },
+  kitDeck: { ids: ['body', 'hands', 'soothe', 'words', 'place', 'reasons', 'pros_cons', 'starter'], measures: ['durationSec', 'doneCount'] },
 };
 
 /**
@@ -128,6 +131,23 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
  * (src/lib/skillRuntime/embedProps.ts) and passes nothing undeclared.
  */
 export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, EmbedPropSpec>>> = {
+  kitDeck: {
+    fromSkill: { type: 'id' },
+    prosSkill: { type: 'id' },
+    starter: { type: 'copy' },
+    another: { type: 'copy' },
+    enough: { type: 'copy' },
+    secBody: { type: 'copy' },
+    secHands: { type: 'copy' },
+    secSoothe: { type: 'copy' },
+    secWords: { type: 'copy' },
+    secPlace: { type: 'copy' },
+    secReasons: { type: 'copy' },
+    secProsCons: { type: 'copy' },
+    placeHow: { type: 'copy' },
+    wordsHow: { type: 'copy' },
+    reasonsLabel: { type: 'copy' },
+  },
   partsLine: { promptId: { type: 'id' }, as: { type: 'enum', values: ['line', 'heading'], optional: true } },
   partLater: {},
   holdRing: {

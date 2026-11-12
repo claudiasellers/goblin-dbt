@@ -30,7 +30,7 @@ the design. The app claims nothing on screen.
 | 6 | `card` | The card on the square paper: *My reasons not to* (two, their own words first) and *And yes, it pulls because* (one pro, or *It does something for me in the moment.*). *Next* | Step 6 |
 | — | `keep` | *Keep this card in Me? Hold to wait will show it next time this pull comes up.* Keep it in Me · Not this time | Saved |
 | — | `end` | Its line: a kept card says it's in Me, else by the lean; *Doing it* or *Not sure yet* offers Wise mind; Done | — |
-| — | `reach` | Not sure or no after *Hurt myself*, or leaning towards it: the banner, *Please reach out to someone now…*, Done. No close | C6.5, S9 |
+| — | `reach` | Not sure or no after *Hurt myself*, or leaning towards it: the banner, *Please reach out to someone now…*, *Talk to someone now*, then My crisis kit (`frame=crisis`), Done. No close | C6.5, S9 |
 
 **The replay.** Kept, the card is `pros_cons` (a `ProfileFact`, many, own words encrypted), read back by the
 `prosCons` slice. Hold to wait (`PROFILE_NEEDS.pause`) shows the newest card for the pull picked there on its
@@ -80,7 +80,7 @@ on Hold to wait's sessions (an aggregate, never read back into a flow).
 | Replay inside the hold (a 20 s replay card) | On the proceed step, as a still card | The hold is a whole-screen press; reading while pressing splits attention. Proceed is where the PRD's step 5 puts it |
 | Fade: full card → one line → none | Full card every time | Needs `fade_levels` (CORE-12) |
 | After a lapse: *Want to add what actually happened?* | Not built | Needs the close's *Yes* to open an edit of the kept card; after the clinician pass |
-| The kit (section `pros_cons`) | Not built | DT-03, the safety batch |
+| The kit (section `pros_cons`) | Built: the kit plays up to two kept cards (`crisisKit` reads `prosCons`; [`crisis-kit.md`](crisis-kit.md)) | — |
 | `ProsConsItem` graph nodes per urge | `SkillOption:ProsConsItem` options with `forUrges` and `cell` | The runtime's options are the graph content; the `FOR_URGE` edges make them queryable |
 | A card can be edited in Me | Set aside or kept; not edited in place | No editor kind yet; make a new one |
 | DT-09 (after a lapse) as an entry point | Not built | DT-09 is built (part 1, `habit-plan.md`) and offers this card on its end and *not ready* cards; entering from a lapse waits for DT-09 part 2 |
