@@ -30,7 +30,7 @@ person's own values become the measure of a good outcome, not the app's.
 | `keep` | *Which ones matter most for now? Up to three.* (*Two can pull different ways. Both can matter. Not sure yet? Save with none picked. Your list is kept either way.*) Up to three of the sort, or own words. *Keep these* keeps `values` either way; kept only in their words goes straight to `step` | Step 2, keep three; conflicting values → both can matter |
 | `sorted` | None kept: *Your list is kept.* *Your sort is in Me. You can pick three another time.* | *not sure yet* saves the sort |
 | `one` / `one_kept` | *Which one do you want to take a small step for?* (*One is enough for this week.*) This visit's three (or *One in my words*), or (coming back) the ones kept before, named from the `values` slice | Step 3, one value |
-| `step` | *One small step this week.* (*Small enough that you'd likely do it, and safe to do. If it means facing someone who hurts you, that's not the step.*) That value's three steps (a value in their own words gets three general ones), or own words | Steps 3–4, a direction and a step sized to succeed |
+| `step` | *One small step this week.* (a smaller one after *Not this time* starts fresh) (*Small enough that you'd likely do it, and safe to do. If it means facing someone who hurts you, that's not the step.*) That value's three steps (a value in their own words gets three general ones), or own words | Steps 3–4, a direction and a step sized to succeed |
 | `when` | *When could you do it?* Tomorrow · In a few days · Sometime this week; *Want me to ask how it went?* Yes books `value_step` | Step 4 → FollowUp |
 | `set` | *Your step: {step}.* *It's a direction, not a rule. Doing part of it counts.* | Values as directions, not shoulds |
 

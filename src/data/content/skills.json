@@ -49962,6 +49962,11 @@
                 ]
               }
             ],
+            "clears": [
+              "step",
+              "when",
+              "remind"
+            ],
             "hint": "step_hint",
             "next": [
               {
