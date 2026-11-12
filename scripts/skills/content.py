@@ -17,12 +17,13 @@ import pros_cons  # noqa: E402
 import first_body  # noqa: E402
 import ride_it_out  # noqa: E402
 import let_it_be  # noqa: E402
+import mind_job  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
 SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKILL, *fast.SKILLS, nightmare_rescript.SKILL, problem_solve.SKILL,
           ending_relationships.SKILL, hold_to_wait.SKILL, dear_man_debrief.SKILL, pros_cons.SKILL, first_body.SKILL,
-          ride_it_out.SKILL, let_it_be.SKILL]
+          ride_it_out.SKILL, let_it_be.SKILL, mind_job.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -60,6 +61,9 @@ EMBEDS = {
     "urgeWave": {"ids": ["still_here", "fading", "gone", "bigger", "ended_gone", "ended_bigger", "ended_not_now",
                          "ended_left", "ended_long"], "measures": ["durationSec", "doneCount"]},
     "waveTrace": {"ids": ["read"]},
+    # DT-06's lid (plan C3b `lidShelf`, DT-owned; src/components/skillPlayer/LidShelf.tsx): put it in, hold the lid
+    # shut. `shut` when the hold finished, `partly` after a release, `skipped` when the way past came first.
+    "lidShelf": {"ids": ["shut", "partly", "skipped"], "measures": ["durationSec"]},
 }
 # What each embed takes from the skill (embeds.ts EMBED_PROPS; the contract test keeps the two equal). build.py
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
@@ -235,6 +239,16 @@ EMBED_PROPS = {
         "downLine": {"type": "copy"},
         "riseLine": {"type": "copy", "optional": True},
         "heldLine": {"type": "copy"},
+        "next": {"type": "copy"},
+    },
+    "lidShelf": {
+        "containerField": {"type": "field"},
+        "put": {"type": "copy"},
+        "hold": {"type": "copy"},
+        "holding": {"type": "copy"},
+        "hint": {"type": "copy"},
+        "holdSec": {"type": "int", "min": 1, "max": 10},
+        "done": {"type": "copy"},
         "next": {"type": "copy"},
     },
 }

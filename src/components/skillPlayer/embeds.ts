@@ -12,6 +12,7 @@ import { RescriptCard } from './RescriptCard';
 import { WaitLockEmbed } from './WaitLockEmbed';
 import { UrgeWave, WaveTrace } from './UrgeWave';
 import { DebriefWhoEmbed } from './DebriefWhoEmbed';
+import { LidShelf } from './LidShelf';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -67,6 +68,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   orientFind: OrientFind,
   urgeWave: UrgeWave,
   waveTrace: WaveTrace,
+  lidShelf: LidShelf,
 };
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
@@ -91,6 +93,7 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
     measures: ['durationSec', 'doneCount'],
   },
   waveTrace: { ids: ['read'] },
+  lidShelf: { ids: ['shut', 'partly', 'skipped'], measures: ['durationSec'] },
 };
 
 /**
@@ -273,6 +276,17 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     /** The down line when the trace rose first (a *bigger* tap); else `downLine`. */
     riseLine: { type: 'copy', optional: true },
     heldLine: { type: 'copy' },
+    next: { type: 'copy' },
+  },
+  lidShelf: {
+    /** The field whose pick is the container: `jar` · `tin` · `box` (its id; anything else draws a jar). */
+    containerField: { type: 'field' },
+    put: { type: 'copy' },
+    hold: { type: 'copy' },
+    holding: { type: 'copy' },
+    hint: { type: 'copy' },
+    holdSec: { type: 'int', min: 1, max: 10 },
+    done: { type: 'copy' },
     next: { type: 'copy' },
   },
 };

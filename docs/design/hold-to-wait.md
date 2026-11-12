@@ -44,8 +44,8 @@ screen.
 | Use, drink, binge or buy | Cool my body down first · Ride it out (→ Ride it out) · Tell it: not now |
 | Own words | Cool my body down first · Ride it out |
 
-Moves into tools not built yet (My crisis kit DT-03, Held DT-07, Give your mind a job DT-06) are planned exits on
-the end card and are never chips until their tools ship.
+Moves into tools not built yet (My crisis kit DT-03, Held DT-07) are planned exits on the end card and are never
+chips until their tools ship. *Checking* offers Give your mind a job (DT-06, built 12 Nov) on the end card.
 
 **The flooded short path.** No band is asked (C6.2). A carried flooded reading (`$ctx.band`: a hand-off's, else the person's own `band.current()`, ≤ 20 min) shows the flooded
 hold line, then the step back (two choices), then `settle`: *Your body's loud. Settle it first. The rest can wait, and Today will

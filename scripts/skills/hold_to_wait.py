@@ -254,7 +254,7 @@ STEPS = [
         "lines": [*[{"when": MOVE(m), "key": k} for m, k in MOVE_LINES.items()], {"when": ALWAYS, "key": "next_line"}],
         "offers": [
             *[{"exit": x, "when": MOVE(m)} for m, _, _, x in MOVES if x],
-            # Planned (not shown until built): the kit and Held for hurt myself, Give your mind a job for checking.
+            # The kit (planned, not shown until built) for hurt myself; Give your mind a job (DT-06) for checking.
             {"exit": "crisis_kit", "when": {"eq": [a("pull"), "use"]}},
             {"exit": "mind_job", "when": {"eq": [a("pull"), "check"]}},
         ],
@@ -299,7 +299,7 @@ EXITS = [
     {"id": "alternate_rebellion", "toolId": "alternate-rebellion"},     # DT-11 (the *blow it up* chip)
     {"id": "crisis_kit", "toolId": "crisis-kit", "planned": True},      # DT-03 My crisis kit (safety batch)
     {"id": "held", "toolId": "soothe", "planned": True},                # DT-07 Held (hand on heart)
-    {"id": "mind_job", "toolId": "mind-job", "planned": True},          # DT-06 park it, look once
+    {"id": "mind_job", "toolId": "mind-job"},          # DT-06 Give your mind a job: park it, look once
     {"id": "safety_open", "toolId": None, "safety": True},              # safety.open (R6)
     {"id": "done", "done": True},
 ]

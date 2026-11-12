@@ -155,6 +155,9 @@ CONCEPT_TAGS["fast"] = {"concept": "dbt_fast", "side": "change", "skillKind": "r
 # Let it be (DT-04, appToolId 'let-it-be', D6: routing's planned `radical-acceptance` renamed,
 # docs/design/let-it-be.md) has shipped on the skill runtime: out of PLANNED; its three rows stay switched off and
 # drafts until Claudia signs them off (D15).
+# Give your mind a job (DT-06, appToolId 'mind-job': routing's planned `accepts` renamed, docs/design/mind-job.md) has
+# shipped on the skill runtime: out of PLANNED; its three rows stay switched off and drafts until Claudia signs them off.
+CONCEPT_TAGS["mind-job"] = {"concept": "dbt_accepts", "side": "acceptance", "skillKind": "redirect", "direction": "neutral"}
 CONCEPT_TAGS["let-it-be"] = {"concept": "dbt_radical_acceptance", "side": "acceptance", "skillKind": "hold", "direction": "neutral"}
 BUILT_NOT_SIGNED_OFF = {
     "fast": "built on the skill runtime; its word rows go live on Claudia's sign-off, row by row (docs/design/fast.md)",
@@ -163,10 +166,10 @@ BUILT_NOT_SIGNED_OFF = {
     # DT-05: the slider is gone (rebuilt as Ride it out on the skill runtime, DT-B3); its rows stay off and drafts.
     "let-it-be": "built on the skill runtime; its rows go live on Claudia's sign-off, row by row (docs/design/let-it-be.md)",
     "urge-surfing": "rebuilt on the skill runtime as Ride it out; its rows go live on Claudia's sign-off (docs/design/ride-it-out.md)",
+    "mind-job": "built on the skill runtime; its rows go live on Claudia's sign-off, row by row (docs/design/mind-job.md)",
 }
 PLANNED = {
     "running-low":        {"concept": "dbt_please",             "side": "both",       "skillKind": "body",       "direction": "neutral"},
-    "accepts":            {"concept": "dbt_accepts",            "side": "acceptance", "skillKind": "hold",       "direction": "neutral"},
     "wise-mind":          {"concept": "dbt_wise_mind",          "side": "both",       "skillKind": "naming",     "direction": "neutral"},
     "give":               {"concept": "dbt_give",               "side": "change",     "skillKind": "relational", "direction": "neutral"},
 }
@@ -267,15 +270,15 @@ WORD_RULES = [
     {"key": "overwhelm", "pattern": "acute_alarm", "tool": "pause", "priority": WORD_LEAD, "words": ["overwhelmed", "out_of_control"],
      "why": "Capacity saturation needs a behavioural halt: Pause (STOP), then Cool Down (TIPP). Overwhelmed stays on Alarm, not Flooded: one everyday word doesn't raise the crisis banner."},
     {"key": "stress", "pattern": "acute_alarm", "tool": "problem-solve", "priority": WORD_LEAD, "words": STRESS_WORDS,
-     "why": "Bridge high agitation: distraction (ACCEPTS, planned) then Problem Solve; until ACCEPTS ships, Problem Solve leads and Cool Down follows."},
-    {"key": "stress", "pattern": "acute_alarm", "tool": "accepts", "priority": 0.4, "words": STRESS_WORDS,
-     "why": "Planned: ACCEPTS (distract) leads for strain words once built."},
+     "why": "Bridge high agitation: distraction (Give your mind a job) then Problem Solve; until its row is signed off, Problem Solve leads and Cool Down follows."},
+    {"key": "stress", "pattern": "acute_alarm", "tool": "mind-job", "priority": 0.4, "words": STRESS_WORDS,
+     "why": "Give your mind a job (ACCEPTS, distract) leads for strain words."},
     {"key": "annoyed", "pattern": "acute_alarm", "tool": "opposite-action", "priority": WORD_LEAD, "words": ["annoyed"],
      "why": "Check the Facts on low-grade anger (planned); Do the Opposite's fits-the-facts step until then."},
     {"key": "annoyed", "pattern": "acute_alarm", "tool": "check-the-facts", "priority": 0.4, "words": ["annoyed"],
      "why": "Planned: Check the Facts leads for low-grade anger."},
-    {"key": "annoyed", "pattern": "acute_alarm", "tool": "accepts", "priority": WORD_NEXT, "words": ["annoyed"],
-     "why": "Planned: ACCEPTS as the alternative."},
+    {"key": "annoyed", "pattern": "acute_alarm", "tool": "mind-job", "priority": WORD_NEXT, "words": ["annoyed"],
+     "why": "Give your mind a job (ACCEPTS) as the alternative."},
     {"key": "freeze", "pattern": "acute_alarm", "tool": "five-senses", "priority": WORD_LEAD, "words": ["distant", "withdrawn"],
      "why": "Freeze with high arousal underneath (review, Oct 2026): orient to present safety first, then Cool Down."},
     # --- On guard ---
@@ -319,8 +322,8 @@ WORD_RULES = [
     # --- On replay ---
     {"key": "aversion", "pattern": "rumination_loop", "tool": "opposite-action", "priority": WORD_LEAD, "words": DISGUST_WORDS + ["hesitant", "guilty", "remorseful"],
      "why": "Disgust: Do the Opposite (towards acceptance); guilt: Check the Facts (is it justified?) then repair; hesitation: approach. Do the Opposite leads until Check the Facts ships."},
-    {"key": "aversion", "pattern": "rumination_loop", "tool": "accepts", "priority": WORD_NEXT, "words": DISGUST_WORDS + ["hesitant"],
-     "why": "Planned: ACCEPTS as the alternative."},
+    {"key": "aversion", "pattern": "rumination_loop", "tool": "mind-job", "priority": WORD_NEXT, "words": DISGUST_WORDS + ["hesitant"],
+     "why": "Give your mind a job (ACCEPTS) as the alternative."},
     {"key": "guilt", "pattern": "rumination_loop", "tool": "check-the-facts", "priority": 0.4, "words": ["guilty", "remorseful", "hesitant"],
      "why": "Planned: Check the Facts leads for guilt (is it justified?) and hesitation."},
     {"key": "low-shame", "pattern": "rumination_loop", "tool": "recovering-from-invalidation", "priority": WORD_LEAD, "words": ["embarrassed", "ashamed", "victimized"],

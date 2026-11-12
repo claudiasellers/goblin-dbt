@@ -345,6 +345,17 @@
     "fear"
    ]
   },
+  "dbt_accepts": {
+   "appToolId": "mind-job",
+   "name": "ACCEPTS",
+   "description": "Activities, Contributing, Comparisons, Emotions, Pushing away, Thoughts, Sensations",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": "acceptance",
+   "skillKind": "redirect",
+   "direction": "neutral",
+   "addresses": []
+  },
   "dbt_alternate_rebellion": {
    "appToolId": "alternate-rebellion",
    "name": "Alternate Rebellion",
@@ -2315,31 +2326,6 @@
    "rationale": "Nothing was named (somatic skip): offer to find the word as the alternative (R9)."
   },
   {
-   "id": "rf_acute_alarm_words_annoyed_accepts",
-   "conceptId": "dbt_accepts",
-   "patternId": "acute_alarm",
-   "bands": [
-    "steady",
-    "stirred"
-   ],
-   "priority": 0.6,
-   "direction": "neutral",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": "words",
-   "words": [
-    "annoyed"
-   ],
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": false,
-   "version": "rf-v2",
-   "reviewStatus": "draft",
-   "rationale": "Planned: ACCEPTS as the alternative."
-  },
-  {
    "id": "rf_acute_alarm_words_annoyed_check-the-facts",
    "conceptId": "dbt_check_facts",
    "patternId": "acute_alarm",
@@ -2363,6 +2349,31 @@
    "version": "rf-v2",
    "reviewStatus": "draft",
    "rationale": "Planned: Check the Facts leads for low-grade anger."
+  },
+  {
+   "id": "rf_acute_alarm_words_annoyed_mind-job",
+   "conceptId": "dbt_accepts",
+   "patternId": "acute_alarm",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.6,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "annoyed"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": false,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Give your mind a job (ACCEPTS) as the alternative."
   },
   {
    "id": "rf_acute_alarm_words_annoyed_opposite-action",
@@ -2442,7 +2453,7 @@
    "rationale": "Capacity saturation needs a behavioural halt: Pause (STOP), then Cool Down (TIPP). Overwhelmed stays on Alarm, not Flooded: one everyday word doesn't raise the crisis banner."
   },
   {
-   "id": "rf_acute_alarm_words_stress_accepts",
+   "id": "rf_acute_alarm_words_stress_mind-job",
    "conceptId": "dbt_accepts",
    "patternId": "acute_alarm",
    "bands": [
@@ -2468,7 +2479,7 @@
    "active": false,
    "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Planned: ACCEPTS (distract) leads for strain words once built."
+   "rationale": "Give your mind a job (ACCEPTS, distract) leads for strain words."
   },
   {
    "id": "rf_acute_alarm_words_stress_problem-solve",
@@ -2497,7 +2508,7 @@
    "active": true,
    "version": "rf-v2",
    "reviewStatus": "approved",
-   "rationale": "Bridge high agitation: distraction (ACCEPTS, planned) then Problem Solve; until ACCEPTS ships, Problem Solve leads and Cool Down follows."
+   "rationale": "Bridge high agitation: distraction (Give your mind a job) then Problem Solve; until its row is signed off, Problem Solve leads and Cool Down follows."
   },
   {
    "id": "rf_chronic_vigilance_addresses_recovering-from-invalidation",
@@ -3628,7 +3639,7 @@
    "rationale": "Nothing was named (somatic skip): offer to find the word as the alternative (R9)."
   },
   {
-   "id": "rf_rumination_loop_words_aversion_accepts",
+   "id": "rf_rumination_loop_words_aversion_mind-job",
    "conceptId": "dbt_accepts",
    "patternId": "rumination_loop",
    "bands": [
@@ -3661,7 +3672,7 @@
    "active": false,
    "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Planned: ACCEPTS as the alternative."
+   "rationale": "Give your mind a job (ACCEPTS) as the alternative."
   },
   {
    "id": "rf_rumination_loop_words_aversion_opposite-action",

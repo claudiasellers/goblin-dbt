@@ -60,7 +60,7 @@ test("D-02 defaults kept: Urge Surfing switched off, no DEAR MAN rows, Pause act
   assert.deepEqual([...new Set(rows.filter((r) => !r.active).map((r) => r.conceptId))].sort(), [...planned, "urge_surfing"].sort());
   // Wise mind's module ships before its row is signed off: it has its app tool id, and the watchful row
   // stays switched off and a draft (Claudia signs it off separately; build.py refuses an active draft).
-  for (const c of planned.filter((x) => x !== "dbt_wise_mind" && x !== "dbt_cope_ahead" && x !== "dbt_check_facts" && x !== "dbt_fast" && x !== "dbt_radical_acceptance")) assert.ok(!graph.concepts[c]?.appToolId, `${c} has no app module yet`);
+  for (const c of planned.filter((x) => x !== "dbt_wise_mind" && x !== "dbt_cope_ahead" && x !== "dbt_check_facts" && x !== "dbt_fast" && x !== "dbt_radical_acceptance" && x !== "dbt_accepts")) assert.ok(!graph.concepts[c]?.appToolId, `${c} has no app module yet`);
   assert.equal(graph.concepts.dbt_wise_mind.appToolId, "wise-mind");
   const wise = rows.filter((r) => r.conceptId === "dbt_wise_mind");
   assert.deepEqual(wise.map((r) => [r.id, r.active, r.reviewStatus]), [["rf_chronic_vigilance_words_watchful_wise-mind", false, "draft"]]);
@@ -101,7 +101,7 @@ test("tags (WMP-04 v0 side, skillKind, direction) on the 13 app-tool concepts; D
     "dear-man": ["change", "relational", "neutral"], "recovering-from-invalidation": ["both", "relational", "neutral"],
     "wise-mind": ["both", "naming", "neutral"], "cope-ahead": ["change", "change", "neutral"],
     "check-the-facts": ["change", "change", "neutral"], "alternate-rebellion": ["acceptance", "redirect", "neutral"], fast: ["change", "relational", "neutral"],
-    "let-it-be": ["acceptance", "hold", "neutral"],
+    "let-it-be": ["acceptance", "hold", "neutral"], "mind-job": ["acceptance", "redirect", "neutral"],
   });
   for (const id of Object.keys(tags)) assert.ok(toolIds.includes(id), id);
 });

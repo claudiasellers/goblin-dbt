@@ -280,6 +280,38 @@ FOLLOW_UP_TYPES = [
         "notification": "Something you asked to come back to is ready.",
     },
     {
+        # Give your mind a job (DT-06, docs/design/mind-job.md): a break's return. The person picks when (5, 15 or 30
+        # minutes, or about an hour for "when I'm done"); the card reopens that visit at its check (`back`, a resumeAt
+        # re-entry: *Back. Is it louder, the same, quieter?*, then the fork). Opening it is the resolution. The copy
+        # never names what they were taking a break from.
+        "id": "mind_job_back", "ownerModule": "dt", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/mind-job?run={sourceSessionId}&at=back&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"m5": {"kind": "after", "minutes": 5},
+                                             "m15": {"kind": "after", "minutes": 15},
+                                             "m30": {"kind": "after", "minutes": 30},
+                                             "m60": {"kind": "after", "minutes": 60}}},
+        "staleAfterHours": 6, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Back from your break", "body": "How is it now? Louder, the same, quieter?"},
+        "choices": [{"id": "not_now", "label": "Not now", "status": "dismissed"}],
+        "notification": "Your break's up. How is it now?",
+    },
+    {
+        # Give your mind a job's lid (DT-06): the reopen the person booked when they put it on the shelf (tonight,
+        # tomorrow, in a few days). The card reopens that visit at `reopen` (R9 `reopens`: *It's still on the shelf.
+        # Open it for five minutes?*); *Not yet* books it again. Opening it is the resolution. Never names what's in it.
+        "id": "lid_reopen", "ownerModule": "dt", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/mind-job?run={sourceSessionId}&at=reopen&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"tonight": {"kind": "at_local", "days": 0, "time": "20:00"},
+                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
+                                             "few_days": {"kind": "at_local", "days": 3, "time": "18:00"}}},
+        "staleAfterHours": 72, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "On the shelf", "body": "It's still on the shelf. Open it for five minutes?"},
+        "choices": [{"id": "not_now", "label": "Not now", "status": "dismissed"}],
+        "notification": "Something you put on the shelf is ready to open.",
+    },
+    {
         # E3 §A4.2.6: "Come back to this later" from the breakdown hand-off (A4-2 schedules it).
         "id": "resume_skill", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
         "deepLinkTemplate": "/tool/{sourceToolId}?resume={sourceSessionId}&followUp={followUpId}",
