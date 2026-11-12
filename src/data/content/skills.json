@@ -1,7 +1,7 @@
 {
   "source": {
     "file": "graph-content-only-2026-11-12.json",
-    "exportedAt": "2026-11-12T17:13:16.882Z"
+    "exportedAt": "2026-11-12T17:36:44.027Z"
   },
   "content": {
     "version": "skills-v1",
@@ -8418,126 +8418,126 @@
           "express"
         ],
         "copy": {
-          "situation_title": "What kind of conversation is this?",
-          "situation_title_heads_up": "When talks with them tend to go badly, it can help to keep it short, about one thing, and in writing if that suits. What kind of conversation is this?",
-          "debrief_link": "I've already had the conversation",
-          "cool_down": "Settle my body first",
-          "scared_line": "Your safety comes first. You don't have to plan this conversation. The people below can help, any time.",
-          "matters_title": "What matters most to you here?",
-          "matters_hint": "If it gets tough, this is what you'll protect.",
-          "hard_title": "What makes this hard?",
-          "hard_hint": "Pick any that fit.",
-          "who_title": "Who might show up in this conversation?",
-          "describe_title": "What happened? Say it the way a camera would see it.",
-          "describe_hint": "Facts are harder to argue with than judgements.",
-          "express_title": "How does it feel?",
-          "express_hint": "Naming it helps them see this matters.",
-          "assert_title": "What are you asking for?",
+          "again_title": "Your plan, once more.",
           "assert_hint": "A clear ask is easier to say yes to.",
+          "assert_title": "What are you asking for?",
           "assert_title_heads_up": "What's the one practical thing you're asking for?",
-          "fill_title": "Say it plainly.",
-          "reinforce_title": "What would be better for them, or for you both, if they said yes?",
-          "reinforce_hint": "This is the step most people skip. It helps them listen.",
-          "mindful_title": "What do you need to hear in that moment?",
+          "card_attack": "If they attack: you don't have to answer it. Come back to the ask.",
+          "card_drift": "If it drifts: say the ask again, same words.",
+          "card_felt": "I felt",
+          "card_middle": "Middle ground I could live with",
+          "card_next_card": "Next card",
+          "card_prev": "Previous card",
+          "card_push": "If they push back",
+          "card_say": "Say it",
+          "card_skip": "Done with the cards",
+          "card_steady": "Stay steady",
+          "card_title": "Your plan, on three cards.",
+          "card_walk": "I won't accept",
+          "coach_barrier_angry": "If they get defensive: that's their feeling, not proof you're wrong. You can name it and come back to what you need.",
+          "coach_barrier_dont_know": "If you blank: you've built your plan, and it's fine to glance at it. You can say you wrote it down because it matters.",
+          "coach_barrier_emotional": "If tears or a shaky voice come, take a breath. You can say this is hard to say and you want to get through it.",
+          "coach_barrier_guilty": "If guilt shows up, it may tell you to back down or apologise for having needs. Notice it, and stay with your ask.",
+          "coach_barrier_no_right": "If you start doubting yourself: you don't have to earn the right to need things. Asking clearly is respectful.",
+          "coach_barrier_tried_before": "If your mind pulls you to the last five times, come back to this conversation, this ask, now.",
           "coach_default": "The hard part is staying with it when it gets uncomfortable. When your mind races or shuts down, come back to one line.",
-          "phrase_title": "Pick the line you'll say to yourself, or make it yours.",
-          "phrase_hint": "Short enough to fit in one breath.",
-          "confident_title": "Your body can help. One thing to do before you start?",
           "confident_hint": "Even when you don't feel confident.",
+          "confident_title": "Your body can help. One thing to do before you start?",
+          "cool_down": "Settle my body first",
+          "copied": "Copied",
+          "copy": "Copy",
+          "debrief_link": "I've already had the conversation",
+          "describe_hint": "Facts are harder to argue with than judgements.",
+          "describe_title": "What happened? Say it the way a camera would see it.",
+          "edge_dizzy": "Feeling dizzy? Stop and breathe normally.",
+          "edge_done": "That's the edge off. Read your plan once more, out loud if you can.",
+          "edge_in": "In",
+          "edge_next": "Back to my plan",
+          "edge_out": "Out, longer",
+          "edge_start": "Start",
+          "edge_step1": "Unclench your jaw and drop your shoulders while you read it through.",
+          "express_hint": "Naming it helps them see this matters.",
+          "express_title": "How does it feel?",
+          "fill_ask_change_how": "What would you like to be different?",
+          "fill_ask_flexibility": "What would that look like in practice?",
+          "fill_ask_specific_help": "What kind of help, and by when?",
+          "fill_bound_cant_do": "What aren't you able to do?",
+          "fill_bound_need_space": "When do you need the space?",
+          "fill_bound_respect_no": "Which decision?",
+          "fill_bound_stop_behavior": "What do you need them to stop?",
+          "fill_patt_more_effort": "What would more effort look like, plainly?",
+          "fill_title": "Say it plainly.",
+          "hard_hint": "Pick any that fit.",
+          "hard_title": "What makes this hard?",
+          "hot_hint": "When it's loud inside, even a good plan can come out sharper than you mean. Taking the edge off first can help it land.",
+          "hot_title": "Your plan is ready. Heads up: it's still loud in there.",
+          "let_go": "I've asked them to hear me before. Look at letting this one go",
+          "matters_hint": "If it gets tough, this is what you'll protect.",
+          "matters_title": "What matters most to you here?",
           "middle_title": "If they push back, what middle ground could you live with?",
           "middle_title_objective": "Getting what you need comes first, so know the part you won't give on. If they push back, what middle ground could you live with?",
           "middle_title_relationship": "Keeping things good comes first, so you can give on details, as long as you feel heard. What middle ground could you live with?",
           "middle_title_self_respect": "Your self-respect comes first, so notice any pressure to agree to what doesn't sit right. What middle ground could you live with?",
-          "walk_title": "What won't you accept?",
-          "walk_hint": "Knowing this ahead makes it easier to stop or step away.",
-          "card_title": "Your plan, on three cards.",
-          "card_say": "Say it",
-          "card_steady": "Stay steady",
-          "card_push": "If they push back",
-          "card_prev": "Previous card",
-          "card_skip": "Done with the cards",
-          "card_felt": "I felt",
-          "card_middle": "Middle ground I could live with",
-          "card_walk": "I won't accept",
-          "card_drift": "If it drifts: say the ask again, same words.",
-          "card_attack": "If they attack: you don't have to answer it. Come back to the ask.",
-          "card_next_card": "Next card",
-          "copy": "Copy",
-          "copied": "Copied",
-          "selected": "Selected. Copy it from here.",
+          "mindful_title": "What do you need to hear in that moment?",
+          "mirror_addr_broke_promise": "When someone doesn't follow through, disappointment often comes first, then frustration, sometimes hurt. Only keep what fits.",
+          "mirror_addr_dismissed": "Opening up and being brushed aside often leaves people feeling unheard, hurt, then angry. Only keep what fits.",
+          "mirror_addr_hurtful": "When a hurt goes unnoticed, the hurt is right there, often with feeling invisible, sometimes anger. Only keep what fits.",
+          "mirror_addr_no_consult": "A decision made without you often leaves people feeling disrespected, invisible, a bit helpless. Only keep what fits.",
+          "mirror_ask_need_help": "Needing help you haven't asked for often brings overwhelm, a worry about being a burden, and sometimes quiet resentment. Only keep what fits.",
+          "mirror_ask_not_working": "When how you do things isn't working, people often feel frustrated, unheard, a bit trapped. Only keep what fits.",
+          "mirror_ask_support": "Needing support through something hard often comes with loneliness, sadness, and a fear of pushing them away. Only keep what fits.",
+          "mirror_ask_time_space": "Needing time or space you don't have tends to leave people worn out, often with some guilt about wanting it. Only keep what fits.",
+          "mirror_bound_new_thing": "When something new isn't okay with you, hurt or feeling disrespected is common, and nerves about what to say. Only keep what fits.",
+          "mirror_bound_overcommit": "Taking back a yes often brings guilt, worry about letting them down, and tiredness from carrying it. Only keep what fits.",
+          "mirror_bound_pressure": "Being pressed to do something you don't want to do can feel like being cornered: frustrated, anxious, resentful. Only keep what fits.",
+          "mirror_bound_unnamed_line": "When a line you haven't named keeps getting crossed, resentment tends to build quietly, along with feeling disrespected. Only keep what fits.",
+          "mirror_patt_avoids": "When the conversation keeps getting avoided, people often feel unheard, invisible, lonely in it. Only keep what fits.",
+          "mirror_patt_keeps_doing": "When it keeps happening after you've asked, frustration and resentment are very common. Only keep what fits.",
+          "mirror_patt_one_sided": "When effort feels one-sided, resentment and tiredness tend to build, and sadness underneath. Only keep what fits.",
+          "mirror_patt_shuts_down": "When it ends badly every time, people often feel helpless and worn out before they start. Only keep what fits.",
+          "mirror_sit_address": "Bringing something up often has some hurt underneath, some frustration, and nerves about reopening it. Only keep what fits.",
+          "mirror_sit_ask": "Asking for something often brings worry about how it'll land, and sometimes guilt for needing it. Only keep what fits.",
+          "mirror_sit_boundary": "Setting a limit often comes with guilt and worry about their reaction, on top of what made it necessary. Only keep what fits.",
+          "mirror_sit_pattern": "A pattern that keeps repeating often leaves people worn out, unheard, with resentment built up. Only keep what fits.",
           "next": "Next",
-          "hot_title": "Your plan is ready. Heads up: it's still loud in there.",
-          "hot_hint": "When it's loud inside, even a good plan can come out sharper than you mean. Taking the edge off first can help it land.",
-          "edge_step1": "Unclench your jaw and drop your shoulders while you read it through.",
-          "edge_start": "Start",
-          "edge_in": "In",
-          "edge_out": "Out, longer",
-          "edge_dizzy": "Feeling dizzy? Stop and breathe normally.",
-          "edge_done": "That's the edge off. Read your plan once more, out loud if you can.",
-          "edge_next": "Back to my plan",
-          "again_title": "Your plan, once more.",
+          "own_line": "In my own words",
+          "phrase_hint": "Short enough to fit in one breath.",
+          "phrase_title": "Pick the line you'll say to yourself, or make it yours.",
+          "picker_personChanged": "Things changed with someone?",
+          "picker_personChangedHint": "Pick who it is, and you'll be asked about them again.",
+          "picker_personGoOn": "Go on",
+          "picker_personKeepLine": "The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.",
+          "picker_personNameHint": "A nickname is fine. No real names needed.",
+          "picker_personNameLabel": "What do you call them?",
+          "picker_personNew": "Someone new",
+          "picker_personNoNameLine": "Without a name, nothing about them is kept.",
+          "picker_personRoleLabel": "Who are they to you?",
+          "picker_personSignedOutLine": "This stays on this screen only.",
+          "picker_personWho": "Who is this conversation with?",
+          "picker_riskBadly": "It tends to go badly",
+          "picker_riskHarm": "They might hurt or control me",
+          "picker_riskQuestion": "Is it more that they might hurt or control you, or that it tends to go badly?",
+          "picker_riskUnsaid": "I'd rather not say",
+          "picker_safeNo": "No",
+          "picker_safeQuestion": "Is it safe to bring hard things up with {who}?",
+          "picker_safeUnsure": "Not sure",
+          "picker_safeYes": "Yes, mostly",
+          "picker_safetyRouteBack": "This is about someone else",
+          "picker_safetyRouteBody": "The people below can help you think it through, any time, and you don't have to be sure.",
+          "picker_safetyRouteEnding": "Thinking about ending the relationship",
+          "picker_safetyRouteHeading": "Planning a hard talk with {who} can wait. Your safety comes first.",
+          "reinforce_hint": "This is the step most people skip. It helps them listen.",
+          "reinforce_title": "What would be better for them, or for you both, if they said yes?",
+          "scared_line": "Your safety comes first. You don't have to plan this conversation. The people below can help, any time.",
+          "selected": "Selected. Copy it from here.",
+          "situation_title": "What kind of conversation is this?",
+          "situation_title_heads_up": "When talks with them tend to go badly, it can help to keep it short, about one thing, and in writing if that suits. What kind of conversation is this?",
+          "walk_hint": "Knowing this ahead makes it easier to stop or step away.",
+          "walk_title": "What won't you accept?",
           "when_label": "When is the conversation? I can ask how it went, after.",
           "when_line": "You've planned what to say, what matters most, and what you'll do if it gets hard.",
           "when_line_badly": "You're going in knowing it might not go well. Keep it short, about one thing, and look after yourself after.",
-          "own_line": "In my own words",
-          "let_go": "I've asked them to hear me before. Look at letting this one go",
-          "mirror_ask_need_help": "Needing help you haven't asked for often brings overwhelm, a worry about being a burden, and sometimes quiet resentment. Only keep what fits.",
-          "mirror_ask_not_working": "When how you do things isn't working, people often feel frustrated, unheard, a bit trapped. Only keep what fits.",
-          "mirror_ask_time_space": "Needing time or space you don't have tends to leave people worn out, often with some guilt about wanting it. Only keep what fits.",
-          "mirror_ask_support": "Needing support through something hard often comes with loneliness, sadness, and a fear of pushing them away. Only keep what fits.",
-          "mirror_bound_unnamed_line": "When a line you haven't named keeps getting crossed, resentment tends to build quietly, along with feeling disrespected. Only keep what fits.",
-          "mirror_bound_new_thing": "When something new isn't okay with you, hurt or feeling disrespected is common, and nerves about what to say. Only keep what fits.",
-          "mirror_bound_pressure": "Being pressed to do something you don't want to do can feel like being cornered: frustrated, anxious, resentful. Only keep what fits.",
-          "mirror_bound_overcommit": "Taking back a yes often brings guilt, worry about letting them down, and tiredness from carrying it. Only keep what fits.",
-          "mirror_addr_broke_promise": "When someone doesn't follow through, disappointment often comes first, then frustration, sometimes hurt. Only keep what fits.",
-          "mirror_addr_hurtful": "When a hurt goes unnoticed, the hurt is right there, often with feeling invisible, sometimes anger. Only keep what fits.",
-          "mirror_addr_dismissed": "Opening up and being brushed aside often leaves people feeling unheard, hurt, then angry. Only keep what fits.",
-          "mirror_addr_no_consult": "A decision made without you often leaves people feeling disrespected, invisible, a bit helpless. Only keep what fits.",
-          "mirror_patt_keeps_doing": "When it keeps happening after you've asked, frustration and resentment are very common. Only keep what fits.",
-          "mirror_patt_shuts_down": "When it ends badly every time, people often feel helpless and worn out before they start. Only keep what fits.",
-          "mirror_patt_avoids": "When the conversation keeps getting avoided, people often feel unheard, invisible, lonely in it. Only keep what fits.",
-          "mirror_patt_one_sided": "When effort feels one-sided, resentment and tiredness tend to build, and sadness underneath. Only keep what fits.",
-          "mirror_sit_ask": "Asking for something often brings worry about how it'll land, and sometimes guilt for needing it. Only keep what fits.",
-          "mirror_sit_boundary": "Setting a limit often comes with guilt and worry about their reaction, on top of what made it necessary. Only keep what fits.",
-          "mirror_sit_address": "Bringing something up often has some hurt underneath, some frustration, and nerves about reopening it. Only keep what fits.",
-          "mirror_sit_pattern": "A pattern that keeps repeating often leaves people worn out, unheard, with resentment built up. Only keep what fits.",
-          "coach_barrier_angry": "If they get defensive: that's their feeling, not proof you're wrong. You can name it and come back to what you need.",
-          "coach_barrier_dont_know": "If you blank: you've built your plan, and it's fine to glance at it. You can say you wrote it down because it matters.",
-          "coach_barrier_guilty": "If guilt shows up, it may tell you to back down or apologise for having needs. Notice it, and stay with your ask.",
-          "coach_barrier_tried_before": "If your mind pulls you to the last five times, come back to this conversation, this ask, now.",
-          "coach_barrier_emotional": "If tears or a shaky voice come, take a breath. You can say this is hard to say and you want to get through it.",
-          "coach_barrier_no_right": "If you start doubting yourself: you don't have to earn the right to need things. Asking clearly is respectful.",
-          "fill_ask_specific_help": "What kind of help, and by when?",
-          "fill_ask_flexibility": "What would that look like in practice?",
-          "fill_ask_change_how": "What would you like to be different?",
-          "fill_bound_stop_behavior": "What do you need them to stop?",
-          "fill_bound_respect_no": "Which decision?",
-          "fill_bound_cant_do": "What aren't you able to do?",
-          "fill_bound_need_space": "When do you need the space?",
-          "fill_patt_more_effort": "What would more effort look like, plainly?",
-          "picker_personWho": "Who is this conversation with?",
-          "picker_personNew": "Someone new",
-          "picker_personNameLabel": "What do you call them?",
-          "picker_personNameHint": "A nickname is fine. No real names needed.",
-          "picker_personRoleLabel": "Who are they to you?",
-          "picker_personKeepLine": "The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.",
-          "picker_personNoNameLine": "Without a name, nothing about them is kept.",
-          "picker_personSignedOutLine": "This stays on this screen only.",
-          "picker_personGoOn": "Go on",
-          "picker_personChanged": "Things changed with someone?",
-          "picker_personChangedHint": "Pick who it is, and you'll be asked about them again.",
-          "picker_safeQuestion": "Is it safe to bring hard things up with {who}?",
-          "picker_safeYes": "Yes, mostly",
-          "picker_safeNo": "No",
-          "picker_safeUnsure": "Not sure",
-          "picker_riskQuestion": "Is it more that they might hurt or control you, or that it tends to go badly?",
-          "picker_riskHarm": "They might hurt or control me",
-          "picker_riskBadly": "It tends to go badly",
-          "picker_riskUnsaid": "I'd rather not say",
-          "picker_safetyRouteHeading": "Planning a hard talk with {who} can wait. Your safety comes first.",
-          "picker_safetyRouteBody": "The people below can help you think it through, any time, and you don't have to be sure.",
-          "picker_safetyRouteEnding": "Thinking about ending the relationship",
-          "picker_safetyRouteBack": "This is about someone else"
+          "who_title": "Who might show up in this conversation?"
         },
         "tables": {},
         "derive": [],
@@ -8545,29 +8545,9 @@
           {
             "id": "situation",
             "kind": "ask",
-            "title": [
-              {
-                "key": "situation_title_heads_up",
-                "when": {
-                  "eq": [
-                    "$ctx.frame",
-                    "heads_up"
-                  ]
-                }
-              },
-              {
-                "key": "situation_title"
-              }
-            ],
             "fields": [
               {
                 "id": "situation",
-                "options": {
-                  "list": "situation",
-                  "firstFrom": "$ctx.situationId"
-                },
-                "max": 1,
-                "required": true,
                 "links": [
                   {
                     "exit": "debrief",
@@ -8586,7 +8566,27 @@
                       ]
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "firstFrom": "$ctx.situationId",
+                  "list": "situation"
+                },
+                "required": true
+              }
+            ],
+            "title": [
+              {
+                "key": "situation_title_heads_up",
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "heads_up"
+                  ]
+                }
+              },
+              {
+                "key": "situation_title"
               }
             ],
             "next": [
@@ -8600,18 +8600,18 @@
           {
             "id": "matters",
             "kind": "ask",
-            "title": "matters_title",
-            "hint": "matters_hint",
             "fields": [
               {
                 "id": "matters",
+                "max": 1,
                 "options": {
                   "list": "matters"
                 },
-                "max": 1,
                 "required": true
               }
             ],
+            "hint": "matters_hint",
+            "title": "matters_title",
             "next": [
               {
                 "to": "hard",
@@ -8623,22 +8623,6 @@
           {
             "id": "hard",
             "kind": "ask",
-            "title": "hard_title",
-            "hint": "hard_hint",
-            "fields": [
-              {
-                "id": "hard",
-                "options": {
-                  "list": "hard"
-                },
-                "max": 3,
-                "own": {
-                  "hint": "own_line",
-                  "countsAsPick": true,
-                  "max": 35
-                }
-              }
-            ],
             "crisis": [
               {
                 "variant": "other_person",
@@ -8650,6 +8634,22 @@
                 }
               }
             ],
+            "fields": [
+              {
+                "id": "hard",
+                "max": 3,
+                "options": {
+                  "list": "hard"
+                },
+                "own": {
+                  "countsAsPick": true,
+                  "hint": "own_line",
+                  "max": 35
+                }
+              }
+            ],
+            "hint": "hard_hint",
+            "title": "hard_title",
             "next": [
               {
                 "to": "scared",
@@ -8677,7 +8677,6 @@
             "id": "scared",
             "kind": "handoff",
             "complete": true,
-            "noClose": true,
             "crisis": [
               {
                 "variant": "other_person",
@@ -8686,13 +8685,14 @@
                 }
               }
             ],
+            "done": "done",
             "lines": [
               {
-                "when": null,
-                "key": "scared_line"
+                "key": "scared_line",
+                "when": null
               }
             ],
-            "done": "done",
+            "noClose": true,
             "next": [],
             "offers": [
               {
@@ -8708,19 +8708,27 @@
           {
             "id": "who",
             "kind": "ask",
-            "title": "who_title",
+            "fields": [
+              {
+                "id": "part",
+                "max": 1,
+                "options": {
+                  "profile": "parts"
+                }
+              }
+            ],
             "slots": [
               {
                 "after": "$title",
                 "embed": "partsLine",
                 "props": {
-                  "promptId": "cope_title_any",
-                  "as": "heading"
+                  "as": "heading",
+                  "promptId": "cope_title_any"
                 },
+                "record": "parts_title",
                 "showWhen": {
                   "set": "$p.parts"
-                },
-                "record": "parts_title"
+                }
               },
               {
                 "after": "part",
@@ -8728,21 +8736,13 @@
                 "props": {
                   "partField": "part"
                 },
+                "record": "part_anchor",
                 "showWhen": {
                   "set": "$a.part"
-                },
-                "record": "part_anchor"
+                }
               }
             ],
-            "fields": [
-              {
-                "id": "part",
-                "options": {
-                  "profile": "parts"
-                },
-                "max": 1
-              }
-            ],
+            "title": "who_title",
             "next": [
               {
                 "to": "describe",
@@ -8754,11 +8754,10 @@
           {
             "id": "describe",
             "kind": "ask",
-            "title": "describe_title",
-            "hint": "describe_hint",
             "fields": [
               {
                 "id": "describe",
+                "max": 1,
                 "options": {
                   "list": "describe",
                   "where": {
@@ -8768,15 +8767,16 @@
                     ]
                   }
                 },
-                "max": 1,
-                "required": true,
                 "own": {
-                  "hint": "own_line",
                   "countsAsPick": true,
+                  "hint": "own_line",
                   "max": 60
-                }
+                },
+                "required": true
               }
             ],
+            "hint": "describe_hint",
+            "title": "describe_title",
             "next": [
               {
                 "to": "express",
@@ -8788,7 +8788,18 @@
           {
             "id": "express",
             "kind": "ask",
-            "title": "express_title",
+            "fields": [
+              {
+                "id": "express",
+                "max": 3,
+                "options": {
+                  "firstFrom": "$ctx.feelingId",
+                  "list": "express"
+                },
+                "required": true
+              }
+            ],
+            "hint": "express_hint",
             "lines": [
               {
                 "key": "mirror_ask_need_help",
@@ -8971,18 +8982,7 @@
                 }
               }
             ],
-            "hint": "express_hint",
-            "fields": [
-              {
-                "id": "express",
-                "options": {
-                  "list": "express",
-                  "firstFrom": "$ctx.feelingId"
-                },
-                "max": 3,
-                "required": true
-              }
-            ],
+            "title": "express_title",
             "next": [
               {
                 "to": "assert",
@@ -8994,24 +8994,35 @@
           {
             "id": "assert",
             "kind": "ask",
-            "title": [
-              {
-                "key": "assert_title_heads_up",
-                "when": {
-                  "eq": [
-                    "$ctx.frame",
-                    "heads_up"
-                  ]
-                }
-              },
-              {
-                "key": "assert_title"
-              }
-            ],
-            "hint": "assert_hint",
             "fields": [
               {
                 "id": "assert",
+                "links": [
+                  {
+                    "exit": "let_go",
+                    "label": "let_go",
+                    "when": {
+                      "all": [
+                        {
+                          "eq": [
+                            "$ctx.refused",
+                            "validation"
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.situation",
+                            [
+                              "address",
+                              "pattern"
+                            ]
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "max": 1,
                 "options": {
                   "list": "assert",
                   "where": {
@@ -9045,38 +9056,27 @@
                     ]
                   }
                 },
-                "max": 1,
-                "required": true,
                 "own": {
-                  "hint": "own_line",
                   "countsAsPick": true,
+                  "hint": "own_line",
                   "max": 70
                 },
-                "links": [
-                  {
-                    "exit": "let_go",
-                    "label": "let_go",
-                    "when": {
-                      "all": [
-                        {
-                          "eq": [
-                            "$ctx.refused",
-                            "validation"
-                          ]
-                        },
-                        {
-                          "in": [
-                            "$a.situation",
-                            [
-                              "address",
-                              "pattern"
-                            ]
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                ]
+                "required": true
+              }
+            ],
+            "hint": "assert_hint",
+            "title": [
+              {
+                "key": "assert_title_heads_up",
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "heads_up"
+                  ]
+                }
+              },
+              {
+                "key": "assert_title"
               }
             ],
             "next": [
@@ -9108,6 +9108,29 @@
           {
             "id": "fill",
             "kind": "ask",
+            "fields": [
+              {
+                "id": "fill",
+                "max": 1,
+                "options": {
+                  "list": "fill",
+                  "where": {
+                    "eq": [
+                      "$opt.assert",
+                      "$a.assert"
+                    ]
+                  }
+                },
+                "own": {
+                  "countsAsPick": true,
+                  "hint": "own_line",
+                  "max": 30,
+                  "open": true,
+                  "seed": true
+                },
+                "required": true
+              }
+            ],
             "title": [
               {
                 "key": "fill_ask_specific_help",
@@ -9185,29 +9208,6 @@
                 "key": "fill_title"
               }
             ],
-            "fields": [
-              {
-                "id": "fill",
-                "options": {
-                  "list": "fill",
-                  "where": {
-                    "eq": [
-                      "$opt.assert",
-                      "$a.assert"
-                    ]
-                  }
-                },
-                "max": 1,
-                "required": true,
-                "own": {
-                  "hint": "own_line",
-                  "countsAsPick": true,
-                  "max": 30,
-                  "open": true,
-                  "seed": true
-                }
-              }
-            ],
             "next": [
               {
                 "to": "reinforce",
@@ -9219,22 +9219,22 @@
           {
             "id": "reinforce",
             "kind": "ask",
-            "title": "reinforce_title",
-            "hint": "reinforce_hint",
             "fields": [
               {
                 "id": "reinforce",
+                "max": 2,
                 "options": {
                   "list": "reinforce"
                 },
-                "max": 2,
                 "own": {
-                  "hint": "own_line",
                   "countsAsPick": true,
+                  "hint": "own_line",
                   "max": 40
                 }
               }
             ],
+            "hint": "reinforce_hint",
+            "title": "reinforce_title",
             "next": [
               {
                 "to": "mindful",
@@ -9246,7 +9246,16 @@
           {
             "id": "mindful",
             "kind": "ask",
-            "title": "mindful_title",
+            "fields": [
+              {
+                "id": "need",
+                "max": 1,
+                "options": {
+                  "list": "need"
+                },
+                "required": true
+              }
+            ],
             "lines": [
               {
                 "key": "coach_barrier_angry",
@@ -9307,16 +9316,7 @@
                 "when": null
               }
             ],
-            "fields": [
-              {
-                "id": "need",
-                "options": {
-                  "list": "need"
-                },
-                "max": 1,
-                "required": true
-              }
-            ],
+            "title": "mindful_title",
             "next": [
               {
                 "to": "phrase",
@@ -9328,11 +9328,10 @@
           {
             "id": "phrase",
             "kind": "ask",
-            "title": "phrase_title",
-            "hint": "phrase_hint",
             "fields": [
               {
                 "id": "phrase",
+                "max": 1,
                 "options": {
                   "list": "phrase",
                   "where": {
@@ -9342,15 +9341,16 @@
                     ]
                   }
                 },
-                "max": 1,
-                "required": true,
                 "own": {
-                  "hint": "own_line",
                   "countsAsPick": true,
+                  "hint": "own_line",
                   "max": 30
-                }
+                },
+                "required": true
               }
             ],
+            "hint": "phrase_hint",
+            "title": "phrase_title",
             "next": [
               {
                 "to": "confident",
@@ -9362,17 +9362,17 @@
           {
             "id": "confident",
             "kind": "ask",
-            "title": "confident_title",
-            "hint": "confident_hint",
             "fields": [
               {
                 "id": "confident",
+                "max": 1,
                 "options": {
                   "list": "confident"
-                },
-                "max": 1
+                }
               }
             ],
+            "hint": "confident_hint",
+            "title": "confident_title",
             "next": [
               {
                 "to": "middle",
@@ -9384,6 +9384,20 @@
           {
             "id": "middle",
             "kind": "ask",
+            "fields": [
+              {
+                "id": "middle",
+                "max": 1,
+                "options": {
+                  "list": "middle"
+                },
+                "own": {
+                  "countsAsPick": true,
+                  "hint": "own_line",
+                  "max": 40
+                }
+              }
+            ],
             "title": [
               {
                 "key": "middle_title_objective",
@@ -9416,20 +9430,6 @@
                 "key": "middle_title"
               }
             ],
-            "fields": [
-              {
-                "id": "middle",
-                "options": {
-                  "list": "middle"
-                },
-                "max": 1,
-                "own": {
-                  "hint": "own_line",
-                  "countsAsPick": true,
-                  "max": 40
-                }
-              }
-            ],
             "next": [
               {
                 "to": "walk",
@@ -9441,22 +9441,22 @@
           {
             "id": "walk",
             "kind": "ask",
-            "title": "walk_title",
-            "hint": "walk_hint",
             "fields": [
               {
                 "id": "walk",
+                "max": 1,
                 "options": {
                   "list": "walk"
                 },
-                "max": 1,
                 "own": {
-                  "hint": "own_line",
                   "countsAsPick": true,
+                  "hint": "own_line",
                   "max": 40
                 }
               }
             ],
+            "hint": "walk_hint",
+            "title": "walk_title",
             "next": [
               {
                 "to": "card",
@@ -9468,45 +9468,45 @@
           {
             "id": "card",
             "kind": "embed",
-            "embed": "pocketCard",
-            "title": "card_title",
             "answerAs": "card_how",
+            "embed": "pocketCard",
             "props": {
+              "copiedLabel": "copied",
+              "copyLabel": "copy",
+              "detail": "fill",
+              "fill": "assert",
+              "joinField": "express",
+              "joinLead": "card_felt",
+              "labelA": "card_middle",
+              "labelAField": "middle",
+              "labelB": "card_walk",
+              "labelBField": "walk",
+              "next": "next",
+              "nextCardLabel": "card_next_card",
+              "prevLabel": "card_prev",
+              "push": [
+                "middle",
+                "walk"
+              ],
+              "pushLabel": "card_push",
               "say": [
                 "describe",
                 "express",
                 "assert",
                 "reinforce"
               ],
-              "fill": "assert",
-              "detail": "fill",
+              "sayLabel": "card_say",
+              "selectedLabel": "selected",
+              "skipLabel": "card_skip",
               "steady": [
                 "phrase",
                 "confident"
               ],
-              "push": [
-                "middle",
-                "walk"
-              ],
-              "sayLabel": "card_say",
               "steadyLabel": "card_steady",
-              "pushLabel": "card_push",
-              "prevLabel": "card_prev",
-              "nextCardLabel": "card_next_card",
-              "copyLabel": "copy",
-              "copiedLabel": "copied",
-              "selectedLabel": "selected",
-              "next": "next",
-              "skipLabel": "card_skip",
-              "joinField": "express",
-              "joinLead": "card_felt",
-              "labelAField": "middle",
-              "labelA": "card_middle",
-              "labelBField": "walk",
-              "labelB": "card_walk",
               "steadyNoteA": "card_drift",
               "steadyNoteB": "card_attack"
             },
+            "title": "card_title",
             "next": [
               {
                 "to": "hot",
@@ -9530,16 +9530,9 @@
           {
             "id": "hot",
             "kind": "ask",
-            "title": "hot_title",
-            "hint": "hot_hint",
             "fields": [
               {
                 "id": "hot",
-                "options": {
-                  "list": "hot"
-                },
-                "max": 1,
-                "required": true,
                 "links": [
                   {
                     "exit": "cool_down",
@@ -9551,9 +9544,16 @@
                       ]
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "list": "hot"
+                },
+                "required": true
               }
             ],
+            "hint": "hot_hint",
+            "title": "hot_title",
             "next": [
               {
                 "to": "edge",
@@ -9574,19 +9574,19 @@
           {
             "id": "edge",
             "kind": "embed",
-            "embed": "breathPacer",
             "answerAs": "edge_how",
+            "embed": "breathPacer",
             "props": {
-              "seconds": 30,
-              "inSec": 4,
-              "outSec": 6,
-              "step1": "edge_step1",
-              "start": "edge_start",
-              "inLabel": "edge_in",
-              "outLabel": "edge_out",
               "dizzy": "edge_dizzy",
               "done": "edge_done",
-              "next": "edge_next"
+              "inLabel": "edge_in",
+              "inSec": 4,
+              "next": "edge_next",
+              "outLabel": "edge_out",
+              "outSec": 6,
+              "seconds": 30,
+              "start": "edge_start",
+              "step1": "edge_step1"
             },
             "next": [
               {
@@ -9599,45 +9599,45 @@
           {
             "id": "again",
             "kind": "embed",
-            "embed": "pocketCard",
-            "title": "again_title",
             "answerAs": "again_how",
+            "embed": "pocketCard",
             "props": {
+              "copiedLabel": "copied",
+              "copyLabel": "copy",
+              "detail": "fill",
+              "fill": "assert",
+              "joinField": "express",
+              "joinLead": "card_felt",
+              "labelA": "card_middle",
+              "labelAField": "middle",
+              "labelB": "card_walk",
+              "labelBField": "walk",
+              "next": "next",
+              "nextCardLabel": "card_next_card",
+              "prevLabel": "card_prev",
+              "push": [
+                "middle",
+                "walk"
+              ],
+              "pushLabel": "card_push",
               "say": [
                 "describe",
                 "express",
                 "assert",
                 "reinforce"
               ],
-              "fill": "assert",
-              "detail": "fill",
+              "sayLabel": "card_say",
+              "selectedLabel": "selected",
+              "skipLabel": "card_skip",
               "steady": [
                 "phrase",
                 "confident"
               ],
-              "push": [
-                "middle",
-                "walk"
-              ],
-              "sayLabel": "card_say",
               "steadyLabel": "card_steady",
-              "pushLabel": "card_push",
-              "prevLabel": "card_prev",
-              "nextCardLabel": "card_next_card",
-              "copyLabel": "copy",
-              "copiedLabel": "copied",
-              "selectedLabel": "selected",
-              "next": "next",
-              "skipLabel": "card_skip",
-              "joinField": "express",
-              "joinLead": "card_felt",
-              "labelAField": "middle",
-              "labelA": "card_middle",
-              "labelBField": "walk",
-              "labelB": "card_walk",
               "steadyNoteA": "card_drift",
               "steadyNoteB": "card_attack"
             },
+            "title": "again_title",
             "next": [
               {
                 "to": "when",
@@ -9650,21 +9650,7 @@
             "id": "when",
             "kind": "handoff",
             "complete": true,
-            "lines": [
-              {
-                "when": {
-                  "eq": [
-                    "$ctx.frame",
-                    "heads_up"
-                  ]
-                },
-                "key": "when_line_badly"
-              },
-              {
-                "when": null,
-                "key": "when_line"
-              }
-            ],
+            "done": "done",
             "fields": [
               {
                 "id": "when",
@@ -9679,7 +9665,21 @@
               "type": "ask_outcome",
               "whenFrom": "when"
             },
-            "done": "done",
+            "lines": [
+              {
+                "key": "when_line_badly",
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "heads_up"
+                  ]
+                }
+              },
+              {
+                "key": "when_line",
+                "when": null
+              }
+            ],
             "next": [],
             "offers": [
               {
@@ -9701,8 +9701,8 @@
             "id": "cope_ahead",
             "toolId": "cope-ahead",
             "query": {
-              "situationId": "conversation",
-              "partId": "$a.part"
+              "partId": "$a.part",
+              "situationId": "conversation"
             },
             "carry": [],
             "done": false
@@ -10011,98 +10011,98 @@
             {
               "value": "ask_specific_help",
               "label": "I'd like help with [this]",
-              "situation": "ask",
-              "heard": false
+              "heard": false,
+              "situation": "ask"
             },
             {
               "value": "ask_flexibility",
               "label": "I need some give on [this]",
-              "situation": "ask",
-              "heard": false
+              "heard": false,
+              "situation": "ask"
             },
             {
               "value": "ask_change_how",
               "label": "I'd like us to change how we handle [this]",
-              "situation": "ask",
-              "heard": false
+              "heard": false,
+              "situation": "ask"
             },
             {
               "value": "ask_just_listen",
               "label": "I need you to listen and be with me in this, not fix it",
-              "situation": "ask",
-              "heard": true
+              "heard": true,
+              "situation": "ask"
             },
             {
               "value": "bound_stop_behavior",
               "label": "I need you to stop [this]",
-              "situation": "boundary",
-              "heard": false
+              "heard": false,
+              "situation": "boundary"
             },
             {
               "value": "bound_respect_no",
               "label": "I need you to respect my decision about [this]",
-              "situation": "boundary",
-              "heard": false
+              "heard": false,
+              "situation": "boundary"
             },
             {
               "value": "bound_cant_do",
               "label": "I'm not able to do [this], and I need that to be okay",
-              "situation": "boundary",
-              "heard": false
+              "heard": false,
+              "situation": "boundary"
             },
             {
               "value": "bound_need_space",
               "label": "I need space when [this happens]",
-              "situation": "boundary",
-              "heard": false
+              "heard": false,
+              "situation": "boundary"
             },
             {
               "value": "addr_follow_through",
               "label": "I need you to follow through on what you said you'd do",
-              "situation": "address",
-              "heard": false
+              "heard": false,
+              "situation": "address"
             },
             {
               "value": "addr_acknowledge",
               "label": "I need you to see what happened and how it affected me",
-              "situation": "address",
-              "heard": true
+              "heard": true,
+              "situation": "address"
             },
             {
               "value": "addr_check_first",
               "label": "I'd like you to check with me before deciding things that affect me",
-              "situation": "address",
-              "heard": false
+              "heard": false,
+              "situation": "address"
             },
             {
               "value": "addr_hear_me",
               "label": "I need you to hear me out before you answer",
-              "situation": "address",
-              "heard": true
+              "heard": true,
+              "situation": "address"
             },
             {
               "value": "patt_actually_stop",
               "label": "I need this to change, not only be talked about",
-              "situation": "pattern",
-              "heard": false
+              "heard": false,
+              "situation": "pattern"
             },
             {
               "value": "patt_stay_in_it",
               "label": "I need you to stay in the conversation when it's uncomfortable",
-              "situation": "pattern",
-              "heard": true
+              "heard": true,
+              "situation": "pattern"
             },
             {
               "value": "patt_more_effort",
               "label": "I need more effort from you with [this]",
-              "situation": "pattern",
-              "heard": false
+              "heard": false,
+              "situation": "pattern"
             },
             {
               "value": "patt_new_approach",
               "label": "I need us to find a different way to handle this",
-              "situation": "pattern",
-              "heard": false
+              "heard": false,
+              "situation": "pattern"
             }
           ],
           "fill": [
