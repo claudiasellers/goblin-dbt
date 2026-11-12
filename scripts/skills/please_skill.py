@@ -103,14 +103,14 @@ ROWS = [
         ("moved_yes", "Yes", False), ("moved_bit", "A bit", False), ("moved_not_yet", "Not yet", True)]),
 ]
 LOUD = {fid: [v for v, _l, loud in opts if loud] for _s, fid, _t, _h, opts in ROWS}
-# The readout's order: the body first, then sleep, food, last night, moving.
+# The readout's order: the body first, then sleep, food, alcohol or drugs, moving.
 ORDER = ["body", "sleep", "food", "subs", "moved"]
 LOUD_ROW = {f: {"in": [a(f), LOUD[f]]} for f in ORDER}
 ANY_LOUD = {"any": [LOUD_ROW[f] for f in ORDER]}
 
 # One fix for today (PRD step 3, PR #33's right-now list): small enough to do while depleted. `on` names the loud
 # answers it's for; "always" is offered whatever was picked (lowering the bar is the skill on an empty tank).
-# Medication: never advice, only what's already prescribed.
+# Medication: never advice; a missed dose goes to the label or a pharmacist, never "take it now".
 FIXES = [
     # Food (ED-safe, C6.7): regular eating, never a nutrient, a size or "proper".
     ("fix_snack", "Something to eat in the next hour, whatever's easy", ["food_skipped", "food_all_over", "subs_some"]),
@@ -123,7 +123,7 @@ FIXES = [
     ("fix_usual", "Whatever you'd usually do for the pain", ["body_pain"]),
     ("fix_sit", "Sit or lie down for 15 minutes", ["body_pain"]),
     # A missed dose: never "take it now" (a late or doubled dose can be wrong); the label or a pharmacist says.
-    ("fix_meds", "Check what's due, and what the label or a pharmacist says about a missed dose", ["body_meds"]),
+    ("fix_meds", "Check the label, or ask a pharmacist, about the missed dose", ["body_meds"]),
     ("fix_food_first", "Food and water before any big decisions", ["subs_some"]),
     ("fix_move", "Walk around the block, or the room, for five minutes", ["moved_not_yet", "sleep_much"]),
     ("fix_one_thing", "Shrink today to the one thing that has to happen", ["always"]),

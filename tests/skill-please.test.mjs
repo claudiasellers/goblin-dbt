@@ -98,7 +98,7 @@ test("one fix for today: the loudest row's fixes only (two or three), plus shrin
   assert.deepEqual(fixValues(pain), ["fix_usual", "fix_sit", "fix_one_thing"]);
   const meds = run(toFix({ body: "body_meds" }));
   assert.deepEqual(fixValues(meds), ["fix_meds", "fix_one_thing"]);
-  assert.match(skill.options.fix.find((o) => o.value === "fix_meds").label, /label or a pharmacist/, "a missed dose: never take it now");
+  assert.match(skill.options.fix.find((o) => o.value === "fix_meds").label, /label, or ask a pharmacist/, "a missed dose: never take it now");
   // Several loud rows: only the loudest row's, so the screen stays short.
   const many = fixValues(run(toFix({ food: "food_skipped", moved: "moved_not_yet" })));
   assert.deepEqual(many, ["fix_snack", "fix_water", "fix_one_thing"]);

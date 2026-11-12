@@ -20,8 +20,8 @@ one small thing for today. It is the lowest-effort skill in the module: five tap
 | `food` | *How's food been today?* Regular so far · Skipped something · All over the place · Not sure | ED-safe: no calories, amounts, weight or "too much" |
 | `body` | *How's your body today?* Okay · Ill or sore · In pain · Missed my meds | |
 | `subs` | *Any alcohol or drugs in the last day?* None · Some · Rather not say | No judgment copy; *rather not say* is a complete answer and never counts as loud |
-| `moved` | *Have you moved much today?* Yes · A bit · Not yet | |
-| `read_<row>` | The readout: *"Sleep is part of why the volume's up today."* over the day's tank (`batteryRead`) | Shown only when a row is loud. The title names the loudest row in a fixed order: body, sleep, food, last night, moving (pain and missed meds matter most). The picture is a battery of five cells: an answered row full, a skipped row an outline, the loudest row draining to a sliver as the screen opens (still under reduced motion). No numbers, levels or percentages. One `read_*` step per row, picked by the last row's transitions, because embed props are static |
+| `moved` | *Have you moved today?* Yes · A bit · Not yet | |
+| `read_<row>` | The readout: *"Sleep may be part of why the volume's up today."* over the day's tank (`batteryRead`) | Shown only when a row is loud. The title names the loudest row in a fixed order: body, sleep, food, alcohol or drugs, moving (pain and missed meds matter most). The picture is a battery of five cells: an answered row full, a skipped row an outline, the loudest row draining to a sliver as the screen opens (still under reduced motion). No numbers, levels or percentages. One `read_*` step per row, picked by the last row's transitions, because embed props are static |
 | `fix` | *One thing for today*, then one fix | The options are the loudest row's fixes (two or three), plus *Shrink today to the one thing that has to happen*, always; or own words. Ill or in pain adds a quiet line: *If it's new, bad or not easing, a doctor or pharmacist can help.* Sleep or moving loud adds *Rest doesn't refill me: find the feeling* (PR #33's tired-or-heavy check) |
 | `when` | *When will you do it?* Now · Later today; on Later, *Want me to ask tonight if it happened?* | The chip books `please_fix` at 20:00 |
 | `set` | *Your one thing for today: {the fix}* | One line for now, later, or later with the check. Sleep loud offers Sleep reset (ER-13, planned: not shown until it ships) |
@@ -47,7 +47,7 @@ first keeps a walk away from someone ill or in pain:
 | Five minutes outside, or by an open window | broken, too much sleep, not moved yet |
 | Look after it like a cold: rest, fluids, warmth | ill or sore |
 | Whatever you'd usually do for the pain · Sit or lie down for 15 minutes | in pain |
-| Check what's due, and what the label or a pharmacist says about a missed dose | missed my meds (never "take it now": a late or doubled dose can be wrong) |
+| Check the label, or ask a pharmacist, about the missed dose | missed my meds (never "take it now": a late or doubled dose can be wrong) |
 | Food and water before any big decisions | alcohol or drugs |
 | Walk around the block, or the room, for five minutes | not moved yet, too much sleep |
 | Shrink today to the one thing that has to happen | always |

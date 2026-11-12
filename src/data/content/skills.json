@@ -32102,7 +32102,7 @@
             },
             {
               "value": "fix_meds",
-              "label": "Check what's due, and what the label or a pharmacist says about a missed dose",
+              "label": "Check the label, or ask a pharmacist, about the missed dose",
               "on": [
                 "body_meds"
               ]

@@ -17409,7 +17409,7 @@ MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:fix:fix_
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "fix", order: 26};
 MERGE (o:SkillOption {id: "please_skill:fix:fix_meds"})
-SET o:SkillOption, o += {skillId: "please_skill", list: "fix", value: "fix_meds", label: "Check what's due, and what the label or a pharmacist says about a missed dose", version: "pl-v1"}, o.propsJson = "{\"on\": [\"body_meds\"]}";
+SET o:SkillOption, o += {skillId: "please_skill", list: "fix", value: "fix_meds", label: "Check the label, or ask a pharmacist, about the missed dose", version: "pl-v1"}, o.propsJson = "{\"on\": [\"body_meds\"]}";
 MATCH (s:Skill {id: "please_skill"}), (o:SkillOption {id: "please_skill:fix:fix_meds"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "fix", order: 27};
