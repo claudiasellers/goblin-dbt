@@ -152,3 +152,12 @@ test("Me lists the plan, never its contents; the review card is done only once a
   // Only a first plan or a save from a review books the next review (never every edit).
   assert.match(read("src/hooks/useSafetyPlan.ts"), /if \(!hadAccount \|\| opts\.review\) void scheduleSafetyPlanReview\(\)/);
 });
+
+test("Codex on #126: the build draft is the account's own and goes on sign-out; a failed edit wins over the older account plan", () => {
+  const build = read("src/components/safety/SafetyPlanBuild.tsx");
+  assert.match(build, /d\.owner === owner && d\.from === from/);
+  assert.match(read("src/contexts/BandContext.tsx"), /sessionStorage\.removeItem\(PLAN_BUILD_KEY\)/);
+  const hook = read("src/hooks/useSafetyPlan.ts");
+  assert.match(hook, /const pending = uid && deviceNow\?\.owner === uid \? deviceNow\.plan : null;/);
+  assert.match(hook, /const plan = pending \?\? account \?\? deviceNow\?\.plan \?\? null;/);
+});

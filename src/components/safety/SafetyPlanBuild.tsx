@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { PlanChip, SafetyContent, SafetyCountry } from '../../data/safetyTypes';
 import {
-  PLAN_STEPS, cleanPhone, planPrint, saferChips, type ChipField, type PlanPerson, type PlanPro, type ProRole, type SafetyPlan,
+  PLAN_BUILD_KEY, PLAN_STEPS, cleanPhone, planPrint, saferChips, type ChipField, type PlanPerson, type PlanPro, type ProRole, type SafetyPlan,
 } from '../../lib/safetyPlan';
 import { fill } from '../../lib/safetyRoute';
 import type { PlanSaved } from '../../hooks/useSafetyPlan';
@@ -19,13 +19,14 @@ const card = 'p-4 rounded-xl border border-[var(--color-border)] bg-[var(--color
  * fingerprint of the plan it started from: a draft from a different starting plan (saved since, moved to the account)
  * is dropped. Written only past the intro; cleared on save and on leaving.
  */
-const BUILD_KEY = 'goblin.safety.planBuild.v2';
-interface BuildDraft { plan: SafetyPlan; i: number; from: string }
-function readBuild(from: string): BuildDraft | null {
+const BUILD_KEY = PLAN_BUILD_KEY;
+/** `owner`: the uid it was made under (null signed out); read back only under the same one, cleared on sign-out. */
+interface BuildDraft { plan: SafetyPlan; i: number; from: string; owner: string | null }
+function readBuild(from: string, owner: string | null): BuildDraft | null {
   try {
     const v = sessionStorage.getItem(BUILD_KEY);
     const d = v ? (JSON.parse(v) as BuildDraft) : null;
-    return d && d.from === from && d.plan && typeof d.i === 'number' ? d : null;
+    return d && d.owner === owner && d.from === from && d.plan && typeof d.i === 'number' ? d : null;
   } catch { return null; }
 }
 function writeBuild(v: BuildDraft | null): void {
@@ -71,6 +72,8 @@ interface Props {
   /** How many cards the person's crisis kit has (0: offer to make one). */
   kitCards: number;
   signedIn: boolean;
+  /** The signed-in uid (null signed out): the session draft is this person's only. */
+  uid: string | null;
   save: (p: SafetyPlan) => Promise<PlanSaved>;
   onUse: () => void;
   onLeave: () => void;
@@ -81,10 +84,10 @@ interface Props {
  * shows the plan as one card and saves it. Kept for this browser session as it goes (leaving to make the crisis kit
  * and coming back picks up where it was).
  */
-export function SafetyPlanBuild({ content, country, start, isNew, fromDraft, flooded, kitCards, signedIn, save, onUse, onLeave }: Props) {
+export function SafetyPlanBuild({ content, country, start, isNew, fromDraft, flooded, kitCards, signedIn, uid, save, onUse, onLeave }: Props) {
   const c = content.flow.plan;
   const [from] = useState(() => planPrint(start));
-  const [state, setState] = useState<BuildDraft>(() => readBuild(from) ?? { plan: { ...start, kit: start.kit || (isNew && kitCards > 0) }, i: -1, from });
+  const [state, setState] = useState<BuildDraft>(() => readBuild(from, uid) ?? { plan: { ...start, kit: start.kit || (isNew && kitCards > 0) }, i: -1, from, owner: uid });
   const [saving, setSaving] = useState(false);
   const [result, setResult] = useState<PlanSaved | null>(null);
   const [headsUp, setHeadsUp] = useState(flooded);

@@ -22,6 +22,9 @@ export const USE_ORDER: readonly PlanStepId[] = ['hear', 'signs', 'coping', 'dis
  */
 export const PLAN_KEY = 'goblin.safety.plan.v2';
 
+/** Build mode's in-progress draft (sessionStorage), owned by the uid it was made under; cleared on sign-out. */
+export const PLAN_BUILD_KEY = 'goblin.safety.planBuild.v3';
+
 export interface DevicePlan { owner: string | null; plan: SafetyPlan }
 
 /** The device copy for this uid (null signed out), or null when there's none or it's someone else's. */

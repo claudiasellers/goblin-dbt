@@ -82,12 +82,15 @@ export function useSafetyPlan(): SafetyPlanState {
     }
   }, [uid, hadAccount]);
 
-  const plan = account ?? deviceNow?.plan ?? null;
+  // An edit this account made that didn't reach the server (a device copy owned by this uid) wins over the older
+  // account version until it's saved, so changed numbers or steps are never hidden behind the old plan.
+  const pending = uid && deviceNow?.owner === uid ? deviceNow.plan : null;
+  const plan = pending ?? account ?? deviceNow?.plan ?? null;
   return {
     status,
     plan,
-    onAccount: !!account,
-    devicePlan: user && ctx.status === 'ready' && !account && deviceNow ? deviceNow.plan : null,
+    onAccount: !!account && !pending,
+    devicePlan: user && ctx.status === 'ready' && deviceNow && (!account || pending) ? deviceNow.plan : null,
     kitCards,
     save,
   };

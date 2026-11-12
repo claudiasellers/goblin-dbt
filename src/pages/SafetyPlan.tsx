@@ -84,7 +84,7 @@ export function SafetyPlan() {
   return (
     <div className="max-w-md mx-auto pb-8">
       <SafetyPlanBuild content={content} country={country} start={plan || quick ? start : emptyPlan()} isNew={!plan}
-        fromDraft={!plan && !!quick} flooded={flooded} kitCards={kitCards} signedIn={!!user}
+        fromDraft={!plan && !!quick} flooded={flooded} kitCards={kitCards} signedIn={!!user} uid={user?.uid ?? null}
         save={async (p) => {
           const r = await save(p, c, { review: !!changing });
           // From the review card: done now the change is saved (the save booked the next one).

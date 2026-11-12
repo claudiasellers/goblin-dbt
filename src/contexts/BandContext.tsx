@@ -6,7 +6,7 @@ import {
   type RecordInput,
 } from '../lib/bandStore';
 import { clearResumeTokens } from '../lib/resumeToken';
-import { PLAN_KEY, deviceOwnedBy } from '../lib/safetyPlan';
+import { PLAN_BUILD_KEY, PLAN_KEY, deviceOwnedBy } from '../lib/safetyPlan';
 
 /** A safety plan kept on this device under an account that just signed out (CORE-02): it goes with them. */
 function clearDevicePlanOf(uid: string): void {
@@ -14,6 +14,8 @@ function clearDevicePlanOf(uid: string): void {
     const v = localStorage.getItem(PLAN_KEY);
     if (v && deviceOwnedBy(JSON.parse(v), uid)) localStorage.removeItem(PLAN_KEY);
   } catch { /* private mode */ }
+  // A plan being built in this tab goes too, whoever made it (it may hold names and numbers).
+  try { sessionStorage.removeItem(PLAN_BUILD_KEY); } catch { /* private mode */ }
 }
 import { newId } from '../lib/spine/ids';
 import { isCurrent } from '../lib/band';
