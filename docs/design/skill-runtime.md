@@ -86,7 +86,7 @@ linted by the voice gate like every flow document; `specJson` holds no copy, onl
   parts step's question as a `partsLine` with `as: heading`), with `showWhen` and `record` (the name it's recorded
   under when it shows). Check the Facts' parts line is one.
 - **Exit** = where the skill can send you: another tool (`toolId`, `query`, `carry` which answers go
-  along as the hand-off's emotions) or `done`. Offer labels come from `src/data/tools.ts`, never the graph.
+  along as the hand-off's emotions) or `done`. Offer labels come from `src/data/tools.ts`, never the graph, unless the exit carries `label` (a copy key of the skill, DT-03: two exits into the same tool need their own names, *Open my kit* / *Make it yours*).
 
 ### Conditions (`src/lib/skillRuntime/conditions.ts`)
 

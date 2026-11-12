@@ -253,7 +253,8 @@ export interface StepDef {
  * A hand-on. `planned`: the tool isn't built yet; the exit is written (so the edge exists) but never shown.
  * `safety`: the reserved `safety.open` exit, opening the crisis resources over the skill (it doesn't end the run).
  */
-export interface ExitDef { id: string; toolId: string | null; query: Record<string, string>; carry: string[]; done: boolean; planned?: boolean; safety?: boolean }
+/** An exit; `label` (a copy key) names its offer button instead of the tool's name (DT-03's *Make it yours*). */
+export interface ExitDef { id: string; toolId: string | null; query: Record<string, string>; carry: string[]; done: boolean; planned?: boolean; safety?: boolean; label?: string }
 
 export interface OptionDef { value: string; label: string; for?: string; [prop: string]: unknown }
 

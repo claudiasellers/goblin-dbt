@@ -58,7 +58,7 @@ test("what: substances and behaviours, or their own words; hurting myself is a r
   assert.ok(harm.noClose, "no close");
   assert.ok(M.opensSafety(ctx(), harm, h), "the resources open over it as it arrives");
   assert.equal(M.crisisFor(ctx(), harm, h)?.variant, "crisis");
-  assert.deepEqual(offers(h), [], "no plan, no exercise: the kit is planned, someone to talk to is the link");
+  assert.deepEqual(offers(h), ["safety_open", "crisis_kit"], "no plan, no exercise: someone to talk to first, then the kit (DT-03)");
   assert.ok(M.stepLinks(ctx(), harm, h).some((l) => l.exit.id === "safety_open"));
 });
 

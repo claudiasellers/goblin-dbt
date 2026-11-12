@@ -326,14 +326,15 @@ STEPS = [
         # Hurt myself, safe for now: its own end card, with no "did you act on it?" (as in Hold to wait).
         "id": "hurt_end", "kind": "handoff", "complete": True, "noClose": True, "crisis": CRISIS,
         "lines": [{"when": ALWAYS, "key": "hurt_end_line"}],
-        "offers": [{"exit": "cool_down", "when": ALWAYS}, {"exit": "crisis_kit", "when": ALWAYS}],
+        "offers": [{"exit": "safety_open", "when": ALWAYS}, {"exit": "cool_down", "when": ALWAYS}, {"exit": "crisis_kit", "when": ALWAYS}],
         "done": "done", "links": [SAFETY_LINK],
     },
     {
         # Not safe or not sure: someone to talk to first (S9), nothing to ride.
         "id": "reach", "kind": "handoff", "complete": True, "noClose": True, "crisis": CRISIS,
         "lines": [{"when": ALWAYS, "key": "reach_line"}],
-        "offers": [{"exit": "crisis_kit", "when": ALWAYS}],
+        # People first, then the kit (DT-03): coping sits beside help, never before it (CORE-01's rule).
+        "offers": [{"exit": "safety_open", "when": ALWAYS}, {"exit": "crisis_kit", "when": ALWAYS}],
         "done": "done",
     },
 ]
@@ -343,7 +344,7 @@ EXITS = [
     {"id": "pause", "toolId": "pause"},                                  # DT-02 Hold to wait (bigger twice, flooded)
     {"id": "pros_cons", "toolId": "pros-cons"},                          # DT-10 a card for a pull that keeps coming back
     {"id": "habit_plan", "toolId": "habit-plan"},                        # DT-09 When it's a habit (use, check)
-    {"id": "crisis_kit", "toolId": "crisis-kit", "planned": True},       # DT-03 My crisis kit (safety batch)
+    {"id": "crisis_kit", "toolId": "crisis-kit", "query": {"frame": "crisis"}},       # DT-03 My crisis kit, opened from a crisis route (the banner on every card)
     {"id": "safety_open", "toolId": None, "safety": True},               # safety.open (R6)
     {"id": "done", "done": True},
 ]

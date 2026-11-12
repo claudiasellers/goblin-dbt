@@ -35,7 +35,7 @@ export const getSkillContent = callable<unknown, SkillsContent>(
     const exitRes = await tx.run(
       `MATCH (s:Skill)-[:HAS_EXIT]->(x:SkillExit)
        RETURN s.id AS skillId, x.exit AS id, x.toolId AS toolId, x.queryJson AS query, x.carry AS carry, x.done AS done,
-              x.planned AS planned, x.safety AS safety ORDER BY x.id`);
+              x.planned AS planned, x.safety AS safety, x.label AS label ORDER BY x.id`);
     const optRes = await tx.run(
       `MATCH (s:Skill)-[h:HAS_OPTION]->(o:SkillOption)
        OPTIONAL MATCH (o)-[:ALTERNATIVE_TO]->(story:SkillOption)
@@ -78,7 +78,8 @@ export const getSkillContent = callable<unknown, SkillsContent>(
     for (const r of exitRes.records) {
       const e: ExitDef = { id: r.get('id'), toolId: (r.get('toolId') as string | null) ?? null, query: json(r.get('query'), {}),
         carry: (r.get('carry') as string[] | null) ?? [], done: r.get('done') === true,
-        ...(r.get('planned') === true ? { planned: true } : {}), ...(r.get('safety') === true ? { safety: true } : {}) };
+        ...(r.get('planned') === true ? { planned: true } : {}), ...(r.get('safety') === true ? { safety: true } : {}),
+        ...(typeof r.get('label') === 'string' ? { label: r.get('label') as string } : {}) };
       by.get(r.get('skillId'))?.exits.push(e);
     }
     for (const r of optRes.records) {

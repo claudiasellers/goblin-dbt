@@ -30,7 +30,7 @@ it lasts. The 1–10 slider is gone: every sample is a tap on *still here · fad
 | `shape` | *Here's the wave you rode.* The trace as a line without axes (`waveTrace`), with *It rose, crested and came down.* when the last check was gone or fading and it was seen to rise (a *bigger*), *It came down.* when it wasn't, else *You rode it as far as it went today.* | Step 5 |
 | `end` / `passed` | *You watched it come down.* (never *without acting on it*: the close asks) · *You told it not now, and it eased.* · *You stayed with it. That's the skill.* Offer: the Pros & cons card for this pull, and When it's a habit (DT-09) for the *use* and *check* pulls. Then the two-part close (R7: *Did you act on it?*, then-vs-now) | Step 5 |
 | `switch` | *Let's change what you're doing. Your body first, or a way to wait.* First, the body · Hold to wait (not after hurt myself). No close: the next tool is the next step | Bigger ×2 |
-| `hurt_end` | Hurt myself, safe for now: *You stayed with it. The support is still here if it comes back.* First, the body; the crisis kit (planned). No *did you act on it?* (as Hold to wait) | C6.5 |
+| `hurt_end` | Hurt myself, safe for now: *You stayed with it. The support is still here if it comes back.* *Talk to someone now*, then First, the body, then My crisis kit (DT-03, `frame=crisis`). No *did you act on it?* (as Hold to wait) | C6.5 |
 
 The swaps, per pull (never food, drink, shopping or scrolling, C6.7): a walk, even round the room · cool water on my
 hands · call or text someone safe (not for *send*, where texting is the pull) · hold something cool (hit) · squeeze a
@@ -81,7 +81,7 @@ and nothing cold or squeezed for hurt myself (Gate 3: a sensation substitute kee
 - **Flooded gets the body first** as a choice, never a lock. *This is too much right now* is under every screen.
 - **No promised durations** (PRD risk line). Only the round the person starts says *five minutes*; a test holds every
   other line to no numbers, minutes or "it will pass".
-- **No swap is food or drink** (C6.7). *Talk to someone now* is on every screen but `reach`, whose banner is the way.
+- **No swap is food or drink** (C6.7). *Talk to someone now* is on every screen; on `reach` it is the first offer, then My crisis kit (`frame=crisis`).
 
 ## Deferred
 

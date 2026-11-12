@@ -13,7 +13,7 @@ test("uses the universally safe fallback set and two links that split direction"
   const steps = micro.getMicroStepsForPattern(help.HELP_NOW_MICRO_STEP_SET);
   assert.ok(steps.length >= 2);
   assert.ok(steps.every((s) => s.id.startsWith("fb-")));
-  assert.deepEqual([...help.HELP_NOW_TOOL_IDS], ["cool-down", "five-senses"]);
+  assert.deepEqual([...help.HELP_NOW_TOOL_IDS], ["cool-down", "five-senses", "crisis-kit"]);
   assert.equal(tools.SPINE_TOOLS["cool-down"].closeKind, "regulation_down");
   assert.equal(tools.SPINE_TOOLS["five-senses"].closeKind, "orienting");
   assert.deepEqual(help.helpNowLinkState("h"), { spine: { entry: "checkin_grid", hostSessionId: "h" } });

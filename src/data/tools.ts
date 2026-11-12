@@ -150,6 +150,19 @@ export const tools: Tool[] = [
     emoji: '🌉',
     bare: true,
   },
+  {
+    // DT-03 on the skill runtime (docs/design/crisis-kit.md): two skills under one id. Opening it plays the kit one
+    // card at a time (a starter kit until the person makes their own); `?frame=build` makes it.
+    id: 'crisis-kit',
+    name: 'My crisis kit',
+    tagline: 'What helps, one card at a time',
+    description: 'Your own ideas from a calmer day, handed back when you can\'t think straight: something for your body, something to keep your hands busy, something soothing, words for you, a safe place and your reasons to get through. One card at a time.',
+    whenToUse: 'On a hard night when you can\'t remember what helps. Make it on a calmer day so it\'s ready.',
+    module: 'distress-tolerance',
+    dbtBasis: 'Crisis survival skills (DT Handouts 6–9a)',
+    emoji: '🧰',
+    bare: true,
+  },
   // Emotion Regulation
   {
     id: 'opposite-action',
@@ -385,6 +398,8 @@ export const allIntents: Intent[] = [
   { id: 'blow-it-up', label: 'I want to blow it all up', toolId: 'alternate-rebellion', emoji: '🎸' },
   { id: 'reasons', label: 'Make a card for a pull that keeps coming back', toolId: 'pros-cons', emoji: '⚖️' },
   { id: 'habit-plan', label: 'Something I keep doing', toolId: 'habit-plan', emoji: '🌉' },
+  { id: 'crisis-kit', label: 'Open my crisis kit', toolId: 'crisis-kit', emoji: '🧰' },
+  { id: 'make-kit', label: 'Make my crisis kit for hard nights', toolId: 'crisis-kit', query: 'frame=build', emoji: '🧰' },
   { id: 'shift', label: 'Shift a feeling that isn\'t helping', toolId: 'opposite-action', emoji: '🔄' },
   { id: 'problem', label: 'Work through a problem', toolId: 'problem-solve', emoji: '🛠️' },
   { id: 'ask', label: 'Ask someone for what I need', toolId: 'dear-man', emoji: '🗣️' },
