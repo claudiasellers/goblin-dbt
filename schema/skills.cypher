@@ -17946,7 +17946,7 @@ SET r += {list: "keep_more", order: 51};
 
 // --- values (vc-v1) ---
 MERGE (s:Skill {id: "values"})
-SET s += {toolId: "values-clarification", version: "vc-v1", contentVersion: "skills-v1", start: "start", ownMax: 60, emotionFields: [], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"back_no_line\": \"Values are directions, not rules. A smaller step still counts, any time.\", \"back_no_title\": \"That's okay.\", \"back_title\": \"Earlier you picked: {step}.\", \"back_yes_line\": \"Steps like that are what a value looks like from the outside.\", \"back_yes_title\": \"That was {focus} in action.\", \"back_yes_title_kept\": \"That was {focus_kept} in action.\", \"done\": \"Done\", \"happened_label\": \"Did it happen?\", \"heads_up_hint\": \"This works better once it settles a little.\", \"heads_up_title\": \"Your body's loud right now.\", \"keep_hint\": \"Two can pull different ways. Both can matter. Not sure yet is a full answer.\", \"keep_own\": \"In my words\", \"keep_primary\": \"Save\", \"keep_title\": \"If you could only keep three for now, which?\", \"next\": \"Next\", \"not_sure_line\": \"What matters can take a while to find. Come back any time.\", \"not_sure_title\": \"Not sure yet is fine.\", \"one_hint\": \"One is enough for this week.\", \"one_title\": \"Which one do you want to take a small step for?\", \"profile_unnamed\": \"something that matters to you\", \"remind_label\": \"Want me to ask how it went?\", \"safety_open\": \"Talk to someone now\", \"set_line\": \"It's a direction, not a rule. Doing part of it counts.\", \"set_remind\": \"I'll ask how it went. Doing part of it counts.\", \"set_title\": \"Your step: {step}.\", \"settle_line\": \"This will keep. Look after the next few minutes first.\", \"sort_hint\": \"Pick as many as fit. If you're not sure, pick none. That's a full answer.\", \"sort_own\": \"Add your own\", \"sort_title\": \"Which of these sound like you?\", \"sorted_line\": \"Your sort is in Me. You can pick three another time.\", \"start_back_title\": \"Your values are here.\", \"start_hint\": \"There are no right answers, and they can change. A few minutes is enough.\", \"start_title\": \"What matters to you?\", \"step_hint\": \"Small enough that you'd likely do it. It's a direction, not a rule.\", \"step_own\": \"My own step\", \"step_title\": \"One small step this week.\", \"when_title\": \"When could you do it?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "values-clarification", version: "vc-v1", contentVersion: "skills-v1", start: "start", ownMax: 60, emotionFields: [], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"back_end_line\": \"It'll keep. Come back to it any time.\", \"back_hurt_line\": \"Doing it still counts. How it landed isn't all on you.\", \"back_hurt_title\": \"That took something, and it hurt.\", \"back_no_hint\": \"Values are directions, not rules. A smaller step still counts.\", \"back_no_title\": \"Not this time is a real answer.\", \"back_title\": \"Earlier you picked: {step}.\", \"back_yes_line\": \"Steps like that are what a value looks like from the outside.\", \"back_yes_title\": \"That was {focus} in action.\", \"back_yes_title_kept\": \"That was {focus_kept} in action.\", \"back_yes_title_own\": \"That was something that matters to you, in action.\", \"done\": \"Done\", \"focus_own\": \"One in my words\", \"happened_label\": \"Did it happen?\", \"heads_up_hint\": \"This works better once it settles a little.\", \"heads_up_title\": \"Your body's loud right now.\", \"keep_hint\": \"Two can pull different ways. Both can matter. Not sure yet? Save with none picked.\", \"keep_own\": \"In my words\", \"keep_primary\": \"Save\", \"keep_title\": \"If you could only keep three for now, which?\", \"next\": \"Next\", \"not_sure_line\": \"What matters can take a while to find. Come back any time.\", \"not_sure_title\": \"Not sure yet is fine.\", \"one_hint\": \"One is enough for this week.\", \"one_title\": \"Which one do you want to take a small step for?\", \"profile_unnamed\": \"something that matters to you\", \"remind_label\": \"Want me to ask how it went?\", \"safety_open\": \"Talk to someone now\", \"set_line\": \"It's a direction, not a rule. Doing part of it counts.\", \"set_remind\": \"I'll ask how it went. Doing part of it counts.\", \"set_title\": \"Your step: {step}.\", \"settle_line\": \"This will keep. Look after the next few minutes first.\", \"sort_hint\": \"Pick as many as fit. If you're not sure, pick none. That's a full answer.\", \"sort_own\": \"Add your own\", \"sort_title\": \"Which of these sound like you?\", \"sorted_line\": \"Your sort is in Me. You can pick three another time.\", \"start_back_title\": \"Your values are here.\", \"start_hint\": \"There are no right answers, and they can change. A few minutes is enough.\", \"start_title\": \"What matters to you?\", \"step_hint\": \"Small enough that you'd likely do it, and safe to do. If it means facing someone who hurts you, that's not the step.\", \"step_own\": \"My own step\", \"step_title\": \"One small step this week.\", \"when_title\": \"When could you do it?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "dbt_values_priorities"}), (s:Skill {id: "values"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "values"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
@@ -17987,7 +17987,7 @@ MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:sorted"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 6};
 MERGE (n:SkillStep {id: "values:one"})
-SET n += {skillId: "values", step: "one", kind: "ask", version: "vc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"focus\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"value\", \"where\": {\"has\": [\"$a.kept.ids\", \"$opt.value\"]}}, \"required\": true}], \"hint\": \"one_hint\", \"title\": \"one_title\"}";
+SET n += {skillId: "values", step: "one", kind: "ask", version: "vc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"focus\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"value\", \"where\": {\"has\": [\"$a.kept.ids\", \"$opt.value\"]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"focus_own\", \"max\": 60}, \"required\": true}], \"hint\": \"one_hint\", \"title\": \"one_title\"}";
 MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:one"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 7};
@@ -17997,7 +17997,7 @@ MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:one_kept"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 8};
 MERGE (n:SkillStep {id: "values:step"})
-SET n += {skillId: "values", step: "step", kind: "ask", version: "vc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"step\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"step\", \"where\": {\"any\": [{\"eq\": [\"$opt.value_id\", \"$a.focus\"]}, {\"eq\": [\"$opt.value_id\", \"$a.focus_kept\"]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"step_own\", \"max\": 60}, \"required\": true}], \"hint\": \"step_hint\", \"title\": \"step_title\"}";
+SET n += {skillId: "values", step: "step", kind: "ask", version: "vc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"step\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"step\", \"where\": {\"any\": [{\"eq\": [\"$opt.value_id\", \"$a.focus\"]}, {\"eq\": [\"$opt.value_id\", \"$a.focus_kept\"]}, {\"all\": [{\"eq\": [\"$opt.value_id\", \"own\"]}, {\"any\": [{\"all\": [{\"not\": {\"set\": \"$a.focus.ids\"}}, {\"not\": {\"set\": \"$a.focus_kept.ids\"}}]}, {\"eq\": [\"$a.focus_kept\", \"own\"]}]}]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"step_own\", \"max\": 60}, \"required\": true}], \"hint\": \"step_hint\", \"title\": \"step_title\"}";
 MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:step"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 9};
@@ -18012,25 +18012,41 @@ MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:set"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 11};
 MERGE (n:SkillStep {id: "values:back"})
-SET n += {skillId: "values", step: "back", kind: "ask", version: "vc-v1"}, n.specJson = "{\"clears\": [\"happened\"], \"fields\": [{\"id\": \"happened\", \"label\": \"happened_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"happened\"}, \"required\": true}], \"reopens\": {\"after\": \"when\"}, \"title\": \"back_title\", \"titleSlots\": {\"step\": {\"labelOf\": \"step\"}}}";
+SET n += {skillId: "values", step: "back", kind: "ask", version: "vc-v1"}, n.specJson = "{\"clears\": [\"happened\", \"again\"], \"fields\": [{\"id\": \"happened\", \"label\": \"happened_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"happened\"}, \"required\": true}], \"reopens\": {\"after\": \"when\"}, \"title\": \"back_title\", \"titleSlots\": {\"step\": {\"labelOf\": \"step\"}}}";
 MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:back"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 12};
 MERGE (n:SkillStep {id: "values:back_yes"})
-SET n += {skillId: "values", step: "back_yes", kind: "handoff", version: "vc-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"back_yes_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": [{\"key\": \"back_yes_title\", \"when\": {\"set\": \"$a.focus\"}}, {\"key\": \"back_yes_title_kept\"}], \"titleSlots\": {\"focus\": {\"labelOf\": \"focus\"}, \"focus_kept\": {\"labelOf\": \"focus_kept\"}}}";
+SET n += {skillId: "values", step: "back_yes", kind: "handoff", version: "vc-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"back_yes_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": [{\"key\": \"back_yes_title\", \"when\": {\"set\": \"$a.focus\"}}, {\"key\": \"back_yes_title_kept\", \"when\": {\"set\": \"$a.focus_kept\"}}, {\"key\": \"back_yes_title_own\"}], \"titleSlots\": {\"focus\": {\"labelOf\": \"focus\"}, \"focus_kept\": {\"labelOf\": \"focus_kept\"}}}";
 MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:back_yes"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 13};
-MERGE (n:SkillStep {id: "values:back_no"})
-SET n += {skillId: "values", step: "back_no", kind: "handoff", version: "vc-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"back_no_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"back_no_title\"}";
-MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:back_no"})
+MERGE (n:SkillStep {id: "values:back_hurt"})
+SET n += {skillId: "values", step: "back_hurt", kind: "handoff", version: "vc-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"back_hurt_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"back_hurt_title\"}";
+MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:back_hurt"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 14};
+MERGE (n:SkillStep {id: "values:back_no"})
+SET n += {skillId: "values", step: "back_no", kind: "ask", version: "vc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"again\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"again\"}, \"required\": true}], \"hint\": \"back_no_hint\", \"title\": \"back_no_title\"}";
+MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:back_no"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 15};
+MERGE (n:SkillStep {id: "values:back_end"})
+SET n += {skillId: "values", step: "back_end", kind: "handoff", version: "vc-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"back_end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": null}";
+MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:back_end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 16};
 MERGE (x:SkillExit {id: "values:cool_down"})
 SET x += {skillId: "values", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
 MATCH (s:Skill {id: "values"}), (x:SkillExit {id: "values:cool_down"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "values:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "values:recover"})
+SET x += {skillId: "values", exit: "recover", toolId: "recovering-from-invalidation", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "values"}), (x:SkillExit {id: "values:recover"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "values:recover"}), (t:TherapyConcept {appToolId: "recovering-from-invalidation"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "values:safety_open"})
 SET x += {skillId: "values", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
@@ -18040,12 +18056,12 @@ MERGE (x:SkillExit {id: "values:done"})
 SET x += {skillId: "values", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
 MATCH (s:Skill {id: "values"}), (x:SkillExit {id: "values:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
-MATCH (a:SkillStep {id: "values:start"}), (b:SkillStep {id: "values:one_kept"})
-MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.start\", \"step\"]}";
 MATCH (a:SkillStep {id: "values:start"}), (b:SkillStep {id: "values:heads_up"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
+MATCH (a:SkillStep {id: "values:start"}), (b:SkillStep {id: "values:one_kept"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.start\", \"step\"]}";
 MATCH (a:SkillStep {id: "values:start"}), (b:SkillStep {id: "values:sort"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 2}, r.whenJson = "null";
@@ -18055,9 +18071,12 @@ SET r += {order: 0, field: "start", label: "safety_open"}, r.whenJson = "{\"all\
 MATCH (a:SkillStep {id: "values:heads_up"}), (b:SkillStep {id: "values:settle"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.heads_up\", \"settle\"]}";
+MATCH (a:SkillStep {id: "values:heads_up"}), (b:SkillStep {id: "values:one_kept"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.start\", \"step\"]}";
 MATCH (a:SkillStep {id: "values:heads_up"}), (b:SkillStep {id: "values:sort"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "null";
+SET r += {order: 2}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "values:heads_up"}), (x:SkillExit {id: "values:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "heads_up", label: "safety_open"}, r.whenJson = "{\"all\": []}";
@@ -18081,10 +18100,13 @@ MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "values:keep"}), (b:SkillStep {id: "values:one"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "{\"set\": \"$a.kept\"}";
+SET r += {order: 0}, r.whenJson = "{\"set\": \"$a.kept.ids\"}";
+MATCH (a:SkillStep {id: "values:keep"}), (b:SkillStep {id: "values:step"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"set\": \"$a.kept\"}";
 MATCH (a:SkillStep {id: "values:keep"}), (b:SkillStep {id: "values:sorted"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "null";
+SET r += {order: 2}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "values:keep"}), (x:SkillExit {id: "values:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "kept", label: "safety_open"}, r.whenJson = "{\"all\": []}";
@@ -18121,16 +18143,37 @@ SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []
 MATCH (a:SkillStep {id: "values:back"}), (b:SkillStep {id: "values:back_no"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.happened\", \"no\"]}";
+MATCH (a:SkillStep {id: "values:back"}), (b:SkillStep {id: "values:back_hurt"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.happened\", \"hurt\"]}";
 MATCH (a:SkillStep {id: "values:back"}), (b:SkillStep {id: "values:back_yes"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "null";
+SET r += {order: 2}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "values:back"}), (x:SkillExit {id: "values:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "happened", label: "safety_open"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "values:back_yes"}), (x:SkillExit {id: "values:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "values:back_hurt"}), (x:SkillExit {id: "values:recover"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "values:back_hurt"}), (x:SkillExit {id: "values:cool_down"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "values:back_hurt"}), (x:SkillExit {id: "values:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "values:back_no"}), (b:SkillStep {id: "values:step"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.again\", \"smaller\"]}";
+MATCH (a:SkillStep {id: "values:back_no"}), (b:SkillStep {id: "values:back_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "values:back_no"}), (x:SkillExit {id: "values:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "again", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "values:back_end"}), (x:SkillExit {id: "values:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
 MERGE (o:SkillOption {id: "values:start:begin"})
@@ -18219,7 +18262,7 @@ MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:value:adventure"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "value", order: 16};
 MERGE (o:SkillOption {id: "values:value:meaning"})
-SET o:SkillOption, o += {skillId: "values", list: "value", value: "meaning", label: "Faith or meaning", version: "vc-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "values", list: "value", value: "meaning", label: "Meaning, or something bigger than me", version: "vc-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:value:meaning"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "value", order: 17};
@@ -18234,7 +18277,7 @@ MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:value:beauty"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "value", order: 19};
 MERGE (o:SkillOption {id: "values:value:family"})
-SET o:SkillOption, o += {skillId: "values", list: "value", value: "family", label: "Family", version: "vc-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "values", list: "value", value: "family", label: "Family, or the people who feel like family", version: "vc-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:value:family"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "value", order: 20};
@@ -18309,7 +18352,7 @@ MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:step:count_on_3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "step", order: 34};
 MERGE (o:SkillOption {id: "values:step:fairness_1"})
-SET o:SkillOption, o += {skillId: "values", list: "step", value: "fairness_1", label: "Speak up once when something's unfair", version: "vc-v1"}, o.propsJson = "{\"value_id\": \"fairness\"}";
+SET o:SkillOption, o += {skillId: "values", list: "step", value: "fairness_1", label: "Speak up once when something's unfair, if it's safe to", version: "vc-v1"}, o.propsJson = "{\"value_id\": \"fairness\"}";
 MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:step:fairness_1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "step", order: 35};
@@ -18399,12 +18442,12 @@ MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:step:independence_3"
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "step", order: 52};
 MERGE (o:SkillOption {id: "values:step:honesty_1"})
-SET o:SkillOption, o += {skillId: "values", list: "step", value: "honesty_1", label: "Say one true thing I've been holding back", version: "vc-v1"}, o.propsJson = "{\"value_id\": \"honesty\"}";
+SET o:SkillOption, o += {skillId: "values", list: "step", value: "honesty_1", label: "Say one true thing I've been holding back, to someone safe", version: "vc-v1"}, o.propsJson = "{\"value_id\": \"honesty\"}";
 MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:step:honesty_1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "step", order: 53};
 MERGE (o:SkillOption {id: "values:step:honesty_2"})
-SET o:SkillOption, o += {skillId: "values", list: "step", value: "honesty_2", label: "Tell someone how I really am", version: "vc-v1"}, o.propsJson = "{\"value_id\": \"honesty\"}";
+SET o:SkillOption, o += {skillId: "values", list: "step", value: "honesty_2", label: "Tell someone safe how I really am", version: "vc-v1"}, o.propsJson = "{\"value_id\": \"honesty\"}";
 MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:step:honesty_2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "step", order: 54};
@@ -18484,7 +18527,7 @@ MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:step:achievement_2"}
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "step", order: 69};
 MERGE (o:SkillOption {id: "values:step:achievement_3"})
-SET o:SkillOption, o += {skillId: "values", list: "step", value: "achievement_3", label: "Do one task I've been putting off", version: "vc-v1"}, o.propsJson = "{\"value_id\": \"achievement\"}";
+SET o:SkillOption, o += {skillId: "values", list: "step", value: "achievement_3", label: "Call one thing done at good enough", version: "vc-v1"}, o.propsJson = "{\"value_id\": \"achievement\"}";
 MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:step:achievement_3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "step", order: 70};
@@ -18504,17 +18547,17 @@ MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:step:beauty_3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "step", order: 73};
 MERGE (o:SkillOption {id: "values:step:family_1"})
-SET o:SkillOption, o += {skillId: "values", list: "step", value: "family_1", label: "Message or call someone in my family", version: "vc-v1"}, o.propsJson = "{\"value_id\": \"family\"}";
+SET o:SkillOption, o += {skillId: "values", list: "step", value: "family_1", label: "Spend time with someone who feels like family", version: "vc-v1"}, o.propsJson = "{\"value_id\": \"family\"}";
 MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:step:family_1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "step", order: 74};
 MERGE (o:SkillOption {id: "values:step:family_2"})
-SET o:SkillOption, o += {skillId: "values", list: "step", value: "family_2", label: "Share a meal with family", version: "vc-v1"}, o.propsJson = "{\"value_id\": \"family\"}";
+SET o:SkillOption, o += {skillId: "values", list: "step", value: "family_2", label: "Do one thing from a family tradition I like", version: "vc-v1"}, o.propsJson = "{\"value_id\": \"family\"}";
 MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:step:family_2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "step", order: 75};
 MERGE (o:SkillOption {id: "values:step:family_3"})
-SET o:SkillOption, o += {skillId: "values", list: "step", value: "family_3", label: "Ask someone in my family about their week", version: "vc-v1"}, o.propsJson = "{\"value_id\": \"family\"}";
+SET o:SkillOption, o += {skillId: "values", list: "step", value: "family_3", label: "Message someone in my family, if that feels safe", version: "vc-v1"}, o.propsJson = "{\"value_id\": \"family\"}";
 MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:step:family_3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "step", order: 76};
@@ -18534,12 +18577,12 @@ MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:step:friendship_3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "step", order: 79};
 MERGE (o:SkillOption {id: "values:step:standing_up_1"})
-SET o:SkillOption, o += {skillId: "values", list: "step", value: "standing_up_1", label: "Say what I need, once, plainly", version: "vc-v1"}, o.propsJson = "{\"value_id\": \"standing_up\"}";
+SET o:SkillOption, o += {skillId: "values", list: "step", value: "standing_up_1", label: "Say what I need to someone safe, once, plainly", version: "vc-v1"}, o.propsJson = "{\"value_id\": \"standing_up\"}";
 MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:step:standing_up_1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "step", order: 80};
 MERGE (o:SkillOption {id: "values:step:standing_up_2"})
-SET o:SkillOption, o += {skillId: "values", list: "step", value: "standing_up_2", label: "Say no to one thing", version: "vc-v1"}, o.propsJson = "{\"value_id\": \"standing_up\"}";
+SET o:SkillOption, o += {skillId: "values", list: "step", value: "standing_up_2", label: "Say no to one small thing", version: "vc-v1"}, o.propsJson = "{\"value_id\": \"standing_up\"}";
 MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:step:standing_up_2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "step", order: 81};
@@ -18609,7 +18652,7 @@ MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:step:self_respect_3"
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "step", order: 94};
 MERGE (o:SkillOption {id: "values:step:love_1"})
-SET o:SkillOption, o += {skillId: "values", list: "step", value: "love_1", label: "Tell someone I love them", version: "vc-v1"}, o.propsJson = "{\"value_id\": \"love\"}";
+SET o:SkillOption, o += {skillId: "values", list: "step", value: "love_1", label: "Tell someone safe that I love them", version: "vc-v1"}, o.propsJson = "{\"value_id\": \"love\"}";
 MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:step:love_1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "step", order: 95};
@@ -18638,43 +18681,73 @@ SET o:SkillOption, o += {skillId: "values", list: "step", value: "work_3", label
 MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:step:work_3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "step", order: 100};
+MERGE (o:SkillOption {id: "values:step:own_1"})
+SET o:SkillOption, o += {skillId: "values", list: "step", value: "own_1", label: "Spend ten minutes on it", version: "vc-v1"}, o.propsJson = "{\"value_id\": \"own\"}";
+MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:step:own_1"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 101};
+MERGE (o:SkillOption {id: "values:step:own_2"})
+SET o:SkillOption, o += {skillId: "values", list: "step", value: "own_2", label: "Tell someone safe it matters to me", version: "vc-v1"}, o.propsJson = "{\"value_id\": \"own\"}";
+MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:step:own_2"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 102};
+MERGE (o:SkillOption {id: "values:step:own_3"})
+SET o:SkillOption, o += {skillId: "values", list: "step", value: "own_3", label: "Notice one moment it shows up this week", version: "vc-v1"}, o.propsJson = "{\"value_id\": \"own\"}";
+MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:step:own_3"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step", order: 103};
 MERGE (o:SkillOption {id: "values:when:tomorrow"})
 SET o:SkillOption, o += {skillId: "values", list: "when", value: "tomorrow", label: "Tomorrow", version: "vc-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:when:tomorrow"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "when", order: 101};
+SET r += {list: "when", order: 104};
 MERGE (o:SkillOption {id: "values:when:few_days"})
 SET o:SkillOption, o += {skillId: "values", list: "when", value: "few_days", label: "In a few days", version: "vc-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:when:few_days"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "when", order: 102};
+SET r += {list: "when", order: 105};
 MERGE (o:SkillOption {id: "values:when:this_week"})
 SET o:SkillOption, o += {skillId: "values", list: "when", value: "this_week", label: "Sometime this week", version: "vc-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:when:this_week"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "when", order: 103};
+SET r += {list: "when", order: 106};
 MERGE (o:SkillOption {id: "values:remind:yes"})
 SET o:SkillOption, o += {skillId: "values", list: "remind", value: "yes", label: "Yes, ask me", version: "vc-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:remind:yes"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "remind", order: 104};
+SET r += {list: "remind", order: 107};
 MERGE (o:SkillOption {id: "values:remind:no"})
 SET o:SkillOption, o += {skillId: "values", list: "remind", value: "no", label: "No thanks", version: "vc-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:remind:no"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "remind", order: 105};
+SET r += {list: "remind", order: 108};
 MERGE (o:SkillOption {id: "values:happened:yes"})
 SET o:SkillOption, o += {skillId: "values", list: "happened", value: "yes", label: "Yes", version: "vc-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:happened:yes"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 106};
+SET r += {list: "happened", order: 109};
 MERGE (o:SkillOption {id: "values:happened:partly"})
 SET o:SkillOption, o += {skillId: "values", list: "happened", value: "partly", label: "Partly", version: "vc-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:happened:partly"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 107};
+SET r += {list: "happened", order: 110};
+MERGE (o:SkillOption {id: "values:happened:hurt"})
+SET o:SkillOption, o += {skillId: "values", list: "happened", value: "hurt", label: "It happened, and it hurt", version: "vc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:happened:hurt"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "happened", order: 111};
 MERGE (o:SkillOption {id: "values:happened:no"})
 SET o:SkillOption, o += {skillId: "values", list: "happened", value: "no", label: "Not this time", version: "vc-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:happened:no"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 108};
+SET r += {list: "happened", order: 112};
+MERGE (o:SkillOption {id: "values:again:smaller"})
+SET o:SkillOption, o += {skillId: "values", list: "again", value: "smaller", label: "Pick a smaller one", version: "vc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:again:smaller"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "again", order: 113};
+MERGE (o:SkillOption {id: "values:again:not_now"})
+SET o:SkillOption, o += {skillId: "values", list: "again", value: "not_now", label: "Not now", version: "vc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "values"}), (o:SkillOption {id: "values:again:not_now"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "again", order: 114};

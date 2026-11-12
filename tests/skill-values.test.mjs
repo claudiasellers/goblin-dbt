@@ -78,7 +78,8 @@ test("one value, one small step: the steps are that value's own; own words alway
   assert.equal(step.stepId, "step");
   const steps = values(step, "step");
   assert.deepEqual(steps, ["friendship_1", "friendship_2", "friendship_3"]);
-  assert.match(skill.copy.step_hint, /direction, not a rule/, "values as directions, not shoulds (PRD risks)");
+  assert.match(skill.copy.set_line, /direction, not a rule/, "values as directions, not shoulds (PRD risks)");
+  assert.match(skill.copy.step_hint, /facing someone who hurts you, that's not the step/, "someone unsafe is never the step");
   const when = run([pick("step", "friendship_1"), next], ctx(), step);
   assert.equal(when.stepId, "when");
   const set = run([pick("when", "few_days"), pick("remind", "yes"), next], ctx(), when);
@@ -86,6 +87,16 @@ test("one value, one small step: the steps are that value's own; own words alway
   assert.equal(title(set), "Your step: Reach out to a friend.");
   assert.deepEqual(M.followUpFor(ctx(), M.stepOf(skill, "when"), run([pick("when", "few_days"), pick("remind", "yes")], ctx(), when)), { type: "value_step", chip: "few_days" });
   assert.equal(M.followUpFor(ctx(), M.stepOf(skill, "when"), run([pick("when", "few_days"), pick("remind", "no")], ctx(), when)), null);
+});
+
+test("kept only in their own words: straight to a step, with the general steps; a focus in own words too", () => {
+  const ownOnly = run([own("kept", "Being a good dad"), next], ctx(), SORTED());
+  assert.equal(ownOnly.stepId, "step", "never stuck on a choice of one with nothing to pick");
+  assert.deepEqual(values(ownOnly, "step"), ["own_1", "own_2", "own_3"]);
+  const one = run([pick("kept", "honesty"), next], ctx(), SORTED());
+  const typed = run([own("focus", "Being brave"), next], ctx(), one);
+  assert.equal(typed.stepId, "step");
+  assert.deepEqual(values(typed, "step"), ["own_1", "own_2", "own_3"]);
 });
 
 test("coming back with values kept: a step for one of them (named from the slice), or sort again", () => {
@@ -99,7 +110,7 @@ test("coming back with values kept: a step for one of them (named from the slice
   const step = run([pick("focus_kept", "friendship"), next], c, one);
   assert.deepEqual(values(step, "step", c), ["friendship_1", "friendship_2", "friendship_3"]);
   const ownStep = run([pick("focus_kept", "own"), next], c, one);
-  assert.deepEqual(values(ownStep, "step", c), [], "an own-words value: own words for the step");
+  assert.deepEqual(values(ownStep, "step", c), ["own_1", "own_2", "own_3"], "an own-words value: the general steps, or own words");
   assert.equal(run([pick("start", "sort"), next], c).stepId, "sort");
 });
 
@@ -120,8 +131,20 @@ test("value_step: registered, content-free, reopens at back; yes names the value
   assert.equal(yes.stepId, "back_yes");
   assert.equal(title(yes), "That was Friendship in action.");
   const no = run([pick("happened", "no"), next], ctx(), r);
-  assert.match(line(no), /^Values are directions, not rules/);
-  assert.deepEqual(offers(no), []);
+  assert.equal(no.stepId, "back_no");
+  assert.equal(title(no), "Not this time is a real answer.");
+  assert.match(skill.copy.back_no_hint, /^Values are directions, not rules/);
+  assert.deepEqual(values(no, "again"), ["smaller", "not_now"]);
+  const smaller = run([pick("again", "smaller"), next], ctx(), no);
+  assert.equal(smaller.stepId, "step", "a smaller step for the same value");
+  assert.deepEqual(values(smaller, "step"), ["friendship_1", "friendship_2", "friendship_3"]);
+  const later = run([pick("again", "not_now"), next], ctx(), no);
+  assert.equal(later.stepId, "back_end");
+  assert.deepEqual(offers(later), []);
+  const hurt = run([pick("happened", "hurt"), next], ctx(), r);
+  assert.equal(hurt.stepId, "back_hurt");
+  assert.match(line(hurt), /isn't all on you/, "no blame when a step went badly");
+  assert.deepEqual(offers(hurt), ["recover", "cool_down"]);
   // From a value kept before.
   const c = ctx({}, KEPT);
   const kb = run([pick("start", "step"), next, pick("focus_kept", "friendship"), next, pick("step", "friendship_1"), next, pick("when", "tomorrow"), next], c);
@@ -136,6 +159,11 @@ test("a carried flooded reading: the body first or try anyway; Talk to someone n
   const settle = run([pick("heads_up", "settle"), next], c, h);
   assert.deepEqual(offers(settle, c), ["cool_down"]);
   assert.equal(run([pick("heads_up", "try"), next], c, h).stepId, "sort");
+  // Coming back for a step with a flooded reading gets the heads-up too, then the kept ones.
+  const ck = ctx({ band: "flooded" }, KEPT);
+  const hk = run([pick("start", "step"), next], ck);
+  assert.equal(hk.stepId, "heads_up");
+  assert.equal(run([pick("heads_up", "try"), next], ck, hk).stepId, "one_kept");
   for (const st of skill.steps) {
     const links = st.kind === "ask" ? st.fields.flatMap((f) => f.links ?? []) : st.links ?? [];
     assert.ok(links.some((l) => l.exit === "safety_open"), st.id);

@@ -45876,7 +45876,7 @@
           "sort_hint": "Pick as many as fit. If you're not sure, pick none. That's a full answer.",
           "sort_own": "Add your own",
           "keep_title": "If you could only keep three for now, which?",
-          "keep_hint": "Two can pull different ways. Both can matter. Not sure yet is a full answer.",
+          "keep_hint": "Two can pull different ways. Both can matter. Not sure yet? Save with none picked.",
           "keep_own": "In my words",
           "keep_primary": "Save",
           "not_sure_title": "Not sure yet is fine.",
@@ -45884,8 +45884,9 @@
           "sorted_line": "Your sort is in Me. You can pick three another time.",
           "one_title": "Which one do you want to take a small step for?",
           "one_hint": "One is enough for this week.",
+          "focus_own": "One in my words",
           "step_title": "One small step this week.",
-          "step_hint": "Small enough that you'd likely do it. It's a direction, not a rule.",
+          "step_hint": "Small enough that you'd likely do it, and safe to do. If it means facing someone who hurts you, that's not the step.",
           "step_own": "My own step",
           "when_title": "When could you do it?",
           "remind_label": "Want me to ask how it went?",
@@ -45896,13 +45897,17 @@
           "happened_label": "Did it happen?",
           "back_yes_title": "That was {focus} in action.",
           "back_yes_line": "Steps like that are what a value looks like from the outside.",
-          "back_no_title": "That's okay.",
-          "back_no_line": "Values are directions, not rules. A smaller step still counts, any time.",
+          "back_yes_title_own": "That was something that matters to you, in action.",
+          "back_hurt_title": "That took something, and it hurt.",
+          "back_hurt_line": "Doing it still counts. How it landed isn't all on you.",
+          "back_no_title": "Not this time is a real answer.",
+          "back_no_hint": "Values are directions, not rules. A smaller step still counts.",
           "safety_open": "Talk to someone now",
           "next": "Next",
           "done": "Done",
           "profile_unnamed": "something that matters to you",
-          "back_yes_title_kept": "That was {focus_kept} in action."
+          "back_yes_title_kept": "That was {focus_kept} in action.",
+          "back_end_line": "It'll keep. Come back to it any time."
         },
         "tables": {},
         "derive": [],
@@ -45977,20 +45982,20 @@
             "hint": "start_hint",
             "next": [
               {
-                "to": "one_kept",
-                "when": {
-                  "eq": [
-                    "$a.start",
-                    "step"
-                  ]
-                }
-              },
-              {
                 "to": "heads_up",
                 "when": {
                   "eq": [
                     "$ctx.band",
                     "flooded"
+                  ]
+                }
+              },
+              {
+                "to": "one_kept",
+                "when": {
+                  "eq": [
+                    "$a.start",
+                    "step"
                   ]
                 }
               },
@@ -46032,6 +46037,15 @@
                   "eq": [
                     "$a.heads_up",
                     "settle"
+                  ]
+                }
+              },
+              {
+                "to": "one_kept",
+                "when": {
+                  "eq": [
+                    "$a.start",
+                    "step"
                   ]
                 }
               },
@@ -46194,6 +46208,12 @@
               {
                 "to": "one",
                 "when": {
+                  "set": "$a.kept.ids"
+                }
+              },
+              {
+                "to": "step",
+                "when": {
                   "set": "$a.kept"
                 }
               },
@@ -46249,6 +46269,11 @@
                 },
                 "max": 1,
                 "required": true,
+                "own": {
+                  "hint": "focus_own",
+                  "countsAsPick": true,
+                  "max": 60
+                },
                 "links": [
                   {
                     "exit": "safety_open",
@@ -46326,6 +46351,40 @@
                         "eq": [
                           "$opt.value_id",
                           "$a.focus_kept"
+                        ]
+                      },
+                      {
+                        "all": [
+                          {
+                            "eq": [
+                              "$opt.value_id",
+                              "own"
+                            ]
+                          },
+                          {
+                            "any": [
+                              {
+                                "all": [
+                                  {
+                                    "not": {
+                                      "set": "$a.focus.ids"
+                                    }
+                                  },
+                                  {
+                                    "not": {
+                                      "set": "$a.focus_kept.ids"
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "eq": [
+                                  "$a.focus_kept",
+                                  "own"
+                                ]
+                              }
+                            ]
+                          }
                         ]
                       }
                     ]
@@ -46476,7 +46535,8 @@
               "after": "when"
             },
             "clears": [
-              "happened"
+              "happened",
+              "again"
             ],
             "titleSlots": {
               "step": {
@@ -46490,6 +46550,15 @@
                   "eq": [
                     "$a.happened",
                     "no"
+                  ]
+                }
+              },
+              {
+                "to": "back_hurt",
+                "when": {
+                  "eq": [
+                    "$a.happened",
+                    "hurt"
                   ]
                 }
               },
@@ -46512,7 +46581,13 @@
                 "key": "back_yes_title"
               },
               {
+                "when": {
+                  "set": "$a.focus_kept"
+                },
                 "key": "back_yes_title_kept"
+              },
+              {
+                "key": "back_yes_title_own"
               }
             ],
             "lines": [
@@ -46546,16 +46621,97 @@
             "offers": []
           },
           {
-            "id": "back_no",
+            "id": "back_hurt",
             "kind": "handoff",
             "complete": true,
-            "title": "back_no_title",
+            "title": "back_hurt_title",
             "lines": [
               {
                 "when": {
                   "all": []
                 },
-                "key": "back_no_line"
+                "key": "back_hurt_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
+            "next": [],
+            "offers": [
+              {
+                "exit": "recover",
+                "when": {
+                  "all": []
+                }
+              },
+              {
+                "exit": "cool_down",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
+          },
+          {
+            "id": "back_no",
+            "kind": "ask",
+            "title": "back_no_title",
+            "fields": [
+              {
+                "id": "again",
+                "options": {
+                  "list": "again"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "hint": "back_no_hint",
+            "next": [
+              {
+                "to": "step",
+                "when": {
+                  "eq": [
+                    "$a.again",
+                    "smaller"
+                  ]
+                }
+              },
+              {
+                "to": "back_end",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "back_end",
+            "kind": "handoff",
+            "complete": true,
+            "title": null,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "back_end_line"
               }
             ],
             "done": "done",
@@ -46587,6 +46743,13 @@
             "query": {},
             "carry": [],
             "done": true
+          },
+          {
+            "id": "recover",
+            "toolId": "recovering-from-invalidation",
+            "query": {},
+            "carry": [],
+            "done": false
           },
           {
             "id": "safety_open",
@@ -46675,7 +46838,7 @@
             },
             {
               "value": "meaning",
-              "label": "Faith or meaning"
+              "label": "Meaning, or something bigger than me"
             },
             {
               "value": "achievement",
@@ -46687,7 +46850,7 @@
             },
             {
               "value": "family",
-              "label": "Family"
+              "label": "Family, or the people who feel like family"
             },
             {
               "value": "friendship",
@@ -46755,7 +46918,7 @@
             },
             {
               "value": "fairness_1",
-              "label": "Speak up once when something's unfair",
+              "label": "Speak up once when something's unfair, if it's safe to",
               "value_id": "fairness"
             },
             {
@@ -46845,12 +47008,12 @@
             },
             {
               "value": "honesty_1",
-              "label": "Say one true thing I've been holding back",
+              "label": "Say one true thing I've been holding back, to someone safe",
               "value_id": "honesty"
             },
             {
               "value": "honesty_2",
-              "label": "Tell someone how I really am",
+              "label": "Tell someone safe how I really am",
               "value_id": "honesty"
             },
             {
@@ -46930,7 +47093,7 @@
             },
             {
               "value": "achievement_3",
-              "label": "Do one task I've been putting off",
+              "label": "Call one thing done at good enough",
               "value_id": "achievement"
             },
             {
@@ -46950,17 +47113,17 @@
             },
             {
               "value": "family_1",
-              "label": "Message or call someone in my family",
+              "label": "Spend time with someone who feels like family",
               "value_id": "family"
             },
             {
               "value": "family_2",
-              "label": "Share a meal with family",
+              "label": "Do one thing from a family tradition I like",
               "value_id": "family"
             },
             {
               "value": "family_3",
-              "label": "Ask someone in my family about their week",
+              "label": "Message someone in my family, if that feels safe",
               "value_id": "family"
             },
             {
@@ -46980,12 +47143,12 @@
             },
             {
               "value": "standing_up_1",
-              "label": "Say what I need, once, plainly",
+              "label": "Say what I need to someone safe, once, plainly",
               "value_id": "standing_up"
             },
             {
               "value": "standing_up_2",
-              "label": "Say no to one thing",
+              "label": "Say no to one small thing",
               "value_id": "standing_up"
             },
             {
@@ -47055,7 +47218,7 @@
             },
             {
               "value": "love_1",
-              "label": "Tell someone I love them",
+              "label": "Tell someone safe that I love them",
               "value_id": "love"
             },
             {
@@ -47082,6 +47245,21 @@
               "value": "work_3",
               "label": "Learn one small thing for my work",
               "value_id": "work"
+            },
+            {
+              "value": "own_1",
+              "label": "Spend ten minutes on it",
+              "value_id": "own"
+            },
+            {
+              "value": "own_2",
+              "label": "Tell someone safe it matters to me",
+              "value_id": "own"
+            },
+            {
+              "value": "own_3",
+              "label": "Notice one moment it shows up this week",
+              "value_id": "own"
             }
           ],
           "when": [
@@ -47118,8 +47296,22 @@
               "label": "Partly"
             },
             {
+              "value": "hurt",
+              "label": "It happened, and it hurt"
+            },
+            {
               "value": "no",
               "label": "Not this time"
+            }
+          ],
+          "again": [
+            {
+              "value": "smaller",
+              "label": "Pick a smaller one"
+            },
+            {
+              "value": "not_now",
+              "label": "Not now"
             }
           ]
         }

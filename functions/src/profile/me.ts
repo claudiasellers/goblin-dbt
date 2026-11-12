@@ -221,10 +221,14 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
         if (ids.length) thingIds = ids;
       }
     }
-    // Values (ER-09): the ones kept for now, named from the graph after the loop, their own words last.
+    // Values (ER-09): the ones kept for now, named from the graph after the loop, their own words last. None kept
+    // (*not sure yet*): the first few of the sort instead.
     if (meta.kind === 'values' && value) {
-      const ids = (Array.isArray(value.keptIds) ? (value.keptIds as unknown[]) : []).filter((x): x is string => typeof x === 'string').slice(0, 3);
-      const own = typeof value.keptOwn === 'string' && value.keptOwn.trim() ? value.keptOwn.trim() : undefined;
+      const list = (k: string, n: number) => (Array.isArray(value![k]) ? (value![k] as unknown[]) : []).filter((x): x is string => typeof x === 'string').slice(0, n);
+      const word = (k: string) => (typeof value![k] === 'string' && (value![k] as string).trim() ? (value![k] as string).trim() : undefined);
+      const keptAny = list('keptIds', 3).length > 0 || !!word('keptOwn');
+      const ids = keptAny ? list('keptIds', 3) : list('mineIds', 3);
+      const own = keptAny ? word('keptOwn') : (ids.length < 3 ? word('mineOwn') : undefined);
       valueIds = { ids: ids.map((id) => VALUE_OPTION + id), ...(own ? { own } : {}) };
     }
     // A person (IE-03): the name they gave, never the safety answer (Me is not where that's asked or shown).

@@ -27,10 +27,10 @@ person's own values become the measure of a good outcome, not the app's.
 | `heads_up` | A carried flooded reading: *Your body's loud right now.* (*This works better once it settles a little.*) Look after the next few minutes first → `settle` (First, the body) · Try it anyway | `steady` moment |
 | `sort` | *Which of these sound like you?* (*Pick as many as fit. If you're not sure, pick none. That's a full answer.*) 24 value cards in plain words, or *Add your own* | Step 1, sort; *add your own* |
 | `not_sure` | Nothing picked: *Not sure yet is fine. What matters can take a while to find. Come back any time.* | Identity diffusion: *not sure yet* is a full answer |
-| `keep` | *If you could only keep three for now, which?* (*Two can pull different ways. Both can matter. Not sure yet is a full answer.*) Up to three of the sort, or own words. *Save* keeps `values` either way | Step 2, keep three; conflicting values → both can matter |
+| `keep` | *If you could only keep three for now, which?* (*Two can pull different ways. Both can matter. Not sure yet? Save with none picked.*) Up to three of the sort, or own words. *Save* keeps `values` either way; kept only in their words goes straight to `step` | Step 2, keep three; conflicting values → both can matter |
 | `sorted` | None kept: *Your sort is in Me. You can pick three another time.* | *not sure yet* saves the sort |
-| `one` / `one_kept` | *Which one do you want to take a small step for?* (*One is enough for this week.*) This visit's three, or (coming back) the ones kept before, named from the `values` slice | Step 3, one value |
-| `step` | *One small step this week.* (*Small enough that you'd likely do it. It's a direction, not a rule.*) That value's three steps, or own words | Steps 3–4, a direction and a step sized to succeed |
+| `one` / `one_kept` | *Which one do you want to take a small step for?* (*One is enough for this week.*) This visit's three (or *One in my words*), or (coming back) the ones kept before, named from the `values` slice | Step 3, one value |
+| `step` | *One small step this week.* (*Small enough that you'd likely do it, and safe to do. If it means facing someone who hurts you, that's not the step.*) That value's three steps (a value in their own words gets three general ones), or own words | Steps 3–4, a direction and a step sized to succeed |
 | `when` | *When could you do it?* Tomorrow · In a few days · Sometime this week; *Want me to ask how it went?* Yes books `value_step` | Step 4 → FollowUp |
 | `set` | *Your step: {step}.* *It's a direction, not a rule. Doing part of it counts.* | Values as directions, not shoulds |
 
@@ -41,9 +41,10 @@ never naming either) reopens the run at `back` (R9 `reopens`, only on a run that
 
 | Step | What the person sees |
 |---|---|
-| `back` | *Earlier you picked: {step}.* *Did it happen?* Yes · Partly · Not this time |
+| `back` | *Earlier you picked: {step}.* *Did it happen?* Yes · Partly · It happened, and it hurt · Not this time |
 | `back_yes` | *That was {value} in action.* *Steps like that are what a value looks like from the outside.* |
-| `back_no` | *That's okay.* *Values are directions, not rules. A smaller step still counts, any time.* |
+| `back_hurt` | *That took something, and it hurt.* *Doing it still counts. How it landed isn't all on you.* Recover · First, the body |
+| `back_no` | *Not this time is a real answer.* (*Values are directions, not rules. A smaller step still counts.*) Pick a smaller one (back to `step`) · Not now (*It'll keep. Come back to it any time.*) |
 
 *Talk to someone now* is on every screen.
 
@@ -51,11 +52,14 @@ never naming either) reopens the run at `back` (R9 `reopens`, only on a run that
 
 Paraphrasing H18's themes in plain words, no verbatim list: belonging, being someone people can count on, fairness,
 making things, learning, looking after my body, fun and play, being independent, honesty, caring for others, calm and
-peace, adventure and new things, faith or meaning, getting things done, beauty and nature, family, friendship,
+peace, adventure and new things, meaning or something bigger than me, getting things done, beauty and nature, family
+or the people who feel like family, friendship,
 standing up for myself, kindness, respect, community, self-respect, love and closeness, work that matters to me.
 
 Each card carries three small steps for this week (e.g. friendship: *Reach out to a friend · See a friend in person ·
-Be a bit more honest with a friend*). Nothing is a rule, and nothing says what wasn't done.
+Be a bit more honest with a friend*). Nothing is a rule, and nothing says what wasn't done. Steps that face another
+person name someone safe (*Tell someone safe how I really am*); family steps don't assume family is safe (*Message
+someone in my family, if that feels safe*); getting things done includes *Call one thing done at good enough*.
 
 ## Saved
 
@@ -64,7 +68,8 @@ Be a bit more honest with a friend*). Nothing is a rule, and nothing says what w
   three, or none). A re-sort replaces it. Revisited after 30 days in Me (*Are these still yours?*), the PRD's monthly
   re-sort as a sampling, not a declaration. The **`values`** slice (`PROFILE_NEEDS['values-clarification']`) returns
   the kept ones named from the graph (`SkillOption values:value:<id>`, never a copy), their own words with the id
-  `own`. Me lists the item under About me with its kept values joined, and *Set aside*.
+  `own`. Me lists the item under About me with its kept values joined (none kept: the first three of the sort), and
+  *Set aside*.
 - **`ext.run`** (plan D2): the visit's answers, the keep and the booked follow-up; a kept value picked again is its id.
   No `SkillPractice` rep of its own.
 - **`value_step`** (`scripts/practice-spine/content.py`): chips `tomorrow` (next day 18:00), `few_days` (three days,
@@ -74,6 +79,7 @@ Be a bit more honest with a friend*). Nothing is a rule, and nothing says what w
 ## Connected
 
 - **Problem Solve**'s companion and solution links to `values-clarification` resolve now (`BUILT`).
+- **Recover** and **First, the body** from the step card's *It happened, and it hurt*.
 - **Tools page**: listed under Emotion Regulation; intent *Work out what matters to me*.
 - No routing rows by design: it's a `steady` skill for a quiet moment, not a check-in result.
 
@@ -81,7 +87,10 @@ Be a bit more honest with a friend*). Nothing is a rule, and nothing says what w
 
 | PRD | Built | Why | Batch |
 |---|---|---|---|
-| A pile sort, each card *that's me · sometimes · not now* (`pileSort`) | A chip sort: *sounds like me*, the rest unpicked | `pileSort` reports card ids, which the embed contract can't declare yet (a runtime change for the plan thread); the chips keep the PRD's *add your own* and *not sure yet* | ER-B4 part 2 |
+| A pile sort, each card *that's me · sometimes · not now* (`pileSort`) | A chip sort: *sounds like me*, the rest unpicked (so no place yet for mixed feelings about a value, *sometimes*) | `pileSort` reports card ids, which the embed contract can't declare yet (a runtime change for the plan thread); the chips keep the PRD's *add your own* and *not sure yet* | ER-B4 part 2 |
+| `ValueCard {id, label, theme}`, `ValueGoal`, `ValueStep`, `ValuesFlow` nodes | The skill's options (`SkillOption values:value:<id>`, steps with their `value_id`) | A skill's content lives in its options until a second reader needs the nodes (the PRD's `RELATES_TO` links will) | ER-B4 part 2 |
+| WMP dialectics for value conflicts | One line on the keep screen (*Both can matter*); no both/and step | Waits for WMP's dialectics | WMP / ER-B4 part 2 |
+| Fade: the person's own labels listed first | Not built (own words are the escape hatch on each screen) | Needs the sort to remember own words as chips | ER-B4 part 2 |
 | `ValueGoal` (a direction) then `ValueStep` (a step) | One chip: a small step that is the direction | Two screens of chips for one small step was more than the moment holds; the directions are in the step wording | ER-B4 part 2 |
 | `ValueCard -[:RELATES_TO]->` OA goals, IE priorities | Not linked | Their hosts (OA's guilt fit card, FAST's values, IE-09) read the slice once they adopt it | IE / ER-B5 |
 | Catch it after the fact: other tools' readouts show *That was standing up for myself*, a values-action rep | Not built; the step card's *That was {value} in action* is the one catch | Needs each host to map its choices to values | ER-B5 |
@@ -92,7 +101,10 @@ Be a bit more honest with a friend*). Nothing is a rule, and nothing says what w
 ## Safety
 
 - Values as shoulds: every line frames a direction (*a direction, not a rule*, *doing part of it counts*), and
-  nothing says what wasn't done.
+  nothing says what wasn't done. *Not this time* is a real answer, with a smaller step or *not now*.
+- Someone unsafe: the step screen says a step that means facing someone who hurts you isn't the step, and steps that
+  face a person name someone safe. A step that went badly (*It happened, and it hurt*) gets no blame, Recover and the
+  body.
 - Identity diffusion: picking nothing, or keeping none, is a full answer, and the sort is still kept.
 - Conflicting values: *Two can pull different ways. Both can matter.*
 - A carried flooded reading gets the body first or *Try it anyway*, never a lock.
