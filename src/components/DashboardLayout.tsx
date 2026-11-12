@@ -15,7 +15,10 @@ import { TodayButton } from './today/TodayButton';
  * own title and next action stay dominant.
  */
 export function DashboardLayout() {
-  const { user } = useAuth();
+  const { user, phase } = useAuth();
+  // Until Firebase says who this is, render the shell only: never the signed-out page or a Sign in link
+  // to someone whose session is still being restored.
+  const resolving = phase === 'resolving';
   const { profile } = useUserProfile();
   const { pathname } = useLocation();
 
@@ -73,7 +76,7 @@ export function DashboardLayout() {
             )}
             <div className="flex items-center gap-3">
               {user && !focusedLayout && <TodayButton />}
-              {!user && (
+              {phase === 'signed_out' && (
                 <Link
                   to="/login"
                   className="text-sm font-medium text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] transition-colors"
@@ -88,7 +91,7 @@ export function DashboardLayout() {
         <main className="flex-1 min-h-0 overflow-y-auto">
           <div className="max-w-7xl w-full mx-auto px-4 md:px-6 py-6 flex gap-6">
             <div className="flex-1 min-w-0">
-              <Outlet />
+              {resolving ? null : <Outlet />}
             </div>
             {showSidePanel && (
               <aside className="hidden lg:block w-[280px] flex-shrink-0" aria-label="Today and recent patterns">
