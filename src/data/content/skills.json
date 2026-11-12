@@ -14309,39 +14309,42 @@
         "copy": {
           "heads_up_title": "Your body's loud right now.",
           "heads_up_hint": "Looking at a belief works better once it settles a little.",
-          "settle_line": "This will keep. First, the body.",
+          "settle_line": "Body first. This will be here when you're ready.",
           "myth_title": "Which belief about feelings sounds most like yours?",
           "myth_hint": "Pick the closest. You can put it your own way too.",
           "own_hint": "In your own words",
           "look_title": "A belief can feel like a fact.",
-          "look_own": "Beliefs about feelings often feel like facts. You can hold this one up and look at it.",
+          "look_own": "A belief like this often makes sense given where it came from. You can look at whether it still fits.",
+          "own_safety": "If it's about hurting yourself or not wanting to be here, talk to someone now.",
           "sits_label": "How does that sit with you?",
-          "end_title_some": "Some of it fits. That's worth keeping.",
-          "end_title_not_yet": "Not yet is fine. A belief that's been around a while takes more than one look.",
+          "end_title_some": "Some of it fits. That's worth noticing.",
+          "end_title_not_yet": "Not yet is fine.",
+          "end_not_yet": "A belief that's been around a while takes more than one look.",
           "end_title_unsure": "You don't have to decide now.",
-          "end_own": "This week, notice one time the belief shows up, and what the feeling was doing then.",
+          "end_own": "This week, notice one time the belief shows up, and what you were feeling right then.",
+          "offer_guide": "What a feeling is for",
           "safety_open": "Talk to someone now",
           "done": "Done",
           "look_myth_failing": "Feelings aren't grades. Having one says you're human, not that you're failing.",
           "look_myth_past_it": "Feelings don't run on a schedule. Some take longer, and that isn't a fault.",
-          "look_myth_true": "A strong feeling shows how much something matters to you. It doesn't prove what happened.",
+          "look_myth_true": "A strong feeling shows how much something matters. Sometimes it fits the facts, sometimes it doesn't. Strength alone can't tell you which.",
           "look_myth_right_way": "People feel different things about the same moment. There isn't one correct feeling to have.",
           "look_myth_weak": "Showing a feeling takes nerve. It also lets people know what you need.",
-          "look_myth_bad": "Painful feelings are signals. They can hurt without harming you, and they pass.",
+          "look_myth_bad": "Painful feelings are part of being human. They're signals, and they rise and fall.",
           "look_myth_out_of_control": "You can feel something strongly and still choose what you do.",
           "look_myth_no_reason": "Every feeling comes from somewhere, even when the reason isn't clear yet.",
           "look_myth_ignore": "Ignored feelings tend to come back louder. Noticing one is often what lets it settle.",
-          "look_myth_approval": "Your feelings are yours. Other people's opinions don't decide whether they're real.",
+          "look_myth_approval": "Your feelings are yours. Other people's approval doesn't decide whether you're allowed to have them.",
           "look_myth_big": "Big reactions can get attention fast, and often cost a lot after. There are steadier ways to be heard.",
           "try_myth_failing": "This week, notice the feeling and the effort you're making, side by side.",
           "try_myth_past_it": "This week, try saying to yourself: it's still here, and that makes sense.",
           "try_myth_true": "Next time it's strong, ask: what are the facts, apart from the feeling?",
           "try_myth_right_way": "Next time a feeling seems wrong, try naming it without grading it.",
-          "try_myth_weak": "This week, try letting one safe person see one feeling, and notice what happens.",
+          "try_myth_weak": "This week, if there's someone safe, try letting them see one small feeling. If there isn't, try naming it to yourself.",
           "try_myth_bad": "Next time one shows up, try asking what it's telling you.",
           "try_myth_out_of_control": "This week, notice one time you felt a lot and still chose what to do.",
           "try_myth_no_reason": "When one seems to come from nowhere, try asking what happened right before.",
-          "try_myth_ignore": "Today, try noticing one feeling for a minute without pushing it away.",
+          "try_myth_ignore": "Today, try noticing one feeling for a few breaths. You can stop whenever you want.",
           "try_myth_approval": "Next time, try telling yourself: it makes sense that I feel this.",
           "try_myth_big": "This week, try saying what you need in one clear sentence, once."
         },
@@ -14578,6 +14581,12 @@
                 "when": {
                   "own": "myth"
                 }
+              },
+              {
+                "key": "own_safety",
+                "when": {
+                  "own": "myth"
+                }
               }
             ],
             "fields": [
@@ -14637,6 +14646,15 @@
               }
             ],
             "lines": [
+              {
+                "key": "end_not_yet",
+                "when": {
+                  "eq": [
+                    "$a.sits",
+                    "not_yet"
+                  ]
+                }
+              },
               {
                 "key": "try_myth_failing",
                 "when": {
@@ -14774,17 +14792,7 @@
                     [
                       "myth_failing",
                       "myth_right_way",
-                      "myth_bad"
-                    ]
-                  ]
-                }
-              },
-              {
-                "exit": "find_the_feeling",
-                "when": {
-                  "in": [
-                    "$a.myth",
-                    [
+                      "myth_bad",
                       "myth_no_reason"
                     ]
                   ]
@@ -14810,6 +14818,34 @@
                       "myth_big"
                     ]
                   ]
+                }
+              },
+              {
+                "exit": "pause",
+                "when": {
+                  "in": [
+                    "$a.myth",
+                    [
+                      "myth_out_of_control"
+                    ]
+                  ]
+                }
+              },
+              {
+                "exit": "recover",
+                "when": {
+                  "in": [
+                    "$a.myth",
+                    [
+                      "myth_approval"
+                    ]
+                  ]
+                }
+              },
+              {
+                "exit": "safety_open",
+                "when": {
+                  "own": "myth"
                 }
               }
             ]
@@ -14849,18 +14885,26 @@
             "toolId": "emotion-guide",
             "query": {},
             "carry": [],
-            "done": false
+            "done": false,
+            "label": "offer_guide"
           },
           {
-            "id": "find_the_feeling",
-            "toolId": "find-the-feeling",
+            "id": "let_it_be",
+            "toolId": "let-it-be",
             "query": {},
             "carry": [],
             "done": false
           },
           {
-            "id": "let_it_be",
-            "toolId": "let-it-be",
+            "id": "pause",
+            "toolId": "pause",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "recover",
+            "toolId": "recovering-from-invalidation",
             "query": {},
             "carry": [],
             "done": false
@@ -16677,6 +16721,7 @@
           "belief_hint": "Beliefs about feelings can make a skill feel pointless before it starts.",
           "safety_open": "Talk to someone now",
           "fix_belief": "Beliefs like that can feel like facts. They're beliefs, and you can look at them.",
+          "fix_belief_own": "If it's about hurting yourself or not wanting to be here, talk to someone now.",
           "fix_belief_heavy": "That sounds heavy to carry. After trying this much, it makes sense to feel it. You don't have to hold it alone.",
           "none": "Nothing stood out this time. That's information too. Skills can take a few goes, and that isn't on you.",
           "again_q": "Want a nudge to try it again?",
@@ -17217,6 +17262,12 @@
                   "all": []
                 },
                 "key": "fix_belief"
+              },
+              {
+                "when": {
+                  "own": "belief"
+                },
+                "key": "fix_belief_own"
               }
             ],
             "done": "done",
@@ -17236,9 +17287,16 @@
               {
                 "exit": "safety_open",
                 "when": {
-                  "eq": [
-                    "$a.belief",
-                    "myth_nothing"
+                  "any": [
+                    {
+                      "eq": [
+                        "$a.belief",
+                        "myth_nothing"
+                      ]
+                    },
+                    {
+                      "own": "belief"
+                    }
                   ]
                 }
               },

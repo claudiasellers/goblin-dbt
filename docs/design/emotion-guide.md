@@ -92,12 +92,18 @@ at, and every answer to *How does that sit with you?* counts.
    *Look anyway*. Never a lock.
 3. **look**: *A belief can feel like a fact.* The belief's other side (H3's challenge, paraphrased, no *should*),
    or for own words a general line. Then *How does that sit with you?* with *Some of it fits*, *Not yet* or
-   *Not sure*. All three go on.
-4. **end**: a title by answer (*Not yet is fine. A belief that's been around a while takes more than one look.*), one
+   *Not sure*. All three go on. The other sides keep DBT's point: a feeling may or may not fit the facts, so *it
+   must be true* is met with *strength alone can't tell you which*, never *it isn't true*.
+4. **end**: a title by answer (*Not yet is fine.*, then *A belief that's been around a while takes more than one look.*), one
    small way to test the belief this week, and where that belief goes next, whatever the answer: *it must be true*
-   → Check the Facts; *failing*, *a right way to feel*, *painful feelings are bad* → Know this feeling; *makes no
-   sense* → Find the feeling; *past this by now* → Let it be; *big reactions are the only way* → DEAR MAN. The rest,
-   and own words, end on the test and Done.
+   → Check the Facts; *failing*, *a right way to feel*, *painful feelings are bad*, *makes no sense* → Know this
+   feeling (offered as *What a feeling is for*; the card has what often sets it off); *past this by now* → Let it
+   be; *big reactions are the only way* → DEAR MAN; *out of control* → Hold to wait; *wrong to feel it if others
+   don't approve* → Recover. *Weak* and *best ignored* end on the test and Done.
+
+**Own words are never read**, so they can't raise the crisis slot. The look screen says *If it's about hurting
+yourself or not wanting to be here, talk to someone now.* and the end card offers someone to talk to beside Done
+(gate 3; It isn't working's belief card does the same for own words).
 
 **Hopelessness is not a myth card.** *Nothing will ever help me* isn't on the list. It isn't working sends it to
 someone to talk to and Done, and never here, because answering it with an opposing belief would argue with

@@ -53,6 +53,7 @@ COPY = {
     "belief_hint": "Beliefs about feelings can make a skill feel pointless before it starts.",
     "safety_open": "Talk to someone now",
     "fix_belief": "Beliefs like that can feel like facts. They're beliefs, and you can look at them.",
+    "fix_belief_own": "If it's about hurting yourself or not wanting to be here, talk to someone now.",
     "fix_belief_heavy": "That sounds heavy to carry. After trying this much, it makes sense to feel it. You don't have to hold it alone.",
     # Nothing stood out.
     "none": "Nothing stood out this time. That's information too. Skills can take a few goes, and that isn't on you.",
@@ -154,10 +155,13 @@ def steps():
         fix("fix_env", "fix_env", ["problem_solve"]),
         fix("fix_will", "fix_will", ["let_it_be"], again=True),
         fix("fix_much", "fix_much", ["problem_solve", "five_senses"], again=True),
-        {**fix("fix_belief", [{"when": HOPELESS, "key": "fix_belief_heavy"}, {"when": ALWAYS, "key": "fix_belief"}],
+        {**fix("fix_belief", [{"when": HOPELESS, "key": "fix_belief_heavy"}, {"when": ALWAYS, "key": "fix_belief"},
+                             {"when": {"own": "belief"}, "key": "fix_belief_own"}],
                ["emotion_guide"], crisis=[{"variant": "crisis", "when": HOPELESS}]),
          # Hopelessness: someone to talk to, and Done; no myth cards and no reappraisal (voice.md S9, crisis speech).
-         "offers": [{"exit": "safety_open", "when": HOPELESS}, {"exit": "emotion_guide", "when": {"not": HOPELESS}}]},
+         # Own words aren't read: someone to talk to is offered beside the cards (gate 3, ER-10 part 4).
+         "offers": [{"exit": "safety_open", "when": {"any": [HOPELESS, {"own": "belief"}]}},
+                    {"exit": "emotion_guide", "when": {"not": HOPELESS}}]},
         fix("none", "none", ["missing_links"]),
     ]
     return out

@@ -23,8 +23,8 @@ const lines = (s, c = ctx()) => (step(s).lines ?? []).filter((l) => M.handoffLin
 const offers = (s, c = ctx()) => M.offersFor(c, step(s), s);
 const myths = skill.options.myth;
 const goesTo = { myth_failing: "emotion_guide", myth_past_it: "let_it_be", myth_true: "check_the_facts", myth_right_way: "emotion_guide",
-  myth_weak: null, myth_bad: "emotion_guide", myth_out_of_control: null, myth_no_reason: "find_the_feeling", myth_ignore: null,
-  myth_approval: null, myth_big: "dear_man" };
+  myth_weak: null, myth_bad: "emotion_guide", myth_out_of_control: "pause", myth_no_reason: "emotion_guide", myth_ignore: null,
+  myth_approval: "recover", myth_big: "dear_man" };
 
 test("the skill: emotion-guide on dbt_model_of_emotions, picked by ?frame=myths, no close, nothing kept", () => {
   assert.equal(skill.toolId, "emotion-guide");
@@ -87,17 +87,18 @@ test("every answer to how it sits is an answer, each with its own end title", ()
     const end = [pick("sits", v), next].reduce((x, e) => M.runNext(ctx(), x, e), look);
     assert.equal(end.stepId, "end", v);
     assert.equal(titleOf(end), t, v);
+    assert.equal(lines(end).includes(skill.copy.end_not_yet), v === "not_yet", v);
     assert.deepEqual(offers(end), ["check_the_facts"], `${v}: the next step doesn't depend on agreeing`);
   }
 });
 
-test("own words: a general other side and a general test, no onward tool", () => {
+test("own words: a general other side, a general test, and someone to talk to (own words aren't read)", () => {
   const look = run([own("myth", "Being angry makes me a bad person"), next]);
   assert.equal(look.stepId, "look");
-  assert.deepEqual(lines(look), [skill.copy.look_own]);
+  assert.deepEqual(lines(look), [skill.copy.look_own, skill.copy.own_safety]);
   const end = [pick("sits", "unsure"), next].reduce((x, e) => M.runNext(ctx(), x, e), look);
   assert.deepEqual(lines(end), [skill.copy.end_own]);
-  assert.deepEqual(offers(end), []);
+  assert.deepEqual(offers(end), ["safety_open"]);
   assert.equal(M.stepOf(skill, "myth").fields[0].own.max, 100);
 });
 
@@ -118,4 +119,6 @@ test("Talk to someone now on every screen", () => {
     assert.ok(links.some((l) => l.exit === "safety_open"), st.id);
   }
   assert.ok(skill.exits.find((e) => e.id === "safety_open").safety);
+  // A chip pick never gets the safety offer as a card (it's the link); own words do.
+  assert.ok(!offers([pick("sits", "some"), next].reduce((x, e) => M.runNext(ctx(), x, e), run([pick("myth", "myth_weak"), next]))).includes("safety_open"));
 });
