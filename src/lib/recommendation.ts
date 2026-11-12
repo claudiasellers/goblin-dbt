@@ -66,3 +66,17 @@ export function recommendationCards(result: { tools?: ReadonlyArray<CardInput> }
 export function shownToolIds(result: { tools?: ReadonlyArray<CardInput> } | null | undefined): string[] {
   return recommendationCards(result).map((c) => c.tool.id);
 }
+
+/**
+ * A result card's frame for a skill that reads one (`?frame=`; the skill `accepts` it), by the check-in's pattern:
+ * Find your people shows the low-energy patterns (freeze, low reward) the smallest steps only (PRD IE-09).
+ */
+export const CARD_FRAMES: Readonly<Record<string, Readonly<Record<string, string>>>> = {
+  'finding-connection': { reward_drive_low: 'low', conservation_freeze: 'low' },
+};
+
+/** The result card's link: the tool page, with the frame its pattern gives, if any. */
+export function cardHref(toolId: string, activationPatternId?: string | null): string {
+  const frame = activationPatternId ? CARD_FRAMES[toolId]?.[activationPatternId] : undefined;
+  return frame ? `/tool/${toolId}?frame=${frame}` : `/tool/${toolId}`;
+}

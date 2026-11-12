@@ -1251,6 +1251,62 @@
         "notification": "A step you planned is ready."
       },
       {
+        "id": "reach_out_outcome",
+        "ownerModule": "ie",
+        "tier": "practice",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/finding-connection?run={sourceSessionId}&at=back&followUp={followUpId}",
+        "staleAfterHours": 72,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "A step towards people you picked. Did you do it?",
+          "title": "Your small step"
+        },
+        "choices": [
+          {
+            "id": "dismiss",
+            "label": "Not this time",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "chips": {
+            "evening": {
+              "days": 0,
+              "kind": "at_local",
+              "time": "21:00"
+            },
+            "few_days": {
+              "days": 3,
+              "kind": "at_local",
+              "time": "19:00"
+            },
+            "this_week": {
+              "days": 6,
+              "kind": "at_local",
+              "time": "19:00"
+            },
+            "today": {
+              "kind": "after",
+              "minutes": 180
+            },
+            "tomorrow": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "19:00"
+            }
+          },
+          "kind": "chip"
+        },
+        "notification": "Your small step is ready to check."
+      },
+      {
         "id": "recover_log",
         "ownerModule": "wmp",
         "tier": "quality",

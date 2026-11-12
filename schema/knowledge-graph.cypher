@@ -1421,6 +1421,16 @@ SET give += {
   skill_type: "relationship_effectiveness"
 };
 
+// IE Handouts 10-11 (PRD IE-09): finding and keeping friends; Find your people (docs/design/find-your-people.md).
+MERGE (building_relationships:TherapyConcept {id: "dbt_building_relationships"})
+SET building_relationships += {
+  name: "Building Relationships",
+  description: "Finding people and keeping friendships going, one small step at a time, with a prediction checked against what happened",
+  modality: "DBT",
+  module: "Interpersonal Effectiveness",
+  skill_type: "relationship_building"
+};
+
 MERGE (fast:TherapyConcept {id: "dbt_fast"})
 SET fast += {
   name: "FAST",
