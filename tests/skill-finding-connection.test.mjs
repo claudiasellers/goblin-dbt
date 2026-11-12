@@ -215,6 +215,18 @@ test("a step with nobody on the other end asks no liking questions and has no 'n
   assert.equal(run([pick("area", "friend"), next, own("step", "Text Sam"), next]).stepId, "predict", "own words: asked");
 });
 
+test("a bigger step picked on a steady day survives its card opened on a stirred one (Codex on #114)", () => {
+  const b = run([pick("predict", "well"), next, held, pick("when", "tomorrow"), pick("remind", "yes"), next], ctx(), TO_PREDICT("friend", "friend_invite"));
+  const stirred = ctx({ band: "stirred" });
+  const r = M.resumeRun(stirred, M.runRecord(stirred, b), "back");
+  assert.equal(r.stepId, "back");
+  assert.deepEqual(r.answers.step.ids, ["friend_invite"]);
+  assert.equal(title(r, stirred), "Earlier you picked: Invite someone to something low-key. Your guess: Well.");
+  const smaller = run([pick("happened", "not_yet"), next, pick("again", "smaller"), next], stirred, r);
+  assert.equal(smaller.stepId, "step");
+  assert.ok(!values(smaller, "step", stirred).includes("friend_invite"), "a smaller step is still the smallest");
+});
+
 test("pick a smaller step: the smallest only, whatever the band", () => {
   const again = run([pick("happened", "not_yet"), next], ctx(), reopened(booked()));
   const st = run([pick("again", "smaller"), next], ctx(), again);

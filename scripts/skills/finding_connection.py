@@ -173,7 +173,11 @@ CONTACT = {"any": [{"in": [a("step"), CONTACT_IDS]}, {"not": {"set": a("step") +
 # validates an answer against every field of that id, so the filter is open whenever the step has someone in it.
 NOT_NO_ANSWER = {"any": [CONTACT, {"not": {"eq": ["$opt.value", "no_answer"]}}]}
 FOR_AREA = {"eq": ["$opt.area", a("area")]}
-SMALL_IF_LOW = {"any": [{"all": [{"not": LOW}, {"not": SMALLER}]}, {"eq": ["$opt.small", True]}]}
+# A step already planned stays valid whatever the band when its card reopens the run: the reopened run is checked
+# against today's context, and a steady day's bigger step must not vanish on a stirred one (Codex on #114). Only a run
+# that booked the card reopens, and `remind` is read back (an embed's answer isn't). *Pick a smaller step* still narrows it.
+PLANNED = {"eq": [a("remind"), "yes"]}
+SMALL_IF_LOW = {"any": [{"all": [{"any": [{"not": LOW}, PLANNED]}, {"not": SMALLER}]}, {"eq": ["$opt.small", True]}]}
 # The prediction and the outcome share a scale, so the gap is one comparison.
 HOW = [("well", "Well"), ("mixed", "Mixed"), ("badly", "Badly"), ("no_answer", "No one will respond")]
 WENT = [("well", "Well"), ("mixed", "Mixed"), ("badly", "Badly"), ("no_answer", "No one responded")]
