@@ -140,7 +140,9 @@ MERGE (opt)-[:FOR_SITUATION]->(s);""")
     L.append(unwind(C.REINFORCE_OPTIONS, "r") + "\nMERGE (opt:DearManReinforceOption {id: r.id})\nSET opt.label = r.label, opt.sortOrder = r.sort;")
 
     L.append(section("5. BARRIERS + BARRIER COACHING"))
-    L.append(unwind(C.BARRIERS, "b") + "\nMERGE (bar:DearManBarrier {id: b.id})\nSET bar.label = b.label;\n\n// --- Coaching per barrier ---\n")
+    L.append(unwind(C.BARRIERS, "b") + "\nMERGE (bar:DearManBarrier {id: b.id})\nSET bar.label = b.label;\n\n"
+             + "// --- IE-12: myths (Handout 2a), DearManBarrier kind 'myth' ---\n"
+             + unwind(C.MYTHS, "m") + "\nMERGE (bar:DearManBarrier {id: m.id})\nSET bar.label = m.label, bar.kind = m.kind;\n\n// --- Coaching per barrier ---\n")
     coach = []
     for r in C.BARRIER_COACHING:
         props = {k: v for k, v in r.items() if k not in ("id", "barrier")}

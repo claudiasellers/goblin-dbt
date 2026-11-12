@@ -104,6 +104,18 @@ BARRIERS = [
     {"id": "barrier_emotional", "label": "I'm worried I'll get emotional"},
     {"id": "barrier_no_right", "label": "I don't feel like I have the right to ask"},
 ]
+# IE-12 (DBT IE Handout 2a, myths in the way of effectiveness): thoughts about asking itself, `kind: 'myth'`, shown in
+# DEAR MAN's prep beside the barriers. Received and named, never argued with (the parked-CBT decision): each is
+# answered by a cheerleading anchor phrase (HELPS_WITH below), never a disputation.
+MYTHS = [
+    {"id": "myth_deserve", "label": "I don't deserve it", "kind": "myth"},
+    {"id": "myth_weak", "label": "Asking makes me look weak", "kind": "myth"},
+    {"id": "myth_matter", "label": "If they say no, it means I don't matter", "kind": "myth"},
+    {"id": "myth_know", "label": "They'd know if they cared", "kind": "myth"},
+    {"id": "myth_last", "label": "My needs come last", "kind": "myth"},
+    {"id": "myth_sure", "label": "I need to know they'll say yes first", "kind": "myth"},
+    {"id": "myth_alone", "label": "If I can't fix it alone, I'm not good enough", "kind": "myth"},
+]
 # Coaching per barrier (DearManBarrierCoaching -[:ADDRESSES]-> DearManBarrier); the last is the default.
 BARRIER_COACHING = [
     {"id": "coaching_angry", "title": "If they get defensive", "body": "That's their emotion — not proof that you're wrong. You can acknowledge it ('I can see this is frustrating') and come back to what you need.", "barrier": "barrier_angry"},
@@ -292,22 +304,22 @@ ASSERT_PROMPTS = [
 ]
 # 5. Anchor needs (DearManAnchorNeed), each with the barriers it most often answers.
 ANCHOR_NEEDS = [
-    {"id": "need_permission", "label": "That I'm allowed to ask", "sort": 1, "barriers": ["barrier_guilty", "barrier_no_right"]},
+    {"id": "need_permission", "label": "That I'm allowed to ask", "sort": 1, "barriers": ["barrier_guilty", "barrier_no_right", "myth_deserve", "myth_weak", "myth_last", "myth_alone"]},
     {"id": "need_reaction", "label": "That their reaction isn't mine to fix", "sort": 2, "barriers": ["barrier_angry"]},
     {"id": "need_steady", "label": "That I can stay steady", "sort": 3, "barriers": ["barrier_emotional"]},
     {"id": "need_imperfect", "label": "That I don't have to say it perfectly", "sort": 4, "barriers": ["barrier_dont_know"]},
-    {"id": "need_different", "label": "That this time can be different", "sort": 5, "barriers": ["barrier_tried_before"]},
-    {"id": "need_matters", "label": "That this is worth saying", "sort": 6, "barriers": []},
+    {"id": "need_different", "label": "That this time can be different", "sort": 5, "barriers": ["barrier_tried_before", "myth_matter", "myth_sure"]},
+    {"id": "need_matters", "label": "That this is worth saying", "sort": 6, "barriers": ["myth_know"]},
 ]
 # 6. Anchor phrases tagged by need and barrier (retags the original four, adds the rest).
 ANCHOR_PHRASES = [
-    {"id": "anchor_needs_valid", "label": "My needs are valid", "sort": 1, "needs": ["need_permission"], "barriers": ["barrier_guilty", "barrier_no_right"]},
-    {"id": "anchor_allowed", "label": "I'm allowed to want this", "sort": 2, "needs": ["need_permission"], "barriers": ["barrier_guilty", "barrier_no_right"]},
+    {"id": "anchor_needs_valid", "label": "My needs are valid", "sort": 1, "needs": ["need_permission"], "barriers": ["barrier_guilty", "barrier_no_right", "myth_deserve", "myth_last"]},
+    {"id": "anchor_allowed", "label": "I'm allowed to want this", "sort": 2, "needs": ["need_permission"], "barriers": ["barrier_guilty", "barrier_no_right", "myth_deserve"]},
     {"id": "anchor_burden", "label": "Asking isn't a burden. Guessing is.", "sort": 3, "needs": ["need_permission"], "barriers": ["barrier_guilty"]},
     {"id": "anchor_clear_is_kind", "label": "Clear is kind", "sort": 4, "needs": ["need_permission", "need_imperfect"], "barriers": ["barrier_guilty", "barrier_no_right"]},
     {"id": "anchor_their_feelings", "label": "Their feelings are theirs to hold", "sort": 5, "needs": ["need_reaction"], "barriers": ["barrier_angry"]},
     {"id": "anchor_anger_not_verdict", "label": "Their anger isn't a verdict on me", "sort": 6, "needs": ["need_reaction"], "barriers": ["barrier_angry"]},
-    {"id": "anchor_hear_no", "label": "I can hear a no and still be okay", "sort": 7, "needs": ["need_reaction", "need_different"], "barriers": ["barrier_angry", "barrier_tried_before"]},
+    {"id": "anchor_hear_no", "label": "I can hear a no and still be okay", "sort": 7, "needs": ["need_reaction", "need_different"], "barriers": ["barrier_angry", "barrier_tried_before", "myth_matter"]},
     {"id": "anchor_stay_kind_firm", "label": "I can be kind and still not back down", "sort": 8, "needs": ["need_reaction", "need_steady"], "barriers": ["barrier_angry", "barrier_guilty"]},
     {"id": "anchor_stay_with", "label": "I can stay with this", "sort": 9, "needs": ["need_steady"], "barriers": ["barrier_emotional"]},
     {"id": "anchor_tears_ok", "label": "Tears don't cancel the point", "sort": 10, "needs": ["need_steady"], "barriers": ["barrier_emotional"]},
@@ -319,10 +331,14 @@ ANCHOR_PHRASES = [
     {"id": "anchor_wrote_it_down", "label": "I wrote it down because it matters", "sort": 16, "needs": ["need_imperfect", "need_matters"], "barriers": ["barrier_dont_know"]},
     {"id": "anchor_this_time", "label": "This time, I'm asking differently", "sort": 17, "needs": ["need_different"], "barriers": ["barrier_tried_before"]},
     {"id": "anchor_not_the_past", "label": "I'm here for this conversation, not the last five", "sort": 18, "needs": ["need_different"], "barriers": ["barrier_tried_before"]},
-    {"id": "anchor_one_ask", "label": "One ask. This one.", "sort": 19, "needs": ["need_different", "need_imperfect"], "barriers": ["barrier_tried_before", "barrier_dont_know"]},
+    {"id": "anchor_one_ask", "label": "One ask. This one.", "sort": 19, "needs": ["need_different", "need_imperfect"], "barriers": ["barrier_tried_before", "barrier_dont_know", "myth_sure"]},
     {"id": "anchor_worth_saying", "label": "This is worth saying", "sort": 20, "needs": ["need_matters"], "barriers": []},
     {"id": "anchor_matters_to_me", "label": "This matters to me, and that's reason enough", "sort": 21, "needs": ["need_matters", "need_permission"], "barriers": ["barrier_no_right"]},
     {"id": "anchor_future_me", "label": "Future me will be glad I said it", "sort": 22, "needs": ["need_matters"], "barriers": []},
+    # IE-12's three (PRD: new phrases where a myth had none).
+    {"id": "anchor_human", "label": "Needing things is human, not weak", "sort": 23, "needs": ["need_permission"], "barriers": ["myth_weak", "myth_last", "myth_alone"]},
+    {"id": "anchor_this_ask", "label": "A no to this ask isn't a no to me", "sort": 24, "needs": ["need_different"], "barriers": ["myth_matter"]},
+    {"id": "anchor_kinder_than_guess", "label": "Saying it clearly is kinder than hoping they guess", "sort": 25, "needs": ["need_permission", "need_matters"], "barriers": ["myth_know"]},
 ]
 # The anchor generator's copy, on the DEAR MAN TherapyConcept.
 ANCHOR_GENERATOR = {"anchorGeneratorIntro": "An anchor phrase is one short line you can say to yourself when the conversation gets hard. The best ones answer the specific thing your brain will try to tell you in that moment.",

@@ -32,7 +32,7 @@ import sys, json; sys.path.insert(0, 'scripts/dear-man')
 import content as C
 import importlib.util
 spec = importlib.util.spec_from_file_location('parts_content', 'scripts/parts/content.py'); P = importlib.util.module_from_spec(spec); spec.loader.exec_module(P)
-ours = {'MomentResponse': C.MOMENT_RESPONSES, 'TurningPoint': C.TURNING_POINTS, 'ThoughtPattern': C.THOUGHT_PATTERNS, 'DearManBarrier': C.BARRIERS}
+ours = {'MomentResponse': C.MOMENT_RESPONSES, 'TurningPoint': C.TURNING_POINTS, 'ThoughtPattern': C.THOUGHT_PATTERNS, 'DearManBarrier': C.BARRIERS + C.MYTHS}
 print(json.dumps({k: {'ours': sorted(r['id'] for r in v), 'parts': sorted(set(P.EXPRESSES.get(k, {})) | set(P.HELD.get(k, {})))} for k, v in ours.items()}))`], { encoding: "utf8" }));
   for (const [label, { ours, parts }] of Object.entries(out)) assert.deepEqual(parts, ours, label);
 });
