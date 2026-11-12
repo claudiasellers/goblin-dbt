@@ -24,6 +24,7 @@ import { InlineSkillEmbed } from './InlineSkillEmbed';
 import { TwoColumns } from './TwoColumns';
 import { RehearsalStage } from './RehearsalStage';
 import { FeelingCard } from './FeelingCard';
+import { EpisodeStrip } from './EpisodeStrip';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -94,6 +95,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   twoColumns: TwoColumns,
   rehearsalStage: RehearsalStage,
   feelingCard: FeelingCard,
+  episodeStrip: EpisodeStrip,
   kitDeck: KitDeck,
   inlineSkill: InlineSkillEmbed,
 };
@@ -134,6 +136,8 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   rehearsalStage: { ids: ['again', 'acknowledge', 'name', 'middle', 'turn', 'break', 'done', 'aloud', 'finished', 'stopped', 'lost_it', 'stepped_out'], measures: ['doneCount'] },
   // ER-10's feeling card: read, then on.
   feelingCard: { ids: ['read'] },
+  // ER-10 part 2's strip: read, then on.
+  episodeStrip: { ids: ['read'] },
   kitDeck: { ids: ['body', 'hands', 'soothe', 'words', 'place', 'reasons', 'pros_cons', 'starter'], measures: ['durationSec', 'doneCount'] },
   inlineSkill: { ids: ['finished', 'left', 'stopped', 'body', 'unsafe'] },
 };
@@ -451,6 +455,16 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     forLabel: { type: 'copy' }, promptsLabel: { type: 'copy' }, bodyLabel: { type: 'copy' }, urgesLabel: { type: 'copy' },
     /** Under the urges: a pull isn't something to do. */
     urgeNote: { type: 'copy' },
+    next: { type: 'copy' },
+  },
+  // ER-10 part 2: the wave's slots in order, named by `names` (split on " · "), `blank` for a slot left out.
+  episodeStrip: {
+    fields: { type: 'fields' },
+    names: { type: 'copy' },
+    blank: { type: 'copy' },
+    /** The guess, under the rows with its label (*Maybe: frustrated*). */
+    nameField: { type: 'field', optional: true },
+    nameLabel: { type: 'copy', optional: true },
     next: { type: 'copy' },
   },
   // R8: another skill run inline; `skill` names it (it must declare `inline`), `enterAt` one of its `inline.enterAt`.

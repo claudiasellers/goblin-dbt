@@ -5,8 +5,8 @@ DBT Emotion Regulation Handouts 3–6: what emotions do, the model of emotions, 
 `emotion_guide` on the skill runtime. Listed under Emotion Regulation for everyone, with the Tools intent *Get to
 know a feeling*.
 
-Part 1 (built 12 Nov 2026) is the feeling card and the ladder; part 4 (built 12 Nov 2026) is the myth cards, below.
-Parts 2–3 are under *Not yet*.
+Part 1 (built 12 Nov 2026) is the feeling card and the ladder; part 2 (built 12 Nov 2026) is Walk the wave and part 4
+(built 12 Nov 2026) the myth cards, below. Part 3 is under *Not yet*.
 
 ## What it is for
 
@@ -74,6 +74,34 @@ who said no). Do the Opposite still lists all three, where the steps meet them. 
 phone / social media* stay: as recognition they are the feeling's own pulls, while the DT `check` urge is the act. The DT behaviour urges (send, check, hit, leave, use, self_harm) are
 never on the card either: only `kind: 'emotion'` urges reach it.
 
+## Walk the wave (`scripts/skills/walk_the_wave.py`, part 2)
+
+DBT ER Handout 5, the model of emotions: one episode laid out start to finish, in calm. A third skill, `walk_the_wave`,
+under the same tool: `?frame=wave` picks it (`emotionGuideSkillFor`). Opened from a card on the tool's page (*Walk the
+wave*) and the Tools intent *Make sense of a feeling that just happened*.
+
+1. **start**: *Where do you want to start?* what happened · my body · the urge · what I did · from the beginning.
+   Starting at the body or the urge is for someone who can't name the feeling yet (the PRD's alexithymia path).
+2. **heads_up** (a carried flooded reading only, after the start): the body first or *Walk it anyway*, back to the
+   slot they chose. Never a lock.
+3. **the seven slots**, the start slot first, then the others in the model's order: *before* (what was already
+   wearing you down: Running low's rows in plain words), *what happened* (Check the Facts' event kinds, same ids,
+   danger ones included), *what your mind said*, *your body*, *the urge* (Hold to wait's six pulls with their ActionUrge
+   ids, so the visit records `urgeIds`, plus six of the feeling's own pulls), *what you did*, *after* (a second
+   feeling about the first lives here). Chips and own words; none required (*Skip any you're not sure of*).
+4. **name**: *If you had to guess, what was the feeling?* One grid word, or none. The guess is the visit's emotion
+   (`emotionFields`).
+5. **strip**: the `episodeStrip` embed: the seven slots on the paper in the model's order whatever the start, a
+   skipped slot marked *Skipped*, the guess under them (*Maybe: frustrated*). Read, then on.
+6. **end**: *A feeling has a beginning, a middle and an end.* Then the guess's card (*Get to know this feeling*,
+   carrying it), Check the Facts when the mind said something (*Check the story your mind told*, carrying the guess),
+   and Cope Ahead (*Plan for next time*).
+
+Safety: danger from a person among what happened opens the `other_person` slot on every screen after it, and the end
+offers only someone to talk to and Ending in its careful frame (no plan to face them). *Hurt myself* among the urges
+opens the crisis banner on every screen after it, and the end says *talk to someone now* and offers only that.
+*Talk to someone now* on every screen. No close, no keep, no follow-up: the episode is the run (`ext.run`).
+
 ## The myth cards (`scripts/skills/emotion_myths.py`, part 4)
 
 DBT ER Handout 3's myths about emotions, and It isn't working's belief check (H24). A second skill, `emotion_myths`,
@@ -136,8 +164,8 @@ Not yet: carrying It isn't working's pick in, so the person doesn't choose twice
 
 ## Not yet
 
-- Part 2, *Walk the wave*: the `episodeStrip` embed (prompting event → interpretation → body → urge → action →
-  after-effects), embedded by CORE-08.
+- Walk the wave, part 2: CORE-08's chain analysis embedding the strip; an `EmotionEpisode` record (the PRD's proposal)
+  once something reads episodes back; ladder taps as `SkillPractice`.
 - Part 3, words everywhere: `FOUND_WORD` from more hosts, own words first, the card after naming in the check-in and
   Find the feeling.
 
