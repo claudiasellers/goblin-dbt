@@ -94,9 +94,9 @@ jobs:
           fi
           $ok
 
-      # No test or lint here: the merge lane ran CI's checks on this PR on top of main before merging
-      # it, and CI runs them again on the push to main. Building is still a gate (and functions deploy
-      # what it builds).
+      # No test or lint here: the merge lane is the only place tests run (Claudia, 12 Nov 2026). It ran
+      # every check on this exact merge commit before pushing it. Building is still a gate (and functions
+      # deploy what it builds).
       - name: Install
         if: steps.plan.outputs.any == 'true'
         run: npm ci && npm ci --prefix functions
