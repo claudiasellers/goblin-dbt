@@ -45867,18 +45867,18 @@
         "emotionFields": [],
         "copy": {
           "start_title": "What matters to you?",
-          "start_hint": "There are no right answers, and they can change. A few minutes is enough.",
-          "start_back_title": "Your values are here.",
+          "start_hint": "There are no right answers, and they can change.",
+          "start_back_title": "You've kept a few things that matter to you.",
           "heads_up_title": "Your body's loud right now.",
           "heads_up_hint": "This works better once it settles a little.",
           "settle_line": "This will keep. Look after the next few minutes first.",
           "sort_title": "Which of these sound like you?",
-          "sort_hint": "Pick as many as fit. If you're not sure, pick none. That's a full answer.",
+          "sort_hint": "Pick as many as fit, then Next. None is a full answer: not sure yet.",
           "sort_own": "Add your own",
-          "keep_title": "If you could only keep three for now, which?",
-          "keep_hint": "Two can pull different ways. Both can matter. Not sure yet? Save with none picked.",
+          "keep_title": "Which ones matter most for now? Up to three.",
+          "keep_hint": "Two can pull different ways. Both can matter. Not sure yet? Save with none picked. Your list is kept either way.",
           "keep_own": "In my words",
-          "keep_primary": "Save",
+          "keep_primary": "Keep these",
           "not_sure_title": "Not sure yet is fine.",
           "not_sure_line": "What matters can take a while to find. Come back any time.",
           "sorted_line": "Your sort is in Me. You can pick three another time.",
@@ -45895,7 +45895,7 @@
           "set_remind": "I'll ask how it went. Doing part of it counts.",
           "back_title": "Earlier you picked: {step}.",
           "happened_label": "Did it happen?",
-          "back_yes_title": "That was {focus} in action.",
+          "back_yes_title": "{focus}, in action.",
           "back_yes_line": "Steps like that are what a value looks like from the outside.",
           "back_yes_title_own": "That was something that matters to you, in action.",
           "back_hurt_title": "That took something, and it hurt.",
@@ -45906,7 +45906,9 @@
           "next": "Next",
           "done": "Done",
           "profile_unnamed": "something that matters to you",
-          "back_yes_title_kept": "That was {focus_kept} in action.",
+          "back_yes_title_kept": "{focus_kept}, in action.",
+          "back_partly_line": "Part of it counts. Steps like that are what a value looks like from the outside.",
+          "sorted_title": "Your list is kept.",
           "back_end_line": "It'll keep. Come back to it any time."
         },
         "tables": {},
@@ -45932,42 +45934,11 @@
                 "options": {
                   "list": "start",
                   "where": {
-                    "any": [
-                      {
-                        "all": [
-                          {
-                            "set": "$p.values"
-                          },
-                          {
-                            "eq": [
-                              "$opt.back",
-                              true
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        "all": [
-                          {
-                            "not": {
-                              "set": "$p.values"
-                            }
-                          },
-                          {
-                            "not": {
-                              "eq": [
-                                "$opt.back",
-                                true
-                              ]
-                            }
-                          }
-                        ]
-                      }
-                    ]
+                    "set": "$p.values"
                   }
                 },
                 "max": 1,
-                "required": true,
+                "required": false,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -46228,7 +46199,7 @@
             "id": "sorted",
             "kind": "handoff",
             "complete": true,
-            "title": "not_sure_title",
+            "title": "sorted_title",
             "lines": [
               {
                 "when": {
@@ -46593,6 +46564,15 @@
             "lines": [
               {
                 "when": {
+                  "eq": [
+                    "$a.happened",
+                    "partly"
+                  ]
+                },
+                "key": "back_partly_line"
+              },
+              {
+                "when": {
                   "all": []
                 },
                 "key": "back_yes_line"
@@ -46763,18 +46743,12 @@
         "options": {
           "start": [
             {
-              "value": "begin",
-              "label": "Let's look"
-            },
-            {
               "value": "step",
-              "label": "Take a small step for one of them",
-              "back": true
+              "label": "Take a small step for one of them"
             },
             {
               "value": "sort",
-              "label": "Sort them again",
-              "back": true
+              "label": "Sort them again"
             }
           ],
           "heads_up": [
@@ -46866,7 +46840,7 @@
             },
             {
               "value": "respect",
-              "label": "Respect"
+              "label": "Treating people with respect"
             },
             {
               "value": "community",
@@ -46973,7 +46947,7 @@
             },
             {
               "value": "health_3",
-              "label": "Book a check-up I've been putting off",
+              "label": "Book a check-up",
               "value_id": "health"
             },
             {
@@ -47018,7 +46992,7 @@
             },
             {
               "value": "honesty_3",
-              "label": "Put right one small untruth",
+              "label": "Tell one small truth",
               "value_id": "honesty"
             },
             {

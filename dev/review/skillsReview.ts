@@ -51,7 +51,7 @@ const SEEDS: Record<string, Record<string, string[]>> = {
   // Running low: sleep short and food skipped, so the readout drains Sleep and the fix screen lists real fixes.
   please_skill: { sleep: ['sleep_short'], food: ['food_skipped'], fix: ['fix_rest'], when: ['later'], remind: ['evening'] },
   good_things: { start: ['one'], energy: ['little'], pick: ['outside'], when: ['evening'], remind: ['yes'], kind: ['colour'], keepit: ['keep'], happened: ['yes'], compared: ['lighter'], mind: ['here'] },
-  values: { start: ['begin'], mine: ['honesty', 'friendship', 'calm'], kept: ['friendship'], focus: ['friendship'], step: ['friendship_1'], when: ['few_days'], remind: ['yes'], happened: ['yes'] },
+  values: { start: ['step'], mine: ['honesty', 'friendship', 'calm', 'fun', 'learning'], kept: ['friendship', 'honesty'], focus: ['friendship'], focus_kept: ['friendship'], step: ['friendship_1'], when: ['few_days'], remind: ['yes'], happened: ['yes'] },
 };
 
 /** The first option a field offers: a seed, an emotion id, or its list's first value (tables and profile options: none). */
@@ -80,8 +80,11 @@ export function reviewRun(skill: SkillDef, stepId: string) {
     if (st?.each && !pick) continue;
     if (st?.answerAs && seed[st.answerAs]) answers.push({ fieldId: st.answerAs, optionIds: seed[st.answerAs] });
     for (const f of st?.fields ?? []) {
+      // A multi-pick field seeded with several (a sort, then three of it) gets them all, so later filtered lists fill.
+      const many = !st?.each && f.max > 1 && (seed[f.id]?.length ?? 0) > 1 ? seed[f.id] : null;
       const v = firstOption(skill, f);
-      if (v) answers.push({ fieldId: f.id, optionIds: [v], ...(pick ? { pick } : {}) });
+      if (many) answers.push({ fieldId: f.id, optionIds: many });
+      else if (v) answers.push({ fieldId: f.id, optionIds: [v], ...(pick ? { pick } : {}) });
     }
   }
   // A `reopens` step is where a reopened run starts, never on its record: the record stops at the step before it.

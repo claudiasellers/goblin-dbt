@@ -23,7 +23,7 @@ const values = (s, fieldId, c = ctx()) => {
   return M.optionGroups(c, f, s.answers).flatMap((g) => g.options.map((o) => o.value));
 };
 const offers = (s, c = ctx()) => M.offersFor(c, M.stepOf(skill, s.stepId), s);
-const SORTED = (c = ctx()) => run([pick("start", "begin"), next, pick("mine", "honesty"), pick("mine", "friendship"), pick("mine", "calm"), pick("mine", "fun"), next], c);
+const SORTED = (c = ctx()) => run([next, pick("mine", "honesty"), pick("mine", "friendship"), pick("mine", "calm"), pick("mine", "fun"), next], c);
 
 test("the skill: tool values-clarification, concept dbt_values_priorities, no close question, listed under Emotion Regulation", () => {
   assert.equal(skill.toolId, "values-clarification");
@@ -44,8 +44,8 @@ test("the skill: tool values-clarification, concept dbt_values_priorities, no cl
 test("first time: the question, then the sort; nothing picked is a full answer (not sure yet)", () => {
   const s = M.initialRun(skill);
   assert.equal(title(s), "What matters to you?");
-  assert.deepEqual(values(s, "start"), ["begin"]);
-  const sort = run([pick("start", "begin"), next]);
+  assert.deepEqual(values(s, "start"), [], "nothing to choose the first time: Next goes to the sort");
+  const sort = run([next]);
   assert.equal(sort.stepId, "sort");
   const cards = values(sort, "mine");
   assert.ok(cards.length >= 20 && cards.length <= 26, "about two dozen value cards");
@@ -102,7 +102,7 @@ test("kept only in their own words: straight to a step, with the general steps; 
 test("coming back with values kept: a step for one of them (named from the slice), or sort again", () => {
   const c = ctx({}, KEPT);
   const s = M.initialRun(skill);
-  assert.equal(title(s, c), "Your values are here.");
+  assert.equal(title(s, c), "You've kept a few things that matter to you.");
   assert.deepEqual(values(s, "start", c), ["step", "sort"]);
   const one = run([pick("start", "step"), next], c);
   assert.equal(one.stepId, "one_kept");
@@ -129,7 +129,8 @@ test("value_step: registered, content-free, reopens at back; yes names the value
   assert.equal(title(r), "Earlier you picked: See a friend in person.");
   const yes = run([pick("happened", "partly"), next], ctx(), r);
   assert.equal(yes.stepId, "back_yes");
-  assert.equal(title(yes), "That was Friendship in action.");
+  assert.equal(title(yes), "Friendship, in action.");
+  assert.match(line(yes), /^Part of it counts/, "partly gets its own line");
   const no = run([pick("happened", "no"), next], ctx(), r);
   assert.equal(no.stepId, "back_no");
   assert.equal(title(no), "Not this time is a real answer.");
@@ -149,12 +150,14 @@ test("value_step: registered, content-free, reopens at back; yes names the value
   const c = ctx({}, KEPT);
   const kb = run([pick("start", "step"), next, pick("focus_kept", "friendship"), next, pick("step", "friendship_1"), next, pick("when", "tomorrow"), next], c);
   const rk = M.resumeRun(c, M.runRecord(c, kb), "back");
-  assert.equal(title(run([pick("happened", "yes"), next], c, rk), c), "That was Friendship in action.");
+  const full = run([pick("happened", "yes"), next], c, rk);
+  assert.equal(title(full, c), "Friendship, in action.");
+  assert.match(line(full, c), /^Steps like that/);
 });
 
 test("a carried flooded reading: the body first or try anyway; Talk to someone now on every screen", () => {
   const c = ctx({ band: "flooded" });
-  const h = run([pick("start", "begin"), next], c);
+  const h = run([next], c);
   assert.equal(h.stepId, "heads_up");
   const settle = run([pick("heads_up", "settle"), next], c, h);
   assert.deepEqual(offers(settle, c), ["cool_down"]);

@@ -7,14 +7,14 @@ Steps:
   heads_up   a carried flooded reading: values work wants a steadier moment; the body first or *Try it anyway*.
   sort       *Which of these sound like you?* ~24 value cards in plain words (paraphrasing H18's themes), as many as
              fit, or own words. Nothing picked is a full answer: *not sure yet* (`not_sure`).
-  keep       *If you could only keep three for now*: up to three from the sort (or own words). *Not sure yet* is
+  keep       *Which ones matter most for now? Up to three.*: up to three from the sort (or own words). *Not sure yet* is
              complete: the sort is kept either way (`values`, one per person, re-sorting replaces it).
   one        one kept value to take a step for (this visit's three), or `one_kept` (the ones kept before).
   step       one small step this week for that value (2–3 per value, sized to succeed), or own words.
   when       when (*tomorrow · in a few days · sometime this week*); *Want me to ask how it went?* books `value_step`.
   set        "Your step: {step}." and the direction line (a direction, not a rule).
   back       the `value_step` card reopens the run here (R9): *Earlier you picked: {step}.* *Did it happen?*
-  back_yes   yes / partly: *That was {focus} in action.*
+  back_yes   yes / partly: *{focus}, in action.* (partly: *Part of it counts.*)
   back_hurt  it happened, and it hurt: it took something; how it landed isn't all on you (Recover, the body).
   back_no    not this time: a real answer; a smaller step for the same value, or not now.
 
@@ -39,20 +39,20 @@ OWN_MAX = 60  # a value or a step in a few words
 
 COPY = {
     "start_title": "What matters to you?",
-    "start_hint": "There are no right answers, and they can change. A few minutes is enough.",
-    "start_back_title": "Your values are here.",
+    "start_hint": "There are no right answers, and they can change.",
+    "start_back_title": "You've kept a few things that matter to you.",
     # A carried flooded reading: values work wants a steadier moment (PRD: `steady`).
     "heads_up_title": "Your body's loud right now.",
     "heads_up_hint": "This works better once it settles a little.",
     "settle_line": "This will keep. Look after the next few minutes first.",
     "sort_title": "Which of these sound like you?",
-    "sort_hint": "Pick as many as fit. If you're not sure, pick none. That's a full answer.",
+    "sort_hint": "Pick as many as fit, then Next. None is a full answer: not sure yet.",
     "sort_own": "Add your own",
-    "keep_title": "If you could only keep three for now, which?",
+    "keep_title": "Which ones matter most for now? Up to three.",
     # Conflicting values (PRD risks) and identity diffusion: *not sure yet* is complete.
-    "keep_hint": "Two can pull different ways. Both can matter. Not sure yet? Save with none picked.",
+    "keep_hint": "Two can pull different ways. Both can matter. Not sure yet? Save with none picked. Your list is kept either way.",
     "keep_own": "In my words",
-    "keep_primary": "Save",
+    "keep_primary": "Keep these",
     "not_sure_title": "Not sure yet is fine.",
     "not_sure_line": "What matters can take a while to find. Come back any time.",
     "sorted_line": "Your sort is in Me. You can pick three another time.",
@@ -70,7 +70,7 @@ COPY = {
     # The value_step card reopens the run here.
     "back_title": "Earlier you picked: {step}.",
     "happened_label": "Did it happen?",
-    "back_yes_title": "That was {focus} in action.",
+    "back_yes_title": "{focus}, in action.",
     "back_yes_line": "Steps like that are what a value looks like from the outside.",
     "back_yes_title_own": "That was something that matters to you, in action.",
     # It happened and went badly (a rejection, a put-down): the step still counts; how it landed isn't all on them.
@@ -95,11 +95,10 @@ FLOODED = {"eq": ["$ctx.band", "flooded"]}
 SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
 HAS_VALUES = {"set": "$p.values"}
 
-# First time: one way in. With values kept: a step for one, or sort again (`back`).
+# With values kept: a step for one, or sort again. First time the start screen has no chips.
 STARTS = [
-    ("begin", "Let's look", {}),
-    ("step", "Take a small step for one of them", {"back": True}),
-    ("sort", "Sort them again", {"back": True}),
+    ("step", "Take a small step for one of them", {}),
+    ("sort", "Sort them again", {}),
 ]
 HEADS_UP = [("settle", "Look after the next few minutes first"), ("try", "Try it anyway")]
 # The value cards (paraphrasing H18's themes in plain words; no verbatim list), each with 2–3 small steps for this
@@ -116,13 +115,13 @@ VALUES = [
     ("learning", "Learning", ["Spend ten minutes on something new", "Ask someone how they do something",
                               "Try one new thing once"]),
     ("health", "Looking after my body", ["Go to bed a little earlier one night", "Take a short walk",
-                                         "Book a check-up I've been putting off"]),
+                                         "Book a check-up"]),
     ("fun", "Fun and play", ["Do one thing only because it's fun", "Play a game", "Put on music and move"]),
     ("independence", "Being independent", ["Do one thing on my own that I'd usually ask for help with",
                                            "Make one small decision without checking with anyone",
                                            "Plan an hour that's all mine"]),
     ("honesty", "Honesty", ["Say one true thing I've been holding back, to someone safe", "Tell someone safe how I really am",
-                            "Put right one small untruth"]),
+                            "Tell one small truth"]),
     ("caring", "Caring for others", ["Do one kind thing for someone", "Ask someone how they're really doing",
                                      "Help with one small task"]),
     ("calm", "Calm and peace", ["Take five quiet minutes", "Clear one small space",
@@ -144,7 +143,7 @@ VALUES = [
                                                "Ask for one thing I want"]),
     ("kindness", "Kindness", ["Do one kind thing no one will see", "Say something kind to someone",
                               "Go easy on myself about one mistake"]),
-    ("respect", "Respect", ["Listen without interrupting, once", "Keep one boundary that matters to me",
+    ("respect", "Treating people with respect", ["Listen without interrupting, once", "Keep one boundary that matters to me",
                             "Thank someone properly"]),
     ("community", "Community", ["Help a neighbour with something small", "Go to one local event",
                                 "Give an hour to something local"]),
@@ -207,8 +206,8 @@ TO_SORT = [{"when": FLOODED, "to": "heads_up"}, {"when": {"eq": [a("start"), "st
 STEPS = [
     # First time: the start screen is the question itself, and Next goes to the sort.
     ask("start", [{"when": HAS_VALUES, "key": "start_back_title"}, {"key": "start_title"}], "start_hint",
-        [field("start", "start", where={"any": [{"all": [HAS_VALUES, {"eq": ["$opt.back", True]}]},
-                                                 {"all": [{"not": HAS_VALUES}, {"not": {"eq": ["$opt.back", True]}}]}]})],
+        # First time there's nothing to choose: Next goes to the sort. With values kept: a step, or sort again.
+        [field("start", "start", where=HAS_VALUES, required=False)],
         TO_SORT),
     ask("heads_up", "heads_up_title", "heads_up_hint", [field("heads_up", "heads_up")],
         [{"when": {"eq": [a("heads_up"), "settle"]}, "to": "settle"}, {"when": {"eq": [a("start"), "step"]}, "to": "one_kept"},
@@ -223,7 +222,7 @@ STEPS = [
         # Kept only in their own words: that's the value, straight to its step.
         [{"when": {"set": a("kept") + ".ids"}, "to": "one"}, {"when": KEPT, "to": "step"}, {"to": "sorted"}],
         keep={"kind": "values", "many": False, "from": ["mine", "kept"]}, primary="keep_primary"),
-    handoff("sorted", "not_sure_title", [{"when": ALWAYS, "key": "sorted_line"}], [], no_close=True),
+    handoff("sorted", "sorted_title", [{"when": ALWAYS, "key": "sorted_line"}], [], no_close=True),
     ask("one", "one_title", "one_hint", [field("focus", "value", where=IN_KEPT, own="focus_own")], [{"to": "step"}]),
     ask("one_kept", "one_title", "one_hint", [field("focus_kept", "value", where={"any": []}, profile="values")],
         [{"to": "step"}]),
@@ -241,7 +240,7 @@ STEPS = [
         reopens={"after": "when"}, clears=["happened", "again"], titleSlots={"step": {"labelOf": "step"}}),
     handoff("back_yes", [{"when": {"set": a("focus")}, "key": "back_yes_title"},
                          {"when": {"set": a("focus_kept")}, "key": "back_yes_title_kept"}, {"key": "back_yes_title_own"}],
-            [{"when": ALWAYS, "key": "back_yes_line"}], [], no_close=True,
+            [{"when": {"eq": [a("happened"), "partly"]}, "key": "back_partly_line"}, {"when": ALWAYS, "key": "back_yes_line"}], [], no_close=True,
             titleSlots={"focus": {"labelOf": "focus"}, "focus_kept": {"labelOf": "focus_kept"}}),
     handoff("back_hurt", "back_hurt_title", [{"when": ALWAYS, "key": "back_hurt_line"}],
             [{"exit": "recover", "when": ALWAYS}, {"exit": "cool_down", "when": ALWAYS}], no_close=True),
@@ -249,7 +248,9 @@ STEPS = [
         [{"when": {"eq": [a("again"), "smaller"]}, "to": "step"}, {"to": "back_end"}]),
     handoff("back_end", None, [{"when": ALWAYS, "key": "back_end_line"}], [], no_close=True),
 ]
-COPY["back_yes_title_kept"] = "That was {focus_kept} in action."
+COPY["back_yes_title_kept"] = "{focus_kept}, in action."
+COPY["back_partly_line"] = "Part of it counts. Steps like that are what a value looks like from the outside."
+COPY["sorted_title"] = "Your list is kept."
 COPY["back_end_line"] = "It'll keep. Come back to it any time."
 
 EXITS = [
