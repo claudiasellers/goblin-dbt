@@ -43,6 +43,10 @@ KINDS = [
     # Pros & cons card (DT-10): a card the person kept for one pull. Never stale: theirs until they set it aside.
     ("pros_cons", "my_plans", "A pros & cons card", None,
      "", "Set aside. Hold to wait won't show it until you bring it back."),
+    # What matters to me (ER-09): the person's value sort and the few kept for now. Revisited monthly (PRD: a
+    # monthly *still yours?*, sampling, not declaring; values change and that's healthy).
+    ("values", "about_me", "What matters to me", 30,
+     "Are these still yours?", "Set aside. What matters to me won't offer them until you bring them back."),
     # Good things (ER-04): something the person likes, kept from a good moment or a good thing that helped. Never stale.
     ("thing_i_like", "my_words", "A thing I like", None,
      "", "Set aside. Good things won't offer it until you bring it back."),

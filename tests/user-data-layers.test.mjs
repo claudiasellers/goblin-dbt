@@ -218,7 +218,7 @@ test("profile kinds (user-profile.md §4.2): a kept value never holds an ask-fre
     cope_ahead_plan: { situationIds: ["conversation"], momentIds: ["go_blank"], movesIds: ["long_out"] },
     pros_cons: { pullIds: ["send"], longIds: ["regret"], keepsOwn: "I want to say it right" },
     abstinence_plan: { whatIds: ["drink"], spanIds: ["tonight"], lapseIds: ["tell"], buildOwn: "Ring my sister" },
-    thing_i_like: { kindIds: ["colour"], kindOwn: "The blue mug" }, crisis_kit: { bodyIds: ["cold"], wordsOwn: "You can do hard things", placeIds: ["beach"] }, person: { label: "Sam", role: "friend" } };
+    thing_i_like: { kindIds: ["colour"], kindOwn: "The blue mug" }, crisis_kit: { bodyIds: ["cold"], wordsOwn: "You can do hard things", placeIds: ["beach"] }, values: { mineIds: ["honesty", "calm"], keptIds: ["honesty"], keptOwn: "Being a good dad" }, person: { label: "Sam", role: "friend" } };
   for (const [kind, def] of Object.entries(PROFILE_KINDS)) {
     assert.ok(ok[kind], `${kind}: add a valid value here`);
     for (const f of ["thenVsNow", "fitsFacts", "bandLevel", "urgeIds"]) {

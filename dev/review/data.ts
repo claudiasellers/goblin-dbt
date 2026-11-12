@@ -52,7 +52,8 @@ export function slices(): ProfileSlices {
       { lineId: 'wl_makes_sense', text: 'It makes sense this got to you.', confirmedAt: '2026-09-10T09:00:00.000Z' },
       { lineId: 'wl_still_here', text: "You're still here, and that counts.", confirmedAt: '2026-09-12T09:00:00.000Z' },
     ],
-    people: [], bodyFlags: null, values: [], goals: [], copeAheadPlans: [], boundaryLines: [], practicePrefs: null, fadeLevels: {},
+    people: [], bodyFlags: null,
+    values: [{ id: 'friendship', label: 'Friendship', meta: meta('values-1', 'active') }, { id: 'own', label: 'Being near the sea', meta: meta('values-1', 'active') }], goals: [], copeAheadPlans: [], boundaryLines: [], practicePrefs: null, fadeLevels: {},
     ownWords: [], thingsILike: [], crisisKit: null, safetyPlan: null, country: null,
     parts,
     partDetail: parts.map((p) => ({

@@ -507,6 +507,9 @@ MERGE (c)-[:PART_OF]->(mod);
 MATCH (c:TherapyConcept {id: "dbt_self_soothe"}), (mod:TherapyConcept {id: "dbt_distress_tolerance"})
 MERGE (c)-[:PART_OF]->(mod);
 
+MATCH (c:TherapyConcept {id: "dbt_values_priorities"}), (mod:TherapyConcept {id: "dbt_emotion_regulation_module"})
+MERGE (c)-[:PART_OF]->(mod);
+
 MATCH (c:TherapyConcept {id: "dbt_mindfulness_current_thoughts"}), (mod:TherapyConcept {id: "dbt_distress_tolerance"})
 MERGE (c)-[:PART_OF]->(mod);
 

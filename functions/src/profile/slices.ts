@@ -90,6 +90,10 @@ export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
     WITH p ORDER BY p.confirmedAt DESC, p.id LIMIT 60
     RETURN p {.id, .kind, .area, .status, .source, .valueJson,
               confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p`,
+  // What matters to me (ER-09): the one sort (one per person), active only.
+  values: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'values', status: 'active'})
+    RETURN p {.id, .kind, .area, .status, .source, .valueJson,
+              confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p LIMIT 1`,
   // The same rows; the resolver keeps only the catalogue id a good thing done was kept as.
   thingsILikePicks: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'thing_i_like', status: 'active'})
     RETURN p {.id, .valueJson} AS p`,
@@ -99,6 +103,8 @@ export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
 export const THING_LABELS = `MATCH (o:SkillOption) WHERE o.id IN $ids RETURN o.id AS id, o.label AS label`;
 /** The `SkillOption` id a kept thing's field names (scripts/skills/good_things.py: `kind` chips, `pick` → `activity`). */
 export const THING_OPTION: Record<'kind' | 'pick', string> = { kind: 'good_things:kind:', pick: 'good_things:activity:' };
+/** The `SkillOption` id prefix a kept value names (scripts/skills/values.py: the `value` cards). */
+export const VALUE_OPTION = 'values:value:';
 
 /**
  * A stored person's value (profile/kinds.ts `person`), its label decrypted; null when it can't be read (a label that
@@ -137,7 +143,7 @@ const objs = (v: unknown): Record<string, unknown>[] =>
 type Resolver<K extends SliceId> = (tx: ManagedTransaction, uid: string, now: number) => Promise<ProfileSlices[K]>;
 
 const EMPTY: { [K in SliceId]?: () => ProfileSlices[K] } = {
-  bodyFlags: () => null, values: () => [], goals: () => [], copeAheadPlans: () => [],
+  bodyFlags: () => null, goals: () => [], copeAheadPlans: () => [],
   boundaryLines: () => [], practicePrefs: () => null, fadeLevels: () => ({}), ownWords: () => [],
   crisisKit: () => null, safetyPlan: () => null, country: () => null,
 };
@@ -275,6 +281,24 @@ const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
       const own = (['kindOwn', 'pickOwn'] as const).map((k) => (typeof v[k] === 'string' ? decrypt(v[k]) : null)).find((x) => x && x.trim());
       const label = own?.trim() || optionIds(v).map((id) => labels.get(id)).find((x) => !!x);
       if (label) out.push({ id: String(p.id), label, meta: metaFrom(p, now) });
+    }
+    return out;
+  },
+  values: async (tx, uid, now) => {
+    const r = await tx.run(SLICE_QUERIES.values!, { uid });
+    if (!r.records.length) return [];
+    const p = r.records[0].get('p') as Record<string, unknown>;
+    let v: Record<string, unknown>;
+    try { v = JSON.parse(String(p.valueJson)) as Record<string, unknown>; } catch { return []; }
+    const ids = strings(v.keptIds).slice(0, 3);
+    const labels = new Map<string, string>();
+    if (ids.length) for (const rec of (await tx.run(THING_LABELS, { ids: ids.map((id) => VALUE_OPTION + id) })).records) labels.set(String(rec.get('id')), String(rec.get('label')));
+    const meta = metaFrom(p, now);
+    const out: ProfileSlices['values'] = [];
+    for (const id of ids) { const label = labels.get(VALUE_OPTION + id); if (label) out.push({ id, label, meta }); }
+    if (typeof v.keptOwn === 'string') {
+      const own = (await ownDecrypter(tx, uid))(v.keptOwn)?.trim();
+      if (own) out.push({ id: 'own', label: own, meta });
     }
     return out;
   },

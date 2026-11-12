@@ -126,6 +126,29 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
       return out;
     },
   },
+  // What matters to me (ER-09, docs/design/values.md): the person's value sort, one per person (a re-sort replaces
+  // it): `mine` (every card that sounded like them, or their own words) and `kept` (up to three for now; empty is
+  // *not sure yet*, a full answer). The runtime's keep (R4). Read back by the `values` slice (the kept ones, named
+  // there from the graph's SkillOptions or their words); revisited monthly in Me (*Are these still yours?*).
+  values: {
+    kind: 'values', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'about_me', slice: 'values',
+    owner: 'ER', many: false, maxItems: 1, editor: null, ownFields: ['mineOwn', 'keptOwn'],
+    validate: (v) => {
+      const o = obj(v);
+      const most = { mine: 30, kept: 3 } as const;
+      const out: Record<string, unknown> = {};
+      for (const f of ['mine', 'kept'] as const) {
+        const ids = o[`${f}Ids`];
+        const own = o[`${f}Own`];
+        if (ids !== undefined) out[`${f}Ids`] = strArray(ids, { max: most[f], item: (x) => str(x, { max: 40, pattern: OPTION_ID }) });
+        if (own !== undefined) out[`${f}Own`] = str(own, { max: 60 });
+      }
+      for (const k of Object.keys(o)) if (!/^(mine|kept)(Ids|Own)$/.test(k)) throw new ValidationError('Unexpected field');
+      const has = (k: string) => (Array.isArray(out[`${k}Ids`]) && (out[`${k}Ids`] as string[]).length > 0) || (typeof out[`${k}Own`] === 'string' && (out[`${k}Own`] as string).trim() !== '');
+      if (!has('mine')) throw new ValidationError('Nothing to keep');
+      return out;
+    },
+  },
   // Good things (ER-04, docs/design/good-things.md): one thing the person likes, kept on *Keep it* (a found thing:
   // `kind`, the chip, or a few words) or *Add it* (a good thing that left them lighter: `pick`, a catalogue id or a few
   // words). The runtime's keep (R4: `<field>Ids` / `<field>Own`). Read back by the `thingsILike` slice, named there
