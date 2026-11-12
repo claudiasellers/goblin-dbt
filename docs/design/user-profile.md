@@ -191,7 +191,7 @@ moves in the same PR.
 | `cope_ahead_plan` (`ProfileFact`, many, own words encrypted) | My plans | ER | **Built (ER-B2, 11 Nov):** Cope Ahead on the skill runtime, on *Keep this*: the plan's ids and own words (situation, hardest moment, the If from the pull, the pull, one or two moves), never a sentence or a part; Me composes it with `planLine`. Plans kept before stay `OwnLine`s | Me only for now; DEAR MAN, follow-ups and CORE-08 can read it once they declare a slice |
 | `thing_i_like` (`ThingILike`) | My words | ER | ER-04 accumulate positives; DT-06 / DT-04 sources | DT-06, WMP-05, diary |
 | `value` / `goal` (`Goal`, `kind` field, `SERVES` edge) | About me | ER (value), CORE (goal) | ER-09, CORE-06 | OA, IE FAST, safety plan reasons |
-| `kit_card` (`KitCard` under `CrisisKit`) | My plans | DT | DT-03 | CORE-02, CORE-01 |
+| ~~`kit_card` (`KitCard` under `CrisisKit`)~~ | My plans | DT | **Superseded by `crisis_kit`** (DT-03): one item; a card is `section:optionId` (ids never renamed), which CORE-02's step 2 will reference | CORE-02, CORE-01 |
 | `pros_cons` (`ProsConsCard`) | My plans | DT | DT-10 | CORE-04/10 |
 | `acceptance_target` (`AcceptanceTarget`) | My plans | DT | DT-04 | CORE-11, ER-04 |
 | `body_flags` (`ProfileFact`) | My body | DT | DT-01 "remember this?" (the per-visit check stays ask-fresh) | Cool Down, every cold/exertion primitive, router `medicalFlagFilter` |
@@ -201,6 +201,7 @@ moves in the same PR.
 | `country` (`ProfileFact`) | About me | CORE | CORE-01 helplines | `CrisisBanner` |
 | `nightmare_script` (`ProfileFact`, many, own words encrypted) | My plans | ER | **Built:** ER-15 Rewrite the nightmare, on *Keep it in Me* (`docs/design/nightmare-rescript.md`) | Me only (a read-through reopens the visit's run, not the item) |
 | `pros_cons` (`ProfileFact`, many, own words encrypted) | My plans | DT | **Built:** DT-10 Pros & cons card, on *Keep it in Me* (`docs/design/pros-cons.md`) | the `prosCons` slice: Hold to wait (its replay); Me |
+| `crisis_kit` (`ProfileFact`, one, own words encrypted) | My plans | DT | **Built:** DT-03 My crisis kit, on *Keep it* (`docs/design/crisis-kit.md`); keeping it again replaces it | `crisisKit` (`crisis-kit`: the kit plays it one card at a time); Me |
 | `abstinence_plan` (`ProfileFact`, many, own words encrypted) | My plans | DT | **Built:** DT-09 When it's a habit, on *Keep it in Me* (`docs/design/habit-plan.md`); the minimal TargetBehavior until CORE-04 | Me only (the renewal reopens the visit's run, not the item) |
 
 **Outside the registry, on purpose:** `Part` / `PartLink` / `DenSnapshot` (parts keep their own writers,

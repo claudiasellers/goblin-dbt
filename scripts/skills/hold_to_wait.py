@@ -157,8 +157,8 @@ GOALS = [
 ]
 # PRD step 5's urge-specific moves (ProceedOption, FOR_URGE → ActionUrge). `urges`: which pulls offer it (`other`:
 # own words, so no pull to match). `exit`: the move hands on to that tool on the end card; a move without one is
-# the person's own step, with its own line. Moves into tools not built yet (the kit) wait as planned exits and
-# aren't offered as chips until their tools ship.
+# the person's own step, with its own line. A move into a tool not built yet waits as a planned exit and isn't offered
+# as a chip until its tool ships.
 MOVES = [
     ("later", "Save it, and look again when I'm steadier", ["send"], None),
     ("tell", "Tell it to someone safe first", ["send"], None),
@@ -255,8 +255,8 @@ STEPS = [
         "lines": [*[{"when": MOVE(m), "key": k} for m, k in MOVE_LINES.items()], {"when": ALWAYS, "key": "next_line"}],
         "offers": [
             *[{"exit": x, "when": MOVE(m)} for m, _, _, x in MOVES if x],
-            # The kit (planned, not shown until built) for hurt myself; Give your mind a job (DT-06) for checking.
-            {"exit": "crisis_kit", "when": {"eq": [a("pull"), "use"]}},
+            # The kit (DT-03) for using; Give your mind a job (DT-06) for checking.
+            {"exit": "kit", "when": {"eq": [a("pull"), "use"]}},
             {"exit": "mind_job", "when": {"eq": [a("pull"), "check"]}},
             # A pull that keeps coming back as a habit: a plan made in calm (DT-09).
             {"exit": "habit_plan", "when": {"in": [a("pull"), ["use", "check"]]}},
@@ -272,24 +272,25 @@ STEPS = [
     },
     {
         # Hurt myself, safe for now: its own end card, with no "did you act on it?" (a yes there would get only
-        # "Noted."); the banner stays, and the move's tool is the offer.
+        # "Noted."); the banner stays. Someone to talk to first, always (CORE-01's rule), then the move's tool, then the kit.
         "id": "hurt_end", "kind": "handoff", "complete": True, "noClose": True, "crisis": CRISIS,
         "lines": [{"when": FLOODED, "key": "next_hurt_flooded"}, {"when": ALWAYS, "key": "next_hurt"}],
         "offers": [
+            {"exit": "safety_open", "when": ALWAYS},
             {"exit": "cool_down", "when": {"any": [MOVE("cool"), FLOODED]}},
-            {"exit": "safety_open", "when": MOVE("call")},
             {"exit": "held", "when": MOVE("heart")},
-            # Planned (not shown until built): the kit.
+            # The kit (DT-03), with the crisis banner on every card.
             {"exit": "crisis_kit", "when": ALWAYS},
         ],
         "done": "done", "links": [SAFETY_LINK],
     },
     {
         # Not safe or not sure: someone to talk to first, and no "did you act on it?" (it would land wrong here).
-        # The banner on the card is the way to them; the card adds no second button that competes with it.
+        # The banner on the card is the way to them, and *Talk to someone now* is the first button.
         "id": "reach", "kind": "handoff", "complete": True, "noClose": True, "crisis": CRISIS,
         "lines": [{"when": ALWAYS, "key": "reach_line"}],
-        "offers": [{"exit": "crisis_kit", "when": ALWAYS}],
+        # People first, then the kit (DT-03): coping sits beside help, never before it (CORE-01's rule).
+        "offers": [{"exit": "safety_open", "when": ALWAYS}, {"exit": "crisis_kit", "when": ALWAYS}],
         "done": "done",
     },
 ]
@@ -300,7 +301,8 @@ EXITS = [
     {"id": "fast", "toolId": "fast"},                                   # IE-05 one line to hold your ground
     {"id": "urge_surfing", "toolId": "urge-surfing"},                   # DT-05 Ride it out
     {"id": "alternate_rebellion", "toolId": "alternate-rebellion"},     # DT-11 (the *blow it up* chip)
-    {"id": "crisis_kit", "toolId": "crisis-kit", "planned": True},      # DT-03 My crisis kit (safety batch)
+    {"id": "crisis_kit", "toolId": "crisis-kit", "query": {"frame": "crisis"}},      # DT-03 My crisis kit, opened from a crisis route (the banner on every card)
+    {"id": "kit", "toolId": "crisis-kit"},                               # DT-03 My crisis kit (the use pull, no crisis frame)
     {"id": "held", "toolId": "soothe", "query": {"frame": "hurt"}},      # DT-07 Held (hand on heart; its banner stays)
     {"id": "mind_job", "toolId": "mind-job"},          # DT-06 Give your mind a job: park it, look once
     {"id": "habit_plan", "toolId": "habit-plan"},                       # DT-09 When it's a habit (use, check)

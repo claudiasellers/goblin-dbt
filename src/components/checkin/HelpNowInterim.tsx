@@ -6,7 +6,7 @@ import { getToolById } from '../../data/tools';
 import { useOfficialNames } from '../../hooks/useOfficialNames';
 import { recordToolSession } from '../../services/spine';
 import { newId } from '../../lib/spine/ids';
-import { HELP_NOW_MICRO_STEP_SET, HELP_NOW_TOOL_IDS, helpNowLinkState } from '../../lib/spine/helpNow';
+import { HELP_NOW_MICRO_STEP_SET, HELP_NOW_QUERY, HELP_NOW_TOOL_IDS, helpNowLinkState } from '../../lib/spine/helpNow';
 
 /**
  * "Help me now" from the check-in grid (PR-C2, D-08 interim). One safe body step, a way to get
@@ -63,7 +63,7 @@ export function HelpNowInterim({ onDone }: { onDone: () => void }) {
           const tool = getToolById(id);
           if (!tool) return null;
           return (
-            <Link key={id} to={`/tool/${id}`} state={helpNowLinkState(user ? sessionId : null)}
+            <Link key={id} to={`/tool/${id}${HELP_NOW_QUERY[id] ? `?${HELP_NOW_QUERY[id]}` : ''}`} state={helpNowLinkState(user ? sessionId : null)}
               onClick={() => record('exited_early')}
               className="min-h-11 inline-flex items-center gap-1 text-sm text-[var(--color-text-secondary)] underline underline-offset-2 hover:text-[var(--color-text-primary)]">
               <span aria-hidden="true">{tool.emoji}</span> {label(tool)}

@@ -24,6 +24,9 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   'pros-cons': { module: 'dt', closeKind: 'none' },
   // When it's a habit (DT-09, docs/design/habit-plan.md): a plan made in calm; its outcome is the habit_renew card.
   'habit-plan': { module: 'dt', closeKind: 'none' },
+  // My crisis kit (DT-03, docs/design/crisis-kit.md): opening it asks how it is now in the flow, once, after the cards
+  // (askFresh thenVsNow, no SessionClose after it); making it ends with no close.
+  'crisis-kit': { module: 'dt', closeKind: 'regulation_down' },
   // Rebel without the wreckage (DT-11): "And the urge to blow it up?", the acted answer on the destructive urge.
   'alternate-rebellion': { module: 'dt', closeKind: 'urge' },
   'problem-solve': { module: 'er', closeKind: 'plan' },

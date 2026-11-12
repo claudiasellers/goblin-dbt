@@ -394,6 +394,17 @@
    "direction": "neutral",
    "addresses": []
   },
+  "dbt_crisis_survival_kit": {
+   "appToolId": "crisis-kit",
+   "name": "Crisis Survival Kit",
+   "description": "The person's own crisis survival skills, picked on a calmer day and handed back one card at a time when they can't think straight: body, distraction, self-soothe, encouragement, a safe place and reasons to get through",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": []
+  },
   "dbt_dear_man": {
    "appToolId": "dear-man",
    "name": "DEAR MAN",

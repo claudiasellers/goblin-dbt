@@ -2,6 +2,21 @@
   "about": "Jumps from hand-built pages to another tool (docs/design/dbt-modules-plan.md C4.1). A page not on the skill runtime links with linkTo or a /tool/ path and is listed here until it ports; when it ports, its jumps become SkillExits in the graph and leave this list. tests/legacy-exits.test.mjs holds the source to this list in both directions.",
   "exits": [
     {
+      "from": "src/components/me/KeptCrisisKit.tsx",
+      "to": "crisis-kit",
+      "state": "built"
+    },
+    {
+      "from": "src/components/tools/dearMan/DearManDebrief.tsx",
+      "to": "dear-man",
+      "state": "built"
+    },
+    {
+      "from": "src/components/tools/dearMan/DearManOne.tsx",
+      "to": "dear-man",
+      "state": "built"
+    },
+    {
       "from": "src/lib/checkFactsEntry.ts",
       "to": "check-the-facts",
       "state": "built"
@@ -9,6 +24,16 @@
     {
       "from": "src/lib/copeAheadEntry.ts",
       "to": "cope-ahead",
+      "state": "built"
+    },
+    {
+      "from": "src/lib/dearManDebrief.ts",
+      "to": "dear-man",
+      "state": "built"
+    },
+    {
+      "from": "src/lib/dearManOne.ts",
+      "to": "dear-man",
       "state": "built"
     },
     {
@@ -59,26 +84,6 @@
     {
       "from": "src/pages/tools/DearMan.tsx",
       "to": "fast",
-      "state": "built"
-    },
-    {
-      "from": "src/components/tools/dearMan/DearManDebrief.tsx",
-      "to": "dear-man",
-      "state": "built"
-    },
-    {
-      "from": "src/lib/dearManDebrief.ts",
-      "to": "dear-man",
-      "state": "built"
-    },
-    {
-      "from": "src/components/tools/dearMan/DearManOne.tsx",
-      "to": "dear-man",
-      "state": "built"
-    },
-    {
-      "from": "src/lib/dearManOne.ts",
-      "to": "dear-man",
       "state": "built"
     },
     {

@@ -68,7 +68,7 @@ test("Meet a part, Two pulls, Wise mind, Cope Ahead, Check the Facts, Rebel with
   const page = read("src/pages/ToolPage.tsx");
   const tools = importsOf(page).filter((s) => s.startsWith("./tools/")).map((s) => s.slice("./tools/".length)).sort();
   assert.deepEqual(tools, ["CoolDown", "DearMan", "FindTheFeeling", "FiveSenses", "InvalidationRecovery", "OppositeAction", "Pause", "ProblemSolve", "UrgeSurfing"]);
-  assert.equal((page.match(/\blazy\(/g) ?? []).length, 7, "seven lazy tools");
+  assert.equal((page.match(/\blazy\(/g) ?? []).length, 8, "eight lazy tools");
   // Check the Facts (not a parts surface): played by the skill player (playerTools.ts), its own chunk, for everyone.
   assert.match(page, /const LazySkillPlayer = lazy\(\(\) => import\('\.\.\/components\/skillPlayer\/SkillPlayer'\)/);
   assert.match(read("src/lib/skillRuntime/playerTools.ts"), /'check-the-facts': 'check_the_facts',/);
@@ -80,6 +80,9 @@ test("Meet a part, Two pulls, Wise mind, Cope Ahead, Check the Facts, Rebel with
   // Say no (not a parts surface): its own chunk, who's asking first, then the skill.
   assert.match(page, /const LazySayNo = lazy\(\(\) => import\('\.\/tools\/SayNo'\)/);
   assert.match(page, /'say-no': SayNo,/);
+  // My crisis kit (DT-03, not a parts surface): its own chunk, which picks open it or make it.
+  assert.match(page, /const LazyCrisisKit = lazy\(\(\) => import\('\.\/tools\/CrisisKit'\)/);
+  assert.match(page, /'crisis-kit': CrisisKit,/);
   // Cope Ahead (not a parts surface): its own chunk, for everyone.
   assert.match(page, /const loadCopeAhead = \(\) => import\('\.\/tools\/CopeAhead'\);/);
   assert.match(page, /'cope-ahead': CopeAhead,/);
