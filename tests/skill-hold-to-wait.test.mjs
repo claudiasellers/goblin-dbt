@@ -221,7 +221,7 @@ test("the player: safetyFirst opens the resources once per arrival; the run's ur
   assert.match(p, /toolSession\.setUrgeIds\(visitUrgeIds\(ctx, st, reopenUrges\.current\)\)/);
   assert.match(p, /contextFrom\(skill, location\.search, location\.state, band\.current\(\)\?\.value \?\? null, pageCtx\)/, "the person's own current reading is the carry");
   assert.match(p, /answerToolOutcome\(toolSession\.id, \{ dismissed: true \}\)/, "a noClose ending never reappears as Today's outcome card");
-  assert.match(p, /if \(!picksWords && output\.ids\.length && !output\.ids\.includes\('skipped'\)\) toolSession\.markPracticed\(\);/, "a held hold is practice (a picker embed's words are not)");
+  assert.match(p, /if \(!picksWords && output\.ids\.length && !output\.ids\.includes\('skipped'\) && !output\.ids\.includes\('left'\)\) toolSession\.markPracticed\(\);/, "a held hold is practice (a picker embed's words are not)");
   assert.match(p, /if \(resuming \|\| safetyAt\.current === st\.path\.length\) return;/);
   assert.match(p, /if \(opensSafety\(ctx, stepOf\(skill, st\.stepId\), st\)\) \{/);
   const w = readFileSync("src/components/skillPlayer/WaitLockEmbed.tsx", "utf8");
