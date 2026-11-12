@@ -411,8 +411,8 @@
    "description": "Fair, no excessive Apologies, Stick to values, Truthful",
    "whenToUse": null,
    "dbtBasis": null,
-   "side": "change",
-   "skillKind": "relational",
+   "side": "both",
+   "skillKind": "values",
    "direction": "neutral",
    "addresses": [
     "cold_shame",

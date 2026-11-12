@@ -147,8 +147,12 @@ CONCEPT_TAGS["check-the-facts"] = {"concept": "dbt_check_facts", "side": "change
 # diversity rule could never set it beside Pause, and its one row could never show.
 CONCEPT_TAGS["alternate-rebellion"] = {"concept": "dbt_alternate_rebellion", "side": "acceptance", "skillKind": "redirect", "direction": "neutral"}
 # Keep your self-respect (FAST) has shipped on the skill runtime (appToolId 'fast', docs/design/fast.md, IE-B1):
-# out of PLANNED; its two word rows are live (Claudia, 12 Nov: default to connected).
-CONCEPT_TAGS["fast"] = {"concept": "dbt_fast", "side": "change", "skillKind": "relational", "direction": "neutral"}
+# out of PLANNED; its two word rows are live (Claudia, 12 Nov: default to connected). Its tags are what let them
+# show: it is always the alternative, to Recover (relational) on betrayed / disrespected and to Check the Facts
+# (change) on bitter / resentful, so it can be neither `relational` nor change-side, or the diversity rule
+# rejects it every time (as Rebel's `hold` did). skillKind `values` (the review asks what you stand for, F-A-S-T);
+# side `both` (the review, then Let go when nothing can be done).
+CONCEPT_TAGS["fast"] = {"concept": "dbt_fast", "side": "both", "skillKind": "values", "direction": "neutral"}
 
 # It isn't working (ER-14, appToolId 'er-troubleshoot', docs/design/er-troubleshoot.md) has no RECOMMENDED_FOR rows
 # by design: it answers "I did a skill and it didn't help", which no check-in state names. Its entries are skill
