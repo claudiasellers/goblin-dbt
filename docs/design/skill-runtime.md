@@ -247,7 +247,7 @@ Added by ER-B3 (`docs/design/opposite-action-v3.md`, *Runtime pieces*; agreed wi
 - `build.py`: no `each` on the start step; `each` names a field of a step that isn't per-pick, `max ≤ 3`; no keep,
   follow-up, reopens or resume point per pick; one field per segment; the each field required (a segment entered with
   no pick left, every pick set aside, goes to the segment's way out); `carryOn` only on a per-pick hand-off, with the
-  `carry_on` copy; the longest record stays within 32 answers (3 × per-pick fields + the rest) and 8 embed reports
+  `carry_on` copy; the longest record stays within 40 answers (3 × per-pick fields + the rest) and 8 embed reports
   (3 × per-pick embed steps + the rest).
 - **Back walks the screens back** (`trail`): every forward move pushes its screen and every Back pops one, so Back
   twice goes two screens back (before, Back appended the screen it returned to and the second tap found it and went
@@ -424,10 +424,32 @@ The first host of an inline run is another skill: FAST's Let go runs Let it be a
   a hand-off, so whatever that card would have shown (a crisis slot, its offers) is lost unless the host shows it.
   The embed's output ids are the outcome for the hand-off it ended on (`ends`: `stopped`, `body`, `finished`; a step
   not named is `finished`, *Back to where I was* is `left`), then each flag whose condition holds on the sub-run's
-  answers (`unsafe`, `body`). The host's transitions read them with `has` on `$a.<answerAs>.ids`. The ids are
+  answers (`unsafe`, `body`). The host's transitions read them with `has` on `$a.<answerAs>.ids`. The five ids are
   fixed (`EMBED_OUTPUTS.inlineSkill`); `build.py` checks `ends` name hand-off steps and give outcome ids.
+- **A skill's own outcomes** (ER-B5, `inline.outcomes`; first: Check the Facts' verdict `fits` · `partly` ·
+  `doesnt_fit` · `unsure`): ids beyond the five that its `ends` and `flags` may give. `build.py` refuses one that
+  reuses a fixed id or that no end or flag gives, requires such a skill to declare an `unsafe` flag, writes the list on
+  each host step as its `outcomes` prop (never by hand; the machine accepts those ids from that step only), refuses a
+  host that branches on an id its sub-skill can't give, and requires a host that branches on any of them to branch on
+  `unsafe` first: a run can end on a verdict and still carry the danger flag, and the danger card wins.
 - A way out of the sub-run (a link to another tool) leaves the page: the sub-run closes as left early and asks no
   close of its own, which would sit inside the host's screen without the step's crisis slot.
-- What's not carried: context. An inline run starts with no context in (no band, frame or person), so a host
-  runs it only where its own context makes that safe (Let go only after a host's no and never flooded: it accepts the band for that).
+- Context in (ER-B5): only what the host's step hands it in its `ctx` prop (context key → a ref in the host's run:
+  `$a.`, `$d.`, `$ctx.`, `$each`, read as the step renders), narrowed by the sub-skill's `accepts`; `build.py` checks
+  both sides. Nothing else is carried (no band, frame or person), so a host runs it only where its own context makes
+  that safe (Let go only after a host's no and never flooded: it accepts the band for that).
+- **Seeded entry** (`inline.seed`, `inline.enterWhen`): at one of its `enterAt` steps the sub-run starts with answers
+  from that context (`field` → `$ctx.<key>`: a grid word for an emotion field, else one of the field's options), and
+  only when the entry's condition holds on them; otherwise it starts at its start with nothing seeded, an emotion
+  value carried (first, never pre-selected). `build.py` requires every seeded entry to have a condition, so a run never
+  opens on a screen that needs an answer it doesn't have (Check the Facts: `feel` from `feelingId`, entering at
+  `event` only when `fitsParent` is set).
+- **Ask-fresh answers stay with the inline run** (ER-B5): the sub-run is its own ToolSession inside the host's visit,
+  and its ask-fresh fields (Check the Facts' `fitsFacts`) are recorded there only. `returns` never carries one to the
+  host, so nothing is counted twice; the host's own record holds the outcome ids (`checked` on Do the Opposite).
+- **The record's caps** (ER-B5): `ext.run.answers` holds 40 (32 before: Do the Opposite's longest real path, three
+  feelings through the inline check, is 34) and `ext` 6 KB (4 KB before: that path with own words at the cap in
+  3-byte characters is 4.3 KB; `tests/skill-opposite-action.test.mjs`). `build.py` checks both for every skill, the
+  answer count and the longest record's bytes against the server's `EXT_MAX_BYTES`. The own-words encryption at close
+  (`spine/extOwn.ts`) runs after the check and lengthens the stored string; Neo4j's string properties take it.
 

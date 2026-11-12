@@ -16,7 +16,7 @@ import { handoffExt } from '../../lib/bandStore';
 import { closeQuestion, closeKindFor } from '../../lib/spine/close';
 import { emotionIdsFromLink } from '../../lib/spine/toolLink';
 import {
-  answersOf, askFresh, canGoOn, carried as carriedOf, carryOnOthers, labelOfValue, offersFor, contextIn, copyText, crisisFor, ctxAfterResume, seededFrom, stepLinks, emotionChoices, fieldLinks, fieldList, followUpFor,
+  answersOf, askFresh, canGoOn, carried as carriedOf, carryOnOthers, labelOfValue, offersFor, contextIn, inlineCarried, inlineCtxFor, inlineStart, copyText, crisisFor, ctxAfterResume, seededFrom, stepLinks, emotionChoices, fieldLinks, fieldList, followUpFor,
   exitQuery, handoffLine, initialRun, inlineResult, keepFor, opensSafety, optionGroups, ownMaxOf, persistence, pickedLabels, pickTrack, resumeRun, runEmotionIds, runNext, runRecord,
   runUrgeIds,
   scope, shownFields, stepOf, titleSlots, visitUrgeIds,
@@ -113,7 +113,7 @@ export function SkillPlayer({ skillId, mode = 'page', enterAt, hostSessionId, on
     if (!skill.inline || !hostSessionId) return null;
     return (
       <ToolSessionProvider toolId={skill.toolId} inside={{ hostSessionId }}>
-        <SkillRun skill={skill} content={content} inline={{ enterAt, onReturn, covered }} />
+        <SkillRun skill={skill} content={content} inline={{ enterAt, onReturn, covered }} pageCtx={ctx} />
       </ToolSessionProvider>
     );
   }
@@ -157,14 +157,16 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
   const navigate = useNavigate();
   const location = useLocation();
   const band = useBand();
-  // Inline, the host owns the address: nothing is read from it.
-  const [carried] = useState(() => (inline ? [] : carriedFrom(location.search, location.state)));
-  // A link's `enterAt` is for the run it reopens (R9): with no `?run=` to reopen, it doesn't hold from the start.
+  // Inline, the host owns the address: nothing is read from it. Its context in is what the host's step hands it (the
+  // step's `ctx` prop), narrowed to what the skill accepts; its carried words are the emotion seeds of that context.
   const [ctxIn, setCtxIn] = useState(() => {
-    if (inline) return {};
+    if (inline) return contextIn(skill, { ...(pageCtx ?? {}) });
     const c = contextFrom(skill, location.search, location.state, band.current()?.value ?? null, pageCtx);
     return resumeRecord !== null && UUID.test(new URLSearchParams(location.search).get('run') ?? '') ? c : ctxAfterResume(c, false);
   });
+  const [carried] = useState(() => (inline
+    ? inlineCarried({ skill, shared: { parentOf: content.parentOf, fitsWhen: content.fitsWhen }, carried: [], gridIds: GRID, emotionLabel, ctxIn })
+    : carriedFrom(location.search, location.state)));
   const profile = useProfileContext(skill.toolId as ClientProfileConsumer, { enabled: needsProfile(skill.toolId) });
   const slices = profile.slices as Record<string, unknown> | null;
   const ctx = useMemo<RunContext>(() => ({
@@ -174,7 +176,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
   const [safetyOpen, setSafetyOpen] = useState(false);
   // P2 (This is too much right now) over the step: an embed hears it as `covered`, with safety.open.
   const [p2Open, setP2Open] = useState(false);
-  const [st, setSt] = useState<RunState>(() => initialRun(skill, inline?.enterAt));
+  const [st, setSt] = useState<RunState>(() => (inline ? inlineStart(ctx, inline.enterAt) : initialRun(skill)));
   // A new step starts uncovered (P2 left open by a path that didn't say so never stops a later clock).
   useEffect(() => { setP2Open(false); }, [st.stepId]);
   // Resume (R9): `?run=<sessionId>&at=<stepId>` reopens the person's own run of this tool, or starts fresh.
@@ -507,7 +509,7 @@ function AskStep({ ctx, step, st, send, onExit, onShown, onPrimary, busy }: {
     const show = holds(s.showWhen, sc);
     return (
       <div key={`${s.embed}:${s.record}`} className="min-h-6">
-        {Embed && show ? <Embed props={embedProps(ctx, s.embed, s.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(ctx, st)} carried={ctx.carried} profile={ctx.profile ?? null} onShown={() => onShown(s.record)} /> : null}
+        {Embed && show ? <Embed props={embedProps(ctx, st, s.embed, s.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(ctx, st)} carried={ctx.carried} profile={ctx.profile ?? null} onShown={() => onShown(s.record)} /> : null}
       </div>
     );
   });
@@ -541,9 +543,16 @@ function AskStep({ ctx, step, st, send, onExit, onShown, onPrimary, busy }: {
   </>);
 }
 
-/** An embed's props as it receives them: only what EMBED_PROPS declares, copy keys swapped for the skill's text. */
-function embedProps(ctx: RunContext, name: string, props: Record<string, unknown> | undefined) {
-  return resolveEmbedProps(EMBED_PROPS[name], props, ctx.skill.copy);
+/**
+ * An embed's props as it receives them: only what EMBED_PROPS declares, copy keys swapped for the skill's text, a
+ * `ctx` prop read in this run as it renders (R8: the context an inline run starts with).
+ */
+function embedProps(ctx: RunContext, st: RunState, name: string, props: Record<string, unknown> | undefined) {
+  const out = resolveEmbedProps(EMBED_PROPS[name], props, ctx.skill.copy);
+  for (const [k, spec] of Object.entries(EMBED_PROPS[name] ?? {})) {
+    if (spec.type === 'ctx' && k in out) out[k] = inlineCtxFor(ctx, st, { ctx: props?.[k] });
+  }
+  return out;
 }
 
 /** The run's answers as ids, for an embed that asks the server about them (the witness beat's emotions). */
@@ -576,7 +585,7 @@ function EmbedStep({ ctx, step, st, send, onShown, onExit, covered }: {
     {crisis && <CrisisBanner compact variant={crisis.variant} />}
     {title && <Prompt>{title}</Prompt>}
     {step.hint && ctx.skill.copy[step.hint] && <Line>{ctx.skill.copy[step.hint]}</Line>}
-    <Embed props={embedProps(ctx, step.embed ?? '', step.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(ctx, st)} carried={ctx.carried}
+    <Embed props={embedProps(ctx, st, step.embed ?? '', step.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(ctx, st)} carried={ctx.carried}
       profile={ctx.profile ?? null} onShown={shown} onDone={done} covered={covered} />
     <StepLinks ctx={ctx} step={step} st={st} onExit={onExit} />
   </>);

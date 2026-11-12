@@ -123,6 +123,61 @@ export function initialRun(skill: SkillDef, enterAt?: string | null): RunState {
   return { stepId: at, path: [at], answers: {}, shown: [], offered: [], exitId: null, out: {}, kept: {}, scheduled: {}, pick: null, aside: [], eachEntry: null };
 }
 
+/**
+ * An inline run's first state (R8): `initialRun` at `enterAt`, with the skill's `inline.seed` answers from the host's
+ * context in (an emotion field takes a grid word, a list field one of its options; anything else is dropped). When
+ * the entry's `inline.enterWhen` doesn't hold on them, or a seed is missing, the run starts at the skill's start with
+ * nothing seeded (Check the Facts with no feeling it has fit statements for asks for the feeling first).
+ */
+export function inlineStart(ctx: RunContext, enterAt?: string | null): RunState {
+  const s0 = initialRun(ctx.skill, enterAt);
+  const inl = ctx.skill.inline;
+  if (!inl || s0.stepId === ctx.skill.start) return s0;
+  const answers: Answers = {};
+  for (const [fieldId, ref] of Object.entries(inl.seed ?? {})) {
+    const v = resolve(ref, scopeOf(ctx, {}, {}));
+    const f = fieldOf(ctx.skill, fieldId);
+    const ok = typeof v === 'string' && !!f && (f.options.emotions || f.emotion
+      ? ctx.gridIds.has(v)
+      : !!f.options.list && (ctx.skill.options[f.options.list] ?? []).some((o) => o.value === v));
+    if (!ok) return initialRun(ctx.skill, null);
+    answers[fieldId] = { ids: [v as string], own: null };
+  }
+  const cond = inl.enterWhen?.[s0.stepId];
+  if (cond && !holds(cond, scopeOf(ctx, answers, derive(ctx, answers)))) return initialRun(ctx.skill, null);
+  return { ...s0, answers };
+}
+
+/**
+ * The emotions an inline run carries in (first on its emotion field, never pre-selected): the grid words its `seed`
+ * reads from the host's context, used when the run starts at its start instead of entering with them answered.
+ */
+export function inlineCarried(ctx: RunContext): string[] {
+  const out: string[] = [];
+  for (const [fieldId, ref] of Object.entries(ctx.skill.inline?.seed ?? {})) {
+    const f = fieldOf(ctx.skill, fieldId);
+    const v = resolve(ref, scopeOf(ctx, {}, {}));
+    if (f && (f.options.emotions || f.emotion) && typeof v === 'string' && ctx.gridIds.has(v)) out.push(v);
+  }
+  return out;
+}
+
+/**
+ * The context an `inlineSkill` step hands its sub-run (its `ctx` prop: context key → a ref read in this run as the step
+ * renders); values that don't resolve to one id are left out. The sub-skill's `accepts` narrows it again.
+ */
+export function inlineCtxFor(ctx: RunContext, s: StateLike, props: Record<string, unknown> | undefined): Record<string, string> {
+  const spec = props?.ctx;
+  if (!spec || typeof spec !== 'object') return {};
+  const sc = scope(ctx, s);
+  const out: Record<string, string> = {};
+  for (const [k, ref] of Object.entries(spec as Record<string, unknown>)) {
+    const v = resolve(ref, sc);
+    if (typeof v === 'string' && ID.test(v)) out[k] = v;
+  }
+  return out;
+}
+
 // --- R16, per-pick repeat -------------------------------------------------------------------------------------
 
 /** A path entry: the step id, with `:index` for a per-pick step. */
@@ -539,7 +594,9 @@ export function runNext(ctx: RunContext, s: RunState, e: RunEvent): RunState {
       if (step.kind !== 'embed' || !step.embed) return s;
       const o = e.output;
       const decl = ctx.embedOutputs?.[step.embed] ?? {};
-      const allowed = new Set(decl.ids ?? []);
+      // An inline run may also give its sub-skill's own outcomes (build.py writes them on the step as `outcomes`).
+      const extra = step.embed === 'inlineSkill' && Array.isArray(step.props?.outcomes) ? step.props.outcomes.filter((v): v is string => typeof v === 'string') : [];
+      const allowed = new Set([...(decl.ids ?? []), ...extra]);
       const isGrid = (v: string) => (decl.emotions ?? 0) > 0 && ctx.gridIds.has(v);
       const ids = [...new Set((o.ids ?? []).filter((v) => typeof v === 'string' && ID.test(v) && (allowed.has(v) || isGrid(v))))]
         .slice(0, decl.emotions && !allowed.size ? decl.emotions : 12);
@@ -1069,7 +1126,7 @@ export function runRecord(ctx: RunContext, s: RunState): Record<string, unknown>
       return { fieldId, optionIds: a.ids.slice(0, 12), ...(at < 0 ? {} : { pick: k.slice(at + 1) }), ...(a.own ? { valueOwn: a.own.trim().slice(0, ctx.skill.ownMax) } : {}) };
     })
     .filter((a) => a.optionIds.length > 0 || a.valueOwn)
-    .slice(0, 32);
+    .slice(0, 40);
   // An exit to a persist-nothing tool is never named in the host's record (offered or taken).
   const recorded = (exitId: string) => {
     const tool = ctx.skill.exits.find((x) => x.id === exitId)?.toolId;
