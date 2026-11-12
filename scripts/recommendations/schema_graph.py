@@ -247,11 +247,60 @@ class Rel:
 
 
 class Graph:
+    # Merge keys the loaded files match on. Lookups on them go through an index instead of a scan of every node;
+    # the index only narrows the candidates (each is still checked in full), so results and their order are unchanged.
+    INDEXED = ('id', 'key', 'dbtParent')
+
     def __init__(self):
         self.nodes = []
         self.relationships = []
         self.unsupported = []   # [(file, index, reason, statement)]
         self._seq = 0
+        self._nidx = None       # {prop: {value: [nodes in insertion order]}}, built lazily, dropped on a SET of a key
+        self._out, self._in = {}, {}   # id(node) -> [relationships in insertion order]
+
+    def _node_index(self):
+        if self._nidx is None:
+            self._nidx = {k: {} for k in self.INDEXED}
+            for n in self.nodes:
+                self._index_node(n)
+        return self._nidx
+
+    def _index_node(self, n):
+        for k in self.INDEXED:
+            v = n.props.get(k)
+            if v is not None and isinstance(v, (str, int, float)):
+                self._nidx[k].setdefault(v, []).append(n)
+
+    def invalidate_nodes(self):
+        self._nidx = None
+
+    def candidates(self, props):
+        """The nodes that could match these (resolved) props: an index bucket when a merge key is given."""
+        for k in self.INDEXED:
+            v = props.get(k)
+            if v is not None and isinstance(v, (str, int, float)):
+                return self._node_index()[k].get(v, [])
+        return self.nodes
+
+    def delete_relationships(self, doomed):
+        """Drop the relationships whose id() is in doomed, from the list and the end-node indexes (order kept)."""
+        gone = [r for r in self.relationships if id(r) in doomed]
+        if not gone:
+            return
+        self.relationships = [r for r in self.relationships if id(r) not in doomed]
+        for r in gone:
+            for idx, end in ((self._out, r.start), (self._in, r.end)):
+                lst = idx.get(id(end))
+                if lst is not None:
+                    idx[id(end)] = [x for x in lst if id(x) not in doomed]
+
+    def set_relationships(self, rels):
+        self.relationships = rels
+        self._out, self._in = {}, {}
+        for r in rels:
+            self._out.setdefault(id(r.start), []).append(r)
+            self._in.setdefault(id(r.end), []).append(r)
 
     # -- lookups used by fixture.py --
     def find(self, label, **props):
@@ -268,20 +317,24 @@ class Graph:
 
     # -- mutation --
     def merge_node(self, labels, props):
-        for n in self.nodes:
+        for n in self.candidates(props):
             if set(labels) <= n.labels and all(n.props.get(k) == v for k, v in props.items()):
                 return n
         n = Node(labels, props)
         self.nodes.append(n)
+        if self._nidx is not None:
+            self._index_node(n)
         return n
 
     def merge_rel(self, type_, start, end, key):
-        for r in self.relationships:
+        for r in self._out.get(id(start), ()):
             if r.type == type_ and r.start is start and r.end is end and all(r.props.get(k) == v for k, v in key.items()):
                 return r
         self._seq += 1
         r = Rel(type_, start, end, key, self._seq)
         self.relationships.append(r)
+        self._out.setdefault(id(start), []).append(r)
+        self._in.setdefault(id(end), []).append(r)
         return r
 
 
@@ -423,7 +476,8 @@ def bind_node(g, spec, env, create):
         return [g.merge_node(labels, {k: resolve(v, env) for k, v in props.items()})]
     if var and var in env:
         return [env[var]] if node_matches(env[var], labels, props, env) else []
-    return [n for n in g.nodes if node_matches(n, labels, props, env)]
+    resolved = {k: resolve(v, env) for k, v in props.items()}
+    return [n for n in g.candidates(resolved) if set(labels) <= n.labels and all(n.props.get(k) == v for k, v in resolved.items())]
 
 
 def match(g, env, pattern):
@@ -439,7 +493,18 @@ def match(g, env, pattern):
         return out
     _, a, (rvar, types, rprops), b, direction = pattern
     out = []
-    for r in list(g.relationships):
+    # A bound end narrows the scan to that node's relationships (same order as the full list).
+    if direction == 'out' and a[0] and a[0] in env:
+        pool = g._out.get(id(env[a[0]]), [])
+    elif direction == 'out' and b[0] and b[0] in env:
+        pool = g._in.get(id(env[b[0]]), [])
+    elif direction == 'in' and a[0] and a[0] in env:
+        pool = g._in.get(id(env[a[0]]), [])
+    elif direction == 'in' and b[0] and b[0] in env:
+        pool = g._out.get(id(env[b[0]]), [])
+    else:
+        pool = g.relationships
+    for r in list(pool):
         if types and r.type not in types:
             continue
         if not all(r.props.get(k) == resolve(v, env) for k, v in rprops.items()):
@@ -495,7 +560,7 @@ def where(env, cond):
     return True
 
 
-def set_items(env, body):
+def set_items(env, body, g=None):
     for item in split_top(body):
         m = re.fullmatch(r'(\w+)((?::\w+)+)', item.strip())
         if m:
@@ -505,6 +570,8 @@ def set_items(env, body):
         if m:
             target = env[m.group(1)]
             for k, v in resolve(Parser(m.group(2)).map(), env).items():
+                if g is not None and k in Graph.INDEXED and isinstance(target, Node):
+                    g.invalidate_nodes()
                 if v is None:
                     target.props.pop(k, None)
                 else:
@@ -519,6 +586,8 @@ def set_items(env, body):
         p.ws()
         if p.i < len(p.t):
             raise Unsupported(f'SET expression {m.group(3)[:40]}')
+        if g is not None and m.group(2) in Graph.INDEXED and isinstance(target, Node):
+            g.invalidate_nodes()
         if v is None:
             target.props.pop(m.group(2), None)
         else:
@@ -564,7 +633,7 @@ def run_statement(g, stmt):
             rows = [r for r in rows if where(r, body)]
         elif kw == 'SET':
             for r in rows:
-                set_items(r, body)
+                set_items(r, body, g)
         elif kw == 'WITH' and re.fullmatch(r'\w+(\s*,\s*\w+)*', body):
             keep = [v.strip() for v in body.split(',')]
             rows = [{k: r[k] for k in keep} for r in rows]
@@ -577,7 +646,7 @@ def run_statement(g, stmt):
                     r[m.group(1)].props.pop(m.group(2), None)
         elif kw == 'DELETE':
             doomed = {id(r[v.strip()]) for r in rows for v in body.split(',')}
-            g.relationships = [x for x in g.relationships if id(x) not in doomed]
+            g.delete_relationships(doomed)
         else:
             raise Unsupported(kw)
 

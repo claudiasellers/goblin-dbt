@@ -125,7 +125,7 @@ COPY = {
     "fork_hint": "Any answer is fine.",
     "end_change": "Then it's worth a look, while you're steadier.",
     "end_accept": "That's a heavy thing to carry. You don't have to solve it right now.",
-    "end_park": "Then it can wait. You can come back to it when you choose.",
+    "end_park": "Then it can wait, with a time to come back to it.",
     "end_through": "You got through it. That's the skill.",
     "safety_open": "Talk to someone now",
     "next": "Next",
@@ -313,7 +313,7 @@ EXITS = [
     {"id": "dear_man", "toolId": "dear-man"},
     {"id": "opposite_action", "toolId": "opposite-action"},
     {"id": "let_it_be", "toolId": "let-it-be"},         # DT-04 (DT-B4): it's how things are
-    {"id": "mind_job", "toolId": "mind-job", "planned": True},           # DT-06 (DT-B3): not right now, with a return
+    {"id": "mind_job", "toolId": "mind-job"},           # DT-06 Give your mind a job: not right now, with a return
     {"id": "crisis_kit", "toolId": "crisis-kit", "planned": True},       # DT-03 the kit's people (safety batch)
     {"id": "safety_open", "toolId": None, "safety": True},               # safety.open (R6)
     {"id": "done", "done": True},

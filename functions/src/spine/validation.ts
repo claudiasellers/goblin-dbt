@@ -138,7 +138,9 @@ export function validateRecord(raw: unknown, now: Date): { start: StartInput; cl
 
 // ---- Follow-ups (PR-S5) ----
 
-export const FOLLOW_UP_WINDOWS = ['hour', 'afternoon', 'evening', 'tomorrow', 'this_week', 'next_time', 'unsure', 'today', '1h', 'later', 'tonight', 'tomorrow_night', 'month'] as const;
+export const FOLLOW_UP_WINDOWS = ['hour', 'afternoon', 'evening', 'tomorrow', 'this_week', 'next_time', 'unsure', 'today', '1h', 'later', 'tonight', 'tomorrow_night', 'month',
+  // Give your mind a job (DT-06): a break's return in minutes, and the lid's reopen in a few days.
+  'm5', 'm15', 'm30', 'm60', 'few_days'] as const;
 export type FollowUpWindow = (typeof FOLLOW_UP_WINDOWS)[number];
 const TYPE_ID = /^[a-z][a-z0-9_]{0,63}$/;
 const MINUTE = 60_000;

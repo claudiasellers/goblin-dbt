@@ -38,6 +38,16 @@ RETIRED_VERSIONS = ["rf-v1"]
 # fix it or set POLICY["enabled"] back to False (build.py won't enable with a draft active row).
 SIGNED_OFF = {
     "checkin_result": "2026-10-05",
+    # Claudia, 12 Nov 2026: default to connected. Ride it out, Let it be and Give your mind a job go live as built
+    # (a clinician tweaks after).
+    "rf_chronic_vigilance_words_worry_urge-surfing": "2026-11-12",
+    "rf_chronic_vigilance_words_helpless_let-it-be": "2026-11-12",
+    "rf_reward_drive_low_words_fragile_let-it-be": "2026-11-12",
+    "rf_conservation_freeze_words_grief_let-it-be": "2026-11-12",
+    "rf_acute_alarm_words_stress_mind-job": "2026-11-12",
+    "rf_acute_alarm_words_annoyed_mind-job": "2026-11-12",
+    "rf_rumination_loop_words_aversion_mind-job": "2026-11-12",
+    "rf_rumination_loop_words_low-shame_soothe": "2026-11-12",
     # Claudia, 12 Nov 2026: default to connected, so built tools' rows go live (Cope Ahead, Check the Facts).
     "rf_acute_alarm_words_annoyed_check-the-facts": "2026-11-12",
     "rf_chronic_vigilance_words_anticipatory_cope-ahead": "2026-11-12",
@@ -180,15 +190,19 @@ CONCEPT_TAGS["say-no"] = {"concept": "dbt_saying_no", "side": "change", "skillKi
 # Let it be (DT-04, appToolId 'let-it-be', D6: routing's planned `radical-acceptance` renamed,
 # docs/design/let-it-be.md) has shipped on the skill runtime: out of PLANNED; its three rows stay switched off and
 # drafts until Claudia signs them off (D15).
+# Give your mind a job (DT-06, appToolId 'mind-job': routing's planned `accepts` renamed, docs/design/mind-job.md) has
+# shipped on the skill runtime: out of PLANNED; its three rows are live (12 Nov 2026).
+CONCEPT_TAGS["mind-job"] = {"concept": "dbt_accepts", "side": "acceptance", "skillKind": "redirect", "direction": "neutral"}
 CONCEPT_TAGS["let-it-be"] = {"concept": "dbt_radical_acceptance", "side": "acceptance", "skillKind": "hold", "direction": "neutral"}
+# Held (DT-07, appToolId 'soothe', docs/design/held.md): self-soothe calms (direction `down`, so the blank-pattern ban
+# keeps it off every blank result, primary or alongside), by the body and senses (`body`). One word row, live with the
+# module (connected by default, 12 Nov 2026): cold shame on replay, beside Recover.
+CONCEPT_TAGS["soothe"] = {"concept": "dbt_self_soothe", "side": "acceptance", "skillKind": "body", "direction": "down"}
 BUILT_NOT_SIGNED_OFF = {
-    # DT-05: the slider is gone (rebuilt as Ride it out on the skill runtime, DT-B3); its rows stay off and drafts.
-    "let-it-be": "built on the skill runtime; its rows go live on Claudia's sign-off, row by row (docs/design/let-it-be.md)",
-    "urge-surfing": "rebuilt on the skill runtime as Ride it out; its rows go live on Claudia's sign-off (docs/design/ride-it-out.md)",
 }
+# Ride it out (urge-surfing), Let it be and Give your mind a job are live (Claudia, 12 Nov 2026: default to connected).
 PLANNED = {
     "running-low":        {"concept": "dbt_please",             "side": "both",       "skillKind": "body",       "direction": "neutral"},
-    "accepts":            {"concept": "dbt_accepts",            "side": "acceptance", "skillKind": "hold",       "direction": "neutral"},
     "give":               {"concept": "dbt_give",               "side": "change",     "skillKind": "relational", "direction": "neutral"},
 }
 CONCEPT_TAGS.update(PLANNED)
@@ -261,7 +275,8 @@ BACKUP = 3.0  # a pattern's backup row, used only when its first pick and altern
 # CONTRAINDICATED_FOR (the engine's hook: the primary OR the co-occurring pattern): tool → patterns.
 # Do the Opposite never runs while someone is dissociated (ER-06), also when dissociation sits
 # alongside another pattern.
-CONTRAINDICATIONS = {"opposite-action": ["dissociation_overmodulation"]}
+# Give your mind a job neither: pushing a feeling away while already disconnected deepens it (12 Nov 2026).
+CONTRAINDICATIONS = {"opposite-action": ["dissociation_overmodulation"], "mind-job": ["dissociation_overmodulation"]}
 
 # Emotion-gated rows. `addresses`: fires only when one of the user's words is in the concept's
 # ADDRESSES/REDUCES/TARGETS set; `none_named`: only when no emotion was named.
@@ -294,17 +309,17 @@ WORD_RULES = [
     {"key": "overwhelm", "pattern": "acute_alarm", "tool": "pause", "priority": WORD_LEAD, "words": ["overwhelmed", "out_of_control"],
      "why": "Capacity saturation needs a behavioural halt: Pause (STOP), then Cool Down (TIPP). Overwhelmed stays on Alarm, not Flooded: one everyday word doesn't raise the crisis banner."},
     {"key": "stress", "pattern": "acute_alarm", "tool": "problem-solve", "priority": WORD_LEAD, "words": STRESS_WORDS,
-     "why": "Bridge high agitation: distraction (ACCEPTS, planned) then Problem Solve; until ACCEPTS ships, Problem Solve leads and Cool Down follows."},
-    {"key": "stress", "pattern": "acute_alarm", "tool": "accepts", "priority": 0.4, "words": STRESS_WORDS,
-     "why": "Planned: ACCEPTS (distract) leads for strain words once built."},
+     "why": "Bridge high agitation: distraction (Give your mind a job) leads, then Problem Solve."},
+    {"key": "stress", "pattern": "acute_alarm", "tool": "mind-job", "priority": 0.4, "words": [w for w in STRESS_WORDS if w != "pressured"],
+     "why": "Give your mind a job (ACCEPTS, distract) leads for strain words; not pressured, where Say no sits beside Problem Solve (a demand to answer, not to distract from)."},
     {"key": "demand", "pattern": "acute_alarm", "tool": "say-no", "priority": WORD_NEXT, "words": ["pressured"], "beside": ["problem-solve"],
      "why": "Pressure from someone's demands: Say no (IE-04) beside Problem Solve, so the person can turn the ask down instead of absorbing it."},
     {"key": "annoyed", "pattern": "acute_alarm", "tool": "opposite-action", "priority": WORD_LEAD, "words": ["annoyed"],
      "why": "Check the Facts on low-grade anger (planned); Do the Opposite's fits-the-facts step until then."},
     {"key": "annoyed", "pattern": "acute_alarm", "tool": "check-the-facts", "priority": 0.4, "words": ["annoyed"],
      "why": "Planned: Check the Facts leads for low-grade anger."},
-    {"key": "annoyed", "pattern": "acute_alarm", "tool": "accepts", "priority": WORD_NEXT, "words": ["annoyed"],
-     "why": "Planned: ACCEPTS as the alternative."},
+    {"key": "annoyed", "pattern": "acute_alarm", "tool": "mind-job", "priority": WORD_NEXT, "words": ["annoyed"],
+     "why": "Give your mind a job (ACCEPTS) as the alternative."},
     {"key": "freeze", "pattern": "acute_alarm", "tool": "five-senses", "priority": WORD_LEAD, "words": ["distant", "withdrawn"],
      "why": "Freeze with high arousal underneath (review, Oct 2026): orient to present safety first, then Cool Down."},
     # --- On guard ---
@@ -319,11 +334,11 @@ WORD_RULES = [
     {"key": "worry", "pattern": "chronic_vigilance", "tool": "check-the-facts", "priority": 0.4, "words": ["worried"] + WATCHFUL_WORDS,
      "why": "Planned: Check the Facts leads."},
     {"key": "worry", "pattern": "chronic_vigilance", "tool": "urge-surfing", "priority": WORD_NEXT, "words": ["worried"],
-     "why": "Ride it out (DT-05, rebuilt on the skill runtime) for the checking / reassurance urge; off until signed off."},
+     "why": "Ride it out (DT-05, rebuilt on the skill runtime) for the checking / reassurance urge."},
     {"key": "watchful", "pattern": "chronic_vigilance", "tool": "wise-mind", "priority": WORD_NEXT, "words": WATCHFUL_WORDS,
      "why": "Wise Mind as the alternative for suspicion and judgement."},
     {"key": "helpless", "pattern": "chronic_vigilance", "tool": "problem-solve", "priority": WORD_LEAD, "words": ["helpless"],
-     "why": "Let it be (built, row off until signed off), then Problem Solve in micro-steps; Problem Solve leads until then."},
+     "why": "Let it be leads (its own row), then Problem Solve in micro-steps."},
     {"key": "helpless", "pattern": "chronic_vigilance", "tool": "let-it-be", "priority": 0.4, "words": ["helpless"],
      "why": "Let it be (radical acceptance) leads for helplessness."},
     # --- Social threat ---
@@ -350,17 +365,21 @@ WORD_RULES = [
     # --- On replay ---
     {"key": "aversion", "pattern": "rumination_loop", "tool": "opposite-action", "priority": WORD_LEAD, "words": DISGUST_WORDS + ["hesitant", "guilty", "remorseful"],
      "why": "Disgust: Do the Opposite (towards acceptance); guilt: Check the Facts (is it justified?) then repair; hesitation: approach. Do the Opposite leads until Check the Facts ships."},
-    {"key": "aversion", "pattern": "rumination_loop", "tool": "accepts", "priority": WORD_NEXT, "words": DISGUST_WORDS + ["hesitant"],
-     "why": "Planned: ACCEPTS as the alternative."},
+    {"key": "aversion", "pattern": "rumination_loop", "tool": "mind-job", "priority": WORD_NEXT, "words": DISGUST_WORDS + ["hesitant"],
+     "why": "Give your mind a job (ACCEPTS) as the alternative."},
     {"key": "guilt", "pattern": "rumination_loop", "tool": "check-the-facts", "priority": 0.4, "words": ["guilty", "remorseful", "hesitant"],
      "why": "Planned: Check the Facts leads for guilt (is it justified?) and hesitation."},
     {"key": "low-shame", "pattern": "rumination_loop", "tool": "recovering-from-invalidation", "priority": WORD_LEAD, "words": ["embarrassed", "ashamed", "victimized"],
      "why": "Low-energy shame: Recover (self-validation) first. The review's Cool Down isn't used on this side: the person marked low energy and Cool Down brings it down further."},
+    {"key": "low-shame", "pattern": "rumination_loop", "tool": "soothe", "priority": 0.55, "words": ["embarrassed", "ashamed"], "beside": ["recovering-from-invalidation"],
+     "why": "Held (self-soothe, hand on heart) beside Recover for cold shame: kindness first, which shame makes hardest to take in; Do the Opposite (unhiding) asks more than a low-energy moment has. Never on a blank result (direction down)."},
     {"key": "low-shame", "pattern": "rumination_loop", "tool": "opposite-action", "priority": WORD_NEXT, "words": ["embarrassed", "ashamed"],
      "why": "Do the Opposite (unhiding) as the alternative for shame."},
     # --- Low drive ---
     {"key": "fragile", "pattern": "reward_drive_low", "tool": "problem-solve", "priority": WORD_LEAD, "words": ["vulnerable", "fragile", "powerless"],
      "why": "Let it be (built, row off until signed off), then Problem Solve in micro-steps; Problem Solve until then."},
+    {"key": "grief", "pattern": "conservation_freeze", "tool": "let-it-be", "priority": 1.5, "words": ["despair", "grief", "empty"], "requiresPrior": "up_regulation",
+     "why": "Let it be (radical acceptance) after gentle movement for despair, grief and emptiness; not for numbness, which needs the body first (12 Nov 2026: was a pattern row for all of Shut down)."},
     {"key": "fragile", "pattern": "reward_drive_low", "tool": "let-it-be", "priority": 0.4, "words": ["vulnerable", "fragile", "powerless"],
      "why": "Let it be (radical acceptance) leads."},
     {"key": "connection", "pattern": "reward_drive_low", "tool": "give", "priority": 0.85, "words": ["lonely", "isolated"],
@@ -371,8 +390,6 @@ WORD_RULES = [
 PLANNED_ROWS = [
     {"pattern": "reward_drive_low", "tool": "running-low", "priority": 0.9,
      "why": "Planned: Running low (PLEASE: address the body's vulnerability) leads Low drive, Do the Opposite after it."},
-    {"pattern": "conservation_freeze", "tool": "let-it-be", "priority": 1.5,
-     "why": "Let it be (radical acceptance) after gentle movement for despair, grief, emptiness and numbness."},
 ]
 
 
@@ -423,7 +440,7 @@ def rows():
             add(f"rf_{pattern}_{g['gate']}_{g['tool']}", g["tool"], pattern, g["bands"], g["priority"], g["why"], gate=g["gate"])
     for w in WORD_RULES:
         add(f"rf_{w['pattern']}_words_{w['key']}_{w['tool']}", w["tool"], w["pattern"], DEFAULT_BANDS, w["priority"], w["why"],
-            gate="words", words=w["words"], spec={"beside": w.get("beside", [])})
+            gate="words", words=w["words"], spec={"beside": w.get("beside", []), **{k: w[k] for k in ("requiresPrior",) if k in w}})
     for pr in PLANNED_ROWS:
         add(f"rf_{pr['pattern']}_planned_{pr['tool']}", pr["tool"], pr["pattern"], DEFAULT_BANDS, pr["priority"], pr["why"])
     for r in out:

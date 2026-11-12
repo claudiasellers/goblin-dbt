@@ -1453,6 +1453,17 @@ SET saying_no += {
 };
 
 
+// DT Handouts 8 and 8a (PRD DT-07): self-soothing with the five senses, hand on heart; Held (docs/design/held.md).
+MERGE (self_soothe:TherapyConcept {id: "dbt_self_soothe"})
+SET self_soothe += {
+  name: "Self-Soothe",
+  description: "Comforting yourself through the five senses and kind touch, so a hard moment is met with care",
+  modality: "DBT",
+  module: "Distress Tolerance",
+  skill_type: "self_soothing"
+};
+
+
 // ============================================================
 // MINDFULNESS AS CROSS-MODALITY CONCEPT
 // ============================================================

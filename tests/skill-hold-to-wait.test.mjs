@@ -96,7 +96,8 @@ test("hurt myself, safe for now: no phone-down step, and its own end card with n
     assert.equal(M.crisisFor(ctx(), card, s)?.variant, "crisis");
   }
   assert.deepEqual(M.offersFor(ctx(), card, end("cool")), ["cool_down"]);
-  assert.deepEqual(M.offersFor(ctx(), card, end("call")), ["safety_open"], "the kit and Held are planned");
+  assert.deepEqual(M.offersFor(ctx(), card, end("heart")), ["held"], "Held (DT-07, built): a hand on the heart");
+  assert.deepEqual(M.offersFor(ctx(), card, end("call")), ["safety_open"], "the kit is planned");
   // Flooded and hurt: the step back, then this card (body first), never the settle card's close.
   const f = run([pick("pull", "hurt"), next, pick("safe", "safe"), next, HELD, pick("step_back", "sit"), next], FLOODED);
   assert.equal(f.stepId, "hurt_end");
@@ -166,7 +167,7 @@ test("observe is one tap each and skippable; proceed offers the pull's own moves
   assert.ok(M.canGoOn(ctx(), atObserve), "nothing required");
   assert.deepEqual(moves(run(toProceed("send"))), ["later", "tell", "ask"]);
   assert.deepEqual(moves(run(toProceed("check"))), ["phone_room", "look_once"]);
-  assert.deepEqual(moves(run(toProceed("hurt"))), ["cool", "call"]);
+  assert.deepEqual(moves(run(toProceed("hurt"))), ["cool", "heart", "call"]);
   assert.deepEqual(moves(run(toProceed("hit"))), ["cool", "rebel"], "no confrontation line while aroused enough to hit");
   assert.deepEqual(moves(run(toProceed("leave"))), ["boundary", "step_out", "rebel"]);
   assert.deepEqual(moves(run(toProceed("use"))), ["cool", "ride", "not_now"]);
@@ -183,12 +184,12 @@ test("the end card: the move's own line or the plain one, its tool as the one of
   const s2 = end("send", "later");
   assert.deepEqual(M.offersFor(ctx(), card, s2), []);
   assert.match(M.handoffLine(ctx(), card, s2), /Saving it for later is a choice/);
-  assert.deepEqual(M.offersFor(ctx(), card, end("check", "phone_room")), [], "mind job is planned");
+  assert.deepEqual(M.offersFor(ctx(), card, end("check", "phone_room")), ["mind_job"], "Give your mind a job (DT-06, built)");
   assert.deepEqual(M.offersFor(ctx(), card, end("use", "ride")), ["urge_surfing"]);
   assert.deepEqual(M.offersFor(ctx(), card, end("leave", "boundary")), ["fast"]);
   assert.deepEqual(M.offersFor(ctx(), card, end("hit", "rebel")), ["alternate_rebellion"]);
   const planned = new Set(skill.exits.filter((x) => x.planned).map((x) => x.id));
-  assert.deepEqual([...planned].sort(), ["crisis_kit", "held", "mind_job"]);
+  assert.deepEqual([...planned].sort(), ["crisis_kit"], "Held is built (DT-07)");
   for (const o of skill.options.move) assert.ok(!planned.has(o.handsOn), `${o.value}: no chip into a planned tool`);
 });
 

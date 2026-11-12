@@ -17,6 +17,8 @@ export const PLAYER_TOOLS: Readonly<Record<string, string>> = {
   'cool-down': 'first_body',
   'urge-surfing': 'ride_it_out',
   'let-it-be': 'let_it_be',
+  'mind-job': 'mind_job',
+  'soothe': 'held',
   'opposite-action': 'opposite_action',
 };
 

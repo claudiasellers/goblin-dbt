@@ -1,7 +1,7 @@
 {
   "source": {
     "file": "graph-content-only-2026-11-12.json",
-    "exportedAt": "2026-11-12T04:31:04.678Z"
+    "exportedAt": "2026-11-12T07:45:36.176Z"
   },
   "content": {
     "version": "spine-v1",
@@ -530,6 +530,101 @@
           "minutes": 10
         },
         "notification": "Something you asked to come back to is ready."
+      },
+      {
+        "id": "lid_reopen",
+        "ownerModule": "dt",
+        "tier": "practice",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/mind-job?run={sourceSessionId}&at=reopen&followUp={followUpId}",
+        "staleAfterHours": 72,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "It's still on the shelf. Open it for five minutes?",
+          "title": "On the shelf"
+        },
+        "choices": [
+          {
+            "id": "not_now",
+            "label": "Not now",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "chips": {
+            "few_days": {
+              "days": 3,
+              "kind": "at_local",
+              "time": "18:00"
+            },
+            "tomorrow": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "18:00"
+            },
+            "tonight": {
+              "days": 0,
+              "kind": "at_local",
+              "time": "20:00"
+            }
+          },
+          "kind": "chip"
+        },
+        "notification": "Something you put on the shelf is ready to open."
+      },
+      {
+        "id": "mind_job_back",
+        "ownerModule": "dt",
+        "tier": "practice",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/mind-job?run={sourceSessionId}&at=back&followUp={followUpId}",
+        "staleAfterHours": 6,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "How is it now? Louder, the same, quieter?",
+          "title": "Back from your break"
+        },
+        "choices": [
+          {
+            "id": "not_now",
+            "label": "Not now",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "chips": {
+            "m15": {
+              "kind": "after",
+              "minutes": 15
+            },
+            "m30": {
+              "kind": "after",
+              "minutes": 30
+            },
+            "m5": {
+              "kind": "after",
+              "minutes": 5
+            },
+            "m60": {
+              "kind": "after",
+              "minutes": 60
+            }
+          },
+          "kind": "chip"
+        },
+        "notification": "Your break's up. How is it now?"
       },
       {
         "id": "nightmare_rehearse",
