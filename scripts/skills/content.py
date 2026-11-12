@@ -35,6 +35,7 @@ import finding_connection  # noqa: E402
 import notice_them  # noqa: E402
 import rehearse  # noqa: E402
 import crisis_kit  # noqa: E402
+import emotion_guide  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
@@ -42,7 +43,7 @@ SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKIL
           ending_relationships.SKILL, cope_ahead.SKILL, hold_to_wait.SKILL, dear_man_debrief.SKILL, pros_cons.SKILL, first_body.SKILL,
           ride_it_out.SKILL, let_it_be.SKILL, mind_job.SKILL, say_no.SKILL, dear_man_one.SKILL, held.SKILL, thoughts_passing.SKILL, dear_man_prep.SKILL,
           opposite_action.SKILL, habit_plan.SKILL, please_skill.SKILL, give.SKILL, good_things.SKILL, *crisis_kit.SKILLS, values.SKILL, build_mastery.SKILL,
-          finding_connection.SKILL, notice_them.SKILL, rehearse.SKILL]
+          finding_connection.SKILL, notice_them.SKILL, rehearse.SKILL, emotion_guide.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -112,6 +113,8 @@ EMBEDS = {
     "kitDeck": {"ids": ["body", "hands", "soothe", "words", "place", "reasons", "pros_cons", "starter"], "measures": ["durationSec", "doneCount"]},
     # R8: another skill run inline (runtime-owned); its `inline.ends` / `flags` give these ids.
     "inlineSkill": {"ids": ["finished", "left", "stopped", "body", "unsafe"]},
+    # ER-10's feeling card: read, then on.
+    "feelingCard": {"ids": ["read"]},
 }
 # What each embed takes from the skill (embeds.ts EMBED_PROPS; the contract test keeps the two equal). build.py
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
@@ -164,6 +167,10 @@ EMBED_PROPS = {
     # R8: another skill run inline; `skill` names it (it must declare `inline`), `enterAt` one of its `inline.enterAt`.
     # `ctx`: context key → a ref in the host's run (the sub-run's context in); `outcomes`: the sub-skill's
     # `inline.outcomes`, written by build.py, never by hand.
+    # ER-10: `guide` is a `row` prop (a ref whose value keys the shared table; the embed receives the row).
+    "feelingCard": {"guide": {"type": "row", "table": "feelingOf"}, "familyLine": {"type": "copy"},
+                    "forLabel": {"type": "copy"}, "promptsLabel": {"type": "copy"}, "bodyLabel": {"type": "copy"},
+                    "urgesLabel": {"type": "copy"}, "urgeNote": {"type": "copy"}, "next": {"type": "copy"}},
     "inlineSkill": {"skill": {"type": "id"}, "enterAt": {"type": "id", "optional": True},
                     "ctx": {"type": "ctx", "optional": True}, "outcomes": {"type": "ids", "optional": True}},
     "holdRing": {
@@ -415,4 +422,4 @@ EMBED_PROPS = {
     },
 }
 # Shared tables the graph supplies to every skill (never written here).
-GRAPH_TABLES = ("parentOf", "fitsWhen")
+GRAPH_TABLES = ("parentOf", "fitsWhen", "feelingOf", "feelingGuideOf")

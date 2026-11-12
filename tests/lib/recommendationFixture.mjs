@@ -88,6 +88,8 @@ export function fixtureDeps(g = graph, calls = []) {
       const policy = {
         version: p.version, enabled: p.enabled === true, maxCards: p.maxCards ?? 2, fallbackConceptId: p.fallbackConceptId,
         defaultBand: p.defaultBand, floodedPatterns: p.floodedPatterns || [],
+        ...(p.answerWeight != null ? { answerWeight: p.answerWeight } : {}),
+        ...(p.tieBreak === "words" ? { tieBreak: "words" } : {}),
       };
       return { policy, fallback: routingConcept(g, p.fallbackConceptId, { withAddresses: false }) };
     },

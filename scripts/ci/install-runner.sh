@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Registers this Mac as the repo's self-hosted GitHub Actions runner (label "goblin") and installs it
-# as a launchd service that starts at login. CI and Deploy both run on it (docs/ci-runner.md).
+# as a launchd service that starts at login. Deploy runs on it (docs/ci-runner.md).
 # Needs gh signed in as a repo admin and python3 3.9+ (the jobs fetch Node 22 themselves; the Firebase CLI
-# comes from functions/node_modules; no Java: the emulator tier is not in CI). Safe to run again: an
+# comes from functions/node_modules; no Java: the emulator tier runs by hand). Safe to run again: an
 # already registered runner is just restarted.
 set -euo pipefail
 

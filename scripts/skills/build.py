@@ -111,7 +111,7 @@ def check_cond(c, fields, derived, where, accepts=None):
 ID = re.compile(r"^[a-z0-9][a-z0-9_:-]{0,63}$")
 
 
-def check_embed_props(name, props, copy, fields, w):
+def check_embed_props(name, props, copy, fields, w, derived=frozenset(), accepts=None):
     """A step's or slot's props against the embed's EMBED_PROPS: declared, typed, and every copy key in the skill."""
     spec = EMBED_PROPS[name]
     props = props or {}
@@ -138,11 +138,18 @@ def check_embed_props(name, props, copy, fields, w):
             # Context key → a ref in this run; the sub-skill's `accepts` and the refs are checked with the host (R8 below).
             assert isinstance(v, dict) and v and set(v) <= CTX_KEYS, (w, f"{name}.{k} maps context keys", v)
             assert all(isinstance(r, str) and (r == "$each" or re.match(r"^\$(a|d|ctx)\.[A-Za-z_][A-Za-z0-9_]*$", r)) for r in v.values()), (w, f"{name}.{k} maps to refs", v)
+        elif t == "row":
+            # A ref whose value keys a shared graph table (ER-10's feeling card reads its guide's feelingOf row).
+            assert sp["table"] in GRAPH_TABLES, (w, f"{name}.{k} reads a shared table", sp)
+            assert isinstance(v, str) and re.match(r"^\$(a|d|ctx)\.[A-Za-z_][A-Za-z0-9_]*$", v), (w, f"{name}.{k} is a ref", v)
+            check_cond({"set": v}, fields, derived, w, accepts)
         else:
             assert isinstance(v, str) and ID.match(v), (w, f"{name}.{k} is an id", v)
 
 
 RUNTIME_KEYS = ("persist", "quickExit", "resumeAt")
+# The feeling card's row (src/data/skillTypes.ts FeelingRow).
+FEELING_ROW_FIELDS = ("label", "functionLine", "prompts", "urges", "body", "ladder")
 
 
 def runtime_of(sk):
@@ -180,6 +187,9 @@ def check(skill):
                 float(k)  # a count's table is keyed by thresholds
         else:
             assert d.get("kind", "lookup") == "lookup" and isinstance(d.get("from"), str), (sid, d)
+            if "field" in d:
+                # One field of a row: only feelingOf's (its fields are the runtime's FeelingRow).
+                assert d["table"] == "feelingOf" and d["field"] in FEELING_ROW_FIELDS and d.get("keep") != "key", (sid, "a derive field reads a feelingOf row", d)
     assert sum(1 for e in skill["exits"] if e.get("safety")) <= 1, (sid, "one safety.open exit at most")
     for e in skill["exits"]:
         if e.get("safety"):
@@ -209,7 +219,7 @@ def check(skill):
         assert s["kind"] in STEP_KINDS, w
         if s["kind"] == "embed":
             assert s.get("embed") in EMBEDS, (w, "a whole-screen embed the player has", s.get("embed"))
-            check_embed_props(s["embed"], s.get("props"), copy, fields, w)
+            check_embed_props(s["embed"], s.get("props"), copy, fields, w, derived, accepts)
             assert not s.get("fields"), (w, "an embed step has no fields; its output is `answerAs`")
             for v, kind in EMBEDS[s["embed"]].get("danger", {}).items():
                 want = DANGER_VARIANT[kind]
@@ -253,9 +263,13 @@ def check(skill):
                 assert ref.startswith("$d.") and ref[3:] in derived, (w, "emotionsFrom is a derived value", o)
                 d = next(x for x in skill["derive"] if x["name"] == ref[3:])
                 assert d.get("kind", "lookup") == "lookup" and d.get("keep") != "key", (w, "emotionsFrom reads a lookup's row", d)
-                rows = list(skill["tables"].get(d["table"], {}).values()) + ([d["default"]] if "default" in d else [])
-                assert rows and all(isinstance(r, list) and r and all(isinstance(x, str) for x in r) for r in rows), (
-                    w, "every row of an emotionsFrom table is a list of words", d)
+                if d["table"] in GRAPH_TABLES:
+                    # A shared table's list field (feelingOf's ladder: grid words, checked by scripts/emotion-guide/build.py).
+                    assert d["table"] == "feelingOf" and d.get("field") == "ladder", (w, "emotionsFrom reads feelingOf's ladder", d)
+                else:
+                    rows = list(skill["tables"].get(d["table"], {}).values()) + ([d["default"]] if "default" in d else [])
+                    assert rows and all(isinstance(r, list) and r and all(isinstance(x, str) for x in r) for r in rows), (
+                        w, "every row of an emotionsFrom table is a list of words", d)
             if "moreKey" in o:
                 assert o["moreKey"] in copy, (w, o)
             for k in ("label",):
@@ -304,7 +318,7 @@ def check(skill):
             # Under a field of this step, or under the title (`$title`: above every field).
             assert sl["embed"] in EMBEDS and (sl["after"] == "$title" or sl["after"] in [f["id"] for f in s.get("fields", [])]), (w, sl)
             assert s["kind"] == "ask", (w, "slots live on ask steps")
-            check_embed_props(sl["embed"], sl.get("props"), copy, fields, w)
+            check_embed_props(sl["embed"], sl.get("props"), copy, fields, w, derived, accepts)
             check_cond(sl["showWhen"], fields, derived, w, accepts)
         # A line or an offer with `when: None` always holds (a hand-off's default line, an offer for every path).
         for ln in s.get("lines", []):

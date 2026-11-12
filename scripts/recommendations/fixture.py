@@ -94,7 +94,7 @@ def build(g):
     policy = None
     if rp:
         policy = {k: rp.props.get(k) for k in ('version', 'enabled', 'maxCards', 'fallbackConceptId', 'defaultBand',
-                                                'floodedPatterns', 'reviewStatus')}
+                                                'floodedPatterns', 'answerWeight', 'tieBreak', 'reviewStatus')}
 
     return {
         'kind': 'recommendation-graph',

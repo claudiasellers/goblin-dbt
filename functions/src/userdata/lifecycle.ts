@@ -16,6 +16,8 @@
 export const CHECKIN_OPEN_HOURS = 2;
 /** A closed tool session can still take its "did it help?" answer for 12 h. */
 export const TOOL_SESSION_ANSWER_HOURS = 12;
+/** A safety route visit (SafetyCheck, CORE-01) takes its later answers for 2 h, until its exit. */
+export const SAFETY_CHECK_OPEN_HOURS = 2;
 /** An open tool session older than this reads as abandoned (derived, never stored). */
 export const TOOL_SESSION_ABANDONED_HOURS = 2;
 
@@ -79,6 +81,10 @@ export const GUARDS = {
     /** answerPartCandidate's "Not any more" (Me): only while open; a dismissed one stays dismissed. */
     dismiss: (v: string) => `${v}.status = 'open'`,
   },
+  SafetyCheck: {
+    /** saveSafetyCheck: forward-only moves while open (no exit yet) and within 2 h of the first answer. */
+    update: (v: string) => `(${v}.status = 'open' AND ${v}.at > datetime() - duration({hours: ${SAFETY_CHECK_OPEN_HOURS}}))`,
+  },
   TrailOffer: {
     /** getTrailOfferEvidence ("Show me"): offered → seen, once. */
     see: (v: string) => `${v}.status = 'offered'`,
@@ -102,7 +108,7 @@ const ms = (v: unknown): number | null => {
 
 /** The TypeScript mirror of GUARDS (for tests and for callers that already hold the record). */
 export function writable(
-  label: 'CheckIn' | 'ToolSession' | 'FollowUp' | 'PatternOffer' | 'ToolUsage' | 'SkillPractice' | 'PartSession' | 'PullsSession' | 'PartCandidate' | 'TrailOffer',
+  label: 'CheckIn' | 'ToolSession' | 'FollowUp' | 'PatternOffer' | 'ToolUsage' | 'SkillPractice' | 'PartSession' | 'PullsSession' | 'PartCandidate' | 'TrailOffer' | 'SafetyCheck',
   op: string,
   p: Props,
   now: number = Date.now(),
@@ -145,6 +151,11 @@ export function writable(
       if (op !== 'answer' || (p.status !== 'offered' && p.status !== 'seen')) return false;
       const until = ms(p.cooldownUntil);
       return until === null || until <= now;
+    }
+    case 'SafetyCheck': {
+      if (p.status !== 'open') return false;
+      const at = ms(p.at);
+      return at !== null && at > now - SAFETY_CHECK_OPEN_HOURS * HOUR;
     }
     case 'SkillPractice': return false; // terminal at creation
     default: return false;

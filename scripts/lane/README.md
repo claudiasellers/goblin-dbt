@@ -21,8 +21,9 @@ Every 2 minutes launchd runs `~/.goblin-lane/bin/merge-lane.sh`. It takes open, 
 
 1. Merges the PR head into the current `origin/main` in its own clone (`~/.goblin-lane/repo`, never your
    working checkout). A conflict fails the PR.
-2. Runs the same checks as CI (`.github/workflows/ci.yml`): `npm ci` (root and functions), both builds,
-   `npm test`, lint budget.
+2. Runs every check: `npm ci` (root and functions), both builds (each with `tsc`), `npm test` (which includes
+   the module check, `tests/tool-modules.test.mjs`), lint budget. This is the only place tests run: there is no
+   CI workflow, and Deploy doesn't test (Claudia, 12 Nov 2026).
 3. Pushes that exact tested merge commit to `main`. If main moved while testing (another merge, or the
    deploy workflow's content-snapshot commit), the push is rejected and it retests, up to 3 times.
    GitHub then marks the PR merged, and the push starts `.github/workflows/deploy.yml`.

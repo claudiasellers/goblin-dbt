@@ -1654,6 +1654,43 @@
         "notification": "Something you set aside is ready when you are."
       },
       {
+        "id": "safety_checkin",
+        "ownerModule": "core",
+        "tier": "safety",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/safety?checkin={followUpId}",
+        "staleAfterHours": 30,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "How are you this morning?",
+          "title": "Checking in"
+        },
+        "choices": [
+          {
+            "id": "not_now",
+            "label": "Not now",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "chips": {
+            "tomorrow": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "09:30"
+            }
+          },
+          "kind": "chip"
+        },
+        "notification": "Checking in"
+      },
+      {
         "id": "tool_outcome",
         "ownerModule": "core",
         "tier": "skills",

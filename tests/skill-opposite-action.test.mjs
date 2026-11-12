@@ -159,6 +159,12 @@ test("Check the Facts inline on I still do not know (ER-B5): the verdict joins w
   assert.equal(title(left), skill.copy.clar_title_left);
   assert.equal(line(left), skill.copy.clar_left);
   assert.deepEqual(offers(left), ["check_the_facts"]);
+  // Leaving from the verdict screen still sends its flags back: leaving wins over every verdict (Codex, #116).
+  for (const v of ["fits", "partly", "doesnt_fit"]) {
+    for (const help of ["helpful", "unhelpful"]) assert.equal(back(toCheck("anxious", help), "left", v).stepId, "clar", `left + ${v}:${help}`);
+  }
+  assert.equal(back(toCheck("ashamed", "unhelpful", { goal: "repair" }), "left", "fits").stepId, "clar", "never repair on a leave");
+  assert.equal(back(ctf, "left", "unsafe").stepId, "cdng", "unsafe still wins over leaving");
   // A danger chip, then a verdict: the danger card wins, the other-person resources, no close, no carrying on.
   const cdng = M.stepOf(skill, "cdng");
   assert.equal(cdng.noClose, true);

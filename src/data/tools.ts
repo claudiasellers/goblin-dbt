@@ -23,6 +23,20 @@ export interface Tool {
    * it, or never does (its `persist`). Ending a relationship: its safety branch saves nothing unless chosen.
    */
   deferSession?: boolean;
+  /**
+   * More cards for the same tool in its module's list on the Tools page, each opening one of its modes by query
+   * (My crisis kit's *Make it*; Claudia, 12 Nov: both under Distress Tolerance). Same module, same tool id.
+   */
+  moreCards?: ToolModeCard[];
+}
+
+export interface ToolModeCard {
+  key: string;
+  name: string;
+  tagline: string;
+  emoji: string;
+  /** The query the card opens the tool with, e.g. `frame=build`. */
+  query: string;
 }
 
 export const tools: Tool[] = [
@@ -162,6 +176,7 @@ export const tools: Tool[] = [
     dbtBasis: 'Crisis survival skills (DT Handouts 6–9a)',
     emoji: '🧰',
     bare: true,
+    moreCards: [{ key: 'build', name: 'Make my crisis kit', tagline: 'On a calmer day, so it\'s ready for a hard night', emoji: '🧰', query: 'frame=build' }],
   },
   // Emotion Regulation
   {
@@ -291,6 +306,18 @@ export const tools: Tool[] = [
     module: 'emotion-regulation',
     dbtBasis: 'DBT ER Handout 19 (build mastery)',
     emoji: '🪜',
+    bare: true,
+  },
+  {
+    // ER-10 on the skill runtime (docs/design/emotion-guide.md): the feeling card and its family ladder.
+    id: 'emotion-guide',
+    name: 'Know This Feeling',
+    tagline: 'What a feeling is for, and a closer word for it',
+    description: 'Pick a feeling to see what it\'s for, what often sets it off, where it shows up in the body and the pull it can bring. Then find the word in its family that\'s closest.',
+    whenToUse: 'When you\'ve named a feeling and want to understand it, or the word you have feels too big or too vague.',
+    module: 'emotion-regulation',
+    dbtBasis: 'DBT ER Handouts 3–6 (what emotions do, the model of emotions, describing emotions)',
+    emoji: '🔎',
     bare: true,
   },
   // Interpersonal Effectiveness
@@ -489,6 +516,7 @@ export const allIntents: Intent[] = [
   { id: 'find-good', label: 'Find something good', toolId: 'good-things', emoji: '🌼' },
   { id: 'what-matters', label: 'Work out what matters to me', toolId: 'values-clarification', emoji: '🧭' },
   { id: 'one-thing', label: 'Get one thing done', toolId: 'build-mastery', emoji: '🪜' },
+  { id: 'know-feeling', label: 'Get to know a feeling', toolId: 'emotion-guide', emoji: '🔎' },
   { id: 'nightmares', label: 'The same nightmare keeps coming back', toolId: 'nightmare-rescript', emoji: '🌙' },
 ];
 

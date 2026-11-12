@@ -70,7 +70,8 @@ test("listed only with parts on and its copy shipped (the gate ToolPage opens it
   assert.deepEqual(S.parseMeetEntry(PM.toolsMeetLink().state), { trailheadKind: "tools", partId: null, candidateId: null, moveId: null });
   assert.equal(PM.toolsMeetLink().pathname, "/tool/meet-a-part");
   assert.equal(V.validateStartPartSession(S.startRequest(SID, { move: "hide", partId: null }, S.parseMeetEntry(PM.toolsMeetLink().state))).trailheadKind, "tools", "the server takes it");
-  assert.match(read("src/components/ToolCard.tsx"), /to=\{`\/tool\/\$\{tool\.id\}`\}\s+state=\{state\}/);
+  // (A mode card, Tool.moreCards, adds its query; Meet a part has none, so its link is the tool's own.)
+  assert.match(read("src/components/ToolCard.tsx"), /to=\{`\/tool\/\$\{tool\.id\}\$\{mode \? `\?\$\{mode\.query\}` : ''\}`\}\s+state=\{state\}/);
   assert.match(tools, /\{intents\.map\(/, "the intents are the fixed list");
   const page = read("src/pages/ToolPage.tsx");
   assert.match(page, /'meet-a-part': MeetAPart,/);

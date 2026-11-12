@@ -22,8 +22,8 @@ export type { Answer, Answers } from './conditions';
 
 export interface RunContext {
   skill: SkillDef;
-  /** The shared tables (skills.json `parentOf`, `fitsWhen`). */
-  shared: Pick<SkillsContent, 'parentOf' | 'fitsWhen'>;
+  /** The shared tables (skills.json `parentOf`, `fitsWhen`, and the feeling guide's `feelingOf` / `feelingGuideOf`). */
+  shared: Pick<SkillsContent, 'parentOf' | 'fitsWhen'> & Partial<Pick<SkillsContent, 'feelingOf' | 'feelingGuideOf'>>;
   /** Emotions a link or hand-off carried in (grid ids): first on an emotion field, never pre-selected. */
   carried: string[];
   /** Every grid word id (an emotion pick must be one). */
@@ -319,7 +319,15 @@ const fieldOf = (skill: SkillDef, id: string): FieldDef | undefined => allFields
 function table(ctx: RunContext, name: string): Record<string, unknown> | undefined {
   if (name === 'parentOf') return ctx.shared.parentOf;
   if (name === 'fitsWhen') return ctx.shared.fitsWhen;
+  if (name === 'feelingOf') return ctx.shared.feelingOf;
+  if (name === 'feelingGuideOf') return ctx.shared.feelingGuideOf;
   return ctx.skill.tables[name];
+}
+
+/** A shared table's row by key (the `row` embed prop: the feeling card reads its guide's row). */
+export function sharedRow(ctx: RunContext, name: string, key: unknown): unknown {
+  const t = table(ctx, name);
+  return typeof key === 'string' && t && Object.hasOwn(t, key) ? t[key] : undefined;
 }
 
 /** The skill's derived values (lookups through tables), in order: a later one may read an earlier one. */
@@ -332,8 +340,10 @@ export function derive(ctx: RunContext, answers: Answers): Record<string, unknow
       continue;
     }
     const v = resolve(d.from, scopeOf(ctx, answers, out));
-    if (typeof v === 'string' && t && Object.hasOwn(t, v)) out[d.name] = d.keep === 'key' ? v : t[v];
-    else out[d.name] = d.default ?? null;
+    if (typeof v === 'string' && t && Object.hasOwn(t, v)) {
+      const row = t[v];
+      out[d.name] = d.keep === 'key' ? v : d.field ? (row as Record<string, unknown> | null)?.[d.field] ?? d.default ?? null : row;
+    } else out[d.name] = d.default ?? null;
   }
   return out;
 }

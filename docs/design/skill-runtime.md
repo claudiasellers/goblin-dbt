@@ -61,6 +61,14 @@ Two tables are emotion knowledge the graph already has, so every skill shares th
 `parentOf` (grid word → DBT parent, from `HAS_REGULATION_CONTENT`) and `fitsWhen` (parent → its
 `EmotionRegulationContent.fitsTheFactsWhen`, unchanged).
 
+Two more since ER-10 (Know this feeling, [`emotion-guide.md`](emotion-guide.md)): `feelingOf` (feeling guide → its
+card row: `label`, `functionLine`, `prompts`, `urges`, `body`, `ladder`) and `feelingGuideOf` (grid word → its
+guide: through its DBT parent's `GUIDES` edge, or `IN_GUIDE` for the happiness words, which have no parent).
+`feelingOf`'s urges are the parent's emotion `ActionUrge`s only (never the behaviour urges, never a held one,
+three at most); its body places are only signed-off `FELT_AS` rows of the guide's `BodyMap`, through
+`placesFromFelt`, three at most. `functions/src/skills/feelingOf.ts` is the one shaping, used by
+`getSkillContent` and the snapshot build; `scripts/skills/graph_tables.py` mirrors it without a database.
+
 **Why JSON on steps.** A step's fields (question, chips source, how many picks, own words, when it shows)
 are presentation config that nothing traverses; Neo4j can't store nested maps; and the structure a router
 or a review needs (steps, transitions, offers, exits, options) is real nodes and edges. `copyJson` is
@@ -106,7 +114,9 @@ Refs: `$a.<field>` (first pick), `$a.<field>.ids` (all picks), `$a.<field>.own`,
 `$opt.<prop>` (the option under test), `$ctx.<key>` (context in: one id, no suffix; only keys the skill
 `accepts`). Derived values are lookups through tables: `{name: 'parent', from:
 '$a.feel', table: 'parentOf'}`, `{name: 'set', from: '$d.parent', table: 'storySetOf', default:
-'general'}`, `{name: 'fitsParent', from: '$d.parent', table: 'fitsWhen', keep: 'key'}`.
+'general'}`, `{name: 'fitsParent', from: '$d.parent', table: 'fitsWhen', keep: 'key'}`. A derive on
+`feelingOf` may take one `field` of the row (`{name: 'ladder', from: '$d.guide', table: 'feelingOf', field:
+'ladder'}`); `build.py` allows `field` on that table only.
 
 ### The run (`src/lib/skillRuntime/machine.ts`, pure)
 
@@ -132,7 +142,8 @@ Added by F1 (docs/design/dbt-modules-plan.md §4, 10 Nov 2026):
   (ids, `ownText`, measures; content.py `EMBEDS` mirrors it), its ids become the `answerAs` answer (ids only),
   and the whole report goes in `out`. Own words from an embed are kept once, in `out`.
 - **Embed props** (F2). Each embed declares what it takes in `EMBED_PROPS` (`copy`, `int` with a range, `enum`,
-  `field`, `id`; any may be `optional`), mirrored in content.py. `build.py` refuses an undeclared, mistyped or
+  `field`, `id`, and since ER-10 `row`: a ref whose value keys a shared table, the player handing the embed that
+  table's row, or no prop when nothing matches; any may be `optional`), mirrored in content.py. `build.py` refuses an undeclared, mistyped or
   missing prop on any embed step or slot, and a `copy` prop must name a key in the skill's copy: the player
   passes its text (`resolveEmbedProps`), so an embed never carries its own words. Embeds also get `answerIds`.
   Shared embeds: `holdRing` (`press` · `timed` · `settle`; `src/lib/holdRing.ts`), `waitLock` (DT-02), `prosConsCard` / `prosConsReplay` (DT-10) and `witness` (the receive beat,
@@ -338,7 +349,8 @@ every other content file), and runs it inside the page's `ToolSessionProvider`:
   used when it wasn't answered. A hand-off's chips stay on its card.
 - **Words that follow an earlier answer** (ER-B2). An emotion field's `options.emotionsFrom` is a `$d.<name>` ref to a
   lookup whose rows are lists of grid words (Cope Ahead's feelings by situation); `emotions` stays the fallback, used
-  when the lookup finds no row. One field instead of one per earlier answer keeps the record small.
+  when the lookup finds no row. One field instead of one per earlier answer keeps the record small. Since ER-10 it may
+  also name a `feelingOf` derive with `field: 'ladder'` (Know this feeling's *Which of these is closest?*).
 - **A quiet way on, and a keep's confirmation** (ER-B2, Gate 2). An ask step's `secondary` (a copy key) is a quiet
   button under the primary that goes on without the step's keep or follow-up (Cope Ahead's *Not now* under *Keep
   this*); `keep.done` is a line shown on the next screen once the keep saved. A crisis slot that already holds as a
