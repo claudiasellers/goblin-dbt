@@ -70,6 +70,10 @@ MERGE (k:ProfileKind {id: "abstinence_plan"})
 SET k.area = "my_plans", k.label = "A habit plan", k.revisitAfterDays = null, k.stillTrueCopy = "", k.setAsideCopy = "Set aside. It stays out of the way until you bring it back.", k.reviewStatus = "draft";
 MATCH (k:ProfileKind {id: "abstinence_plan"}), (a:ProfileArea {id: "my_plans"})
 MERGE (k)-[:IN_AREA]->(a);
+MERGE (k:ProfileKind {id: "please_rows"})
+SET k.area = "my_body", k.label = "Rows Running low leaves out", k.revisitAfterDays = null, k.stillTrueCopy = "", k.setAsideCopy = "Set aside. Running low asks every row again.", k.reviewStatus = "draft";
+MATCH (k:ProfileKind {id: "please_rows"}), (a:ProfileArea {id: "my_body"})
+MERGE (k)-[:IN_AREA]->(a);
 MERGE (k:ProfileKind {id: "crisis_kit"})
 SET k.area = "my_plans", k.label = "My crisis kit", k.revisitAfterDays = null, k.stillTrueCopy = "", k.setAsideCopy = "Set aside. The kit opens with the starter cards until you bring it back.", k.reviewStatus = "draft";
 MATCH (k:ProfileKind {id: "crisis_kit"}), (a:ProfileArea {id: "my_plans"})

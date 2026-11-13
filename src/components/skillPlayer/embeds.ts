@@ -446,6 +446,8 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     names: { type: 'copy' },
     line: { type: 'copy', optional: true },
     next: { type: 'copy' },
+    /** A profile slice naming rows the person left out in Me (Running low's `pleaseRows`): their cells aren't drawn. */
+    hidden: { type: 'enum', values: ['pleaseRows'], optional: true },
   },
   // ER-10: the guide's feelingOf row (a `row` prop from a ref), and the card's words.
   feelingCard: {

@@ -167,7 +167,8 @@ EMBED_PROPS = {
         "steadyNoteA": {"type": "copy", "optional": True}, "steadyNoteB": {"type": "copy", "optional": True},
     },
     "batteryRead": {"fields": {"type": "fields"}, "low": {"type": "field"}, "names": {"type": "copy"},
-                    "line": {"type": "copy", "optional": True}, "next": {"type": "copy"}},
+                    "line": {"type": "copy", "optional": True}, "next": {"type": "copy"},
+                    "hidden": {"type": "enum", "values": ["pleaseRows"], "optional": True}},
     # R8: another skill run inline; `skill` names it (it must declare `inline`), `enterAt` one of its `inline.enterAt`.
     # `ctx`: context key → a ref in the host's run (the sub-run's context in); `outcomes`: the sub-skill's
     # `inline.outcomes`, written by build.py, never by hand.

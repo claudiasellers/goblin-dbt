@@ -216,3 +216,47 @@ test("connected: Low drive's check-in result leads with Running low; It isn't wo
     assert.ok(ex && !ex.planned, id);
   }
 });
+
+test("rows left out in Me: each row's transitions skip them, the readout leaves them out; sleep is always asked", () => {
+  const c = (hidden) => ({ ...ctx(), profile: { pleaseRows: hidden } });
+  // Food and alcohol or drugs left out: sleep, body, moving, then the readout.
+  let s = M.initialRun(skill);
+  const seen = [];
+  for (let i = 0; i < 3; i++) { seen.push(s.stepId); s = M.runNext(c(["food", "subs"]), s, next); }
+  assert.deepEqual(seen, ["sleep", "body", "moved"]);
+  assert.equal(s.stepId, "none", "nothing loud");
+  // The last rows left out: the readout follows the last row asked.
+  s = run([pick("sleep", "sleep_short"), next, pick("food", "food_regular"), next], c(["body", "subs", "moved"]));
+  assert.equal(s.stepId, "read_sleep");
+  // While the profile loads (null) or signed out, nothing is hidden: every row is asked.
+  assert.equal(M.runNext({ ...ctx(), profile: null }, M.initialRun(skill), next).stepId, "food");
+  assert.equal(M.runNext(ctx(), M.initialRun(skill), next).stepId, "food");
+  for (const f of ["sleep", "food", "body", "subs"]) {
+    assert.ok(skill.steps.find((x) => x.id === f).next.some((t) => JSON.stringify(t.when ?? {}).includes('"$p.pleaseRows"')), f);
+  }
+  assert.ok(skill.steps.filter((x) => x.embed === "batteryRead").every((x) => x.props.hidden === "pleaseRows"));
+  const battery = readFileSync("src/components/skillPlayer/BatteryRead.tsx", "utf8");
+  assert.match(battery, /\.filter\(\(c\) => !hidden\.has\(c\.id\)\)/, "a left-out row gets no cell");
+});
+
+test("the setting: kind please_rows in My body, one per person, the four rows but sleep; the slice for please-skill only", async () => {
+  const kinds = readFileSync("functions/src/profile/kinds.ts", "utf8");
+  assert.match(kinds, /export const PLEASE_HIDEABLE_ROWS = \['food', 'body', 'subs', 'moved'\] as const;/);
+  assert.match(kinds, /please_rows: \{\n\s+kind: 'please_rows', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'my_body', slice: 'pleaseRows',\n\s+owner: 'ER', many: false, maxItems: 1, editor: 'please_rows', ownFields: \[\],/);
+  const lib = await importTs("src/lib/pleaseRows.ts");
+  assert.deepEqual([...lib.PLEASE_HIDEABLE_ROWS], ["food", "body", "subs", "moved"]);
+  assert.match(readFileSync("scripts/skills/please_skill.py", "utf8"), /HIDEABLE = \["food", "body", "subs", "moved"\]/);
+  assert.deepEqual(lib.pleaseRowsOf({ hidden: ["subs", "sleep", "food", 3] }), ["food", "subs"], "known rows only, in row order");
+  assert.deepEqual(lib.pleaseRowsOf(null), []);
+  assert.deepEqual(Object.values(lib.pleaseRowNames(skill.copy)), ["Food", "Body", "Alcohol or drugs", "Moving"]);
+  const types = await importTs("functions/src/profile/types.ts");
+  assert.deepEqual([...types.PROFILE_NEEDS["please-skill"]], ["pleaseRows"]);
+  for (const [consumer, needs] of Object.entries(types.PROFILE_NEEDS)) {
+    if (consumer !== "please-skill") assert.ok(!needs.includes("pleaseRows"), consumer);
+  }
+  assert.match(readFileSync("functions/src/profile/slices.ts", "utf8"), /pleaseRows: `MATCH \(:User \{id: \$uid\}\)-\[:HAS_PROFILE_FACT\]->\(p:ProfileFact \{kind: 'please_rows', status: 'active'\}\)/);
+  assert.match(readFileSync("scripts/profile-layer/content.py", "utf8"), /\("please_rows", "my_body", "Rows Running low leaves out", None,/);
+  const me = readFileSync("src/components/me/MeSection.tsx", "utf8");
+  assert.match(me, /keepProfileItem\(\{ kind: 'please_rows', value: \{ hidden \} \}\)/);
+  assert.match(me, /<PleaseRowsNew onSave=\{keepPleaseRows\} \/>/);
+});

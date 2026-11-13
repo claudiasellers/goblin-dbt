@@ -56,6 +56,9 @@ KINDS = [
     # When it's a habit (DT-09): a plan the person kept for one behaviour. Never stale: theirs until they set it aside.
     ("abstinence_plan", "my_plans", "A habit plan", None,
      "", "Set aside. It stays out of the way until you bring it back."),
+    # Running low (ER-07): the rows the person would rather it didn't ask about, set in Me. Never stale: a setting.
+    ("please_rows", "my_body", "Rows Running low leaves out", None,
+     "", "Set aside. Running low asks every row again."),
     # My crisis kit (DT-03): one per person, kept on *Keep it*. Never stale: theirs until they set it aside or change it.
     ("crisis_kit", "my_plans", "My crisis kit", None,
      "", "Set aside. The kit opens with the starter cards until you bring it back."),

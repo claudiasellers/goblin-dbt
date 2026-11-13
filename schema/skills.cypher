@@ -17426,7 +17426,7 @@ SET r += {list: "renew", order: 83};
 
 // --- please_skill (pl-v1) ---
 MERGE (s:Skill {id: "please_skill"})
-SET s += {toolId: "please-skill", version: "pl-v1", contentVersion: "skills-v1", start: "sleep", ownMax: 90, emotionFields: [], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"back_end_title\": \"Looking after your body is the skill\", \"back_no\": \"Days like that happen. Tomorrow's another go, and a smaller thing can count.\", \"back_partly\": \"Part of it counts. Your body got some of what it needed.\", \"back_title\": \"Did it happen? {fix}\", \"back_yes\": \"That's one thing done for your body today.\", \"body_title\": \"How's your body today?\", \"done\": \"Done\", \"fix_care\": \"If it's new, bad or not easing, a doctor or pharmacist can help.\", \"fix_hint\": \"Pick the smallest one that feels doable.\", \"fix_own\": \"Something else\", \"fix_title\": \"One thing for today\", \"food_title\": \"How's food been today?\", \"heavy_link\": \"Rest doesn't refill me: find the feeling\", \"moved_title\": \"Have you moved today?\", \"next\": \"Next\", \"none_line\": \"That's worth knowing too. If things still feel loud, it may be a feeling more than the body.\", \"none_title\": \"Nothing obvious from the body today\", \"remind_label\": \"Want me to ask tonight if it happened?\", \"set_later\": \"It's on for later today.\", \"set_now\": \"Feelings run hotter on an empty tank. This is one small thing for it.\", \"set_remind\": \"It'll be on Today this evening, to ask if it happened.\", \"set_title\": \"Your one thing for today: {fix}\", \"settle_first\": \"Things feel loud right now. You could settle your body first.\", \"sleep_hint\": \"Running low on sleep, food or health can make every feeling louder. One tap each, and any can be skipped.\", \"sleep_title\": \"How was your sleep last night?\", \"subs_hint\": \"Any answer is fine here, and so is not saying.\", \"subs_title\": \"Any alcohol or drugs in the last day?\", \"tank_names\": \"Sleep · Food · Body · Alcohol or drugs · Moving\", \"vol_body\": \"Your body may be part of why the volume's up today.\", \"vol_food\": \"Food may be part of why the volume's up today.\", \"vol_moved\": \"A still day can keep the volume up. That's the body, not you.\", \"vol_sleep\": \"Sleep may be part of why the volume's up today.\", \"vol_subs\": \"Alcohol or drugs may be part of why the volume's up today.\", \"when_title\": \"When will you do it?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "please-skill", version: "pl-v1", contentVersion: "skills-v1", start: "sleep", ownMax: 90, emotionFields: [], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"back_end_title\": \"Looking after your body is the skill\", \"back_no\": \"Days like that happen. Tomorrow's another go, and a smaller thing can count.\", \"back_partly\": \"Part of it counts. Your body got some of what it needed.\", \"back_title\": \"Did it happen? {fix}\", \"back_yes\": \"That's one thing done for your body today.\", \"body_title\": \"How's your body today?\", \"done\": \"Done\", \"fix_care\": \"If it's new, bad or not easing, a doctor or pharmacist can help.\", \"fix_hint\": \"Pick the smallest one that feels doable.\", \"fix_own\": \"Something else\", \"fix_title\": \"One thing for today\", \"food_title\": \"How's food been today?\", \"heavy_link\": \"Rest doesn't refill me: find the feeling\", \"me_rows_hint\": \"Running low won't ask about the ones you pick. Sleep always comes first, and any row can be skipped.\", \"me_rows_names\": \"Food · Body · Alcohol or drugs · Moving\", \"me_rows_none\": \"Running low asks every row.\", \"me_rows_set\": \"Leave rows out of Running low\", \"moved_title\": \"Have you moved today?\", \"next\": \"Next\", \"none_line\": \"That's worth knowing too. If things still feel loud, it may be a feeling more than the body.\", \"none_title\": \"Nothing obvious from the body today\", \"remind_label\": \"Want me to ask tonight if it happened?\", \"set_later\": \"It's on for later today.\", \"set_now\": \"Feelings run hotter on an empty tank. This is one small thing for it.\", \"set_remind\": \"It'll be on Today this evening, to ask if it happened.\", \"set_title\": \"Your one thing for today: {fix}\", \"settle_first\": \"Things feel loud right now. You could settle your body first.\", \"sleep_hint\": \"Running low on sleep, food or health can make every feeling louder. One tap each, and any can be skipped.\", \"sleep_title\": \"How was your sleep last night?\", \"subs_hint\": \"Any answer is fine here, and so is not saying.\", \"subs_title\": \"Any alcohol or drugs in the last day?\", \"tank_names\": \"Sleep · Food · Body · Alcohol or drugs · Moving\", \"vol_body\": \"Your body may be part of why the volume's up today.\", \"vol_food\": \"Food may be part of why the volume's up today.\", \"vol_moved\": \"A still day can keep the volume up. That's the body, not you.\", \"vol_sleep\": \"Sleep may be part of why the volume's up today.\", \"vol_subs\": \"Alcohol or drugs may be part of why the volume's up today.\", \"when_title\": \"When will you do it?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "dbt_please"}), (s:Skill {id: "please_skill"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "please_skill"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
@@ -17457,27 +17457,27 @@ MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:moved"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 4};
 MERGE (n:SkillStep {id: "please_skill:read_body"})
-SET n += {skillId: "please_skill", step: "read_body", kind: "embed", version: "pl-v1"}, n.specJson = "{\"answerAs\": \"tank\", \"embed\": \"batteryRead\", \"props\": {\"fields\": [\"sleep\", \"food\", \"body\", \"subs\", \"moved\"], \"low\": \"body\", \"names\": \"tank_names\", \"next\": \"next\"}, \"title\": \"vol_body\"}";
+SET n += {skillId: "please_skill", step: "read_body", kind: "embed", version: "pl-v1"}, n.specJson = "{\"answerAs\": \"tank\", \"embed\": \"batteryRead\", \"props\": {\"fields\": [\"sleep\", \"food\", \"body\", \"subs\", \"moved\"], \"hidden\": \"pleaseRows\", \"low\": \"body\", \"names\": \"tank_names\", \"next\": \"next\"}, \"title\": \"vol_body\"}";
 MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:read_body"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 5};
 MERGE (n:SkillStep {id: "please_skill:read_sleep"})
-SET n += {skillId: "please_skill", step: "read_sleep", kind: "embed", version: "pl-v1"}, n.specJson = "{\"answerAs\": \"tank\", \"embed\": \"batteryRead\", \"props\": {\"fields\": [\"sleep\", \"food\", \"body\", \"subs\", \"moved\"], \"low\": \"sleep\", \"names\": \"tank_names\", \"next\": \"next\"}, \"title\": \"vol_sleep\"}";
+SET n += {skillId: "please_skill", step: "read_sleep", kind: "embed", version: "pl-v1"}, n.specJson = "{\"answerAs\": \"tank\", \"embed\": \"batteryRead\", \"props\": {\"fields\": [\"sleep\", \"food\", \"body\", \"subs\", \"moved\"], \"hidden\": \"pleaseRows\", \"low\": \"sleep\", \"names\": \"tank_names\", \"next\": \"next\"}, \"title\": \"vol_sleep\"}";
 MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:read_sleep"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 6};
 MERGE (n:SkillStep {id: "please_skill:read_food"})
-SET n += {skillId: "please_skill", step: "read_food", kind: "embed", version: "pl-v1"}, n.specJson = "{\"answerAs\": \"tank\", \"embed\": \"batteryRead\", \"props\": {\"fields\": [\"sleep\", \"food\", \"body\", \"subs\", \"moved\"], \"low\": \"food\", \"names\": \"tank_names\", \"next\": \"next\"}, \"title\": \"vol_food\"}";
+SET n += {skillId: "please_skill", step: "read_food", kind: "embed", version: "pl-v1"}, n.specJson = "{\"answerAs\": \"tank\", \"embed\": \"batteryRead\", \"props\": {\"fields\": [\"sleep\", \"food\", \"body\", \"subs\", \"moved\"], \"hidden\": \"pleaseRows\", \"low\": \"food\", \"names\": \"tank_names\", \"next\": \"next\"}, \"title\": \"vol_food\"}";
 MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:read_food"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 7};
 MERGE (n:SkillStep {id: "please_skill:read_subs"})
-SET n += {skillId: "please_skill", step: "read_subs", kind: "embed", version: "pl-v1"}, n.specJson = "{\"answerAs\": \"tank\", \"embed\": \"batteryRead\", \"props\": {\"fields\": [\"sleep\", \"food\", \"body\", \"subs\", \"moved\"], \"low\": \"subs\", \"names\": \"tank_names\", \"next\": \"next\"}, \"title\": \"vol_subs\"}";
+SET n += {skillId: "please_skill", step: "read_subs", kind: "embed", version: "pl-v1"}, n.specJson = "{\"answerAs\": \"tank\", \"embed\": \"batteryRead\", \"props\": {\"fields\": [\"sleep\", \"food\", \"body\", \"subs\", \"moved\"], \"hidden\": \"pleaseRows\", \"low\": \"subs\", \"names\": \"tank_names\", \"next\": \"next\"}, \"title\": \"vol_subs\"}";
 MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:read_subs"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 8};
 MERGE (n:SkillStep {id: "please_skill:read_moved"})
-SET n += {skillId: "please_skill", step: "read_moved", kind: "embed", version: "pl-v1"}, n.specJson = "{\"answerAs\": \"tank\", \"embed\": \"batteryRead\", \"props\": {\"fields\": [\"sleep\", \"food\", \"body\", \"subs\", \"moved\"], \"low\": \"moved\", \"names\": \"tank_names\", \"next\": \"next\"}, \"title\": \"vol_moved\"}";
+SET n += {skillId: "please_skill", step: "read_moved", kind: "embed", version: "pl-v1"}, n.specJson = "{\"answerAs\": \"tank\", \"embed\": \"batteryRead\", \"props\": {\"fields\": [\"sleep\", \"food\", \"body\", \"subs\", \"moved\"], \"hidden\": \"pleaseRows\", \"low\": \"moved\", \"names\": \"tank_names\", \"next\": \"next\"}, \"title\": \"vol_moved\"}";
 MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:read_moved"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 9};
@@ -17535,19 +17535,109 @@ MATCH (s:Skill {id: "please_skill"}), (x:SkillExit {id: "please_skill:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "please_skill:sleep"}), (b:SkillStep {id: "please_skill:food"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "null";
+SET r += {order: 0}, r.whenJson = "{\"not\": {\"has\": [\"$p.pleaseRows\", \"food\"]}}";
+MATCH (a:SkillStep {id: "please_skill:sleep"}), (b:SkillStep {id: "please_skill:body"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"not\": {\"has\": [\"$p.pleaseRows\", \"body\"]}}";
+MATCH (a:SkillStep {id: "please_skill:sleep"}), (b:SkillStep {id: "please_skill:subs"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "{\"not\": {\"has\": [\"$p.pleaseRows\", \"subs\"]}}";
+MATCH (a:SkillStep {id: "please_skill:sleep"}), (b:SkillStep {id: "please_skill:moved"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 3}, r.whenJson = "{\"not\": {\"has\": [\"$p.pleaseRows\", \"moved\"]}}";
+MATCH (a:SkillStep {id: "please_skill:sleep"}), (b:SkillStep {id: "please_skill:read_body"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 4}, r.whenJson = "{\"in\": [\"$a.body\", [\"body_ill\", \"body_pain\", \"body_meds\"]]}";
+MATCH (a:SkillStep {id: "please_skill:sleep"}), (b:SkillStep {id: "please_skill:read_sleep"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 5}, r.whenJson = "{\"in\": [\"$a.sleep\", [\"sleep_short\", \"sleep_broken\", \"sleep_much\"]]}";
+MATCH (a:SkillStep {id: "please_skill:sleep"}), (b:SkillStep {id: "please_skill:read_food"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 6}, r.whenJson = "{\"in\": [\"$a.food\", [\"food_skipped\", \"food_all_over\"]]}";
+MATCH (a:SkillStep {id: "please_skill:sleep"}), (b:SkillStep {id: "please_skill:read_subs"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 7}, r.whenJson = "{\"in\": [\"$a.subs\", [\"subs_some\"]]}";
+MATCH (a:SkillStep {id: "please_skill:sleep"}), (b:SkillStep {id: "please_skill:read_moved"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 8}, r.whenJson = "{\"in\": [\"$a.moved\", [\"moved_not_yet\"]]}";
+MATCH (a:SkillStep {id: "please_skill:sleep"}), (b:SkillStep {id: "please_skill:none"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 9}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "please_skill:sleep"}), (x:SkillExit {id: "please_skill:cool_down"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "sleep", label: "settle_first"}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
 MATCH (a:SkillStep {id: "please_skill:food"}), (b:SkillStep {id: "please_skill:body"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "null";
+SET r += {order: 0}, r.whenJson = "{\"not\": {\"has\": [\"$p.pleaseRows\", \"body\"]}}";
+MATCH (a:SkillStep {id: "please_skill:food"}), (b:SkillStep {id: "please_skill:subs"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"not\": {\"has\": [\"$p.pleaseRows\", \"subs\"]}}";
+MATCH (a:SkillStep {id: "please_skill:food"}), (b:SkillStep {id: "please_skill:moved"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "{\"not\": {\"has\": [\"$p.pleaseRows\", \"moved\"]}}";
+MATCH (a:SkillStep {id: "please_skill:food"}), (b:SkillStep {id: "please_skill:read_body"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 3}, r.whenJson = "{\"in\": [\"$a.body\", [\"body_ill\", \"body_pain\", \"body_meds\"]]}";
+MATCH (a:SkillStep {id: "please_skill:food"}), (b:SkillStep {id: "please_skill:read_sleep"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 4}, r.whenJson = "{\"in\": [\"$a.sleep\", [\"sleep_short\", \"sleep_broken\", \"sleep_much\"]]}";
+MATCH (a:SkillStep {id: "please_skill:food"}), (b:SkillStep {id: "please_skill:read_food"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 5}, r.whenJson = "{\"in\": [\"$a.food\", [\"food_skipped\", \"food_all_over\"]]}";
+MATCH (a:SkillStep {id: "please_skill:food"}), (b:SkillStep {id: "please_skill:read_subs"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 6}, r.whenJson = "{\"in\": [\"$a.subs\", [\"subs_some\"]]}";
+MATCH (a:SkillStep {id: "please_skill:food"}), (b:SkillStep {id: "please_skill:read_moved"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 7}, r.whenJson = "{\"in\": [\"$a.moved\", [\"moved_not_yet\"]]}";
+MATCH (a:SkillStep {id: "please_skill:food"}), (b:SkillStep {id: "please_skill:none"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 8}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "please_skill:body"}), (b:SkillStep {id: "please_skill:subs"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "null";
+SET r += {order: 0}, r.whenJson = "{\"not\": {\"has\": [\"$p.pleaseRows\", \"subs\"]}}";
+MATCH (a:SkillStep {id: "please_skill:body"}), (b:SkillStep {id: "please_skill:moved"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"not\": {\"has\": [\"$p.pleaseRows\", \"moved\"]}}";
+MATCH (a:SkillStep {id: "please_skill:body"}), (b:SkillStep {id: "please_skill:read_body"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "{\"in\": [\"$a.body\", [\"body_ill\", \"body_pain\", \"body_meds\"]]}";
+MATCH (a:SkillStep {id: "please_skill:body"}), (b:SkillStep {id: "please_skill:read_sleep"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 3}, r.whenJson = "{\"in\": [\"$a.sleep\", [\"sleep_short\", \"sleep_broken\", \"sleep_much\"]]}";
+MATCH (a:SkillStep {id: "please_skill:body"}), (b:SkillStep {id: "please_skill:read_food"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 4}, r.whenJson = "{\"in\": [\"$a.food\", [\"food_skipped\", \"food_all_over\"]]}";
+MATCH (a:SkillStep {id: "please_skill:body"}), (b:SkillStep {id: "please_skill:read_subs"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 5}, r.whenJson = "{\"in\": [\"$a.subs\", [\"subs_some\"]]}";
+MATCH (a:SkillStep {id: "please_skill:body"}), (b:SkillStep {id: "please_skill:read_moved"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 6}, r.whenJson = "{\"in\": [\"$a.moved\", [\"moved_not_yet\"]]}";
+MATCH (a:SkillStep {id: "please_skill:body"}), (b:SkillStep {id: "please_skill:none"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 7}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "please_skill:subs"}), (b:SkillStep {id: "please_skill:moved"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "null";
+SET r += {order: 0}, r.whenJson = "{\"not\": {\"has\": [\"$p.pleaseRows\", \"moved\"]}}";
+MATCH (a:SkillStep {id: "please_skill:subs"}), (b:SkillStep {id: "please_skill:read_body"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"in\": [\"$a.body\", [\"body_ill\", \"body_pain\", \"body_meds\"]]}";
+MATCH (a:SkillStep {id: "please_skill:subs"}), (b:SkillStep {id: "please_skill:read_sleep"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "{\"in\": [\"$a.sleep\", [\"sleep_short\", \"sleep_broken\", \"sleep_much\"]]}";
+MATCH (a:SkillStep {id: "please_skill:subs"}), (b:SkillStep {id: "please_skill:read_food"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 3}, r.whenJson = "{\"in\": [\"$a.food\", [\"food_skipped\", \"food_all_over\"]]}";
+MATCH (a:SkillStep {id: "please_skill:subs"}), (b:SkillStep {id: "please_skill:read_subs"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 4}, r.whenJson = "{\"in\": [\"$a.subs\", [\"subs_some\"]]}";
+MATCH (a:SkillStep {id: "please_skill:subs"}), (b:SkillStep {id: "please_skill:read_moved"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 5}, r.whenJson = "{\"in\": [\"$a.moved\", [\"moved_not_yet\"]]}";
+MATCH (a:SkillStep {id: "please_skill:subs"}), (b:SkillStep {id: "please_skill:none"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 6}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "please_skill:moved"}), (b:SkillStep {id: "please_skill:read_body"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"in\": [\"$a.body\", [\"body_ill\", \"body_pain\", \"body_meds\"]]}";

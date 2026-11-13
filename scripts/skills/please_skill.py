@@ -17,8 +17,9 @@ Departures from the PRD, all listed in docs/design/running-low.md with a reason 
 - No weekly pattern card, no "sleep short 3 of 7 → Sleep reset" offer and no monthly *something you've been putting
   off*: each is an aggregate over past visits or a monthly schedule, which a live flow never reads (data layers).
 - Sleep reset (ER-13) from the sleep row is a planned exit until it's built (ER-B5).
-- No per-row hiding in settings: every row can be skipped (nothing is required), and food and substances have
-  *not sure* / *rather not say*.
+- Rows hidden in settings (ER-B5): Me → My body can leave out food, body, alcohol or drugs and moving (kind
+  `please_rows`, the `pleaseRows` slice); each row's transitions skip a hidden row and the readout leaves it out.
+  Sleep, the opening screen, is always asked (and, like every row, can be skipped).
 
 Regenerate:  python3 scripts/skills/build.py > /tmp/s.cypher && mv /tmp/s.cypher schema/skills.cypher
              python3 scripts/skills/fixture.py --ship
@@ -81,6 +82,11 @@ COPY = {
     "back_yes": "That's one thing done for your body today.",
     "back_partly": "Part of it counts. Your body got some of what it needed.",
     "back_no": "Days like that happen. Tomorrow's another go, and a smaller thing can count.",
+    # Me → My body (kind `please_rows`): the rows the person would rather Running low didn't ask about.
+    "me_rows_hint": "Running low won't ask about the ones you pick. Sleep always comes first, and any row can be skipped.",
+    "me_rows_names": "Food · Body · Alcohol or drugs · Moving",
+    "me_rows_set": "Leave rows out of Running low",
+    "me_rows_none": "Running low asks every row.",
 }
 
 # Each row: (step, field, title, hint, [(value, label, loud)]). Values are unique across rows so a fix's `on`
@@ -107,6 +113,13 @@ LOUD = {fid: [v for v, _l, loud in opts if loud] for _s, fid, _t, _h, opts in RO
 ORDER = ["body", "sleep", "food", "subs", "moved"]
 LOUD_ROW = {f: {"in": [a(f), LOUD[f]]} for f in ORDER}
 ANY_LOUD = {"any": [LOUD_ROW[f] for f in ORDER]}
+# The rows Me can leave out (functions/src/profile/kinds.ts PLEASE_HIDEABLE_ROWS; a test keeps them equal), in
+# ROWS order: every row but sleep, the opening screen. A hidden row is never visited, so it is never loud.
+HIDEABLE = ["food", "body", "subs", "moved"]
+
+
+def hidden(field):
+    return {"has": ["$p.pleaseRows", field]}
 
 # One fix for today (PRD step 3, PR #33's right-now list): small enough to do while depleted. `on` names the loud
 # answers it's for; "always" is offered whatever was picked (lowering the bar is the skill on an empty tank).
@@ -142,7 +155,6 @@ BACK = [("done_yes", "Yes"), ("done_partly", "Partly"), ("done_no", "No")]
 def steps():
     out = []
     for i, (sid, fid, title, hint, _opts) in enumerate(ROWS):
-        nxt = ROWS[i + 1][0] if i + 1 < len(ROWS) else None
         field = {"id": fid, "options": {"list": fid}, "max": 1}
         step = {"id": sid, "kind": "ask", "title": title, "fields": [field]}
         if hint:
@@ -150,14 +162,17 @@ def steps():
         if sid == "sleep":
             # Not offered flooded (PRD): a carried flooded reading gets a quiet way to settle first; going on is fine.
             field["links"] = [{"exit": "cool_down", "label": "settle_first", "when": FLOODED}]
-        # The last row: the loudest row's readout, in ORDER (the first loud row wins), or nothing loud.
-        step["next"] = [{"to": nxt}] if nxt else [{"when": LOUD_ROW[f], "to": f"read_{f}"} for f in ORDER] + [{"to": "none"}]
+        # The next row the person hasn't left out in Me; after the last, the loudest row's readout, in ORDER (the
+        # first loud row wins), or nothing loud. A hidden row is skipped (while the profile loads, nothing is hidden).
+        later = [{"when": {"not": hidden(r[0])}, "to": r[0]} for r in ROWS[i + 1:]]
+        step["next"] = later + [{"when": LOUD_ROW[f], "to": f"read_{f}"} for f in ORDER] + [{"to": "none"}]
         out.append(step)
     # The readout (PRD step 2): the day's tank, one cell per row, the loudest drained (`batteryRead`); its title names it.
     for f in ORDER:
         out.append({
             "id": f"read_{f}", "kind": "embed", "embed": "batteryRead", "answerAs": "tank", "title": f"vol_{f}",
-            "props": {"fields": [r[1] for r in ROWS], "low": f, "names": "tank_names", "next": "next"},
+            # `hidden`: the profile slice naming rows left out in Me (their cells are left out of the tank).
+            "props": {"fields": [r[1] for r in ROWS], "low": f, "names": "tank_names", "hidden": "pleaseRows", "next": "next"},
             "next": [{"to": "fix"}],
         })
     out += [

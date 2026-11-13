@@ -11,7 +11,7 @@ import { int } from '../shared/values';
 import { partSafetyCypher } from '../safety/partSafetyFlag';
 import { ownDecrypter } from '../shared/crypto';
 import { metaFrom } from './meta';
-import { PERSON_RISK, PERSON_SAFE, planContacts } from './kinds';
+import { PERSON_RISK, PERSON_SAFE, PLEASE_HIDEABLE_ROWS, planContacts } from './kinds';
 import { PROFILE_NEEDS, type ProfileConsumer, type ProfileSlices, type SliceId } from './types';
 
 /** Words everywhere: own words come first once there are this many distinct ones (PRD ER-10 part 3), and at most this many. */
@@ -118,6 +118,9 @@ export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
   // different per area (Spend five minutes on it: the garden, the guitar), so it's always offered.
   iCanRungs: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'i_can', status: 'active'})
     RETURN p {.id, .valueJson} AS p`,
+  // Running low (ER-07): the rows the person left out in Me (one per person).
+  pleaseRows: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'please_rows', status: 'active'})
+    RETURN p.valueJson AS valueJson LIMIT 1`,
 };
 
 /** A kept thing's picked ids, named by Good things' own options (graph content: `SkillOption`, never a copy). */
@@ -344,6 +347,14 @@ const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
       try { for (const id of strings((JSON.parse(String((rec.get('p') as Record<string, unknown>).valueJson)) as Record<string, unknown>).rungIds).slice(0, 1)) if (!id.startsWith('own_')) ids.add(id); } catch { /* unreadable: skip */ }
     }
     return [...ids].map((id) => ({ id }));
+  },
+  pleaseRows: async (tx, uid) => {
+    const r = await tx.run(SLICE_QUERIES.pleaseRows!, { uid });
+    if (!r.records.length) return [];
+    try {
+      const hidden = strings((JSON.parse(String(r.records[0].get('valueJson'))) as Record<string, unknown>).hidden);
+      return hidden.filter((x) => (PLEASE_HIDEABLE_ROWS as readonly string[]).includes(x));
+    } catch { return []; }
   },
   crisisKit: async (tx, uid, now) => {
     const r = await tx.run(SLICE_QUERIES.crisisKit!, { uid });

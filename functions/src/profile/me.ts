@@ -26,7 +26,7 @@ export interface MeItem {
   /** Display summary; may contain {toolName} (the client fills it). */
   summary: string;
   /** Which editor the Me surface opens for "change" (null: not editable in place). */
-  editor: 'quiet_hours' | null;
+  editor: 'quiet_hours' | 'please_rows' | null;
   value?: Record<string, unknown>;
   stillTrueCopy: string;
   setAsideCopy: string;
@@ -260,7 +260,7 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
     if (part && toldIt) part.told = toldIt;
     const item: MeItem = {
       label: r.get('label'), meta, title: (r.get('title') as string | null) ?? meta.kind, summary,
-      editor: meta.kind === 'quiet_hours' ? 'quiet_hours' : null,
+      editor: meta.kind === 'quiet_hours' || meta.kind === 'please_rows' ? meta.kind : null,
       ...(value ? { value } : {}),
       stillTrueCopy: (r.get('stillTrue') as string | null) ?? '', setAsideCopy: (r.get('setAside') as string | null) ?? '',
       ...(p.toolId !== undefined ? { toolId: (p.toolId as string | null) ?? null } : {}),
