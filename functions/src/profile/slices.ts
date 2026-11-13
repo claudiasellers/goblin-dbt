@@ -14,8 +14,20 @@ import { metaFrom } from './meta';
 import { PERSON_RISK, PERSON_SAFE, planContacts } from './kinds';
 import { PROFILE_NEEDS, type ProfileConsumer, type ProfileSlices, type SliceId } from './types';
 
+/** Words everywhere: own words come first once there are this many distinct ones (PRD ER-10 part 3), and at most this many. */
+export const OWN_WORDS_MIN = 5;
+export const OWN_WORDS_MAX = 12;
+
 /** The Cypher each resolver runs (params: $uid). Reserved slices have none. */
 export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
+  // The person's words (ER-10 part 3): FOUND_WORD, the log aggregate of accepted words, read here for ordering only
+  // (never pre-selected, never a node of the log). Most used first, then most recent. A safety-screen word
+  // (`Emotion.safetyScreen`: worthless, empty, despair, …) is never moved up: it keeps its place on the square.
+  ownWords: `MATCH (:User {id: $uid})-[w:FOUND_WORD]->(e:Emotion)
+    WHERE coalesce(e.safetyScreen, false) = false
+    WITH e.id AS id, coalesce(w.count, 0) AS n, w.lastAt AS lastAt ORDER BY n DESC, lastAt DESC
+    WITH collect(id) AS ids
+    RETURN CASE WHEN size(ids) >= ${OWN_WORDS_MIN} THEN ids[0..${OWN_WORDS_MAX}] ELSE [] END AS ids`,
   name: `MATCH (u:User {id: $uid}) RETURN u.displayName AS displayName`,
   quietHours: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'quiet_hours', status: 'active'})
     RETURN p {.id, .kind, .area, .status, .source, .valueJson,
@@ -155,11 +167,15 @@ type Resolver<K extends SliceId> = (tx: ManagedTransaction, uid: string, now: nu
 
 const EMPTY: { [K in SliceId]?: () => ProfileSlices[K] } = {
   bodyFlags: () => null, goals: () => [], copeAheadPlans: () => [],
-  boundaryLines: () => [], practicePrefs: () => null, fadeLevels: () => ({}), ownWords: () => [],
+  boundaryLines: () => [], practicePrefs: () => null, fadeLevels: () => ({}),
   crisisKit: () => null, country: () => null,
 };
 
 const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
+  ownWords: async (tx, uid) => {
+    const r = await tx.run(SLICE_QUERIES.ownWords!, { uid });
+    return strings(r.records[0]?.get('ids'));
+  },
   name: async (tx, uid) => {
     const r = await tx.run(SLICE_QUERIES.name!, { uid });
     const dn = r.records[0]?.get('displayName') as string | null | undefined;
@@ -401,6 +417,11 @@ export async function readProfileSlices<T extends ProfileConsumer>(
     out[id] = r ? await r(tx, uid, now) : EMPTY[id]!();
   }
   return out as Pick<ProfileSlices, (typeof PROFILE_NEEDS)[T][number]>;
+}
+
+/** The name slice alone (Me's greeting): Me reads every kept item through getMe, never a tool's slices. */
+export async function readNameSlice(tx: ManagedTransaction, uid: string): Promise<ProfileSlices['name']> {
+  return RESOLVERS.name!(tx, uid, Date.now());
 }
 
 /** User.profileVersion (0 before any profile write). */

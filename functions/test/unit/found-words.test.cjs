@@ -67,8 +67,16 @@ test('the check-in: its known words once the result rendered, source checkin; no
   assert.ok(!f.calls.some(isFound), 'no words, no query');
   f = checkInDriver();
   setDriver(f.driver);
-  await fns.saveCheckIn.run({ auth: auth(), data: { ...checkIn(), source: 'ftf', emotionIds: ['anxious'], resultShown: true } });
+  await fns.saveCheckIn.run({ auth: auth(), data: { ...checkIn(), source: 'ftf', emotionIds: ['anxious'], countedWordIds: ['anxious'], resultShown: true } });
   assert.ok(!f.calls.some(isFound), 'a word found in Find the feeling inside the check-in was counted by that save');
+  f = checkInDriver();
+  setDriver(f.driver);
+  await fns.saveCheckIn.run({ auth: auth(), data: { ...checkIn(), source: 'ftf', emotionIds: ['anxious', 'hurt'], countedWordIds: ['anxious'], resultShown: true } });
+  assert.deepEqual(f.calls.find(isFound).params.ids, ['hurt'], 'only the word Find the feeling saved is skipped');
+  f = checkInDriver();
+  setDriver(f.driver);
+  await fns.saveCheckIn.run({ auth: auth(), data: { ...checkIn(), source: 'ftf', emotionIds: ['hurt'], resultShown: true } });
+  assert.deepEqual(f.calls.find(isFound).params.ids, ['hurt'], 'Find the feeling found nothing, a body-first pick: it counts (Codex, PR #129)');
   f = checkInDriver({ open: false });
   setDriver(f.driver);
   await fns.saveCheckIn.run({ auth: auth(), data: { ...checkIn(), emotionIds: ['anxious'], resultShown: true } });
@@ -124,4 +132,21 @@ test('Find the feeling\'s shelf and harp stay the words shaped or tuned there (t
   setDriver(f.driver);
   await fns.getFeelingCollection.run({ auth: auth(), data: {} });
   assert.match(f.calls[0].query, /MATCH \(:User \{id: \$userId\}\)-\[fw:FOUND_WORD\]->\(e:Emotion\)[\s\S]*WHERE size\(coalesce\(fw\.ways, \[\]\)\) > 0/);
+});
+
+test('the ownWords slice: the check-in and Find the feeling read the person\'s words (ids, most used first) in one read', async () => {
+  const f = fakeDriver((q) => {
+    if (/profileVersion/.test(q)) return [{ v: 3 }];
+    if (/-\[w:FOUND_WORD\]->\(e:Emotion\)/.test(q)) return [{ ids: ['anxious', 'hurt', 'tired', 'calm', 'lonely'] }];
+    return [];
+  });
+  setDriver(f.driver);
+  const out = await fns.getProfileContext.run({ auth: auth(), data: { toolId: 'checkin' } });
+  assert.deepEqual(Object.keys(out.slices), ['patterns', 'ownWords']);
+  assert.deepEqual(out.slices.ownWords, ['anxious', 'hurt', 'tired', 'calm', 'lonely']);
+  assert.equal(f.sessions[0].config.defaultAccessMode, 'READ');
+  const g = fakeDriver((q) => (/profileVersion/.test(q) ? [{ v: 3 }] : []));
+  setDriver(g.driver);
+  const none = await fns.getProfileContext.run({ auth: auth(), data: { toolId: 'find-the-feeling' } });
+  assert.deepEqual(none.slices.ownWords, [], 'no row: nothing');
 });

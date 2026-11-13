@@ -10,3 +10,13 @@ export function emotionGuideSkillFor(frame: string | null): EmotionGuideSkill {
   if (frame === 'wave') return 'walk_the_wave';
   return 'emotion_guide';
 }
+
+/**
+ * The feeling card after naming (ER-10 part 3, docs/design/emotion-guide.md): the first named word that has a card,
+ * that is, a word with one of the nine DBT parents in Do the Opposite's picker content (`parentOf`, the graph's
+ * `HAS_REGULATION_CONTENT`). Happiness words have a card too, but the pleasant result offers Good things instead, so
+ * they aren't looked up here. Null when none has one: no link (a word with no card would land on *There's no card yet*).
+ */
+export function feelingCardWord(emotionIds: readonly string[], parentOf: Readonly<Record<string, { parent: string | null }>>): string | null {
+  return emotionIds.find((id) => !!parentOf[id]?.parent) ?? null;
+}

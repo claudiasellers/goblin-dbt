@@ -37,6 +37,8 @@ export interface FlowState {
   /** Transitions since the shape/sound was found: drives ambient descent. */
   stepsSinceStart: number;
   ambientDescent: boolean;
+  /** The person's own words, taken as the word step opens (ER-10 part 3), so the offers can't shift under them. */
+  own: string[];
 }
 
 export type Action =
@@ -59,19 +61,20 @@ export function initialFlow(content: FindTheFeelingContent, entry: Entry = 'tool
   return {
     entry, way: way ?? content.flow.defaultWay, switchedWay: false, step: 'intro', found: null,
     band: null, pull: null, regulation: 'none', offer: firstOffer(), word: null, wordAccepted: false,
-    setOff: null, close: null, routedTo: [], stepsSinceStart: 0, ambientDescent,
+    setOff: null, close: null, routedTo: [], stepsSinceStart: 0, ambientDescent, own: [],
   };
 }
 
 const afterWord = (s: FlowState): Step => (s.entry === 'checkin' ? 'handoff' : 'setOff');
 
-export function makeFlowReducer(content: FindTheFeelingContent) {
+/** `ownWords`: read as the word step opens (the person's own words, most used first; ER-10 part 3). */
+export function makeFlowReducer(content: FindTheFeelingContent, ownWords: () => readonly string[] = () => []) {
   const g = content.flow.gates;
   const urgeRoutes = Object.fromEntries(content.urges.map(u => [u.id, u.routes]));
   const allWords = content.families.flatMap(f => f.words);
 
   const step = (s: FlowState, next: Step, patch: Partial<FlowState> = {}): FlowState => ({
-    ...s, ...patch, step: next,
+    ...s, ...patch, ...(next === 'word' ? { own: [...ownWords()] } : {}), step: next,
     stepsSinceStart: s.found || patch.found ? s.stepsSinceStart + 1 : 0,
   });
 
@@ -100,7 +103,7 @@ export function makeFlowReducer(content: FindTheFeelingContent) {
       case 'oriented': return s.step !== 'orient' ? s : step(s, afterWord(s), { word: null, wordAccepted: false });
       case 'word': {
         if (s.step !== 'word' || !s.found) return s;
-        const ranked = rankFamilies(content.families, s.found);
+        const ranked = rankFamilies(content.families, s.found, s.own);
         const r = answerOffer(ranked, s.offer, a.answer, g.maxWordsOffered);
         if (!r.done) return { ...s, offer: r.state };
         return step(s, afterWord(s), { offer: r.state, word: r.word, wordAccepted: r.word !== null });
@@ -136,7 +139,7 @@ export function makeFlowReducer(content: FindTheFeelingContent) {
 /** The word currently on offer (null outside the word step or when nothing is left). */
 export function wordOnOffer(content: FindTheFeelingContent, s: FlowState) {
   if (!s.found) return null;
-  return currentWord(rankFamilies(content.families, s.found), s.offer);
+  return currentWord(rankFamilies(content.families, s.found, s.own ?? []), s.offer);
 }
 
 /** Session record for saveFindTheFeelingSession. Only valid once the flow has reached its end. */

@@ -47,6 +47,8 @@ export interface SaveCheckInRequest {
   resultShown?: boolean;
   nextAction?: CheckInNextAction;
   embeddedToolSessionIds?: string[];
+  /** Words an embedded tool's own save already counted (Find the feeling's found word): the check-in doesn't again. */
+  countedWordIds?: string[];
   /** Two or three places on the feeling square at once, each with its own words (grid only). */
   spots?: Array<{ x: number; y: number; emotionIds: string[] }>;
 }
@@ -75,6 +77,7 @@ export interface CheckInState {
   capacity?: CapacityReading | null;
   discriminatingAnswers?: Array<{ questionId: string; responseId: string }>;
   embeddedToolSessionIds?: string[];
+  countedWordIds?: string[];
   /** The safety route's visit asked before the result (CORE-01). */
   safetyCheckId?: string | null;
   /** The square's spots (grid check-ins): sent only when two or more hold words. */
@@ -129,6 +132,7 @@ export function buildCheckInPayload(s: CheckInState, result: ResultLike | null, 
   if (s.capacity) req.capacity = s.capacity;
   if (s.discriminatingAnswers?.length) req.discriminatingAnswers = s.discriminatingAnswers;
   if (s.embeddedToolSessionIds?.length) req.embeddedToolSessionIds = s.embeddedToolSessionIds;
+  if (s.countedWordIds?.length) req.countedWordIds = s.countedWordIds;
   if (s.safetyCheckId) req.safetyCheckId = s.safetyCheckId;
   const spots = s.source === 'grid' ? spotsFor(s.spots) : undefined;
   if (spots) req.spots = spots;

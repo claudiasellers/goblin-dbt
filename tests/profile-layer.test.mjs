@@ -29,10 +29,10 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
     for (const s of needs) assert.ok(types.SLICE_IDS.includes(s), `${consumer}: ${s}`);
   }
   assert.deepEqual(types.PROFILE_NEEDS["recovering-from-invalidation"], ["name"]);
-  assert.deepEqual(types.PROFILE_NEEDS["find-the-feeling"], ["name", "parts"], "the tag row on its close");
+  assert.deepEqual(types.PROFILE_NEEDS["find-the-feeling"], ["name", "parts", "ownWords"], "the tag row on its close; own words first in its offers (ER-10 part 3)");
   assert.deepEqual(types.PROFILE_NEEDS["opposite-action"], ["parts"], "the tag row on its close (ER-B3 port)");
   assert.deepEqual(types.PROFILE_NEEDS["cool-down"], ["parts"], "the tag row on its close");
-  assert.deepEqual(types.PROFILE_NEEDS.checkin, ["patterns"], "R20: consumer is `checkin`");
+  assert.deepEqual(types.PROFILE_NEEDS.checkin, ["patterns", "ownWords"], "R20: consumer is `checkin`; own words first in the word pick (ER-10 part 3)");
   assert.deepEqual(types.PROFILE_NEEDS.today, ["quietHours", "parts"], "parts: the check-back card's name (part-checkback)");
   assert.deepEqual(types.PROFILE_NEEDS.witness, ["name", "ownLines", "savedLines"], "R16");
   assert.deepEqual(types.PROFILE_NEEDS["five-senses"], ["parts"], "the tag row on its close");
@@ -255,7 +255,10 @@ test("cache: per user, bumped by a newer version, stale after 10 minutes; never 
 test("pilot: Recover and FTF read the name through getProfileContext", () => {
   for (const [f, id] of [["InvalidationRecovery", "recovering-from-invalidation"], ["FindTheFeeling", "find-the-feeling"]]) {
     const src = readFileSync(`src/pages/tools/${f}.tsx`, "utf8");
-    assert.match(src, new RegExp(`useProfileContext\\('${id}'\\)\\.slices\\?\\.name\\.firstName \\?\\? null`), f);
+    // FTF also reads its own words from the same call (ER-10 part 3), so it keeps the slices in a const.
+    assert.match(src, f === "FindTheFeeling"
+      ? /const profile = useProfileContext\('find-the-feeling'\)\.slices;\s+const name = profile\?\.name\.firstName \?\? null/
+      : new RegExp(`useProfileContext\\('${id}'\\)\\.slices\\?\\.name\\.firstName \\?\\? null`), f);
     assert.doesNotMatch(src, /displayName/, `${f} reads the profile ad hoc`);
   }
 });

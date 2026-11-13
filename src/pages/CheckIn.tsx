@@ -38,6 +38,7 @@ import { bandStepFor, checkInIntensity } from '../lib/checkInBand';
 import { beatBand, beatRequest, type WitnessHandlers } from '../lib/witness';
 import { recordWitnessBeat } from '../services/witness';
 import { profileCache } from '../lib/profileCache';
+import { useProfileContext } from '../hooks/useProfileContext';
 import { SafetyRoute } from '../components/safety/SafetyRoute';
 import { SafetyPeopleCard } from '../components/safety/SafetyPeople';
 import { ASKED_KEY, shouldAsk } from '../lib/safetyRoute';
@@ -87,8 +88,12 @@ function markAsked() {
   try { sessionStorage.setItem(ASKED_KEY, '1'); } catch { /* private mode: asks again next time */ }
 }
 
+const NO_OWN_WORDS: readonly string[] = [];
+
 export function CheckIn() {
   const { user } = useAuth();
+  // Words everywhere (ER-10 part 3): the person's own words lead the word list near where they touched.
+  const ownWords = useProfileContext('checkin').slices?.ownWords ?? NO_OWN_WORDS;
   const [step, setStep] = useState<CheckInStep>('emotion');
   const [entryPoint, setEntryPoint] = useState<EntryPoint>('standard');
   const [checkInData, setCheckInData] = useState<CheckInData>({
@@ -146,6 +151,8 @@ export function CheckIn() {
   // Wake the result's engine while the person is still on the square (signed-in only).
   useEffect(() => { if (user) warmCheckInEngine(); }, [user]);
   const [embeddedIds, setEmbeddedIds] = useState<string[]>([]);
+  // The word Find the feeling found and saved inside this check-in: its save counted it (ER-10 part 3).
+  const [countedWordIds, setCountedWordIds] = useState<string[]>([]);
   /** The render save in flight: resolves true when saved. Next actions chain after it. */
   const savePromise = useRef<Promise<boolean> | null>(null);
   const savedResult = useRef<StateResultType | null>(null);
@@ -175,6 +182,7 @@ export function CheckIn() {
     capacity,
     discriminatingAnswers,
     embeddedToolSessionIds: embeddedIds,
+    countedWordIds,
     // Which words sat in which spot (sent only for a grid check-in with 2+ filled spots).
     spots,
     safetyCheckId,
@@ -448,6 +456,8 @@ export function CheckIn() {
     if (r.toolSessionId) setEmbeddedIds([r.toolSessionId]);
     const emotion = r.emotionId ? getEmotionById(r.emotionId) : undefined;
     if (emotion) setKnownEmotionIds([emotion.id]);
+    // Signed in, Find the feeling saved its word (a session id means it did): the check-in doesn't count it again.
+    setCountedWordIds(emotion && r.toolSessionId ? [emotion.id] : []);
     if (!emotion) {
       setCheckInData(prev => ({ ...prev, intensity: { x: 0.5, y } }));
       setEntryPoint('somatic');
@@ -637,6 +647,7 @@ export function CheckIn() {
     setCapacity(null);
     setKnownEmotionIds([]);
     setEmbeddedIds([]);
+    setCountedWordIds([]);
     ftfBlank.current = false;
     setCheckInData({
       quadrant: null,
@@ -777,6 +788,7 @@ export function CheckIn() {
 
         {step === 'word' && point && (
           <WordPick
+            ownWords={ownWords}
             spots={spots}
             active={active}
             onToggleWord={handleToggleWord}
@@ -868,6 +880,7 @@ export function CheckIn() {
               checkinEmotions={checkInData.emotions}
               band={capacity?.value ?? null}
               emotionIds={emotionIdsFor(checkInData.emotions, knownEmotionIds)}
+              quietCard={safetyCheckId != null || safetyPeople}
               witness={witness}
             />
           ) : (
@@ -884,6 +897,7 @@ export function CheckIn() {
               checkinEmotions={checkInData.emotions}
               band={capacity?.value ?? null}
               emotionIds={emotionIdsFor(checkInData.emotions, knownEmotionIds)}
+              quietCard={safetyCheckId != null || safetyPeople}
               witness={witness}
             />
           )

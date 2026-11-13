@@ -327,6 +327,8 @@ export async function getDiscriminatingQuestions(
 export function preloadCheckInContent(): void {
   relatedWordsFile().catch(() => {});
   discriminatingQuestionsFile().catch(() => {});
+  // The feeling card link under the result reads the doors' parents: loaded now, so it never pops in above Done.
+  void import('./oppositeActionPicker').then((m) => m.getOppositeActionPickerContent()).catch(() => {});
 }
 
 /**
