@@ -60,6 +60,9 @@ test("a blank or far-away word never gets the wave: grounding, and someone to ta
     assert.equal(s.stepId, "blank", w);
     assert.ok(M.stepOf(skill, "blank").noClose);
     assert.deepEqual(offers(s), ["numb", "empty"].includes(w) ? ["five_senses", "safety_open"] : ["five_senses"], w);
+    // Someone to talk to once: the offer for numb and empty, else the quiet link (Gate 2: never two of the same button).
+    const links = M.stepLinks(ctx(), M.stepOf(skill, "blank"), s).map((l) => l.exit.id);
+    assert.deepEqual(links, ["numb", "empty"].includes(w) ? [] : ["safety_open"], w);
   }
   // Even with a flooded reading: grounding first, not a choice about the body.
   assert.equal(run([pick("feel", "numb"), next], ctx({ band: "flooded" })).stepId, "blank");
@@ -76,18 +79,18 @@ test("a carried flooded reading: a heads-up first, the body or try it anyway", (
   assert.equal(run([pick("heads_up", "try"), next], F, s).stepId, "where");
 });
 
-test("where it sits: the body's places (the BodyRegion nodes), up to two, or I can't find it", () => {
+test("where it sits: the body's places (the BodyRegion nodes), one, or I can't find it", () => {
   const s = run([pick("feel", "sad"), next]);
   assert.equal(s.stepId, "where");
   assert.deepEqual(ids(s, "where"), ["head", "face", "jaw", "throat", "neck", "shoulders", "chest", "upper_back", "stomach",
     "lower_back", "arms", "hands", "legs", "feet", "body", "cant_find"]);
-  assert.equal(M.stepOf(skill, "where").fields[0].max, 2);
+  assert.equal(M.stepOf(skill, "where").fields[0].max, 1, "one place (Gate 2: never a place and I can't find it together)");
   const cypher = readFileSync("schema/skills.cypher", "utf8");
   assert.match(cypher, /MATCH \(o:SkillOption \{id: "mindfulness_emotions:where:chest"\}\), \(c:BodyRegion \{id: "chest"\}\)\nMERGE \(o\)-\[:PRESENTS\]->\(c\);/);
   assert.equal(run([pick("where", "cant_find"), next], ctx(), s).stepId, "wave", "a full answer");
 });
 
-test("the wave: the two errors in words, a soft check every 30 s, four at most, no durations, eyes open", () => {
+test("the wave: the two errors in words, a soft check every 30 s, four at most, no durations, the room in view", () => {
   const s = run(TO_WAVE());
   assert.equal(s.stepId, "wave");
   assert.equal(title(s), "Don't push it away. Don't hold on to it.");
@@ -96,7 +99,8 @@ test("the wave: the two errors in words, a soft check every 30 s, four at most, 
   assert.equal(w.props.checkSec, 30);
   assert.equal(w.props.maxChecks, 4);
   assert.equal(w.props.notNow, undefined, "nothing to say not now to: it's a feeling, not an urge");
-  assert.match(skill.copy[w.props.riding], /Eyes open is fine/);
+  assert.match(skill.copy[w.props.riding], /^Pushing makes it stick\. Holding on makes it bigger\./, "the PRD's words");
+  assert.doesNotMatch(skill.copy[w.props.riding], /eyes/i, "nothing raises eyes closed");
   // Stopping early, gone, or four checks: all go on to noticing it.
   for (const end of [["ended_left"], ["fading", "gone", "ended_gone"], ["still_here", "still_here", "still_here", "fading", "ended_long"]])
     assert.equal(run([out(...end)], ctx(), s).stepId, "close", end.join());
@@ -157,8 +161,51 @@ test("savouring a good feeling: let it be, it doesn't have to last; no then-vs-n
   }
   assert.equal(skill.exits.find((x) => x.id === "good_things").toolId, "good-things");
   assert.deepEqual(skill.exits.find((x) => x.id === "good_things").query, { frame: "savour" });
-  // Surprises that aren't good feelings get the wave, as do the unpleasant ones.
-  for (const w of ["shocked", "confused", "dismayed", "startled"]) assert.equal(run(TO_WAVE(w)).stepId, "wave", w);
+  // Surprises that aren't good feelings get the wave, and so do aroused and powerful (Gate 3: activation that can run away).
+  for (const w of ["shocked", "confused", "dismayed", "startled", "aroused", "powerful"]) assert.equal(run(TO_WAVE(w)).stepId, "wave", w);
+  // Savouring that keeps getting bigger: the body, not "that counts".
+  assert.equal(run([out("bigger", "bigger", "ended_bigger")], ctx(), run(TO_WAVE("excited"))).stepId, "switch");
+  assert.equal(skill.copy[skill.exits.find((x) => x.id === "good_things").label], "Keep it in Things I like");
+});
+
+test("a word that can mean danger now asks once: anything but no is the safety branch, no wave (Gate 3)", () => {
+  for (const w of ["threatened", "violated", "persecuted", "victimized"]) {
+    const s = run([pick("feel", w), next]);
+    assert.equal(s.stepId, "safe", w);
+    for (const v of ["yes", "sometimes", "unsure"]) {
+      const u = run([pick("safe", v), next], ctx(), s);
+      assert.equal(u.stepId, "unsafe", v);
+      assert.equal(M.crisisFor(ctx(), M.stepOf(skill, "unsafe"), u)?.variant, "other_person");
+      assert.deepEqual(offers(u), ["safety_open", "ending"]);
+      assert.ok(M.stepOf(skill, "unsafe").noClose);
+    }
+    assert.equal(run([pick("safe", "no"), next], ctx(), s).stepId, "where");
+  }
+  assert.deepEqual(skill.exits.find((x) => x.id === "ending").query, { frame: "careful" });
+  assert.equal(run([pick("feel", "threatened"), next, pick("safe", "no"), next], ctx({ band: "flooded" })).stepId, "heads_up");
+  assert.equal(run([pick("feel", "sad"), next]).stepId, "where", "other words aren't asked");
+});
+
+test("a word that means flooding gets the heads-up without a carried reading (Gate 3)", () => {
+  for (const w of ["overwhelmed", "out_of_control"]) assert.equal(run([pick("feel", w), next]).stepId, "heads_up", w);
+});
+
+test("a safety-screen word getting bigger or louder: no keep watching, someone to talk to first, the line again (Gate 3)", () => {
+  const big = run([out("bigger", "bigger", "ended_bigger")], ctx(), run(TO_WAVE("despair")));
+  assert.equal(big.stepId, "switch");
+  assert.deepEqual(offers(big), ["safety_open", "cool_down"]);
+  assert.equal(line(big), `${skill.copy.switch_line} ${skill.copy.heavy_line}`);
+  const loud = run([pick("close", "worse"), next], ctx(), run(TO_CLOSE("depressed")));
+  assert.deepEqual(offers(loud), ["safety_open", "cool_down"]);
+  assert.equal(line(loud), `${skill.copy.louder_line} ${skill.copy.heavy_line}`);
+  assert.deepEqual(offers(run([pick("close", "worse"), next], ctx(), run(TO_CLOSE("sad")))), ["cool_down"]);
+});
+
+test("bigger can be a memory pulling in: grounding, never more watching (Gate 3)", () => {
+  const s = run([out("bigger", "bigger", "ended_bigger"), pick("bigger", "memory"), next], ctx(), run(TO_WAVE("scared")));
+  assert.equal(s.stepId, "memory");
+  assert.deepEqual(offers(s), ["five_senses", "safety_open"]);
+  assert.ok(M.stepOf(skill, "memory").noClose);
 });
 
 test("every screen has a quiet way to someone; nothing asks the person to close their eyes or go back to a memory", () => {

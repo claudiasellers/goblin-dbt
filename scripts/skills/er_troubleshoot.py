@@ -22,6 +22,8 @@ VERSION = "et-v1-1"
 OWN_MAX = 140
 
 COPY = {
+    # Let it be and Let it be a wave on one card read as the same tool twice (Gate 2, ER-08): the wave says what it does.
+    "wave_offer": "Let the feeling rise and fall",
     # The validation line (absorb), before any question.
     "validate": "When a skill doesn't help, that's information. It isn't proof you can't do this.",
     "settle_first": "Things feel loud right now. You could ground yourself first.",
@@ -174,7 +176,7 @@ EXITS = [
     {"id": "problem_solve", "toolId": "problem-solve"},
     {"id": "check_the_facts", "toolId": "check-the-facts"},
     {"id": "let_it_be", "toolId": "let-it-be"},             # DT-04 willingness (DT-B4)
-    {"id": "mindfulness_emotions", "toolId": "mindfulness-emotions"},       # ER-08 Let it be a wave (ER-B5)
+    {"id": "mindfulness_emotions", "toolId": "mindfulness-emotions", "label": "wave_offer"},       # ER-08 Let it be a wave (ER-B5)
     {"id": "five_senses", "toolId": "five-senses"},                          # orienting (DT-01's orient entry)
     # ER-10 myth cards (part 4): Know this feeling's second skill, on its myths frame.
     {"id": "emotion_guide", "toolId": "emotion-guide", "query": {"frame": "myths"}},

@@ -71,7 +71,7 @@ print(json.dumps(sorted({w for r in m.WORD_RULES if r["tool"]=="problem-solve" f
   const offers = (w) => { const s = run([pick("feel", w), next]); assert.equal(s.stepId, "not_fit", w); return s.offered; };
   assert.deepEqual(offers("ashamed"), ["opposite_action"], "self-validation is planned, so not shown");
   assert.deepEqual(offers("confused"), ["check_the_facts"]);
-  assert.deepEqual(offers("happy"), ["find_the_feeling"], "the wave is planned");
+  assert.deepEqual(offers("happy"), ["mindfulness_emotions", "find_the_feeling"], "the wave (ER-08, built 13 Nov): savouring for a good feeling");
   assert.deepEqual(offers("numb"), ["find_the_feeling"], "body scan is planned");
   assert.equal(run([pick("feel", "anxious"), next]).stepId, "ready");
   assert.equal(run([pick("feel", "anxious"), next], ctx({ band: "flooded" })).stepId, "not_now", "a carried flooded reading settles first (C6.2)");
@@ -441,6 +441,27 @@ test("opened on repair (?frame=repair, Do the Opposite's guilt or shame that fit
   const guilty = run([pick("feel", "guilty"), next, pick("ready", "can"), next], ctx({ frame: "repair" }));
   assert.deepEqual(M.optionGroups(ctx({ frame: "repair" }), M.stepOf(skill, "problem").fields[0], guilty.answers).flatMap((g) => g.options.map((o) => o.value)),
     [...ps.problemTypes.guilt.map((p) => p.id), "piling"]);
+});
+
+test("a plan made on repair reopens on repair: How did it go? keeps the repair-only picks (Codex, #133)", () => {
+  const rep = ctx({ frame: "repair" }, ["ashamed"]);
+  const done = run([pick("feel", "ashamed"), next, pick("ready", "can"), next, own("problem", "what I said to her"), next,
+    pick("barrier", "not-sure-what"), next, pick("solutions", "guilt-harm-apologize"), next, pick("size", "guilt-harm-apologize:small"), next,
+    pick("when", "today")], rep);
+  const rec = M.runRecord(rep, done);
+  assert.deepEqual(rec.ctx, { frame: "repair" }, "the visit's frame is recorded");
+  // The ps_review link carries only run, at and followUp: without the record's frame the repair-only picks fall away.
+  const bare = ctx({}, []);
+  assert.equal(M.resumeRun(bare, rec, "review").answers.size?.ids?.length ?? 0, 0, "the failure Codex found");
+  const ci = M.ctxForResume(skill, bare.ctxIn, rec);
+  assert.deepEqual(ci, { frame: "repair" });
+  const back = M.resumeRun({ ...bare, ctxIn: ci }, rec, "review");
+  assert.equal(back.stepId, "review");
+  assert.deepEqual(back.answers.solutions.ids, ["guilt-harm-apologize"]);
+  assert.deepEqual(back.answers.size.ids, ["guilt-harm-apologize:small"]);
+  // enterAt is the starting link's, never restored; keys the skill doesn't accept never come back.
+  assert.deepEqual(M.ctxForResume(skill, { band: "stirred" }, { ctx: { frame: "repair", enterAt: "review", personId: "p1" } }), { band: "stirred", frame: "repair" });
+  assert.deepEqual(M.ctxForResume(skill, { band: "stirred" }, { answers: [] }), { band: "stirred" });
 });
 
 test("repair keeps every guard: flooded settles first, *too loud* still waits, and without the frame shame is still not here", () => {

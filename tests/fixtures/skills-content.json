@@ -3160,9 +3160,11 @@
     "fits_title_general": "Does feeling {feeling} fit what happened?",
     "fits_title_inline": "Now, with what happened in mind, does one of these match?",
     "inline_back": "Leave the check here",
-    "next_fits": "When a feeling fits, the move is to work on the situation. While it can't change, you can let the feeling be.",
+    "next_fits": "When a feeling fits, the move is to work on the situation. If it can't change yet, you can make room for the feeling, or for what happened.",
     "next_partly": "The feeling makes sense, and it's turned up loud. Bring the volume down, then work on what's left.",
-    "next_no": "The feeling is bigger than the facts. Acting opposite to its urge helps it settle, or you can let it rise and fall.",
+    "next_no": "The feeling is bigger than the facts. Acting opposite to its urge helps it settle. Or you can let it rise and fall.",
+    "wave_offer": "Let the feeling rise and fall",
+    "let_it_be_offer": "Make room for what happened",
     "next_unsure": "That's all right. Sometimes the facts come later.",
     "own_hint": "Say it your way",
     "not_sure": "Not sure",
@@ -3827,7 +3829,8 @@
      "toolId": "let-it-be",
      "query": {},
      "carry": [],
-     "done": false
+     "done": false,
+     "label": "let_it_be_offer"
     },
     {
      "id": "mindfulness_emotions",
@@ -3836,7 +3839,8 @@
      "carry": [
       "feel"
      ],
-     "done": false
+     "done": false,
+     "label": "wave_offer"
     },
     {
      "id": "opposite_action",
@@ -18016,6 +18020,7 @@
    "ownMax": 140,
    "emotionFields": [],
    "copy": {
+    "wave_offer": "Let the feeling rise and fall",
     "validate": "When a skill doesn't help, that's information. It isn't proof you can't do this.",
     "settle_first": "Things feel loud right now. You could ground yourself first.",
     "body_title": "Could your body be turning the volume up?",
@@ -18698,7 +18703,8 @@
      "toolId": "mindfulness-emotions",
      "query": {},
      "carry": [],
-     "done": false
+     "done": false,
+     "label": "wave_offer"
     },
     {
      "id": "missing_links",
@@ -35581,6 +35587,8 @@
    "ownMax": 36,
    "emotionFields": [],
    "copy": {
+    "wave_offer": "Let the feeling rise and fall",
+    "let_it_be_offer": "Make room for what happened",
     "what_title": "What would help right now?",
     "what_hint": "Each one comes back to it, so nothing's pushed away for good.",
     "heads_up_title": "Your body's loud right now.",
@@ -37476,14 +37484,16 @@
      "toolId": "let-it-be",
      "query": {},
      "carry": [],
-     "done": false
+     "done": false,
+     "label": "let_it_be_offer"
     },
     {
      "id": "mindfulness_emotions",
      "toolId": "mindfulness-emotions",
      "query": {},
      "carry": [],
-     "done": false
+     "done": false,
+     "label": "wave_offer"
     },
     {
      "id": "problem_solve",
@@ -37812,16 +37822,20 @@
     "feel_title": "What's the feeling?",
     "feel_hint": "Pick the closest word. It doesn't have to be exact.",
     "feel_more": "More words",
-    "blank_title": "When a feeling is hard to reach, coming back to the room comes first.",
-    "blank_line": "Watching a feeling can wait. Something around you to notice can help right now.",
+    "blank_title": "Back to the room first.",
+    "blank_line": "When a feeling is hard to reach, watching it can wait. Noticing what's around you can help right now.",
+    "safe_title": "Is anyone hurting or threatening you right now?",
+    "safe_hint": "Letting a feeling be is never about staying somewhere you're being hurt.",
+    "unsafe_title": "When someone is hurting you, the feeling is telling you something.",
+    "unsafe_line": "Getting safe comes first. The support is on this screen. If it's someone close to you, Ending a relationship that's hurting you can help you think it through.",
     "heads_up_title": "Your body's loud right now.",
     "heads_up_hint": "A feeling is easier to watch once your body settles a little. You can still try.",
-    "settle_line": "The feeling will keep. First, the body.",
+    "settle_line": "The feeling will keep. Settling your body comes first.",
     "where_title": "Where do you notice it in your body?",
-    "where_hint": "Pick one or two. Somewhere vague is fine.",
+    "where_hint": "Pick the closest. Roughly is fine, and whole body counts.",
     "heavy_line": "Heavy feelings can come with thoughts of not being here. If they do, talk to someone now.",
     "wave_title": "Don't push it away. Don't hold on to it.",
-    "riding": "Pushing tends to make a feeling stick, and holding on makes it bigger. Let it rise and fall on its own. Eyes open is fine.",
+    "riding": "Pushing makes it stick. Holding on makes it bigger. Let it rise and fall where you notice it, with the room still in view.",
     "wave_again_title": "Back to watching it.",
     "savour_wave_title": "Let it be as big as it is. You don't have to make it last.",
     "savour_riding": "If a worry about it ending shows up, notice it, and come back to the feeling.",
@@ -37834,18 +37848,24 @@
     "bigger_title": "It's getting bigger.",
     "bigger_hint": "That can happen when you stop pushing a feeling away. You can give your body something, or keep watching.",
     "switch_line": "Let's give your body something first. The feeling will keep.",
+    "memory_line": "When a feeling pulls you into a memory, grounding comes first, not watching. If it happens a lot, someone trained in trauma can help.",
     "notice_title": "You're the one noticing it.",
-    "notice_hint": "There's the feeling, and there's you, watching it. You're more than this feeling.",
+    "notice_hint": "There's the feeling, and there's you, watching it.",
+    "notice_gone_title": "You were the one watching it.",
+    "notice_gone": "It came and went, and you stayed with it.",
     "close_title": "How is the feeling now?",
     "louder_line": "Letting a feeling in can make it louder for a bit. That happens.",
     "end_same": "It doesn't have to go anywhere. You let it be here, and that's the skill.",
     "end_quieter": "You let it rise and fall without pushing it away. You can do this again, anywhere.",
     "savour_end": "You let a good feeling be here, without needing it to last. That counts.",
+    "good_things_offer": "Keep it in Things I like",
     "safety_open": "Talk to someone now",
     "next": "Next",
     "done": "Done",
     "end_same_heavy": "It doesn't have to go anywhere. You let it be here, and that's the skill. Heavy feelings can come with thoughts of not being here. If they do, talk to someone now.",
-    "end_quieter_heavy": "You let it rise and fall without pushing it away. You can do this again, anywhere. Heavy feelings can come with thoughts of not being here. If they do, talk to someone now."
+    "end_quieter_heavy": "You let it rise and fall without pushing it away. You can do this again, anywhere. Heavy feelings can come with thoughts of not being here. If they do, talk to someone now.",
+    "switch_heavy": "Let's give your body something first. The feeling will keep. Heavy feelings can come with thoughts of not being here. If they do, talk to someone now.",
+    "louder_heavy": "Letting a feeling in can make it louder for a bit. That happens. Heavy feelings can come with thoughts of not being here. If they do, talk to someone now."
    },
    "tables": {},
    "derive": [],
@@ -37903,11 +37923,38 @@
        }
       },
       {
+       "to": "safe",
+       "when": {
+        "in": [
+         "$a.feel",
+         [
+          "threatened",
+          "violated",
+          "persecuted",
+          "victimized"
+         ]
+        ]
+       }
+      },
+      {
        "to": "heads_up",
        "when": {
-        "eq": [
-         "$ctx.band",
-         "flooded"
+        "any": [
+         {
+          "eq": [
+           "$ctx.band",
+           "flooded"
+          ]
+         },
+         {
+          "in": [
+           "$a.feel",
+           [
+            "overwhelmed",
+            "out_of_control"
+           ]
+          ]
+         }
         ]
        }
       },
@@ -37917,6 +37964,143 @@
       }
      ],
      "offers": []
+    },
+    {
+     "id": "safe",
+     "kind": "ask",
+     "title": "safe_title",
+     "hint": "safe_hint",
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "in": [
+         "$a.safe",
+         [
+          "yes",
+          "sometimes",
+          "unsure"
+         ]
+        ]
+       }
+      }
+     ],
+     "fields": [
+      {
+       "id": "safe",
+       "options": {
+        "list": "safe"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "unsafe",
+       "when": {
+        "in": [
+         "$a.safe",
+         [
+          "yes",
+          "sometimes",
+          "unsure"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "heads_up",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$ctx.band",
+           "flooded"
+          ]
+         },
+         {
+          "in": [
+           "$a.feel",
+           [
+            "overwhelmed",
+            "out_of_control"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "where",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "unsafe",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "unsafe_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "title": "unsafe_title",
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "in": [
+         "$a.safe",
+         [
+          "yes",
+          "sometimes",
+          "unsure"
+         ]
+        ]
+       }
+      }
+     ],
+     "noClose": true,
+     "next": [],
+     "offers": [
+      {
+       "exit": "safety_open",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "ending",
+       "when": {
+        "all": []
+       }
+      }
+     ]
     },
     {
      "id": "blank",
@@ -37936,7 +38120,15 @@
        "exit": "safety_open",
        "label": "safety_open",
        "when": {
-        "all": []
+        "not": {
+         "in": [
+          "$a.feel",
+          [
+           "numb",
+           "empty"
+          ]
+         ]
+        }
        }
       }
      ],
@@ -38053,7 +38245,8 @@
           "worthless",
           "despair",
           "helpless",
-          "powerless"
+          "powerless",
+          "depressed"
          ]
         ]
        },
@@ -38066,7 +38259,7 @@
        "options": {
         "list": "where"
        },
-       "max": 2,
+       "max": 1,
        "required": true,
        "links": [
         {
@@ -38089,7 +38282,6 @@
           "accepted",
           "amazed",
           "appreciative",
-          "aroused",
           "astonished",
           "at_ease",
           "awe",
@@ -38122,7 +38314,6 @@
           "optimistic",
           "peaceful",
           "playful",
-          "powerful",
           "proud",
           "relaxed",
           "respected",
@@ -38178,6 +38369,31 @@
      },
      "next": [
       {
+       "to": "switch",
+       "when": {
+        "all": [
+         {
+          "has": [
+           "$a.wave.ids",
+           "ended_bigger"
+          ]
+         },
+         {
+          "in": [
+           "$a.feel",
+           [
+            "worthless",
+            "despair",
+            "helpless",
+            "powerless",
+            "depressed"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
        "to": "bigger",
        "when": {
         "has": [
@@ -38228,11 +38444,59 @@
        }
       },
       {
+       "to": "memory",
+       "when": {
+        "eq": [
+         "$a.bigger",
+         "memory"
+        ]
+       }
+      },
+      {
        "to": "switch",
        "when": null
       }
      ],
      "offers": []
+    },
+    {
+     "id": "memory",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "memory_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "next": [],
+     "offers": [
+      {
+       "exit": "five_senses",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ]
     },
     {
      "id": "wave2",
@@ -38285,6 +38549,21 @@
      "lines": [
       {
        "when": {
+        "in": [
+         "$a.feel",
+         [
+          "worthless",
+          "despair",
+          "helpless",
+          "powerless",
+          "depressed"
+         ]
+        ]
+       },
+       "key": "switch_heavy"
+      },
+      {
+       "when": {
         "all": []
        },
        "key": "switch_line"
@@ -38304,6 +38583,21 @@
      "next": [],
      "offers": [
       {
+       "exit": "safety_open",
+       "when": {
+        "in": [
+         "$a.feel",
+         [
+          "worthless",
+          "despair",
+          "helpless",
+          "powerless",
+          "depressed"
+         ]
+        ]
+       }
+      },
+      {
        "exit": "cool_down",
        "when": {
         "all": []
@@ -38314,8 +38608,57 @@
     {
      "id": "close",
      "kind": "ask",
-     "title": "notice_title",
-     "hint": "notice_hint",
+     "title": [
+      {
+       "when": {
+        "any": [
+         {
+          "has": [
+           "$a.wave.ids",
+           "ended_gone"
+          ]
+         },
+         {
+          "has": [
+           "$a.again.ids",
+           "ended_gone"
+          ]
+         }
+        ]
+       },
+       "key": "notice_gone_title"
+      },
+      {
+       "key": "notice_title"
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "any": [
+         {
+          "has": [
+           "$a.wave.ids",
+           "ended_gone"
+          ]
+         },
+         {
+          "has": [
+           "$a.again.ids",
+           "ended_gone"
+          ]
+         }
+        ]
+       },
+       "key": "notice_gone"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "notice_hint"
+      }
+     ],
      "fields": [
       {
        "id": "close",
@@ -38361,6 +38704,21 @@
      "lines": [
       {
        "when": {
+        "in": [
+         "$a.feel",
+         [
+          "worthless",
+          "despair",
+          "helpless",
+          "powerless",
+          "depressed"
+         ]
+        ]
+       },
+       "key": "louder_heavy"
+      },
+      {
+       "when": {
         "all": []
        },
        "key": "louder_line"
@@ -38378,6 +38736,21 @@
      ],
      "next": [],
      "offers": [
+      {
+       "exit": "safety_open",
+       "when": {
+        "in": [
+         "$a.feel",
+         [
+          "worthless",
+          "despair",
+          "helpless",
+          "powerless",
+          "depressed"
+         ]
+        ]
+       }
+      },
       {
        "exit": "cool_down",
        "when": {
@@ -38401,7 +38774,8 @@
             "worthless",
             "despair",
             "helpless",
-            "powerless"
+            "powerless",
+            "depressed"
            ]
           ]
          },
@@ -38423,7 +38797,8 @@
           "worthless",
           "despair",
           "helpless",
-          "powerless"
+          "powerless",
+          "depressed"
          ]
         ]
        },
@@ -38486,6 +38861,15 @@
      },
      "next": [
       {
+       "to": "switch",
+       "when": {
+        "has": [
+         "$a.savour.ids",
+         "ended_bigger"
+        ]
+       }
+      },
+      {
        "to": "savour_end",
        "when": null
       }
@@ -38542,6 +38926,15 @@
      "done": true
     },
     {
+     "id": "ending",
+     "toolId": "ending-relationships",
+     "query": {
+      "frame": "careful"
+     },
+     "carry": [],
+     "done": false
+    },
+    {
      "id": "five_senses",
      "toolId": "five-senses",
      "query": {},
@@ -38555,7 +38948,8 @@
       "frame": "savour"
      },
      "carry": [],
-     "done": false
+     "done": false,
+     "label": "good_things_offer"
     },
     {
      "id": "safety_open",
@@ -38575,6 +38969,27 @@
      {
       "value": "try",
       "label": "Try it anyway"
+     }
+    ],
+    "safe": [
+     {
+      "value": "no",
+      "label": "No, I'm safe right now"
+     },
+     {
+      "value": "yes",
+      "label": "Yes",
+      "danger": "other"
+     },
+     {
+      "value": "sometimes",
+      "label": "Sometimes",
+      "danger": "other"
+     },
+     {
+      "value": "unsure",
+      "label": "I'm not sure",
+      "danger": "other"
      }
     ],
     "where": [
@@ -38651,6 +39066,10 @@
      {
       "value": "keep",
       "label": "Keep watching it"
+     },
+     {
+      "value": "memory",
+      "label": "It's pulling me into a memory"
      }
     ],
     "tvn": [
@@ -41605,7 +42024,8 @@
     "keep_title": "Some feelings are worth keeping",
     "pun_title": "The pull to punish yourself deserves care",
     "pun_line": "You don't have to act on it. If something needs making right, there are kinder ways to do it.",
-    "keep_line": "Want help acting on it well, or a minute to let it be here?",
+    "keep_line": "Want help acting on it well, or a minute with the feeling first?",
+    "wave_offer": "A minute with the feeling",
     "help_title_any": "If you follow this urge, will it help?",
     "clar_title": "It may be serving a different goal",
     "clar_line": "The facts are worth a closer look before you act either way.",
@@ -45641,7 +46061,8 @@
      "carry": [
       "feel"
      ],
-     "done": false
+     "done": false,
+     "label": "wave_offer"
     },
     {
      "id": "wise_mind",
@@ -52263,9 +52684,26 @@
       {
        "exit": "mindfulness_emotions",
        "when": {
-        "eq": [
-         "$d.fit",
-         "other"
+        "all": [
+         {
+          "eq": [
+           "$d.fit",
+           "other"
+          ]
+         },
+         {
+          "not": {
+           "in": [
+            "$a.feel",
+            [
+             "numb",
+             "empty",
+             "apathetic",
+             "indifferent"
+            ]
+           ]
+          }
+         }
         ]
        }
       },

@@ -17,7 +17,7 @@ import { closeQuestion, closeKindFor } from '../../lib/spine/close';
 import { emotionIdsFromLink } from '../../lib/spine/toolLink';
 import {
   answersOf, askFresh, canGoOn, carried as carriedOf, carryOnOthers, labelOfValue, offersFor, contextIn, inlineCarried, inlineCtxFor, inlineStart, visitEmotionIds, copyText, crisisFor, ctxAfterResume, seededFrom, stepLinks, emotionChoices, fieldLinks, fieldList, followUpFor,
-  exitQuery, handoffLine, initialRun, inlineResult, keepFor, opensSafety, optionGroups, ownMaxOf, persistence, pickedLabels, pickTrack, resumeRun, runNext, runRecord,
+  ctxForResume, exitQuery, handoffLine, initialRun, inlineResult, keepFor, opensSafety, optionGroups, ownMaxOf, persistence, pickedLabels, pickTrack, resumeRun, runNext, runRecord,
   runUrgeIds,
   scope, sharedRow, shownFields, stepOf, titleSlots, visitUrgeIds,
   type Answer, type RunContext, type RunEvent, type RunState,
@@ -201,8 +201,11 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
     resumed.current = true;
     (resumeRecord !== undefined ? Promise.resolve(resumeRecord) : getSkillRun(resumeFrom.run, skill.toolId))
       .then((rec) => {
-        const r = resumeRun(ctx, rec, resumeFrom.at, { keepFresh: !!resumeKeepsFresh });
+        // The run's own recorded context first (its frame, person, part…), so its answers read as they were given.
+        const resumedCtxIn = ctxForResume(skill, ctx.ctxIn ?? {}, rec);
+        const r = resumeRun({ ...ctx, ctxIn: resumedCtxIn }, rec, resumeFrom.at, { keepFresh: !!resumeKeepsFresh });
         if (r) {
+          if (resumedCtxIn !== ctx.ctxIn) setCtxIn(resumedCtxIn);
           reopenedRef.current = !!stepOf(skill, r.stepId).reopens;
           reopenUrges.current = reopenedRef.current ? runUrgeIds(ctx, r) : [];
           setSt(r);

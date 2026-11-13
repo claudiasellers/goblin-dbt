@@ -25,26 +25,32 @@ two minutes.
 |---|---|---|
 | `feel` | *What's the feeling?* Carried words first, nine common ones (sad, scared, angry, ashamed, guilty, lonely, hurt, happy, loving), any word behind *More words* | Entry: the word the host carried |
 | `blank` | numb, empty, apathetic or indifferent: *When a feeling is hard to reach, coming back to the room comes first.* 5-4-3-2-1 (and someone to talk to for numb and empty, safety-screen words); no wave, no close. Before the flooded heads-up | Blank / numb / dissociated: not offered |
-| `heads_up` | A carried flooded reading: *Your body's loud right now.* My body first → `settle` (First, the body, no close) · Try it anyway → `where` | Flooded → ER-01 first |
-| `where` | *Where do you notice it in your body?* The 15 places (the options present the `BodyRegion` nodes the check-in marks), one or two, or *I can't find it* (a full answer). A safety-screen word (worthless, despair, helpless, powerless) adds the line about thoughts of not being here, never a gate | Step 1 (quick shape: tap the body) |
-| `wave` | *Don't push it away. Don't hold on to it.* and *Pushing tends to make a feeling stick, and holding on makes it bigger. Let it rise and fall on its own. Eyes open is fine.* The wave (`urgeWave`): a soft check every 30 s (*Still here · Easing · Gone · Bigger*), four at most, *Stop here*; no digits or durations | Steps 2–3, the two errors in words |
-| `bigger` | Bigger twice: *It's getting bigger.* (*That can happen when you stop pushing a feeling away.*) Something for my body → `switch` (First, the body, no close) · Keep watching it → `wave2` (from where it was; bigger twice again → `switch`) | Overwhelm: always an exit |
-| `close` | *You're the one noticing it.* (*There's the feeling, and there's you, watching it. You're more than this feeling.*) above *How is the feeling now?* Louder · About the same · A bit quieter · Much quieter (`askFresh: 'thenVsNow'`) | Steps 4 and 6 |
-| `louder` | *Letting a feeling in can make it louder for a bit. That happens.* First, the body | Close |
+| `safe` | A word that can mean danger now (threatened, violated, persecuted, victimized): *Is anyone hurting or threatening you right now?* (*Letting a feeling be is never about staying somewhere you're being hurt.*) Anything but *No, I'm safe right now* → `unsafe`: the `other_person` crisis slot, *Getting safe comes first…*, someone to talk to and Ending in its careful frame; no wave, no close (as Let it be) | Gate 3 |
+| `heads_up` | A carried flooded reading, or *overwhelmed* / *out of control*: *Your body's loud right now.* My body first → `settle` (First, the body, no close) · Try it anyway → `where` | Flooded → ER-01 first |
+| `where` | *Where do you notice it in your body?* The 15 places (the options present the `BodyRegion` nodes the check-in marks), one, or *I can't find it* (a full answer). A safety-screen word (worthless, despair, helpless, powerless, depressed) adds the line about thoughts of not being here, never a gate | Step 1 (quick shape: tap the body) |
+| `wave` | *Don't push it away. Don't hold on to it.* and *Pushing makes it stick. Holding on makes it bigger. Let it rise and fall where you notice it, with the room still in view.* The wave (`urgeWave`): a soft check every 30 s (*Still here · Easing · Gone · Bigger*), four at most, *Stop here*; no digits or durations | Steps 2–3, the two errors in words |
+| `bigger` | Bigger twice: *It's getting bigger.* (*That can happen when you stop pushing a feeling away.*) Something for my body → `switch` (First, the body, no close) · Keep watching it → `wave2` (from where it was; bigger twice again → `switch`) · It's pulling me into a memory → `memory` (grounding and someone to talk to, no close). A safety-screen word skips the choice: `switch` with someone to talk to first and the heavy line | Overwhelm: always an exit |
+| `close` | *You're the one noticing it.* (*There's the feeling, and there's you, watching it.*; after *Gone*: *You were the one watching it.* / *It came and went, and you stayed with it.*) above *How is the feeling now?* Louder · About the same · A bit quieter · Much quieter (`askFresh: 'thenVsNow'`) | Steps 4 and 6 |
+| `louder` | *Letting a feeling in can make it louder for a bit. That happens.* First, the body (a safety-screen word: someone to talk to first, and the heavy line) | Close |
 | `end` | About the same: *It doesn't have to go anywhere. You let it be here, and that's the skill.* Quieter: *You let it rise and fall without pushing it away. You can do this again, anywhere.* (the heavy line after either, for a safety-screen word) | Step 6, PRD's line |
-| `savour_wave` | A good feeling (the happy family on both pleasant quadrants, and amazed, excited, astonished, awe, eager, energetic, surprised): *Let it be as big as it is. You don't have to make it last.* and *If a worry about it ending shows up, notice it, and come back to the feeling.* The same wave, no bigger branch | Savouring mode (H15) |
-| `savour_end` | *You let a good feeling be here, without needing it to last. That counts.* Good things on `frame=savour`; no then-vs-now | Savouring's close offers ER-04 |
+| `savour_wave` | A good feeling (the happy family on both pleasant quadrants but aroused and powerful, and amazed, excited, astonished, awe, eager, energetic, surprised): *Let it be as big as it is. You don't have to make it last.* and *If a worry about it ending shows up, notice it, and come back to the feeling.* The same wave; bigger twice → `switch` | Savouring mode (H15) |
+| `savour_end` | *You let a good feeling be here, without needing it to last. That counts.* *Keep it in Things I like* (Good things on `frame=savour`); no then-vs-now | Savouring's close offers ER-04 |
 
 *Talk to someone now* on every screen. Nothing asks the person to close their eyes or go back to a memory: the wave is
 for the feeling now.
 
 ## The links that now open it
 
+Where the wave sits beside Let it be on one card (Check the Facts, the lid), each offer says what it does: *Let the
+feeling rise and fall* and *Make room for what happened* (Gate 2: the two names read as one tool twice). It isn't
+working and Do the Opposite label only the wave (*A minute with the feeling* on the keep card).
+
 - Check the Facts' verdict: *fits* (with Let it be) and *doesn't fit* (beside Do the Opposite), carrying the word. The
   verdict lines say so (*While it can't change, you can let the feeling be.* / *…or you can let it rise and fall.*).
 - Do the Opposite's keep card (*No, I want to keep it*): beside Problem Solve, DEAR MAN and Ride it out, carrying the
   word; the line is now *Want help acting on it well, or a minute to let it be here?*
-- Problem Solve's not-an-emotion words whose alternative skill is the wave (`not_fit` other), carrying the word.
+- Problem Solve's not-an-emotion words whose alternative skill is the wave (`not_fit` other), carrying the word; never
+  for numb, empty, apathetic or indifferent (the wave would only send them to grounding).
 - It isn't working's *it fits* fix, between Problem Solve and Let it be.
 - Give your mind a job's lid reopen: *can't be changed* offers the wave beside Let it be (PRD: what DT puts away while
   flooded comes back here when steady).
@@ -72,6 +78,13 @@ the hosts that carry a word to it are where it's reached in part 1. A row is one
   stirred 60 s / room-sound variant, distanced self-talk in the person's name, fade (words only, timer, off-phone cue),
   the `SkillPractice` rep and push / grab counts.
 
+## Also in this PR
+
+A plan made in one frame now reopens in it: the player restores the run's recorded context (`run.ctx`: frame,
+person, part, situation, urge; never `enterAt`) before reading a reopened run (`ctxForResume` in
+`src/lib/skillRuntime/machine.ts`). Codex found it on #133: a Problem Solve plan made on repair lost its repair-only
+picks when `ps_review` reopened it, since the card's link carries only `run`, `at` and `followUp`.
+
 ## Departures from the PRD
 
 - The two errors are said, not taught by gesture (part 1 has no gesture embed); they head the wave rather than a screen
@@ -84,4 +97,6 @@ the hosts that carry a word to it are where it's reached in part 1. A row is one
 
 ## Clinician pass (open)
 
-The heavy line's placement, the blank list, and whether *About the same* should ever offer Check the Facts.
+The heavy line's placement, the blank, danger and flood word lists, savouring's exclusions, and whether *About the
+same* should ever offer Check the Facts. When a routing row is added: the PRD also names `flooding_triggered_shutdown`
+(a co-occurrence label, not a pattern) as a contraindication.

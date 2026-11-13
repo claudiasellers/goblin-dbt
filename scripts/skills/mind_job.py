@@ -36,6 +36,9 @@ VERSION = "mj-v1"
 OWN_MAX = 36  # an activity, or a label, in their words (short: the record keeps every own-words field)
 
 COPY = {
+    # Two names this close on one card read as the same tool twice (Gate 2, ER-08): each says what it does.
+    "wave_offer": "Let the feeling rise and fall",
+    "let_it_be_offer": "Make room for what happened",
     "what_title": "What would help right now?",
     "what_hint": "Each one comes back to it, so nothing's pushed away for good.",
     # A carried flooded reading (PRD: DT-01 first, then level-0 find tasks only).
@@ -370,8 +373,8 @@ EXITS = [
     {"id": "problem_solve", "toolId": "problem-solve"},                  # ER-12: something can be done
     {"id": "dear_man", "toolId": "dear-man"},                            # IE-01: it's about someone
     {"id": "check_the_facts", "toolId": "check-the-facts"},              # ER-02: not as big as it felt
-    {"id": "let_it_be", "toolId": "let-it-be"},                          # DT-04: it can't be changed
-    {"id": "mindfulness_emotions", "toolId": "mindfulness-emotions"},    # ER-08: the feeling it brings, rising and falling
+    {"id": "let_it_be", "toolId": "let-it-be", "label": "let_it_be_offer"},                          # DT-04: it can't be changed
+    {"id": "mindfulness_emotions", "toolId": "mindfulness-emotions", "label": "wave_offer"},    # ER-08: the feeling it brings, rising and falling
     {"id": "cool_down", "toolId": "cool-down"},                          # DT-01 First, the body
     {"id": "safety_open", "toolId": None, "safety": True},               # safety.open (R6)
     {"id": "done", "done": True},
