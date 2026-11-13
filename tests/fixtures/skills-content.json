@@ -27245,7 +27245,7 @@
       }
      ],
      "followUp": {
-      "type": "good_week_1",
+      "type": "good_week_one",
       "whenFrom": "day1"
      },
      "hint": "week_hint",
@@ -27325,7 +27325,7 @@
       }
      ],
      "followUp": {
-      "type": "good_week_2",
+      "type": "good_week_two",
       "whenFrom": "day2"
      },
      "next": [
@@ -27396,7 +27396,7 @@
       }
      ],
      "followUp": {
-      "type": "good_week_3",
+      "type": "good_week_three",
       "whenFrom": "day3"
      },
      "next": [

@@ -234,6 +234,7 @@ test("routing: Low drive's bored, apathetic and indifferent get Good things as t
 // --- Level 2: plan the week (part 2) ---
 const W = await importTs("src/lib/spine/windows.ts");
 const spine = JSON.parse(readFileSync("src/data/content/spine.json", "utf8")).content;
+const WORD = { 1: "one", 2: "two", 3: "three" };
 const WEEK = (c = ctx()) => run([
   pick("start", "week"), next,
   pick("wk1", "walk"), pick("day1", "tomorrow"), pick("more1", "more"), next,
@@ -251,7 +252,7 @@ test("plan the week: up to three good things, a day each, a card each; never one
   assert.match(skill.copy.week_hint, /^If nothing sounds good, that's part of feeling low\./, "the anhedonia line, as at level 1");
   assert.deepEqual(values(w1, "more1"), ["enough", "more"], "stopping at one comes first");
   assert.deepEqual(M.followUpFor(ctx(), M.stepOf(skill, "week_1"), run([pick("wk1", "walk"), pick("day1", "day_after")], ctx(), w1)),
-    { type: "good_week_1", chip: "day_after" }, "the day books the card: the card is the plan");
+    { type: "good_week_one", chip: "day_after" }, "the day books the card: the card is the plan");
   const w2 = run([pick("wk1", "walk"), pick("day1", "tomorrow"), pick("more1", "more"), next], ctx(), w1);
   assert.equal(w2.stepId, "week_2");
   assert.ok(!values(w2, "wk2").includes("walk"), "a good thing picked already isn't offered again");
@@ -278,7 +279,7 @@ test("plan the week: up to three good things, a day each, a card each; never one
 test("good_week cards: one per slot, the evening of the day, content-free, each reopening its own step", () => {
   const at = new Date(2026, 10, 13, 10, 0);
   for (const n of [1, 2, 3]) {
-    const t = spine.followUpTypes.find((x) => x.id === `good_week_${n}`);
+    const t = spine.followUpTypes.find((x) => x.id === `good_week_${WORD[n]}`);
     assert.equal(t.deepLinkTemplate, `/tool/good-things?run={sourceSessionId}&at=back_w${n}&followUp={followUpId}`);
     assert.doesNotMatch(`${t.copy.title} ${t.copy.body}`, /\d|walk|song|monday|tuesday/i, "never names the thing or the day");
     for (const [chip, day, h] of [["evening", 13, 20], ["tomorrow", 14, 18], ["day_after", 15, 18], ["few_days", 16, 18], ["this_week", 19, 18]]) {
@@ -286,11 +287,11 @@ test("good_week cards: one per slot, the evening of the day, content-free, each 
       assert.deepEqual([due.getDate(), due.getHours()], [day, h], `${n} ${chip}`);
     }
     assert.doesNotMatch(t.copy.body, /today/i, "a card can sit on Today after its day");
-    assert.match(readFileSync("functions/src/spine/toolSession.ts", "utf8"), new RegExp(`OPEN_RESOLVES = \\[[^\\]]*'good_week_${n}'`));
-    assert.match(readFileSync("functions/src/spine/copeAheadAfter.ts", "utf8"), new RegExp(`good_week_${n}: 'good-things'`));
+    assert.match(readFileSync("functions/src/spine/toolSession.ts", "utf8"), new RegExp(`OPEN_RESOLVES = \\[[^\\]]*'good_week_${WORD[n]}'`));
+    assert.match(readFileSync("functions/src/spine/copeAheadAfter.ts", "utf8"), new RegExp(`good_week_${WORD[n]}: 'good-things'`));
   }
   assert.ok(readFileSync("functions/src/spine/validation.ts", "utf8").includes("'day_after'"), "the server accepts the day chip");
-  const bodies = [1, 2, 3].map((n) => spine.followUpTypes.find((x) => x.id === `good_week_${n}`).copy.body);
+  const bodies = [1, 2, 3].map((n) => spine.followUpTypes.find((x) => x.id === `good_week_${WORD[n]}`).copy.body);
   assert.equal(new Set(bodies).size, 3, "three on one evening aren't identical");
 });
 
