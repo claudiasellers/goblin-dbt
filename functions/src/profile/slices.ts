@@ -14,15 +14,17 @@ import { metaFrom } from './meta';
 import { PERSON_RISK, PERSON_SAFE, planContacts } from './kinds';
 import { PROFILE_NEEDS, type ProfileConsumer, type ProfileSlices, type SliceId } from './types';
 
-/** The Cypher each resolver runs (params: $uid). Reserved slices have none. */
 /** Words everywhere: own words come first once there are this many distinct ones (PRD ER-10 part 3), and at most this many. */
 export const OWN_WORDS_MIN = 5;
 export const OWN_WORDS_MAX = 12;
 
+/** The Cypher each resolver runs (params: $uid). Reserved slices have none. */
 export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
   // The person's words (ER-10 part 3): FOUND_WORD, the log aggregate of accepted words, read here for ordering only
-  // (never pre-selected, never a node of the log). Most used first, then most recent.
+  // (never pre-selected, never a node of the log). Most used first, then most recent. A safety-screen word
+  // (`Emotion.safetyScreen`: worthless, empty, despair, …) is never moved up: it keeps its place on the square.
   ownWords: `MATCH (:User {id: $uid})-[w:FOUND_WORD]->(e:Emotion)
+    WHERE coalesce(e.safetyScreen, false) = false
     WITH e.id AS id, coalesce(w.count, 0) AS n, w.lastAt AS lastAt ORDER BY n DESC, lastAt DESC
     WITH collect(id) AS ids
     RETURN CASE WHEN size(ids) >= ${OWN_WORDS_MIN} THEN ids[0..${OWN_WORDS_MAX}] ELSE [] END AS ids`,

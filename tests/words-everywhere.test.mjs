@@ -37,6 +37,7 @@ test("the ownWords slice: FOUND_WORD only (no log node), most used first, nothin
   assert.match(q, /CASE WHEN size\(ids\) >= 5 THEN ids\[0\.\.12\] ELSE \[\] END AS ids/);
   assert.equal(slices.OWN_WORDS_MIN, 5, "the PRD's *once they have five*");
   assert.doesNotMatch(q, /:LogRecord\b|:CheckIn\b|:ToolSession\b|FOUND\]/, "the aggregate edge, never the records or their FOUND edges");
+  assert.match(q, /WHERE coalesce\(e\.safetyScreen, false\) = false/, "a safety-screen word is never moved up");
   assert.deepEqual([...types.PROFILE_NEEDS.checkin], ["patterns", "ownWords"]);
   assert.deepEqual([...types.PROFILE_NEEDS["find-the-feeling"]], ["name", "parts", "ownWords"]);
   for (const [consumer, needs] of Object.entries(types.PROFILE_NEEDS)) {
@@ -44,19 +45,23 @@ test("the ownWords slice: FOUND_WORD only (no log node), most used first, nothin
   }
 });
 
-test("the check-in's word list: own words near the touch lead, most used first; far ones stay put; none is a no-op", () => {
+test("the check-in's word list: up to three near own words lead, nearest first; far ones stay put; none is a no-op", () => {
   const ranked = square.wordsNear({ x: 0.85, y: 0.85 });
   const ids = ranked.map((e) => e.id);
-  const near = [ids[9], ids[3]];
   const far = ids[ids.length - 1];
-  const got = square.ownWordsFirst(ranked, [far, ...near]).map((e) => e.id);
-  assert.deepEqual(got.slice(0, 2), near, "near own words first, in the slice's order (most used first)");
+  const got = square.ownWordsFirst(ranked, [far, ids[9], ids[3]]).map((e) => e.id);
+  assert.deepEqual(got.slice(0, 2), [ids[3], ids[9]], "near own words first, nearest first");
   assert.equal(got.length, ids.length);
   assert.equal(got.indexOf(far), ids.indexOf(far), "an own word far from the touch keeps its place: the square decides");
-  assert.deepEqual(got.slice(2), ids.filter((x) => !near.includes(x)), "the rest keep their distance order");
+  assert.deepEqual(got.slice(2), ids.filter((x) => ![ids[3], ids[9]].includes(x)), "the rest keep their distance order");
+  const many = square.ownWordsFirst(ranked, [ids[12], ids[10], ids[8], ids[6], ids[4]]).map((e) => e.id);
+  assert.deepEqual(many.slice(0, 4), [ids[8], ids[10], ids[12], ids[0]], "the three most used lead, then the nearest word");
   assert.deepEqual(square.ownWordsFirst(ranked, []).map((e) => e.id), ids);
   assert.equal(square.OWN_WORDS_WINDOW, 16, "two pages of the word list");
-  assert.match(readFileSync("src/components/checkin/WordPick.tsx", "utf8"), /ownWordsFirst\(wordsNear\(point\), ownWords\)/);
+  assert.equal(square.OWN_WORDS_LEAD, 3);
+  const pick = readFileSync("src/components/checkin/WordPick.tsx", "utf8");
+  assert.match(pick, /const \[own\] = useState\(ownWords\);/, "taken when the list opens: a late slice never reshuffles");
+  assert.match(pick, /ownWordsFirst\(wordsNear\(point\), own\)/);
   const checkInSrc = readFileSync("src/pages/CheckIn.tsx", "utf8");
   assert.match(checkInSrc, /useProfileContext\('checkin'\)\.slices\?\.ownWords/);
   assert.match(checkInSrc, /setCountedWordIds\(emotion && r\.toolSessionId \? \[emotion\.id\] : \[\]\)/,
@@ -105,12 +110,15 @@ test("the feeling card link: the first named word with a card (a DBT parent); no
   assert.equal(guide.feelingCardWord([], parentOf), null);
 });
 
-test("the link sits under the check-in results (not beside a crisis banner) and on Find the feeling's last screen", () => {
+test("the link sits under the check-in results, never after a safety visit, beside a banner or note, or flooded", () => {
   for (const f of ["src/components/checkin/StateResult.tsx", "src/components/checkin/LowEnergyStateResult.tsx"]) {
     const src = readFileSync(f, "utf8");
-    assert.match(src, /\{!has\('crisis_banner'\) && \(\s+<FeelingCardLink /, f);
+    assert.match(src, /\{!quietCard && !has\('crisis_banner'\) && !has\('clinical_note'\) && result\.routing\?\.band !== 'flooded' && \(\s+<FeelingCardLink className="mb-4" /, f);
     assert.match(src, /state=\{\(word\) => fromCheckIn\(checkInId, \[word\], pattern\.id\)\}/, f);
   }
+  const checkIn = readFileSync("src/pages/CheckIn.tsx", "utf8");
+  assert.equal(checkIn.match(/quietCard=\{safetyCheckId != null \|\| safetyPeople\}/g)?.length, 2, "both result screens");
+  assert.match(readFileSync("src/services/neo4j.ts", "utf8"), /m\.getOppositeActionPickerContent\(\)/, "preloaded with the check-in");
   const ftfPage = readFileSync("src/pages/tools/FindTheFeeling.tsx", "utf8");
   assert.match(ftfPage, /state\.wordAccepted && state\.word && \(\s+<FeelingCardLink emotionIds=\{\[state\.word\]\}/);
   const link = readFileSync("src/components/checkin/FeelingCardLink.tsx", "utf8");

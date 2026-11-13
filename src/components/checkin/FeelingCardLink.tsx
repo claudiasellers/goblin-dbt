@@ -7,7 +7,7 @@ import { getOppositeActionPickerContent } from '../../services/oppositeActionPic
 /**
  * The feeling card after naming (ER-10 part 3, docs/design/emotion-guide.md): a quiet link under a result, never a
  * screen of its own (the card is one tap away; nothing is added before help). Shown only for a word that has a card;
- * the word goes in as the carried word, so the card opens on it.
+ * the word goes in as the carried word, so Know this feeling offers it first.
  */
 export function FeelingCardLink({ emotionIds, state, onOpen, className = '' }: {
   emotionIds: readonly string[];

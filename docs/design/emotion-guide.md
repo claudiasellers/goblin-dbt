@@ -190,18 +190,24 @@ There is no way yet to remove a single word from My words.
 Claudia via the coordinator (13 Nov): the recommended option for both of the PRD's open points.
 
 - **Own words first.** The `ownWords` slice (`functions/src/profile/slices.ts`) reads `FOUND_WORD`: the person's
-  words, most used first, at most 12, and nothing until there are five (the PRD's *once they have five*). It is the
+  words, most used first, at most 12, and nothing until there are five (the PRD's *once they have five*). A
+  safety-screen word (`Emotion.safetyScreen`: worthless, empty, despair, numb, helpless, powerless) is never in it: it
+  keeps its place on the square (a clinician may revisit; it is the conservative default). It is the
   one slice that reads a log aggregate, for ordering only: nothing is pre-selected, and no log record or `FOUND` edge
   is read. Check the Facts' build decision 1 (curated chips, not most-used words) stands for its own chips.
   - The check-in's word list (`ownWordsFirst` in `src/lib/feelingSquare.ts`): an own word among the 16 words nearest
-    the touch leads, most used first; one far from the touch keeps its place, so the square still decides.
+    the touch can lead, at most three (the most used), nearest first, so most of page one is still the nearest words;
+    one far from the touch keeps its place, so the square still decides. The order is taken when the list opens: a
+    slice that arrives later never reshuffles the chips.
   - Find the feeling's offers (`rankFamilies`' `own`): an own word among a family's two nearest is offered first in
     that family; the family order stays the shape's or sound's. The flow takes the words as the word step opens, so
     the offer can't shift under the person.
 - **The card after naming, on tap.** *Get to know “{word}”* (`FeelingCardLink`), a quiet link under the check-in's
-  result (both screens, never beside a crisis banner) and on Find the feeling's last screen, for the first named word
-  with a card (one of the nine DBT parents in Do the Opposite's picker content). Nothing is added before help; the
-  card opens on the word. The pleasant result keeps Good things.
+  result (both screens) and on Find the feeling's last screen, for the first named word with a card (one of the nine
+  DBT parents in Do the Opposite's picker content). Never after a safety route visit this check-in (any answer), beside
+  its people card, a crisis banner or a clinical note, or on a flooded result (the engine keeps those to the body).
+  Nothing is added before help; the word is carried, so Know this feeling offers it first (it is not pre-selected).
+  The pleasant result keeps Good things.
 
 ## Departures from the PRD
 

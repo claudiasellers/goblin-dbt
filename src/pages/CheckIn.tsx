@@ -880,6 +880,7 @@ export function CheckIn() {
               checkinEmotions={checkInData.emotions}
               band={capacity?.value ?? null}
               emotionIds={emotionIdsFor(checkInData.emotions, knownEmotionIds)}
+              quietCard={safetyCheckId != null || safetyPeople}
               witness={witness}
             />
           ) : (
@@ -896,6 +897,7 @@ export function CheckIn() {
               checkinEmotions={checkInData.emotions}
               band={capacity?.value ?? null}
               emotionIds={emotionIdsFor(checkInData.emotions, knownEmotionIds)}
+              quietCard={safetyCheckId != null || safetyPeople}
               witness={witness}
             />
           )

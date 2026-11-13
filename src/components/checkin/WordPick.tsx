@@ -35,6 +35,8 @@ const NO_WORDS: readonly string[] = [];
  */
 export function WordPick({ spots, active, onToggleWord, onRemoveWord, onContinue, continuing = false, onMovePoint, onAddSpot, onNoneFit, onHelpNow, ownWords = NO_WORDS }: WordPickProps) {
   const [shown, setShown] = useState(PAGE);
+  // Own words as they were when the list opened: a slice that lands later never reshuffles chips under a finger.
+  const [own] = useState(ownWords);
   const spot = spots[active];
   const point = spot.point as SquarePoint;
   const everyWord = allWords(spots);
@@ -42,8 +44,8 @@ export function WordPick({ spots, active, onToggleWord, onRemoveWord, onContinue
 
   const ranked = useMemo(() => {
     const elsewhere = elsewhereKey.split('|');
-    return ownWordsFirst(wordsNear(point), ownWords).map((e) => e.name).filter((n) => !elsewhere.includes(n));
-  }, [point, elsewhereKey, ownWords]);
+    return ownWordsFirst(wordsNear(point), own).map((e) => e.name).filter((n) => !elsewhere.includes(n));
+  }, [point, elsewhereKey, own]);
   const words = useMemo(() => {
     const near = ranked.slice(0, shown);
     // Words picked from the related row stay visible even when they are not near the point.

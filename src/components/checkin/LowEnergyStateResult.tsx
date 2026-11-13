@@ -28,6 +28,8 @@ interface LowEnergyStateResultProps {
   band?: Band | null;
   /** Graph ids of the check-in's words (the beat's family / word match). */
   emotionIds?: string[];
+  /** The safety route ran this visit (any answer) or its people card shows: no feeling card link (ER-10 part 3). */
+  quietCard?: boolean;
   /** The witness beat's log (A5-3): the host queues recordWitnessBeat until the check-in is saved. */
   witness?: WitnessHandlers;
 }
@@ -52,6 +54,7 @@ export function LowEnergyStateResult({
   onToolOpen,
   band,
   emotionIds,
+  quietCard = false,
   witness,
 }: LowEnergyStateResultProps) {
   const { pattern, safetyFlag, coOccurrence, guidedActivity } = result;
@@ -229,9 +232,10 @@ export function LowEnergyStateResult({
         </div>
       )}
 
-      {/* The feeling card after naming (ER-10 part 3): one quiet link; not beside a crisis banner */}
-      {!has('crisis_banner') && (
-        <FeelingCardLink className="mb-4 text-sm" emotionIds={emotionIds ?? []} onOpen={() => onToolOpen?.('emotion-guide')}
+      {/* The feeling card after naming (ER-10 part 3): one quiet link, never a screen before help; never after a safety
+          visit, beside a crisis banner or clinical note, or on a flooded result */}
+      {!quietCard && !has('crisis_banner') && !has('clinical_note') && result.routing?.band !== 'flooded' && (
+        <FeelingCardLink className="mb-4" emotionIds={emotionIds ?? []} onOpen={() => onToolOpen?.('emotion-guide')}
           state={(word) => fromCheckIn(checkInId, [word], pattern.id)} />
       )}
 
