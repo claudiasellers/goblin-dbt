@@ -235,7 +235,7 @@ STEPS += [
         "offers": [
             {"exit": "safety_open", "when": {"any": [HURT, DANGER]}},
             {"exit": "ending_careful", "when": DANGER},
-            {"exit": "emotion_guide", "when": {"all": [NAMED, {"not": DANGER}]}},
+            {"exit": "emotion_guide", "when": {"all": [NAMED, {"not": {"any": [DANGER, HURT]}}]}},
             # Questioning a story while a self-harm pull may be live is the wrong next step (Gate 3).
             {"exit": "check_the_facts", "when": {"all": [{"set": a("mind")}, {"not": {"any": [DANGER, HURT]}}]}},
             {"exit": "cope_ahead", "when": {"not": {"any": [DANGER, HURT]}}},

@@ -129,10 +129,12 @@ test("Hurt myself: the resources first and are you safe?; not sure → someone t
   assert.equal(s.stepId, "before", "the walk goes on from the urge");
   while (s.stepId !== "mind") s = M.runNext(c, s, next);
   s = M.runNext(c, s, pick("mind", "mind_cant_cope"));
+  while (s.stepId !== "name") s = M.runNext(c, s, next);
+  s = M.runNext(c, s, pick("name", "frustrated"));
   while (s.stepId !== "end") s = M.runNext(c, s, s.stepId === "strip" ? read : next);
   assert.equal(M.crisisFor(c, step(s), s)?.variant, "crisis");
   assert.match(line(s), /talk to someone now/);
-  assert.deepEqual(offers(s), ["safety_open"], "no story check, no plan, while the pull may be live");
+  assert.deepEqual(offers(s), ["safety_open"], "no feeling card, no story check, no plan, while the pull may be live (Codex, #127)");
 });
 
 test("both dangers: the other_person banner (it lists 988 too), one line naming both, no second Talk link", () => {

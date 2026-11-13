@@ -104,7 +104,7 @@ Safety:
 - *Hurt myself* among the urges does what every sibling with that pull does: the resources open over the next screen
   first (`safetyFirst`), then *Are you safe right now?* *Not sure* or *No* goes straight to someone to talk to and
   Done; *safe for now* goes on with the walk, the crisis banner on every screen after. The end says *talk to someone
-  now* and offers only that (no story check or plan while the pull may be live).
+  now* and offers only that (no feeling card, story check or plan while the pull may be live, even with a guess named).
 - Both: the `other_person` banner (it lists 988 too) and one line naming both.
 - *This is bringing it back* (First, the body) beside *Talk to someone now* on every slot: a way out mid-walk.
 - *Talk to someone now* on every screen, as a link or, where it's the way on, the offer itself. No close, no keep, no follow-up: the episode is the run (`ext.run`).
