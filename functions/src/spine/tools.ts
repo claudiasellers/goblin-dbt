@@ -64,6 +64,7 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   // Know this feeling (ER-10, docs/design/emotion-guide.md): no close question; a card and a closer word aren't a
   // state change to rate.
   'emotion-guide': { module: 'er', closeKind: 'none' },
+  'mindfulness-emotions': { module: 'er', closeKind: 'regulation_down' },
   // These ask their own questions inside their flows; the spine adds none (PR-S4 wraps them).
   'opposite-action': { module: 'er', closeKind: 'regulation_down' },
   'dear-man': { module: 'ie', closeKind: 'none' },

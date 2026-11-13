@@ -82,7 +82,7 @@ test("nothing stood out: all seven answered no ends on the none card, which offe
 test("each fix offers its PRD move: planned tools are written and never shown", () => {
   const at = (check, value) => run([...upTo(check), pick(check, value), next]);
   assert.deepEqual(at("body", "body_yes").offered, ["please"], "Running low (ER-07, built 12 Nov)");
-  assert.deepEqual(at("fit", "fit_yes").offered, ["problem_solve", "let_it_be"]);
+  assert.deepEqual(at("fit", "fit_yes").offered, ["problem_solve", "mindfulness_emotions", "let_it_be"], "Let it be a wave (ER-08, built 13 Nov)");
   assert.deepEqual(at("way", "way_part").offered, [], "the line is the move: retry the same skill, smaller and all the way");
   assert.deepEqual(at("env", "env_get_out").offered, ["problem_solve"]);
   assert.deepEqual(at("will", "will_not").offered, ["let_it_be"], "Let it be (DT-04, built 11 Nov)");
@@ -97,8 +97,8 @@ test("each fix offers its PRD move: planned tools are written and never shown", 
   assert.match(M.handoffLine(ctx(), M.stepOf(skill, "fix_belief"), ownFix), /talk to someone now\.$/);
   assert.equal(M.handoffLine(ctx(), M.stepOf(skill, "fix_belief"), run([...upTo("belief"), pick("belief", "myth_past_it"), next])), skill.copy.fix_belief);
   const planned = skill.exits.filter((x) => x.planned).map((x) => x.toolId).sort();
-  assert.deepEqual(planned, ["mindfulness-emotions", "missing-links"]);
-  // It fits: the situation, or making room for it (the wave planned, Let it be built), as Check the Facts' verdict table does.
+  assert.deepEqual(planned, ["missing-links"]);
+  // It fits: the situation, or making room for it (the wave and Let it be, both built), as Check the Facts' verdict table does.
   assert.deepEqual(M.stepOf(skill, "fix_fit").offers.map((o) => o.exit), ["problem_solve", "mindfulness_emotions", "let_it_be"]);
   assert.ok(!JSON.stringify(skill.exits).includes("cool-down"), "no cold-water exit");
 });

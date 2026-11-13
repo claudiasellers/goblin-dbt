@@ -36,6 +36,9 @@ VERSION = "mj-v1"
 OWN_MAX = 36  # an activity, or a label, in their words (short: the record keeps every own-words field)
 
 COPY = {
+    # Two names this close on one card read as the same tool twice (Gate 2, ER-08): each says what it does.
+    "wave_offer": "Let the feeling rise and fall",
+    "let_it_be_offer": "Make room for what happened",
     "what_title": "What would help right now?",
     "what_hint": "Each one comes back to it, so nothing's pushed away for good.",
     # A carried flooded reading (PRD: DT-01 first, then level-0 find tasks only).
@@ -113,7 +116,8 @@ COPY = {
     "repark_hint": "It's okay to wait. If it keeps coming back, someone can look at it with you.",
     "reopen_change": "Then let's look at what can be done.",
     "reopen_facts": "Checking the facts can show how big it is now.",
-    "reopen_cant": "Then the fight with it can ease. Let it be is for that.",
+    # ER-08 (ER-B5): what the lid put away while flooded comes back here when steady (PRD ER-08, containment).
+    "reopen_cant": "Then the fight with it can ease. You can let the situation be, or let the feeling rise and fall.",
     "reopen_gone": "Then it can go. You opened it, and that's enough.",
     "reopen_skip": "Then it can go. You came back to check, and that's enough.",
     # A carried flooded reading when the reopen card is opened: the body first, or back on the shelf.
@@ -361,14 +365,16 @@ STEPS = [
              *[{"when": {"eq": [a("can_do"), v]}, "key": f"reopen_{v}"} for v in ("change", "facts", "cant", "gone")]],
             [{"exit": "problem_solve", "when": {"eq": [a("can_do"), "change"]}},
              {"exit": "check_the_facts", "when": {"eq": [a("can_do"), "facts"]}},
-             {"exit": "let_it_be", "when": {"eq": [a("can_do"), "cant"]}}]),
+             {"exit": "let_it_be", "when": {"eq": [a("can_do"), "cant"]}},
+             {"exit": "mindfulness_emotions", "when": {"eq": [a("can_do"), "cant"]}}]),
 ]
 
 EXITS = [
     {"id": "problem_solve", "toolId": "problem-solve"},                  # ER-12: something can be done
     {"id": "dear_man", "toolId": "dear-man"},                            # IE-01: it's about someone
     {"id": "check_the_facts", "toolId": "check-the-facts"},              # ER-02: not as big as it felt
-    {"id": "let_it_be", "toolId": "let-it-be"},                          # DT-04: it can't be changed
+    {"id": "let_it_be", "toolId": "let-it-be", "label": "let_it_be_offer"},                          # DT-04: it can't be changed
+    {"id": "mindfulness_emotions", "toolId": "mindfulness-emotions", "label": "wave_offer"},    # ER-08: the feeling it brings, rising and falling
     {"id": "cool_down", "toolId": "cool-down"},                          # DT-01 First, the body
     {"id": "safety_open", "toolId": None, "safety": True},               # safety.open (R6)
     {"id": "done", "done": True},

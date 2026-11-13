@@ -24,6 +24,7 @@ export const PLAYER_TOOLS: Readonly<Record<string, string>> = {
   'habit-plan': 'habit_plan',
   'please-skill': 'please_skill',
   'good-things': 'good_things',
+  'mindfulness-emotions': 'mindfulness_emotions',
   'values-clarification': 'values',
   'build-mastery': 'build_mastery',
   'finding-connection': 'finding_connection',

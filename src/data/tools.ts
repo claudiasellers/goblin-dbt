@@ -325,6 +325,19 @@ export const tools: Tool[] = [
       { key: 'myths', name: 'Beliefs about feelings', tagline: 'Look at a belief that makes feelings harder', emoji: '🪞', query: 'frame=myths' },
     ],
   },
+  {
+    // ER-08 on the skill runtime (docs/design/mindfulness-emotions.md): mindfulness of current emotion; savouring for
+    // a good feeling.
+    id: 'mindfulness-emotions',
+    name: 'Let it be a wave',
+    tagline: 'Let a feeling rise and fall without fighting it',
+    description: 'Name the feeling, find where it sits in your body, and watch it rise and fall without pushing it away or holding on. For a good feeling, let it be here without needing it to last.',
+    whenToUse: 'When a feeling fits and can\'t be fixed right now, and you\'re fighting it. Or when something good is here and you can\'t let yourself have it.',
+    module: 'emotion-regulation',
+    dbtBasis: 'Mindfulness of current emotion (DBT ER Handout 22)',
+    emoji: '🫧',
+    bare: true,
+  },
   // Interpersonal Effectiveness
   {
     id: 'dear-man',
@@ -521,6 +534,7 @@ export const allIntents: Intent[] = [
   { id: 'find-good', label: 'Find something good', toolId: 'good-things', emoji: '🌼' },
   { id: 'what-matters', label: 'Work out what matters to me', toolId: 'values-clarification', emoji: '🧭' },
   { id: 'one-thing', label: 'Get one thing done', toolId: 'build-mastery', emoji: '🪜' },
+  { id: 'let-feeling-be', label: 'Let a feeling be', toolId: 'mindfulness-emotions', emoji: '🫧' },
   { id: 'know-feeling', label: 'Get to know a feeling', toolId: 'emotion-guide', emoji: '🔎' },
   { id: 'feeling-wave', label: 'Look back at a feeling, start to finish', toolId: 'emotion-guide', query: 'frame=wave', emoji: '🌊' },
   { id: 'feeling-myths', label: 'A belief about feelings is in the way', toolId: 'emotion-guide', query: 'frame=myths', emoji: '🪞' },

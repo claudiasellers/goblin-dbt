@@ -122,6 +122,7 @@ test("tags (WMP-04 v0 side, skillKind, direction) on the 13 app-tool concepts; D
     give: ["change", "relational", "neutral"], "finding-connection": ["change", "relational", "up"],
     "mindfulness-of-others": ["both", "relational", "neutral"],
     "rehearse": ["change", "relational", "neutral"],
+    "mindfulness-emotions": ["acceptance", "hold", "neutral"],
   });
   for (const id of Object.keys(tags)) assert.ok(toolIds.includes(id), id);
 });

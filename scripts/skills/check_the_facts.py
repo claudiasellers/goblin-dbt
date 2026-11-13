@@ -33,9 +33,11 @@ COPY = {
     # Inline in Do the Opposite (ER-B5), which asked *does it fit?* already: this is the closer look, not the same question.
     "fits_title_inline": "Now, with what happened in mind, does one of these match?",
     "inline_back": "Leave the check here",
-    "next_fits": "When a feeling fits, the move is to work on the situation.",
+    "next_fits": "When a feeling fits, the move is to work on the situation. If it can't change yet, you can make room for the feeling, or for what happened.",
     "next_partly": "The feeling makes sense, and it's turned up loud. Bring the volume down, then work on what's left.",
-    "next_no": "The feeling is bigger than the facts. Acting opposite to its urge helps it settle.",
+    "next_no": "The feeling is bigger than the facts. Acting opposite to its urge helps it settle. Or you can let it rise and fall.",
+    "wave_offer": "Let the feeling rise and fall",
+    "let_it_be_offer": "Make room for what happened",
     "next_unsure": "That's all right. Sometimes the facts come later.",
     "own_hint": "Say it your way",
     "not_sure": "Not sure",
@@ -269,7 +271,7 @@ STEPS = [
             {"exit": "opposite_action", "when": {"in": [a("fits"), ["partly", "doesnt_fit"]]}},
             {"exit": "problem_solve", "when": FITS_IS("partly")},
             {"exit": "wise_mind", "when": FITS_IS("unsure")},
-            # v1.1: it fits and can't be changed today → the wave (ER-08, planned until it ships) or let it be
+            # v1.1: it fits and can't be changed today → the wave (ER-08, built 13 Nov 2026) or let it be
             # (DT-04, built 11 Nov 2026); doesn't fit with no urge to act on → the wave.
             {"exit": "mindfulness_emotions", "when": FITS_IS("fits")},
             {"exit": "let_it_be", "when": FITS_IS("fits")},
@@ -294,8 +296,8 @@ EXITS = [
     {"id": "opposite_action", "toolId": "opposite-action", "carry": ["feel"]},
     {"id": "wise_mind", "toolId": "wise-mind", "query": {"first": "wm_q_next"}},
     {"id": "cope_ahead", "toolId": "cope-ahead", "query": {"situationId": "other"}},
-    {"id": "mindfulness_emotions", "toolId": "mindfulness-emotions", "planned": True},  # ER-08 (ER-B5)
-    {"id": "let_it_be", "toolId": "let-it-be"},                        # DT-04 (DT-B4)
+    {"id": "mindfulness_emotions", "toolId": "mindfulness-emotions", "carry": ["feel"], "label": "wave_offer"},  # ER-08 Let it be a wave (ER-B5)
+    {"id": "let_it_be", "toolId": "let-it-be", "label": "let_it_be_offer"},                        # DT-04 (DT-B4)
     {"id": "safety_open", "safety": True},                                              # safety.open (R6)
     {"id": "done", "done": True},
 ]

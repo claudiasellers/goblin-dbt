@@ -89,7 +89,8 @@ COPY = {
     # *Punish yourself*: never "worth keeping" or "acting on it" (Gate 3). The crisis banner stays on screen.
     "pun_title": "The pull to punish yourself deserves care",
     "pun_line": "You don't have to act on it. If something needs making right, there are kinder ways to do it.",
-    "keep_line": "Want help acting on it well?",
+    "keep_line": "Want help acting on it well, or a minute with the feeling first?",
+    "wave_offer": "A minute with the feeling",
 
     "help_title_any": "If you follow this urge, will it help?",
     "clar_title": "It may be serving a different goal",
@@ -339,7 +340,7 @@ STEPS = [
     },
     handoff("keep", "keep_title", [{"when": ALWAYS, "key": "keep_line"}],
             [{"exit": "problem_solve", "when": ALWAYS}, {"exit": "dear_man", "when": ALWAYS},
-             {"exit": "ride", "when": ALWAYS}]),
+             {"exit": "ride", "when": ALWAYS}, {"exit": "wave", "when": ALWAYS}]),
     {
         # The parent's fit statements above the verdict (Check the Facts' list); the full check is a quiet link.
         "id": "fits", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "title": by_parent("fits_title"),
@@ -553,6 +554,7 @@ EXITS = [
     {"id": "cool_down", "toolId": "cool-down"},                                    # too big: down first (DT-01)
     {"id": "dear_man", "toolId": "dear-man"},                                      # keep it, a boundary (IE-01)
     {"id": "fast", "toolId": "fast"},                                              # a boundary (IE-05)
+    {"id": "wave", "toolId": "mindfulness-emotions", "carry": ["feel"], "label": "wave_offer"},           # keep it, let it be here (ER-08)
     {"id": "ride", "toolId": "urge-surfing"},                                      # keep it, ride the urge (DT-05)
     {"id": "pause", "toolId": "pause"},                                            # not safe, not sure (DT-02)
     {"id": "ending", "toolId": "ending-relationships", "query": {"frame": "careful"}},  # danger from someone (IE-08)

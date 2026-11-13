@@ -1495,6 +1495,18 @@ SET model_of_emotions += {
 };
 
 
+// ER Handout 22 (PRD ER-08): mindfulness of current emotion, letting a feeling rise and fall without blocking or
+// amplifying it; Let it be a wave (docs/design/mindfulness-emotions.md).
+MERGE (current_emotion:TherapyConcept {id: "dbt_mindfulness_current_emotion"})
+SET current_emotion += {
+  name: "Mindfulness of Current Emotion",
+  description: "Letting a feeling be as big as it is, noticing it in the body as it rises and falls, without pushing it away or holding on to it",
+  modality: "DBT",
+  module: "Emotion Regulation",
+  skill_type: "emotion_acceptance"
+};
+
+
 // ER Handouts 17-18 (PRD ER-09): values and priorities; What matters to me (docs/design/values.md).
 MERGE (values_priorities:TherapyConcept {id: "dbt_values_priorities"})
 SET values_priorities += {

@@ -919,6 +919,21 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { ke
  * reopens picks up, so it holds only when that run reopened. When it didn't (too old, another version, a failed
  * read), the fresh run starts without it and is a whole first visit, never one that thinks it was reopened.
  */
+/**
+ * The context a reopened run plays in: the visit's own recorded context (`run.ctx`: the frame, person, part, situation
+ * or urge it was made in) over what the reopening link carries, so the run's answers are read in the frame they were
+ * given in. A follow-up's link carries only `run`, `at` and `followUp`: without this, a plan made on Problem Solve's
+ * repair frame lost its repair-only picks when *How did it go?* reopened it (Codex, #133). `enterAt` belongs to the
+ * link that started the visit, never restored; only keys the skill accepts come back.
+ */
+export function ctxForResume(skill: SkillDef, ctxIn: Readonly<Record<string, string>>, rec: unknown): Readonly<Record<string, string>> {
+  const recCtx = rec && typeof rec === 'object' ? (rec as { ctx?: unknown }).ctx : null;
+  if (!recCtx || typeof recCtx !== 'object') return ctxIn;
+  const kept = contextIn(skill, Object.fromEntries(Object.entries(recCtx as Record<string, unknown>)
+    .filter(([k]) => k !== 'enterAt' && (RECORDED_CTX as readonly string[]).includes(k))));
+  return Object.keys(kept).length ? { ...ctxIn, ...kept } : ctxIn;
+}
+
 export function ctxAfterResume(ctxIn: Readonly<Record<string, string>>, reopened: boolean): Readonly<Record<string, string>> {
   if (reopened || !('enterAt' in ctxIn)) return ctxIn;
   return Object.fromEntries(Object.entries(ctxIn).filter(([k]) => k !== 'enterAt'));

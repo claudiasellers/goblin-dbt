@@ -525,6 +525,17 @@
    "direction": "neutral",
    "addresses": []
   },
+  "dbt_mindfulness_current_emotion": {
+   "appToolId": "mindfulness-emotions",
+   "name": "Mindfulness of Current Emotion",
+   "description": "Letting a feeling be as big as it is, noticing it in the body as it rises and falls, without pushing it away or holding on to it",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": "acceptance",
+   "skillKind": "hold",
+   "direction": "neutral",
+   "addresses": []
+  },
   "dbt_mindfulness_current_thoughts": {
    "appToolId": "thoughts-passing",
    "name": "Mindfulness of Current Thoughts",
@@ -4447,6 +4458,10 @@
  "contraindicated": [
   {
    "conceptId": "dbt_accepts",
+   "targetId": "dissociation_overmodulation"
+  },
+  {
+   "conceptId": "dbt_mindfulness_current_emotion",
    "targetId": "dissociation_overmodulation"
   },
   {

@@ -36,6 +36,7 @@ export const TOOL_CLOSE_KIND: Record<string, { module: SpineModule; closeKind: C
   'mindfulness-of-others': { module: 'ie', closeKind: 'none' },
   'rehearse': { module: 'ie', closeKind: 'regulation_down' },
   'emotion-guide': { module: 'er', closeKind: 'none' },
+  'mindfulness-emotions': { module: 'er', closeKind: 'regulation_down' },
   'opposite-action': { module: 'er', closeKind: 'regulation_down' },
   'dear-man': { module: 'ie', closeKind: 'none' },
   'fast': { module: 'ie', closeKind: 'regulation_down' },

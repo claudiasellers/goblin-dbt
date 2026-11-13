@@ -277,7 +277,7 @@ START_SMALL = {r["id"]: "yes" for rows in PS["subs"].values() for r in rows if r
 # --- Exits: every tool the content names. Unbuilt ones are planned: written, never offered or linked. ---
 BUILT = {"cool-down", "five-senses", "pause", "cope-ahead", "dear-man", "fast", "opposite-action", "check-the-facts",
          "find-the-feeling", "ending-relationships", "let-it-be", "please-skill", "give", "values-clarification", "build-mastery",
-         "finding-connection"}
+         "finding-connection", "mindfulness-emotions"}
 
 
 def exit_id(tool):
@@ -577,7 +577,9 @@ STEPS = [
             {"exit": "self_validate", "when": eq("$d.fit", "shame")},
             {"exit": "check_the_facts", "when": eq("$d.fit", "facts")},
             {"exit": "body_scan", "when": eq(a("feel"), "numb")},
-            {"exit": "mindfulness_emotions", "when": eq("$d.fit", "other")},
+            # The wave, never for a blank or far-away word (ER-08: those get grounding, not the wave).
+            {"exit": "mindfulness_emotions", "when": {"all": [eq("$d.fit", "other"),
+                                                               {"not": {"in": [a("feel"), ["numb", "empty", "apathetic", "indifferent"]]}}]}},
             {"exit": "find_the_feeling", "when": eq("$d.fit", "other")},
         ],
         "done": "done",
