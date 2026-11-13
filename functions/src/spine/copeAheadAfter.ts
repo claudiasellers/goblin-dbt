@@ -44,6 +44,9 @@ export const FOLLOW_UP_SESSION_TOOL: Readonly<Record<string, string>> = {
   // Running low's evening check (ER-B4): only from a Running low visit.
   please_fix: 'please-skill',
   good_thing: 'good-things',
+  good_week_one: 'good-things',
+  good_week_two: 'good-things',
+  good_week_three: 'good-things',
   value_step: 'values-clarification',
   mastery_step: 'build-mastery',
   reach_out_outcome: 'finding-connection',

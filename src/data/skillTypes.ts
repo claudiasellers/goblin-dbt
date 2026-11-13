@@ -97,6 +97,11 @@ export interface OptionsSource {
   /** Put this option first (never selected): a `$ctx.<key>` ref, e.g. Cope Ahead's `?first=`, or a derived `$d.<name>`. */
   firstFrom?: string;
   /**
+   * Leave out every option, the profile's included, whose value an earlier field picked (`$a.<field>.ids` refs): Good
+   * things' week plan never offers a thing twice. `where` filters the skill's own list only.
+   */
+  notIn?: string[];
+  /**
    * The person's own kept items from a profile slice (plan C3a R3), listed before `list`'s options, never
    * selected. The pick is the item's id; its label is what the person kept (shown, never recorded).
    */

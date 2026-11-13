@@ -155,20 +155,26 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
   // Good things (ER-04, docs/design/good-things.md): one thing the person likes, kept on *Keep it* (a found thing:
   // `kind`, the chip, or a few words) or *Add it* (a good thing that left them lighter: `pick`, a catalogue id or a few
   // words). The runtime's keep (R4: `<field>Ids` / `<field>Own`). Read back by the `thingsILike` slice, named there
-  // (own words, else the option's label from the graph), so the next visit can offer it first.
+  // (own words, else the option's label from the graph), so the next visit can offer it first. The week plan's
+  // `wk<n>Own` are listed too: the validator stores them as `pickOwn`, but listing them keeps every own-words field
+  // a keep can send under encryption should that mapping ever change (skill-contracts C2).
   thing_i_like: {
     kind: 'thing_i_like', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'my_words', slice: 'thingsILike',
-    owner: 'ER', many: true, maxItems: 60, editor: null, ownFields: ['kindOwn', 'pickOwn'],
+    owner: 'ER', many: true, maxItems: 60, editor: null, ownFields: ['kindOwn', 'pickOwn', 'wk1Own', 'wk2Own', 'wk3Own'],
     validate: (v) => {
       const o = obj(v);
       const out: Record<string, unknown> = {};
-      for (const f of ['kind', 'pick'] as const) {
+      // The week plan's good things (`wk1`–`wk3`, one field per slot) are picks like level 1's: stored as `pick`.
+      const fields = ['kind', 'pick', 'wk1', 'wk2', 'wk3'] as const;
+      if (fields.filter((f) => f !== 'kind' && (o[`${f}Ids`] !== undefined || o[`${f}Own`] !== undefined)).length > 1) throw new ValidationError('One pick');
+      for (const f of fields) {
+        const to = f === 'kind' ? 'kind' : 'pick';
         const ids = o[`${f}Ids`];
         const own = o[`${f}Own`];
-        if (ids !== undefined) out[`${f}Ids`] = strArray(ids, { max: 1, item: (x) => str(x, { max: 40, pattern: OPTION_ID }) });
-        if (own !== undefined) out[`${f}Own`] = str(own, { max: 40 });
+        if (ids !== undefined) out[`${to}Ids`] = strArray(ids, { max: 1, item: (x) => str(x, { max: 40, pattern: OPTION_ID }) });
+        if (own !== undefined) out[`${to}Own`] = str(own, { max: 40 });
       }
-      for (const k of Object.keys(o)) if (!/^(kind|pick)(Ids|Own)$/.test(k)) throw new ValidationError('Unexpected field');
+      for (const k of Object.keys(o)) if (!/^(kind|pick|wk[123])(Ids|Own)$/.test(k)) throw new ValidationError('Unexpected field');
       const has = (k: string) => (Array.isArray(out[`${k}Ids`]) && (out[`${k}Ids`] as string[]).length > 0) || (typeof out[`${k}Own`] === 'string' && (out[`${k}Own`] as string).trim() !== '');
       if (!has('kind') && !has('pick')) throw new ValidationError('Nothing to keep');
       return out;
