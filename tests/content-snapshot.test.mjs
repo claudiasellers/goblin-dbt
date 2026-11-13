@@ -138,7 +138,7 @@ test("shipped spine content: the close flow, and every non-reserved follow-up ty
   assert.ok(spine.closeFlow?.kinds && spine.closeFlow.skip && spine.closeFlow.saved);
   assert.ok(!("version" in spine.closeFlow), "the flow's own version is stripped, as getSpineContent does");
   const schema = readFileSync("schema/practice-spine.cypher", "utf8");
-  const types = [...schema.matchAll(/MERGE \(t:FollowUpType \{id: "([a-z_]+)"\}\)\nSET [^\n]*t\.reserved = (true|false)/g)];
+  const types = [...schema.matchAll(/MERGE \(t:FollowUpType \{id: "([a-z][a-z0-9_]*)"\}\)\nSET [^\n]*t\.reserved = (true|false)/g)];
   assert.ok(types.length >= 10, `${types.length} follow-up types read from the schema (guards the regex)`);
   const defined = [...new Set(types.filter(([, , r]) => r === "false").map(([, id]) => id))].sort();
   assert.deepEqual(spine.followUpTypes.map((t) => t.id), defined);

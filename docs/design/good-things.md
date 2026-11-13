@@ -1,6 +1,6 @@
 # Good things (ER-04)
 
-**Status:** part 1 built 12 Nov 2026 on the skill runtime (batch ER-B4 of [the modules plan](dbt-modules-plan.md), the
+**Status:** part 1 built 12 Nov 2026; level 2 (*Plan the week*) built 13 Nov 2026 on the skill runtime (batch ER-B4 of [the modules plan](dbt-modules-plan.md), the
 second of its three skills). Tool `good-things`, listed under Emotion Regulation with the Tools intent *Find something
 good*, on the existing concept `dbt_accumulate_positives` (`appToolId: 'good-things'`). Source:
 `scripts/skills/good_things.py`. Tests: `tests/skill-good-things.test.mjs`. New profile kind `thing_i_like` and its
@@ -48,6 +48,28 @@ reopens the run at `back` (R9 `reopens`, only on a run that reached `when`):
 | `not_today` | *That's okay. A smaller one tomorrow still counts. If energy's been low for a while, Running low looks at sleep, food and the body.* and Running low |
 
 *Talk to someone now* is on every screen.
+
+### Plan the week (level 2, part 2a, built 13 Nov 2026)
+
+*Plan a few for this week* on the start screen. Every level stays a choice from the start (no graduation yet).
+
+| Step | What the person sees |
+|---|---|
+| `week_1` | *Pick a good thing for this week.* (*Your own things are first. Pick something you'd actually do.*) The person's things I like, then the whole catalogue (the energy on the day isn't known yet), or own words; *Which day?* Tomorrow · The day after · In a few days · Later this week; *Another one?* Add another · That's enough for now. Next books `good_week_1` for that day: the card is the plan, so there's no separate yes |
+| `week_2`, `week_3` | *And another?* / *One more?*, the same, never offering a thing picked in an earlier slot. Three at most |
+| `picture` | *Pick one of them. Picture the best ten seconds of it.* A 10 s timed `holdRing` (*Where you are, what you can see and hear, the bit you'd like most.*) |
+| `week_set` | *Your good things this week: {wk1}, {wk2}, and {wk3}.* (or one, or two) *I'll check in on each day, in the evening. Doing it counts, whether or not you enjoy it.* |
+| `back_w1`–`back_w3` | The day's card reopens the run at its own step: *Your good thing for today: {wk<n>}.* *Did it happen?*, then the same `after`, keep and end cards as level 1 (`keep_more_w<n>` keeps `wk<n>`, stored as a pick) |
+
+**Cards.** `good_week_1`–`good_week_3` (*Your good thing*: *A good thing you planned for today. Did it happen?*, never
+naming it or the day): chips `tomorrow` / `day_after` / `few_days` / `this_week` at 18:00, 1, 2, 3 and 5 days on;
+stale after 24 h; opening resolves them; bound to `good-things`. One type per slot, as Give has one per reopens
+step, so no new deep-link variable. The server accepts the new `day_after` chip.
+
+**Runtime.** Each card's step clears every review answer (one reopened round is about one good thing), and a run
+reopened at any of them keeps the path up to the latest plan step (`skill-runtime.md`, `reopens`), so reviewing the
+second thing first never stops the first or third card from reopening. `thing_i_like` accepts `wk1`–`wk3` and stores
+them as `pick`, one at a time.
 
 ### The catalogue
 
@@ -98,7 +120,7 @@ skill's `profile_unnamed` copy, never its id or a raw `{slot}` (agreed with the 
 | PRD | Built | Why | Batch |
 |---|---|---|---|
 | Levels unlock by reps (level 1 after three kept items, level 2 after five completions with *lighter* twice, level 3 after ten), offered, never pushed | Every level is a choice from the start, level 0 first | Counting reps is a server read over past visits; the PRD's own rule is that every level stays reachable | ER-B4 part 2 |
-| Level 2: plan good things for the week (`weekPlanner`, one FollowUp each, the best ten seconds pictured) | Not built | Needs the `weekPlanner` embed | ER-B4 part 2 |
+| Level 2: plan good things for the week (`weekPlanner`, one FollowUp each, the best ten seconds pictured) | Built 13 Nov as three plan steps, no embed (see *Plan the week*) | Placing things on a week grid is more than the moment holds; a day chip per thing does the job | — |
 | Level 3: the directory as a mirror (by kind, times done, a *lighter* count, the monthly card at ten items) | Things I like is a plain list in Me | Counts on a kept thing move log → profile; they wait for part 2's yes | ER-B4 part 2 |
 | `PleasantActivity` nodes with `GOOD_FOR` edges; three shown, *show others* swaps modality | The catalogue is this skill's options (graph content through `skills.cypher`, each with its energy); one short list per energy | A skill's content lives in its options until a second reader needs the nodes | ER-B4 part 2 |
 | Level 0 only while the last three check-ins are Low drive or Shut down; numb prompts favour strong sensory input | One find prompt for everyone | Needs a read of past check-ins | ER-B4 part 2 |

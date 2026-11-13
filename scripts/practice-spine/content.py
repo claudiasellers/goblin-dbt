@@ -297,6 +297,48 @@ FOLLOW_UP_TYPES = [
         "choices": [{"id": "dismiss", "label": "Not today", "status": "dismissed"}],
         "notification": "Your good thing is ready to check.",
     },
+        # Good things' week plan (ER-04 level 2, docs/design/good-things.md *Plan the week*): one card per good thing
+        # planned, on its day, in the evening. One type per slot, like Give's two cards (one card reopens one step):
+        # each reopens the visit at its own `back_w<n>` (R9). Content-free: never names the thing or the day.
+    {
+        "id": "good_week_1", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/good-things?run={sourceSessionId}&at=back_w1&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
+                                             "day_after": {"kind": "at_local", "days": 2, "time": "18:00"},
+                                             "few_days": {"kind": "at_local", "days": 3, "time": "18:00"},
+                                             "this_week": {"kind": "at_local", "days": 5, "time": "18:00"}}},
+        "staleAfterHours": 24, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Your good thing", "body": "A good thing you planned for today. Did it happen?"},
+        "choices": [{"id": "dismiss", "label": "Not today", "status": "dismissed"}],
+        "notification": "Your good thing is ready to check.",
+    },
+    {
+        "id": "good_week_2", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/good-things?run={sourceSessionId}&at=back_w2&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
+                                             "day_after": {"kind": "at_local", "days": 2, "time": "18:00"},
+                                             "few_days": {"kind": "at_local", "days": 3, "time": "18:00"},
+                                             "this_week": {"kind": "at_local", "days": 5, "time": "18:00"}}},
+        "staleAfterHours": 24, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Your good thing", "body": "A good thing you planned for today. Did it happen?"},
+        "choices": [{"id": "dismiss", "label": "Not today", "status": "dismissed"}],
+        "notification": "Your good thing is ready to check.",
+    },
+    {
+        "id": "good_week_3", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/good-things?run={sourceSessionId}&at=back_w3&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
+                                             "day_after": {"kind": "at_local", "days": 2, "time": "18:00"},
+                                             "few_days": {"kind": "at_local", "days": 3, "time": "18:00"},
+                                             "this_week": {"kind": "at_local", "days": 5, "time": "18:00"}}},
+        "staleAfterHours": 24, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Your good thing", "body": "A good thing you planned for today. Did it happen?"},
+        "choices": [{"id": "dismiss", "label": "Not today", "status": "dismissed"}],
+        "notification": "Your good thing is ready to check.",
+    },
     {
         # Cope Ahead (docs/design/cope-ahead.md, "Today, afterwards"): on the keep screen's "Want me to ask how
         # it went?" Yes, for the time from screen 1 (the chip is ext.ca.when). Scheduled only on the caller's

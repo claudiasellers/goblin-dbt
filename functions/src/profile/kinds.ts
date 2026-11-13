@@ -162,13 +162,17 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
     validate: (v) => {
       const o = obj(v);
       const out: Record<string, unknown> = {};
-      for (const f of ['kind', 'pick'] as const) {
+      // The week plan's good things (`wk1`–`wk3`, one field per slot) are picks like level 1's: stored as `pick`.
+      const fields = ['kind', 'pick', 'wk1', 'wk2', 'wk3'] as const;
+      if (fields.filter((f) => f !== 'kind' && (o[`${f}Ids`] !== undefined || o[`${f}Own`] !== undefined)).length > 1) throw new ValidationError('One pick');
+      for (const f of fields) {
+        const to = f === 'kind' ? 'kind' : 'pick';
         const ids = o[`${f}Ids`];
         const own = o[`${f}Own`];
-        if (ids !== undefined) out[`${f}Ids`] = strArray(ids, { max: 1, item: (x) => str(x, { max: 40, pattern: OPTION_ID }) });
-        if (own !== undefined) out[`${f}Own`] = str(own, { max: 40 });
+        if (ids !== undefined) out[`${to}Ids`] = strArray(ids, { max: 1, item: (x) => str(x, { max: 40, pattern: OPTION_ID }) });
+        if (own !== undefined) out[`${to}Own`] = str(own, { max: 40 });
       }
-      for (const k of Object.keys(o)) if (!/^(kind|pick)(Ids|Own)$/.test(k)) throw new ValidationError('Unexpected field');
+      for (const k of Object.keys(o)) if (!/^(kind|pick|wk[123])(Ids|Own)$/.test(k)) throw new ValidationError('Unexpected field');
       const has = (k: string) => (Array.isArray(out[`${k}Ids`]) && (out[`${k}Ids`] as string[]).length > 0) || (typeof out[`${k}Own`] === 'string' && (out[`${k}Own`] as string).trim() !== '');
       if (!has('kind') && !has('pick')) throw new ValidationError('Nothing to keep');
       return out;

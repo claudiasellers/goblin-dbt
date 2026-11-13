@@ -854,9 +854,12 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { ke
   if (!reopened && asksFresh >= 0 && asksFresh < path.lastIndexOf(resumeEntry)) resumeEntry = path[asksFresh];
   const stepId = base(resumeEntry);
   // Reopened: the path up to where the plan was last made, so earlier review loops (whose answers the step clears)
-  // don't pile up, and the newest steps are the ones kept.
+  // don't pile up, and the newest steps are the ones kept. With several reopens steps on one path (Good things' week
+  // plan: a card per good thing, each reopening its own step), up to the latest plan any of them asks about, so
+  // reviewing the first never cuts the second's plan off the path (its card would then have nothing to reopen).
   // A re-entry step opened off the path is reached from the run's last step.
-  const upTo = reopened ? path.slice(0, Math.max(lastAt(reopensAt!.reopens!.after), 0) + 1)
+  const madeAt = Math.max(0, ...ctx.skill.steps.filter((st) => st.reopens).map((st) => lastAt(st.reopens!.after)));
+  const upTo = reopened ? path.slice(0, madeAt + 1)
     : reentry && stepId === at ? [...path, at] : path.slice(0, path.lastIndexOf(resumeEntry) + 1);
   // A step after the resume point will be asked again, and an answer read back there would be a pre-fill (a reminder
   // chip picked last time would schedule again unasked).

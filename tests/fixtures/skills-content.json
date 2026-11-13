@@ -26443,6 +26443,22 @@
     "no_title": "That's okay.",
     "no_line": "A smaller one tomorrow still counts.",
     "no_low": "If energy's been low for a while, Running low looks at sleep, food and the body.",
+    "week_title_1": "Pick a good thing for this week.",
+    "week_title_2": "And another?",
+    "week_title_3": "One more?",
+    "week_hint": "Your own things are first. Pick something you'd actually do.",
+    "day_label": "Which day?",
+    "more_label": "Another one?",
+    "picture_title": "Pick one of them. Picture the best ten seconds of it.",
+    "picture_label": "Start",
+    "picture_running": "Picturing it",
+    "picture_hint": "Where you are, what you can see and hear, the bit you'd like most.",
+    "picture_done": "That's the bit to look forward to.",
+    "week_set_title_1": "Your good thing this week: {wk1}.",
+    "week_set_title_2": "Your good things this week: {wk1}, and {wk2}.",
+    "week_set_title_3": "Your good things this week: {wk1}, {wk2}, and {wk3}.",
+    "week_set_line": "I'll check in on each day, in the evening. Doing it counts, whether or not you enjoy it.",
+    "back_w_title": "Your good thing for today: {pick}.",
     "keep_primary": "Next",
     "safety_open": "Talk to someone now",
     "next": "Next",
@@ -26536,6 +26552,15 @@
        }
       },
       {
+       "to": "week_1",
+       "when": {
+        "eq": [
+         "$a.start",
+         "week"
+        ]
+       }
+      },
+      {
        "to": "energy",
        "when": null
       }
@@ -26591,6 +26616,15 @@
         "eq": [
          "$a.start",
          "find"
+        ]
+       }
+      },
+      {
+       "to": "week_1",
+       "when": {
+        "eq": [
+         "$a.start",
+         "week"
         ]
        }
       },
@@ -27059,6 +27093,659 @@
      "offers": []
     },
     {
+     "id": "week_1",
+     "kind": "ask",
+     "title": "week_title_1",
+     "fields": [
+      {
+       "id": "wk1",
+       "options": {
+        "list": "activity",
+        "where": {
+         "all": [
+          {
+           "not": {
+            "has": [
+             "$p.thingsILikePicks.ids",
+             "$opt.value"
+            ]
+           }
+          }
+         ]
+        },
+        "profile": "thingsILike"
+       },
+       "max": 1,
+       "required": true,
+       "own": {
+        "hint": "pick_own",
+        "countsAsPick": true,
+        "max": 40
+       }
+      },
+      {
+       "id": "day1",
+       "options": {
+        "list": "day"
+       },
+       "max": 1,
+       "required": true,
+       "label": "day_label"
+      },
+      {
+       "id": "more1",
+       "options": {
+        "list": "more"
+       },
+       "max": 1,
+       "required": true,
+       "label": "more_label",
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "followUp": {
+      "type": "good_week_1",
+      "whenFrom": "day1"
+     },
+     "hint": "week_hint",
+     "next": [
+      {
+       "to": "week_2",
+       "when": {
+        "eq": [
+         "$a.more1",
+         "more"
+        ]
+       }
+      },
+      {
+       "to": "picture",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "week_2",
+     "kind": "ask",
+     "title": "week_title_2",
+     "fields": [
+      {
+       "id": "wk2",
+       "options": {
+        "list": "activity",
+        "where": {
+         "all": [
+          {
+           "not": {
+            "has": [
+             "$p.thingsILikePicks.ids",
+             "$opt.value"
+            ]
+           }
+          },
+          {
+           "not": {
+            "has": [
+             "$a.wk1.ids",
+             "$opt.value"
+            ]
+           }
+          }
+         ]
+        },
+        "profile": "thingsILike"
+       },
+       "max": 1,
+       "required": true,
+       "own": {
+        "hint": "pick_own",
+        "countsAsPick": true,
+        "max": 40
+       }
+      },
+      {
+       "id": "day2",
+       "options": {
+        "list": "day"
+       },
+       "max": 1,
+       "required": true,
+       "label": "day_label"
+      },
+      {
+       "id": "more2",
+       "options": {
+        "list": "more"
+       },
+       "max": 1,
+       "required": true,
+       "label": "more_label",
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "followUp": {
+      "type": "good_week_2",
+      "whenFrom": "day2"
+     },
+     "next": [
+      {
+       "to": "week_3",
+       "when": {
+        "eq": [
+         "$a.more2",
+         "more"
+        ]
+       }
+      },
+      {
+       "to": "picture",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "week_3",
+     "kind": "ask",
+     "title": "week_title_3",
+     "fields": [
+      {
+       "id": "wk3",
+       "options": {
+        "list": "activity",
+        "where": {
+         "all": [
+          {
+           "not": {
+            "has": [
+             "$p.thingsILikePicks.ids",
+             "$opt.value"
+            ]
+           }
+          },
+          {
+           "not": {
+            "has": [
+             "$a.wk1.ids",
+             "$opt.value"
+            ]
+           }
+          },
+          {
+           "not": {
+            "has": [
+             "$a.wk2.ids",
+             "$opt.value"
+            ]
+           }
+          }
+         ]
+        },
+        "profile": "thingsILike"
+       },
+       "max": 1,
+       "required": true,
+       "own": {
+        "hint": "pick_own",
+        "countsAsPick": true,
+        "max": 40
+       }
+      },
+      {
+       "id": "day3",
+       "options": {
+        "list": "day"
+       },
+       "max": 1,
+       "required": true,
+       "label": "day_label",
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "followUp": {
+      "type": "good_week_3",
+      "whenFrom": "day3"
+     },
+     "next": [
+      {
+       "to": "picture",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "picture",
+     "kind": "embed",
+     "embed": "holdRing",
+     "answerAs": "picture",
+     "title": "picture_title",
+     "props": {
+      "variant": "timed",
+      "seconds": 10,
+      "label": "picture_label",
+      "runningLabel": "picture_running",
+      "hint": "picture_hint",
+      "doneLabel": "picture_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "week_set",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "week_set",
+     "kind": "handoff",
+     "complete": true,
+     "title": [
+      {
+       "when": {
+        "set": "$a.wk3"
+       },
+       "key": "week_set_title_3"
+      },
+      {
+       "when": {
+        "set": "$a.wk2"
+       },
+       "key": "week_set_title_2"
+      },
+      {
+       "key": "week_set_title_1"
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "week_set_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "titleSlots": {
+      "wk1": {
+       "labelOf": "wk1"
+      },
+      "wk2": {
+       "labelOf": "wk2"
+      },
+      "wk3": {
+       "labelOf": "wk3"
+      }
+     },
+     "next": [],
+     "offers": []
+    },
+    {
+     "id": "back_w1",
+     "kind": "ask",
+     "title": "back_w_title",
+     "fields": [
+      {
+       "id": "hap1",
+       "options": {
+        "list": "happened"
+       },
+       "max": 1,
+       "required": true,
+       "label": "happened_label",
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "reopens": {
+      "after": "week_1"
+     },
+     "clears": [
+      "happened",
+      "compared",
+      "mind",
+      "keep_more",
+      "hap1",
+      "hap2",
+      "hap3",
+      "km1",
+      "km2",
+      "km3"
+     ],
+     "titleSlots": {
+      "pick": {
+       "labelOf": "wk1"
+      }
+     },
+     "next": [
+      {
+       "to": "not_today",
+       "when": {
+        "eq": [
+         "$a.hap1",
+         "no"
+        ]
+       }
+      },
+      {
+       "to": "after",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "back_w2",
+     "kind": "ask",
+     "title": "back_w_title",
+     "fields": [
+      {
+       "id": "hap2",
+       "options": {
+        "list": "happened"
+       },
+       "max": 1,
+       "required": true,
+       "label": "happened_label",
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "reopens": {
+      "after": "week_2"
+     },
+     "clears": [
+      "happened",
+      "compared",
+      "mind",
+      "keep_more",
+      "hap1",
+      "hap2",
+      "hap3",
+      "km1",
+      "km2",
+      "km3"
+     ],
+     "titleSlots": {
+      "pick": {
+       "labelOf": "wk2"
+      }
+     },
+     "next": [
+      {
+       "to": "not_today",
+       "when": {
+        "eq": [
+         "$a.hap2",
+         "no"
+        ]
+       }
+      },
+      {
+       "to": "after",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "back_w3",
+     "kind": "ask",
+     "title": "back_w_title",
+     "fields": [
+      {
+       "id": "hap3",
+       "options": {
+        "list": "happened"
+       },
+       "max": 1,
+       "required": true,
+       "label": "happened_label",
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "reopens": {
+      "after": "week_3"
+     },
+     "clears": [
+      "happened",
+      "compared",
+      "mind",
+      "keep_more",
+      "hap1",
+      "hap2",
+      "hap3",
+      "km1",
+      "km2",
+      "km3"
+     ],
+     "titleSlots": {
+      "pick": {
+       "labelOf": "wk3"
+      }
+     },
+     "next": [
+      {
+       "to": "not_today",
+       "when": {
+        "eq": [
+         "$a.hap3",
+         "no"
+        ]
+       }
+      },
+      {
+       "to": "after",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "keep_more_w1",
+     "kind": "ask",
+     "title": "keep_more_title",
+     "fields": [
+      {
+       "id": "km1",
+       "options": {
+        "list": "keep_more"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "keep": {
+      "kind": "thing_i_like",
+      "many": true,
+      "when": {
+       "eq": [
+        "$a.km1",
+        "keep"
+       ]
+      },
+      "from": [
+       "wk1"
+      ]
+     },
+     "primary": "keep_primary",
+     "hint": "keep_more_hint",
+     "next": [
+      {
+       "to": "after_end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "keep_more_w2",
+     "kind": "ask",
+     "title": "keep_more_title",
+     "fields": [
+      {
+       "id": "km2",
+       "options": {
+        "list": "keep_more"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "keep": {
+      "kind": "thing_i_like",
+      "many": true,
+      "when": {
+       "eq": [
+        "$a.km2",
+        "keep"
+       ]
+      },
+      "from": [
+       "wk2"
+      ]
+     },
+     "primary": "keep_primary",
+     "hint": "keep_more_hint",
+     "next": [
+      {
+       "to": "after_end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "keep_more_w3",
+     "kind": "ask",
+     "title": "keep_more_title",
+     "fields": [
+      {
+       "id": "km3",
+       "options": {
+        "list": "keep_more"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "keep": {
+      "kind": "thing_i_like",
+      "many": true,
+      "when": {
+       "eq": [
+        "$a.km3",
+        "keep"
+       ]
+      },
+      "from": [
+       "wk3"
+      ]
+     },
+     "primary": "keep_primary",
+     "hint": "keep_more_hint",
+     "next": [
+      {
+       "to": "after_end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
      "id": "back",
      "kind": "ask",
      "title": "back_title",
@@ -27089,7 +27776,13 @@
       "happened",
       "compared",
       "mind",
-      "keep_more"
+      "keep_more",
+      "hap1",
+      "hap2",
+      "hap3",
+      "km1",
+      "km2",
+      "km3"
      ],
      "titleSlots": {
       "pick": {
@@ -27157,6 +27850,9 @@
           ]
          },
          {
+          "set": "$a.happened"
+         },
+         {
           "set": "$a.pick.ids"
          },
          {
@@ -27172,6 +27868,117 @@
              "has": [
               "$p.thingsILikePicks.ids",
               "$a.pick"
+             ]
+            }
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "to": "keep_more_w1",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.compared",
+           "lighter"
+          ]
+         },
+         {
+          "set": "$a.hap1"
+         },
+         {
+          "set": "$a.wk1.ids"
+         },
+         {
+          "not": {
+           "any": [
+            {
+             "has": [
+              "$p.thingsILike.ids",
+              "$a.wk1"
+             ]
+            },
+            {
+             "has": [
+              "$p.thingsILikePicks.ids",
+              "$a.wk1"
+             ]
+            }
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "to": "keep_more_w2",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.compared",
+           "lighter"
+          ]
+         },
+         {
+          "set": "$a.hap2"
+         },
+         {
+          "set": "$a.wk2.ids"
+         },
+         {
+          "not": {
+           "any": [
+            {
+             "has": [
+              "$p.thingsILike.ids",
+              "$a.wk2"
+             ]
+            },
+            {
+             "has": [
+              "$p.thingsILikePicks.ids",
+              "$a.wk2"
+             ]
+            }
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "to": "keep_more_w3",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.compared",
+           "lighter"
+          ]
+         },
+         {
+          "set": "$a.hap3"
+         },
+         {
+          "set": "$a.wk3.ids"
+         },
+         {
+          "not": {
+           "any": [
+            {
+             "has": [
+              "$p.thingsILike.ids",
+              "$a.wk3"
+             ]
+            },
+            {
+             "has": [
+              "$p.thingsILikePicks.ids",
+              "$a.wk3"
              ]
             }
            ]
@@ -27214,9 +28021,31 @@
       "kind": "thing_i_like",
       "many": true,
       "when": {
-       "eq": [
-        "$a.keep_more",
-        "keep"
+       "any": [
+        {
+         "eq": [
+          "$a.keep_more",
+          "keep"
+         ]
+        },
+        {
+         "eq": [
+          "$a.km1",
+          "keep"
+         ]
+        },
+        {
+         "eq": [
+          "$a.km2",
+          "keep"
+         ]
+        },
+        {
+         "eq": [
+          "$a.km3",
+          "keep"
+         ]
+        }
        ]
       },
       "from": [
@@ -27241,9 +28070,31 @@
      "lines": [
       {
        "when": {
-        "eq": [
-         "$a.keep_more",
-         "keep"
+        "any": [
+         {
+          "eq": [
+           "$a.keep_more",
+           "keep"
+          ]
+         },
+         {
+          "eq": [
+           "$a.km1",
+           "keep"
+          ]
+         },
+         {
+          "eq": [
+           "$a.km2",
+           "keep"
+          ]
+         },
+         {
+          "eq": [
+           "$a.km3",
+           "keep"
+          ]
+         }
         ]
        },
        "key": "after_kept"
@@ -27401,6 +28252,10 @@
      {
       "value": "one",
       "label": "Pick one good thing for today"
+     },
+     {
+      "value": "week",
+      "label": "Plan a few for this week"
      }
     ],
     "heads_up": [
@@ -27637,6 +28492,34 @@
      {
       "value": "not_now",
       "label": "Not this time"
+     }
+    ],
+    "day": [
+     {
+      "value": "tomorrow",
+      "label": "Tomorrow"
+     },
+     {
+      "value": "day_after",
+      "label": "The day after"
+     },
+     {
+      "value": "few_days",
+      "label": "In a few days"
+     },
+     {
+      "value": "this_week",
+      "label": "Later this week"
+     }
+    ],
+    "more": [
+     {
+      "value": "more",
+      "label": "Add another"
+     },
+     {
+      "value": "enough",
+      "label": "That's enough for now"
      }
     ]
    }

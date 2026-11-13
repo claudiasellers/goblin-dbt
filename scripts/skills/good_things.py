@@ -32,7 +32,7 @@ in a directory of things I like, built slowly.
 
 Departures from the PRD (docs/design/good-things.md lists them with the batch that picks each up): no graduation
 rule (every level is a choice from the start, level 0 first; counting reps needs a server read); level 2 (plan the
-week, `weekPlanner`) and level 3 (the directory as a mirror, the monthly card) are part 2; `timesDone` /
+week) is three plan steps, a `good_week_<n>` card each reopening `back_w<n>` (no `weekPlanner` embed); level 3 (the directory as a mirror, the monthly card) are part 2; `timesDone` /
 `lighterCount` on a kept thing wait for part 2's yes; the catalogue is this skill's options (graph content through
 skills.cypher, each with its `energy`), not `PleasantActivity` nodes with `GOOD_FOR` edges; three shown with
 *show others* is one short list per energy; `micro-win` stays the low-energy result's guided activity.
@@ -109,6 +109,23 @@ COPY = {
     "no_title": "That's okay.",
     "no_line": "A smaller one tomorrow still counts.",
     "no_low": "If energy's been low for a while, Running low looks at sleep, food and the body.",
+    # Level 2 (PRD: plan good things for the week, one card each, the best ten seconds pictured).
+    "week_title_1": "Pick a good thing for this week.",
+    "week_title_2": "And another?",
+    "week_title_3": "One more?",
+    "week_hint": "Your own things are first. Pick something you'd actually do.",
+    "day_label": "Which day?",
+    "more_label": "Another one?",
+    "picture_title": "Pick one of them. Picture the best ten seconds of it.",
+    "picture_label": "Start",
+    "picture_running": "Picturing it",
+    "picture_hint": "Where you are, what you can see and hear, the bit you'd like most.",
+    "picture_done": "That's the bit to look forward to.",
+    "week_set_title_1": "Your good thing this week: {wk1}.",
+    "week_set_title_2": "Your good things this week: {wk1}, and {wk2}.",
+    "week_set_title_3": "Your good things this week: {wk1}, {wk2}, and {wk3}.",
+    "week_set_line": "I'll check in on each day, in the evening. Doing it counts, whether or not you enjoy it.",
+    "back_w_title": "Your good thing for today: {pick}.",
     "keep_primary": "Next",
     "safety_open": "Talk to someone now",
     "next": "Next",
@@ -133,13 +150,14 @@ HEAVIER = {"eq": [a("compared"), "heavier"]}
 FROM_KEPT = {"any": [{"has": ["$p.thingsILike.ids", a("pick")]}, {"has": ["$p.thingsILikePicks.ids", a("pick")]}]}
 # A catalogue thing already kept shows once, as the person's own (first), not again in the catalogue.
 NOT_KEPT = {"not": {"has": ["$p.thingsILikePicks.ids", "$opt.value"]}}
-KEPT_MORE = {"eq": [a("keep_more"), "keep"]}
+KEPT_MORE = {"any": [{"eq": [a(f), "keep"]} for f in ("keep_more", "km1", "km2", "km3")]}
 
 # Where to start. `savour` only from a pleasant check-in (`frames`), first.
 STARTS = [
     ("savour", "Stay with this good moment", {"savour": True}),
     ("find", "Find one okay thing around me", {}),
     ("one", "Pick one good thing for today", {}),
+    ("week", "Plan a few for this week", {}),
 ]
 HEADS_UP = [("settle", "Look after the next few minutes first"), ("try", "Try it anyway")]
 # What it was (PRD level 0's chip labels), read in Things I like as the item's name when there are no own words.
@@ -186,6 +204,12 @@ HAPPENED = [("yes", "Yes"), ("partly", "Partly"), ("no", "Not today")]
 COMPARED = [("lighter", "Lighter"), ("same", "About the same"), ("heavier", "Heavier")]
 MIND = [("here", "Mostly here"), ("partly", "Partly"), ("elsewhere", "Somewhere else")]
 KEEP_MORE = [("keep", "Add it"), ("not_now", "Not this time")]
+# Level 2: the good_week_<n> cards' chips, the evening of that day.
+DAYS = [("tomorrow", "Tomorrow"), ("day_after", "The day after"), ("few_days", "In a few days"), ("this_week", "Later this week")]
+MORE = [("more", "Add another"), ("enough", "That's enough for now")]
+SLOTS = (1, 2, 3)
+# Every review answer, cleared by each card's step: a reopened run is one round, about one good thing.
+REVIEW = ["happened", "compared", "mind", "keep_more", *[f"hap{n}" for n in SLOTS], *[f"km{n}" for n in SLOTS]]
 
 
 def ask(sid, title, hint, fields, nxt, **extra):
@@ -217,7 +241,38 @@ def handoff(sid, title, lines, offers, *, no_close=False, **extra):
 FROM_SAVOUR = {"any": [{"not": {"eq": ["$opt.savour", True]}}, {"eq": [a("start"), "savour"]}]}
 
 BY_START = [{"when": {"eq": [a("start"), "savour"]}, "to": "stay"}, {"when": {"eq": [a("start"), "find"]}, "to": "find"},
-            {"to": "energy"}]
+            {"when": {"eq": [a("start"), "week"]}, "to": "week_1"}, {"to": "energy"}]
+
+
+def kept_already(f):
+    """A pick from Things I like, or a catalogue thing kept before."""
+    return {"any": [{"has": ["$p.thingsILike.ids", a(f)]}, {"has": ["$p.thingsILikePicks.ids", a(f)]}]}
+
+
+def week_step(n):
+    # One good thing and its day; the step books that day's card (always: the card is the plan). Never one picked
+    # in an earlier slot.
+    earlier = [{"not": {"has": [f"$a.wk{m}.ids", "$opt.value"]}} for m in SLOTS if m < n]
+    fields = [field(f"wk{n}", "activity", own="pick_own", where={"all": [NOT_KEPT, *earlier]}, profile="thingsILike"),
+              field(f"day{n}", "day", label="day_label")]
+    if n < 3:
+        fields.append(field(f"more{n}", "more", label="more_label"))
+    nxt = [{"when": {"eq": [a(f"more{n}"), "more"]}, "to": f"week_{n + 1}"}] if n < 3 else []
+    return ask(f"week_{n}", f"week_title_{n}", "week_hint" if n == 1 else None, fields, [*nxt, {"to": "picture"}],
+               followUp={"type": f"good_week_{n}", "whenFrom": f"day{n}"})
+
+
+def back_week(n):
+    # The good_week_<n> card reopens the run here (R9), on a run that planned slot n.
+    return ask(f"back_w{n}", "back_w_title", None, [field(f"hap{n}", "happened", label="happened_label")],
+               [{"when": {"eq": [a(f"hap{n}"), "no"]}, "to": "not_today"}, {"to": "after"}],
+               reopens={"after": f"week_{n}"}, clears=REVIEW, titleSlots={"pick": {"labelOf": f"wk{n}"}})
+
+
+def keep_more_week(n):
+    return ask(f"keep_more_w{n}", "keep_more_title", "keep_more_hint", [field(f"km{n}", "keep_more")], [{"to": "after_end"}],
+               keep={"kind": "thing_i_like", "many": True, "when": {"eq": [a(f"km{n}"), "keep"]}, "from": [f"wk{n}"]},
+               primary="keep_primary")
 
 STEPS = [
     ask("start", [{"when": SAVOUR, "key": "start_title_savour"}, {"key": "start_title"}], "start_hint",
@@ -254,15 +309,31 @@ STEPS = [
         followUp={"type": "good_thing", "whenFrom": "when", "when": {"eq": [a("remind"), "yes"]}}),
     handoff("set", "set_title", [{"when": {"eq": [a("remind"), "yes"]}, "key": "set_remind"}, {"when": ALWAYS, "key": "set_line"}],
             [], titleSlots={"pick": {"labelOf": "pick"}}),
+    # --- Level 2: plan the week, up to three good things, a card each ---
+    *[week_step(n) for n in SLOTS],
+    {"id": "picture", "kind": "embed", "embed": "holdRing", "answerAs": "picture", "title": "picture_title",
+     "props": {"variant": "timed", "seconds": 10, "label": "picture_label", "runningLabel": "picture_running",
+               "hint": "picture_hint", "doneLabel": "picture_done", "next": "next"},
+     "links": [SAFETY_LINK], "next": [{"to": "week_set"}]},
+    handoff("week_set", [{"when": {"set": a("wk3")}, "key": "week_set_title_3"}, {"when": {"set": a("wk2")}, "key": "week_set_title_2"},
+                         {"key": "week_set_title_1"}],
+            [{"when": ALWAYS, "key": "week_set_line"}], [],
+            titleSlots={f"wk{n}": {"labelOf": f"wk{n}"} for n in SLOTS}),
+    *[back_week(n) for n in SLOTS],
+    *[keep_more_week(n) for n in SLOTS],
     # --- The good_thing card reopens the run here (R9), on a run that reached `when` ---
     ask("back", "back_title", None, [field("happened", "happened", label="happened_label")],
         [{"when": {"eq": [a("happened"), "no"]}, "to": "not_today"}, {"to": "after"}],
-        reopens={"after": "when"}, clears=["happened", "compared", "mind", "keep_more"],
+        reopens={"after": "when"}, clears=REVIEW,
         titleSlots={"pick": {"labelOf": "pick"}}),
     ask("after", "after_title", None,
         [field("compared", "compared"), field("mind", "mind", required=False, label="mind_label")],
         # Not for own words until CORE's target behaviours can check them (an own pick could be anything).
-        [{"when": {"all": [LIGHTER, {"set": a("pick") + ".ids"}, {"not": FROM_KEPT}]}, "to": "keep_more"}, {"to": "after_end"}]),
+        [{"when": {"all": [LIGHTER, {"set": a("happened")}, {"set": a("pick") + ".ids"}, {"not": FROM_KEPT}]}, "to": "keep_more"},
+         # The week's: the card's slot is the one whose answer is set (each card's step clears the others').
+         *[{"when": {"all": [LIGHTER, {"set": a(f"hap{n}")}, {"set": a(f"wk{n}") + ".ids"}, {"not": kept_already(f"wk{n}")}]},
+            "to": f"keep_more_w{n}"} for n in SLOTS],
+         {"to": "after_end"}]),
     ask("keep_more", "keep_more_title", "keep_more_hint", [field("keep_more", "keep_more")], [{"to": "after_end"}],
         keep={"kind": "thing_i_like", "many": True, "when": KEPT_MORE, "from": ["pick"]}, primary="keep_primary"),
     handoff("after_end", "after_end_title", [
@@ -297,6 +368,8 @@ def options():
     out += [("compared", v, label, {}, None) for v, label in COMPARED]
     out += [("mind", v, label, {}, None) for v, label in MIND]
     out += [("keep_more", v, label, {}, None) for v, label in KEEP_MORE]
+    out += [("day", v, label, {}, None) for v, label in DAYS]
+    out += [("more", v, label, {}, None) for v, label in MORE]
     return out
 
 
