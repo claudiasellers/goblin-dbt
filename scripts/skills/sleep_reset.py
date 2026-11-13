@@ -88,8 +88,8 @@ COPY = {
     "keep_label": "Keep this wake time in Me?",
     "wake_primary": "Next",
     "plan_title": "Up at {wake}, every day.",
-    "plan_remind": "A morning check will be on Today. Caffeine after midday and alcohol at night both break sleep up. If sleep's been bad for weeks, a doctor can help.",
-    "plan_line": "Caffeine after midday and alcohol at night both break sleep up. On a night you can't sleep, open Sleep Reset again. If sleep's been bad for weeks, a doctor can help.",
+    "plan_remind": "A check-in will be on Today when you get up. Caffeine in the hours before sleep and alcohol close to bedtime both break sleep up. If sleep's been bad for weeks, a doctor can help.",
+    "plan_line": "Caffeine in the hours before sleep and alcohol close to bedtime both break sleep up. When you can't sleep, open Sleep Reset again. If sleep's been bad for weeks, a doctor can help.",
     # The morning card reopens the run here.
     "morning_title": "Morning. How was the night?",
     "morning_title_shift": "You're up. How was your sleep?",
@@ -99,9 +99,9 @@ COPY = {
     "again_title": "A late start doesn't undo the reset.",
     "again_label": "Same again tomorrow?",
     "morning_end_title": "That's the reset.",
-    "morning_barely": "A short night is hard. A nap can make tonight harder; if you need one, keep it short and early, and don't drive drowsy. Barely sleeping and full of energy, not tired? Tell your doctor soon.",
+    "morning_barely": "A short night is hard. A nap can make your next sleep harder; if you need one, keep it short and well before it, and don't drive drowsy. Barely sleeping and full of energy, not tired? Tell your doctor soon.",
     "morning_broken": "Broken nights add up. If it's been weeks, or there's loud snoring, gasping or restless legs, a doctor can help.",
-    "morning_not_yet": "Getting up now still helps. Light and moving tell your body it's morning.",
+    "morning_not_yet": "Getting up now still helps. Light and moving tell your body the day has started.",
     "morning_again_no": "One fixed time to get up, every day, is most of it. You can set it up again any time in Sleep Reset.",
     "morning_line": "One fixed time to get up, every day, is most of it.",
 }
@@ -137,7 +137,11 @@ CRISIS = [{"variant": "crisis", "when": ALWAYS}]
 UNSAFE = {"in": [a("safe"), ["not_sure", "no"]]}
 REST = {"eq": [a("up"), "rest"]}
 # A shift time shows once the person says their hours are different, or when it is the time they kept.
-SHIFT_WHERE = {"any": [{"not": {"eq": ["$opt.shift", "yes"]}}, {"set": a("hours")}, {"eq": ["$opt.value", KEPT_ANCHOR]}]}
+# The run's own pick stays too, so a reopened run keeps its time when the anchor has changed since (the renewal's time).
+SHIFT_WHERE = {"any": [{"not": {"eq": ["$opt.shift", "yes"]}}, {"set": a("hours")}, {"eq": ["$opt.value", KEPT_ANCHOR]},
+                       {"eq": ["$opt.value", a("wake")]}]}
+# The time picked is a shift time (tapped open or kept): the morning screen doesn't say morning.
+SHIFT_PICKED = {"some": ["wake", {"eq": ["$opt.shift", "yes"]}]}
 
 
 def field(fid, *, label=None, required=True, own=None, links=None, show=None, max_=1):
@@ -228,11 +232,11 @@ STEPS = [
     {
         "id": "wake", "kind": "ask", "title": [{"when": {"set": KEPT_ANCHOR}, "key": "wake_title_kept"}, {"key": "wake_title"}],
         "hint": "wake_hint",
-        "fields": [{**field("wake", links=[]), "options": {"list": "wake", "firstFrom": KEPT_ANCHOR, "where": SHIFT_WHERE}},
+        "fields": [{**field("wake"), "options": {"list": "wake", "firstFrom": KEPT_ANCHOR, "where": SHIFT_WHERE}},
                    # Night shifts and late starts: the rest of the day's hours, one tap away, nothing asked about work.
                    field("hours", required=False, links=[]),
                    # Asked only when the time isn't already the kept one; the chip is the yes (R4).
-                   field("keep", label="keep_label", required=False, show={"not": {"eq": [a("wake"), KEPT_ANCHOR]}})],
+                   field("keep", label="keep_label", required=False, links=[], show={"not": {"eq": [a("wake"), KEPT_ANCHOR]}})],
         # Kept on the yes chip (as Build mastery's I can; the button stays *Next*), or when the person picks the kept time
         # again: their tap answers *Still your time?*, so the anchor's confirmedAt and Me's revisit refresh.
         "keep": {"kind": "sleep_anchor", "many": False, "from": ["wake"],
@@ -254,7 +258,7 @@ STEPS = [
     {
         "id": "morning", "kind": "ask", "reopens": {"after": "wind", "again": ["again"]},
         "clears": ["slept", "up_at", "dream", "again"],
-        "title": [{"when": {"set": a("hours")}, "key": "morning_title_shift"}, {"key": "morning_title"}],
+        "title": [{"when": SHIFT_PICKED, "key": "morning_title_shift"}, {"key": "morning_title"}],
         "fields": [field("slept"), field("up_at", label="up_label", links=[]), field("dream", label="dream_label", required=False, links=[])],
         "next": [{"to": "again"}],
     },

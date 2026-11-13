@@ -63355,11 +63355,11 @@
           "mode_hint": "For tonight, or for the nights ahead.",
           "mode_title": "What do you need?",
           "morning_again_no": "One fixed time to get up, every day, is most of it. You can set it up again any time in Sleep Reset.",
-          "morning_barely": "A short night is hard. A nap can make tonight harder; if you need one, keep it short and early, and don't drive drowsy. Barely sleeping and full of energy, not tired? Tell your doctor soon.",
+          "morning_barely": "A short night is hard. A nap can make your next sleep harder; if you need one, keep it short and well before it, and don't drive drowsy. Barely sleeping and full of energy, not tired? Tell your doctor soon.",
           "morning_broken": "Broken nights add up. If it's been weeks, or there's loud snoring, gasping or restless legs, a doctor can help.",
           "morning_end_title": "That's the reset.",
           "morning_line": "One fixed time to get up, every day, is most of it.",
-          "morning_not_yet": "Getting up now still helps. Light and moving tell your body it's morning.",
+          "morning_not_yet": "Getting up now still helps. Light and moving tell your body the day has started.",
           "morning_title": "Morning. How was the night?",
           "next": "Next",
           "night_end_rest": "Eyes closed, phone face down. Resting still counts. If you start to stew, getting up for a bit helps.",
@@ -63371,8 +63371,8 @@
           "park_hint": "Name it and leave it for the morning. It'll keep.",
           "park_own": "In my words",
           "park_title": "Put it down for the night.",
-          "plan_line": "Caffeine after midday and alcohol at night both break sleep up. On a night you can't sleep, open Sleep Reset again. If sleep's been bad for weeks, a doctor can help.",
-          "plan_remind": "A morning check will be on Today. Caffeine after midday and alcohol at night both break sleep up. If sleep's been bad for weeks, a doctor can help.",
+          "plan_line": "Caffeine in the hours before sleep and alcohol close to bedtime both break sleep up. When you can't sleep, open Sleep Reset again. If sleep's been bad for weeks, a doctor can help.",
+          "plan_remind": "A check-in will be on Today when you get up. Caffeine in the hours before sleep and alcohol close to bedtime both break sleep up. If sleep's been bad for weeks, a doctor can help.",
           "plan_title": "Up at {wake}, every day.",
           "reach_line": "Someone is there to talk to, right now.",
           "reach_title": "You don't have to do this part alone.",
@@ -63957,7 +63957,15 @@
             "fields": [
               {
                 "id": "wake",
-                "links": [],
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
                 "max": 1,
                 "options": {
                   "list": "wake",
@@ -63980,6 +63988,12 @@
                           "$opt.value",
                           "$p.sleepAnchor"
                         ]
+                      },
+                      {
+                        "eq": [
+                          "$opt.value",
+                          "$a.wake"
+                        ]
                       }
                     ]
                   }
@@ -64000,15 +64014,7 @@
                   "list": "keep"
                 },
                 "max": 1,
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ],
+                "links": [],
                 "label": "keep_label",
                 "showWhen": {
                   "not": {
@@ -64207,7 +64213,15 @@
             "title": [
               {
                 "when": {
-                  "set": "$a.hours"
+                  "some": [
+                    "wake",
+                    {
+                      "eq": [
+                        "$opt.shift",
+                        "yes"
+                      ]
+                    }
+                  ]
                 },
                 "key": "morning_title_shift"
               },

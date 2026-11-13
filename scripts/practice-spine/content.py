@@ -199,16 +199,16 @@ FOLLOW_UP_TYPES = [
         "deepLinkTemplate": "/tool/sleep-reset?run={sourceSessionId}&at=morning&followUp={followUpId}",
         # Every wake time Sleep reset offers (its `WAKE`: the mornings by half hours, then shift and night
         # times by the hour), the next time it comes round; then the morning's renewal (*Same again
-        # tomorrow?*): tomorrow at the wake time, never the next clock time (a 6:00 answer for a 7:00 wake
-        # would book this morning again).
+        # tomorrow?*): the next wake time at least 12 hours on (a 6:00 answer for a 7:00 wake would book this
+        # morning again; a 0:30 answer for a 23:00 wake still books tonight, not the night after).
         "window": {"kind": "chip", "chips": {
             **{f"w{t}": {"kind": "next_local", "time": f"{t[:2]}:{t[2:]}"} for t in SLEEP_WAKE_TIMES},
-            **{f"n{t}": {"kind": "at_local", "days": 1, "time": f"{t[:2]}:{t[2:]}"} for t in SLEEP_WAKE_TIMES}}},
+            **{f"n{t}": {"kind": "next_local", "time": f"{t[:2]}:{t[2:]}", "minAheadHours": 12} for t in SLEEP_WAKE_TIMES}}},
         "staleAfterHours": 8, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
         "enabled": True,
-        "copy": {"title": "Morning check", "body": "From Sleep Reset. How was the night?"},
+        "copy": {"title": "Sleep check", "body": "From Sleep Reset. How was your sleep?"},
         "choices": [{"id": "dismiss", "label": "Not today", "status": "dismissed"}],
-        "notification": "Your morning check is ready.",
+        "notification": "Your sleep check is ready.",
     },
     {
         # What matters to me (ER-09, docs/design/values.md): the one small step for a value, checked when the person

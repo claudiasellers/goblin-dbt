@@ -1913,8 +1913,8 @@
         },
         "enabled": true,
         "copy": {
-          "body": "From Sleep Reset. How was the night?",
-          "title": "Morning check"
+          "body": "From Sleep Reset. How was your sleep?",
+          "title": "Sleep check"
         },
         "choices": [
           {
@@ -1926,143 +1926,143 @@
         "window": {
           "chips": {
             "n0000": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "00:00"
             },
             "n0100": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "01:00"
             },
             "n0200": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "02:00"
             },
             "n0300": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "03:00"
             },
             "n0400": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "04:00"
             },
             "n0500": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "05:00"
             },
             "n0600": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "06:00"
             },
             "n0630": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "06:30"
             },
             "n0700": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "07:00"
             },
             "n0730": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "07:30"
             },
             "n0800": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "08:00"
             },
             "n0830": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "08:30"
             },
             "n0900": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "09:00"
             },
             "n0930": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "09:30"
             },
             "n1000": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "10:00"
             },
             "n1100": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "11:00"
             },
             "n1200": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "12:00"
             },
             "n1300": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "13:00"
             },
             "n1400": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "14:00"
             },
             "n1500": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "15:00"
             },
             "n1600": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "16:00"
             },
             "n1700": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "17:00"
             },
             "n1800": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "18:00"
             },
             "n1900": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "19:00"
             },
             "n2000": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "20:00"
             },
             "n2100": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "21:00"
             },
             "n2200": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "22:00"
             },
             "n2300": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
+              "minAheadHours": 12,
               "time": "23:00"
             },
             "w0000": {
@@ -2180,7 +2180,7 @@
           },
           "kind": "chip"
         },
-        "notification": "Your morning check is ready."
+        "notification": "Your sleep check is ready."
       },
       {
         "id": "tool_outcome",

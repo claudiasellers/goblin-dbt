@@ -131,8 +131,8 @@ test("the plan: one wake time (the morning card's chips), one wind-down thing, t
   assert.deepEqual(skill.options.wake.map((o) => o.value).sort(), chips.filter((c) => c.startsWith("w")).sort(), "every wake time is a chip");
   assert.deepEqual(Object.values(step("again").followUp.whenMap).sort(), chips.filter((c) => c.startsWith("n")), "and each has its tomorrow chip");
   for (const [k, w] of Object.entries(ft.window.chips)) {
-    assert.equal(w.kind, k.startsWith("w") ? "next_local" : "at_local", `${k}: the plan books the next one, the renewal tomorrow`);
-    if (k.startsWith("n")) assert.equal(w.days, 1, k);
+    assert.equal(w.kind, "next_local", k);
+    if (k.startsWith("n")) assert.equal(w.minAheadHours, 12, `${k}: the renewal is the next one after a rest, never the one just gone`);
     assert.equal(w.time.replace(":", ""), k.slice(1), k);
   }
   // Wind-down: never food, drink or pills.
@@ -145,7 +145,7 @@ test("the plan: one wake time (the morning card's chips), one wind-down thing, t
   assert.equal(line(noRemind), "plan_line");
   for (const k of ["plan_remind", "plan_line"]) {
     assert.match(skill.copy[k], /a doctor can help/, `${k}: the referral line`);
-    assert.match(skill.copy[k], /Caffeine after midday and alcohol at night/, `${k}: H20b's substances`);
+    assert.match(skill.copy[k], /Caffeine in the hours before sleep and alcohol close to bedtime/, `${k}: H20b's substances`);
   }
   assert.match(skill.copy.wake_hint, /shifts/, "shift workers have a line");
 });
@@ -270,6 +270,9 @@ test("the anchor: kept on a yes, re-confirmed by picking it again, listed first 
   const moved = run([pick("wake", "w0800")], withAnchor, wake);
   assert.deepEqual(fieldIds(moved, withAnchor), ["wake", "hours", "keep"]);
   assert.equal(M.keepFor(withAnchor, step("wake"), moved), null);
+  // Talk to someone now on the always-shown time field, so it never hides with the keep chip (Codex on #139).
+  for (const [st, c] of [[first, ctx()], [same, withAnchor], [moved, withAnchor]])
+    assert.equal(M.shownFields(c, step("wake"), st).flatMap((f) => f.links ?? []).filter((l) => l.exit === "safety_open").length, 1);
   // The kind: one per person, My body, a wake id only, the same ids as the skill's times; on the tool's needs.
   const { PROFILE_KINDS, SLEEP_WAKE_IDS } = await importTs("functions/src/profile/kinds.ts");
   assert.deepEqual([...SLEEP_WAKE_IDS], skill.options.wake.map((o) => o.value), "the server's wake ids are the skill's");
@@ -310,15 +313,36 @@ test("shift hours: every other hour of the day one tap away; a kept shift time s
   const ft = spine.followUpTypes.find((x) => x.id === "sleep_morning");
   assert.deepEqual(ft.window.chips.w1400, { kind: "next_local", time: "14:00" });
   assert.equal(step("again").followUp.whenMap.w1400, "n1400");
-  assert.deepEqual(ft.window.chips.n1400, { days: 1, kind: "at_local", time: "14:00" });
+  assert.deepEqual(ft.window.chips.n1400, { kind: "next_local", minAheadHours: 12, time: "14:00" });
   const morning = { ...plan, stepId: "morning" };
   assert.equal(M.copyText(ctx(), step("morning").title, morning), skill.copy.morning_title_shift);
   assert.doesNotMatch(skill.copy.morning_title_shift, /morning|night/i);
+  // The title follows the time, not the tap: tapped open but 7:00 picked is a morning.
+  const early = run([pick("wake", "w0700")], ctx(), shift);
+  assert.equal(M.copyText(ctx(), step("morning").title, { ...early, stepId: "morning" }), skill.copy.morning_title);
+  // Nothing on the plan or morning cards assumes a night sleeper.
+  for (const k of ["plan_remind", "plan_line", "morning_barely", "morning_not_yet", "morning_title_shift"])
+    assert.doesNotMatch(skill.copy[k], /after midday|at night|tonight|it's morning|morning check|On a night/i, k);
+  assert.doesNotMatch(JSON.stringify(ft.copy) + ft.notification, /morning|night/i, "the Today card says sleep, not morning");
+  // The renewal: a 23:00 waker answering at 0:30 gets tonight's card, not the night after; a 7:00 waker answering at
+  // 6:50 gets tomorrow's, not this morning's.
+  const at = (y, mo, d, h, mi) => new Date(y, mo, d, h, mi);
+  assert.deepEqual(W.dueAtFor(ft.window, at(2026, 10, 14, 0, 30), "n2300"), at(2026, 10, 14, 23, 0));
+  assert.deepEqual(W.dueAtFor(ft.window, at(2026, 10, 14, 23, 10), "n2300"), at(2026, 10, 15, 23, 0));
+  assert.deepEqual(W.dueAtFor(ft.window, at(2026, 10, 14, 6, 50), "n0700"), at(2026, 10, 15, 7, 0));
+  assert.deepEqual(W.dueAtFor(ft.window, at(2026, 10, 14, 9, 0), "n0700"), at(2026, 10, 15, 7, 0));
   // A kept shift time is listed first next time without the tap, the other shift hours still behind it.
   const withAnchor = { ...ctx(), profile: { sleepAnchor: "w2200" } };
   const back = shown(toWake(withAnchor), withAnchor);
   assert.equal(back[0], "w2200");
   assert.equal(back.length, 9);
+  // Picked from the top without the tap, it's a shift time all the same (the morning screen says so), and it stays the
+  // run's time when the card reopens after the anchor has moved: the renewal books it, not the 7:00 default.
+  const keptPick = run([pick("wake", "w2200")], withAnchor, toWake(withAnchor));
+  assert.equal(M.copyText(withAnchor, step("morning").title, { ...keptPick, stepId: "morning" }), skill.copy.morning_title_shift);
+  const moved = { ...ctx(), profile: { sleepAnchor: null } };
+  assert.deepEqual(shown(keptPick, moved).slice(-1), ["w2200"], "the run's own pick is still an option");
+  assert.equal(M.optionGroups(moved, step("wake").fields[0], keptPick.answers).length > 0, true);
   // The server accepts every chip it books.
   const v = readFileSync("functions/src/spine/validation.ts", "utf8");
   for (const c of Object.keys(ft.window.chips)) assert.match(v, new RegExp(`'${c}'`), c);
