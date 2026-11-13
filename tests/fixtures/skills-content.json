@@ -63367,14 +63367,14 @@
     "night_end_title": "Back to bed when your eyes get heavy.",
     "night_end_up": "Phone face down, out of reach. Go back when you're sleepy, not by the clock. Whatever time you fall asleep, get up at your usual time.",
     "wake_title": "What time will you get up, every day?",
-    "wake_title_kept": "Still your time? Your wake time from before is first.",
+    "wake_title_kept": "Still your time? It's at the top.",
     "wake_hint": "The same time on weekends too. It resets sleep more than any bedtime does. If your hours change with shifts, set it by your shift; a doctor can help plan it.",
     "wind_title": "Pick one thing for the hour before bed.",
     "wind_hint": "One thing is enough. Go to bed when you're sleepy, not before.",
     "wind_own": "Something else",
     "remind_label": "Check in with me in the morning?",
     "keep_label": "Keep this wake time in Me?",
-    "wind_primary": "Next",
+    "wake_primary": "Next",
     "plan_title": "Up at {wake}, every day.",
     "plan_remind": "A morning check will be on Today. Caffeine after midday and alcohol at night both break sleep up. If sleep's been bad for weeks, a doctor can help.",
     "plan_line": "Caffeine after midday and alcohol at night both break sleep up. On a night you can't sleep, open Sleep Reset again. If sleep's been bad for weeks, a doctor can help.",
@@ -63968,6 +63968,15 @@
         "firstFrom": "$p.sleepAnchor"
        },
        "max": 1,
+       "links": [],
+       "required": true
+      },
+      {
+       "id": "keep",
+       "options": {
+        "list": "keep"
+       },
+       "max": 1,
        "links": [
         {
          "exit": "safety_open",
@@ -63977,9 +63986,38 @@
          }
         }
        ],
-       "required": true
+       "label": "keep_label",
+       "showWhen": {
+        "not": {
+         "eq": [
+          "$a.wake",
+          "$p.sleepAnchor"
+         ]
+        }
+       }
       }
      ],
+     "keep": {
+      "kind": "sleep_anchor",
+      "many": false,
+      "from": [
+       "wake"
+      ],
+      "when": {
+       "any": [
+        {
+         "set": "$a.keep"
+        },
+        {
+         "eq": [
+          "$a.wake",
+          "$p.sleepAnchor"
+         ]
+        }
+       ]
+      }
+     },
+     "primary": "wake_primary",
      "next": [
       {
        "to": "wind",
@@ -64024,36 +64062,8 @@
        "max": 1,
        "links": [],
        "label": "remind_label"
-      },
-      {
-       "id": "keep",
-       "options": {
-        "list": "keep"
-       },
-       "max": 1,
-       "links": [],
-       "label": "keep_label",
-       "showWhen": {
-        "not": {
-         "eq": [
-          "$a.wake",
-          "$p.sleepAnchor"
-         ]
-        }
-       }
       }
      ],
-     "keep": {
-      "kind": "sleep_anchor",
-      "many": false,
-      "when": {
-       "set": "$a.keep"
-      },
-      "from": [
-       "wake"
-      ]
-     },
-     "primary": "wind_primary",
      "followUp": {
       "type": "sleep_morning",
       "whenFrom": "wake",

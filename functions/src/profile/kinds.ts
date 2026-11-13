@@ -217,7 +217,7 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
     },
   },
   // Sleep reset (ER-13 part 2, docs/design/sleep-reset.md): the wake time a person keeps as their anchor, on the plan's
-  // *Keep it in Me* (the tap is the yes). One per person (keeping a new time replaces it), My body, a wake id only.
+  // *Keep this wake time in Me?* (the chip is the yes; picking the kept time again re-confirms it). One per person (keeping a new time replaces it), My body, a wake id only.
   // Read back by the `sleepAnchor` slice: the next plan lists it first under *Still your time?*, never picked for them.
   sleep_anchor: {
     kind: 'sleep_anchor', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'my_body', slice: 'sleepAnchor',

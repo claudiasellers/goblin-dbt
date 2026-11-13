@@ -38,8 +38,8 @@ an optional morning check.
 | `sleepy` | *Back to bed.* *Phone face down, out of reach.* Still awake after a while: get up for a bit; and the wake anchor | Stimulus control: no screens in bed |
 | `up` | *Try getting up for a bit.* (*A different room for a while often helps more than lying there.*) Another room, lights low · Something calm on paper · I'd rather rest here | Get out of bed; stimulus control |
 | `night_end` | Got up: *Back to bed when your eyes get heavy.* Phone face down, back when sleepy not by the clock, and the wake anchor. Resting: *Rest is enough for now.* Eyes closed, phone face down, getting up helps if you stew. Give your mind a job for a mind that won't stop | Don't give up and get up for the day |
-| `wake` | *What time will you get up, every day?* (with a kept anchor: *Still your time? Your wake time from before is first.*, the kept time first, never picked) 6:00 to 9:30 by half hours (*The same time on weekends too.* Shift workers: set it by your shift; a doctor can help plan it) | Regular schedule |
-| `wind` | *Pick one thing for the hour before bed.* Screens away · Lights low · Write tomorrow's list · A warm shower or bath · A book, music or stretching, or their own words; *Check in with me in the morning?*; *Keep this wake time in Me?* (only when the time isn't the kept one) | Wind down 30–60 min |
+| `wake` | *What time will you get up, every day?* (with a kept anchor: *Still your time? It's at the top.*, the kept time first, never picked; *Keep this wake time in Me?* under the times when the pick isn't the kept one) 6:00 to 9:30 by half hours (*The same time on weekends too.* Shift workers: set it by your shift; a doctor can help plan it) | Regular schedule |
+| `wind` | *Pick one thing for the hour before bed.* Screens away · Lights low · Write tomorrow's list · A warm shower or bath · A book, music or stretching, or their own words; *Check in with me in the morning?* | Wind down 30–60 min |
 | `plan_end` | *Up at 7:30, every day.* One line: the morning card when asked, *Caffeine after midday and alcohol at night both break sleep up.*, how to come back on a bad night, and *If sleep's been bad for weeks, a doctor can help.* | H20b's substances; referral, quietly |
 | `morning` | The `sleep_morning` card reopens the run here: *Morning. How was the night?* Slept okay · Broken · Barely slept; *Up at your time?*; *Did a bad dream wake you?* | The morning log |
 | `again` | *Up at your time. That's the reset working.* or *A late start doesn't undo the reset.* above *Same again tomorrow?* (yes books the card for tomorrow at the same wake time) | |
@@ -71,16 +71,20 @@ ask-fresh field, no projection. One keep, on the yes chip only: `sleep_anchor` (
 
 ## The anchor in Me (part 2, built 13 Nov)
 
-- **Kept** on the plan's *Keep this wake time in Me?* (`keep`, *Yes, keep it*; the chip is the yes, the button stays
-  *Next*, as Build mastery's I can). Kind `sleep_anchor` (`ProfileFact`, My body, one per person: keeping a new time
+- **Kept** on the wake screen's *Keep this wake time in Me?* (`keep`, *Yes, keep it*; the chip is the yes, the button
+  stays *Next*, as Build mastery's I can), or re-confirmed when the person picks the kept time again: that tap answers
+  *Still your time?*, so the item's `confirmedAt` and Me's 30-day revisit start over (Gate 1). Kind `sleep_anchor` (`ProfileFact`, My body, one per person: keeping a new time
   replaces it), `{wakeIds: [<one WAKE id>]}`, nothing else (no wind-down, no own words). Me shows *Up at 7:30, every
   day* and revisits it after 30 days (*Still your time?*); *Set aside* is there.
 - **Read** through the `sleepAnchor` slice (`PROFILE_NEEDS['sleep-reset']`): the next plan's `wake` step lists the kept
   time first (`firstFrom: '$p.sleepAnchor'`, which the runtime now allows for a profile slice holding one option id)
   under *Still your time?*, every other time still there, nothing picked: the profile layer's *still true?*, asked
-  by the person's own tap. The chip to keep it again is hidden when the picked time is already the kept one.
+  by the person's own tap. The chip is hidden when the picked time is already the kept one (that pick re-confirms it).
+  The server's wake ids (`SLEEP_WAKE_IDS`) are test-pinned to the skill's `WAKE` options.
 - **Not** read by the morning card (it reads the run it reopens, as before), the night path or routing.
-- Rejected: a separate *Still up at 7:30?* yes/no screen (one more tap, and the wake field still needs the answer for
+- Open (part 2, Gate 3): the times run 6:00 to 9:30, so a night-shift worker can't keep their real time; wider times
+  or a *My hours change* chip that keeps nothing.
+- Rejected: the chip on the wind-down screen (it asked about the screen before, beside the morning check); a separate *Still up at 7:30?* yes/no screen (one more tap, and the wake field still needs the answer for
   the card's time); keeping the wind-down too (it changes with the evening, and is one tap to pick again).
 
 ## Routing

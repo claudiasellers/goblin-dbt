@@ -8,8 +8,8 @@ check, `sleep_morning`, that reopens the run at *How was the night?*).
 Part 1 departures, all listed in docs/design/sleep-reset.md with a reason:
 - No app-wide night mode (CORE's, Index §5.1 #13): the night path is written for the dark (short screens, nothing
   that wakes you up, no cold water) but the app's look doesn't change.
-- The morning card reads the wake time from the run it reopens. Part 2 (13 Nov) adds the profile anchor: *Keep it in
-  Me* on the plan keeps the wake time (`sleep_anchor`, Me → My body, one per person), and the next plan lists it first
+- The morning card reads the wake time from the run it reopens. Part 2 (13 Nov) adds the profile anchor: *Keep this
+  wake time in Me?* on the plan keeps the wake time (`sleep_anchor`, Me → My body, one per person), and the next plan lists it first
   under *Still your time?* (the `sleepAnchor` slice, `firstFrom`); it is never picked for them.
 - The morning check is one card per plan, booked again only on the person's *yes* the next morning (no nightly
   schedule, no SleepLog label, no two-week pattern): a live flow never reads past visits (data layers).
@@ -79,14 +79,14 @@ COPY = {
     # The plan (H20b, the sleep schedule).
     "wake_title": "What time will you get up, every day?",
     # A kept anchor (part 2): first on the list, never picked for them (profile: *still true?*).
-    "wake_title_kept": "Still your time? Your wake time from before is first.",
+    "wake_title_kept": "Still your time? It's at the top.",
     "wake_hint": "The same time on weekends too. It resets sleep more than any bedtime does. If your hours change with shifts, set it by your shift; a doctor can help plan it.",
     "wind_title": "Pick one thing for the hour before bed.",
     "wind_hint": "One thing is enough. Go to bed when you're sleepy, not before.",
     "wind_own": "Something else",
     "remind_label": "Check in with me in the morning?",
     "keep_label": "Keep this wake time in Me?",
-    "wind_primary": "Next",
+    "wake_primary": "Next",
     "plan_title": "Up at {wake}, every day.",
     "plan_remind": "A morning check will be on Today. Caffeine after midday and alcohol at night both break sleep up. If sleep's been bad for weeks, a doctor can help.",
     "plan_line": "Caffeine after midday and alcohol at night both break sleep up. On a night you can't sleep, open Sleep Reset again. If sleep's been bad for weeks, a doctor can help.",
@@ -221,17 +221,19 @@ STEPS = [
     {
         "id": "wake", "kind": "ask", "title": [{"when": {"set": KEPT_ANCHOR}, "key": "wake_title_kept"}, {"key": "wake_title"}],
         "hint": "wake_hint",
-        "fields": [{**field("wake"), "options": {"list": "wake", "firstFrom": KEPT_ANCHOR}}],
+        "fields": [{**field("wake", links=[]), "options": {"list": "wake", "firstFrom": KEPT_ANCHOR}},
+                   # Asked only when the time isn't already the kept one; the chip is the yes (R4).
+                   field("keep", label="keep_label", required=False, show={"not": {"eq": [a("wake"), KEPT_ANCHOR]}})],
+        # Kept on the yes chip (as Build mastery's I can; the button stays *Next*), or when the person picks the kept time
+        # again: their tap answers *Still your time?*, so the anchor's confirmedAt and Me's revisit refresh.
+        "keep": {"kind": "sleep_anchor", "many": False, "from": ["wake"],
+                 "when": {"any": [{"set": a("keep")}, {"eq": [a("wake"), KEPT_ANCHOR]}]}},
+        "primary": "wake_primary",
         "next": [{"to": "wind"}],
     },
     {
         "id": "wind", "kind": "ask", "title": "wind_title", "hint": "wind_hint",
-        "fields": [field("wind", own="wind_own"), field("remind", label="remind_label", required=False, links=[]),
-                   # Asked only when the time isn't already the kept one; the tap is the yes (R4).
-                   field("keep", label="keep_label", required=False, links=[],
-                         show={"not": {"eq": [a("wake"), KEPT_ANCHOR]}})],
-        # A keep on the yes chip only (as Build mastery's I can): the button stays *Next*.
-        "keep": {"kind": "sleep_anchor", "many": False, "when": {"set": a("keep")}, "from": ["wake"]}, "primary": "wind_primary",
+        "fields": [field("wind", own="wind_own"), field("remind", label="remind_label", required=False, links=[])],
         # The morning card at the wake time picked on the screen before; it reopens the run at `morning`.
         "followUp": {"type": "sleep_morning", "whenFrom": "wake", "when": {"set": a("remind")}},
         "next": [{"to": "plan_end"}],
