@@ -14,6 +14,7 @@ import { invalid, parseOrInvalid } from '../shared/errors';
 import { obj, uuid } from '../shared/validate';
 import { GUARDS } from '../userdata/lifecycle';
 import { MERGE_USER, userKey } from '../userdata/ownership';
+import { recordFoundWords } from '../userdata/foundWords';
 import { readingProps } from '../capacity/reading';
 import { nextActionParams, parseNextAction, spotsJson, validateSaveCheckIn, type CheckInNextAction } from './validation';
 
@@ -57,6 +58,9 @@ export const saveCheckIn = callable<unknown, SaveCheckInResponse>(
       const emotionIds = input.emotionIds.filter((e) => known.has(e));
       const band = readingProps('band', input.capacity);
       const next = nextActionParams(input.nextAction);
+      // Words everywhere (ER-10 part 3): the words of a check-in whose result rendered join the person's words, once.
+      // A word found in Find the feeling inside the check-in (source ftf) was counted by that save.
+      if (input.resultShown && input.source !== 'ftf') await recordFoundWords(tx, uid as string, 'CheckIn', key, emotionIds, 'checkin');
       // 2. Every result field (re-analysis overwrites them); a next-action stub keeps its next action.
       await tx.run(
         `MATCH (u:User {id: $uid})-[:LOGGED]->(c:CheckIn {key: $key})

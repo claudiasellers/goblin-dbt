@@ -6,7 +6,8 @@ DBT Emotion Regulation Handouts 3–6: what emotions do, the model of emotions, 
 know a feeling*.
 
 Part 1 (built 12 Nov 2026) is the feeling card and the ladder; part 2 (built 12 Nov 2026) is Walk the wave and part 4
-(built 12 Nov 2026) the myth cards, below. Part 3 is under *Not yet*.
+(built 12 Nov 2026) the myth cards, below. Part 3's first half, words everywhere's writes, is built (13 Nov); the rest
+is under *Not yet*.
 
 ## What it is for
 
@@ -159,6 +160,32 @@ Not yet: carrying It isn't working's pick in, so the person doesn't choose twice
 - An embed prop of type `row`: the player resolves the ref and hands the embed the table's row
   (`sharedRow` in `machine.ts`). The card reads its row this way; nothing emotion-level is copied into the skill.
 
+## Words everywhere (part 3, the writes; `functions/src/userdata/foundWords.ts`)
+
+Every save that records an accepted word adds it to the person's words, `(:User)-[:FOUND_WORD]->(:Emotion)`, the log
+aggregate Me → My words shows (D-10: it accumulates without a yes, read-only, exported and deleted with the person).
+Before this only Find the feeling wrote it.
+
+- **The check-in**: its words once the result has rendered (`resultShown`), source `checkin`.
+- **A tool's close**: the words picked in the visit (`setEmotionIds`, never a hand-off's), source the tool id. That
+  covers Recover, Do the Opposite, Cope Ahead, Know this feeling, Walk the wave's guess, Check the Facts and every
+  skill with `emotionFields`. A one-shot `recordToolSession` writes none: its ids are the hand-off's, already counted.
+- **Find the feeling**: its own save, as before, now with `sources`; neither its close nor a check-in it fed
+  (`source: 'ftf'`) counts the word again. Its shelf and harp still show only the words shaped or tuned there (the
+  ones with `ways`); every other word is Me → My words.
+- **An inline run** (Check the Facts inside Do the Opposite) doesn't count the host's word it was seeded with
+  (`visitEmotionIds`); a feeling it asked for itself counts.
+
+Once per record and word: the record gets a `FOUND` edge to the word the first time, and only a new `FOUND` edge
+counts, so the check-in's re-saves and a replayed close never count twice. `FOUND_WORD` gains `sources` (`checkin`,
+`find-the-feeling`, `invalidation-recovery`, …) beside FTF's `ways`; the PRD's `{count, ways, sources[], firstAt,
+lastAt}`. Nothing reads `sources` yet: it is for granularity (distinct words per month, by where they were named). An edge
+from before `sources` existed was Find the feeling's, so it keeps that source when another save adds one.
+
+Retention deletes a record's `FOUND` edges with it, but `FOUND_WORD` (its count, `firstAt` and sources) outlives
+`dataRetentionDays`, as it always has for Find the feeling: it is the person's vocabulary, deleted with the account.
+There is no way yet to remove a single word from My words.
+
 ## Departures from the PRD
 
 - **Happiness is not a tenth `EmotionRegulationContent`.** The PRD added it as a parent. That would grow every loop
@@ -173,8 +200,9 @@ Not yet: carrying It isn't working's pick in, so the person doesn't choose twice
 
 - Walk the wave, part 2: CORE-08's chain analysis embedding the strip; an `EmotionEpisode` record (the PRD's proposal)
   once something reads episodes back; ladder taps as `SkillPractice`.
-- Part 3, words everywhere: `FOUND_WORD` from more hosts, own words first, the card after naming in the check-in and
-  Find the feeling.
+- Part 3, the rest of words everywhere: own words first in the word pickers (the PRD's *once they have five*; it
+  crosses the data-layer rule Check the Facts' build decision 1 kept, so it waits on Claudia), and the card after
+  naming in the check-in and Find the feeling (the PRD's open question: automatic with one tap to dismiss, or on tap).
 
 ## Tests
 

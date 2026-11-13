@@ -139,7 +139,7 @@ exported or synced and is lost with the device; the Me surface says so in one li
 | own_line | `OwnLine` | My words | `recordWitnessBeat` (*say it my way*), Wise mind / Cope Ahead / Two pulls *Keep* | none | `ownLines`: witness, DEAR MAN, Cope Ahead |
 | saved line | `SAVED_LINE` edge | My words | witness *keep* | none | `savedLines` |
 | part | `Part` (+ `PartLink`, `DenSnapshot`) | Parts of me | `parts/keep.ts`, `parts/links.ts`, `parts/denSnapshot.ts` only | 30 d (`PartRevisit`) | `parts`, `partDetail`, `partAnchors`, `den`; empty unless `partsEnabled` |
-| found words | `FOUND_WORD` edge (**log aggregate**, not profile) | My words, read-only | FTF, check-in | — | Me only |
+| found words | `FOUND_WORD` edge (**log aggregate**, not profile) | My words, read-only | FTF, check-in, every tool close (ER-10 part 3) | — | Me only |
 
 ### 4.2 Coming with the modules: one registry, one write path
 
