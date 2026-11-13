@@ -4,7 +4,7 @@
 third of its three skills). Tool `values-clarification`, listed under Emotion Regulation with the Tools intent *Work
 out what matters to me*, on the new concept `dbt_values_priorities` (`appToolId: 'values-clarification'`, PART_OF the
 ER module). Source: `scripts/skills/values.py`. Tests: `tests/skill-values.test.mjs`. New profile kind `values` and
-its slice `values`, new follow-up type `value_step`. No new embed (the `pileSort` embed is a departure, below). Close
+its slice `values`, new follow-up type `value_step`. No new embed (the three piles are two chip screens, not the `pileSort` embed: below). Close
 kind `none`: the outcome is the `value_step` card's answer. Rolling back is removing `'values-clarification'` from
 `src/lib/skillRuntime/playerTools.ts` and the tool from `src/data/tools.ts` (Problem Solve's link goes back to
 planned with it: `BUILT` in `scripts/skills/problem_solve.py`).
@@ -26,7 +26,7 @@ person's own values become the measure of a good outcome, not the app's.
 | `start` | First time: *What matters to you?* (*There are no right answers, and they can change.*), Next to the sort, nothing to pick. With values kept: *You've kept a few things that matter to you.* Take a small step for one of them · Sort them again | Moment: `steady`, a quiet evening; 1 min later |
 | `heads_up` | A carried flooded reading: *Your body's loud right now.* (*This works better once it settles a little.*) Look after the next few minutes first → `settle` (First, the body) · Try it anyway | `steady` moment |
 | `sort` | *Which of these sound like you?* (*Pick as many as fit, then Next. None is a full answer: not sure yet.*) 24 value cards in plain words, or *Add your own* | Step 1, sort; *add your own* |
-| `sometimes` | *Any that are you some of the time?* (*Mixed feelings about one are normal. Skip if none. The rest can be not now.*) The cards not in the first pile (`options.notIn`), no own words. Nothing in either pile → `not_sure` (built 13 Nov, part 2) | Step 1's middle pile: *that's me · sometimes · not now* |
+| `sometimes` | *Any that matter to you some of the time?* (with nothing in the first pile: *Any that matter even a little, or some of the time?*), *Mixed feelings about one are normal. None is fine too: not sure yet is a full answer.* It asks how much a value matters, never whether the person *is* it (the deck holds traits like Honesty). The cards not in the first pile (`options.notIn`), up to 12 (a run records 12 picks per answer, so a kept value survives the `value_step` reopen), no own words. Nothing in either pile → `not_sure` (built 13 Nov, part 2) | Step 1's middle pile: *that's me · sometimes · not now* |
 | `not_sure` | Nothing picked: *Not sure yet is fine. What matters can take a while to find. Come back any time.* | Identity diffusion: *not sure yet* is a full answer |
 | `keep` | *Which ones matter most for now? Up to three.* (*Two can pull different ways. Both can matter. Not sure yet? Save with none picked. Your list is kept either way.*) Up to three from either pile, or own words. *Keep these* keeps `values` either way; kept only in their words goes straight to `step` | Step 2, keep three; conflicting values → both can matter |
 | `sorted` | None kept: *Your list is kept.* *Your sort is in Me. You can pick three another time.* | *not sure yet* saves the sort |
@@ -88,7 +88,7 @@ someone in my family, if that feels safe*); getting things done includes *Call o
 
 | PRD | Built | Why | Batch |
 |---|---|---|---|
-| A pile sort, each card *that's me · sometimes · not now* (`pileSort`) | **Built 13 Nov (part 2) as two chip screens**: *that's me*, then *some of the time* from the rest; the rest is *not now* and is never named. Saved as `sometimesIds` on `values` (cards only); Me names the middle pile only when nothing else is kept | A card-by-card embed is 24 decisions in a row; two chip screens hold the same three piles in two taps' worth of attention | — |
+| A pile sort, each card *that's me · sometimes · not now* (`pileSort`) | **Built 13 Nov (part 2) as two chip screens**: *that's me*, then *some of the time* from the rest; the rest is *not now* and is never named. Saved as `sometimesIds` on `values` (cards only); Me names the middle pile only when nothing is kept and the first pile is empty, own words included | A card-by-card embed is 24 decisions in a row; two chip screens hold the same three piles in two taps' worth of attention | — |
 | `ValueCard {id, label, theme}`, `ValueGoal`, `ValueStep`, `ValuesFlow` nodes | The skill's options (`SkillOption values:value:<id>`, steps with their `value_id`) | A skill's content lives in its options until a second reader needs the nodes (the PRD's `RELATES_TO` links will) | ER-B4 part 2 |
 | WMP dialectics for value conflicts | One line on the keep screen (*Both can matter*); no both/and step | Waits for WMP's dialectics | WMP / ER-B4 part 2 |
 | Fade: the person's own labels listed first | Not built (own words are the escape hatch on each screen) | Needs the sort to remember own words as chips | ER-B4 part 2 |

@@ -65533,8 +65533,9 @@
           "step_own": "My own step",
           "step_title": "One small step this week.",
           "when_title": "When could you do it?",
-          "sometimes_title": "Any that are you some of the time?",
-          "sometimes_hint": "Mixed feelings about one are normal. Skip if none. The rest can be not now."
+          "sometimes_title": "Any that matter to you some of the time?",
+          "sometimes_hint": "Mixed feelings about one are normal. None is fine too: not sure yet is a full answer.",
+          "sometimes_title_none": "Any that matter even a little, or some of the time?"
         },
         "tables": {},
         "derive": [],
@@ -65726,7 +65727,19 @@
           {
             "id": "sometimes",
             "kind": "ask",
-            "title": "sometimes_title",
+            "title": [
+              {
+                "when": {
+                  "not": {
+                    "set": "$a.mine"
+                  }
+                },
+                "key": "sometimes_title_none"
+              },
+              {
+                "key": "sometimes_title"
+              }
+            ],
             "next": [
               {
                 "to": "keep",
@@ -65756,7 +65769,7 @@
                     "$a.mine.ids"
                   ]
                 },
-                "max": 24,
+                "max": 12,
                 "required": false,
                 "links": [
                   {

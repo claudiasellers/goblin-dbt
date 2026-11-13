@@ -65493,8 +65493,9 @@
     "sort_title": "Which of these sound like you?",
     "sort_hint": "Pick as many as fit, then Next. None is a full answer: not sure yet.",
     "sort_own": "Add your own",
-    "sometimes_title": "Any that are you some of the time?",
-    "sometimes_hint": "Mixed feelings about one are normal. Skip if none. The rest can be not now.",
+    "sometimes_title": "Any that matter to you some of the time?",
+    "sometimes_title_none": "Any that matter even a little, or some of the time?",
+    "sometimes_hint": "Mixed feelings about one are normal. None is fine too: not sure yet is a full answer.",
     "keep_title": "Which ones matter most for now? Up to three.",
     "keep_hint": "Two can pull different ways. Both can matter. Not sure yet? Save with none picked. Your list is kept either way.",
     "keep_own": "In my words",
@@ -65721,7 +65722,19 @@
     {
      "id": "sometimes",
      "kind": "ask",
-     "title": "sometimes_title",
+     "title": [
+      {
+       "when": {
+        "not": {
+         "set": "$a.mine"
+        }
+       },
+       "key": "sometimes_title_none"
+      },
+      {
+       "key": "sometimes_title"
+      }
+     ],
      "fields": [
       {
        "id": "sometimes",
@@ -65731,7 +65744,7 @@
          "$a.mine.ids"
         ]
        },
-       "max": 24,
+       "max": 12,
        "required": false,
        "links": [
         {
