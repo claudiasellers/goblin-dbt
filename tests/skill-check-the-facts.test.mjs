@@ -310,6 +310,17 @@ test("inline: with a feeling it has fit statements for, it starts at what happen
   assert.deepEqual(M.inlineCarried(c), ["annoyed"]);
 });
 
+test("inline: the seeded feeling is the host's word, never counted as this visit's (words everywhere, ER-10 part 3)", () => {
+  const c = inl({ feelingId: "annoyed" });
+  const s0 = M.inlineStart(c, "event");
+  const s = [pick("event", "said"), next].reduce((st, e) => M.runNext(c, st, e), s0);
+  assert.deepEqual(M.runEmotionIds(c, s), ["annoyed"], "the run still holds it");
+  assert.deepEqual(M.visitEmotionIds(c, s, s0.answers), [], "seeded: the host counts it");
+  // A visit that picked its own feeling (no seed) counts it.
+  const own = M.runNext(c, M.initialRun(skill), pick("feel", "hurt"));
+  assert.deepEqual(M.visitEmotionIds(c, own, {}), ["hurt"]);
+});
+
 test("inline: no feeling, a feeling with no fit statements, or one off the grid starts at the feeling (carried, never pre-selected)", () => {
   for (const ctxIn of [{}, { feelingId: "happy" }, { feelingId: "not_a_word" }]) {
     const c = inl(ctxIn);

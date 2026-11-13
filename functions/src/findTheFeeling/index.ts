@@ -160,6 +160,9 @@ export const getFeelingCollection = onCall(
     try {
       const res = await session.executeRead(tx => tx.run(
         `MATCH (:User {id: $userId})-[fw:FOUND_WORD]->(e:Emotion)
+         // The shelf and the harp are the words shaped or tuned here (they have ways), not every word the person has
+         // named since words everywhere (ER-10 part 3): those are Me → My words.
+         WHERE size(coalesce(fw.ways, [])) > 0
          OPTIONAL MATCH (e)-[:HAS_FEELING_SIGNATURE]->(g:FeelingSignature)
          RETURN e.id AS emotionId, coalesce(e.name, e.id) AS name, g.shape AS shape, g.sound AS sound,
                 fw.count AS count, fw.ways AS ways, toString(fw.firstAt) AS firstAt

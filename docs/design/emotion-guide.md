@@ -170,12 +170,21 @@ Before this only Find the feeling wrote it.
 - **A tool's close**: the words picked in the visit (`setEmotionIds`, never a hand-off's), source the tool id. That
   covers Recover, Do the Opposite, Cope Ahead, Know this feeling, Walk the wave's guess, Check the Facts and every
   skill with `emotionFields`. A one-shot `recordToolSession` writes none: its ids are the hand-off's, already counted.
-- **Find the feeling**: its own save, as before, now with `sources`; its close doesn't count the word again.
+- **Find the feeling**: its own save, as before, now with `sources`; neither its close nor a check-in it fed
+  (`source: 'ftf'`) counts the word again. Its shelf and harp still show only the words shaped or tuned there (the
+  ones with `ways`); every other word is Me → My words.
+- **An inline run** (Check the Facts inside Do the Opposite) doesn't count the host's word it was seeded with
+  (`visitEmotionIds`); a feeling it asked for itself counts.
 
 Once per record and word: the record gets a `FOUND` edge to the word the first time, and only a new `FOUND` edge
 counts, so the check-in's re-saves and a replayed close never count twice. `FOUND_WORD` gains `sources` (`checkin`,
 `find-the-feeling`, `invalidation-recovery`, …) beside FTF's `ways`; the PRD's `{count, ways, sources[], firstAt,
-lastAt}`. Nothing reads `sources` yet: it is for granularity (distinct words per month, by where they were named).
+lastAt}`. Nothing reads `sources` yet: it is for granularity (distinct words per month, by where they were named). An edge
+from before `sources` existed was Find the feeling's, so it keeps that source when another save adds one.
+
+Retention deletes a record's `FOUND` edges with it, but `FOUND_WORD` (its count, `firstAt` and sources) outlives
+`dataRetentionDays`, as it always has for Find the feeling: it is the person's vocabulary, deleted with the account.
+There is no way yet to remove a single word from My words.
 
 ## Departures from the PRD
 

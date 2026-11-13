@@ -16,8 +16,8 @@ import { handoffExt } from '../../lib/bandStore';
 import { closeQuestion, closeKindFor } from '../../lib/spine/close';
 import { emotionIdsFromLink } from '../../lib/spine/toolLink';
 import {
-  answersOf, askFresh, canGoOn, carried as carriedOf, carryOnOthers, labelOfValue, offersFor, contextIn, inlineCarried, inlineCtxFor, inlineStart, copyText, crisisFor, ctxAfterResume, seededFrom, stepLinks, emotionChoices, fieldLinks, fieldList, followUpFor,
-  exitQuery, handoffLine, initialRun, inlineResult, keepFor, opensSafety, optionGroups, ownMaxOf, persistence, pickedLabels, pickTrack, resumeRun, runEmotionIds, runNext, runRecord,
+  answersOf, askFresh, canGoOn, carried as carriedOf, carryOnOthers, labelOfValue, offersFor, contextIn, inlineCarried, inlineCtxFor, inlineStart, visitEmotionIds, copyText, crisisFor, ctxAfterResume, seededFrom, stepLinks, emotionChoices, fieldLinks, fieldList, followUpFor,
+  exitQuery, handoffLine, initialRun, inlineResult, keepFor, opensSafety, optionGroups, ownMaxOf, persistence, pickedLabels, pickTrack, resumeRun, runNext, runRecord,
   runUrgeIds,
   scope, sharedRow, shownFields, stepOf, titleSlots, visitUrgeIds,
   type Answer, type RunContext, type RunEvent, type RunState,
@@ -192,6 +192,8 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
   const profileSettled = !needsProfile(skill.toolId) || profile.status !== 'loading';
   const resumed = useRef(false);
   const reopenedRef = useRef(false);
+  // An inline run's seeded answers (the host's word): not this visit's pick, so not counted as its word.
+  const seededRef = useRef(inline ? st.answers : {});
   /** On a reopened run, the urges the first visit recorded (read back with it): not this visit's. */
   const reopenUrges = useRef<string[]>([]);
   useEffect(() => {
@@ -248,7 +250,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
     // A run reopened at a `reopens` step (a review afterwards) is a new visit about the same plan: the feeling and
     // the urges read back with it were the first visit's, so they aren't counted again here (an urge picked on the
     // review itself is this visit's).
-    toolSession.setEmotionIds(reopenedRef.current ? [] : runEmotionIds(ctx, st));
+    toolSession.setEmotionIds(reopenedRef.current ? [] : visitEmotionIds(ctx, st, seededRef.current));
     toolSession.setUrgeIds(visitUrgeIds(ctx, st, reopenUrges.current));
     const fresh = askFresh(ctx, st);
     toolSession.setFitsFacts((fresh.fitsFacts as Parameters<typeof toolSession.setFitsFacts>[0]) ?? null);

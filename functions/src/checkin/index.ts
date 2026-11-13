@@ -59,7 +59,8 @@ export const saveCheckIn = callable<unknown, SaveCheckInResponse>(
       const band = readingProps('band', input.capacity);
       const next = nextActionParams(input.nextAction);
       // Words everywhere (ER-10 part 3): the words of a check-in whose result rendered join the person's words, once.
-      if (input.resultShown) await recordFoundWords(tx, uid as string, 'CheckIn', key, emotionIds, 'checkin');
+      // A word found in Find the feeling inside the check-in (source ftf) was counted by that save.
+      if (input.resultShown && input.source !== 'ftf') await recordFoundWords(tx, uid as string, 'CheckIn', key, emotionIds, 'checkin');
       // 2. Every result field (re-analysis overwrites them); a next-action stub keeps its next action.
       await tx.run(
         `MATCH (u:User {id: $uid})-[:LOGGED]->(c:CheckIn {key: $key})

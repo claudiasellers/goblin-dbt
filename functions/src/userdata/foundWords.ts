@@ -27,21 +27,34 @@ export function foundWordsSource(toolId: string): string | null {
   return OWN_FOUND_WORD_SAVE.includes(toolId) ? null : toolId;
 }
 
+/**
+ * A word's sources so far. An edge from before sources existed was Find the feeling's (the only writer then, and it
+ * always adds a way), so it starts from `find-the-feeling` rather than losing that.
+ */
+export const SOURCES_BEFORE =
+  "coalesce(fw.sources, CASE WHEN size(coalesce(fw.ways, [])) > 0 THEN ['find-the-feeling'] ELSE [] END)";
+
 /** The Cypher, exported for the pins. `$ids` are de-duplicated; unknown ids match no Emotion and are dropped. */
 export function foundWordsQuery(label: FoundWordRecord): string {
+  // MERGE (not a NOT-exists check) locks the pair, so two saves of one record racing count the word once.
   return `MATCH (u:User {id: $uid})-[:${RECORDS[label]}]->(r:${label} {key: $key})
      UNWIND $ids AS eid
      MATCH (e:Emotion {id: eid})
-     WHERE NOT (r)-[:FOUND]->(e)
-     CREATE (r)-[:FOUND]->(e)
+     MERGE (r)-[f:FOUND]->(e)
+     ON CREATE SET f.at = datetime(), f.fresh = true
+     WITH u, e, f WHERE f.fresh = true
+     REMOVE f.fresh
      MERGE (u)-[fw:FOUND_WORD]->(e)
      ON CREATE SET fw.firstAt = datetime(), fw.count = 0, fw.ways = [], fw.sources = []
+     WITH fw, ${SOURCES_BEFORE} AS before
      SET fw.lastAt = datetime(), fw.count = fw.count + 1,
-         fw.sources = CASE WHEN $source IN coalesce(fw.sources, []) THEN fw.sources
-                           ELSE coalesce(fw.sources, []) + $source END`;
+         fw.sources = CASE WHEN $source IN before THEN before ELSE before + $source END`;
 }
 
-/** Add the record's accepted words to the person's words (nothing when there are none). */
+/**
+ * Add the record's accepted words to the person's words (nothing when there are none). The callers write only to an
+ * open record (the check-in's upsert guard, the close's guard): a finalised one returns before this.
+ */
 export async function recordFoundWords(
   tx: ManagedTransaction, uid: string, label: FoundWordRecord, key: string, ids: readonly string[], source: string,
 ): Promise<void> {

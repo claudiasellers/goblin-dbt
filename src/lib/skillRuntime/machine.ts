@@ -1031,6 +1031,23 @@ export function runEmotionIds(ctx: RunContext, s: Pick<RunState, 'answers'>): st
 }
 
 /**
+ * The words this visit picked (the session's `setEmotionIds`, ER-10 part 3's words everywhere): `runEmotionIds`
+ * without a field still holding what an inline run was seeded with (`inlineStart`): the host's word, already the
+ * host's to count, never this run's pick (Check the Facts inside Do the Opposite). A seeded field the person changed
+ * counts.
+ */
+export function visitEmotionIds(ctx: RunContext, s: Pick<RunState, 'answers'>, seeded: Answers = {}): string[] {
+  const same = (f: string) => {
+    const a = s.answers[f]?.ids ?? [];
+    const b = seeded[f]?.ids ?? [];
+    return b.length > 0 && a.length === b.length && a.every((x, i) => x === b[i]);
+  };
+  const kept: Answers = {};
+  for (const [f, v] of Object.entries(s.answers)) if (!same(f)) kept[f] = v;
+  return runEmotionIds(ctx, { answers: kept });
+}
+
+/**
  * An exit's query as the link carries it: a value starting with `$` is read from the run (`$a.<field>`: its first
  * pick; `$ctx.<key>`: context in). A value that is missing, `none` or not an id is left out.
  */

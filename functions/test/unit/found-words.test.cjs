@@ -13,7 +13,7 @@ const { fns, setDriver } = loadFunctions();
 test.after(() => setDriver(null));
 const auth = (uid = 'u1') => ({ uid, token: { email: `${uid}@example.test` } });
 const ID = '3f2c9a0e-1b2c-4d5e-8f90-123456789abc';
-const isFound = (c) => /MERGE \(u\)-\[fw:FOUND_WORD\]->\(e\)/.test(c.query) && /CREATE \(r\)-\[:FOUND\]->\(e\)/.test(c.query);
+const isFound = (c) => /MERGE \(u\)-\[fw:FOUND_WORD\]->\(e\)/.test(c.query) && /MERGE \(r\)-\[f:FOUND\]->\(e\)/.test(c.query);
 const checkIn = () => ({ id: ID, emotion: 'anxious', quadrant: 'high-unpleasant', intensity: { x: 0.3, y: 0.6 }, bodySensations: [], note: '', timestamp: new Date().toISOString() });
 
 function checkInDriver({ open = true, emotions = ['anxious', 'hurt'] } = {}) {
@@ -38,10 +38,13 @@ test('the query: once per record and word (a new FOUND edge only), reached by ow
   await fns.saveCheckIn.run({ auth: auth(), data: { ...checkIn(), emotionIds: ['anxious'], resultShown: true } });
   const q = f.calls.find(isFound).query;
   assert.match(q, /^MATCH \(u:User \{id: \$uid\}\)-\[:LOGGED\]->\(r:CheckIn \{key: \$key\}\)/, 'the caller\'s own record, never a bare key');
-  assert.match(q, /MATCH \(e:Emotion \{id: eid\}\)\s+WHERE NOT \(r\)-\[:FOUND\]->\(e\)\s+CREATE \(r\)-\[:FOUND\]->\(e\)/, 'a re-save counts nothing');
+  assert.match(q, /MATCH \(e:Emotion \{id: eid\}\)\s+MERGE \(r\)-\[f:FOUND\]->\(e\)\s+ON CREATE SET f\.at = datetime\(\), f\.fresh = true\s+WITH u, e, f WHERE f\.fresh = true\s+REMOVE f\.fresh/,
+    'only a new FOUND edge counts: a re-save, a replay or two racing saves count nothing more (MERGE locks the pair)');
   assert.match(q, /ON CREATE SET fw\.firstAt = datetime\(\), fw\.count = 0, fw\.ways = \[\], fw\.sources = \[\]/);
   assert.match(q, /fw\.count = fw\.count \+ 1/);
-  assert.match(q, /fw\.sources = CASE WHEN \$source IN coalesce\(fw\.sources, \[\]\) THEN fw\.sources\s+ELSE coalesce\(fw\.sources, \[\]\) \+ \$source END/);
+  assert.match(q, /WITH fw, coalesce\(fw\.sources, CASE WHEN size\(coalesce\(fw\.ways, \[\]\)\) > 0 THEN \['find-the-feeling'\] ELSE \[\] END\) AS before/,
+    'an edge from before sources was Find the feeling\'s: it keeps that source');
+  assert.match(q, /fw\.sources = CASE WHEN \$source IN before THEN before ELSE before \+ \$source END/);
   assert.doesNotMatch(q, /MERGE \(e:Emotion|CREATE \(e:Emotion/, 'never creates a content node');
 });
 
@@ -62,6 +65,10 @@ test('the check-in: its known words once the result rendered, source checkin; no
   setDriver(f.driver);
   await fns.saveCheckIn.run({ auth: auth(), data: { ...checkIn(), emotionIds: [], resultShown: true } });
   assert.ok(!f.calls.some(isFound), 'no words, no query');
+  f = checkInDriver();
+  setDriver(f.driver);
+  await fns.saveCheckIn.run({ auth: auth(), data: { ...checkIn(), source: 'ftf', emotionIds: ['anxious'], resultShown: true } });
+  assert.ok(!f.calls.some(isFound), 'a word found in Find the feeling inside the check-in was counted by that save');
   f = checkInDriver({ open: false });
   setDriver(f.driver);
   await fns.saveCheckIn.run({ auth: auth(), data: { ...checkIn(), emotionIds: ['anxious'], resultShown: true } });
@@ -110,4 +117,11 @@ test('Find the feeling\'s own save records its source beside its ways', () => {
   const src = require('node:fs').readFileSync(require('node:path').resolve(__dirname, '../../src/findTheFeeling/index.ts'), 'utf8');
   assert.match(src, /ON CREATE SET fw\.firstAt = datetime\(\), fw\.count = 0, fw\.ways = \[\], fw\.sources = \[\]/);
   assert.match(src, /fw\.sources = CASE WHEN 'find-the-feeling' IN coalesce\(fw\.sources, \[\]\) THEN fw\.sources\s+ELSE coalesce\(fw\.sources, \[\]\) \+ 'find-the-feeling' END/);
+});
+
+test('Find the feeling\'s shelf and harp stay the words shaped or tuned there (they have ways), not every named word', async () => {
+  const f = fakeDriver(() => []);
+  setDriver(f.driver);
+  await fns.getFeelingCollection.run({ auth: auth(), data: {} });
+  assert.match(f.calls[0].query, /MATCH \(:User \{id: \$userId\}\)-\[fw:FOUND_WORD\]->\(e:Emotion\)[\s\S]*WHERE size\(coalesce\(fw\.ways, \[\]\)\) > 0/);
 });
