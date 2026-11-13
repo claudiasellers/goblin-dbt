@@ -48,6 +48,8 @@ PRESENTS_LABELS = {"ProblemType", "SolutionDirection", "DecompositionAspect", "B
                    "TurningPoint", "MomentResponse", "BodySignal", "ThoughtPattern", "Underneath", "CopeAhead", "TroubleshootFactor",
                    # Do the Opposite's urges (schema/opposite-action-data.cypher, oa_graph.py).
                    "ActionUrge",
+                   # The body's places (schema/body-map.cypher): Let it be a wave's *where do you notice it?*
+                   "BodyRegion",
                    # DEAR MAN's prep vocabulary (schema/dear-man-content*.cypher, scripts/dear-man/content.py).
                    "DearManSituationType", "DearManBarrier", "DearManDescribeOption", "DearManFeelingChip",
                    "DearManAssertOption", "DearManReinforceOption", "DearManAnchorNeed", "DearManAnchorPhrase",

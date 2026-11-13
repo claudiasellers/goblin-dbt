@@ -258,6 +258,12 @@ CONCEPT_TAGS["mindfulness-of-others"] = {"concept": "dbt_mindfulness_of_others",
 # practising a hard conversation. Relational, so the diversity rule lets it beside Check the Facts; change side (it
 # builds the skill to act); neutral direction. No ADDRESSES edges (as Notice them): the word row routes it.
 CONCEPT_TAGS["rehearse"] = {"concept": "dbt_behavioral_rehearsal", "side": "change", "skillKind": "relational", "direction": "neutral"}
+# Let it be a wave (ER-08, appToolId 'mindfulness-emotions' on the new concept dbt_mindfulness_current_emotion,
+# docs/design/mindfulness-emotions.md): mindfulness of current emotion. Acceptance, `hold` (staying with it), neutral.
+# Tagged so a row is one line; no row yet (the hosts that hand on to it carry the word: Check the Facts' fits, Do the
+# Opposite's keep card, Problem Solve's not-an-emotion words, It isn't working). Never for dissociation (PRD: not
+# offered blank or far away), primary or alongside.
+CONCEPT_TAGS["mindfulness-emotions"] = {"concept": "dbt_mindfulness_current_emotion", "side": "acceptance", "skillKind": "hold", "direction": "neutral"}
 BUILT_NOT_SIGNED_OFF = {
 }
 # Ride it out (urge-surfing), Let it be and Give your mind a job are live (Claudia, 12 Nov 2026: default to connected).
@@ -334,7 +340,8 @@ BACKUP = 3.0  # a pattern's backup row, used only when its first pick and altern
 # Do the Opposite never runs while someone is dissociated (ER-06), also when dissociation sits
 # alongside another pattern.
 # Give your mind a job neither: pushing a feeling away while already disconnected deepens it (12 Nov 2026).
-CONTRAINDICATIONS = {"opposite-action": ["dissociation_overmodulation"], "mind-job": ["dissociation_overmodulation"]}
+CONTRAINDICATIONS = {"opposite-action": ["dissociation_overmodulation"], "mind-job": ["dissociation_overmodulation"],
+                     "mindfulness-emotions": ["dissociation_overmodulation"]}
 
 # Emotion-gated rows. `addresses`: fires only when one of the user's words is in the concept's
 # ADDRESSES/REDUCES/TARGETS set; `none_named`: only when no emotion was named.

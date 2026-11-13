@@ -176,16 +176,16 @@ test("handoffFor: the hand-off table, Done always there", () => {
     const step = M.stepOf(skill, "next");
     return [M.handoffLine(ctx(), step, s), s.offered.map((x) => skill.exits.find((e) => e.id === x).toolId)];
   };
-  assert.deepEqual(offered("fits", "saw"), [skill.copy.next_fits, ["problem-solve", "let-it-be"]]);
-  assert.deepEqual(offered("fits", "said"), [skill.copy.next_fits, ["problem-solve", "dear-man", "let-it-be"]]);
-  assert.deepEqual(offered("fits", "didnt"), [skill.copy.next_fits, ["problem-solve", "dear-man", "let-it-be"]]);
+  assert.deepEqual(offered("fits", "saw"), [skill.copy.next_fits, ["problem-solve", "mindfulness-emotions", "let-it-be"]]);
+  assert.deepEqual(offered("fits", "said"), [skill.copy.next_fits, ["problem-solve", "dear-man", "mindfulness-emotions", "let-it-be"]]);
+  assert.deepEqual(offered("fits", "didnt"), [skill.copy.next_fits, ["problem-solve", "dear-man", "mindfulness-emotions", "let-it-be"]]);
   assert.deepEqual(offered("partly", "said"), [skill.copy.next_partly, ["opposite-action", "problem-solve"]]);
-  assert.deepEqual(offered("doesnt_fit", "said"), [skill.copy.next_no, ["opposite-action"]]);
+  assert.deepEqual(offered("doesnt_fit", "said"), [skill.copy.next_no, ["opposite-action", "mindfulness-emotions"]]);
   assert.deepEqual(offered("unsure", "said"), [skill.copy.next_unsure, ["wise-mind"]]);
   assert.equal(M.stepOf(skill, "next").done, "done");
   const wise = skill.exits.find((e) => e.id === "wise_mind");
   assert.deepEqual(wise.query, { first: "wm_q_next" });
-  for (const id of ["problem_solve", "opposite_action", "dear_man"]) assert.deepEqual(skill.exits.find((e) => e.id === id).carry, ["feel"]);
+  for (const id of ["problem_solve", "opposite_action", "dear_man", "mindfulness_emotions"]) assert.deepEqual(skill.exits.find((e) => e.id === id).carry, ["feel"]);
 });
 
 test("the attempt record: ext.run validates on the server, ids and own words only, nothing pre-filled", () => {
@@ -254,15 +254,16 @@ test("v1.1 safety chips: danger from a person shows the other_person resources a
   assert.equal(M.runNext(c, s, next).stepId, "story");
 });
 
-test("v1.1 exits: let it be is offered when it fits (DT-04 built); the wave is written for fits and doesn't-fit, and never offered until it ships", () => {
+test("v1.1 exits: let it be is offered when it fits (DT-04 built); the wave (ER-08 built) for fits and doesn't-fit, carrying the word", () => {
   const planned = skill.exits.filter((x) => x.planned).map((x) => x.toolId).sort();
-  assert.deepEqual(planned, ["mindfulness-emotions"]);
+  assert.deepEqual(planned, []);
+  assert.deepEqual(skill.exits.find((x) => x.id === "mindfulness_emotions").carry, ["feel"]);
   const nextStep = M.stepOf(skill, "next");
   const offeredExits = nextStep.offers.map((o) => o.exit);
   assert.ok(offeredExits.includes("mindfulness_emotions") && offeredExits.includes("let_it_be"));
   for (const fits of ["fits", "doesnt_fit"]) {
     const s = run([...toFits("hurt", ["sad_gone"]), pick("fits", fits), next]);
-    assert.ok(!s.offered.includes("mindfulness_emotions"), fits);
+    assert.ok(s.offered.includes("mindfulness_emotions"), fits);
     assert.equal(s.offered.includes("let_it_be"), fits === "fits", fits);
   }
 });

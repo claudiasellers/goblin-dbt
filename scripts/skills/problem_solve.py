@@ -277,7 +277,7 @@ START_SMALL = {r["id"]: "yes" for rows in PS["subs"].values() for r in rows if r
 # --- Exits: every tool the content names. Unbuilt ones are planned: written, never offered or linked. ---
 BUILT = {"cool-down", "five-senses", "pause", "cope-ahead", "dear-man", "fast", "opposite-action", "check-the-facts",
          "find-the-feeling", "ending-relationships", "let-it-be", "please-skill", "give", "values-clarification", "build-mastery",
-         "finding-connection"}
+         "finding-connection", "mindfulness-emotions"}
 
 
 def exit_id(tool):

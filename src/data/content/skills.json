@@ -3165,8 +3165,8 @@
           "missing_hint": "Not knowing is an answer. The move is one fact, not a decision.",
           "missing_title": "What's one thing you could find out?",
           "next": "Next",
-          "next_fits": "When a feeling fits, the move is to work on the situation.",
-          "next_no": "The feeling is bigger than the facts. Acting opposite to its urge helps it settle.",
+          "next_fits": "When a feeling fits, the move is to work on the situation. While it can't change, you can let the feeling be.",
+          "next_no": "The feeling is bigger than the facts. Acting opposite to its urge helps it settle, or you can let it rise and fall.",
           "next_partly": "The feeling makes sense, and it's turned up loud. Bring the volume down, then work on what's left.",
           "next_unsure": "That's all right. Sometimes the facts come later.",
           "not_sure": "Not sure",
@@ -3838,9 +3838,10 @@
             "id": "mindfulness_emotions",
             "toolId": "mindfulness-emotions",
             "query": {},
-            "carry": [],
-            "done": false,
-            "planned": true
+            "carry": [
+              "feel"
+            ],
+            "done": false
           },
           {
             "id": "opposite_action",
@@ -18702,8 +18703,7 @@
             "toolId": "mindfulness-emotions",
             "query": {},
             "carry": [],
-            "done": false,
-            "planned": true
+            "done": false
           },
           {
             "id": "missing_links",
@@ -35630,7 +35630,7 @@
           "opened_title": "Take the lid off. What's in there?",
           "re_heads_hint": "It can stay shut until you're steadier.",
           "re_heads_title": "Your body's loud right now.",
-          "reopen_cant": "Then the fight with it can ease. Let it be is for that.",
+          "reopen_cant": "Then the fight with it can ease. You can let the situation be, or let the feeling rise and fall.",
           "reopen_change": "Then let's look at what can be done.",
           "reopen_facts": "Checking the facts can show how big it is now.",
           "reopen_fork_title": "Can anything be done about it?",
@@ -37434,6 +37434,15 @@
                     "cant"
                   ]
                 }
+              },
+              {
+                "exit": "mindfulness_emotions",
+                "when": {
+                  "eq": [
+                    "$a.can_do",
+                    "cant"
+                  ]
+                }
               }
             ]
           }
@@ -37470,6 +37479,13 @@
           {
             "id": "let_it_be",
             "toolId": "let-it-be",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "mindfulness_emotions",
+            "toolId": "mindfulness-emotions",
             "query": {},
             "carry": [],
             "done": false
@@ -40762,7 +40778,7 @@
           "hold_label": "Hold",
           "hold_running": "Stay with it",
           "hold_title": "{cue}",
-          "keep_line": "Want help acting on it well?",
+          "keep_line": "Want help acting on it well, or a minute to let it be here?",
           "keep_title": "Some feelings are worth keeping",
           "miss_line": "A plan that didn't happen tells you something about the moment. You can make another one any time.",
           "miss_strong": "When the urge is that strong, waiting it out comes first.",
@@ -41442,6 +41458,12 @@
               },
               {
                 "exit": "ride",
+                "when": {
+                  "all": []
+                }
+              },
+              {
+                "exit": "wave",
                 "when": {
                   "all": []
                 }
@@ -44739,6 +44761,15 @@
             "carry": [],
             "done": false,
             "safety": true
+          },
+          {
+            "id": "wave",
+            "toolId": "mindfulness-emotions",
+            "query": {},
+            "carry": [
+              "feel"
+            ],
+            "done": false
           },
           {
             "id": "wise_mind",
@@ -51664,9 +51695,10 @@
             "id": "mindfulness_emotions",
             "toolId": "mindfulness-emotions",
             "query": {},
-            "carry": [],
-            "done": false,
-            "planned": true
+            "carry": [
+              "feel"
+            ],
+            "done": false
           },
           {
             "id": "missing_links",
@@ -65477,6 +65509,883 @@
             {
               "value": "after_unsure",
               "label": "Too soon to tell"
+            }
+          ]
+        }
+      },
+      {
+        "id": "mindfulness_emotions",
+        "toolId": "mindfulness-emotions",
+        "version": "me-v1",
+        "start": "feel",
+        "accepts": [
+          "band"
+        ],
+        "ownMax": 60,
+        "emotionFields": [
+          "feel"
+        ],
+        "copy": {
+          "feel_title": "What's the feeling?",
+          "feel_hint": "Pick the closest word. It doesn't have to be exact.",
+          "feel_more": "More words",
+          "blank_title": "When a feeling is hard to reach, coming back to the room comes first.",
+          "blank_line": "Watching a feeling can wait. Something around you to notice can help right now.",
+          "heads_up_title": "Your body's loud right now.",
+          "heads_up_hint": "A feeling is easier to watch once your body settles a little. You can still try.",
+          "settle_line": "The feeling will keep. First, the body.",
+          "where_title": "Where do you notice it in your body?",
+          "where_hint": "Pick one or two. Somewhere vague is fine.",
+          "heavy_line": "Heavy feelings can come with thoughts of not being here. If they do, talk to someone now.",
+          "wave_title": "Don't push it away. Don't hold on to it.",
+          "riding": "Pushing tends to make a feeling stick, and holding on makes it bigger. Let it rise and fall on its own. Eyes open is fine.",
+          "wave_again_title": "Back to watching it.",
+          "savour_wave_title": "Let it be as big as it is. You don't have to make it last.",
+          "savour_riding": "If a worry about it ending shows up, notice it, and come back to the feeling.",
+          "check_title": "How is it now?",
+          "still_here": "Still here",
+          "fading": "Easing",
+          "gone": "Gone",
+          "bigger": "Bigger",
+          "wave_next": "Stop here",
+          "bigger_title": "It's getting bigger.",
+          "bigger_hint": "That can happen when you stop pushing a feeling away. You can give your body something, or keep watching.",
+          "switch_line": "Let's give your body something first. The feeling will keep.",
+          "notice_title": "You're the one noticing it.",
+          "notice_hint": "There's the feeling, and there's you, watching it. You're more than this feeling.",
+          "close_title": "How is the feeling now?",
+          "louder_line": "Letting a feeling in can make it louder for a bit. That happens.",
+          "end_same": "It doesn't have to go anywhere. You let it be here, and that's the skill.",
+          "end_quieter": "You let it rise and fall without pushing it away. You can do this again, anywhere.",
+          "savour_end": "You let a good feeling be here, without needing it to last. That counts.",
+          "safety_open": "Talk to someone now",
+          "next": "Next",
+          "done": "Done",
+          "end_same_heavy": "It doesn't have to go anywhere. You let it be here, and that's the skill. Heavy feelings can come with thoughts of not being here. If they do, talk to someone now.",
+          "end_quieter_heavy": "You let it rise and fall without pushing it away. You can do this again, anywhere. Heavy feelings can come with thoughts of not being here. If they do, talk to someone now."
+        },
+        "tables": {},
+        "derive": [],
+        "steps": [
+          {
+            "id": "feel",
+            "kind": "ask",
+            "title": "feel_title",
+            "hint": "feel_hint",
+            "fields": [
+              {
+                "id": "feel",
+                "options": {
+                  "emotions": [
+                    "sad",
+                    "scared",
+                    "angry",
+                    "ashamed",
+                    "guilty",
+                    "lonely",
+                    "hurt",
+                    "happy",
+                    "loving"
+                  ],
+                  "carriedFirst": true,
+                  "moreKey": "feel_more"
+                },
+                "max": 1,
+                "required": true,
+                "emotion": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "blank",
+                "when": {
+                  "in": [
+                    "$a.feel",
+                    [
+                      "numb",
+                      "empty",
+                      "apathetic",
+                      "indifferent"
+                    ]
+                  ]
+                }
+              },
+              {
+                "to": "heads_up",
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "flooded"
+                  ]
+                }
+              },
+              {
+                "to": "where",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "blank",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "blank_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "title": "blank_title",
+            "noClose": true,
+            "next": [],
+            "offers": [
+              {
+                "exit": "five_senses",
+                "when": {
+                  "all": []
+                }
+              },
+              {
+                "exit": "safety_open",
+                "when": {
+                  "in": [
+                    "$a.feel",
+                    [
+                      "numb",
+                      "empty"
+                    ]
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "heads_up",
+            "kind": "ask",
+            "title": "heads_up_title",
+            "hint": "heads_up_hint",
+            "fields": [
+              {
+                "id": "heads_up",
+                "options": {
+                  "list": "heads_up"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "settle",
+                "when": {
+                  "eq": [
+                    "$a.heads_up",
+                    "body"
+                  ]
+                }
+              },
+              {
+                "to": "where",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "settle",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "settle_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "title": "heads_up_title",
+            "noClose": true,
+            "next": [],
+            "offers": [
+              {
+                "exit": "cool_down",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
+          },
+          {
+            "id": "where",
+            "kind": "ask",
+            "title": "where_title",
+            "hint": "where_hint",
+            "lines": [
+              {
+                "when": {
+                  "in": [
+                    "$a.feel",
+                    [
+                      "worthless",
+                      "despair",
+                      "helpless",
+                      "powerless"
+                    ]
+                  ]
+                },
+                "key": "heavy_line"
+              }
+            ],
+            "fields": [
+              {
+                "id": "where",
+                "options": {
+                  "list": "where"
+                },
+                "max": 2,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "savour_wave",
+                "when": {
+                  "in": [
+                    "$a.feel",
+                    [
+                      "accepted",
+                      "amazed",
+                      "appreciative",
+                      "aroused",
+                      "astonished",
+                      "at_ease",
+                      "awe",
+                      "balanced",
+                      "calm",
+                      "cheeky",
+                      "chill",
+                      "comfortable",
+                      "confident",
+                      "content",
+                      "courageous",
+                      "cozy",
+                      "creative",
+                      "curious",
+                      "eager",
+                      "energetic",
+                      "excited",
+                      "good",
+                      "grounded",
+                      "happy",
+                      "hopeful",
+                      "humble",
+                      "inquisitive",
+                      "inspired",
+                      "interested",
+                      "intimate",
+                      "joyful",
+                      "loving",
+                      "mellow",
+                      "optimistic",
+                      "peaceful",
+                      "playful",
+                      "powerful",
+                      "proud",
+                      "relaxed",
+                      "respected",
+                      "restful",
+                      "satisfied",
+                      "secure",
+                      "sensitive",
+                      "serene",
+                      "successful",
+                      "surprised",
+                      "sympathetic",
+                      "tender",
+                      "thankful",
+                      "thoughtful",
+                      "trusting",
+                      "valued"
+                    ]
+                  ]
+                }
+              },
+              {
+                "to": "wave",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "wave",
+            "kind": "embed",
+            "embed": "urgeWave",
+            "answerAs": "wave",
+            "title": "wave_title",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "props": {
+              "checkSec": 30,
+              "maxChecks": 4,
+              "checkTitle": "check_title",
+              "riding": "riding",
+              "still_here": "still_here",
+              "fading": "fading",
+              "gone": "gone",
+              "bigger": "bigger",
+              "next": "wave_next"
+            },
+            "next": [
+              {
+                "to": "bigger",
+                "when": {
+                  "has": [
+                    "$a.wave.ids",
+                    "ended_bigger"
+                  ]
+                }
+              },
+              {
+                "to": "close",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "bigger",
+            "kind": "ask",
+            "title": "bigger_title",
+            "hint": "bigger_hint",
+            "fields": [
+              {
+                "id": "bigger",
+                "options": {
+                  "list": "bigger"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "wave2",
+                "when": {
+                  "eq": [
+                    "$a.bigger",
+                    "keep"
+                  ]
+                }
+              },
+              {
+                "to": "switch",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "wave2",
+            "kind": "embed",
+            "embed": "urgeWave",
+            "answerAs": "again",
+            "title": "wave_again_title",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "props": {
+              "checkSec": 30,
+              "maxChecks": 4,
+              "checkTitle": "check_title",
+              "riding": "riding",
+              "still_here": "still_here",
+              "fading": "fading",
+              "gone": "gone",
+              "bigger": "bigger",
+              "next": "wave_next",
+              "continueFrom": "wave"
+            },
+            "next": [
+              {
+                "to": "switch",
+                "when": {
+                  "has": [
+                    "$a.again.ids",
+                    "ended_bigger"
+                  ]
+                }
+              },
+              {
+                "to": "close",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "switch",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "switch_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
+            "next": [],
+            "offers": [
+              {
+                "exit": "cool_down",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
+          },
+          {
+            "id": "close",
+            "kind": "ask",
+            "title": "notice_title",
+            "hint": "notice_hint",
+            "fields": [
+              {
+                "id": "close",
+                "label": "close_title",
+                "options": {
+                  "list": "tvn"
+                },
+                "max": 1,
+                "required": true,
+                "askFresh": "thenVsNow",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "louder",
+                "when": {
+                  "eq": [
+                    "$a.close",
+                    "worse"
+                  ]
+                }
+              },
+              {
+                "to": "end",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "louder",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "louder_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "next": [],
+            "offers": [
+              {
+                "exit": "cool_down",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
+          },
+          {
+            "id": "end",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "all": [
+                    {
+                      "in": [
+                        "$a.feel",
+                        [
+                          "worthless",
+                          "despair",
+                          "helpless",
+                          "powerless"
+                        ]
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$a.close",
+                        "same"
+                      ]
+                    }
+                  ]
+                },
+                "key": "end_same_heavy"
+              },
+              {
+                "when": {
+                  "in": [
+                    "$a.feel",
+                    [
+                      "worthless",
+                      "despair",
+                      "helpless",
+                      "powerless"
+                    ]
+                  ]
+                },
+                "key": "end_quieter_heavy"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$a.close",
+                    "same"
+                  ]
+                },
+                "key": "end_same"
+              },
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "end_quieter"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "next": [],
+            "offers": []
+          },
+          {
+            "id": "savour_wave",
+            "kind": "embed",
+            "embed": "urgeWave",
+            "answerAs": "savour",
+            "title": "savour_wave_title",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "props": {
+              "checkSec": 30,
+              "maxChecks": 4,
+              "checkTitle": "check_title",
+              "riding": "savour_riding",
+              "still_here": "still_here",
+              "fading": "fading",
+              "gone": "gone",
+              "bigger": "bigger",
+              "next": "wave_next"
+            },
+            "next": [
+              {
+                "to": "savour_end",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "savour_end",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "savour_end"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
+            "next": [],
+            "offers": [
+              {
+                "exit": "good_things",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
+          }
+        ],
+        "exits": [
+          {
+            "id": "cool_down",
+            "toolId": "cool-down",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "done",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": true
+          },
+          {
+            "id": "five_senses",
+            "toolId": "five-senses",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "good_things",
+            "toolId": "good-things",
+            "query": {
+              "frame": "savour"
+            },
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "safety_open",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": false,
+            "safety": true
+          }
+        ],
+        "options": {
+          "heads_up": [
+            {
+              "value": "body",
+              "label": "My body first"
+            },
+            {
+              "value": "try",
+              "label": "Try it anyway"
+            }
+          ],
+          "where": [
+            {
+              "value": "head",
+              "label": "Head"
+            },
+            {
+              "value": "face",
+              "label": "Face"
+            },
+            {
+              "value": "jaw",
+              "label": "Jaw"
+            },
+            {
+              "value": "throat",
+              "label": "Throat"
+            },
+            {
+              "value": "neck",
+              "label": "Neck"
+            },
+            {
+              "value": "shoulders",
+              "label": "Shoulders"
+            },
+            {
+              "value": "chest",
+              "label": "Chest"
+            },
+            {
+              "value": "upper_back",
+              "label": "Upper back"
+            },
+            {
+              "value": "stomach",
+              "label": "Stomach"
+            },
+            {
+              "value": "lower_back",
+              "label": "Lower back"
+            },
+            {
+              "value": "arms",
+              "label": "Arms"
+            },
+            {
+              "value": "hands",
+              "label": "Hands"
+            },
+            {
+              "value": "legs",
+              "label": "Legs"
+            },
+            {
+              "value": "feet",
+              "label": "Feet"
+            },
+            {
+              "value": "body",
+              "label": "Whole body"
+            },
+            {
+              "value": "cant_find",
+              "label": "I can't find it"
+            }
+          ],
+          "bigger": [
+            {
+              "value": "body",
+              "label": "Something for my body"
+            },
+            {
+              "value": "keep",
+              "label": "Keep watching it"
+            }
+          ],
+          "tvn": [
+            {
+              "value": "worse",
+              "label": "Louder"
+            },
+            {
+              "value": "same",
+              "label": "About the same"
+            },
+            {
+              "value": "better",
+              "label": "A bit quieter"
+            },
+            {
+              "value": "much_better",
+              "label": "Much quieter"
             }
           ]
         }

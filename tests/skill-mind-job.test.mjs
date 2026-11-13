@@ -182,7 +182,7 @@ test("the reopen: only a lid that was booked reopens; open it → name it → wh
   const off = (v) => run([pick("can_do", v), next], ctx(), can);
   assert.deepEqual(offers(off("change")), ["problem_solve"]);
   assert.deepEqual(offers(off("facts")), ["check_the_facts"]);
-  assert.deepEqual(offers(off("cant")), ["let_it_be"]);
+  assert.deepEqual(offers(off("cant")), ["let_it_be", "mindfulness_emotions"], "the feeling it brings: Let it be a wave (ER-08, the containment return)");
   assert.deepEqual(offers(off("gone")), []);
   assert.equal(off("gone").stepId, "lid_off");
   // Not yet: back on the shelf with a new time, and that card reopens too.

@@ -174,7 +174,7 @@ EXITS = [
     {"id": "problem_solve", "toolId": "problem-solve"},
     {"id": "check_the_facts", "toolId": "check-the-facts"},
     {"id": "let_it_be", "toolId": "let-it-be"},             # DT-04 willingness (DT-B4)
-    {"id": "mindfulness_emotions", "toolId": "mindfulness-emotions", "planned": True},  # ER-08 the wave (ER-B5)
+    {"id": "mindfulness_emotions", "toolId": "mindfulness-emotions"},       # ER-08 Let it be a wave (ER-B5)
     {"id": "five_senses", "toolId": "five-senses"},                          # orienting (DT-01's orient entry)
     # ER-10 myth cards (part 4): Know this feeling's second skill, on its myths frame.
     {"id": "emotion_guide", "toolId": "emotion-guide", "query": {"frame": "myths"}},
