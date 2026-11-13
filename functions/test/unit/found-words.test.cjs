@@ -75,8 +75,12 @@ test('the check-in: its known words once the result rendered, source checkin; no
   assert.deepEqual(f.calls.find(isFound).params.ids, ['hurt'], 'only the word Find the feeling saved is skipped');
   f = checkInDriver();
   setDriver(f.driver);
-  await fns.saveCheckIn.run({ auth: auth(), data: { ...checkIn(), source: 'ftf', emotionIds: ['hurt'], resultShown: true } });
+  await fns.saveCheckIn.run({ auth: auth(), data: { ...checkIn(), source: 'ftf', emotionIds: ['hurt'], countedWordIds: [], resultShown: true } });
   assert.deepEqual(f.calls.find(isFound).params.ids, ['hurt'], 'Find the feeling found nothing, a body-first pick: it counts (Codex, PR #129)');
+  f = checkInDriver();
+  setDriver(f.driver);
+  await fns.saveCheckIn.run({ auth: auth(), data: { ...checkIn(), source: 'ftf', emotionIds: ['anxious'], resultShown: true } });
+  assert.ok(!f.calls.some(isFound), 'a client from before countedWordIds: its Find the feeling check-in keeps the old skip (Codex, PR #130)');
   f = checkInDriver({ open: false });
   setDriver(f.driver);
   await fns.saveCheckIn.run({ auth: auth(), data: { ...checkIn(), emotionIds: ['anxious'], resultShown: true } });

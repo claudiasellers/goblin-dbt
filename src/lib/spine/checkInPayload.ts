@@ -132,7 +132,8 @@ export function buildCheckInPayload(s: CheckInState, result: ResultLike | null, 
   if (s.capacity) req.capacity = s.capacity;
   if (s.discriminatingAnswers?.length) req.discriminatingAnswers = s.discriminatingAnswers;
   if (s.embeddedToolSessionIds?.length) req.embeddedToolSessionIds = s.embeddedToolSessionIds;
-  if (s.countedWordIds?.length) req.countedWordIds = s.countedWordIds;
+  // Always sent (empty included): no field means a client from before it, which the server treats the old way.
+  req.countedWordIds = s.countedWordIds ?? [];
   if (s.safetyCheckId) req.safetyCheckId = s.safetyCheckId;
   const spots = s.source === 'grid' ? spotsFor(s.spots) : undefined;
   if (spots) req.spots = spots;

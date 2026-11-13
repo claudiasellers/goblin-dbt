@@ -66,7 +66,7 @@ test("the check-in's word list: up to three near own words lead, nearest first; 
   assert.match(checkInSrc, /useProfileContext\('checkin'\)\.slices\?\.ownWords/);
   assert.match(checkInSrc, /setCountedWordIds\(emotion && r\.toolSessionId \? \[emotion\.id\] : \[\]\)/,
     "only the word Find the feeling saved is left to its save; a body-first pick after it counts here");
-  assert.match(readFileSync("src/lib/spine/checkInPayload.ts", "utf8"), /if \(s\.countedWordIds\?\.length\) req\.countedWordIds = s\.countedWordIds;/);
+  assert.match(readFileSync("src/lib/spine/checkInPayload.ts", "utf8"), /req\.countedWordIds = s\.countedWordIds \?\? \[\];/);
 });
 
 test("Find the feeling: an own word among a family's two nearest is offered first; the family order stays the shape's", () => {
