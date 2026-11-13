@@ -22,7 +22,8 @@ const did = (id = "done") => ({ type: "embedDone", output: { ids: [id], duration
 const run = (events, c = ctx(), from = M.initialRun(skill)) => events.reduce((s, e) => M.runNext(c, s, e), from);
 const step = (id) => M.stepOf(skill, id);
 const offers = (s, c = ctx()) => M.offersFor(c, step(s.stepId), s);
-const lines = (s, c = ctx()) => (step(s.stepId).lines ?? []).filter((l) => holds(l.when, M.scope(c, s))).map((l) => l.key);
+// A hand-off shows its first matching line only, so each line key is the whole card text.
+const line = (s, c = ctx()) => (step(s.stepId).lines ?? []).find((l) => holds(l.when, M.scope(c, s)))?.key;
 const links = (s, c = ctx()) => M.stepLinks(c, step(s.stepId), s).map((l) => l.exit.id);
 const NIGHT = (why) => [pick("mode", "awake"), next, pick("night", why), next];
 const PLAN = (wake = "w0700", remind = true) =>
@@ -73,17 +74,23 @@ test("after the breath: sleepy → back to bed with the wake anchor; still awake
   assert.doesNotMatch(JSON.stringify(skill.copy), /\d+ min/, "no clock times on the night path");
   const sleepy = run([pick("now", "sleepy"), next], ctx(), atNow);
   assert.equal(sleepy.stepId, "sleepy");
-  assert.deepEqual(lines(sleepy), ["sleepy_line", "wake_anchor"]);
+  assert.equal(line(sleepy), "sleepy_line");
+  assert.equal(M.handoffLine(ctx(), step("sleepy"), sleepy), skill.copy.sleepy_line);
+  assert.match(skill.copy.sleepy_line, /Phone face down/, "the phone goes away (stimulus control)");
+  assert.match(skill.copy.sleepy_line, /get up at your usual time/);
   const up = run([pick("now", "awake"), next], ctx(), atNow);
   assert.equal(up.stepId, "up");
-  assert.match(skill.copy.up_hint, /uncomfortable, not dangerous/);
+  assert.doesNotMatch(skill.copy.up_hint, /not dangerous/, "no reassurance that isn't true for everyone (Gate 3)");
   const rest = run([pick("up", "rest"), next], ctx(), up);
   assert.equal(rest.stepId, "night_end");
-  assert.deepEqual(lines(rest), ["night_end_rest", "night_end_up", "wake_anchor"]);
+  assert.equal(line(rest), "night_end_rest");
+  assert.equal(M.copyText(ctx(), step("night_end").title, rest), skill.copy.rest_title, "still in bed: rest is enough");
   assert.deepEqual(offers(rest), []);
   // A mind that won't stop gets Give your mind a job on the end card.
   const mindEnd = run([next, did(), pick("now", "awake"), next, pick("up", "dim"), next], ctx(), run(NIGHT("mind")));
   assert.equal(mindEnd.stepId, "night_end");
+  assert.equal(line(mindEnd), "night_end_up");
+  assert.equal(M.copyText(ctx(), step("night_end").title, mindEnd), skill.copy.night_end_title);
   assert.deepEqual(offers(mindEnd), ["mind_job"]);
 });
 
@@ -95,12 +102,13 @@ test("thoughts of hurting myself: the resources open first, the banner stays, an
   for (const v of ["not_sure", "no"]) {
     const r = run([pick("safe", v), next], ctx(), s);
     assert.equal(r.stepId, "reach", v);
-    assert.deepEqual(offers(r), ["safety_open"], "nothing offered in place of someone to talk to");
+    assert.deepEqual(offers(r), ["safety_open", "crisis_kit"], "someone to talk to first, the kit beside it");
   }
   const ok = run([pick("safe", "safe_now"), next], ctx(), s);
   assert.equal(ok.stepId, "hurt_end");
   assert.equal(M.crisisFor(ctx(), step("hurt_end"), ok)?.variant, "crisis");
-  assert.deepEqual(offers(ok), ["safety_open", "crisis_kit", "five_senses"]);
+  assert.deepEqual(offers(ok), ["safety_open", "crisis_kit"], "the kit carries the banner; nothing that would drop it");
+  for (const id of ["reach", "hurt_end"]) assert.equal(step(id).noClose, true, id);
   assert.deepEqual(skill.exits.find((e) => e.id === "crisis_kit").query, { frame: "crisis" });
   for (const p of [ok.path, ...["not_sure", "no"].map((v) => run([pick("safe", v), next], ctx(), s).path)])
     for (const x of ["park", "breathe", "now", "up"]) assert.ok(!p.includes(x), `${x} never follows`);
@@ -110,7 +118,8 @@ test("a bad dream at night: back to the room or a hand on the heart, never the r
   const s = run(NIGHT("dream"));
   assert.equal(s.stepId, "dream");
   assert.deepEqual(offers(s), ["five_senses", "soothe"]);
-  assert.match(skill.copy.dream_line, /can wait for the daytime/);
+  assert.match(skill.copy.dream_line, /help for that in the daytime/);
+  assert.doesNotMatch(skill.copy.dream_line, /rewrit/i, "never presumes a rewrite (a replay goes to a clinician)");
 });
 
 test("the plan: one wake time (the morning card's chips), one wind-down thing, then the card names the time", () => {
@@ -120,8 +129,7 @@ test("the plan: one wake time (the morning card's chips), one wind-down thing, t
   assert.ok(ft && ft.enabled);
   assert.deepEqual(skill.options.wake.map((o) => o.value), Object.keys(ft.window.chips), "every wake time is a chip");
   for (const [k, w] of Object.entries(ft.window.chips)) {
-    assert.equal(w.kind, "at_local");
-    assert.equal(w.days, 1, `${k}: the next morning`);
+    assert.equal(w.kind, "next_local", `${k}: the next time it comes round`);
     assert.equal(w.time.replace(":", ""), k.slice(1), k);
   }
   // Wind-down: never food, drink or pills.
@@ -129,23 +137,31 @@ test("the plan: one wake time (the morning card's chips), one wind-down thing, t
   const end = run([...PLAN("w0730"), next]);
   assert.equal(end.stepId, "plan_end");
   assert.equal(M.copyText(ctx(), step("plan_end").title, end, M.titleSlots(ctx(), step("plan_end"), end)), "Up at 7:30, every day.");
-  assert.deepEqual(lines(end), ["plan_remind", "plan_line", "plan_doctor"]);
+  assert.equal(line(end), "plan_remind");
   const noRemind = run([...PLAN("w0730", false), next]);
-  assert.deepEqual(lines(noRemind), ["plan_line", "plan_doctor"]);
+  assert.equal(line(noRemind), "plan_line");
+  for (const k of ["plan_remind", "plan_line"]) {
+    assert.match(skill.copy[k], /a doctor can help/, `${k}: the referral line`);
+    assert.match(skill.copy[k], /Caffeine after midday and alcohol at night/, `${k}: H20b's substances`);
+  }
+  assert.match(skill.copy.wake_hint, /shifts/, "shift workers have a line");
 });
 
 test("the morning card: booked at the wake time only on a yes, the next morning, and it opens this run", () => {
   const atWind = run(PLAN("w0630"));
   assert.deepEqual(M.followUpFor(ctx(), step("wind"), atWind), { type: "sleep_morning", chip: "w0630" });
   assert.equal(M.followUpFor(ctx(), step("wind"), run(PLAN("w0630", false))), null, "no yes, no card");
-  // 22:00 tonight → 06:30 tomorrow.
-  const due = W.dueAtFor(spine.followUpTypes.find((x) => x.id === "sleep_morning").window, new Date(2026, 10, 13, 22, 0), "w0630");
-  assert.equal(due.getDate(), 14);
-  assert.equal(due.getHours(), 6);
-  assert.equal(due.getMinutes(), 30);
+  // 22:00 tonight → 06:30 tomorrow; 01:00 → 06:30 this morning (Gate 1: a plan made after midnight); 06:45, past it
+  // (the morning's *Same again*) → tomorrow.
+  const win = spine.followUpTypes.find((x) => x.id === "sleep_morning").window;
+  const at = (h, m) => new Date(2026, 10, 13, h, m);
+  for (const [now, day] of [[at(22, 0), 14], [at(1, 0), 13], [at(6, 45), 14], [at(6, 10), 14]]) {
+    const due = W.dueAtFor(win, now, "w0630");
+    assert.deepEqual([due.getDate(), due.getHours(), due.getMinutes()], [day, 6, 30], String(now));
+  }
   const ft = spine.followUpTypes.find((x) => x.id === "sleep_morning");
   assert.equal(ft.deepLinkTemplate, "/tool/sleep-reset?run={sourceSessionId}&at=morning&followUp={followUpId}");
-  assert.doesNotMatch(`${ft.copy.title} ${ft.copy.body}`, /\d/, "content-free: no time on the card");
+  assert.doesNotMatch(`${ft.copy.title} ${ft.copy.body}`, /\d|night was|wake time/i, "content-free: no time on the card");
   assert.ok(ft.staleAfterHours <= 12, "about one morning");
   assert.match(readFileSync("functions/src/spine/toolSession.ts", "utf8"), /OPEN_RESOLVES = \[[^\]]*'sleep_morning'/);
   assert.match(readFileSync("functions/src/spine/copeAheadAfter.ts", "utf8"), /sleep_morning: 'sleep-reset'/);
@@ -166,7 +182,9 @@ test("the morning: how was the night, up at your time; same again books the card
   assert.equal(M.followUpFor(ctx(), step("again"), run([pick("again", "again_no")], ctx(), atAgain)), null);
   const done = run([next], ctx(), yes);
   assert.equal(done.stepId, "morning_end");
-  assert.deepEqual(lines(done), ["morning_barely", "morning_line"]);
+  assert.equal(line(done), "morning_barely");
+  assert.match(skill.copy.morning_barely, /don't drive drowsy/);
+  assert.match(skill.copy.morning_barely, /full of energy, not tired\? Tell your doctor/, "bipolar: a short night with energy");
   assert.deepEqual(offers(done), ["please_skill"], "a short night: Running low for the day");
   // Reopened a second time (booked again on the yes): asked fresh, the wake time still there.
   const rec2 = M.runRecord(ctx(), { ...done, scheduled: { again: { type: "sleep_morning", id: "f2" } } });
@@ -184,7 +202,12 @@ test("the morning after a bad dream: Rewrite the nightmare, in daylight; not up 
   const done = run([pick("slept", "broken"), pick("up_at", "up_not_yet"), pick("dream", "dream_yes"), next, pick("again", "again_no"), next], ctx(), r);
   assert.equal(done.stepId, "morning_end");
   assert.deepEqual(offers(done), ["nightmare_rescript"]);
-  assert.deepEqual(lines(done), ["morning_not_yet", "morning_line"]);
+  assert.equal(line(done), "morning_broken", "broken nights: the referral line, with snoring, gasping and restless legs");
+  assert.match(skill.copy.morning_broken, /snoring, gasping or restless legs/);
+  const fine = run([pick("slept", "okay"), pick("up_at", "up_not_yet"), next, pick("again", "again_no"), next], ctx(), r);
+  assert.equal(line(fine), "morning_not_yet");
+  const no = run([pick("slept", "okay"), pick("up_at", "up_yes"), next, pick("again", "again_no"), next], ctx(), r);
+  assert.equal(line(no), "morning_again_no", "a no says how to start again");
 });
 
 test("a carried flooded reading: settle first is offered only on the plan side; the night breathes", () => {

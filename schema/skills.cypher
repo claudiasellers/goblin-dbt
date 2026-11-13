@@ -24198,7 +24198,7 @@ SET r += {list: "tvn", order: 28};
 
 // --- sleep_reset (sr-v1) ---
 MERGE (s:Skill {id: "sleep_reset"})
-SET s += {toolId: "sleep-reset", version: "sr-v1", contentVersion: "skills-v1", start: "mode", ownMax: 90, emotionFields: [], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"again_label\": \"Same again tomorrow?\", \"again_title\": \"One morning doesn't undo it.\", \"again_title_up\": \"Up at your time, even so. That's the reset working.\", \"breathe_dizzy\": \"Light-headed? Breathe normally. That's fine too.\", \"breathe_done\": \"That's enough for now.\", \"breathe_in\": \"In\", \"breathe_out\": \"Out\", \"breathe_start\": \"Start\", \"breathe_step1\": \"Lie back, or sit somewhere dim.\", \"breathe_step2\": \"No need to check the time.\", \"breathe_title\": \"Slow breaths, out longer than in.\", \"done\": \"Done\", \"dream_label\": \"Did a bad dream wake you?\", \"dream_line\": \"A bad dream can leave your body on alert. Notice what's around you: the bed, the light, the sounds. Rewriting it can wait for the daytime.\", \"dream_title\": \"Back to the room first.\", \"hurt_end_line\": \"Sleep can wait. Someone to talk to is here any hour, and so is your kit.\", \"hurt_end_title\": \"Getting through the night is the job.\", \"mind_job_link\": \"Give my mind a job instead\", \"mode_hint\": \"Sleep runs hotter and colder with feelings. Both of these help.\", \"mode_title\": \"What do you need?\", \"morning_barely\": \"A short night is hard. Skip the nap if you can, and go to bed when you're sleepy tonight.\", \"morning_end_title\": \"That's the reset.\", \"morning_line\": \"One fixed time to get up, every day, is most of it.\", \"morning_not_yet\": \"Getting up now still helps. Light and moving tell your body it's morning.\", \"morning_title\": \"Morning. How was the night?\", \"next\": \"Next\", \"night_end_rest\": \"Resting with your eyes closed still counts. If you start to stew, getting up for a bit helps.\", \"night_end_title\": \"Back to bed when your eyes get heavy.\", \"night_end_up\": \"Go back when you're sleepy, not by the clock.\", \"night_hint\": \"You don't have to fix the night. Resting counts.\", \"night_title\": \"What's keeping you up?\", \"now_hint\": \"No need to check the time.\", \"now_title\": \"How is it now?\", \"park_hint\": \"A few words is enough. Night isn't the time to solve it, and it'll keep until morning.\", \"park_own\": \"In my words\", \"park_title\": \"Put it down for the night.\", \"plan_doctor\": \"If sleep's been bad for weeks, a doctor can help. Trouble sleeping is very treatable.\", \"plan_line\": \"If you can't sleep, come back here and pick I can't sleep.\", \"plan_remind\": \"It'll be on Today that morning.\", \"plan_title\": \"Up at {wake}, every day.\", \"reach_line\": \"You don't have to get through this part on your own. Someone is there, any hour.\", \"reach_title\": \"Talk to someone now.\", \"remind_label\": \"Check in with me that morning?\", \"safe_hint\": \"The support is on this screen, any hour.\", \"safe_title\": \"Are you safe right now?\", \"safety_open\": \"Talk to someone now\", \"settle_first\": \"Settle my body first\", \"sleepy_line\": \"If you're still awake after a while, come back here.\", \"sleepy_title\": \"Back to bed.\", \"up_hint\": \"Lying awake teaches the bed it's for being awake. Being awake is uncomfortable, not dangerous.\", \"up_label\": \"Up at your time?\", \"up_title\": \"Try getting up for a bit.\", \"wake_anchor\": \"Whatever time you fall asleep, get up at your usual time. That's what resets it.\", \"wake_hint\": \"The same time on weekends too. Getting up at one time resets sleep more than any bedtime does.\", \"wake_title\": \"What time will you get up, every day?\", \"wind_hint\": \"One thing is enough. Go to bed when you're sleepy, not before.\", \"wind_own\": \"Something else\", \"wind_title\": \"Pick one thing for the hour before bed.\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "sleep-reset", version: "sr-v1", contentVersion: "skills-v1", start: "mode", ownMax: 90, emotionFields: [], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"again_label\": \"Same again tomorrow?\", \"again_title\": \"A late start doesn't undo the reset.\", \"again_title_up\": \"Up at your time. That's the reset working.\", \"breathe_dizzy\": \"Light-headed? Breathe normally. That's fine too.\", \"breathe_done\": \"That's enough for now.\", \"breathe_in\": \"In\", \"breathe_out\": \"Out\", \"breathe_start\": \"Start\", \"breathe_step1\": \"Lie back, or sit somewhere dim.\", \"breathe_step2\": \"No need to check the time.\", \"breathe_title\": \"Slow breaths, out longer than in.\", \"done\": \"Done\", \"dream_label\": \"Did a bad dream wake you?\", \"dream_line\": \"Notice what's around you: the bed, the light, the sounds. Back to bed when you're ready. If it keeps coming back, there's help for that in the daytime.\", \"dream_title\": \"Back to the room first.\", \"hurt_end_line\": \"Sleep can wait. Someone to talk to is here, any hour.\", \"hurt_end_title\": \"Getting through the night is the job.\", \"mind_job_link\": \"Give my mind a job instead\", \"mode_hint\": \"For tonight, or for the nights ahead.\", \"mode_title\": \"What do you need?\", \"morning_again_no\": \"One fixed time to get up, every day, is most of it. You can set it up again any time in Sleep Reset.\", \"morning_barely\": \"A short night is hard. A nap can make tonight harder; if you need one, keep it short and early, and don't drive drowsy. Barely sleeping and full of energy, not tired? Tell your doctor soon.\", \"morning_broken\": \"Broken nights add up. If it's been weeks, or there's loud snoring, gasping or restless legs, a doctor can help.\", \"morning_end_title\": \"That's the reset.\", \"morning_line\": \"One fixed time to get up, every day, is most of it.\", \"morning_not_yet\": \"Getting up now still helps. Light and moving tell your body it's morning.\", \"morning_title\": \"Morning. How was the night?\", \"next\": \"Next\", \"night_end_rest\": \"Eyes closed, phone face down. Resting still counts. If you start to stew, getting up for a bit helps.\", \"night_end_title\": \"Back to bed when your eyes get heavy.\", \"night_end_up\": \"Phone face down, out of reach. Go back when you're sleepy, not by the clock. Whatever time you fall asleep, get up at your usual time.\", \"night_hint\": \"You don't have to fix the night. Resting counts.\", \"night_title\": \"What's keeping you up?\", \"now_title\": \"How is it now?\", \"park_hint\": \"Name it and leave it for the morning. It'll keep.\", \"park_own\": \"In my words\", \"park_title\": \"Put it down for the night.\", \"plan_line\": \"Caffeine after midday and alcohol at night both break sleep up. On a night you can't sleep, open Sleep Reset again. If sleep's been bad for weeks, a doctor can help.\", \"plan_remind\": \"A morning check will be on Today. Caffeine after midday and alcohol at night both break sleep up. If sleep's been bad for weeks, a doctor can help.\", \"plan_title\": \"Up at {wake}, every day.\", \"reach_line\": \"Someone is there to talk to, right now.\", \"reach_title\": \"You don't have to do this part alone.\", \"remind_label\": \"Check in with me in the morning?\", \"rest_title\": \"Rest is enough for now.\", \"safe_hint\": \"The support is on this screen, any hour.\", \"safe_title\": \"Are you safe right now?\", \"safety_open\": \"Talk to someone now\", \"settle_first\": \"Settle my body first\", \"sleepy_line\": \"Phone face down, out of reach. If you're still awake after a while, get up for a bit. Whatever time you fall asleep, get up at your usual time.\", \"sleepy_title\": \"Back to bed.\", \"up_hint\": \"A different room for a while often helps more than lying there.\", \"up_label\": \"Up at your time?\", \"up_title\": \"Try getting up for a bit.\", \"wake_hint\": \"The same time on weekends too. It resets sleep more than any bedtime does. If your hours change with shifts, set it by your shift; a doctor can help plan it.\", \"wake_title\": \"What time will you get up, every day?\", \"wind_hint\": \"One thing is enough. Go to bed when you're sleepy, not before.\", \"wind_own\": \"Something else\", \"wind_title\": \"Pick one thing for the hour before bed.\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "dbt_sleep_hygiene"}), (s:Skill {id: "sleep_reset"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "sleep_reset"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
@@ -24219,12 +24219,12 @@ MATCH (s:Skill {id: "sleep_reset"}), (n:SkillStep {id: "sleep_reset:safe"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 2};
 MERGE (n:SkillStep {id: "sleep_reset:reach"})
-SET n += {skillId: "sleep_reset", step: "reach", kind: "handoff", version: "sr-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"all\": []}}], \"done\": \"done\", \"lines\": [{\"key\": \"reach_line\", \"when\": {\"all\": []}}], \"links\": [], \"title\": \"reach_title\"}";
+SET n += {skillId: "sleep_reset", step: "reach", kind: "handoff", version: "sr-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"all\": []}}], \"done\": \"done\", \"lines\": [{\"key\": \"reach_line\", \"when\": {\"all\": []}}], \"links\": [], \"noClose\": true, \"title\": \"reach_title\"}";
 MATCH (s:Skill {id: "sleep_reset"}), (n:SkillStep {id: "sleep_reset:reach"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 3};
 MERGE (n:SkillStep {id: "sleep_reset:hurt_end"})
-SET n += {skillId: "sleep_reset", step: "hurt_end", kind: "handoff", version: "sr-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"all\": []}}], \"done\": \"done\", \"lines\": [{\"key\": \"hurt_end_line\", \"when\": {\"all\": []}}], \"links\": [], \"title\": \"hurt_end_title\"}";
+SET n += {skillId: "sleep_reset", step: "hurt_end", kind: "handoff", version: "sr-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"all\": []}}], \"done\": \"done\", \"lines\": [{\"key\": \"hurt_end_line\", \"when\": {\"all\": []}}], \"links\": [], \"noClose\": true, \"title\": \"hurt_end_title\"}";
 MATCH (s:Skill {id: "sleep_reset"}), (n:SkillStep {id: "sleep_reset:hurt_end"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 4};
@@ -24244,12 +24244,12 @@ MATCH (s:Skill {id: "sleep_reset"}), (n:SkillStep {id: "sleep_reset:breathe"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 7};
 MERGE (n:SkillStep {id: "sleep_reset:now"})
-SET n += {skillId: "sleep_reset", step: "now", kind: "ask", version: "sr-v1"}, n.specJson = "{\"fields\": [{\"id\": \"now\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"now\"}, \"required\": true}], \"hint\": \"now_hint\", \"title\": \"now_title\"}";
+SET n += {skillId: "sleep_reset", step: "now", kind: "ask", version: "sr-v1"}, n.specJson = "{\"fields\": [{\"id\": \"now\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"now\"}, \"required\": true}], \"title\": \"now_title\"}";
 MATCH (s:Skill {id: "sleep_reset"}), (n:SkillStep {id: "sleep_reset:now"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 8};
 MERGE (n:SkillStep {id: "sleep_reset:sleepy"})
-SET n += {skillId: "sleep_reset", step: "sleepy", kind: "handoff", version: "sr-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"sleepy_line\", \"when\": {\"all\": []}}, {\"key\": \"wake_anchor\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"title\": \"sleepy_title\"}";
+SET n += {skillId: "sleep_reset", step: "sleepy", kind: "handoff", version: "sr-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"sleepy_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"title\": \"sleepy_title\"}";
 MATCH (s:Skill {id: "sleep_reset"}), (n:SkillStep {id: "sleep_reset:sleepy"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 9};
@@ -24259,7 +24259,7 @@ MATCH (s:Skill {id: "sleep_reset"}), (n:SkillStep {id: "sleep_reset:up"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 10};
 MERGE (n:SkillStep {id: "sleep_reset:night_end"})
-SET n += {skillId: "sleep_reset", step: "night_end", kind: "handoff", version: "sr-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"night_end_rest\", \"when\": {\"eq\": [\"$a.up\", \"rest\"]}}, {\"key\": \"night_end_up\", \"when\": {\"all\": []}}, {\"key\": \"wake_anchor\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"title\": \"night_end_title\"}";
+SET n += {skillId: "sleep_reset", step: "night_end", kind: "handoff", version: "sr-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"night_end_rest\", \"when\": {\"eq\": [\"$a.up\", \"rest\"]}}, {\"key\": \"night_end_up\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"title\": [{\"key\": \"rest_title\", \"when\": {\"eq\": [\"$a.up\", \"rest\"]}}, {\"key\": \"night_end_title\"}]}";
 MATCH (s:Skill {id: "sleep_reset"}), (n:SkillStep {id: "sleep_reset:night_end"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 11};
@@ -24274,7 +24274,7 @@ MATCH (s:Skill {id: "sleep_reset"}), (n:SkillStep {id: "sleep_reset:wind"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 13};
 MERGE (n:SkillStep {id: "sleep_reset:plan_end"})
-SET n += {skillId: "sleep_reset", step: "plan_end", kind: "handoff", version: "sr-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"plan_remind\", \"when\": {\"set\": \"$a.remind\"}}, {\"key\": \"plan_line\", \"when\": {\"all\": []}}, {\"key\": \"plan_doctor\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"title\": \"plan_title\", \"titleSlots\": {\"wake\": {\"labelOf\": \"wake\"}}}";
+SET n += {skillId: "sleep_reset", step: "plan_end", kind: "handoff", version: "sr-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"plan_remind\", \"when\": {\"set\": \"$a.remind\"}}, {\"key\": \"plan_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"title\": \"plan_title\", \"titleSlots\": {\"wake\": {\"labelOf\": \"wake\"}}}";
 MATCH (s:Skill {id: "sleep_reset"}), (n:SkillStep {id: "sleep_reset:plan_end"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 14};
@@ -24289,7 +24289,7 @@ MATCH (s:Skill {id: "sleep_reset"}), (n:SkillStep {id: "sleep_reset:again"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 16};
 MERGE (n:SkillStep {id: "sleep_reset:morning_end"})
-SET n += {skillId: "sleep_reset", step: "morning_end", kind: "handoff", version: "sr-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"morning_barely\", \"when\": {\"eq\": [\"$a.slept\", \"barely\"]}}, {\"key\": \"morning_not_yet\", \"when\": {\"eq\": [\"$a.up_at\", \"up_not_yet\"]}}, {\"key\": \"morning_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"title\": \"morning_end_title\"}";
+SET n += {skillId: "sleep_reset", step: "morning_end", kind: "handoff", version: "sr-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"morning_barely\", \"when\": {\"eq\": [\"$a.slept\", \"barely\"]}}, {\"key\": \"morning_broken\", \"when\": {\"eq\": [\"$a.slept\", \"broken\"]}}, {\"key\": \"morning_not_yet\", \"when\": {\"eq\": [\"$a.up_at\", \"up_not_yet\"]}}, {\"key\": \"morning_again_no\", \"when\": {\"eq\": [\"$a.again\", \"again_no\"]}}, {\"key\": \"morning_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"title\": \"morning_end_title\"}";
 MATCH (s:Skill {id: "sleep_reset"}), (n:SkillStep {id: "sleep_reset:morning_end"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 17};
@@ -24382,15 +24382,15 @@ SET r += {order: 0, field: "safe", label: "safety_open"}, r.whenJson = "{\"all\"
 MATCH (a:SkillStep {id: "sleep_reset:reach"}), (x:SkillExit {id: "sleep_reset:safety_open"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "sleep_reset:reach"}), (x:SkillExit {id: "sleep_reset:crisis_kit"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
 MATCH (a:SkillStep {id: "sleep_reset:hurt_end"}), (x:SkillExit {id: "sleep_reset:safety_open"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
 MATCH (a:SkillStep {id: "sleep_reset:hurt_end"}), (x:SkillExit {id: "sleep_reset:crisis_kit"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
-MATCH (a:SkillStep {id: "sleep_reset:hurt_end"}), (x:SkillExit {id: "sleep_reset:five_senses"})
-MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"all\": []}}]";
 MATCH (a:SkillStep {id: "sleep_reset:dream"}), (x:SkillExit {id: "sleep_reset:five_senses"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
@@ -24609,7 +24609,7 @@ MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0930
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "wake", order: 25};
 MERGE (o:SkillOption {id: "sleep_reset:wind:screens"})
-SET o:SkillOption, o += {skillId: "sleep_reset", list: "wind", value: "screens", label: "Screens off, or across the room", version: "sr-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wind", value: "screens", label: "Screens away", version: "sr-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wind:screens"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "wind", order: 26};
@@ -24619,7 +24619,7 @@ MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wind:dim"}
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "wind", order: 27};
 MERGE (o:SkillOption {id: "sleep_reset:wind:tomorrow"})
-SET o:SkillOption, o += {skillId: "sleep_reset", list: "wind", value: "tomorrow", label: "Write tomorrow's one thing down, then put it away", version: "sr-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wind", value: "tomorrow", label: "Write tomorrow's list", version: "sr-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wind:tomorrow"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "wind", order: 28};
@@ -24629,7 +24629,7 @@ MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wind:warm"
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "wind", order: 29};
 MERGE (o:SkillOption {id: "sleep_reset:wind:quiet"})
-SET o:SkillOption, o += {skillId: "sleep_reset", list: "wind", value: "quiet", label: "Something quiet: a book, music, stretching", version: "sr-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wind", value: "quiet", label: "A book, music or stretching", version: "sr-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wind:quiet"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "wind", order: 30};

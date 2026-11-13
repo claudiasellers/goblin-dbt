@@ -1742,7 +1742,7 @@
         },
         "enabled": true,
         "copy": {
-          "body": "The wake time you set in Sleep reset. How was the night?",
+          "body": "From Sleep Reset. How was the night?",
           "title": "Morning check"
         },
         "choices": [
@@ -1755,43 +1755,35 @@
         "window": {
           "chips": {
             "w0600": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
               "time": "06:00"
             },
             "w0630": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
               "time": "06:30"
             },
             "w0700": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
               "time": "07:00"
             },
             "w0730": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
               "time": "07:30"
             },
             "w0800": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
               "time": "08:00"
             },
             "w0830": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
               "time": "08:30"
             },
             "w0900": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
               "time": "09:00"
             },
             "w0930": {
-              "days": 1,
-              "kind": "at_local",
+              "kind": "next_local",
               "time": "09:30"
             }
           },

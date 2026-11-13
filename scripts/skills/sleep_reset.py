@@ -41,21 +41,21 @@ COPY = {
     "done": "Done",
     "safety_open": "Talk to someone now",
     "mode_title": "What do you need?",
-    "mode_hint": "Sleep runs hotter and colder with feelings. Both of these help.",
+    "mode_hint": "For tonight, or for the nights ahead.",
     "settle_first": "Settle my body first",
-    # The night (H20b, when you can't sleep).
+    # The night (H20b, when you can't sleep). A hand-off shows its first matching line, so each line is whole.
     "night_title": "What's keeping you up?",
     "night_hint": "You don't have to fix the night. Resting counts.",
     "safe_title": "Are you safe right now?",
     "safe_hint": "The support is on this screen, any hour.",
-    "reach_title": "Talk to someone now.",
-    "reach_line": "You don't have to get through this part on your own. Someone is there, any hour.",
+    "reach_title": "You don't have to do this part alone.",
+    "reach_line": "Someone is there to talk to, right now.",
     "hurt_end_title": "Getting through the night is the job.",
-    "hurt_end_line": "Sleep can wait. Someone to talk to is here any hour, and so is your kit.",
+    "hurt_end_line": "Sleep can wait. Someone to talk to is here, any hour.",
     "dream_title": "Back to the room first.",
-    "dream_line": "A bad dream can leave your body on alert. Notice what's around you: the bed, the light, the sounds. Rewriting it can wait for the daytime.",
+    "dream_line": "Notice what's around you: the bed, the light, the sounds. Back to bed when you're ready. If it keeps coming back, there's help for that in the daytime.",
     "park_title": "Put it down for the night.",
-    "park_hint": "A few words is enough. Night isn't the time to solve it, and it'll keep until morning.",
+    "park_hint": "Name it and leave it for the morning. It'll keep.",
     "park_own": "In my words",
     "mind_job_link": "Give my mind a job instead",
     "breathe_title": "Slow breaths, out longer than in.",
@@ -67,36 +67,36 @@ COPY = {
     "breathe_dizzy": "Light-headed? Breathe normally. That's fine too.",
     "breathe_done": "That's enough for now.",
     "now_title": "How is it now?",
-    "now_hint": "No need to check the time.",
     "up_title": "Try getting up for a bit.",
-    "up_hint": "Lying awake teaches the bed it's for being awake. Being awake is uncomfortable, not dangerous.",
+    "up_hint": "A different room for a while often helps more than lying there.",
     "sleepy_title": "Back to bed.",
-    "sleepy_line": "If you're still awake after a while, come back here.",
+    "sleepy_line": "Phone face down, out of reach. If you're still awake after a while, get up for a bit. Whatever time you fall asleep, get up at your usual time.",
+    "rest_title": "Rest is enough for now.",
+    "night_end_rest": "Eyes closed, phone face down. Resting still counts. If you start to stew, getting up for a bit helps.",
     "night_end_title": "Back to bed when your eyes get heavy.",
-    "night_end_rest": "Resting with your eyes closed still counts. If you start to stew, getting up for a bit helps.",
-    "night_end_up": "Go back when you're sleepy, not by the clock.",
-    "wake_anchor": "Whatever time you fall asleep, get up at your usual time. That's what resets it.",
+    "night_end_up": "Phone face down, out of reach. Go back when you're sleepy, not by the clock. Whatever time you fall asleep, get up at your usual time.",
     # The plan (H20b, the sleep schedule).
     "wake_title": "What time will you get up, every day?",
-    "wake_hint": "The same time on weekends too. Getting up at one time resets sleep more than any bedtime does.",
+    "wake_hint": "The same time on weekends too. It resets sleep more than any bedtime does. If your hours change with shifts, set it by your shift; a doctor can help plan it.",
     "wind_title": "Pick one thing for the hour before bed.",
     "wind_hint": "One thing is enough. Go to bed when you're sleepy, not before.",
     "wind_own": "Something else",
-    "remind_label": "Check in with me that morning?",
+    "remind_label": "Check in with me in the morning?",
     "plan_title": "Up at {wake}, every day.",
-    "plan_remind": "It'll be on Today that morning.",
-    "plan_line": "If you can't sleep, come back here and pick I can't sleep.",
-    "plan_doctor": "If sleep's been bad for weeks, a doctor can help. Trouble sleeping is very treatable.",
+    "plan_remind": "A morning check will be on Today. Caffeine after midday and alcohol at night both break sleep up. If sleep's been bad for weeks, a doctor can help.",
+    "plan_line": "Caffeine after midday and alcohol at night both break sleep up. On a night you can't sleep, open Sleep Reset again. If sleep's been bad for weeks, a doctor can help.",
     # The morning card reopens the run here.
     "morning_title": "Morning. How was the night?",
     "up_label": "Up at your time?",
     "dream_label": "Did a bad dream wake you?",
-    "again_title_up": "Up at your time, even so. That's the reset working.",
-    "again_title": "One morning doesn't undo it.",
+    "again_title_up": "Up at your time. That's the reset working.",
+    "again_title": "A late start doesn't undo the reset.",
     "again_label": "Same again tomorrow?",
     "morning_end_title": "That's the reset.",
-    "morning_barely": "A short night is hard. Skip the nap if you can, and go to bed when you're sleepy tonight.",
+    "morning_barely": "A short night is hard. A nap can make tonight harder; if you need one, keep it short and early, and don't drive drowsy. Barely sleeping and full of energy, not tired? Tell your doctor soon.",
+    "morning_broken": "Broken nights add up. If it's been weeks, or there's loud snoring, gasping or restless legs, a doctor can help.",
     "morning_not_yet": "Getting up now still helps. Light and moving tell your body it's morning.",
+    "morning_again_no": "One fixed time to get up, every day, is most of it. You can set it up again any time in Sleep Reset.",
     "morning_line": "One fixed time to get up, every day, is most of it.",
 }
 
@@ -111,9 +111,8 @@ UP = [("dim", "Another room, lights low"), ("read", "Something calm on paper"), 
 # Wake times (the `sleep_morning` window's chips, scripts/practice-spine/content.py): the next morning.
 WAKE = [(f"w{h:02d}{m:02d}", f"{h}:{m:02d}") for h in range(6, 10) for m in (0, 30)]
 # H20b's wind-down: no screens, low light, worries parked, warmth. No food, drink or pills.
-WIND = [("screens", "Screens off, or across the room"), ("dim", "Lights low"),
-        ("tomorrow", "Write tomorrow's one thing down, then put it away"), ("warm", "A warm shower or bath"),
-        ("quiet", "Something quiet: a book, music, stretching")]
+WIND = [("screens", "Screens away"), ("dim", "Lights low"), ("tomorrow", "Write tomorrow's list"),
+        ("warm", "A warm shower or bath"), ("quiet", "A book, music or stretching")]
 REMIND = [("yes", "Yes")]
 SLEPT = [("okay", "Slept okay"), ("broken", "Broken"), ("barely", "Barely slept")]
 UP_AT = [("up_yes", "Yes"), ("up_later", "Later than planned"), ("up_not_yet", "Not yet")]
@@ -123,6 +122,7 @@ AGAIN = [("again_yes", "Yes, check in tomorrow"), ("again_no", "Not tomorrow")]
 HURT = {"eq": [a("night"), "hurt"]}
 CRISIS = [{"variant": "crisis", "when": ALWAYS}]
 UNSAFE = {"in": [a("safe"), ["not_sure", "no"]]}
+REST = {"eq": [a("up"), "rest"]}
 
 
 def field(fid, *, label=None, required=True, own=None, links=None, show=None, max_=1):
@@ -173,11 +173,10 @@ STEPS = [
         "next": [{"when": UNSAFE, "to": "reach"}, {"to": "hurt_end"}],
     },
     handoff("reach", "reach_title", [{"when": ALWAYS, "key": "reach_line"}],
-            [{"exit": "safety_open", "when": ALWAYS}], crisis=CRISIS),
+            [{"exit": "safety_open", "when": ALWAYS}, {"exit": "crisis_kit", "when": ALWAYS}], crisis=CRISIS, noClose=True),
     # Safe for now: getting through the night is the job; no sleep coaching (Gate 3).
     handoff("hurt_end", "hurt_end_title", [{"when": ALWAYS, "key": "hurt_end_line"}],
-            [{"exit": "safety_open", "when": ALWAYS}, {"exit": "crisis_kit", "when": ALWAYS},
-             {"exit": "five_senses", "when": ALWAYS}], crisis=CRISIS),
+            [{"exit": "safety_open", "when": ALWAYS}, {"exit": "crisis_kit", "when": ALWAYS}], crisis=CRISIS, noClose=True),
     # A bad dream: grounding, never back into it at night (ER-15 is offered in the morning).
     handoff("dream", "dream_title", [{"when": ALWAYS, "key": "dream_line"}],
             [{"exit": "five_senses", "when": ALWAYS}, {"exit": "soothe", "when": ALWAYS}]),
@@ -196,20 +195,19 @@ STEPS = [
         "next": [{"to": "now"}],
     },
     {
-        "id": "now", "kind": "ask", "title": "now_title", "hint": "now_hint",
+        "id": "now", "kind": "ask", "title": "now_title",
         "fields": [field("now")],
         "next": [{"when": {"eq": [a("now"), "sleepy"]}, "to": "sleepy"}, {"to": "up"}],
     },
-    handoff("sleepy", "sleepy_title", [{"when": ALWAYS, "key": "sleepy_line"}, {"when": ALWAYS, "key": "wake_anchor"}], []),
+    handoff("sleepy", "sleepy_title", [{"when": ALWAYS, "key": "sleepy_line"}], []),
     {
         "id": "up", "kind": "ask", "title": "up_title", "hint": "up_hint",
         "fields": [field("up", links=[{"exit": "mind_job", "label": "mind_job_link", "when": {"eq": [a("night"), "mind"]}},
                                       SAFETY_LINK])],
         "next": [{"to": "night_end"}],
     },
-    handoff("night_end", "night_end_title",
-            [{"when": {"eq": [a("up"), "rest"]}, "key": "night_end_rest"}, {"when": ALWAYS, "key": "night_end_up"},
-             {"when": ALWAYS, "key": "wake_anchor"}],
+    handoff("night_end", [{"when": REST, "key": "rest_title"}, {"key": "night_end_title"}],
+            [{"when": REST, "key": "night_end_rest"}, {"when": ALWAYS, "key": "night_end_up"}],
             [{"exit": "mind_job", "when": {"eq": [a("night"), "mind"]}}]),
     # ── The plan ──
     {
@@ -225,8 +223,7 @@ STEPS = [
         "next": [{"to": "plan_end"}],
     },
     {**handoff("plan_end", "plan_title",
-               [{"when": {"set": a("remind")}, "key": "plan_remind"}, {"when": ALWAYS, "key": "plan_line"},
-                {"when": ALWAYS, "key": "plan_doctor"}], []),
+               [{"when": {"set": a("remind")}, "key": "plan_remind"}, {"when": ALWAYS, "key": "plan_line"}], []),
      "titleSlots": {"wake": {"labelOf": "wake"}}},
     # ── The morning card reopens the run here ──
     {
@@ -245,7 +242,9 @@ STEPS = [
     },
     {**handoff("morning_end", "morning_end_title",
                [{"when": {"eq": [a("slept"), "barely"]}, "key": "morning_barely"},
+                {"when": {"eq": [a("slept"), "broken"]}, "key": "morning_broken"},
                 {"when": {"eq": [a("up_at"), "up_not_yet"]}, "key": "morning_not_yet"},
+                {"when": {"eq": [a("again"), "again_no"]}, "key": "morning_again_no"},
                 {"when": ALWAYS, "key": "morning_line"}],
                [{"exit": "nightmare_rescript", "when": {"set": a("dream")}},
                 {"exit": "please_skill", "when": {"eq": [a("slept"), "barely"]}}])},
