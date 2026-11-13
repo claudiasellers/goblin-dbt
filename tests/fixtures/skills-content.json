@@ -40734,6 +40734,8 @@
     "clar_title_open": "One question is still open",
     "cdng_safe": "Your read of danger is the one that counts here. You don't have to check it against anything.",
     "clar_flooded": "Your body's loud right now. The facts can wait until it settles a little.",
+    "fits_quieter": "Now that it's a little quieter, the facts are easier to see.",
+    "size_small_only": "While your body's loud, a small step is the one to start with.",
     "repr_title": "When guilt or shame fits, repair is the opposite of hiding",
     "repr_line": "Owning it and making it right is the skill here.",
     "cue_title": "Let your body go first",
@@ -41378,6 +41380,15 @@
        }
       },
       {
+       "to": "help",
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       }
+      },
+      {
        "to": "fits",
        "when": null
       }
@@ -41565,6 +41576,208 @@
      "offers": []
     },
     {
+     "id": "lfit",
+     "kind": "ask",
+     "each": "feel",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.urge",
+         "guilt-punish"
+        ]
+       }
+      }
+     ],
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "anger"
+        ]
+       },
+       "key": "fits_title_anger"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "disgust"
+        ]
+       },
+       "key": "fits_title_disgust"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "envy"
+        ]
+       },
+       "key": "fits_title_envy"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "fear"
+        ]
+       },
+       "key": "fits_title_fear"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "guilt"
+        ]
+       },
+       "key": "fits_title_guilt"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "jealousy"
+        ]
+       },
+       "key": "fits_title_jealousy"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "love"
+        ]
+       },
+       "key": "fits_title_love"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "sadness"
+        ]
+       },
+       "key": "fits_title_sadness"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "shame"
+        ]
+       },
+       "key": "fits_title_shame"
+      },
+      {
+       "key": "fits_title"
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "fits_quieter"
+      }
+     ],
+     "fields": [
+      {
+       "id": "fitl",
+       "options": {
+        "list": "fits"
+       },
+       "max": 1,
+       "required": true,
+       "list": {
+        "table": "fitsWhen",
+        "key": "$d.fitsParent"
+       },
+       "links": [
+        {
+         "exit": "check_the_facts",
+         "label": "check_link",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "clar",
+       "when": {
+        "all": [
+         {
+          "all": [
+           {
+            "eq": [
+             "$ctx.band",
+             "flooded"
+            ]
+           },
+           {
+            "set": "$a.fitl"
+           },
+           {
+            "in": [
+             "$a.tvnb",
+             [
+              "better",
+              "much_better"
+             ]
+            ]
+           },
+           {
+            "eq": [
+             "$a.help",
+             "unhelpful"
+            ]
+           },
+           {
+            "not": {
+             "all": [
+              {
+               "in": [
+                "$d.parent",
+                [
+                 "guilt",
+                 "shame"
+                ]
+               ]
+              },
+              {
+               "eq": [
+                "$a.goal",
+                "repair"
+               ]
+              }
+             ]
+            }
+           }
+          ]
+         },
+         {
+          "eq": [
+           "$a.fitl",
+           "unsure"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "size",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
      "id": "help",
      "kind": "ask",
      "each": "feel",
@@ -41731,17 +41944,53 @@
        "when": {
         "any": [
          {
-          "all": [
+          "any": [
            {
-            "eq": [
-             "$a.fits",
-             "excessive"
+            "all": [
+             {
+              "eq": [
+               "$a.fits",
+               "excessive"
+              ]
+             },
+             {
+              "eq": [
+               "$a.help",
+               "unhelpful"
+              ]
+             }
             ]
            },
            {
-            "eq": [
-             "$a.help",
-             "unhelpful"
+            "all": [
+             {
+              "eq": [
+               "$a.fits",
+               "fits"
+              ]
+             },
+             {
+              "eq": [
+               "$a.help",
+               "unhelpful"
+              ]
+             }
+            ]
+           },
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.fits",
+               "not_fit"
+              ]
+             },
+             {
+              "eq": [
+               "$a.help",
+               "unhelpful"
+              ]
+             }
             ]
            }
           ]
@@ -41750,31 +41999,41 @@
           "all": [
            {
             "eq": [
-             "$a.fits",
-             "fits"
+             "$ctx.band",
+             "flooded"
             ]
+           },
+           {
+            "not": {
+             "set": "$a.fits"
+            }
            },
            {
             "eq": [
              "$a.help",
              "unhelpful"
             ]
-           }
-          ]
-         },
-         {
-          "all": [
-           {
-            "eq": [
-             "$a.fits",
-             "not_fit"
-            ]
            },
            {
-            "eq": [
-             "$a.help",
-             "unhelpful"
-            ]
+            "not": {
+             "all": [
+              {
+               "in": [
+                "$d.parent",
+                [
+                 "guilt",
+                 "shame"
+                ]
+               ]
+              },
+              {
+               "eq": [
+                "$a.goal",
+                "repair"
+               ]
+              }
+             ]
+            }
            }
           ]
          }
@@ -42210,9 +42469,72 @@
      "title": [
       {
        "when": {
-        "has": [
-         "$a.checked.ids",
-         "unsure"
+        "any": [
+         {
+          "has": [
+           "$a.checked.ids",
+           "unsure"
+          ]
+         },
+         {
+          "all": [
+           {
+            "all": [
+             {
+              "eq": [
+               "$ctx.band",
+               "flooded"
+              ]
+             },
+             {
+              "set": "$a.fitl"
+             },
+             {
+              "in": [
+               "$a.tvnb",
+               [
+                "better",
+                "much_better"
+               ]
+              ]
+             },
+             {
+              "eq": [
+               "$a.help",
+               "unhelpful"
+              ]
+             },
+             {
+              "not": {
+               "all": [
+                {
+                 "in": [
+                  "$d.parent",
+                  [
+                   "guilt",
+                   "shame"
+                  ]
+                 ]
+                },
+                {
+                 "eq": [
+                  "$a.goal",
+                  "repair"
+                 ]
+                }
+               ]
+              }
+             }
+            ]
+           },
+           {
+            "eq": [
+             "$a.fitl",
+             "unsure"
+            ]
+           }
+          ]
+         }
         ]
        },
        "key": "clar_title_unsure"
@@ -42295,6 +42617,57 @@
           "not": {
            "set": "$a.checked"
           }
+         },
+         {
+          "not": {
+           "all": [
+            {
+             "eq": [
+              "$ctx.band",
+              "flooded"
+             ]
+            },
+            {
+             "set": "$a.fitl"
+            },
+            {
+             "in": [
+              "$a.tvnb",
+              [
+               "better",
+               "much_better"
+              ]
+             ]
+            },
+            {
+             "eq": [
+              "$a.help",
+              "unhelpful"
+             ]
+            },
+            {
+             "not": {
+              "all": [
+               {
+                "in": [
+                 "$d.parent",
+                 [
+                  "guilt",
+                  "shame"
+                 ]
+                ]
+               },
+               {
+                "eq": [
+                 "$a.goal",
+                 "repair"
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
          }
         ]
        },
@@ -42302,9 +42675,72 @@
       },
       {
        "when": {
-        "has": [
-         "$a.checked.ids",
-         "unsure"
+        "any": [
+         {
+          "has": [
+           "$a.checked.ids",
+           "unsure"
+          ]
+         },
+         {
+          "all": [
+           {
+            "all": [
+             {
+              "eq": [
+               "$ctx.band",
+               "flooded"
+              ]
+             },
+             {
+              "set": "$a.fitl"
+             },
+             {
+              "in": [
+               "$a.tvnb",
+               [
+                "better",
+                "much_better"
+               ]
+              ]
+             },
+             {
+              "eq": [
+               "$a.help",
+               "unhelpful"
+              ]
+             },
+             {
+              "not": {
+               "all": [
+                {
+                 "in": [
+                  "$d.parent",
+                  [
+                   "guilt",
+                   "shame"
+                  ]
+                 ]
+                },
+                {
+                 "eq": [
+                  "$a.goal",
+                  "repair"
+                 ]
+                }
+               ]
+              }
+             }
+            ]
+           },
+           {
+            "eq": [
+             "$a.fitl",
+             "unsure"
+            ]
+           }
+          ]
+         }
         ]
        },
        "key": "clar_unsure"
@@ -42488,6 +42924,57 @@
           "not": {
            "set": "$a.checked"
           }
+         },
+         {
+          "not": {
+           "all": [
+            {
+             "eq": [
+              "$ctx.band",
+              "flooded"
+             ]
+            },
+            {
+             "set": "$a.fitl"
+            },
+            {
+             "in": [
+              "$a.tvnb",
+              [
+               "better",
+               "much_better"
+              ]
+             ]
+            },
+            {
+             "eq": [
+              "$a.help",
+              "unhelpful"
+             ]
+            },
+            {
+             "not": {
+              "all": [
+               {
+                "in": [
+                 "$d.parent",
+                 [
+                  "guilt",
+                  "shame"
+                 ]
+                ]
+               },
+               {
+                "eq": [
+                 "$a.goal",
+                 "repair"
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
          }
         ]
        }
@@ -42544,6 +43031,65 @@
             "has": [
              "$a.checked.ids",
              "partly"
+            ]
+           }
+          ]
+         },
+         {
+          "all": [
+           {
+            "all": [
+             {
+              "eq": [
+               "$ctx.band",
+               "flooded"
+              ]
+             },
+             {
+              "set": "$a.fitl"
+             },
+             {
+              "in": [
+               "$a.tvnb",
+               [
+                "better",
+                "much_better"
+               ]
+              ]
+             },
+             {
+              "eq": [
+               "$a.help",
+               "unhelpful"
+              ]
+             },
+             {
+              "not": {
+               "all": [
+                {
+                 "in": [
+                  "$d.parent",
+                  [
+                   "guilt",
+                   "shame"
+                  ]
+                 ]
+                },
+                {
+                 "eq": [
+                  "$a.goal",
+                  "repair"
+                 ]
+                }
+               ]
+              }
+             }
+            ]
+           },
+           {
+            "eq": [
+             "$a.fitl",
+             "unsure"
             ]
            }
           ]
@@ -42746,7 +43292,7 @@
      "next": [],
      "offers": [
       {
-       "exit": "problem_solve",
+       "exit": "problem_solve_repair",
        "when": {
         "all": []
        }
@@ -42891,6 +43437,33 @@
      ],
      "next": [
       {
+       "to": "lfit",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$ctx.band",
+           "flooded"
+          ]
+         },
+         {
+          "not": {
+           "set": "$a.fits"
+          }
+         },
+         {
+          "in": [
+           "$a.tvnb",
+           [
+            "better",
+            "much_better"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
        "to": "size",
        "when": null
       }
@@ -42999,119 +43572,272 @@
       }
      ],
      "hint": "size_hint",
+     "lines": [
+      {
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$ctx.band",
+           "flooded"
+          ]
+         },
+         {
+          "not": {
+           "set": "$a.fits"
+          }
+         },
+         {
+          "not": {
+           "all": [
+            {
+             "eq": [
+              "$ctx.band",
+              "flooded"
+             ]
+            },
+            {
+             "set": "$a.fitl"
+            },
+            {
+             "in": [
+              "$a.tvnb",
+              [
+               "better",
+               "much_better"
+              ]
+             ]
+            },
+            {
+             "eq": [
+              "$a.help",
+              "unhelpful"
+             ]
+            },
+            {
+             "not": {
+              "all": [
+               {
+                "in": [
+                 "$d.parent",
+                 [
+                  "guilt",
+                  "shame"
+                 ]
+                ]
+               },
+               {
+                "eq": [
+                 "$a.goal",
+                 "repair"
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
+         }
+        ]
+       },
+       "key": "size_small_only"
+      }
+     ],
      "fields": [
       {
        "id": "size",
        "options": {
         "list": "size",
         "where": {
-         "any": [
+         "all": [
           {
-           "all": [
+           "any": [
             {
-             "in": [
-              "$a.urge",
-              [
-               "anger-criticize",
-               "anger-destroy",
-               "anger-lash",
-               "anger-stonewall",
-               "check-profile",
-               "disgust-judge",
-               "disgust-leave",
-               "disgust-push",
-               "envy-compare",
-               "envy-give-up",
-               "envy-tear-down",
-               "fear-avoid",
-               "fear-cancel",
-               "fear-escape",
-               "fear-freeze",
-               "fire-back",
-               "go-quiet",
-               "guilt-apologize",
-               "guilt-avoid",
-               "guilt-punish",
-               "jealousy-check",
-               "jealousy-cling",
-               "jealousy-interrogate",
-               "love-idealize",
-               "love-proximity",
-               "love-reach-out",
-               "love-stalk",
-               "pull-away",
-               "sad-bed",
-               "sad-give-up",
-               "sad-isolate",
-               "sad-scroll",
-               "shame-avoid-people",
-               "shame-hide",
-               "shame-secret",
-               "shame-shrink",
-               "text-again"
-              ]
+             "all": [
+              {
+               "in": [
+                "$a.urge",
+                [
+                 "anger-criticize",
+                 "anger-destroy",
+                 "anger-lash",
+                 "anger-stonewall",
+                 "check-profile",
+                 "disgust-judge",
+                 "disgust-leave",
+                 "disgust-push",
+                 "envy-compare",
+                 "envy-give-up",
+                 "envy-tear-down",
+                 "fear-avoid",
+                 "fear-cancel",
+                 "fear-escape",
+                 "fear-freeze",
+                 "fire-back",
+                 "go-quiet",
+                 "guilt-apologize",
+                 "guilt-avoid",
+                 "guilt-punish",
+                 "jealousy-check",
+                 "jealousy-cling",
+                 "jealousy-interrogate",
+                 "love-idealize",
+                 "love-proximity",
+                 "love-reach-out",
+                 "love-stalk",
+                 "pull-away",
+                 "sad-bed",
+                 "sad-give-up",
+                 "sad-isolate",
+                 "sad-scroll",
+                 "shame-avoid-people",
+                 "shame-hide",
+                 "shame-secret",
+                 "shame-shrink",
+                 "text-again"
+                ]
+               ]
+              },
+              {
+               "eq": [
+                "$opt.urgeFor",
+                "$a.urge"
+               ]
+              }
              ]
             },
             {
-             "eq": [
-              "$opt.urgeFor",
-              "$a.urge"
+             "all": [
+              {
+               "not": {
+                "in": [
+                 "$a.urge",
+                 [
+                  "anger-criticize",
+                  "anger-destroy",
+                  "anger-lash",
+                  "anger-stonewall",
+                  "check-profile",
+                  "disgust-judge",
+                  "disgust-leave",
+                  "disgust-push",
+                  "envy-compare",
+                  "envy-give-up",
+                  "envy-tear-down",
+                  "fear-avoid",
+                  "fear-cancel",
+                  "fear-escape",
+                  "fear-freeze",
+                  "fire-back",
+                  "go-quiet",
+                  "guilt-apologize",
+                  "guilt-avoid",
+                  "guilt-punish",
+                  "jealousy-check",
+                  "jealousy-cling",
+                  "jealousy-interrogate",
+                  "love-idealize",
+                  "love-proximity",
+                  "love-reach-out",
+                  "love-stalk",
+                  "pull-away",
+                  "sad-bed",
+                  "sad-give-up",
+                  "sad-isolate",
+                  "sad-scroll",
+                  "shame-avoid-people",
+                  "shame-hide",
+                  "shame-secret",
+                  "shame-shrink",
+                  "text-again"
+                 ]
+                ]
+               }
+              },
+              {
+               "eq": [
+                "$opt.parent",
+                "$d.parent"
+               ]
+              }
              ]
             }
            ]
           },
           {
-           "all": [
+           "any": [
             {
              "not": {
-              "in": [
-               "$a.urge",
-               [
-                "anger-criticize",
-                "anger-destroy",
-                "anger-lash",
-                "anger-stonewall",
-                "check-profile",
-                "disgust-judge",
-                "disgust-leave",
-                "disgust-push",
-                "envy-compare",
-                "envy-give-up",
-                "envy-tear-down",
-                "fear-avoid",
-                "fear-cancel",
-                "fear-escape",
-                "fear-freeze",
-                "fire-back",
-                "go-quiet",
-                "guilt-apologize",
-                "guilt-avoid",
-                "guilt-punish",
-                "jealousy-check",
-                "jealousy-cling",
-                "jealousy-interrogate",
-                "love-idealize",
-                "love-proximity",
-                "love-reach-out",
-                "love-stalk",
-                "pull-away",
-                "sad-bed",
-                "sad-give-up",
-                "sad-isolate",
-                "sad-scroll",
-                "shame-avoid-people",
-                "shame-hide",
-                "shame-secret",
-                "shame-shrink",
-                "text-again"
-               ]
+              "all": [
+               {
+                "eq": [
+                 "$ctx.band",
+                 "flooded"
+                ]
+               },
+               {
+                "not": {
+                 "set": "$a.fits"
+                }
+               },
+               {
+                "not": {
+                 "all": [
+                  {
+                   "eq": [
+                    "$ctx.band",
+                    "flooded"
+                   ]
+                  },
+                  {
+                   "set": "$a.fitl"
+                  },
+                  {
+                   "in": [
+                    "$a.tvnb",
+                    [
+                     "better",
+                     "much_better"
+                    ]
+                   ]
+                  },
+                  {
+                   "eq": [
+                    "$a.help",
+                    "unhelpful"
+                   ]
+                  },
+                  {
+                   "not": {
+                    "all": [
+                     {
+                      "in": [
+                       "$d.parent",
+                       [
+                        "guilt",
+                        "shame"
+                       ]
+                      ]
+                     },
+                     {
+                      "eq": [
+                       "$a.goal",
+                       "repair"
+                      ]
+                     }
+                    ]
+                   }
+                  }
+                 ]
+                }
+               }
               ]
              }
             },
             {
              "eq": [
-              "$opt.parent",
-              "$d.parent"
+              "$opt.size",
+              "small"
              ]
             }
            ]
@@ -43981,6 +44707,17 @@
      "toolId": "problem-solve",
      "query": {},
      "carry": [],
+     "done": false
+    },
+    {
+     "id": "problem_solve_repair",
+     "toolId": "problem-solve",
+     "query": {
+      "frame": "repair"
+     },
+     "carry": [
+      "feel"
+     ],
      "done": false
     },
     {
@@ -47094,7 +47831,8 @@
    "version": "ps-v1",
    "start": "feel",
    "accepts": [
-    "band"
+    "band",
+    "frame"
    ],
    "ownMax": 140,
    "emotionFields": [
@@ -47116,6 +47854,7 @@
     "ack_love": "The love is real, and something is in the way. Let's look at what's in the way.",
     "ack_sadness": "You've lost something, or something didn't go the way you needed. Let's see which parts you can do something about.",
     "ack_guilt": "Something you did doesn't sit right with your values. The move now is repair, not punishing yourself.",
+    "ack_repair": "You want to put something right. Owning it and repairing it is the opposite of hiding.",
     "problem_q": "Which of these sounds closest?",
     "ack_routed": "Something is asking a lot of you right now. Let's see what you can do about it.",
     "own_hint": "Say it your way",
@@ -47476,6 +48215,11 @@
      "name": "startSmall",
      "from": "$a.sub",
      "table": "startSmall"
+    },
+    {
+     "name": "dbtParent",
+     "from": "$a.feel",
+     "table": "parentOf"
     }
    ],
    "steps": [
@@ -47520,12 +48264,37 @@
       {
        "to": "not_fit",
        "when": {
-        "not": {
-         "eq": [
-          "$d.fit",
-          "fit"
-         ]
-        }
+        "all": [
+         {
+          "not": {
+           "eq": [
+            "$d.fit",
+            "fit"
+           ]
+          }
+         },
+         {
+          "not": {
+           "all": [
+            {
+             "eq": [
+              "$ctx.frame",
+              "repair"
+             ]
+            },
+            {
+             "in": [
+              "$d.dbtParent",
+              [
+               "guilt",
+               "shame"
+              ]
+             ]
+            }
+           ]
+          }
+         }
+        ]
        }
       },
       {
@@ -47570,6 +48339,28 @@
      "id": "problem",
      "kind": "ask",
      "title": [
+      {
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$ctx.frame",
+           "repair"
+          ]
+         },
+         {
+          "in": [
+           "$d.dbtParent",
+           [
+            "guilt",
+            "shame"
+           ]
+          ]
+         }
+        ]
+       },
+       "key": "ack_repair"
+      },
       {
        "when": {
         "in": [
@@ -47662,9 +48453,63 @@
         "where": {
          "any": [
           {
-           "eq": [
-            "$opt.parent",
-            "$d.parent"
+           "all": [
+            {
+             "not": {
+              "all": [
+               {
+                "eq": [
+                 "$ctx.frame",
+                 "repair"
+                ]
+               },
+               {
+                "in": [
+                 "$d.dbtParent",
+                 [
+                  "guilt",
+                  "shame"
+                 ]
+                ]
+               }
+              ]
+             }
+            },
+            {
+             "eq": [
+              "$opt.parent",
+              "$d.parent"
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "all": [
+              {
+               "eq": [
+                "$ctx.frame",
+                "repair"
+               ]
+              },
+              {
+               "in": [
+                "$d.dbtParent",
+                [
+                 "guilt",
+                 "shame"
+                ]
+               ]
+              }
+             ]
+            },
+            {
+             "eq": [
+              "$opt.parent",
+              "guilt"
+             ]
+            }
            ]
           },
           {
@@ -47770,9 +48615,67 @@
         "where": {
          "all": [
           {
-           "eq": [
-            "$opt.parent",
-            "$d.parent"
+           "any": [
+            {
+             "all": [
+              {
+               "not": {
+                "all": [
+                 {
+                  "eq": [
+                   "$ctx.frame",
+                   "repair"
+                  ]
+                 },
+                 {
+                  "in": [
+                   "$d.dbtParent",
+                   [
+                    "guilt",
+                    "shame"
+                   ]
+                  ]
+                 }
+                ]
+               }
+              },
+              {
+               "eq": [
+                "$opt.parent",
+                "$d.parent"
+               ]
+              }
+             ]
+            },
+            {
+             "all": [
+              {
+               "all": [
+                {
+                 "eq": [
+                  "$ctx.frame",
+                  "repair"
+                 ]
+                },
+                {
+                 "in": [
+                  "$d.dbtParent",
+                  [
+                   "guilt",
+                   "shame"
+                  ]
+                 ]
+                }
+               ]
+              },
+              {
+               "eq": [
+                "$opt.parent",
+                "guilt"
+               ]
+              }
+             ]
+            }
            ]
           },
           {
@@ -48709,6 +49612,59 @@
              ]
             }
            ]
+          },
+          {
+           "all": [
+            {
+             "not": {
+              "any": [
+               {
+                "all": [
+                 {
+                  "set": "$a.problem.ids"
+                 },
+                 {
+                  "not": {
+                   "eq": [
+                    "$a.problem",
+                    "piling"
+                   ]
+                  }
+                 }
+                ]
+               },
+               {
+                "set": "$a.focus.ids"
+               }
+              ]
+             }
+            },
+            {
+             "all": [
+              {
+               "eq": [
+                "$ctx.frame",
+                "repair"
+               ]
+              },
+              {
+               "in": [
+                "$d.dbtParent",
+                [
+                 "guilt",
+                 "shame"
+                ]
+               ]
+              }
+             ]
+            },
+            {
+             "eq": [
+              "$opt.firstOf",
+              "guilt"
+             ]
+            }
+           ]
           }
          ]
         }
@@ -48834,6 +49790,59 @@
              "eq": [
               "$opt.firstOf",
               "$d.parent"
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "not": {
+              "any": [
+               {
+                "all": [
+                 {
+                  "set": "$a.problem.ids"
+                 },
+                 {
+                  "not": {
+                   "eq": [
+                    "$a.problem",
+                    "piling"
+                   ]
+                  }
+                 }
+                ]
+               },
+               {
+                "set": "$a.focus.ids"
+               }
+              ]
+             }
+            },
+            {
+             "all": [
+              {
+               "eq": [
+                "$ctx.frame",
+                "repair"
+               ]
+              },
+              {
+               "in": [
+                "$d.dbtParent",
+                [
+                 "guilt",
+                 "shame"
+                ]
+               ]
+              }
+             ]
+            },
+            {
+             "eq": [
+              "$opt.firstOf",
+              "guilt"
              ]
             }
            ]
@@ -49003,6 +50012,59 @@
                "eq": [
                 "$opt.firstOf",
                 "$d.parent"
+               ]
+              }
+             ]
+            },
+            {
+             "all": [
+              {
+               "not": {
+                "any": [
+                 {
+                  "all": [
+                   {
+                    "set": "$a.problem.ids"
+                   },
+                   {
+                    "not": {
+                     "eq": [
+                      "$a.problem",
+                      "piling"
+                     ]
+                    }
+                   }
+                  ]
+                 },
+                 {
+                  "set": "$a.focus.ids"
+                 }
+                ]
+               }
+              },
+              {
+               "all": [
+                {
+                 "eq": [
+                  "$ctx.frame",
+                  "repair"
+                 ]
+                },
+                {
+                 "in": [
+                  "$d.dbtParent",
+                  [
+                   "guilt",
+                   "shame"
+                  ]
+                 ]
+                }
+               ]
+              },
+              {
+               "eq": [
+                "$opt.firstOf",
+                "guilt"
                ]
               }
              ]

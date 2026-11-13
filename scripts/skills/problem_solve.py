@@ -48,6 +48,8 @@ COPY = {
     "ack_love": "The love is real, and something is in the way. Let's look at what's in the way.",
     "ack_sadness": "You've lost something, or something didn't go the way you needed. Let's see which parts you can do something about.",
     "ack_guilt": "Something you did doesn't sit right with your values. The move now is repair, not punishing yourself.",
+    # Opened on repair (?frame=repair: Do the Opposite's guilt or shame that fits, with the repair goal).
+    "ack_repair": "You want to put something right. Owning it and repairing it is the opposite of hiding.",
     "problem_q": "Which of these sounds closest?",
     # A word the routing sends here from outside the graph's problem-solve words: the screen doesn't name a parent.
     "ack_routed": "Something is asking a lot of you right now. Let's see what you can do about it.",
@@ -223,6 +225,13 @@ def eq(ref, v):
     return {"eq": [ref, v]}
 
 
+# Opened on repair (Do the Opposite's `repr`: guilt or shame that fits the facts, goal *repair harm*, H11). The fit
+# check already happened there, so a shame word isn't turned away here: the problems offered are guilt's (a harm, a
+# pattern, a values conflict), each picked by the person, never pre-filled. Shame that fits because of a group's
+# disapproval (H13: find people who accept you) isn't a repair, and Do the Opposite's repair goal doesn't send it here.
+# The word must be guilt's or shame's (the feeling screen still lets the person change it, and a link can be typed).
+REPAIR = {"all": [eq("$ctx.frame", "repair"), {"in": ["$d.dbtParent", ["guilt", "shame"]]}]}
+REPAIR_PARENT = "guilt"
 # The problem the person picked: on the problem screen, or the foothold they picked when everything piled up.
 PICKED_TYPE = {"any": [{"all": [{"set": "$a.problem.ids"}, {"not": eq(a("problem"), "piling")}]}, {"set": "$a.focus.ids"}]}
 SAFETY = {"any": [eq(a("problem"), SAFETY_TYPE), eq(a("focus"), SAFETY_TYPE)]}
@@ -231,6 +240,7 @@ FOR_TYPE = {"any": [
     {"all": [{"set": a("problem")}, eq("$opt.type", a("problem"))]},
     {"all": [{"set": a("focus")}, eq("$opt.type", a("focus"))]},
     {"all": [{"not": PICKED_TYPE}, eq("$opt.firstOf", "$d.parent")]},
+    {"all": [{"not": PICKED_TYPE}, REPAIR, eq("$opt.firstOf", REPAIR_PARENT)]},
 ]}
 FLOODED = eq("$ctx.band", "flooded")
 # Own words for the problem are never read, so danger told in them gets someone to talk to on the planning screens too.
@@ -244,6 +254,7 @@ DERIVE = [
     {"name": "fit", "from": a("feel"), "table": "psFit", "default": "other"},
     {"name": "subGo", "from": a("sub"), "table": "subGo"},
     {"name": "startSmall", "from": a("sub"), "table": "startSmall"},
+    {"name": "dbtParent", "from": a("feel"), "table": "parentOf"},  # the shared table: the repair frame's check
 ]
 
 RUNNING_LOW = ("cant-no-energy", "tried-exhausted")  # what to say is *refill first*, so the first chip is to stop
@@ -355,7 +366,8 @@ STEPS = [
         "fields": [{"id": "feel", "options": {"emotions": FEEL_CHIPS, "carriedFirst": True, "moreKey": "feel_more"},
                     "max": 1, "required": True, "emotion": True}],
         # A carried flooded reading (C6.2): settle first, never into the planning.
-        "next": [{"when": FLOODED, "to": "not_now"}, {"when": {"not": eq("$d.fit", "fit")}, "to": "not_fit"}, {"to": "ready"}],
+        "next": [{"when": FLOODED, "to": "not_now"}, {"when": {"all": [{"not": eq("$d.fit", "fit")}, {"not": REPAIR}]}, "to": "not_fit"},
+                 {"to": "ready"}],
     },
     {
         "id": "ready", "kind": "ask", "title": "ready_title",
@@ -364,12 +376,16 @@ STEPS = [
     },
     {
         "id": "problem", "kind": "ask",
-        "title": [{"when": {"in": [a("feel"), sorted(ROUTED_IN)]}, "key": "ack_routed"}]
+        "title": [{"when": REPAIR, "key": "ack_repair"}, {"when": {"in": [a("feel"), sorted(ROUTED_IN)]}, "key": "ack_routed"}]
                  + [{"when": eq("$d.parent", p), "key": f"ack_{p}"} for p in sorted(PS["problemTypes"])][:-1]
                  + [{"key": f"ack_{sorted(PS['problemTypes'])[-1]}"}],
         "fields": [{
             "id": "problem", "label": "problem_q", "max": 1, "swap": True, "required": True,
-            "options": {"list": "problem", "where": {"any": [eq("$opt.parent", "$d.parent"), eq("$opt.all", True)]}},
+            # On repair, guilt's problems only (the word may be shame's, or guilt's own).
+            "options": {"list": "problem", "where": {"any": [
+                {"all": [{"not": REPAIR}, eq("$opt.parent", "$d.parent")]},
+                {"all": [REPAIR, eq("$opt.parent", REPAIR_PARENT)]},
+                eq("$opt.all", True)]}},
             # 80, like the step below: the longest record (every field, both own-words boxes full) stays under ext's 6 KB.
             "own": {"hint": "own_hint", "countsAsPick": True, "max": 80},
             # Own words are never read, so danger told in them can't raise the banner: someone to talk to is one tap away.
@@ -381,7 +397,9 @@ STEPS = [
     {
         "id": "triage", "kind": "ask", "title": "triage_title",
         "fields": [{"id": "focus", "max": 1, "required": True, "swap": True,
-                    "options": {"list": "problem", "where": {"all": [eq("$opt.parent", "$d.parent"), {"not": eq("$opt.all", True)}]}},
+                    "options": {"list": "problem", "where": {"all": [
+                        {"any": [{"all": [{"not": REPAIR}, eq("$opt.parent", "$d.parent")]}, {"all": [REPAIR, eq("$opt.parent", REPAIR_PARENT)]}]},
+                        {"not": eq("$opt.all", True)}]}},
                     "own": {"hint": "own_hint", "countsAsPick": True, "max": 80},
                     "links": [{"exit": "safety_open", "label": "safety_open", "when": {"any": [{"own": "focus"}, {"in": [a("feel"), HOPELESS]}]}}]}],
         "crisis": [{"variant": "other_person", "when": eq(a("focus"), SAFETY_TYPE)}],
@@ -654,5 +672,5 @@ SKILL = {
     "id": ID, "toolId": TOOL_ID, "concept": CONCEPT, "version": VERSION, "start": "feel", "ownMax": OWN_MAX,
     "copy": COPY, "tables": {"psFit": PS_FIT, "psParent": PS_PARENT, "subGo": SUB_GO, "startSmall": START_SMALL},
     "derive": DERIVE, "steps": STEPS, "exits": EXITS, "options": options(),
-    "emotionFields": ["feel"], "accepts": ["band"],
+    "emotionFields": ["feel"], "accepts": ["band", "frame"],
 }

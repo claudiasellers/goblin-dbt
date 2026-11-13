@@ -413,3 +413,46 @@ test("Decide if this can be repaired: Ending a relationship only on the stay-or-
   const o = run([pick("solutions", other.id), next, pick("size", `${other.id}:bigger`), next], ctx(), sol);
   assert.ok(!o.offered.includes("ending_relationships"));
 });
+
+test("opened on repair (?frame=repair, Do the Opposite's guilt or shame that fits): guilt's problems, never turned away", () => {
+  assert.deepEqual(skill.accepts, ["band", "frame"]);
+  const rep = ctx({ frame: "repair" }, ["ashamed"]);
+  const title = (s) => M.copyText(rep, M.stepOf(skill, s.stepId).title, { answers: s.answers });
+  // The carried word leads the chips (it may be shame's, which the chips don't list).
+  assert.equal(M.emotionChoices(rep, M.stepOf(skill, "feel").fields[0], {})[0], "ashamed");
+  let s = run([pick("feel", "ashamed"), next], rep);
+  assert.equal(s.stepId, "ready", "the fit check happened in Do the Opposite: no not-fit card");
+  s = run([pick("ready", "can"), next], rep, s);
+  assert.equal(s.stepId, "problem");
+  assert.equal(title(s), skill.copy.ack_repair);
+  const problems = M.optionGroups(rep, M.stepOf(skill, "problem").fields[0], s.answers).flatMap((g) => g.options.map((o) => o.value));
+  assert.deepEqual(problems, [...ps.problemTypes.guilt.map((p) => p.id), "piling"], "guilt's problems, nothing picked for them");
+  // Own words only: guilt's general problem's directions (repair), not nothing.
+  const ownOnly = run([own("problem", "what I said to her"), next, pick("barrier", "not-sure-what"), next], rep, s);
+  assert.equal(ownOnly.stepId, "solutions");
+  const dirs = M.optionGroups(rep, M.stepOf(skill, "solutions").fields[0], ownOnly.answers).flatMap((g) => g.options.map((o) => o.value));
+  assert.ok(dirs.includes("guilt-harm-apologize") && dirs.includes("own"), dirs.join());
+  // Everything piling up: the foothold is one of guilt's problems too.
+  const piled = run([pick("problem", "piling"), next], rep, s);
+  assert.equal(piled.stepId, "triage");
+  assert.deepEqual(M.optionGroups(rep, M.stepOf(skill, "triage").fields[0], piled.answers).flatMap((g) => g.options.map((o) => o.value)),
+    ps.problemTypes.guilt.map((p) => p.id));
+  // A guilt word on repair: the same problems (its own parent).
+  const guilty = run([pick("feel", "guilty"), next, pick("ready", "can"), next], ctx({ frame: "repair" }));
+  assert.deepEqual(M.optionGroups(ctx({ frame: "repair" }), M.stepOf(skill, "problem").fields[0], guilty.answers).flatMap((g) => g.options.map((o) => o.value)),
+    [...ps.problemTypes.guilt.map((p) => p.id), "piling"]);
+});
+
+test("repair keeps every guard: flooded settles first, *too loud* still waits, and without the frame shame is still not here", () => {
+  assert.equal(run([pick("feel", "ashamed"), next], ctx({ frame: "repair", band: "flooded" })).stepId, "not_now");
+  assert.equal(run([pick("feel", "ashamed"), next, pick("ready", "too_loud"), next], ctx({ frame: "repair" })).stepId, "not_now");
+  assert.equal(run([pick("feel", "ashamed"), next]).stepId, "not_fit");
+  assert.equal(run([pick("feel", "ashamed"), next], ctx({ frame: "other" })).stepId, "not_fit", "only repair opens the way");
+  // The word must be guilt's or shame's (Gate 1): another word on a repair link is Problem Solve as usual.
+  const fear = run([pick("feel", "anxious"), next, pick("ready", "can"), next], ctx({ frame: "repair" }));
+  assert.equal(M.copyText(ctx({ frame: "repair" }), M.stepOf(skill, "problem").title, { answers: fear.answers }), skill.copy.ack_fear);
+  assert.ok(M.optionGroups(ctx({ frame: "repair" }), M.stepOf(skill, "problem").fields[0], fear.answers).flatMap((g) => g.options.map((o) => o.value))
+    .every((v) => v === "piling" || ps.problemTypes.fear.some((p) => p.id === v)));
+  assert.equal(run([pick("feel", "sad"), next], ctx({ frame: "repair" })).stepId, "ready");
+  assert.doesNotMatch(skill.copy.ack_repair, /\b(should|just|but|must)\b|!/i);
+});

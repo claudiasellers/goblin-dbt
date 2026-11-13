@@ -104,7 +104,13 @@ test("the route, per feeling: opposite, clarify (its own line for not fit + help
   assert.equal(prob.stepId, "prob");
   assert.deepEqual(offers(prob), ["problem_solve"]);
   assert.deepEqual(offers(to("angry", "excessive", "helpful")), ["cool_down", "problem_solve"]);
-  assert.equal(to("guilty", "fits", "unhelpful", "repair").stepId, "repr");
+  const repr = to("guilty", "fits", "unhelpful", "repair");
+  assert.equal(repr.stepId, "repr");
+  assert.deepEqual(offers(repr), ["problem_solve_repair"], "Problem Solve opened on repair (H11), not on its feeling screen's not-fit card");
+  const ex = skill.exits.find((e) => e.id === "problem_solve_repair");
+  assert.deepEqual([ex.toolId, ex.query, ex.planned ?? false], ["problem-solve", { frame: "repair" }, false]);
+  assert.deepEqual(M.carried(ex, repr, ctx()), ["guilty"], "the word goes with it, first on Problem Solve's feeling screen");
+  assert.ok(content.skills.find((x) => x.id === "problem_solve").accepts.includes("frame"));
   assert.equal(to("guilty", "fits", "unhelpful", "connection").stepId, "cue", "repair only with the repair goal");
   assert.equal(to("sad", "fits", "unhelpful", "repair").stepId, "cue", "repair only for guilt or shame");
 });
@@ -196,7 +202,7 @@ test("the inline check keeps the safety rules (Gate 3): Punish yourself, repair,
   const fc = ctx({ band: "flooded" });
   let f = run([doors("anxious"), held], fc);
   const urge = chips(fc, run([...SAFE], fc, f), "vald", "urge")[0];
-  f = run([...SAFE, pick("urge", urge), next, pick("want", "yes"), next, pick("fits", "unsure"), next, pick("help", "unsure"), next], fc, f);
+  f = run([...SAFE, pick("urge", urge), next, pick("want", "yes"), next, pick("help", "unsure"), next], fc, f);
   assert.equal(f.stepId, "clar");
   assert.equal(M.handoffLine(fc, M.stepOf(skill, "clar"), { answers: M.answersOf(fc, f) }), skill.copy.clar_flooded);
   assert.equal(M.offersFor(fc, M.stepOf(skill, "clar"), { answers: M.answersOf(fc, f) })[0], "cool_down");
@@ -365,6 +371,66 @@ test("the longest real record through the inline check fits ext: three feelings,
   assert.ok(ext, "the server's schema takes it");
   // 4.3 KB: over the old 4 KB, the reason EXT_MAX_BYTES is 6 KB (ER-B5).
   assert.ok(Buffer.byteLength(JSON.stringify(ext), "utf8") <= EXT_MAX_BYTES, String(Buffer.byteLength(JSON.stringify(ext), "utf8")));
+});
+
+test("a carried flooded reading (ER-B5): *will it help?* first, the fit check only after the body, once the pull is weaker", () => {
+  const fc = ctx({ band: "flooded" });
+  const start = (feel, goal = "connection") => {
+    const f = run([doors(feel), held], fc);
+    const urge = chips(fc, run([pick("goal", goal), next, pick("safety", "safe"), next], fc, f), "vald", "urge")[0];
+    return run([pick("goal", goal), next, pick("safety", "safe"), next, pick("urge", urge), next, pick("want", "yes"), next], fc, f);
+  };
+  let s = start("anxious");
+  assert.equal(s.stepId, "help", "no fit question while the body is loud");
+  // It won't help: H10's own reason for the opposite. The body first.
+  s = run([pick("help", "unhelpful"), next], fc, s);
+  assert.equal(s.stepId, "cue");
+  const cue = chips(fc, s, "cue", "cue")[0];
+  // The pull weaker after the hold: now the fit check, with its line.
+  const settled = run([pick("cue", cue), next, held, pick("tvnb", "better"), next], fc, s);
+  assert.equal(settled.stepId, "lfit");
+  assert.equal(M.handoffLine(fc, M.stepOf(skill, "lfit"), { answers: M.answersOf(fc, settled) }), skill.copy.fits_quieter);
+  for (const v of ["fits", "excessive", "not_fit"]) assert.equal(run([pick("fitl", v), next], fc, settled).stepId, "size", v);
+  const unsure = run([pick("fitl", "unsure"), next], fc, settled);
+  assert.equal(unsure.stepId, "clar", "not sure, even calmer: the opposite can wait");
+  assert.equal(M.copyText(fc, M.stepOf(skill, "clar").title, { answers: M.answersOf(fc, unsure) }), skill.copy.clar_title_unsure);
+  assert.equal(M.handoffLine(fc, M.stepOf(skill, "clar"), { answers: M.answersOf(fc, unsure) }), skill.copy.clar_unsure);
+  assert.deepEqual(M.offersFor(fc, M.stepOf(skill, "clar"), { answers: M.answersOf(fc, unsure) }), ["check_the_facts", "wise_mind"], "the body was already done");
+  // Not weaker: the fit stays unasked, and only the small step is offered.
+  const loud = run([pick("cue", cue), next, held, pick("tvnb", "same"), next], fc, s);
+  assert.equal(loud.stepId, "size");
+  const sizes = chips(fc, loud, "size", "size");
+  assert.ok(sizes.length >= 1 && sizes.every((v) => v.endsWith(":small")), sizes.join());
+  assert.equal(M.handoffLine(fc, M.stepOf(skill, "size"), { answers: M.answersOf(fc, loud) }), skill.copy.size_small_only);
+  const settledSizes = chips(fc, run([pick("fitl", "not_fit"), next], fc, settled), "size", "size");
+  assert.ok(settledSizes.some((v) => v.endsWith(":bigger")), "once the fit is known, every size");
+  // Going back never leaves a late fit standing (Gate 1): back to *the pull is…*, now the same → small only again;
+  // back to *will it help?*, now it would help → the clarify card with its flooded line and the body first.
+  const atSize = run([pick("fitl", "not_fit"), next], fc, settled);
+  const back = { type: "back" };
+  const sameNow = run([back, back, pick("tvnb", "same"), next], fc, atSize);
+  assert.equal(sameNow.stepId, "size");
+  assert.ok(chips(fc, sameNow, "size", "size").every((v) => v.endsWith(":small")));
+  const helpNow = run([back, back, back, back, back, pick("help", "helpful"), next], fc, atSize);
+  assert.equal(helpNow.stepId, "clar");
+  assert.equal(M.handoffLine(fc, M.stepOf(skill, "clar"), { answers: M.answersOf(fc, helpNow) }), skill.copy.clar_flooded);
+  assert.equal(M.offersFor(fc, M.stepOf(skill, "clar"), { answers: M.answersOf(fc, helpNow) })[0], "cool_down");
+  // No cue picked: straight to the small step, the fit unasked.
+  assert.equal(run([next], fc, s).stepId, "size");
+  // It would help, or not sure: the clarify card, the body first (as before).
+  for (const h of ["helpful", "unsure"]) {
+    const c = run([pick("help", h), next], fc, start("anxious"));
+    assert.equal(c.stepId, "clar", h);
+    assert.equal(M.handoffLine(fc, M.stepOf(skill, "clar"), { answers: M.answersOf(fc, c) }), skill.copy.clar_flooded);
+  }
+  // Guilt with the repair goal waits for the facts: never the opposite unasked.
+  assert.equal(run([pick("help", "unhelpful"), next], fc, start("guilty", "repair")).stepId, "clar");
+  // Not flooded: unchanged, the fit before *will it help?*.
+  assert.equal(run([doors("anxious"), ...SAFE, pick("urge", chips(ctx(), run([doors("anxious"), ...SAFE]), "vald", "urge")[0]), next, pick("want", "yes"), next]).stepId, "fits");
+  // The record: the unasked fit still reaches the projection's reading, on *won't help*.
+  const done = run([pick("size", sizes[0]), next, next, pick("when", "now"), next, next, pick("outcome", "toward_goal"), next, next, pick("tvna", "better"), next], fc, loud);
+  const oa = oaFromRun(M.runRecord(fc, done));
+  assert.deepEqual(oa.picks.map((p) => [p.emotionId, p.facts, p.effectiveness]), [["anxious", null, "unhelpful"]]);
 });
 
 test("the projection's reading: one record per feeling that reached its step, the size from the option id, own words custom", () => {

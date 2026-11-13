@@ -15,7 +15,9 @@ parent's EmotionRegulationContent for the defaults). So:
   slot and Hold to wait. Nothing is practised on an unsafe answer.
 - **No numbers.** The pull is then-vs-now after the body and after trying (`askFresh: thenVsNow`, newest wins: the
   session's close, `regulation_down`, asked in the flow); what you expect and what happened are named, never scored.
-- **A carried flooded reading**: the body first (a settle hold), then the same flow.
+- **A carried flooded reading**: the body first (a settle hold), then *will it help?* before *does it fit?*: *it won't
+  help* goes to the body cue and the small step, and the fit check comes after the hold once the pull is weaker
+  (ER-B5); if it isn't, the fit stays unasked (recorded as deferred).
 - **What's saved**: `ext.run`, and the projection (functions/src/oppositeAction/projection.ts) writes one
   OppositeActionSession v3 per feeling that reached its step, and the oa_plan follow-up for a plan for later.
 
@@ -111,6 +113,8 @@ COPY = {
     "clar_title_open": "One question is still open",
     "cdng_safe": "Your read of danger is the one that counts here. You don't have to check it against anything.",
     "clar_flooded": "Your body's loud right now. The facts can wait until it settles a little.",
+    "fits_quieter": "Now that it's a little quieter, the facts are easier to see.",
+    "size_small_only": "While your body's loud, a small step is the one to start with.",
     "repr_title": "When guilt or shame fits, repair is the opposite of hiding",
     "repr_line": "Owning it and making it right is the skill here.",
     "cue_title": "Let your body go first",
@@ -222,9 +226,25 @@ def _route_to(step):
 # ER-B5 (Gates 2, 3): only *I still do not know* opens the check, inline, and never with a flooded reading (the clarify
 # card says the facts can wait, the body first). Every other clarify row keeps the clarify card.
 CHECK_ENTER = {"all": [EQ("fits", "unsure"), {"not": FLOODED}]}
+# A carried flooded reading (ER-B5): the fit check waits until the body has settled. *Will it help?* comes first (one
+# plain question), and *it won't help* is H10's own reason for the opposite, whatever the fit: the body cue and its
+# hold, then *does it fit?* once the pull is weaker (`aftb`), never before. Guilt or shame with the repair goal waits for
+# the facts (repair needs them, H11): the clarify card, the body first. Anything else (it would help, not sure) is the
+# clarify card as before.
+# The late fit is its own field (`fitl`, its own step `lfit`), so going back can never leave a fit standing on a path
+# that didn't ask it: it counts only with *won't help* and a weaker pull, read on every screen that uses it.
+REPAIR_GOAL = {"all": [{"in": ["$d.parent", ["guilt", "shame"]]}, EQ("goal", "repair")]}
+DEFER_TO_CUE = {"all": [FLOODED, {"not": {"set": a("fits")}}, EQ("help", "unhelpful"), {"not": REPAIR_GOAL}]}
+SETTLED = {"in": [a("tvnb"), ["better", "much_better"]]}
+# The check after the body, answered: the table on *won't help* (fits, too big or doesn't fit → the step; not sure →
+# the clarify card, the opposite can wait).
+LATE_VALID = {"all": [FLOODED, {"set": a("fitl")}, SETTLED, EQ("help", "unhelpful"), {"not": REPAIR_GOAL}]}
+LATE_UNSURE = {"all": [LATE_VALID, EQ("fitl", "unsure")]}
+# The fit still unknown on a flooded start: the small step only.
+FIT_DEFERRED = {"all": [FLOODED, {"not": {"set": a("fits")}}, {"not": LATE_VALID}]}
 HELP_NEXT = [{"when": REPAIR, "to": "repr"}, {"when": {"all": [PUNISH, EQ("help", "helpful")]}, "to": "pun"},
              {"when": _route_to("prob"), "to": "prob"},
-             {"when": _route_to("cue"), "to": "cue"}, {"when": CHECK_ENTER, "to": "ctf"}, {"to": "clar"}]
+             {"when": {"any": [_route_to("cue"), DEFER_TO_CUE]}, "to": "cue"}, {"when": CHECK_ENTER, "to": "ctf"}, {"to": "clar"}]
 
 URGE_WHERE = {"has": ["$opt.parents", "$d.parent"]}
 # A cue: the urge's own, or the parent's (never with an urge that replaces them).
@@ -315,7 +335,7 @@ STEPS = [
         "id": "want", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "safetyFirst": PUNISH, "title": by_parent("want_title"),
         "fields": [{"id": "want", "options": {"list": "want"}, "max": 1, "required": True}],
         "next": [{"when": {"all": [PUNISH, EQ("want", "no")]}, "to": "pun"}, {"when": EQ("want", "no"), "to": "keep"},
-                 {"to": "fits"}],
+                 {"when": FLOODED, "to": "help"}, {"to": "fits"}],
     },
     handoff("keep", "keep_title", [{"when": ALWAYS, "key": "keep_line"}],
             [{"exit": "problem_solve", "when": ALWAYS}, {"exit": "dear_man", "when": ALWAYS},
@@ -327,6 +347,15 @@ STEPS = [
                     "list": {"table": "fitsWhen", "key": "$d.fitsParent"},
                     "links": [{"exit": "check_the_facts", "label": "check_link", "when": ALWAYS}]}],
         "next": [{"to": "help"}],
+    },
+    {
+        # A flooded start's fit check, after the body once the pull is weaker (`aftb`); *won't help* was the answer.
+        "id": "lfit", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "title": by_parent("fits_title"),
+        "lines": [{"when": ALWAYS, "key": "fits_quieter"}],
+        "fields": [{"id": "fitl", "options": {"list": "fits"}, "max": 1, "required": True,
+                    "list": {"table": "fitsWhen", "key": "$d.fitsParent"},
+                    "links": [{"exit": "check_the_facts", "label": "check_link", "when": ALWAYS}]}],
+        "next": [{"when": LATE_UNSURE, "to": "clar"}, {"to": "size"}],
     },
     {
         "id": "help", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS,
@@ -355,12 +384,12 @@ STEPS = [
     _no_carry(handoff("cdng", "danger_title", [{"when": ALWAYS, "key": "danger_line"}, {"when": ALWAYS, "key": "cdng_safe"}],
                       [{"exit": "ending", "when": ALWAYS}, {"exit": "pause", "when": ALWAYS}, SAFETY_LINK],
                       crisis=[{"variant": "other_person", "when": ALWAYS}, *PUNISH_CRISIS], no_close=True)),
-    handoff("clar", [{"when": CHECKED("unsure"), "key": "clar_title_unsure"},
+    handoff("clar", [{"when": {"any": [CHECKED("unsure"), LATE_UNSURE]}, "key": "clar_title_unsure"},
                      {"when": {"any": [CHECKED("left"), CHECKED("finished")]}, "key": "clar_title_left"},
                      {"when": {"any": [CHECKED_FITS, {"all": [CHECKED("doesnt_fit"), {"not": EQ("help", "helpful")}]}]}, "key": "clar_title_open"},
                      {"key": "clar_title"}],
-            [{"when": {"all": [FLOODED, NOT_CHECKED]}, "key": "clar_flooded"},
-             {"when": CHECKED("unsure"), "key": "clar_unsure"},
+            [{"when": {"all": [FLOODED, NOT_CHECKED, {"not": LATE_VALID}]}, "key": "clar_flooded"},
+             {"when": {"any": [CHECKED("unsure"), LATE_UNSURE]}, "key": "clar_unsure"},
              {"when": {"all": [CHECKED("doesnt_fit"), EQ("help", "helpful")]}, "key": "clar_checked_helpful"},
              {"when": {"all": [CHECKED("doesnt_fit"), {"not": EQ("help", "helpful")}]}, "key": "clar_checked_notfit_open"},
              {"when": CHECKED_FITS, "key": "clar_checked_open"},
@@ -369,9 +398,9 @@ STEPS = [
              {"when": {"all": [NOT_CHECKED, {"not": FLOODED}, {"not": {"all": [EQ("fits", "not_fit"), EQ("help", "helpful")]}}]}, "key": "clar_line"}],
             # The full check as a link only when it didn't run to a verdict here; Wise mind after a verdict that leaves a
             # question; the body first with a flooded reading (the check is skipped then).
-            [{"exit": "cool_down", "when": {"all": [FLOODED, NOT_CHECKED]}},
+            [{"exit": "cool_down", "when": {"all": [FLOODED, NOT_CHECKED, {"not": LATE_VALID}]}},
              {"exit": "check_the_facts", "when": {"any": [NOT_CHECKED, CHECKED("left"), CHECKED("finished")]}},
-             {"exit": "wise_mind", "when": {"any": [CHECKED("unsure"), CHECKED("doesnt_fit"), CHECKED_FITS]}}]),
+             {"exit": "wise_mind", "when": {"any": [CHECKED("unsure"), CHECKED("doesnt_fit"), CHECKED_FITS, LATE_UNSURE]}}]),
     handoff("prob", [{"when": CHECKED("partly"), "key": "prob_title_partly"}, {"when": CHECKED("fits"), "key": "prob_title_checked"},
                      {"key": "prob_title"}],
             [{"when": CHECKED("partly"), "key": "prob_partly"},
@@ -381,7 +410,7 @@ STEPS = [
     # *Punish yourself*, kept or "helpful": a kinder way to make it right, or riding the urge out; never a plan for it.
     handoff("pun", "pun_title", [{"when": ALWAYS, "key": "pun_line"}],
             [{"exit": "problem_solve", "when": ALWAYS}, {"exit": "ride", "when": ALWAYS}]),
-    handoff("repr", "repr_title", [{"when": ALWAYS, "key": "repr_line"}], [{"exit": "problem_solve", "when": ALWAYS}]),
+    handoff("repr", "repr_title", [{"when": ALWAYS, "key": "repr_line"}], [{"exit": "problem_solve_repair", "when": ALWAYS}]),
     {
         "id": "cue", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "title": "cue_title", "hint": "cue_hint",
         # Optional (the hand-built page's *None of these work for me*): no cue, no hold, straight to the step.
@@ -398,11 +427,13 @@ STEPS = [
     {
         "id": "aftb", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "title": "after_body_title",
         "fields": [{"id": "tvnb", "options": {"list": "tvn"}, "max": 1, "required": True, "askFresh": "thenVsNow"}],
-        "next": [{"to": "size"}],
+        "next": [{"when": {"all": [FLOODED, {"not": {"set": a("fits")}}, SETTLED]}, "to": "lfit"}, {"to": "size"}],
     },
     {
         "id": "size", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "title": by_parent("size_title"), "hint": "size_hint",
-        "fields": [{"id": "size", "options": {"list": "size", "where": SIZE_WHERE}, "max": 1, "required": True,
+        "lines": [{"when": FIT_DEFERRED, "key": "size_small_only"}],
+        "fields": [{"id": "size", "options": {"list": "size", "where": {"all": [SIZE_WHERE, {"any": [{"not": FIT_DEFERRED}, {"eq": ["$opt.size", "small"]}]}]}},
+                    "max": 1, "required": True,
                     "own": {"hint": "size_own", "countsAsPick": True, "max": OWN_MAX}}],
         "next": [{"to": "pred"}],
     },
@@ -517,7 +548,8 @@ COPY.update({"hold_title": "{cue}", "check_link": "Check the facts properly"})
 
 EXITS = [
     {"id": "check_the_facts", "toolId": "check-the-facts"},                        # clarify (ER-02)
-    {"id": "problem_solve", "toolId": "problem-solve"},                            # problem, repair, keep it (ER-12)
+    {"id": "problem_solve", "toolId": "problem-solve"},                            # problem, keep it (ER-12)
+    {"id": "problem_solve_repair", "toolId": "problem-solve", "query": {"frame": "repair"}, "carry": ["feel"]},  # repair (H11)
     {"id": "cool_down", "toolId": "cool-down"},                                    # too big: down first (DT-01)
     {"id": "dear_man", "toolId": "dear-man"},                                      # keep it, a boundary (IE-01)
     {"id": "fast", "toolId": "fast"},                                              # a boundary (IE-05)

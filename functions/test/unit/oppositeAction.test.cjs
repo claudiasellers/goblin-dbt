@@ -166,3 +166,41 @@ test('the rep: tried is off the phone, not tried none, the first visit keeps the
   assert.equal(CA.FOLLOW_UP_SESSION_TOOL.oa_try, 'opposite-action');
   assert.ok(TS.OPEN_RESOLVES.includes('oa_try'));
 });
+
+test('a flooded start (ER-B5): a fit never asked counts only on *won\'t help*, recorded as deferred; never guilt or shame on repair', async () => {
+  const deferred = (help = 'unhelpful', over = {}) => sadRun({ answers: sadRun().answers
+    .filter((x) => x.fieldId !== 'fits').map((x) => (x.fieldId === 'help' ? at('help', 'sad', [help]) : x)), ...over });
+  let tx = fakeTx();
+  await P.projectOppositeAction(tx, input(deferred()));
+  const [w] = writes(tx);
+  assert.ok(w, 'won\'t help, the fit unasked: the opposite, recorded');
+  const d = JSON.parse(w.params.dataJson);
+  assert.deepEqual([d.facts, d.factsDeferred, d.effectiveness], ['', true, 'unhelpful']);
+  for (const help of ['helpful', 'unsure']) {
+    tx = fakeTx();
+    await P.projectOppositeAction(tx, input(deferred(help)));
+    assert.equal(writes(tx).length, 0, `${help} with no fit is never the opposite`);
+  }
+  const guilt = sadRun({ answers: [
+    ans('feel', ['guilty']), ans('goal', ['repair']), ans('safety', ['safe']),
+    at('urge', 'guilty', ['guilt-hide']), at('help', 'guilty', ['unhelpful']),
+    at('size', 'guilty', ['guilt-hide:small']), ans('when', ['now']), ans('outcome', ['toward_goal']),
+  ] });
+  tx = fakeTx((q, p) => (q === P.CHECK_PICK ? [{ parentId: 'guilt', urgeId: p.urgeId, flow: FLOW }] : undefined));
+  await P.projectOppositeAction(tx, input(guilt));
+  assert.equal(writes(tx).length, 0, 'repair waits for the facts');
+  // The late fit (after the body, the pull weaker): counted, marked late; with the pull not weaker, it never counts.
+  const late = (tvnb) => sadRun({ answers: sadRun().answers.filter((x) => x.fieldId !== 'fits' && x.fieldId !== 'tvnb')
+    .concat([at('fitl', 'sad', ['not_fit']), at('tvnb', 'sad', [tvnb])]) });
+  tx = fakeTx();
+  await P.projectOppositeAction(tx, input(late('better')));
+  const dl = JSON.parse(writes(tx)[0].params.dataJson);
+  assert.deepEqual([dl.facts, dl.factsLate, dl.factsDeferred], ['not_fit', true, undefined]);
+  tx = fakeTx();
+  await P.projectOppositeAction(tx, input(late('same')));
+  assert.equal(JSON.parse(writes(tx)[0].params.dataJson).factsDeferred, true, 'a late fit left from a weaker pull that was changed: deferred');
+  // An answered fit is unchanged: no deferred flag.
+  tx = fakeTx();
+  await P.projectOppositeAction(tx, input(sadRun()));
+  assert.equal(JSON.parse(writes(tx)[0].params.dataJson).factsDeferred, undefined);
+});
