@@ -82,11 +82,6 @@ COPY = {
     "back_yes": "That's one thing done for your body today.",
     "back_partly": "Part of it counts. Your body got some of what it needed.",
     "back_no": "Days like that happen. Tomorrow's another go, and a smaller thing can count.",
-    # Me → My body (kind `please_rows`): the rows the person would rather Running low didn't ask about.
-    "me_rows_hint": "Running low won't ask about the ones you pick. Sleep always comes first, and any row can be skipped.",
-    "me_rows_names": "Food · Body · Alcohol or drugs · Moving",
-    "me_rows_set": "Leave rows out of Running low",
-    "me_rows_none": "Running low asks every row.",
 }
 
 # Each row: (step, field, title, hint, [(value, label, loud)]). Values are unique across rows so a fix's `on`

@@ -209,7 +209,8 @@ export function MeSection() {
                 </button>
               )
           )}
-          {a.id === 'my_body' && !a.items.some((i) => i.meta.kind === 'please_rows' && i.meta.status === 'active') && (
+          {/* Set aside, it comes back with Restore on its row: the link is for nothing kept yet. */}
+          {a.id === 'my_body' && !a.items.some((i) => i.meta.kind === 'please_rows') && (
             <PleaseRowsNew onSave={keepPleaseRows} />
           )}
           {a.id === 'my_words' && (

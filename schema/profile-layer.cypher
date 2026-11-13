@@ -71,7 +71,7 @@ SET k.area = "my_plans", k.label = "A habit plan", k.revisitAfterDays = null, k.
 MATCH (k:ProfileKind {id: "abstinence_plan"}), (a:ProfileArea {id: "my_plans"})
 MERGE (k)-[:IN_AREA]->(a);
 MERGE (k:ProfileKind {id: "please_rows"})
-SET k.area = "my_body", k.label = "Rows Running low leaves out", k.revisitAfterDays = null, k.stillTrueCopy = "", k.setAsideCopy = "Set aside. Running low asks every row again.", k.reviewStatus = "draft";
+SET k.area = "my_body", k.label = "Left out of Running low", k.revisitAfterDays = null, k.stillTrueCopy = "", k.setAsideCopy = "Set aside. Running low asks every row again.", k.reviewStatus = "draft";
 MATCH (k:ProfileKind {id: "please_rows"}), (a:ProfileArea {id: "my_body"})
 MERGE (k)-[:IN_AREA]->(a);
 MERGE (k:ProfileKind {id: "crisis_kit"})

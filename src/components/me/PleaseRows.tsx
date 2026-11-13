@@ -1,65 +1,48 @@
-import { useEffect, useState } from 'react';
-import type { SkillDef } from '../../data/skillTypes';
-import { PLEASE_HIDEABLE_ROWS, pleaseRowNames, pleaseRowsOf } from '../../lib/pleaseRows';
-import { getSkillsContent, peekSkillsContent } from '../../services/skills';
+import { useEffect, useId, useRef, useState } from 'react';
+import { PLEASE_HIDEABLE_ROWS, PLEASE_ROWS_COPY as C, pleaseRowsOf, type PleaseRow } from '../../lib/pleaseRows';
 
-/** Running low's own skill (its copy names the rows): every word on these screens is graph copy. */
-function usePleaseSkill(): SkillDef | null {
-  const [skill, setSkill] = useState<SkillDef | null>(() => peekSkillsContent()?.skills.find((s) => s.id === 'please_skill') ?? null);
-  useEffect(() => {
-    if (skill) return;
-    let live = true;
-    getSkillsContent().then((c) => { if (live) setSkill(c.skills.find((s) => s.id === 'please_skill') ?? null); }).catch(() => {});
-    return () => { live = false; };
-  }, [skill]);
-  return skill;
-}
-
-/**
- * The rows Running low leaves out, in Me → My body (ER-07, kind `please_rows`, docs/design/running-low.md): named from
- * the skill's copy. Renders nothing until the skill loads.
- */
+/** The rows Running low leaves out, in Me → My body (ER-07, kind `please_rows`, docs/design/running-low.md). */
 export function KeptPleaseRows({ value }: { value: unknown }) {
-  const skill = usePleaseSkill();
-  if (!skill) return null;
-  const names = pleaseRowNames(skill.copy);
   const hidden = pleaseRowsOf(value);
   return (
     <p className="text-sm text-[var(--color-text-secondary)]" data-kept-please-rows="">
-      {hidden.length ? hidden.map((r) => names[r]).join(', ') : skill.copy.me_rows_none}
+      {hidden.length ? hidden.map((r) => C.names[r]).join(', ') : C.none}
     </p>
   );
 }
 
-/** No rows left out yet (or the setting set aside): a quiet link in My body that opens the editor. */
+/** Nothing set yet: a quiet link in My body that opens the editor. */
 export function PleaseRowsNew({ onSave }: { onSave: (hidden: string[]) => Promise<void> }) {
-  const skill = usePleaseSkill();
   const [open, setOpen] = useState(false);
-  if (!skill) return null;
-  return open ? <PleaseRowsEditor value={null} onSave={onSave} onCancel={() => setOpen(false)} /> : (
-    <button type="button" onClick={() => setOpen(true)}
+  const link = useRef<HTMLButtonElement>(null);
+  const close = () => { setOpen(false); requestAnimationFrame(() => link.current?.focus()); };
+  return open ? <PleaseRowsEditor value={null} fresh onSave={onSave} onCancel={close} /> : (
+    <button ref={link} type="button" onClick={() => setOpen(true)}
       className="block min-h-11 text-sm text-[var(--color-text-secondary)] underline underline-offset-2">
-      {skill.copy.me_rows_set}
+      {C.set}
     </button>
   );
 }
 
 /**
- * Choosing the rows (the tap on Save is the person's yes): food, body, alcohol or drugs, moving, each a toggle.
- * Sleep is never offered: it is the opening screen, and like every row it can be skipped there.
+ * Choosing the rows (the tap on Save is the person's yes): food, body, alcohol or drugs, moving, each a toggle; a
+ * picked row is left out. Sleep is never offered: it is the opening screen, and like every row it can be skipped there.
+ * `fresh` (nothing kept yet): Save waits for a pick, so an empty setting is never kept.
  */
-export function PleaseRowsEditor({ value, onSave, onCancel }: {
+export function PleaseRowsEditor({ value, fresh = false, onSave, onCancel }: {
   value: unknown;
+  fresh?: boolean;
   onSave: (hidden: string[]) => Promise<void>;
   onCancel: () => void;
 }) {
-  const skill = usePleaseSkill();
-  const [hidden, setHidden] = useState<string[]>(() => pleaseRowsOf(value));
+  const id = useId();
+  const hint = useRef<HTMLParagraphElement>(null);
+  const [hidden, setHidden] = useState<PleaseRow[]>(() => pleaseRowsOf(value));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(false);
-  if (!skill) return null;
-  const names = pleaseRowNames(skill.copy);
-  const toggle = (r: string) => setHidden((h) => (h.includes(r) ? h.filter((x) => x !== r) : [...h, r]));
+  // Opened from a link that unmounts: focus goes to what the editor asks, never to <body>.
+  useEffect(() => { hint.current?.focus(); }, []);
+  const toggle = (r: PleaseRow) => setHidden((h) => (h.includes(r) ? h.filter((x) => x !== r) : [...h, r]));
   const save = async () => {
     setSaving(true);
     setError(false);
@@ -68,20 +51,24 @@ export function PleaseRowsEditor({ value, onSave, onCancel }: {
   };
   return (
     <div className="mt-2 space-y-3" data-please-rows-editor="">
-      <p className="text-sm text-[var(--color-text-secondary)]">{skill.copy.me_rows_hint}</p>
-      <div className="flex flex-wrap gap-2">
-        {PLEASE_HIDEABLE_ROWS.map((r) => (
-          <button key={r} type="button" aria-pressed={hidden.includes(r)} onClick={() => toggle(r)}
-            className={`min-h-11 px-4 rounded-full border text-sm ${hidden.includes(r)
-              ? 'border-[var(--color-border-accent)] bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] font-medium'
-              : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'}`}>
-            {names[r]}
-          </button>
-        ))}
+      <p id={`${id}-hint`} ref={hint} tabIndex={-1} className="text-sm text-[var(--color-text-secondary)] outline-none">{C.hint}</p>
+      <div role="group" aria-labelledby={`${id}-hint`} className="flex flex-wrap gap-2">
+        {PLEASE_HIDEABLE_ROWS.map((r) => {
+          const on = hidden.includes(r);
+          return (
+            <button key={r} type="button" aria-pressed={on} onClick={() => toggle(r)}
+              className={`min-h-11 px-4 rounded-full border-2 text-sm ${on
+                ? 'border-[var(--color-border-accent)] bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] font-medium'
+                : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'}`}>
+              {on && <span aria-hidden="true">✓ </span>}{C.names[r]}
+            </button>
+          );
+        })}
       </div>
+      {hidden.includes('body') && <p className="text-sm text-[var(--color-text-secondary)]" aria-live="polite">{C.body}</p>}
       {error && <p role="alert" className="text-sm text-[var(--color-danger)]">Couldn't save. Try again?</p>}
       <div className="flex gap-2">
-        <button type="button" disabled={saving} onClick={save}
+        <button type="button" disabled={saving || (fresh && hidden.length === 0)} onClick={save}
           className="min-h-11 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] text-sm font-medium lift-primary disabled:opacity-50">
           {saving ? 'Saving…' : 'Save'}
         </button>

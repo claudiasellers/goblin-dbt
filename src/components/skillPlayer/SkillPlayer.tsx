@@ -443,7 +443,10 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
   } else if (step.kind === 'embed') {
     body = <EmbedStep ctx={ctx} step={step} st={st} send={send} onShown={onShown} onExit={leave} covered={safetyOpen || p2Open || !!inline?.covered} />;
   } else {
-    body = <AskStep ctx={ctx} step={step} st={st} send={send} onExit={leave} onShown={onShown} onPrimary={primary} busy={busy} />;
+    // A step whose way on reads the profile (`$p.*` in a transition, such as Running low's left-out rows) waits for it
+    // to answer, so a quick Next can't take the path the person turned off.
+    const waitsOnProfile = !profileSettled && step.next.some((t) => JSON.stringify(t.when ?? null).includes('"$p.'));
+    body = <AskStep ctx={ctx} step={step} st={st} send={send} onExit={leave} onShown={onShown} onPrimary={primary} busy={busy || waitsOnProfile} />;
   }
 
   // R16 with more than one pick: which one this screen is about, and its place (a small header, not a heading).

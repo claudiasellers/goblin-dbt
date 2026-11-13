@@ -248,14 +248,22 @@ test("the setting: kind please_rows in My body, one per person, the four rows bu
   assert.match(readFileSync("scripts/skills/please_skill.py", "utf8"), /HIDEABLE = \["food", "body", "subs", "moved"\]/);
   assert.deepEqual(lib.pleaseRowsOf({ hidden: ["subs", "sleep", "food", 3] }), ["food", "subs"], "known rows only, in row order");
   assert.deepEqual(lib.pleaseRowsOf(null), []);
-  assert.deepEqual(Object.values(lib.pleaseRowNames(skill.copy)), ["Food", "Body", "Alcohol or drugs", "Moving"]);
+  assert.deepEqual(Object.values(lib.PLEASE_ROWS_COPY.names), ["Food", "Body", "Alcohol or drugs", "Moving"]);
+  const editor = readFileSync("src/components/me/PleaseRows.tsx", "utf8");
+  assert.doesNotMatch(editor, /getSkillsContent/, "Me never loads the skill catalogue for four labels");
+  assert.match(editor, /hidden\.includes\('body'\) && <p[^>]*>\{C\.body\}/, "leaving out Body says what it takes away");
+  assert.match(editor, /disabled=\{saving \|\| \(fresh && hidden\.length === 0\)\}/, "an empty setting is never kept");
+  assert.match(lib.PLEASE_ROWS_COPY.body, /pain or missed meds/);
+  const player = readFileSync("src/components/skillPlayer/SkillPlayer.tsx", "utf8");
+  assert.match(player, /const waitsOnProfile = !profileSettled && step\.next\.some\(\(t\) => JSON\.stringify\(t\.when \?\? null\)\.includes\('"\$p\.'\)\);/,
+    "Next waits for the profile on a step whose way on reads it: a quick tap can't take a left-out row");
   const types = await importTs("functions/src/profile/types.ts");
   assert.deepEqual([...types.PROFILE_NEEDS["please-skill"]], ["pleaseRows"]);
   for (const [consumer, needs] of Object.entries(types.PROFILE_NEEDS)) {
     if (consumer !== "please-skill") assert.ok(!needs.includes("pleaseRows"), consumer);
   }
   assert.match(readFileSync("functions/src/profile/slices.ts", "utf8"), /pleaseRows: `MATCH \(:User \{id: \$uid\}\)-\[:HAS_PROFILE_FACT\]->\(p:ProfileFact \{kind: 'please_rows', status: 'active'\}\)/);
-  assert.match(readFileSync("scripts/profile-layer/content.py", "utf8"), /\("please_rows", "my_body", "Rows Running low leaves out", None,/);
+  assert.match(readFileSync("scripts/profile-layer/content.py", "utf8"), /\("please_rows", "my_body", "Left out of Running low", None,/);
   const me = readFileSync("src/components/me/MeSection.tsx", "utf8");
   assert.match(me, /keepProfileItem\(\{ kind: 'please_rows', value: \{ hidden \} \}\)/);
   assert.match(me, /<PleaseRowsNew onSave=\{keepPleaseRows\} \/>/);
