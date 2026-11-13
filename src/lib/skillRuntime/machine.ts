@@ -16,7 +16,7 @@
  * `scheduled`), inline runs (`initialRun(skill, enterAt)`, `inlineResult`) and resume (`resumeRun`).
  */
 import type { CrisisSlot, EmbedOutput, EmbedOutputSchema, ExitDef, FollowUpAction, KeepAction, FieldDef, OptionDef, SkillDef, SkillsContent, StepDef } from '../../data/skillTypes';
-import { EACH, holds, profileItemId, resolve, type Answer, type Answers, type Scope } from './conditions';
+import { EACH, PREV_KEY, holds, profileItemId, resolve, type Answer, type Answers, type Scope } from './conditions';
 
 export type { Answer, Answers } from './conditions';
 
@@ -904,6 +904,9 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { ke
   }
   const step = stepOf(ctx.skill, stepId);
   const kept = normalize(ctx, reopened && step.clears?.length ? without(answers, step.clears) : answers);
+  // Reopened: the last round's answers to the fields this step clears stay readable as `$prev.<field>` (conditions
+  // only: never a chip's selection, never recorded). Build mastery's *done twice at this rung* reads them.
+  if (reopened) for (const f of step.clears ?? []) if (answers[f]) kept[`${PREV_KEY}${f}`] = answers[f];
   const pick = step.each ? parseEntry(resumeEntry).pick : null;
   const fullPath = (reopened ? [...upTo, stepId] : upTo).slice(-PATH_MAX);
   // Picks set aside (*Carry on with the others*): a per-pick hand-off with `carryOn` the path went on from.
@@ -1169,7 +1172,7 @@ export function carried(exit: ExitDef, s: StateLike, ctx?: RunContext): string[]
 export function runRecord(ctx: RunContext, s: RunState): Record<string, unknown> {
   // A per-pick answer (R16, `field@pick`) is recorded with its pick.
   const answers = Object.entries(s.answers)
-    .filter(([k, a]) => k !== EACH && (a.ids.length > 0 || a.own))
+    .filter(([k, a]) => k !== EACH && !k.startsWith(PREV_KEY) && (a.ids.length > 0 || a.own))
     .map(([k, a]) => {
       const at = k.indexOf('@');
       const fieldId = at < 0 ? k : k.slice(0, at);

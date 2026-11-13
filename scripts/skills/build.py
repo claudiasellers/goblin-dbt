@@ -15,7 +15,7 @@ _spec.loader.exec_module(_spine)
 FOLLOW_UP_TYPES = _spine.FOLLOW_UP_TYPES  # the FollowUpType registry (scripts/practice-spine)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-REF = re.compile(r"^\$(a|d|opt|ctx|p)\.[A-Za-z_][A-Za-z0-9_]*(\.(ids|own))?$")
+REF = re.compile(r"^\$(a|prev|d|opt|ctx|p)\.[A-Za-z_][A-Za-z0-9_]*(\.(ids|own))?$")
 # Profile slices (src/data/profileTypes.ts SLICE_IDS; tests/skill-contracts.test.mjs keeps them equal). A skill
 # may read only the ones its tool's PROFILE_NEEDS declares (checked there too).
 PROFILE_SLICES = {
@@ -38,6 +38,7 @@ ASK_FRESH = {"fitsFacts", "thenVsNow"}
 THEN_VS_NOW = {"worse", "same", "better", "much_better"}
 RUN_OWN_MAX = 140  # functions/src/spine/extSchemas.ts RUN_OWN_MAX (tests/skill-contracts.test.mjs keeps them equal)
 SAFETY_EXIT_ID = "safety_open"  # the reserved exit (plan C3a R6); a skill has at most one
+PREV_FIELDS = set()  # per skill, set by check(): the fields a reopens step clears ($prev.<field>)
 OPS = {"set", "eq", "in", "has", "own", "some", "all", "any", "not"}
 # Content nodes an option may show (PRESENTS), loaded before skills.cypher: Problem Solve's (ps_graph.py), Cope Ahead's,
 # DEAR MAN's debrief vocabulary.
@@ -84,6 +85,9 @@ def check_cond(c, fields, derived, where, accepts=None):
             kind, name = r[1:].split(".")[:2]
             if kind == "a":
                 assert name in fields, (where, "unknown field", r)
+            if kind == "prev":
+                # The last round's answer, kept only for the fields a `reopens` step clears.
+                assert name in PREV_FIELDS, (where, "$prev names a field a reopens step clears", r)
             if kind == "d":
                 assert name in derived, (where, "unknown derived value", r)
             if kind == "ctx":
@@ -167,6 +171,8 @@ def check(skill):
     assert skill["ownMax"] <= RUN_OWN_MAX, (sid, "ownMax over the record's limit")
     fields = {f["id"] for s in skill["steps"] for f in s.get("fields", [])} | {s["answerAs"] for s in skill["steps"] if s.get("answerAs")}
     derived = {d["name"] for d in skill["derive"]}
+    global PREV_FIELDS
+    PREV_FIELDS = {f for s in skill["steps"] if s.get("reopens") for f in s.get("clears", [])}
     steps = {s["id"] for s in skill["steps"]}
     exits = {e["id"] for e in skill["exits"]}
     lists = {o[0] for o in skill["options"]}

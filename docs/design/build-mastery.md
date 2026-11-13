@@ -1,6 +1,6 @@
 # Build mastery (ER-11)
 
-**Status:** built 12 Nov 2026 on the skill runtime (batch ER-B5 of [the modules plan](dbt-modules-plan.md)). Tool
+**Status:** built 12 Nov 2026; auto-adjust (part 2) 13 Nov 2026 on the skill runtime (batch ER-B5 of [the modules plan](dbt-modules-plan.md)). Tool
 `build-mastery`, listed under Emotion Regulation with the Tools intent *Get one thing done*, on the existing concept
 `dbt_build_mastery` (`appToolId: 'build-mastery'`, PART_OF reducing vulnerability). Source:
 `scripts/skills/build_mastery.py`. Tests: `tests/skill-build-mastery.test.mjs`. New profile kind `i_can` and its slice
@@ -79,7 +79,7 @@ minutes*, *Make one small thing from start to end*), so they can always be finis
 
 | PRD | Built | Why | Batch |
 |---|---|---|---|
-| Auto-adjust: done twice at a rung → offer the next; *not yet* twice → a smaller one | Every done offers the next one up (after *the same one again*), every partly and not yet a smaller one; the person picks. *Something keeps getting in the way* (Problem Solve) stands in for *not yet twice* | Counting past visits reads the log in a live flow (a profile slice never reads a log record) | ER-B5 part 2 |
+| Auto-adjust: done twice at a rung → offer the next; *not yet* twice → a smaller one | **Built 13 Nov (part 2), within the visit's own loop**: the card reopens the same run, and the last round's answers are read as `$prev` (a runtime addition: conditions only, never a chip's selection, never recorded). Done after *The same one again* and done before: *Done twice now. The next one up is there when you're ready.* (at the top rung: *That's this one getting easier.*); not yet after *Try the same one again* and not yet before: *Not yet, twice. A smaller one may fit better right now.* Every choice stays; *Something keeps getting in the way* still stands in for the rest | Counting across separate visits would read the log in a live flow (a profile slice never reads a log record); the loop is one visit, so it reads only its own record | — |
 | — | The heads-up comes after the area pick | A skill's first step is fixed; a flooded-only first screen needs a runtime start condition | ER-B5 part 2 |
 | — | Keeping and then going round again (up, the same) shows no *kept* line | A keep on a step that doesn't reach an end card has no acknowledgement (runtime) | ER-B5 part 2 |
 | The I can list is a view over done reps | `i_can` kept on a yes | Profile only on the person's yes (data layers); no rep to view | ER-B5 part 2 |

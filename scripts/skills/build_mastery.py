@@ -68,6 +68,11 @@ COPY = {
     "back_title_own": "Earlier you picked: {rung}, for {area}.",
     "happened_label": "How did it go?",
     "done_title": "You did it.",
+    # PRD auto-adjust, within the visit's own loop (the last round read as `$prev`, never a past visit's log):
+    # done twice at the same rung offers the next one up; not yet twice, a smaller one. Offered, never pushed.
+    "done_twice_title": "Done twice now. The next one up is there when you're ready.",
+    "done_twice_top_title": "Done twice now. That's this one getting easier.",
+    "not_twice_title": "Not yet, twice. A smaller one may fit better right now.",
     "partly_title": "Part of it counts.",
     "done_hint": "That counts. It's evidence you can do things that feel hard.",
     "ican_label": "Keep this on your \u201cI can\u201d list in Me?",
@@ -146,6 +151,10 @@ THEN_WHERE = {"all": [{"not": {"all": [{"eq": ["$opt.up", True]}, {"any": [AT_TO
 AGAIN_WHERE = {"all": [{"not": {"all": [{"eq": ["$opt.down", True]}, AT_BOTTOM]}},
                        {"not": {"all": [{"eq": ["$opt.bottom", True]}, {"not": AT_BOTTOM}]}}]}
 KEPT = {"eq": [a("ican"), "yes"]}
+# The last round (`$prev`: a reopened run's answers before its back step cleared them) went the same way, at the same
+# rung: *The same one again* / *Try the same one again* is the only way back to the same rung.
+DONE_TWICE = {"all": [DONE, {"eq": ["$prev.happened", "done"]}, {"eq": ["$prev.then", "same"]}]}
+NOT_TWICE = {"all": [{"eq": [a("happened"), "not_yet"]}, {"eq": ["$prev.happened", "not_yet"]}, {"eq": ["$prev.again", "same"]}]}
 # A ladder step already on the I can list isn't offered for keeping twice (an own-words step always is).
 NOT_ON_LIST = {"not": {"has": ["$p.iCanRungs.ids", a("rung")]}}
 # Back to the ladder: a carried flooded reading gets the heads-up first, as on a first visit.
@@ -209,7 +218,9 @@ STEPS = [
         reopens={"after": "when"}, clears=["happened", "ican", "then", "again"],
         titleSlots={"rung": {"labelOf": "rung"}, "area": {"labelOf": "area"}}),
     # Done or partly: the I can list on a yes (R4 keep, the rung's id or own words), then what next.
-    ask("back_done", [{"when": {"eq": [a("happened"), "partly"]}, "key": "partly_title"}, {"key": "done_title"}],
+    ask("back_done", [{"when": {"all": [DONE_TWICE, AT_TOP]}, "key": "done_twice_top_title"},
+                      {"when": DONE_TWICE, "key": "done_twice_title"},
+                      {"when": {"eq": [a("happened"), "partly"]}, "key": "partly_title"}, {"key": "done_title"}],
         "done_hint",
         [field("ican", "ican", label="ican_label", required=False, showWhen=NOT_ON_LIST),
          field("then", "then", where=THEN_WHERE, label="then_label")],
@@ -219,7 +230,7 @@ STEPS = [
         # The yes is the *Yes, add it* chip (as Good things' *Add it*); the button goes on. The typed area comes along,
         # so a general step ("Spend five minutes on it") still says what it was.
         keep={"kind": "i_can", "many": True, "when": KEPT, "from": ["area", "rung"]}, primary="keep_primary"),
-    ask("back_not", "not_title", "not_hint", [field("again", "again", where=AGAIN_WHERE)],
+    ask("back_not", [{"when": NOT_TWICE, "key": "not_twice_title"}, {"key": "not_title"}], "not_hint", [field("again", "again", where=AGAIN_WHERE)],
         [*[{**t, "when": {"all": [{"any": [{"eq": [a("again"), "smaller"]}, {"eq": [a("again"), "smaller_own"]}]}, *([t["when"]] if "when" in t else [])]}}
            for t in TO_LADDER],
          {"when": {"eq": [a("again"), "same"]}, "to": "when"}, {"when": {"eq": [a("again"), "stuck"]}, "to": "back_stuck"},
