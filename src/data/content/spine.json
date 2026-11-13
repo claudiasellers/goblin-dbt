@@ -611,7 +611,7 @@
         },
         "enabled": true,
         "copy": {
-          "body": "A good thing you planned for today. Did it happen?",
+          "body": "A good thing you planned. Did it happen?",
           "title": "Your good thing"
         },
         "choices": [
@@ -628,13 +628,18 @@
               "kind": "at_local",
               "time": "18:00"
             },
+            "evening": {
+              "days": 0,
+              "kind": "at_local",
+              "time": "20:00"
+            },
             "few_days": {
               "days": 3,
               "kind": "at_local",
               "time": "18:00"
             },
             "this_week": {
-              "days": 5,
+              "days": 6,
               "kind": "at_local",
               "time": "18:00"
             },
@@ -663,7 +668,7 @@
         },
         "enabled": true,
         "copy": {
-          "body": "A good thing you planned for today. Did it happen?",
+          "body": "Another good thing you planned. Did it happen?",
           "title": "Your good thing"
         },
         "choices": [
@@ -680,13 +685,18 @@
               "kind": "at_local",
               "time": "18:00"
             },
+            "evening": {
+              "days": 0,
+              "kind": "at_local",
+              "time": "20:00"
+            },
             "few_days": {
               "days": 3,
               "kind": "at_local",
               "time": "18:00"
             },
             "this_week": {
-              "days": 5,
+              "days": 6,
               "kind": "at_local",
               "time": "18:00"
             },
@@ -715,7 +725,7 @@
         },
         "enabled": true,
         "copy": {
-          "body": "A good thing you planned for today. Did it happen?",
+          "body": "One more good thing you planned. Did it happen?",
           "title": "Your good thing"
         },
         "choices": [
@@ -732,13 +742,18 @@
               "kind": "at_local",
               "time": "18:00"
             },
+            "evening": {
+              "days": 0,
+              "kind": "at_local",
+              "time": "20:00"
+            },
             "few_days": {
               "days": 3,
               "kind": "at_local",
               "time": "18:00"
             },
             "this_week": {
-              "days": 5,
+              "days": 6,
               "kind": "at_local",
               "time": "18:00"
             },

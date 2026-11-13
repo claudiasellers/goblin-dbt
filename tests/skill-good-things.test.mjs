@@ -247,22 +247,32 @@ test("plan the week: up to three good things, a day each, a card each; never one
   assert.equal(w1.stepId, "week_1");
   assert.equal(title(w1), "Pick a good thing for this week.");
   assert.ok(values(w1, "wk1").includes("walk") && values(w1, "wk1").includes("song"), "the whole catalogue: the energy on the day isn't known yet");
-  assert.deepEqual(values(w1, "day1"), ["tomorrow", "day_after", "few_days", "this_week"]);
+  assert.deepEqual(values(w1, "day1"), ["evening", "tomorrow", "day_after", "few_days", "this_week"]);
+  assert.match(skill.copy.week_hint, /^If nothing sounds good, that's part of feeling low\./, "the anhedonia line, as at level 1");
+  assert.deepEqual(values(w1, "more1"), ["enough", "more"], "stopping at one comes first");
   assert.deepEqual(M.followUpFor(ctx(), M.stepOf(skill, "week_1"), run([pick("wk1", "walk"), pick("day1", "day_after")], ctx(), w1)),
     { type: "good_week_1", chip: "day_after" }, "the day books the card: the card is the plan");
   const w2 = run([pick("wk1", "walk"), pick("day1", "tomorrow"), pick("more1", "more"), next], ctx(), w1);
   assert.equal(w2.stepId, "week_2");
   assert.ok(!values(w2, "wk2").includes("walk"), "a good thing picked already isn't offered again");
+  // The person's own things too (Gate 1): a kept thing planned once isn't offered for a second slot.
+  const pc = ctx({}, LIKES);
+  const k1 = run([pick("start", "week"), next], pc);
+  assert.equal(values(k1, "wk1", pc)[0], KEPT_ID, "own things first");
+  const k2 = run([pick("wk1", KEPT_ID), pick("day1", "tomorrow"), pick("more1", "more"), next], pc, k1);
+  assert.ok(!values(k2, "wk2", pc).includes(KEPT_ID));
   assert.equal(run([pick("wk1", "walk"), pick("day1", "tomorrow"), pick("more1", "enough"), next], ctx(), w1).stepId, "picture", "one is enough");
   assert.equal(M.stepOf(skill, "week_3").fields.some((f) => f.id === "more3"), false, "three at most");
   const pic = run([pick("start", "week"), next, pick("wk1", "walk"), pick("day1", "tomorrow"), pick("more1", "enough"), next]);
   assert.equal(M.stepOf(skill, "picture").props.seconds, 10, "the best ten seconds (PRD)");
   const one = run([done("held"), next], ctx(), pic);
   assert.equal(one.stepId, "week_set");
-  assert.equal(title(one), "Your good thing this week: A short walk somewhere you like.");
+  assert.equal(title(pic), "A short walk somewhere you like: picture the best ten seconds of it.", "one planned: named");
+  assert.match(skill.copy.picture_hint, /If nothing comes, picturing where you'll be is enough\./);
+  assert.equal(title(one), "Your good thing is planned.");
   const all = WEEK();
-  assert.equal(title(all), "Your good things this week: A short walk somewhere you like, Put on a song you like, and Send a message to someone you like.");
-  assert.equal(line(all), "I'll check in on each day, in the evening. Doing it counts, whether or not you enjoy it.");
+  assert.equal(title(all), "Your good things are planned.");
+  assert.equal(line(all), "I'll check in on the evening of each day. Doing it counts, whether or not you enjoy it.");
 });
 
 test("good_week cards: one per slot, the evening of the day, content-free, each reopening its own step", () => {
@@ -271,21 +281,24 @@ test("good_week cards: one per slot, the evening of the day, content-free, each 
     const t = spine.followUpTypes.find((x) => x.id === `good_week_${n}`);
     assert.equal(t.deepLinkTemplate, `/tool/good-things?run={sourceSessionId}&at=back_w${n}&followUp={followUpId}`);
     assert.doesNotMatch(`${t.copy.title} ${t.copy.body}`, /\d|walk|song|monday|tuesday/i, "never names the thing or the day");
-    for (const [chip, day] of [["tomorrow", 14], ["day_after", 15], ["few_days", 16], ["this_week", 18]]) {
+    for (const [chip, day, h] of [["evening", 13, 20], ["tomorrow", 14, 18], ["day_after", 15, 18], ["few_days", 16, 18], ["this_week", 19, 18]]) {
       const due = W.dueAtFor(t.window, at, chip);
-      assert.deepEqual([due.getDate(), due.getHours()], [day, 18], `${n} ${chip}`);
+      assert.deepEqual([due.getDate(), due.getHours()], [day, h], `${n} ${chip}`);
     }
+    assert.doesNotMatch(t.copy.body, /today/i, "a card can sit on Today after its day");
     assert.match(readFileSync("functions/src/spine/toolSession.ts", "utf8"), new RegExp(`OPEN_RESOLVES = \\[[^\\]]*'good_week_${n}'`));
     assert.match(readFileSync("functions/src/spine/copeAheadAfter.ts", "utf8"), new RegExp(`good_week_${n}: 'good-things'`));
   }
   assert.ok(readFileSync("functions/src/spine/validation.ts", "utf8").includes("'day_after'"), "the server accepts the day chip");
+  const bodies = [1, 2, 3].map((n) => spine.followUpTypes.find((x) => x.id === `good_week_${n}`).copy.body);
+  assert.equal(new Set(bodies).size, 3, "three on one evening aren't identical");
 });
 
 test("each card reopens its own good thing; reviewing one never cuts the others off; lighter offers Things I like", () => {
   const rec = M.runRecord(ctx(), WEEK());
   const r2 = M.resumeRun(ctx(), rec, "back_w2");
   assert.equal(r2?.stepId, "back_w2");
-  assert.equal(title(r2), "Your good thing for today: Put on a song you like.");
+  assert.equal(title(r2), "The good thing you planned: Put on a song you like.");
   const keep = run([pick("hap2", "yes"), next, pick("compared", "lighter"), next], ctx(), r2);
   assert.equal(keep.stepId, "keep_more_w2");
   assert.deepEqual(M.keepFor(ctx(), M.stepOf(skill, "keep_more_w2"), run([pick("km2", "keep")], ctx(), keep)).value, { wk2Ids: ["song"] });
@@ -294,13 +307,13 @@ test("each card reopens its own good thing; reviewing one never cuts the others 
   // Card 2 was reviewed first; cards 1 and 3 still reopen theirs, asked fresh, the other round's answers cleared.
   const rec2 = M.runRecord(ctx(), end2);
   const r1 = M.resumeRun(ctx(), rec2, "back_w1");
-  assert.equal(title(r1), "Your good thing for today: A short walk somewhere you like.");
+  assert.equal(title(r1), "The good thing you planned: A short walk somewhere you like.");
   assert.equal(r1.answers.hap2, undefined);
   assert.equal(r1.answers.km2, undefined, "one round, one good thing");
   const flat = run([pick("hap1", "yes"), next, pick("compared", "same"), next], ctx(), r1);
   assert.equal(line(flat), "Enjoying it comes later. Doing it is the rep.", "not the other round's kept line");
   const r3 = M.resumeRun(ctx(), M.runRecord(ctx(), flat), "back_w3");
-  assert.equal(title(r3), "Your good thing for today: Send a message to someone you like.");
+  assert.equal(title(r3), "The good thing you planned: Send a message to someone you like.");
   assert.equal(run([pick("hap3", "no"), next], ctx(), r3).stepId, "not_today");
   // A slot never planned has no card to reopen.
   const onlyOne = run([pick("start", "week"), next, pick("wk1", "walk"), pick("day1", "tomorrow"), pick("more1", "enough"), next, done("held"), next]);

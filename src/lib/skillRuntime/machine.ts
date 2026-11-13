@@ -408,6 +408,10 @@ export function optionGroups(ctx: RunContext, field: FieldDef, answers: Answers,
   if (!src.list && !src.profile) return [];
   const mine = src.profile ? profileOptions(ctx, src.profile) : [];
   let list = [...mine, ...(src.list ? ctx.skill.options[src.list] ?? [] : []).filter((opt) => holds(src.where, { ...sc, opt }))];
+  if (src.notIn?.length) {
+    const out = new Set(src.notIn.flatMap((r) => { const v = resolve(r, sc); return Array.isArray(v) ? v : []; }));
+    list = list.filter((o) => !out.has(o.value));
+  }
   const first = src.firstFrom ? resolve(src.firstFrom, sc) : null;
   if (typeof first === 'string' && list.some((o) => o.value === first)) {
     list = [...list.filter((o) => o.value === first), ...list.filter((o) => o.value !== first)];

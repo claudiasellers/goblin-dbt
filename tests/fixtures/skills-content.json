@@ -26446,19 +26446,19 @@
     "week_title_1": "Pick a good thing for this week.",
     "week_title_2": "And another?",
     "week_title_3": "One more?",
-    "week_hint": "Your own things are first. Pick something you'd actually do.",
-    "day_label": "Which day?",
+    "week_hint": "If nothing sounds good, that's part of feeling low. Pick one that feels doable. One is plenty.",
+    "day_label": "Which day? I'll check in that evening.",
     "more_label": "Another one?",
-    "picture_title": "Pick one of them. Picture the best ten seconds of it.",
+    "picture_title_1": "{wk1}: picture the best ten seconds of it.",
+    "picture_title": "Pick one of your good things. Picture the best ten seconds of it.",
     "picture_label": "Start",
     "picture_running": "Picturing it",
-    "picture_hint": "Where you are, what you can see and hear, the bit you'd like most.",
+    "picture_hint": "Where you are, what you can see and hear, the bit you'd like most. If nothing comes, picturing where you'll be is enough.",
     "picture_done": "That's the bit to look forward to.",
-    "week_set_title_1": "Your good thing this week: {wk1}.",
-    "week_set_title_2": "Your good things this week: {wk1}, and {wk2}.",
-    "week_set_title_3": "Your good things this week: {wk1}, {wk2}, and {wk3}.",
-    "week_set_line": "I'll check in on each day, in the evening. Doing it counts, whether or not you enjoy it.",
-    "back_w_title": "Your good thing for today: {pick}.",
+    "week_set_title_1": "Your good thing is planned.",
+    "week_set_title": "Your good things are planned.",
+    "week_set_line": "I'll check in on the evening of each day. Doing it counts, whether or not you enjoy it.",
+    "back_w_title": "The good thing you planned: {pick}.",
     "keep_primary": "Next",
     "safety_open": "Talk to someone now",
     "next": "Next",
@@ -27102,16 +27102,12 @@
        "options": {
         "list": "activity",
         "where": {
-         "all": [
-          {
-           "not": {
-            "has": [
-             "$p.thingsILikePicks.ids",
-             "$opt.value"
-            ]
-           }
-          }
-         ]
+         "not": {
+          "has": [
+           "$p.thingsILikePicks.ids",
+           "$opt.value"
+          ]
+         }
         },
         "profile": "thingsILike"
        },
@@ -27183,26 +27179,17 @@
        "options": {
         "list": "activity",
         "where": {
-         "all": [
-          {
-           "not": {
-            "has": [
-             "$p.thingsILikePicks.ids",
-             "$opt.value"
-            ]
-           }
-          },
-          {
-           "not": {
-            "has": [
-             "$a.wk1.ids",
-             "$opt.value"
-            ]
-           }
-          }
-         ]
+         "not": {
+          "has": [
+           "$p.thingsILikePicks.ids",
+           "$opt.value"
+          ]
+         }
         },
-        "profile": "thingsILike"
+        "profile": "thingsILike",
+        "notIn": [
+         "$a.wk1.ids"
+        ]
        },
        "max": 1,
        "required": true,
@@ -27271,34 +27258,18 @@
        "options": {
         "list": "activity",
         "where": {
-         "all": [
-          {
-           "not": {
-            "has": [
-             "$p.thingsILikePicks.ids",
-             "$opt.value"
-            ]
-           }
-          },
-          {
-           "not": {
-            "has": [
-             "$a.wk1.ids",
-             "$opt.value"
-            ]
-           }
-          },
-          {
-           "not": {
-            "has": [
-             "$a.wk2.ids",
-             "$opt.value"
-            ]
-           }
-          }
-         ]
+         "not": {
+          "has": [
+           "$p.thingsILikePicks.ids",
+           "$opt.value"
+          ]
+         }
         },
-        "profile": "thingsILike"
+        "profile": "thingsILike",
+        "notIn": [
+         "$a.wk1.ids",
+         "$a.wk2.ids"
+        ]
        },
        "max": 1,
        "required": true,
@@ -27344,7 +27315,24 @@
      "kind": "embed",
      "embed": "holdRing",
      "answerAs": "picture",
-     "title": "picture_title",
+     "title": [
+      {
+       "when": {
+        "not": {
+         "set": "$a.wk2"
+        }
+       },
+       "key": "picture_title_1"
+      },
+      {
+       "key": "picture_title"
+      }
+     ],
+     "titleSlots": {
+      "wk1": {
+       "labelOf": "wk1"
+      }
+     },
      "props": {
       "variant": "timed",
       "seconds": 10,
@@ -27378,15 +27366,9 @@
      "title": [
       {
        "when": {
-        "set": "$a.wk3"
-       },
-       "key": "week_set_title_3"
-      },
-      {
-       "when": {
         "set": "$a.wk2"
        },
-       "key": "week_set_title_2"
+       "key": "week_set_title"
       },
       {
        "key": "week_set_title_1"
@@ -27410,17 +27392,6 @@
        }
       }
      ],
-     "titleSlots": {
-      "wk1": {
-       "labelOf": "wk1"
-      },
-      "wk2": {
-       "labelOf": "wk2"
-      },
-      "wk3": {
-       "labelOf": "wk3"
-      }
-     },
      "next": [],
      "offers": []
     },
@@ -28496,12 +28467,16 @@
     ],
     "day": [
      {
+      "value": "evening",
+      "label": "Today"
+     },
+     {
       "value": "tomorrow",
       "label": "Tomorrow"
      },
      {
       "value": "day_after",
-      "label": "The day after"
+      "label": "The day after tomorrow"
      },
      {
       "value": "few_days",
@@ -28509,17 +28484,17 @@
      },
      {
       "value": "this_week",
-      "label": "Later this week"
+      "label": "In about a week"
      }
     ],
     "more": [
      {
-      "value": "more",
-      "label": "Add another"
-     },
-     {
       "value": "enough",
       "label": "That's enough for now"
+     },
+     {
+      "value": "more",
+      "label": "Add another"
      }
     ]
    }

@@ -113,19 +113,20 @@ COPY = {
     "week_title_1": "Pick a good thing for this week.",
     "week_title_2": "And another?",
     "week_title_3": "One more?",
-    "week_hint": "Your own things are first. Pick something you'd actually do.",
-    "day_label": "Which day?",
+    # The anhedonia line, as at level 1 (Gate 3), and permission to stop at one.
+    "week_hint": "If nothing sounds good, that's part of feeling low. Pick one that feels doable. One is plenty.",
+    "day_label": "Which day? I'll check in that evening.",
     "more_label": "Another one?",
-    "picture_title": "Pick one of them. Picture the best ten seconds of it.",
+    "picture_title_1": "{wk1}: picture the best ten seconds of it.",
+    "picture_title": "Pick one of your good things. Picture the best ten seconds of it.",
     "picture_label": "Start",
     "picture_running": "Picturing it",
-    "picture_hint": "Where you are, what you can see and hear, the bit you'd like most.",
+    "picture_hint": "Where you are, what you can see and hear, the bit you'd like most. If nothing comes, picturing where you'll be is enough.",
     "picture_done": "That's the bit to look forward to.",
-    "week_set_title_1": "Your good thing this week: {wk1}.",
-    "week_set_title_2": "Your good things this week: {wk1}, and {wk2}.",
-    "week_set_title_3": "Your good things this week: {wk1}, {wk2}, and {wk3}.",
-    "week_set_line": "I'll check in on each day, in the evening. Doing it counts, whether or not you enjoy it.",
-    "back_w_title": "Your good thing for today: {pick}.",
+    "week_set_title_1": "Your good thing is planned.",
+    "week_set_title": "Your good things are planned.",
+    "week_set_line": "I'll check in on the evening of each day. Doing it counts, whether or not you enjoy it.",
+    "back_w_title": "The good thing you planned: {pick}.",
     "keep_primary": "Next",
     "safety_open": "Talk to someone now",
     "next": "Next",
@@ -205,8 +206,10 @@ COMPARED = [("lighter", "Lighter"), ("same", "About the same"), ("heavier", "Hea
 MIND = [("here", "Mostly here"), ("partly", "Partly"), ("elsewhere", "Somewhere else")]
 KEEP_MORE = [("keep", "Add it"), ("not_now", "Not this time")]
 # Level 2: the good_week_<n> cards' chips, the evening of that day.
-DAYS = [("tomorrow", "Tomorrow"), ("day_after", "The day after"), ("few_days", "In a few days"), ("this_week", "Later this week")]
-MORE = [("more", "Add another"), ("enough", "That's enough for now")]
+DAYS = [("evening", "Today"), ("tomorrow", "Tomorrow"), ("day_after", "The day after tomorrow"), ("few_days", "In a few days"),
+        ("this_week", "In about a week")]
+# *That's enough* first: planning one is plenty (Gate 3).
+MORE = [("enough", "That's enough for now"), ("more", "Add another")]
 SLOTS = (1, 2, 3)
 # Every review answer, cleared by each card's step: a reopened run is one round, about one good thing.
 REVIEW = ["happened", "compared", "mind", "keep_more", *[f"hap{n}" for n in SLOTS], *[f"km{n}" for n in SLOTS]]
@@ -252,8 +255,11 @@ def kept_already(f):
 def week_step(n):
     # One good thing and its day; the step books that day's card (always: the card is the plan). Never one picked
     # in an earlier slot.
-    earlier = [{"not": {"has": [f"$a.wk{m}.ids", "$opt.value"]}} for m in SLOTS if m < n]
-    fields = [field(f"wk{n}", "activity", own="pick_own", where={"all": [NOT_KEPT, *earlier]}, profile="thingsILike"),
+    earlier = [f"$a.wk{m}.ids" for m in SLOTS if m < n]
+    wk = field(f"wk{n}", "activity", own="pick_own", where=NOT_KEPT, profile="thingsILike")
+    if earlier:
+        wk["options"]["notIn"] = earlier  # the person's own things too, not only the catalogue's
+    fields = [wk,
               field(f"day{n}", "day", label="day_label")]
     if n < 3:
         fields.append(field(f"more{n}", "more", label="more_label"))
@@ -311,14 +317,14 @@ STEPS = [
             [], titleSlots={"pick": {"labelOf": "pick"}}),
     # --- Level 2: plan the week, up to three good things, a card each ---
     *[week_step(n) for n in SLOTS],
-    {"id": "picture", "kind": "embed", "embed": "holdRing", "answerAs": "picture", "title": "picture_title",
+    {"id": "picture", "kind": "embed", "embed": "holdRing", "answerAs": "picture",
+     "title": [{"when": {"not": {"set": a("wk2")}}, "key": "picture_title_1"}, {"key": "picture_title"}],
+     "titleSlots": {"wk1": {"labelOf": "wk1"}},
      "props": {"variant": "timed", "seconds": 10, "label": "picture_label", "runningLabel": "picture_running",
                "hint": "picture_hint", "doneLabel": "picture_done", "next": "next"},
      "links": [SAFETY_LINK], "next": [{"to": "week_set"}]},
-    handoff("week_set", [{"when": {"set": a("wk3")}, "key": "week_set_title_3"}, {"when": {"set": a("wk2")}, "key": "week_set_title_2"},
-                         {"key": "week_set_title_1"}],
-            [{"when": ALWAYS, "key": "week_set_line"}], [],
-            titleSlots={f"wk{n}": {"labelOf": f"wk{n}"} for n in SLOTS}),
+    handoff("week_set", [{"when": {"set": a("wk2")}, "key": "week_set_title"}, {"key": "week_set_title_1"}],
+            [{"when": ALWAYS, "key": "week_set_line"}], []),
     *[back_week(n) for n in SLOTS],
     *[keep_more_week(n) for n in SLOTS],
     # --- The good_thing card reopens the run here (R9), on a run that reached `when` ---
