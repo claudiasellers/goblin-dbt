@@ -208,7 +208,7 @@ test("thing_i_like: a profile kind in My words, own words encrypted, the thingsI
   assert.equal(k.area, "my_words");
   assert.equal(k.slice, "thingsILike");
   assert.ok(k.many);
-  assert.deepEqual(k.ownFields, ["kindOwn", "pickOwn"]);
+  assert.deepEqual(k.ownFields, ["kindOwn", "pickOwn", "wk1Own", "wk2Own", "wk3Own"], "the week plan's wk<n>Own too (stored as pickOwn)");
   assert.deepEqual(k.validate({ kindIds: ["colour"] }), { kindIds: ["colour"] });
   assert.deepEqual(k.validate({ pickOwn: "Baking bread" }), { pickOwn: "Baking bread" });
   assert.throws(() => k.validate({}), /Nothing to keep/);
