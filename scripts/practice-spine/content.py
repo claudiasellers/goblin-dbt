@@ -301,7 +301,7 @@ FOLLOW_UP_TYPES = [
         # planned, on its day, in the evening. Each card's body differs a little, so three on one evening aren't identical. One type per slot, like Give's two cards (one card reopens one step):
         # each reopens the visit at its own `back_w<n>` (R9). Content-free: never names the thing or the day.
     {
-        "id": "good_week_1", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
+        "id": "good_week_one", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
         "deepLinkTemplate": "/tool/good-things?run={sourceSessionId}&at=back_w1&followUp={followUpId}",
         "window": {"kind": "chip", "chips": {"evening": {"kind": "at_local", "days": 0, "time": "20:00"},
                                              "tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
@@ -315,7 +315,7 @@ FOLLOW_UP_TYPES = [
         "notification": "Your good thing is ready to check.",
     },
     {
-        "id": "good_week_2", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
+        "id": "good_week_two", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
         "deepLinkTemplate": "/tool/good-things?run={sourceSessionId}&at=back_w2&followUp={followUpId}",
         "window": {"kind": "chip", "chips": {"evening": {"kind": "at_local", "days": 0, "time": "20:00"},
                                              "tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
@@ -329,7 +329,7 @@ FOLLOW_UP_TYPES = [
         "notification": "Your good thing is ready to check.",
     },
     {
-        "id": "good_week_3", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
+        "id": "good_week_three", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
         "deepLinkTemplate": "/tool/good-things?run={sourceSessionId}&at=back_w3&followUp={followUpId}",
         "window": {"kind": "chip", "chips": {"evening": {"kind": "at_local", "days": 0, "time": "20:00"},
                                              "tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},

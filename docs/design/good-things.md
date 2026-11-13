@@ -55,13 +55,13 @@ reopens the run at `back` (R9 `reopens`, only on a run that reached `when`):
 
 | Step | What the person sees |
 |---|---|
-| `week_1` | *Pick a good thing for this week.* (*If nothing sounds good, that's part of feeling low. Pick one that feels doable. One is plenty.*) The person's things I like, then the whole catalogue (the energy on the day isn't known yet), or own words; *Which day? I'll check in that evening.* Today · Tomorrow · The day after tomorrow · In a few days · In about a week; *Another one?* That's enough for now · Add another. Next books `good_week_1` for that day: the card is the plan, so there's no separate yes |
+| `week_1` | *Pick a good thing for this week.* (*If nothing sounds good, that's part of feeling low. Pick one that feels doable. One is plenty.*) The person's things I like, then the whole catalogue (the energy on the day isn't known yet), or own words; *Which day? I'll check in that evening.* Today · Tomorrow · The day after tomorrow · In a few days · In about a week; *Another one?* That's enough for now · Add another. Next books `good_week_one` for that day: the card is the plan, so there's no separate yes |
 | `week_2`, `week_3` | *And another?* / *One more?*, the same, never offering a thing picked in an earlier slot, kept or catalogue (`options.notIn`, a runtime addition: `where` filters only the skill's own list). Three at most |
 | `picture` | One planned: *{wk1}: picture the best ten seconds of it.*; more: *Pick one of your good things. Picture the best ten seconds of it.* A 10 s timed `holdRing` (*Where you are, what you can see and hear, the bit you'd like most. If nothing comes, picturing where you'll be is enough.*) |
 | `week_set` | *Your good things are planned.* (one: *Your good thing is planned.*) *I'll check in on the evening of each day. Doing it counts, whether or not you enjoy it.* No list: catalogue labels carry commas and colons, and the person has just picked them |
 | `back_w1`–`back_w3` | The day's card reopens the run at its own step: *The good thing you planned: {wk<n>}.* (never *today*: a card can sit on Today after its day) *Did it happen?*, then the same `after`, keep and end cards as level 1 (`keep_more_w<n>` keeps `wk<n>`, stored as a pick) |
 
-**Cards.** `good_week_1`–`good_week_3` (*Your good thing*: *A good thing you planned.* / *Another good thing you planned.* /
+**Cards.** `good_week_one`–`good_week_three` (*Your good thing*: *A good thing you planned.* / *Another good thing you planned.* /
 *One more good thing you planned.* then *Did it happen?*, never naming it or the day, and never alike on one evening):
 chips `evening` (today, 20:00) and `tomorrow` / `day_after` / `few_days` / `this_week` at 18:00, 1, 2, 3 and 6 days on;
 stale after 24 h; opening resolves them; bound to `good-things`. One type per slot, as Give has one per reopens

@@ -32,7 +32,7 @@ in a directory of things I like, built slowly.
 
 Departures from the PRD (docs/design/good-things.md lists them with the batch that picks each up): no graduation
 rule (every level is a choice from the start, level 0 first; counting reps needs a server read); level 2 (plan the
-week) is three plan steps, a `good_week_<n>` card each reopening `back_w<n>` (no `weekPlanner` embed); level 3 (the directory as a mirror, the monthly card) are part 2; `timesDone` /
+week) is three plan steps, a `good_week_<one|two|three>` card each reopening `back_w<n>` (no `weekPlanner` embed); level 3 (the directory as a mirror, the monthly card) are part 2; `timesDone` /
 `lighterCount` on a kept thing wait for part 2's yes; the catalogue is this skill's options (graph content through
 skills.cypher, each with its `energy`), not `PleasantActivity` nodes with `GOOD_FOR` edges; three shown with
 *show others* is one short list per energy; `micro-win` stays the low-energy result's guided activity.
@@ -205,12 +205,14 @@ HAPPENED = [("yes", "Yes"), ("partly", "Partly"), ("no", "Not today")]
 COMPARED = [("lighter", "Lighter"), ("same", "About the same"), ("heavier", "Heavier")]
 MIND = [("here", "Mostly here"), ("partly", "Partly"), ("elsewhere", "Somewhere else")]
 KEEP_MORE = [("keep", "Add it"), ("not_now", "Not this time")]
-# Level 2: the good_week_<n> cards' chips, the evening of that day.
+# Level 2: the good_week_<one|two|three> cards' chips, the evening of that day.
 DAYS = [("evening", "Today"), ("tomorrow", "Tomorrow"), ("day_after", "The day after tomorrow"), ("few_days", "In a few days"),
         ("this_week", "In about a week")]
 # *That's enough* first: planning one is plenty (Gate 3).
 MORE = [("enough", "That's enough for now"), ("more", "Add another")]
 SLOTS = (1, 2, 3)
+# The cards' type ids spell the slot (the spine's id parsers take letters and _).
+WORD = {1: "one", 2: "two", 3: "three"}
 # Every review answer, cleared by each card's step: a reopened run is one round, about one good thing.
 REVIEW = ["happened", "compared", "mind", "keep_more", *[f"hap{n}" for n in SLOTS], *[f"km{n}" for n in SLOTS]]
 
@@ -265,11 +267,11 @@ def week_step(n):
         fields.append(field(f"more{n}", "more", label="more_label"))
     nxt = [{"when": {"eq": [a(f"more{n}"), "more"]}, "to": f"week_{n + 1}"}] if n < 3 else []
     return ask(f"week_{n}", f"week_title_{n}", "week_hint" if n == 1 else None, fields, [*nxt, {"to": "picture"}],
-               followUp={"type": f"good_week_{n}", "whenFrom": f"day{n}"})
+               followUp={"type": f"good_week_{WORD[n]}", "whenFrom": f"day{n}"})
 
 
 def back_week(n):
-    # The good_week_<n> card reopens the run here (R9), on a run that planned slot n.
+    # The good_week_<one|two|three> card reopens the run here (R9), on a run that planned slot n.
     return ask(f"back_w{n}", "back_w_title", None, [field(f"hap{n}", "happened", label="happened_label")],
                [{"when": {"eq": [a(f"hap{n}"), "no"]}, "to": "not_today"}, {"to": "after"}],
                reopens={"after": f"week_{n}"}, clears=REVIEW, titleSlots={"pick": {"labelOf": f"wk{n}"}})

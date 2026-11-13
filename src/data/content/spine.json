@@ -597,7 +597,7 @@
         "notification": "Your good thing is ready to check."
       },
       {
-        "id": "good_week_1",
+        "id": "good_week_one",
         "ownerModule": "er",
         "tier": "practice",
         "resolveMode": "deeplink",
@@ -654,11 +654,11 @@
         "notification": "Your good thing is ready to check."
       },
       {
-        "id": "good_week_2",
+        "id": "good_week_three",
         "ownerModule": "er",
         "tier": "practice",
         "resolveMode": "deeplink",
-        "deepLinkTemplate": "/tool/good-things?run={sourceSessionId}&at=back_w2&followUp={followUpId}",
+        "deepLinkTemplate": "/tool/good-things?run={sourceSessionId}&at=back_w3&followUp={followUpId}",
         "staleAfterHours": 24,
         "missedPath": "none",
         "notify": {
@@ -668,7 +668,7 @@
         },
         "enabled": true,
         "copy": {
-          "body": "Another good thing you planned. Did it happen?",
+          "body": "One more good thing you planned. Did it happen?",
           "title": "Your good thing"
         },
         "choices": [
@@ -711,11 +711,11 @@
         "notification": "Your good thing is ready to check."
       },
       {
-        "id": "good_week_3",
+        "id": "good_week_two",
         "ownerModule": "er",
         "tier": "practice",
         "resolveMode": "deeplink",
-        "deepLinkTemplate": "/tool/good-things?run={sourceSessionId}&at=back_w3&followUp={followUpId}",
+        "deepLinkTemplate": "/tool/good-things?run={sourceSessionId}&at=back_w2&followUp={followUpId}",
         "staleAfterHours": 24,
         "missedPath": "none",
         "notify": {
@@ -725,7 +725,7 @@
         },
         "enabled": true,
         "copy": {
-          "body": "One more good thing you planned. Did it happen?",
+          "body": "Another good thing you planned. Did it happen?",
           "title": "Your good thing"
         },
         "choices": [
