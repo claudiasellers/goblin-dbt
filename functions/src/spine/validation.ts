@@ -143,9 +143,14 @@ export const FOLLOW_UP_WINDOWS = ['hour', 'afternoon', 'evening', 'tomorrow', 't
   'm5', 'm15', 'm30', 'm60', 'few_days',
   // Good things' week plan (ER-04 level 2): the day after tomorrow.
   'day_after',
-  // Sleep reset (ER-13): the wake time the person set, for the next morning's check (`sleep_morning`).
+  // Sleep reset (ER-13): the wake time the person set, for the next morning's check (`sleep_morning`): the mornings by
+  // half hours, then shift and night times by the hour (part 2); `n…` is the renewal, a day on.
   'w0600', 'w0630', 'w0700', 'w0730', 'w0800', 'w0830', 'w0900', 'w0930',
-  'n0600', 'n0630', 'n0700', 'n0730', 'n0800', 'n0830', 'n0900', 'n0930'] as const;
+  'w1000', 'w1100', 'w1200', 'w1300', 'w1400', 'w1500', 'w1600', 'w1700', 'w1800', 'w1900',
+  'w2000', 'w2100', 'w2200', 'w2300', 'w0000', 'w0100', 'w0200', 'w0300', 'w0400', 'w0500',
+  'n0600', 'n0630', 'n0700', 'n0730', 'n0800', 'n0830', 'n0900', 'n0930',
+  'n1000', 'n1100', 'n1200', 'n1300', 'n1400', 'n1500', 'n1600', 'n1700', 'n1800', 'n1900',
+  'n2000', 'n2100', 'n2200', 'n2300', 'n0000', 'n0100', 'n0200', 'n0300', 'n0400', 'n0500'] as const;
 export type FollowUpWindow = (typeof FOLLOW_UP_WINDOWS)[number];
 const TYPE_ID = /^[a-z][a-z0-9_]{0,63}$/;
 const MINUTE = 60_000;

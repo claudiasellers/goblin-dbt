@@ -128,7 +128,7 @@ test("the plan: one wake time (the morning card's chips), one wind-down thing, t
   const ft = spine.followUpTypes.find((x) => x.id === "sleep_morning");
   assert.ok(ft && ft.enabled);
   const chips = Object.keys(ft.window.chips);
-  assert.deepEqual(skill.options.wake.map((o) => o.value), chips.filter((c) => c.startsWith("w")), "every wake time is a chip");
+  assert.deepEqual(skill.options.wake.map((o) => o.value).sort(), chips.filter((c) => c.startsWith("w")).sort(), "every wake time is a chip");
   assert.deepEqual(Object.values(step("again").followUp.whenMap).sort(), chips.filter((c) => c.startsWith("n")), "and each has its tomorrow chip");
   for (const [k, w] of Object.entries(ft.window.chips)) {
     assert.equal(w.kind, k.startsWith("w") ? "next_local" : "at_local", `${k}: the plan books the next one, the renewal tomorrow`);
@@ -247,7 +247,7 @@ test("the anchor: kept on a yes, re-confirmed by picking it again, listed first 
   const first = run([pick("wake", "w0730")], ctx(), toWake());
   assert.equal(first.stepId, "wake");
   assert.equal(title(first), "What time will you get up, every day?");
-  assert.deepEqual(fieldIds(first), ["wake", "keep"]);
+  assert.deepEqual(fieldIds(first), ["wake", "hours", "keep"]);
   assert.equal(M.keepFor(ctx(), step("wake"), first), null, "no tap, no keep");
   const kept = M.keepFor(ctx(), step("wake"), run([pick("keep", "keep_yes")], ctx(), first));
   assert.equal(kept.kind, "sleep_anchor");
@@ -264,11 +264,11 @@ test("the anchor: kept on a yes, re-confirmed by picking it again, listed first 
   assert.equal(wake.answers.wake, undefined, "never picked for them");
   // Picking it again answers *still your time?*: no chip, and the keep refreshes it (Me's revisit starts over).
   const same = run([pick("wake", "w0730")], withAnchor, wake);
-  assert.deepEqual(fieldIds(same, withAnchor), ["wake"]);
+  assert.deepEqual(fieldIds(same, withAnchor), ["wake", "hours"]);
   assert.deepEqual(M.keepFor(withAnchor, step("wake"), same).value, { wakeIds: ["w0730"] });
   // A new time: the chip again, kept only on its yes (keeping it replaces the old one).
   const moved = run([pick("wake", "w0800")], withAnchor, wake);
-  assert.deepEqual(fieldIds(moved, withAnchor), ["wake", "keep"]);
+  assert.deepEqual(fieldIds(moved, withAnchor), ["wake", "hours", "keep"]);
   assert.equal(M.keepFor(withAnchor, step("wake"), moved), null);
   // The kind: one per person, My body, a wake id only, the same ids as the skill's times; on the tool's needs.
   const { PROFILE_KINDS, SLEEP_WAKE_IDS } = await importTs("functions/src/profile/kinds.ts");
@@ -278,11 +278,48 @@ test("the anchor: kept on a yes, re-confirmed by picking it again, listed first 
   assert.equal(k.area, "my_body");
   assert.deepEqual(k.ownFields, []);
   assert.deepEqual(k.validate({ wakeIds: ["w0630"] }), { wakeIds: ["w0630"] });
-  assert.throws(() => k.validate({ wakeIds: ["w1100"] }));
+  assert.deepEqual(k.validate({ wakeIds: ["w1400"] }), { wakeIds: ["w1400"] }, "a night-shift time keeps too");
+  assert.throws(() => k.validate({ wakeIds: ["w1130"] }));
   assert.throws(() => k.validate({ wakeIds: [] }), /One wake time/);
   assert.throws(() => k.validate({ wakeIds: ["w0700"], windIds: ["dim"] }), /Unexpected field/);
   const types = await importTs("src/data/profileTypes.ts");
   assert.deepEqual(types.PROFILE_NEEDS["sleep-reset"], ["sleepAnchor"]);
   assert.match(readFileSync("functions/src/profile/me.ts", "utf8"), /meta\.kind === 'sleep_anchor'[\s\S]{0,200}Up at \$\{Number\(m\[1\]\)\}:\$\{m\[2\]\}, every day/);
   assert.match(readFileSync("schema/profile-layer.cypher", "utf8"), /sleep_anchor/);
+});
+
+// Night shifts and late starts (Gate 3's open line, shipped): every hour of the day behind *My hours are different*,
+// nothing asked about work, and the morning card books and renews at that hour like any other.
+test("shift hours: every other hour of the day one tap away; a kept shift time shows without it; the card follows", () => {
+  const shown = (s, c = ctx()) => M.optionGroups(c, step("wake").fields[0], s.answers).flatMap((g) => g.options.map((o) => o.value));
+  const toWake = (c = ctx()) => run([pick("mode", "plan"), next], c);
+  const plain = toWake();
+  assert.deepEqual(shown(plain), ["w0600", "w0630", "w0700", "w0730", "w0800", "w0830", "w0900", "w0930"], "the morning times first, nothing else");
+  assert.ok(M.shownFields(ctx(), step("wake"), plain).some((f) => f.id === "hours"), "the way to the other hours is on the screen");
+  const shift = run([pick("hours", "shift")], ctx(), plain);
+  const all = shown(shift);
+  assert.equal(all.length, 28, "every hour of the day, the morning's half hours too");
+  assert.deepEqual(all.slice(8, 12), ["w1000", "w1100", "w1200", "w1300"]);
+  assert.ok(all.includes("w2200") && all.includes("w0000") && all.includes("w0500"), "nights: up in the evening or small hours");
+  assert.equal(skill.options.wake.find((o) => o.value === "w1400").label, "14:00");
+  assert.match(skill.copy.wake_hint, /shifts or nights/i);
+  assert.doesNotMatch(JSON.stringify(skill.copy), /what (shift|job)|your work hours/i, "nothing asked about work");
+  // The plan through to the card at 14:00, and its morning screen doesn't say morning.
+  const plan = run([pick("wake", "w1400"), next, pick("wind", "dim"), pick("remind", "yes")], ctx(), shift);
+  assert.equal(M.copyText(ctx(), step("plan_end").title, plan, M.titleSlots(ctx(), step("plan_end"), run([next], ctx(), plan))), "Up at 14:00, every day.");
+  const ft = spine.followUpTypes.find((x) => x.id === "sleep_morning");
+  assert.deepEqual(ft.window.chips.w1400, { kind: "next_local", time: "14:00" });
+  assert.equal(step("again").followUp.whenMap.w1400, "n1400");
+  assert.deepEqual(ft.window.chips.n1400, { days: 1, kind: "at_local", time: "14:00" });
+  const morning = { ...plan, stepId: "morning" };
+  assert.equal(M.copyText(ctx(), step("morning").title, morning), skill.copy.morning_title_shift);
+  assert.doesNotMatch(skill.copy.morning_title_shift, /morning|night/i);
+  // A kept shift time is listed first next time without the tap, the other shift hours still behind it.
+  const withAnchor = { ...ctx(), profile: { sleepAnchor: "w2200" } };
+  const back = shown(toWake(withAnchor), withAnchor);
+  assert.equal(back[0], "w2200");
+  assert.equal(back.length, 9);
+  // The server accepts every chip it books.
+  const v = readFileSync("functions/src/spine/validation.ts", "utf8");
+  for (const c of Object.keys(ft.window.chips)) assert.match(v, new RegExp(`'${c}'`), c);
 });

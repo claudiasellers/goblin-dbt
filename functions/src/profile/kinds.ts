@@ -18,8 +18,15 @@ import type { ProfileAreaId, SliceId } from './types';
 
 /** Running low's rows that Me can leave out (scripts/skills/please_skill.py HIDEABLE; a test keeps them equal). */
 export const PLEASE_HIDEABLE_ROWS = ['food', 'body', 'subs', 'moved'] as const;
-/** Sleep reset's wake times (scripts/skills/sleep_reset.py `WAKE`: 6:00 to 9:30 by half hours), the anchor a person keeps. */
-export const SLEEP_WAKE_IDS = ['w0600', 'w0630', 'w0700', 'w0730', 'w0800', 'w0830', 'w0900', 'w0930'] as const;
+/**
+ * Sleep reset's wake times (scripts/skills/sleep_reset.py `WAKE`, test-pinned): 6:00 to 9:30 by half hours, then shift and
+ * night times by the hour. The anchor a person keeps is one of them.
+ */
+export const SLEEP_WAKE_IDS = [
+  'w0600', 'w0630', 'w0700', 'w0730', 'w0800', 'w0830', 'w0900', 'w0930',
+  'w1000', 'w1100', 'w1200', 'w1300', 'w1400', 'w1500', 'w1600', 'w1700', 'w1800', 'w1900',
+  'w2000', 'w2100', 'w2200', 'w2300', 'w0000', 'w0100', 'w0200', 'w0300', 'w0400', 'w0500',
+] as const;
 
 export interface ProfileKindDef {
   kind: string;

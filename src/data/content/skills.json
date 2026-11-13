@@ -63387,14 +63387,15 @@
           "up_hint": "A different room for a while often helps more than lying there.",
           "up_label": "Up at your time?",
           "up_title": "Try getting up for a bit.",
-          "wake_hint": "The same time on weekends too. It resets sleep more than any bedtime does. If your hours change with shifts, set it by your shift; a doctor can help plan it.",
+          "wake_hint": "The same time on days off too. It resets sleep more than any bedtime does. Work shifts or nights? Pick when you get up after your main sleep; if your shifts rotate, a doctor can help plan it.",
           "wake_title": "What time will you get up, every day?",
           "wind_hint": "One thing is enough. Go to bed when you're sleepy, not before.",
           "wind_own": "Something else",
           "wind_title": "Pick one thing for the hour before bed.",
           "wake_title_kept": "Still your time? It's at the top.",
           "keep_label": "Keep this wake time in Me?",
-          "wake_primary": "Next"
+          "wake_primary": "Next",
+          "morning_title_shift": "You're up. How was your sleep?"
         },
         "tables": {},
         "derive": [],
@@ -63960,9 +63961,38 @@
                 "max": 1,
                 "options": {
                   "list": "wake",
-                  "firstFrom": "$p.sleepAnchor"
+                  "firstFrom": "$p.sleepAnchor",
+                  "where": {
+                    "any": [
+                      {
+                        "not": {
+                          "eq": [
+                            "$opt.shift",
+                            "yes"
+                          ]
+                        }
+                      },
+                      {
+                        "set": "$a.hours"
+                      },
+                      {
+                        "eq": [
+                          "$opt.value",
+                          "$p.sleepAnchor"
+                        ]
+                      }
+                    ]
+                  }
                 },
                 "required": true
+              },
+              {
+                "id": "hours",
+                "options": {
+                  "list": "hours"
+                },
+                "max": 1,
+                "links": []
               },
               {
                 "id": "keep",
@@ -64174,7 +64204,17 @@
                 "again"
               ]
             },
-            "title": "morning_title",
+            "title": [
+              {
+                "when": {
+                  "set": "$a.hours"
+                },
+                "key": "morning_title_shift"
+              },
+              {
+                "key": "morning_title"
+              }
+            ],
             "next": [
               {
                 "to": "again",
@@ -64224,7 +64264,27 @@
                 "w0800": "n0800",
                 "w0830": "n0830",
                 "w0900": "n0900",
-                "w0930": "n0930"
+                "w0930": "n0930",
+                "w1000": "n1000",
+                "w1100": "n1100",
+                "w1200": "n1200",
+                "w1300": "n1300",
+                "w1400": "n1400",
+                "w1500": "n1500",
+                "w1600": "n1600",
+                "w1700": "n1700",
+                "w1800": "n1800",
+                "w1900": "n1900",
+                "w2000": "n2000",
+                "w2100": "n2100",
+                "w2200": "n2200",
+                "w2300": "n2300",
+                "w0000": "n0000",
+                "w0100": "n0100",
+                "w0200": "n0200",
+                "w0300": "n0300",
+                "w0400": "n0400",
+                "w0500": "n0500"
               }
             },
             "title": [
@@ -64513,6 +64573,106 @@
             {
               "value": "w0930",
               "label": "9:30"
+            },
+            {
+              "value": "w1000",
+              "label": "10:00",
+              "shift": "yes"
+            },
+            {
+              "value": "w1100",
+              "label": "11:00",
+              "shift": "yes"
+            },
+            {
+              "value": "w1200",
+              "label": "12:00",
+              "shift": "yes"
+            },
+            {
+              "value": "w1300",
+              "label": "13:00",
+              "shift": "yes"
+            },
+            {
+              "value": "w1400",
+              "label": "14:00",
+              "shift": "yes"
+            },
+            {
+              "value": "w1500",
+              "label": "15:00",
+              "shift": "yes"
+            },
+            {
+              "value": "w1600",
+              "label": "16:00",
+              "shift": "yes"
+            },
+            {
+              "value": "w1700",
+              "label": "17:00",
+              "shift": "yes"
+            },
+            {
+              "value": "w1800",
+              "label": "18:00",
+              "shift": "yes"
+            },
+            {
+              "value": "w1900",
+              "label": "19:00",
+              "shift": "yes"
+            },
+            {
+              "value": "w2000",
+              "label": "20:00",
+              "shift": "yes"
+            },
+            {
+              "value": "w2100",
+              "label": "21:00",
+              "shift": "yes"
+            },
+            {
+              "value": "w2200",
+              "label": "22:00",
+              "shift": "yes"
+            },
+            {
+              "value": "w2300",
+              "label": "23:00",
+              "shift": "yes"
+            },
+            {
+              "value": "w0000",
+              "label": "0:00",
+              "shift": "yes"
+            },
+            {
+              "value": "w0100",
+              "label": "1:00",
+              "shift": "yes"
+            },
+            {
+              "value": "w0200",
+              "label": "2:00",
+              "shift": "yes"
+            },
+            {
+              "value": "w0300",
+              "label": "3:00",
+              "shift": "yes"
+            },
+            {
+              "value": "w0400",
+              "label": "4:00",
+              "shift": "yes"
+            },
+            {
+              "value": "w0500",
+              "label": "5:00",
+              "shift": "yes"
             }
           ],
           "wind": [
@@ -64591,6 +64751,12 @@
             {
               "value": "keep_yes",
               "label": "Yes, keep it"
+            }
+          ],
+          "hours": [
+            {
+              "value": "shift",
+              "label": "My hours are different (shifts or nights)"
             }
           ]
         }

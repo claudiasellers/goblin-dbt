@@ -1925,6 +1925,36 @@
         ],
         "window": {
           "chips": {
+            "n0000": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "00:00"
+            },
+            "n0100": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "01:00"
+            },
+            "n0200": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "02:00"
+            },
+            "n0300": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "03:00"
+            },
+            "n0400": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "04:00"
+            },
+            "n0500": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "05:00"
+            },
             "n0600": {
               "days": 1,
               "kind": "at_local",
@@ -1965,6 +1995,100 @@
               "kind": "at_local",
               "time": "09:30"
             },
+            "n1000": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "10:00"
+            },
+            "n1100": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "11:00"
+            },
+            "n1200": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "12:00"
+            },
+            "n1300": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "13:00"
+            },
+            "n1400": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "14:00"
+            },
+            "n1500": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "15:00"
+            },
+            "n1600": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "16:00"
+            },
+            "n1700": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "17:00"
+            },
+            "n1800": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "18:00"
+            },
+            "n1900": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "19:00"
+            },
+            "n2000": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "20:00"
+            },
+            "n2100": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "21:00"
+            },
+            "n2200": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "22:00"
+            },
+            "n2300": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "23:00"
+            },
+            "w0000": {
+              "kind": "next_local",
+              "time": "00:00"
+            },
+            "w0100": {
+              "kind": "next_local",
+              "time": "01:00"
+            },
+            "w0200": {
+              "kind": "next_local",
+              "time": "02:00"
+            },
+            "w0300": {
+              "kind": "next_local",
+              "time": "03:00"
+            },
+            "w0400": {
+              "kind": "next_local",
+              "time": "04:00"
+            },
+            "w0500": {
+              "kind": "next_local",
+              "time": "05:00"
+            },
             "w0600": {
               "kind": "next_local",
               "time": "06:00"
@@ -1996,6 +2120,62 @@
             "w0930": {
               "kind": "next_local",
               "time": "09:30"
+            },
+            "w1000": {
+              "kind": "next_local",
+              "time": "10:00"
+            },
+            "w1100": {
+              "kind": "next_local",
+              "time": "11:00"
+            },
+            "w1200": {
+              "kind": "next_local",
+              "time": "12:00"
+            },
+            "w1300": {
+              "kind": "next_local",
+              "time": "13:00"
+            },
+            "w1400": {
+              "kind": "next_local",
+              "time": "14:00"
+            },
+            "w1500": {
+              "kind": "next_local",
+              "time": "15:00"
+            },
+            "w1600": {
+              "kind": "next_local",
+              "time": "16:00"
+            },
+            "w1700": {
+              "kind": "next_local",
+              "time": "17:00"
+            },
+            "w1800": {
+              "kind": "next_local",
+              "time": "18:00"
+            },
+            "w1900": {
+              "kind": "next_local",
+              "time": "19:00"
+            },
+            "w2000": {
+              "kind": "next_local",
+              "time": "20:00"
+            },
+            "w2100": {
+              "kind": "next_local",
+              "time": "21:00"
+            },
+            "w2200": {
+              "kind": "next_local",
+              "time": "22:00"
+            },
+            "w2300": {
+              "kind": "next_local",
+              "time": "23:00"
             }
           },
           "kind": "chip"

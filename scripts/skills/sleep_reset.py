@@ -80,7 +80,7 @@ COPY = {
     "wake_title": "What time will you get up, every day?",
     # A kept anchor (part 2): first on the list, never picked for them (profile: *still true?*).
     "wake_title_kept": "Still your time? It's at the top.",
-    "wake_hint": "The same time on weekends too. It resets sleep more than any bedtime does. If your hours change with shifts, set it by your shift; a doctor can help plan it.",
+    "wake_hint": "The same time on days off too. It resets sleep more than any bedtime does. Work shifts or nights? Pick when you get up after your main sleep; if your shifts rotate, a doctor can help plan it.",
     "wind_title": "Pick one thing for the hour before bed.",
     "wind_hint": "One thing is enough. Go to bed when you're sleepy, not before.",
     "wind_own": "Something else",
@@ -92,6 +92,7 @@ COPY = {
     "plan_line": "Caffeine after midday and alcohol at night both break sleep up. On a night you can't sleep, open Sleep Reset again. If sleep's been bad for weeks, a doctor can help.",
     # The morning card reopens the run here.
     "morning_title": "Morning. How was the night?",
+    "morning_title_shift": "You're up. How was your sleep?",
     "up_label": "Up at your time?",
     "dream_label": "Did a bad dream wake you?",
     "again_title_up": "Up at your time. That's the reset working.",
@@ -113,11 +114,15 @@ PARK = [("worry", "A worry"), ("todo", "Something to do tomorrow"), ("replay", "
 NOW = [("sleepy", "Sleepy now"), ("awake", "Still wide awake")]
 # H20b: get up after a while, go to another room, do something calm that won't wake you further; or rest.
 UP = [("dim", "Another room, lights low"), ("read", "Something calm on paper"), ("rest", "I'd rather rest here")]
-# Wake times (the `sleep_morning` window's chips, scripts/practice-spine/content.py): the next morning.
-WAKE = [(f"w{h:02d}{m:02d}", f"{h}:{m:02d}") for h in range(6, 10) for m in (0, 30)]
+# Wake times (the `sleep_morning` window's chips, scripts/practice-spine/content.py, the same order): the morning
+# times by half hours, then every other hour of the day for shifts and nights (`shift`), shown on *My hours are
+# different* or when one is the kept anchor.
+WAKE = [(f"w{h:02d}{m:02d}", f"{h}:{m:02d}", {}) for h in range(6, 10) for m in (0, 30)] + \
+    [(f"w{h:02d}00", f"{h}:00", {"shift": "yes"}) for h in [*range(10, 24), *range(0, 6)]]
 # H20b's wind-down: no screens, low light, worries parked, warmth. No food, drink or pills.
 WIND = [("screens", "Screens away"), ("dim", "Lights low"), ("tomorrow", "Write tomorrow's list"),
         ("warm", "A warm shower or bath"), ("quiet", "A book, music or stretching")]
+HOURS = [("shift", "My hours are different (shifts or nights)")]
 REMIND = [("yes", "Yes")]
 KEEP = [("keep_yes", "Yes, keep it")]
 # The kept anchor (`$p.sleepAnchor`, a WAKE id) or nothing.
@@ -131,6 +136,8 @@ HURT = {"eq": [a("night"), "hurt"]}
 CRISIS = [{"variant": "crisis", "when": ALWAYS}]
 UNSAFE = {"in": [a("safe"), ["not_sure", "no"]]}
 REST = {"eq": [a("up"), "rest"]}
+# A shift time shows once the person says their hours are different, or when it is the time they kept.
+SHIFT_WHERE = {"any": [{"not": {"eq": ["$opt.shift", "yes"]}}, {"set": a("hours")}, {"eq": ["$opt.value", KEPT_ANCHOR]}]}
 
 
 def field(fid, *, label=None, required=True, own=None, links=None, show=None, max_=1):
@@ -221,7 +228,9 @@ STEPS = [
     {
         "id": "wake", "kind": "ask", "title": [{"when": {"set": KEPT_ANCHOR}, "key": "wake_title_kept"}, {"key": "wake_title"}],
         "hint": "wake_hint",
-        "fields": [{**field("wake", links=[]), "options": {"list": "wake", "firstFrom": KEPT_ANCHOR}},
+        "fields": [{**field("wake", links=[]), "options": {"list": "wake", "firstFrom": KEPT_ANCHOR, "where": SHIFT_WHERE}},
+                   # Night shifts and late starts: the rest of the day's hours, one tap away, nothing asked about work.
+                   field("hours", required=False, links=[]),
                    # Asked only when the time isn't already the kept one; the chip is the yes (R4).
                    field("keep", label="keep_label", required=False, show={"not": {"eq": [a("wake"), KEPT_ANCHOR]}})],
         # Kept on the yes chip (as Build mastery's I can; the button stays *Next*), or when the person picks the kept time
@@ -244,7 +253,8 @@ STEPS = [
     # ── The morning card reopens the run here ──
     {
         "id": "morning", "kind": "ask", "reopens": {"after": "wind", "again": ["again"]},
-        "clears": ["slept", "up_at", "dream", "again"], "title": "morning_title",
+        "clears": ["slept", "up_at", "dream", "again"],
+        "title": [{"when": {"set": a("hours")}, "key": "morning_title_shift"}, {"key": "morning_title"}],
         "fields": [field("slept"), field("up_at", label="up_label", links=[]), field("dream", label="dream_label", required=False, links=[])],
         "next": [{"to": "again"}],
     },
@@ -255,7 +265,7 @@ STEPS = [
         # Tomorrow at the wake time: the plan's own chips book the *next* wake time, which before it would be this
         # morning again (Codex on #135), so the renewal maps each to its `n` chip (at_local, a day on).
         "followUp": {"type": "sleep_morning", "whenFrom": "wake", "whenDefault": "w0700",
-                     "whenMap": {f"w{t}": f"n{t}" for t in ("0600", "0630", "0700", "0730", "0800", "0830", "0900", "0930")},
+                     "whenMap": {v: f"n{v[1:]}" for v, _, _ in WAKE},
                      "when": {"eq": [a("again"), "again_yes"]}},
         "next": [{"to": "morning_end"}],
     },
@@ -285,10 +295,10 @@ EXITS = [
 def options():
     out = []
     for fid, rows in (("mode", MODE), ("night", NIGHT), ("safe", SAFE), ("park", PARK), ("now", NOW), ("up", UP),
-                      ("wake", WAKE), ("wind", WIND), ("remind", REMIND), ("keep", KEEP), ("slept", SLEPT), ("up_at", UP_AT),
+                      ("wind", WIND), ("hours", HOURS), ("remind", REMIND), ("keep", KEEP), ("slept", SLEPT), ("up_at", UP_AT),
                       ("dream", DREAM), ("again", AGAIN)):
         out += [(fid, v, label, {}, None) for v, label in rows]
-    return out
+    return out + [("wake", v, label, props, None) for v, label, props in WAKE]
 
 
 SKILL = {
