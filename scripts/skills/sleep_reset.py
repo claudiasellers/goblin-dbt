@@ -8,8 +8,9 @@ check, `sleep_morning`, that reopens the run at *How was the night?*).
 Part 1 departures, all listed in docs/design/sleep-reset.md with a reason:
 - No app-wide night mode (CORE's, Index §5.1 #13): the night path is written for the dark (short screens, nothing
   that wakes you up, no cold water) but the app's look doesn't change.
-- The anchor lives in the run, not the profile: the wake time is asked on the plan path and read by the morning card
-  from the run it reopens. Profile anchors (Me → My body) are part 2.
+- The morning card reads the wake time from the run it reopens. Part 2 (13 Nov) adds the profile anchor: *Keep this
+  wake time in Me?* on the plan keeps the wake time (`sleep_anchor`, Me → My body, one per person), and the next plan lists it first
+  under *Still your time?* (the `sleepAnchor` slice, `firstFrom`); it is never picked for them.
 - The morning check is one card per plan, booked again only on the person's *yes* the next morning (no nightly
   schedule, no SleepLog label, no two-week pattern): a live flow never reads past visits (data layers).
 - A bad dream at night gets grounding only; Rewrite the nightmare is offered the next morning, in daylight, when the
@@ -77,11 +78,15 @@ COPY = {
     "night_end_up": "Phone face down, out of reach. Go back when you're sleepy, not by the clock. Whatever time you fall asleep, get up at your usual time.",
     # The plan (H20b, the sleep schedule).
     "wake_title": "What time will you get up, every day?",
+    # A kept anchor (part 2): first on the list, never picked for them (profile: *still true?*).
+    "wake_title_kept": "Still your time? It's at the top.",
     "wake_hint": "The same time on weekends too. It resets sleep more than any bedtime does. If your hours change with shifts, set it by your shift; a doctor can help plan it.",
     "wind_title": "Pick one thing for the hour before bed.",
     "wind_hint": "One thing is enough. Go to bed when you're sleepy, not before.",
     "wind_own": "Something else",
     "remind_label": "Check in with me in the morning?",
+    "keep_label": "Keep this wake time in Me?",
+    "wake_primary": "Next",
     "plan_title": "Up at {wake}, every day.",
     "plan_remind": "A morning check will be on Today. Caffeine after midday and alcohol at night both break sleep up. If sleep's been bad for weeks, a doctor can help.",
     "plan_line": "Caffeine after midday and alcohol at night both break sleep up. On a night you can't sleep, open Sleep Reset again. If sleep's been bad for weeks, a doctor can help.",
@@ -114,6 +119,9 @@ WAKE = [(f"w{h:02d}{m:02d}", f"{h}:{m:02d}") for h in range(6, 10) for m in (0, 
 WIND = [("screens", "Screens away"), ("dim", "Lights low"), ("tomorrow", "Write tomorrow's list"),
         ("warm", "A warm shower or bath"), ("quiet", "A book, music or stretching")]
 REMIND = [("yes", "Yes")]
+KEEP = [("keep_yes", "Yes, keep it")]
+# The kept anchor (`$p.sleepAnchor`, a WAKE id) or nothing.
+KEPT_ANCHOR = "$p.sleepAnchor"
 SLEPT = [("okay", "Slept okay"), ("broken", "Broken"), ("barely", "Barely slept")]
 UP_AT = [("up_yes", "Yes"), ("up_later", "Later than planned"), ("up_not_yet", "Not yet")]
 DREAM = [("dream_yes", "Yes")]
@@ -211,8 +219,16 @@ STEPS = [
             [{"exit": "mind_job", "when": {"eq": [a("night"), "mind"]}}]),
     # ── The plan ──
     {
-        "id": "wake", "kind": "ask", "title": "wake_title", "hint": "wake_hint",
-        "fields": [field("wake")],
+        "id": "wake", "kind": "ask", "title": [{"when": {"set": KEPT_ANCHOR}, "key": "wake_title_kept"}, {"key": "wake_title"}],
+        "hint": "wake_hint",
+        "fields": [{**field("wake", links=[]), "options": {"list": "wake", "firstFrom": KEPT_ANCHOR}},
+                   # Asked only when the time isn't already the kept one; the chip is the yes (R4).
+                   field("keep", label="keep_label", required=False, show={"not": {"eq": [a("wake"), KEPT_ANCHOR]}})],
+        # Kept on the yes chip (as Build mastery's I can; the button stays *Next*), or when the person picks the kept time
+        # again: their tap answers *Still your time?*, so the anchor's confirmedAt and Me's revisit refresh.
+        "keep": {"kind": "sleep_anchor", "many": False, "from": ["wake"],
+                 "when": {"any": [{"set": a("keep")}, {"eq": [a("wake"), KEPT_ANCHOR]}]}},
+        "primary": "wake_primary",
         "next": [{"to": "wind"}],
     },
     {
@@ -269,7 +285,7 @@ EXITS = [
 def options():
     out = []
     for fid, rows in (("mode", MODE), ("night", NIGHT), ("safe", SAFE), ("park", PARK), ("now", NOW), ("up", UP),
-                      ("wake", WAKE), ("wind", WIND), ("remind", REMIND), ("slept", SLEPT), ("up_at", UP_AT),
+                      ("wake", WAKE), ("wind", WIND), ("remind", REMIND), ("keep", KEEP), ("slept", SLEPT), ("up_at", UP_AT),
                       ("dream", DREAM), ("again", AGAIN)):
         out += [(fid, v, label, {}, None) for v, label in rows]
     return out

@@ -21,7 +21,7 @@ REF = re.compile(r"^\$(a|prev|d|opt|ctx|p)\.[A-Za-z_][A-Za-z0-9_]*(\.(ids|own))?
 PROFILE_SLICES = {
     "name", "quietHours", "patterns", "ownLines", "savedLines", "people", "bodyFlags", "values", "goals",
     "copeAheadPlans", "boundaryLines", "practicePrefs", "fadeLevels", "ownWords", "thingsILike", "thingsILikePicks", "iCanRungs", "crisisKit",
-    "safetyPlan", "country", "parts", "partDetail", "partAnchors", "den", "prosCons", "pleaseRows",
+    "safetyPlan", "country", "parts", "partDetail", "partAnchors", "den", "prosCons", "pleaseRows", "sleepAnchor",
 }
 # Slices a field may list as options (src/data/skillTypes.ts ProfileOptionSlice).
 PROFILE_OPTION_SLICES = {"parts", "ownLines", "savedLines", "people", "values", "goals", "copeAheadPlans", "boundaryLines", "thingsILike"}
@@ -306,7 +306,8 @@ def check(skill):
                 assert re.fullmatch(r"\$a\.[a-z0-9_]+\.ids", r), (w, "notIn names earlier fields' picks ($a.<field>.ids)", r)
                 check_cond({"set": r}, fields, derived, w, accepts)
             if "firstFrom" in o:
-                assert o["firstFrom"].startswith(("$ctx.", "$d.")), (w, "firstFrom is a context or derived ref", o)
+                # A profile slice may order the chips too (R3: the person's kept item first, never picked for them).
+                assert o["firstFrom"].startswith(("$ctx.", "$d.", "$p.")), (w, "firstFrom is a context, derived or profile ref", o)
                 check_cond({"set": o["firstFrom"]}, fields, derived, w, accepts)
             if "list" in o:
                 for x in (x for x in skill["options"] if x[0] == o["list"] and x[3].get("danger")):

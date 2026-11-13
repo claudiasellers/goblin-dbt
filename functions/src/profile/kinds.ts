@@ -18,6 +18,8 @@ import type { ProfileAreaId, SliceId } from './types';
 
 /** Running low's rows that Me can leave out (scripts/skills/please_skill.py HIDEABLE; a test keeps them equal). */
 export const PLEASE_HIDEABLE_ROWS = ['food', 'body', 'subs', 'moved'] as const;
+/** Sleep reset's wake times (scripts/skills/sleep_reset.py `WAKE`: 6:00 to 9:30 by half hours), the anchor a person keeps. */
+export const SLEEP_WAKE_IDS = ['w0600', 'w0630', 'w0700', 'w0730', 'w0800', 'w0830', 'w0900', 'w0930'] as const;
 
 export interface ProfileKindDef {
   kind: string;
@@ -212,6 +214,20 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
       for (const k of Object.keys(o)) if (k !== 'hidden') throw new ValidationError('Unexpected field');
       const hidden = strArray(o.hidden ?? [], { max: PLEASE_HIDEABLE_ROWS.length, item: (x) => oneOf(x, PLEASE_HIDEABLE_ROWS) });
       return { hidden: [...new Set(hidden)] };
+    },
+  },
+  // Sleep reset (ER-13 part 2, docs/design/sleep-reset.md): the wake time a person keeps as their anchor, on the plan's
+  // *Keep this wake time in Me?* (the chip is the yes; picking the kept time again re-confirms it). One per person (keeping a new time replaces it), My body, a wake id only.
+  // Read back by the `sleepAnchor` slice: the next plan lists it first under *Still your time?*, never picked for them.
+  sleep_anchor: {
+    kind: 'sleep_anchor', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'my_body', slice: 'sleepAnchor',
+    owner: 'ER', many: false, maxItems: 1, editor: null, ownFields: [],
+    validate: (v) => {
+      const o = obj(v);
+      for (const k of Object.keys(o)) if (k !== 'wakeIds') throw new ValidationError('Unexpected field');
+      const ids = strArray(o.wakeIds ?? [], { max: 1, item: (x) => oneOf(x, SLEEP_WAKE_IDS) });
+      if (ids.length !== 1) throw new ValidationError('One wake time');
+      return { wakeIds: ids };
     },
   },
   crisis_kit: {

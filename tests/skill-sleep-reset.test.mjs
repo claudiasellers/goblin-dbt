@@ -236,3 +236,53 @@ test("hosts: Running low's sleep row and the nightmare clinician card open it (n
     assert.ok(!e.planned, id);
   }
 });
+
+// Part 2: the profile anchor (Me → My body). Kept on the wake screen's yes chip, or re-confirmed by picking the kept time
+// again; listed first next time, never picked for them.
+test("the anchor: kept on a yes, re-confirmed by picking it again, listed first next time but never picked", async () => {
+  const title = (s, c = ctx()) => M.copyText(c, step(s.stepId).title, s, M.titleSlots(c, step(s.stepId), s));
+  const fieldIds = (s, c = ctx()) => M.shownFields(c, step(s.stepId), s).map((f) => f.id);
+  const toWake = (c = ctx()) => run([pick("mode", "plan"), next], c);
+  // First time: no anchor, the plain title, the keep chip under the times.
+  const first = run([pick("wake", "w0730")], ctx(), toWake());
+  assert.equal(first.stepId, "wake");
+  assert.equal(title(first), "What time will you get up, every day?");
+  assert.deepEqual(fieldIds(first), ["wake", "keep"]);
+  assert.equal(M.keepFor(ctx(), step("wake"), first), null, "no tap, no keep");
+  const kept = M.keepFor(ctx(), step("wake"), run([pick("keep", "keep_yes")], ctx(), first));
+  assert.equal(kept.kind, "sleep_anchor");
+  assert.deepEqual(kept.value, { wakeIds: ["w0730"] });
+  assert.equal(skill.copy[step("wake").primary], "Next", "the chip is the yes; the button stays Next");
+  assert.equal(step("wind").keep, undefined, "the wind-down screen keeps nothing");
+  // Coming back with an anchor: *Still your time?*, the kept time first, nothing picked.
+  const withAnchor = { ...ctx(), profile: { sleepAnchor: "w0730" } };
+  const wake = toWake(withAnchor);
+  assert.equal(title(wake, withAnchor), "Still your time? It's at the top.");
+  const groups = M.optionGroups(withAnchor, step("wake").fields[0], wake.answers);
+  assert.equal(groups[0].options[0].value, "w0730", "the kept time leads");
+  assert.equal(groups[0].options.length, 8, "every time is still there");
+  assert.equal(wake.answers.wake, undefined, "never picked for them");
+  // Picking it again answers *still your time?*: no chip, and the keep refreshes it (Me's revisit starts over).
+  const same = run([pick("wake", "w0730")], withAnchor, wake);
+  assert.deepEqual(fieldIds(same, withAnchor), ["wake"]);
+  assert.deepEqual(M.keepFor(withAnchor, step("wake"), same).value, { wakeIds: ["w0730"] });
+  // A new time: the chip again, kept only on its yes (keeping it replaces the old one).
+  const moved = run([pick("wake", "w0800")], withAnchor, wake);
+  assert.deepEqual(fieldIds(moved, withAnchor), ["wake", "keep"]);
+  assert.equal(M.keepFor(withAnchor, step("wake"), moved), null);
+  // The kind: one per person, My body, a wake id only, the same ids as the skill's times; on the tool's needs.
+  const { PROFILE_KINDS, SLEEP_WAKE_IDS } = await importTs("functions/src/profile/kinds.ts");
+  assert.deepEqual([...SLEEP_WAKE_IDS], skill.options.wake.map((o) => o.value), "the server's wake ids are the skill's");
+  const k = PROFILE_KINDS.sleep_anchor;
+  assert.equal(k.many, false);
+  assert.equal(k.area, "my_body");
+  assert.deepEqual(k.ownFields, []);
+  assert.deepEqual(k.validate({ wakeIds: ["w0630"] }), { wakeIds: ["w0630"] });
+  assert.throws(() => k.validate({ wakeIds: ["w1100"] }));
+  assert.throws(() => k.validate({ wakeIds: [] }), /One wake time/);
+  assert.throws(() => k.validate({ wakeIds: ["w0700"], windIds: ["dim"] }), /Unexpected field/);
+  const types = await importTs("src/data/profileTypes.ts");
+  assert.deepEqual(types.PROFILE_NEEDS["sleep-reset"], ["sleepAnchor"]);
+  assert.match(readFileSync("functions/src/profile/me.ts", "utf8"), /meta\.kind === 'sleep_anchor'[\s\S]{0,200}Up at \$\{Number\(m\[1\]\)\}:\$\{m\[2\]\}, every day/);
+  assert.match(readFileSync("schema/profile-layer.cypher", "utf8"), /sleep_anchor/);
+});

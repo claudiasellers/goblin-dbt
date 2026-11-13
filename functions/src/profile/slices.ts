@@ -11,7 +11,7 @@ import { int } from '../shared/values';
 import { partSafetyCypher } from '../safety/partSafetyFlag';
 import { ownDecrypter } from '../shared/crypto';
 import { metaFrom } from './meta';
-import { PERSON_RISK, PERSON_SAFE, PLEASE_HIDEABLE_ROWS, planContacts } from './kinds';
+import { PERSON_RISK, PERSON_SAFE, PLEASE_HIDEABLE_ROWS, SLEEP_WAKE_IDS, planContacts } from './kinds';
 import { PROFILE_NEEDS, type ProfileConsumer, type ProfileSlices, type SliceId } from './types';
 
 /** Words everywhere: own words come first once there are this many distinct ones (PRD ER-10 part 3), and at most this many. */
@@ -120,6 +120,9 @@ export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
     RETURN p {.id, .valueJson} AS p`,
   // Running low (ER-07): the rows the person left out in Me (one per person).
   pleaseRows: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'please_rows', status: 'active'})
+    RETURN p.valueJson AS valueJson LIMIT 1`,
+  // Sleep reset (ER-13): the wake time kept as an anchor (one per person).
+  sleepAnchor: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'sleep_anchor', status: 'active'})
     RETURN p.valueJson AS valueJson LIMIT 1`,
 };
 
@@ -355,6 +358,14 @@ const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
       const hidden = strings((JSON.parse(String(r.records[0].get('valueJson'))) as Record<string, unknown>).hidden);
       return hidden.filter((x) => (PLEASE_HIDEABLE_ROWS as readonly string[]).includes(x));
     } catch { return []; }
+  },
+  sleepAnchor: async (tx, uid) => {
+    const r = await tx.run(SLICE_QUERIES.sleepAnchor!, { uid });
+    if (!r.records.length) return null;
+    try {
+      const id = strings((JSON.parse(String(r.records[0].get('valueJson'))) as Record<string, unknown>).wakeIds)[0];
+      return id && (SLEEP_WAKE_IDS as readonly string[]).includes(id) ? id : null;
+    } catch { return null; }
   },
   crisisKit: async (tx, uid, now) => {
     const r = await tx.run(SLICE_QUERIES.crisisKit!, { uid });

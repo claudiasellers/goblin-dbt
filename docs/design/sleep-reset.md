@@ -1,6 +1,6 @@
 # Sleep reset (ER-13)
 
-**Status:** part 1 built 13 Nov 2026 on the skill runtime (ER-B5; [the modules plan](dbt-modules-plan.md) §5.1, D3).
+**Status:** part 1 built 13 Nov 2026 on the skill runtime, and the profile anchor (part 2) the same day (ER-B5; [the modules plan](dbt-modules-plan.md) §5.1, D3).
 New tool `sleep-reset` (the id Running low and Rewrite the nightmare already pointed at as planned), named *Sleep
 Reset*, listed under Emotion Regulation with the Tools intent *I can't sleep*. New concept `dbt_sleep_hygiene`
 (`PART_OF dbt_reducing_vulnerability`, beside PLEASE; `appToolId: 'sleep-reset'`). Source:
@@ -14,7 +14,8 @@ nightmare's `sleep_reset` exits `planned` again.
 The plan row marked ER-13 as waiting on CORE's night mode (Index §5.1 #13) and profile anchor times. Part 1 ships
 without both (the lane's call, 13 Nov, under *default to connected*): the night path is written for the dark (short
 screens, nothing that wakes the body, no clock), and the wake time lives in the run the morning card reopens. Night
-mode and profile anchors (Me → My body) are part 2; neither changes this flow, they add to it.
+mode is part 2. The profile anchor (Me → My body) is built (13 Nov, part 2; *The anchor in Me*, below); it adds to
+this flow and changes nothing in it.
 
 ## What it is
 
@@ -37,7 +38,7 @@ an optional morning check.
 | `sleepy` | *Back to bed.* *Phone face down, out of reach.* Still awake after a while: get up for a bit; and the wake anchor | Stimulus control: no screens in bed |
 | `up` | *Try getting up for a bit.* (*A different room for a while often helps more than lying there.*) Another room, lights low · Something calm on paper · I'd rather rest here | Get out of bed; stimulus control |
 | `night_end` | Got up: *Back to bed when your eyes get heavy.* Phone face down, back when sleepy not by the clock, and the wake anchor. Resting: *Rest is enough for now.* Eyes closed, phone face down, getting up helps if you stew. Give your mind a job for a mind that won't stop | Don't give up and get up for the day |
-| `wake` | *What time will you get up, every day?* 6:00 to 9:30 by half hours (*The same time on weekends too.* Shift workers: set it by your shift; a doctor can help plan it) | Regular schedule |
+| `wake` | *What time will you get up, every day?* (with a kept anchor: *Still your time? It's at the top.*, the kept time first, never picked; *Keep this wake time in Me?* under the times when the pick isn't the kept one) 6:00 to 9:30 by half hours (*The same time on weekends too.* Shift workers: set it by your shift; a doctor can help plan it) | Regular schedule |
 | `wind` | *Pick one thing for the hour before bed.* Screens away · Lights low · Write tomorrow's list · A warm shower or bath · A book, music or stretching, or their own words; *Check in with me in the morning?* | Wind down 30–60 min |
 | `plan_end` | *Up at 7:30, every day.* One line: the morning card when asked, *Caffeine after midday and alcohol at night both break sleep up.*, how to come back on a bad night, and *If sleep's been bad for weeks, a doctor can help.* | H20b's substances; referral, quietly |
 | `morning` | The `sleep_morning` card reopens the run here: *Morning. How was the night?* Slept okay · Broken · Barely slept; *Up at your time?*; *Did a bad dream wake you?* | The morning log |
@@ -65,8 +66,26 @@ Content-free on Today (*Morning check*, *From Sleep Reset. How was the night?*: 
 
 ## What it records
 
-`ext.run` only: the path, the night's answers or the plan (wake time, wind-down, own words), the morning's answers.
-No ask-fresh field, no keep, no projection.
+`ext.run`: the path, the night's answers or the plan (wake time, wind-down, own words), the morning's answers. No
+ask-fresh field, no projection. One keep, on the yes chip only: `sleep_anchor` (below).
+
+## The anchor in Me (part 2, built 13 Nov)
+
+- **Kept** on the wake screen's *Keep this wake time in Me?* (`keep`, *Yes, keep it*; the chip is the yes, the button
+  stays *Next*, as Build mastery's I can), or re-confirmed when the person picks the kept time again: that tap answers
+  *Still your time?*, so the item's `confirmedAt` and Me's 30-day revisit start over (Gate 1). Kind `sleep_anchor` (`ProfileFact`, My body, one per person: keeping a new time
+  replaces it), `{wakeIds: [<one WAKE id>]}`, nothing else (no wind-down, no own words). Me shows *Up at 7:30, every
+  day* and revisits it after 30 days (*Still your time?*); *Set aside* is there.
+- **Read** through the `sleepAnchor` slice (`PROFILE_NEEDS['sleep-reset']`): the next plan's `wake` step lists the kept
+  time first (`firstFrom: '$p.sleepAnchor'`, which the runtime now allows for a profile slice holding one option id)
+  under *Still your time?*, every other time still there, nothing picked: the profile layer's *still true?*, asked
+  by the person's own tap. The chip is hidden when the picked time is already the kept one (that pick re-confirms it).
+  The server's wake ids (`SLEEP_WAKE_IDS`) are test-pinned to the skill's `WAKE` options.
+- **Not** read by the morning card (it reads the run it reopens, as before), the night path or routing.
+- Open (part 2, Gate 3): the times run 6:00 to 9:30, so a night-shift worker can't keep their real time; wider times
+  or a *My hours change* chip that keeps nothing.
+- Rejected: the chip on the wind-down screen (it asked about the screen before, beside the morning check); a separate *Still up at 7:30?* yes/no screen (one more tap, and the wake field still needs the answer for
+  the card's time); keeping the wind-down too (it changes with the evening, and is one tap to pick again).
 
 ## Routing
 
@@ -76,7 +95,6 @@ never where someone at 3am should land. Its entries are the Tools intent, Runnin
 ## Deferred (ER-13 part 2)
 
 - CORE's night mode (dimmed look app-wide) and opening Sleep reset from it.
-- Profile anchors (wake time kept in Me → My body, *still true?*), so the morning card isn't tied to one plan.
 - A sleep diary over days (a `SleepLog` label), the two-week pattern, and the three-week referral line.
 - The PRD's *a nightmare woke me ×3 in two weeks* (part 1 offers Rewrite the nightmare each morning one woke them).
 - Wind-down reminders in the evening, caffeine and nap timing, Running low's *sleep short 3 of 7* offer.
@@ -84,7 +102,7 @@ never where someone at 3am should land. Its entries are the Tools intent, Runnin
 
 ## Departures from the PRD
 
-- No night mode and no profile anchors (above).
+- No night mode (above).
 - Thoughts of hurting myself is an answer on the night screen, not only the header link: at night it is likely enough
   to deserve a first-class tap, and it ends the sleep coaching.
 

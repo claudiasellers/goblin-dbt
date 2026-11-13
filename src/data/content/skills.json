@@ -63391,7 +63391,10 @@
           "wake_title": "What time will you get up, every day?",
           "wind_hint": "One thing is enough. Go to bed when you're sleepy, not before.",
           "wind_own": "Something else",
-          "wind_title": "Pick one thing for the hour before bed."
+          "wind_title": "Pick one thing for the hour before bed.",
+          "wake_title_kept": "Still your time? It's at the top.",
+          "keep_label": "Keep this wake time in Me?",
+          "wake_primary": "Next"
         },
         "tables": {},
         "derive": [],
@@ -63953,6 +63956,20 @@
             "fields": [
               {
                 "id": "wake",
+                "links": [],
+                "max": 1,
+                "options": {
+                  "list": "wake",
+                  "firstFrom": "$p.sleepAnchor"
+                },
+                "required": true
+              },
+              {
+                "id": "keep",
+                "options": {
+                  "list": "keep"
+                },
+                "max": 1,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -63962,22 +63979,57 @@
                     }
                   }
                 ],
-                "max": 1,
-                "options": {
-                  "list": "wake"
-                },
-                "required": true
+                "label": "keep_label",
+                "showWhen": {
+                  "not": {
+                    "eq": [
+                      "$a.wake",
+                      "$p.sleepAnchor"
+                    ]
+                  }
+                }
               }
             ],
             "hint": "wake_hint",
-            "title": "wake_title",
+            "title": [
+              {
+                "when": {
+                  "set": "$p.sleepAnchor"
+                },
+                "key": "wake_title_kept"
+              },
+              {
+                "key": "wake_title"
+              }
+            ],
             "next": [
               {
                 "to": "wind",
                 "when": null
               }
             ],
-            "offers": []
+            "offers": [],
+            "keep": {
+              "kind": "sleep_anchor",
+              "many": false,
+              "from": [
+                "wake"
+              ],
+              "when": {
+                "any": [
+                  {
+                    "set": "$a.keep"
+                  },
+                  {
+                    "eq": [
+                      "$a.wake",
+                      "$p.sleepAnchor"
+                    ]
+                  }
+                ]
+              }
+            },
+            "primary": "wake_primary"
           },
           {
             "id": "wind",
@@ -64533,6 +64585,12 @@
             {
               "value": "again_no",
               "label": "Not tomorrow"
+            }
+          ],
+          "keep": [
+            {
+              "value": "keep_yes",
+              "label": "Yes, keep it"
             }
           ]
         }
