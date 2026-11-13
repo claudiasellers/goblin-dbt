@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { FeelingSquare } from './FeelingSquare';
 import { RelatedRow, WordChip } from './WordChips';
 import { getEmotionByName } from '../../data/emotions';
-import { MAX_SPOTS, QUADRANT_ABBR, allWords, describePlace, listWords, wordsNear, type SquarePoint, type Spot } from '../../lib/feelingSquare';
+import { MAX_SPOTS, QUADRANT_ABBR, allWords, describePlace, listWords, ownWordsFirst, wordsNear, type SquarePoint, type Spot } from '../../lib/feelingSquare';
 
 interface WordPickProps {
   spots: Spot[];
@@ -20,9 +20,12 @@ interface WordPickProps {
   onAddSpot: () => void;
   onNoneFit: () => void;
   onHelpNow: () => void;
+  /** The person's own words (Emotion ids, most used first): near ones lead the list (ER-10 part 3). */
+  ownWords?: readonly string[];
 }
 
 const PAGE = 8;
+const NO_WORDS: readonly string[] = [];
 
 /**
  * The full word list for the active spot: nearest first, as big pressable chips in their quadrant
@@ -30,7 +33,7 @@ const PAGE = 8;
  * the graph's related words appear as "+" chips. "More words" pages outward, "Add another spot"
  * goes back to the square for a second or third place, "None of these fit" opens Find the feeling.
  */
-export function WordPick({ spots, active, onToggleWord, onRemoveWord, onContinue, continuing = false, onMovePoint, onAddSpot, onNoneFit, onHelpNow }: WordPickProps) {
+export function WordPick({ spots, active, onToggleWord, onRemoveWord, onContinue, continuing = false, onMovePoint, onAddSpot, onNoneFit, onHelpNow, ownWords = NO_WORDS }: WordPickProps) {
   const [shown, setShown] = useState(PAGE);
   const spot = spots[active];
   const point = spot.point as SquarePoint;
@@ -39,8 +42,8 @@ export function WordPick({ spots, active, onToggleWord, onRemoveWord, onContinue
 
   const ranked = useMemo(() => {
     const elsewhere = elsewhereKey.split('|');
-    return wordsNear(point).map((e) => e.name).filter((n) => !elsewhere.includes(n));
-  }, [point, elsewhereKey]);
+    return ownWordsFirst(wordsNear(point), ownWords).map((e) => e.name).filter((n) => !elsewhere.includes(n));
+  }, [point, elsewhereKey, ownWords]);
   const words = useMemo(() => {
     const near = ranked.slice(0, shown);
     // Words picked from the related row stay visible even when they are not near the point.

@@ -302,7 +302,7 @@ export function WordStep({ kit }: { kit: Kit }) {
 
   const answer = (a: 'yes' | 'close' | 'no') => {
     if (pending || !state.found) return;
-    const ranked = rankFamilies(content.families, state.found);
+    const ranked = rankFamilies(content.families, state.found, state.own ?? []);
     const r = answerOffer(ranked, state.offer, a, content.flow.gates.maxWordsOffered);
     if (!r.done) {
       instRef.current.pluck(1, 0.6, 0.4);

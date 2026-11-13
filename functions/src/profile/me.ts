@@ -7,7 +7,7 @@ import { callable } from '../shared/callable';
 import { readTx } from '../shared/neo4j';
 import { int } from '../shared/values';
 import { metaFrom } from './meta';
-import { readProfileSlices, readProfileVersion, RUNG_OPTION, THING_LABELS, THING_OPTION, VALUE_OPTION } from './slices';
+import { readNameSlice, readProfileVersion, RUNG_OPTION, THING_LABELS, THING_OPTION, VALUE_OPTION } from './slices';
 import type { ProfileAreaId, ProfileItemMeta } from './types';
 import { statsByPart } from '../parts/stats';
 import { readStatsRows } from '../parts/statsQueries';
@@ -281,7 +281,8 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
       if (t.forArea && t.item.summary) t.item.summary = `${t.item.summary} (${t.forArea})`;
     }
   }
-  const { name } = await readProfileSlices(tx, uid, 'find-the-feeling', now);
+  // The name alone: reading a tool's slices here would also run its parts and own-words reads (ER-10 part 3).
+  const name = await readNameSlice(tx, uid);
   return {
     version: await readProfileVersion(tx, uid),
     staleCount,

@@ -7,6 +7,8 @@ import { CrisisBanner } from '../safety/CrisisBanner';
 import { bailoutSections, resultSections, type ResultSection } from '../../lib/crisisBanner';
 import { recommendationCards } from '../../lib/recommendation';
 import { RecommendationCards } from './RecommendationCards';
+import { FeelingCardLink } from './FeelingCardLink';
+import { fromCheckIn } from '../../lib/spine/toolLink';
 import type { CheckInNextAction } from '../../lib/spine/checkInPayload';
 import type { Band } from '../../data/capacityTypes';
 import { WitnessBeat } from '../witness/WitnessBeat';
@@ -225,6 +227,12 @@ export function LowEnergyStateResult({
           <RecommendationCards variant="compact" cards={cards} checkinEmotions={checkinEmotions} activationPatternId={pattern.id}
             checkInId={checkInId} onOpen={(toolId) => onToolOpen?.(toolId)} />
         </div>
+      )}
+
+      {/* The feeling card after naming (ER-10 part 3): one quiet link; not beside a crisis banner */}
+      {!has('crisis_banner') && (
+        <FeelingCardLink className="mb-4 text-sm" emotionIds={emotionIds ?? []} onOpen={() => onToolOpen?.('emotion-guide')}
+          state={(word) => fromCheckIn(checkInId, [word], pattern.id)} />
       )}
 
       {/* Actions */}

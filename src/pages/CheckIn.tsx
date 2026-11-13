@@ -38,6 +38,7 @@ import { bandStepFor, checkInIntensity } from '../lib/checkInBand';
 import { beatBand, beatRequest, type WitnessHandlers } from '../lib/witness';
 import { recordWitnessBeat } from '../services/witness';
 import { profileCache } from '../lib/profileCache';
+import { useProfileContext } from '../hooks/useProfileContext';
 import { SafetyRoute } from '../components/safety/SafetyRoute';
 import { SafetyPeopleCard } from '../components/safety/SafetyPeople';
 import { ASKED_KEY, shouldAsk } from '../lib/safetyRoute';
@@ -87,8 +88,12 @@ function markAsked() {
   try { sessionStorage.setItem(ASKED_KEY, '1'); } catch { /* private mode: asks again next time */ }
 }
 
+const NO_OWN_WORDS: readonly string[] = [];
+
 export function CheckIn() {
   const { user } = useAuth();
+  // Words everywhere (ER-10 part 3): the person's own words lead the word list near where they touched.
+  const ownWords = useProfileContext('checkin').slices?.ownWords ?? NO_OWN_WORDS;
   const [step, setStep] = useState<CheckInStep>('emotion');
   const [entryPoint, setEntryPoint] = useState<EntryPoint>('standard');
   const [checkInData, setCheckInData] = useState<CheckInData>({
@@ -777,6 +782,7 @@ export function CheckIn() {
 
         {step === 'word' && point && (
           <WordPick
+            ownWords={ownWords}
             spots={spots}
             active={active}
             onToggleWord={handleToggleWord}

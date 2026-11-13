@@ -6,8 +6,7 @@ DBT Emotion Regulation Handouts 3–6: what emotions do, the model of emotions, 
 know a feeling*.
 
 Part 1 (built 12 Nov 2026) is the feeling card and the ladder; part 2 (built 12 Nov 2026) is Walk the wave and part 4
-(built 12 Nov 2026) the myth cards, below. Part 3's first half, words everywhere's writes, is built (13 Nov); the rest
-is under *Not yet*.
+(built 12 Nov 2026) the myth cards, below. Part 3, words everywhere, is built (13 Nov): below.
 
 ## What it is for
 
@@ -186,23 +185,39 @@ Retention deletes a record's `FOUND` edges with it, but `FOUND_WORD` (its count,
 `dataRetentionDays`, as it always has for Find the feeling: it is the person's vocabulary, deleted with the account.
 There is no way yet to remove a single word from My words.
 
+## Words everywhere (part 3, the reads)
+
+Claudia via the coordinator (13 Nov): the recommended option for both of the PRD's open points.
+
+- **Own words first.** The `ownWords` slice (`functions/src/profile/slices.ts`) reads `FOUND_WORD`: the person's
+  words, most used first, at most 12, and nothing until there are five (the PRD's *once they have five*). It is the
+  one slice that reads a log aggregate, for ordering only: nothing is pre-selected, and no log record or `FOUND` edge
+  is read. Check the Facts' build decision 1 (curated chips, not most-used words) stands for its own chips.
+  - The check-in's word list (`ownWordsFirst` in `src/lib/feelingSquare.ts`): an own word among the 16 words nearest
+    the touch leads, most used first; one far from the touch keeps its place, so the square still decides.
+  - Find the feeling's offers (`rankFamilies`' `own`): an own word among a family's two nearest is offered first in
+    that family; the family order stays the shape's or sound's. The flow takes the words as the word step opens, so
+    the offer can't shift under the person.
+- **The card after naming, on tap.** *Get to know “{word}”* (`FeelingCardLink`), a quiet link under the check-in's
+  result (both screens, never beside a crisis banner) and on Find the feeling's last screen, for the first named word
+  with a card (one of the nine DBT parents in Do the Opposite's picker content). Nothing is added before help; the
+  card opens on the word. The pleasant result keeps Good things.
+
 ## Departures from the PRD
 
 - **Happiness is not a tenth `EmotionRegulationContent`.** The PRD added it as a parent. That would grow every loop
   over parents: Do the Opposite's doors (`opposite-action-picker.json`), `parentOf`, Problem Solve, Insights and the
   witness corpus. The guide is its own label instead, and happiness words reach it by `IN_GUIDE`. A test pins the
   doors at nine and keeps happiness out of `parentOf` and `fitsWhen`.
-- **The card is a tool of its own for now**, opened from the Tools list. Hosts showing it after naming (check-in,
-  Find the feeling) come with part 3.
+- **The card after naming is a link, not an automatic screen** (the PRD's open question): see *Words everywhere*.
 - **The ladder is milder to stronger as written**, the content's reviewed judgement, not computed from the square.
 
 ## Not yet
 
 - Walk the wave, part 2: CORE-08's chain analysis embedding the strip; an `EmotionEpisode` record (the PRD's proposal)
   once something reads episodes back; ladder taps as `SkillPractice`.
-- Part 3, the rest of words everywhere: own words first in the word pickers (the PRD's *once they have five*; it
-  crosses the data-layer rule Check the Facts' build decision 1 kept, so it waits on Claudia), and the card after
-  naming in the check-in and Find the feeling (the PRD's open question: automatic with one tap to dismiss, or on tap).
+- Part 3: Check the Facts' and Do the Opposite's feeling chips in their own-words order (they keep their curated
+  chips, Check the Facts' build decision 1), and the "not sure" rate the fade signal reads.
 
 ## Tests
 

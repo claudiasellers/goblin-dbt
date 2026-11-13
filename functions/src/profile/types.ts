@@ -70,7 +70,12 @@ export interface ProfileSlices {
   boundaryLines: never[];
   practicePrefs: null;
   fadeLevels: Record<string, 0 | 1 | 2 | 3>;
-  ownWords: never[];
+  /**
+   * Words everywhere (ER-10 part 3, docs/design/emotion-guide.md): the person's own words, most used first, as Emotion
+   * ids, so the word pickers offer them first (ordering only, never selected). Read from `FOUND_WORD`, the one log
+   * aggregate a slice reads (Claudia via the coordinator, 13 Nov). Empty until there are `OWN_WORDS_MIN` distinct words.
+   */
+  ownWords: string[];
   /**
    * Things I like (ER-04, kind `thing_i_like`), active only, newest first: the id and what to call it (the person's own
    * words, else the chip or catalogue option's label from the graph). Good things offers them first on its pick step.
@@ -163,10 +168,10 @@ export interface ProfileSlices {
  */
 export const PROFILE_NEEDS = {
   'recovering-from-invalidation': ['name'],   // later + 'people'
-  'find-the-feeling': ['name', 'parts'],     // parts: the tag row on its close
+  'find-the-feeling': ['name', 'parts', 'ownWords'], // parts: the tag row on its close; ownWords: its word offers (ER-10 part 3)
   'opposite-action': ['parts'],               // the tag row on its close (ER-B3 port); later 'values', 'patterns'
   'cool-down': ['parts'],                     // parts: the tag row on its close; DT-01: 'bodyFlags'
-  'checkin': ['patterns'],                    // the router's tie-break (E4)
+  'checkin': ['patterns', 'ownWords'],        // the router's tie-break (E4); ownWords: the word pick, own words first (ER-10 part 3)
   'today': ['quietHours', 'parts'],          // parts: the check-back card's name (Phase 2, parts on only)
   'witness': ['name', 'ownLines', 'savedLines'],
   'meet-a-part': ['name', 'parts', 'partDetail'], // Phase 2 (parts on only: the slices are empty while off)

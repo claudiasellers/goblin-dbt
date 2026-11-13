@@ -51,13 +51,23 @@ function wordVec(w: FeelingWord, found: Found): readonly number[] {
   return found.way === 'shape' ? w.shape : w.sound;
 }
 
-/** Families ordered by their nearest member to what the person found; words within a family by distance, then offer order. */
-export function rankFamilies(families: FeelingFamily[], found: Found): FeelingFamily[] {
+/** How far down a family's nearest words an own word may come from to be offered first (ER-10 part 3). */
+export const OWN_WORD_REACH = 2;
+
+/**
+ * Families ordered by their nearest member to what the person found; words within a family by distance, then offer
+ * order. `own` (the person's own words, most used first): an own word among a family's `OWN_WORD_REACH` nearest is
+ * offered first in that family (words everywhere, ER-10 part 3). The family order stays the shape's or sound's.
+ */
+export function rankFamilies(families: FeelingFamily[], found: Found, own: readonly string[] = []): FeelingFamily[] {
   const scored = families.map(f => {
-    const words = [...f.words]
+    const sorted = [...f.words]
       .map(w => ({ w, d: dist2(wordVec(w, found), found.vec) }))
       .sort((a, b) => a.d - b.d || a.w.offer - b.w.offer);
-    return { f: { ...f, words: words.map(x => x.w) }, d: words.length ? words[0].d : Infinity };
+    const reach = sorted.slice(0, OWN_WORD_REACH).map(x => x.w.emotionId);
+    const lead = own.find(id => reach.includes(id));
+    const words = lead ? [...sorted.filter(x => x.w.emotionId === lead), ...sorted.filter(x => x.w.emotionId !== lead)] : sorted;
+    return { f: { ...f, words: words.map(x => x.w) }, d: sorted.length ? sorted[0].d : Infinity };
   });
   return scored.filter(s => s.f.words.length).sort((a, b) => a.d - b.d || a.f.order - b.f.order).map(s => s.f);
 }

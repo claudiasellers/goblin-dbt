@@ -102,6 +102,23 @@ export function wordsNear(p: SquarePoint): Emotion[] {
     .map((r) => r.e);
 }
 
+/** How far down the nearest words an own word may come from to lead (two pages of the word list). */
+export const OWN_WORDS_WINDOW = 16;
+
+/**
+ * Own words first (ER-10 part 3, docs/design/emotion-guide.md): the person's own words (Emotion ids, most used first,
+ * the `ownWords` slice) that are near where they touched move to the front, most used first; the rest keep their
+ * distance order. An own word far from the touch stays where it is: the square still decides. Ordering only: nothing
+ * is selected.
+ */
+export function ownWordsFirst(ranked: readonly Emotion[], own: readonly string[], window = OWN_WORDS_WINDOW): Emotion[] {
+  if (!own.length) return [...ranked];
+  const near = new Set(ranked.slice(0, window).map((e) => e.id));
+  const lead = own.flatMap((id) => (near.has(id) ? ranked.filter((e) => e.id === id) : []));
+  const led = new Set(lead.map((e) => e.id));
+  return [...lead, ...ranked.filter((e) => !led.has(e.id))];
+}
+
 export function formatEmotionName(name: string): string {
   return name.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }

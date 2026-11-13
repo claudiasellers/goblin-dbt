@@ -3,6 +3,7 @@ import { useReducedMotion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProfileContext } from '../../hooks/useProfileContext';
+import { FeelingCardLink } from '../../components/checkin/FeelingCardLink';
 import { getFeelingCollection, getFindTheFeelingContent, saveFindTheFeelingSession } from '../../services/neo4j';
 import type { Band, CollectedWord, Entry, FindTheFeelingContent, Way } from '../../data/findTheFeelingTypes';
 import { getToolById } from '../../data/tools';
@@ -64,12 +65,17 @@ export function FindTheFeeling({ entry = 'tool', onHandoff }: { entry?: Entry; o
 function Flow({ content, entry, onHandoff }: { content: FindTheFeelingContent; entry: Entry; onHandoff?: (r: FindTheFeelingResult) => void }) {
   const { user } = useAuth();
   // The single profile read path (PR-P1); null while loading, as before.
-  const name = useProfileContext('find-the-feeling').slices?.name.firstName ?? null;
+  const profile = useProfileContext('find-the-feeling').slices;
+  const name = profile?.name.firstName ?? null;
+  // Words everywhere (ER-10 part 3): own words are offered first; read as the word step opens.
+  const ownRef = useRef<readonly string[]>([]);
+  const ownWords = profile?.ownWords;
+  useEffect(() => { ownRef.current = ownWords ?? []; }, [ownWords]);
   const reduced = useReducedMotion() ?? false;
   const navigate = useNavigate();
   const c = content.flow.copy;
 
-  const reducer = useMemo(() => makeFlowReducer(content), [content]);
+  const reducer = useMemo(() => makeFlowReducer(content, () => ownRef.current), [content]);
   const [history, dispatch] = useReducer(reducer, undefined, (): History => ({ stack: [initialFlow(content, entry)] }));
   const state = history.stack[history.stack.length - 1];
 
@@ -178,6 +184,11 @@ function Flow({ content, entry, onHandoff }: { content: FindTheFeelingContent; e
             </button>
           );
         })}
+        {/* The feeling card after naming (ER-10 part 3): one quiet link for the word found here */}
+        {state.wordAccepted && state.word && (
+          <FeelingCardLink emotionIds={[state.word]} onOpen={() => dispatch({ t: 'nextDone' })}
+            state={(word) => ({ checkinEmotions: [word] })} />
+        )}
         <button type="button" className={primaryButton} onClick={() => dispatch({ t: 'nextDone' })}>{c.next.done}</button>
         {tagRow}
       </div>
