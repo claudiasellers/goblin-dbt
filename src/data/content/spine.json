@@ -1728,6 +1728,70 @@
         "notification": "A month on: a look at your plan"
       },
       {
+        "id": "sleep_morning",
+        "ownerModule": "er",
+        "tier": "practice",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/sleep-reset?run={sourceSessionId}&at=morning&followUp={followUpId}",
+        "staleAfterHours": 8,
+        "missedPath": "none",
+        "notify": {
+          "ics": false,
+          "inTab": true,
+          "push": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "From Sleep Reset. How was the night?",
+          "title": "Morning check"
+        },
+        "choices": [
+          {
+            "id": "dismiss",
+            "label": "Not today",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "chips": {
+            "w0600": {
+              "kind": "next_local",
+              "time": "06:00"
+            },
+            "w0630": {
+              "kind": "next_local",
+              "time": "06:30"
+            },
+            "w0700": {
+              "kind": "next_local",
+              "time": "07:00"
+            },
+            "w0730": {
+              "kind": "next_local",
+              "time": "07:30"
+            },
+            "w0800": {
+              "kind": "next_local",
+              "time": "08:00"
+            },
+            "w0830": {
+              "kind": "next_local",
+              "time": "08:30"
+            },
+            "w0900": {
+              "kind": "next_local",
+              "time": "09:00"
+            },
+            "w0930": {
+              "kind": "next_local",
+              "time": "09:30"
+            }
+          },
+          "kind": "chip"
+        },
+        "notification": "Your morning check is ready."
+      },
+      {
         "id": "tool_outcome",
         "ownerModule": "core",
         "tier": "skills",

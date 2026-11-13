@@ -186,6 +186,27 @@ FOLLOW_UP_TYPES = [
         "notification": "Your check from Running low is ready.",
     },
     {
+        # Sleep reset (ER-13, docs/design/sleep-reset.md): the morning check at the wake time the person set, the next
+        # time it comes round (`next_local`: a plan made at 1am means this morning). The card reopens that visit at `morning` (R9 `reopens`: *How was the night?*, then *Same again
+        # tomorrow?*, which books it again). Opening it is the resolution. Content-free: never names the time or the
+        # night. About one morning only, so it goes stale by the afternoon.
+        "id": "sleep_morning", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/sleep-reset?run={sourceSessionId}&at=morning&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"w0600": {"kind": "next_local", "time": "06:00"},
+                                             "w0630": {"kind": "next_local", "time": "06:30"},
+                                             "w0700": {"kind": "next_local", "time": "07:00"},
+                                             "w0730": {"kind": "next_local", "time": "07:30"},
+                                             "w0800": {"kind": "next_local", "time": "08:00"},
+                                             "w0830": {"kind": "next_local", "time": "08:30"},
+                                             "w0900": {"kind": "next_local", "time": "09:00"},
+                                             "w0930": {"kind": "next_local", "time": "09:30"}}},
+        "staleAfterHours": 8, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Morning check", "body": "From Sleep Reset. How was the night?"},
+        "choices": [{"id": "dismiss", "label": "Not today", "status": "dismissed"}],
+        "notification": "Your morning check is ready.",
+    },
+    {
         # What matters to me (ER-09, docs/design/values.md): the one small step for a value, checked when the person
         # said (tomorrow, three days, a week; evenings). The card reopens that visit at `back` (R9 `reopens`: *Did it
         # happen?*). Opening it is the resolution. Content-free: never names the value or the step.

@@ -1351,6 +1351,17 @@ SET please_skills += {
   skill_type: "reducing_vulnerability"
 };
 
+// ER Handout 20b (PRD ER-13): sleep hygiene, a fixed wake time and what to do when you can't sleep; Sleep reset
+// (docs/design/sleep-reset.md).
+MERGE (sleep_hygiene:TherapyConcept {id: "dbt_sleep_hygiene"})
+SET sleep_hygiene += {
+  name: "Sleep Hygiene Protocol",
+  description: "One wake time every day, an hour to wind down, and getting up for a while instead of lying awake; at night, resting counts and problems wait for the morning",
+  modality: "DBT",
+  module: "Emotion Regulation",
+  skill_type: "reducing_vulnerability"
+};
+
 MERGE (check_the_facts:TherapyConcept {id: "dbt_check_facts"})
 SET check_the_facts += {
   name: "Check the Facts",

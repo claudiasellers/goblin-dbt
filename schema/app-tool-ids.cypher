@@ -45,7 +45,8 @@ UNWIND [
   {c: "dbt_mindfulness_of_others", t: "mindfulness-of-others"},
   {c: "dbt_behavioral_rehearsal", t: "rehearse"},
   {c: "dbt_model_of_emotions", t: "emotion-guide"},
-  {c: "dbt_mindfulness_current_emotion", t: "mindfulness-emotions"}
+  {c: "dbt_mindfulness_current_emotion", t: "mindfulness-emotions"},
+  {c: "dbt_sleep_hygiene", t: "sleep-reset"}
 ] AS row
 MATCH (c:TherapyConcept {id: row.c})
 SET c.appToolId = row.t;

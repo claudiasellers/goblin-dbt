@@ -681,6 +681,17 @@
    "direction": "down",
    "addresses": []
   },
+  "dbt_sleep_hygiene": {
+   "appToolId": "sleep-reset",
+   "name": "Sleep Hygiene Protocol",
+   "description": "One wake time every day, an hour to wind down, and getting up for a while instead of lying awake; at night, resting counts and problems wait for the morning",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": []
+  },
   "dbt_stop": {
    "appToolId": "pause",
    "name": "STOP",

@@ -40024,8 +40024,7 @@
      "toolId": "sleep-reset",
      "query": {},
      "carry": [],
-     "done": false,
-     "planned": true
+     "done": false
     }
    ],
    "options": {
@@ -48937,8 +48936,7 @@
      "toolId": "sleep-reset",
      "query": {},
      "carry": [],
-     "done": false,
-     "planned": true
+     "done": false
     }
    ],
    "options": {
@@ -62361,6 +62359,1210 @@
      {
       "value": "no",
       "label": "No"
+     }
+    ]
+   }
+  },
+  {
+   "id": "sleep_reset",
+   "toolId": "sleep-reset",
+   "version": "sr-v1",
+   "start": "mode",
+   "accepts": [
+    "band"
+   ],
+   "ownMax": 90,
+   "emotionFields": [],
+   "copy": {
+    "next": "Next",
+    "done": "Done",
+    "safety_open": "Talk to someone now",
+    "mode_title": "What do you need?",
+    "mode_hint": "For tonight, or for the nights ahead.",
+    "settle_first": "Settle my body first",
+    "night_title": "What's keeping you up?",
+    "night_hint": "You don't have to fix the night. Resting counts.",
+    "safe_title": "Are you safe right now?",
+    "safe_hint": "The support is on this screen, any hour.",
+    "reach_title": "You don't have to do this part alone.",
+    "reach_line": "Someone is there to talk to, right now.",
+    "hurt_end_title": "Getting through the night is the job.",
+    "hurt_end_line": "Sleep can wait. Someone to talk to is here, any hour.",
+    "dream_title": "Back to the room first.",
+    "dream_line": "Notice what's around you: the bed, the light, the sounds. Back to bed when you're ready. If it keeps coming back, there's help for that in the daytime.",
+    "park_title": "Put it down for the night.",
+    "park_hint": "Name it and leave it for the morning. It'll keep.",
+    "park_own": "In my words",
+    "mind_job_link": "Give my mind a job instead",
+    "breathe_title": "Slow breaths, out longer than in.",
+    "breathe_step1": "Lie back, or sit somewhere dim.",
+    "breathe_step2": "No need to check the time.",
+    "breathe_start": "Start",
+    "breathe_in": "In",
+    "breathe_out": "Out",
+    "breathe_dizzy": "Light-headed? Breathe normally. That's fine too.",
+    "breathe_done": "That's enough for now.",
+    "now_title": "How is it now?",
+    "up_title": "Try getting up for a bit.",
+    "up_hint": "A different room for a while often helps more than lying there.",
+    "sleepy_title": "Back to bed.",
+    "sleepy_line": "Phone face down, out of reach. If you're still awake after a while, get up for a bit. Whatever time you fall asleep, get up at your usual time.",
+    "rest_title": "Rest is enough for now.",
+    "night_end_rest": "Eyes closed, phone face down. Resting still counts. If you start to stew, getting up for a bit helps.",
+    "night_end_title": "Back to bed when your eyes get heavy.",
+    "night_end_up": "Phone face down, out of reach. Go back when you're sleepy, not by the clock. Whatever time you fall asleep, get up at your usual time.",
+    "wake_title": "What time will you get up, every day?",
+    "wake_hint": "The same time on weekends too. It resets sleep more than any bedtime does. If your hours change with shifts, set it by your shift; a doctor can help plan it.",
+    "wind_title": "Pick one thing for the hour before bed.",
+    "wind_hint": "One thing is enough. Go to bed when you're sleepy, not before.",
+    "wind_own": "Something else",
+    "remind_label": "Check in with me in the morning?",
+    "plan_title": "Up at {wake}, every day.",
+    "plan_remind": "A morning check will be on Today. Caffeine after midday and alcohol at night both break sleep up. If sleep's been bad for weeks, a doctor can help.",
+    "plan_line": "Caffeine after midday and alcohol at night both break sleep up. On a night you can't sleep, open Sleep Reset again. If sleep's been bad for weeks, a doctor can help.",
+    "morning_title": "Morning. How was the night?",
+    "up_label": "Up at your time?",
+    "dream_label": "Did a bad dream wake you?",
+    "again_title_up": "Up at your time. That's the reset working.",
+    "again_title": "A late start doesn't undo the reset.",
+    "again_label": "Same again tomorrow?",
+    "morning_end_title": "That's the reset.",
+    "morning_barely": "A short night is hard. A nap can make tonight harder; if you need one, keep it short and early, and don't drive drowsy. Barely sleeping and full of energy, not tired? Tell your doctor soon.",
+    "morning_broken": "Broken nights add up. If it's been weeks, or there's loud snoring, gasping or restless legs, a doctor can help.",
+    "morning_not_yet": "Getting up now still helps. Light and moving tell your body it's morning.",
+    "morning_again_no": "One fixed time to get up, every day, is most of it. You can set it up again any time in Sleep Reset.",
+    "morning_line": "One fixed time to get up, every day, is most of it."
+   },
+   "tables": {},
+   "derive": [],
+   "steps": [
+    {
+     "id": "mode",
+     "kind": "ask",
+     "title": "mode_title",
+     "hint": "mode_hint",
+     "fields": [
+      {
+       "id": "mode",
+       "options": {
+        "list": "mode"
+       },
+       "max": 1,
+       "links": [
+        {
+         "exit": "cool_down",
+         "label": "settle_first",
+         "when": {
+          "all": [
+           {
+            "eq": [
+             "$ctx.band",
+             "flooded"
+            ]
+           },
+           {
+            "eq": [
+             "$a.mode",
+             "plan"
+            ]
+           }
+          ]
+         }
+        },
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "wake",
+       "when": {
+        "eq": [
+         "$a.mode",
+         "plan"
+        ]
+       }
+      },
+      {
+       "to": "night",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "night",
+     "kind": "ask",
+     "title": "night_title",
+     "hint": "night_hint",
+     "fields": [
+      {
+       "id": "night",
+       "options": {
+        "list": "night"
+       },
+       "max": 1,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "safe",
+       "when": {
+        "eq": [
+         "$a.night",
+         "hurt"
+        ]
+       }
+      },
+      {
+       "to": "dream",
+       "when": {
+        "eq": [
+         "$a.night",
+         "dream"
+        ]
+       }
+      },
+      {
+       "to": "park",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.night",
+           "mind"
+          ]
+         },
+         {
+          "not": {
+           "eq": [
+            "$ctx.band",
+            "flooded"
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "to": "breathe",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "safe",
+     "kind": "ask",
+     "title": "safe_title",
+     "hint": "safe_hint",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "safetyFirst": {
+      "all": []
+     },
+     "fields": [
+      {
+       "id": "safe",
+       "options": {
+        "list": "safe"
+       },
+       "max": 1,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "reach",
+       "when": {
+        "in": [
+         "$a.safe",
+         [
+          "not_sure",
+          "no"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "hurt_end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "reach",
+     "kind": "handoff",
+     "complete": true,
+     "title": "reach_title",
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "reach_line"
+      }
+     ],
+     "done": "done",
+     "noClose": true,
+     "links": [],
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "safety_open",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "crisis_kit",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "hurt_end",
+     "kind": "handoff",
+     "complete": true,
+     "title": "hurt_end_title",
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "hurt_end_line"
+      }
+     ],
+     "done": "done",
+     "noClose": true,
+     "links": [],
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "safety_open",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "crisis_kit",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "dream",
+     "kind": "handoff",
+     "complete": true,
+     "title": "dream_title",
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "dream_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "five_senses",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "soothe",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "park",
+     "kind": "ask",
+     "title": "park_title",
+     "hint": "park_hint",
+     "fields": [
+      {
+       "id": "park",
+       "options": {
+        "list": "park"
+       },
+       "max": 1,
+       "links": [
+        {
+         "exit": "mind_job",
+         "label": "mind_job_link",
+         "when": {
+          "all": []
+         }
+        },
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "own": {
+        "hint": "park_own",
+        "countsAsPick": true,
+        "max": 90
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "breathe",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "breathe",
+     "kind": "embed",
+     "embed": "breathPacer",
+     "answerAs": "breathe",
+     "title": "breathe_title",
+     "props": {
+      "seconds": 120,
+      "inSec": 4,
+      "outSec": 6,
+      "step1": "breathe_step1",
+      "step2": "breathe_step2",
+      "start": "breathe_start",
+      "inLabel": "breathe_in",
+      "outLabel": "breathe_out",
+      "dizzy": "breathe_dizzy",
+      "done": "breathe_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "now",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "now",
+     "kind": "ask",
+     "title": "now_title",
+     "fields": [
+      {
+       "id": "now",
+       "options": {
+        "list": "now"
+       },
+       "max": 1,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "sleepy",
+       "when": {
+        "eq": [
+         "$a.now",
+         "sleepy"
+        ]
+       }
+      },
+      {
+       "to": "up",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "sleepy",
+     "kind": "handoff",
+     "complete": true,
+     "title": "sleepy_title",
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "sleepy_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": []
+    },
+    {
+     "id": "up",
+     "kind": "ask",
+     "title": "up_title",
+     "hint": "up_hint",
+     "fields": [
+      {
+       "id": "up",
+       "options": {
+        "list": "up"
+       },
+       "max": 1,
+       "links": [
+        {
+         "exit": "mind_job",
+         "label": "mind_job_link",
+         "when": {
+          "eq": [
+           "$a.night",
+           "mind"
+          ]
+         }
+        },
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "night_end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "night_end",
+     "kind": "handoff",
+     "complete": true,
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$a.up",
+         "rest"
+        ]
+       },
+       "key": "rest_title"
+      },
+      {
+       "key": "night_end_title"
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.up",
+         "rest"
+        ]
+       },
+       "key": "night_end_rest"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "night_end_up"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "mind_job",
+       "when": {
+        "eq": [
+         "$a.night",
+         "mind"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "id": "wake",
+     "kind": "ask",
+     "title": "wake_title",
+     "hint": "wake_hint",
+     "fields": [
+      {
+       "id": "wake",
+       "options": {
+        "list": "wake"
+       },
+       "max": 1,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "wind",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "wind",
+     "kind": "ask",
+     "title": "wind_title",
+     "hint": "wind_hint",
+     "fields": [
+      {
+       "id": "wind",
+       "options": {
+        "list": "wind"
+       },
+       "max": 1,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "required": true,
+       "own": {
+        "hint": "wind_own",
+        "countsAsPick": true,
+        "max": 90
+       }
+      },
+      {
+       "id": "remind",
+       "options": {
+        "list": "remind"
+       },
+       "max": 1,
+       "links": [],
+       "label": "remind_label"
+      }
+     ],
+     "followUp": {
+      "type": "sleep_morning",
+      "whenFrom": "wake",
+      "when": {
+       "set": "$a.remind"
+      }
+     },
+     "next": [
+      {
+       "to": "plan_end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "plan_end",
+     "kind": "handoff",
+     "complete": true,
+     "title": "plan_title",
+     "lines": [
+      {
+       "when": {
+        "set": "$a.remind"
+       },
+       "key": "plan_remind"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "plan_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "titleSlots": {
+      "wake": {
+       "labelOf": "wake"
+      }
+     },
+     "next": [],
+     "offers": []
+    },
+    {
+     "id": "morning",
+     "kind": "ask",
+     "reopens": {
+      "after": "wind",
+      "again": [
+       "again"
+      ]
+     },
+     "clears": [
+      "slept",
+      "up_at",
+      "dream",
+      "again"
+     ],
+     "title": "morning_title",
+     "fields": [
+      {
+       "id": "slept",
+       "options": {
+        "list": "slept"
+       },
+       "max": 1,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "required": true
+      },
+      {
+       "id": "up_at",
+       "options": {
+        "list": "up_at"
+       },
+       "max": 1,
+       "links": [],
+       "required": true,
+       "label": "up_label"
+      },
+      {
+       "id": "dream",
+       "options": {
+        "list": "dream"
+       },
+       "max": 1,
+       "links": [],
+       "label": "dream_label"
+      }
+     ],
+     "next": [
+      {
+       "to": "again",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "again",
+     "kind": "ask",
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$a.up_at",
+         "up_yes"
+        ]
+       },
+       "key": "again_title_up"
+      },
+      {
+       "key": "again_title"
+      }
+     ],
+     "fields": [
+      {
+       "id": "again",
+       "options": {
+        "list": "again"
+       },
+       "max": 1,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "required": true,
+       "label": "again_label"
+      }
+     ],
+     "followUp": {
+      "type": "sleep_morning",
+      "whenFrom": "wake",
+      "whenDefault": "w0700",
+      "when": {
+       "eq": [
+        "$a.again",
+        "again_yes"
+       ]
+      }
+     },
+     "next": [
+      {
+       "to": "morning_end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "morning_end",
+     "kind": "handoff",
+     "complete": true,
+     "title": "morning_end_title",
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.slept",
+         "barely"
+        ]
+       },
+       "key": "morning_barely"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.slept",
+         "broken"
+        ]
+       },
+       "key": "morning_broken"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.up_at",
+         "up_not_yet"
+        ]
+       },
+       "key": "morning_not_yet"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.again",
+         "again_no"
+        ]
+       },
+       "key": "morning_again_no"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "morning_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "nightmare_rescript",
+       "when": {
+        "set": "$a.dream"
+       }
+      },
+      {
+       "exit": "please_skill",
+       "when": {
+        "eq": [
+         "$a.slept",
+         "barely"
+        ]
+       }
+      }
+     ]
+    }
+   ],
+   "exits": [
+    {
+     "id": "cool_down",
+     "toolId": "cool-down",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "crisis_kit",
+     "toolId": "crisis-kit",
+     "query": {
+      "frame": "crisis"
+     },
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "done",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": true
+    },
+    {
+     "id": "five_senses",
+     "toolId": "five-senses",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "mind_job",
+     "toolId": "mind-job",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "nightmare_rescript",
+     "toolId": "nightmare-rescript",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "please_skill",
+     "toolId": "please-skill",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "safety_open",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": false,
+     "safety": true
+    },
+    {
+     "id": "soothe",
+     "toolId": "soothe",
+     "query": {},
+     "carry": [],
+     "done": false
+    }
+   ],
+   "options": {
+    "mode": [
+     {
+      "value": "awake",
+      "label": "I can't sleep"
+     },
+     {
+      "value": "plan",
+      "label": "Set up my sleep times"
+     }
+    ],
+    "night": [
+     {
+      "value": "mind",
+      "label": "My mind won't stop"
+     },
+     {
+      "value": "body",
+      "label": "My body's wired"
+     },
+     {
+      "value": "dream",
+      "label": "A bad dream woke me"
+     },
+     {
+      "value": "hurt",
+      "label": "Thoughts of hurting myself"
+     },
+     {
+      "value": "unsure",
+      "label": "I don't know"
+     }
+    ],
+    "safe": [
+     {
+      "value": "safe_now",
+      "label": "Safe for now"
+     },
+     {
+      "value": "not_sure",
+      "label": "Not sure"
+     },
+     {
+      "value": "no",
+      "label": "No"
+     }
+    ],
+    "park": [
+     {
+      "value": "worry",
+      "label": "A worry"
+     },
+     {
+      "value": "todo",
+      "label": "Something to do tomorrow"
+     },
+     {
+      "value": "replay",
+      "label": "Something that happened"
+     }
+    ],
+    "now": [
+     {
+      "value": "sleepy",
+      "label": "Sleepy now"
+     },
+     {
+      "value": "awake",
+      "label": "Still wide awake"
+     }
+    ],
+    "up": [
+     {
+      "value": "dim",
+      "label": "Another room, lights low"
+     },
+     {
+      "value": "read",
+      "label": "Something calm on paper"
+     },
+     {
+      "value": "rest",
+      "label": "I'd rather rest here"
+     }
+    ],
+    "wake": [
+     {
+      "value": "w0600",
+      "label": "6:00"
+     },
+     {
+      "value": "w0630",
+      "label": "6:30"
+     },
+     {
+      "value": "w0700",
+      "label": "7:00"
+     },
+     {
+      "value": "w0730",
+      "label": "7:30"
+     },
+     {
+      "value": "w0800",
+      "label": "8:00"
+     },
+     {
+      "value": "w0830",
+      "label": "8:30"
+     },
+     {
+      "value": "w0900",
+      "label": "9:00"
+     },
+     {
+      "value": "w0930",
+      "label": "9:30"
+     }
+    ],
+    "wind": [
+     {
+      "value": "screens",
+      "label": "Screens away"
+     },
+     {
+      "value": "dim",
+      "label": "Lights low"
+     },
+     {
+      "value": "tomorrow",
+      "label": "Write tomorrow's list"
+     },
+     {
+      "value": "warm",
+      "label": "A warm shower or bath"
+     },
+     {
+      "value": "quiet",
+      "label": "A book, music or stretching"
+     }
+    ],
+    "remind": [
+     {
+      "value": "yes",
+      "label": "Yes"
+     }
+    ],
+    "slept": [
+     {
+      "value": "okay",
+      "label": "Slept okay"
+     },
+     {
+      "value": "broken",
+      "label": "Broken"
+     },
+     {
+      "value": "barely",
+      "label": "Barely slept"
+     }
+    ],
+    "up_at": [
+     {
+      "value": "up_yes",
+      "label": "Yes"
+     },
+     {
+      "value": "up_later",
+      "label": "Later than planned"
+     },
+     {
+      "value": "up_not_yet",
+      "label": "Not yet"
+     }
+    ],
+    "dream": [
+     {
+      "value": "dream_yes",
+      "label": "Yes"
+     }
+    ],
+    "again": [
+     {
+      "value": "again_yes",
+      "label": "Yes, check in tomorrow"
+     },
+     {
+      "value": "again_no",
+      "label": "Not tomorrow"
      }
     ]
    }

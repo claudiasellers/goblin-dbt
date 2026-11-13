@@ -575,6 +575,9 @@ MERGE (c)-[:PART_OF]->(rv);
 MATCH (c:TherapyConcept {id: "dbt_please"}), (rv:TherapyConcept {id: "dbt_reducing_vulnerability"})
 MERGE (c)-[:PART_OF]->(rv);
 
+MATCH (c:TherapyConcept {id: "dbt_sleep_hygiene"}), (rv:TherapyConcept {id: "dbt_reducing_vulnerability"})
+MERGE (c)-[:PART_OF]->(rv);
+
 // DBT IE Skills -> Module
 MATCH (c:TherapyConcept {id: "dbt_dear_man"}), (mod:TherapyConcept {id: "dbt_interpersonal_effectiveness"})
 MERGE (c)-[:PART_OF]->(mod);

@@ -294,7 +294,7 @@ STEPS = [
 
 EXITS = [
     {"id": "five_senses", "toolId": "five-senses"},                       # orienting (DT-01's orient entry)
-    {"id": "sleep_reset", "toolId": "sleep-reset", "planned": True},      # ER-13 Sleep reset (ER-B5)
+    {"id": "sleep_reset", "toolId": "sleep-reset"},                       # ER-13 Sleep reset
     {"id": "safety_open", "toolId": None, "safety": True},                # safety.open (R6)
     {"id": "done", "done": True},
 ]

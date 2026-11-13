@@ -273,6 +273,18 @@ export const tools: Tool[] = [
     bare: true,
   },
   {
+    // ER-13 on the skill runtime (docs/design/sleep-reset.md): sleep hygiene, the wake-time anchor and the night.
+    id: 'sleep-reset',
+    name: 'Sleep Reset',
+    tagline: 'For a night you can\'t sleep, or to set up your sleep times',
+    description: 'Awake at night: put the thought down, breathe slowly, and get up for a bit instead of lying there. Or pick one time to get up every day and one thing to wind down with, and check in the next morning.',
+    whenToUse: 'When you can\'t sleep, or when sleep has been all over the place and everything feels louder for it.',
+    module: 'emotion-regulation',
+    dbtBasis: 'DBT ER Handout 20b (sleep hygiene)',
+    emoji: '🛌',
+    bare: true,
+  },
+  {
     // ER-04 on the skill runtime (docs/design/good-things.md): accumulating positives, and the things I like list.
     id: 'good-things',
     name: 'Good Things',
@@ -531,6 +543,7 @@ export const allIntents: Intent[] = [
   { id: 'overreacting', label: 'I can\'t tell if I\'m overreacting', toolId: 'check-the-facts', emoji: '🔍' },
   { id: 'not-working', label: 'My skills aren\'t working', toolId: 'er-troubleshoot', emoji: '🧩' },
   { id: 'running-low', label: 'Everything feels like too much today', toolId: 'please-skill', emoji: '🔋' },
+  { id: 'cant-sleep', label: 'I can\'t sleep', toolId: 'sleep-reset', emoji: '🛌' },
   { id: 'find-good', label: 'Find something good', toolId: 'good-things', emoji: '🌼' },
   { id: 'what-matters', label: 'Work out what matters to me', toolId: 'values-clarification', emoji: '🧭' },
   { id: 'one-thing', label: 'Get one thing done', toolId: 'build-mastery', emoji: '🪜' },
