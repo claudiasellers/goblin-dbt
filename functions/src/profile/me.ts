@@ -241,8 +241,10 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
       const list = (k: string, n: number) => (Array.isArray(value![k]) ? (value![k] as unknown[]) : []).filter((x): x is string => typeof x === 'string').slice(0, n);
       const word = (k: string) => (typeof value![k] === 'string' && (value![k] as string).trim() ? (value![k] as string).trim() : undefined);
       const keptAny = list('keptIds', 3).length > 0 || !!word('keptOwn');
-      const ids = keptAny ? list('keptIds', 3) : list('mineIds', 3);
-      const own = keptAny ? word('keptOwn') : (ids.length < 3 ? word('mineOwn') : undefined);
+      // Nothing in *that's me* (no card and no own words) either: the middle pile (*some of the time*).
+      const mineAny = list('mineIds', 3).length > 0 || !!word('mineOwn');
+      const ids = keptAny ? list('keptIds', 3) : mineAny ? list('mineIds', 3) : list('sometimesIds', 3);
+      const own = keptAny ? word('keptOwn') : (mineAny && ids.length < 3 ? word('mineOwn') : undefined);
       valueIds = { ids: ids.map((id) => VALUE_OPTION + id), ...(own ? { own } : {}) };
     }
     // A person (IE-03): the name they gave, never the safety answer (Me is not where that's asked or shown).

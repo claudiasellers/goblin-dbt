@@ -38,8 +38,13 @@ export function profileItemId(item: unknown): string | null {
 
 /** The answers key a per-pick step's view puts its pick under (R16, machine.ts `answersOf`). */
 export const EACH = '$each';
+/**
+ * Where a reopened run keeps the last round's answer to each field its `reopens` step clears (`$prev.<field>`): read by
+ * conditions only, never shown on a chip (no pre-fill), never recorded. Build mastery's *done twice at this rung*.
+ */
+export const PREV_KEY = 'prev.';
 
-const REF = /^\$(a|d|opt|ctx|p)\.([A-Za-z_][A-Za-z0-9_]*)(?:\.(ids|own))?$/;
+const REF = /^\$(a|prev|d|opt|ctx|p)\.([A-Za-z_][A-Za-z0-9_]*)(?:\.(ids|own))?$/;
 
 /** A ref's value, or the literal itself. */
 export function resolve(v: unknown, scope: Scope): unknown {
@@ -48,8 +53,9 @@ export function resolve(v: unknown, scope: Scope): unknown {
   const m = REF.exec(v);
   if (!m) return null;
   const [, kind, name, part] = m;
-  if (kind === 'a') {
-    const a = scope.answers[name];
+  if (kind === 'a' || kind === 'prev') {
+    // `$prev.<field>`: the last round's answer to a field the reopened step clears (PREV_KEY), display-free.
+    const a = scope.answers[kind === 'prev' ? `${PREV_KEY}${name}` : name];
     if (part === 'ids') return a?.ids ?? [];
     if (part === 'own') return a?.own ?? null;
     return a?.ids[0] ?? null;

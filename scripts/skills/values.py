@@ -6,7 +6,9 @@ Steps:
              kept (`$p.values`): *Take a small step for one of them* or *Sort them again*.
   heads_up   a carried flooded reading: values work wants a steadier moment; the body first or *Try it anyway*.
   sort       *Which of these sound like you?* ~24 value cards in plain words (paraphrasing H18's themes), as many as
-             fit, or own words. Nothing picked is a full answer: *not sure yet* (`not_sure`).
+             fit, or own words.
+  sometimes  the middle pile: *Any that matter to you some of the time?* from the cards left (up to 12; a lower-bar
+             title when the first pile is empty). Nothing in either pile is a full answer: *not sure yet* (`not_sure`).
   keep       *Which ones matter most for now? Up to three.*: up to three from the sort (or own words). *Not sure yet* is
              complete: the sort is kept either way (`values`, one per person, re-sorting replaces it).
   one        one kept value to take a step for (this visit's three), or `one_kept` (the ones kept before).
@@ -22,8 +24,8 @@ Risks (PRD): values as "shoulds" (copy frames directions, never rules; nothing s
 conflicting values (*Two can pull different ways. Both can matter.*); identity diffusion (*not sure yet* is a full
 answer, and the sort is kept).
 
-Departures from the PRD (docs/design/values.md lists them with the batch that picks each up): a chip sort, not the
-`pileSort` embed's three piles (that's me · sometimes · not now); goal and step are one chip (`ValueGoal` and
+Departures from the PRD (docs/design/values.md lists them with the batch that picks each up): the PRD's three piles
+(that's me · sometimes · not now) are two chip screens, not the `pileSort` embed (part 2); goal and step are one chip (`ValueGoal` and
 `ValueStep` merged); no catches after the fact; no monthly *still yours?* Today card (Me revisits the item after 30
 days, and the start screen offers *Sort them again*).
 
@@ -48,6 +50,13 @@ COPY = {
     "sort_title": "Which of these sound like you?",
     "sort_hint": "Pick as many as fit, then Next. None is a full answer: not sure yet.",
     "sort_own": "Add your own",
+    # The PRD's middle pile (*that's me · sometimes · not now*): mixed feelings about a value get a place. The rest
+    # is *not now*, never named. It asks how much a value matters, never whether the person *is* it: the deck holds
+    # traits (Honesty, Kindness), and "some of the time" about a trait reads as a confession (gate 3).
+    "sometimes_title": "Any that matter to you some of the time?",
+    # Nothing in the first pile: a lower bar, and *not sure yet* still a full answer, so the question isn't a re-ask.
+    "sometimes_title_none": "Any that matter even a little, or some of the time?",
+    "sometimes_hint": "Mixed feelings about one are normal. None is fine too: not sure yet is a full answer.",
     "keep_title": "Which ones matter most for now? Up to three.",
     # Conflicting values (PRD risks) and identity diffusion: *not sure yet* is complete.
     "keep_hint": "Two can pull different ways. Both can matter. Not sure yet? Save with none picked. Your list is kept either way.",
@@ -166,7 +175,7 @@ AGAIN = [("smaller", "Pick a smaller one"), ("not_now", "Not now")]
 
 KEPT = {"set": a("kept")}
 # This visit's three, from the sort (a value can only be kept if it was sorted in).
-IN_SORT = {"has": [a("mine") + ".ids", "$opt.value"]}
+IN_SORT = {"any": [{"has": [a("mine") + ".ids", "$opt.value"]}, {"has": [a("sometimes") + ".ids", "$opt.value"]}]}
 IN_KEPT = {"has": [a("kept") + ".ids", "$opt.value"]}
 # The focus: this visit's pick, or one kept before. A step chip belongs to its value; a value in their own words
 # (typed here, kept in their words this visit, or kept before as `own`) gets the general ones.
@@ -215,13 +224,19 @@ STEPS = [
     handoff("settle", "heads_up_title", [{"when": ALWAYS, "key": "settle_line"}], [{"exit": "cool_down", "when": ALWAYS}],
             no_close=True),
     ask("sort", "sort_title", "sort_hint", [field("mine", "value", mx=len(VALUES) + 1, required=False, own="sort_own")],
-        [{"when": {"set": a("mine")}, "to": "keep"}, {"to": "not_sure"}]),
+        [{"to": "sometimes"}]),
+    # At most 12: a run records 12 picks per answer (ext.run), and a kept value past the 12th would be lost when the
+    # `value_step` card reopens the run.
+    ask("sometimes", [{"when": {"not": {"set": a("mine")}}, "key": "sometimes_title_none"}, {"key": "sometimes_title"}],
+        "sometimes_hint",
+        [{**field("sometimes", "value", mx=12, required=False), "options": {"list": "value", "notIn": [a("mine") + ".ids"]}}],
+        [{"when": {"any": [{"set": a("mine")}, {"set": a("sometimes")}]}, "to": "keep"}, {"to": "not_sure"}]),
     handoff("not_sure", "not_sure_title", [{"when": ALWAYS, "key": "not_sure_line"}], [], no_close=True),
     # Keep (R4) on *Keep these*: the sort and up to three. *Not sure yet* (none picked) keeps the sort.
     ask("keep", "keep_title", "keep_hint", [field("kept", "value", mx=3, required=False, own="keep_own", where=IN_SORT)],
         # Kept only in their own words: that's the value, straight to its step.
         [{"when": {"set": a("kept") + ".ids"}, "to": "one"}, {"when": KEPT, "to": "step"}, {"to": "sorted"}],
-        keep={"kind": "values", "many": False, "from": ["mine", "kept"]}, primary="keep_primary"),
+        keep={"kind": "values", "many": False, "from": ["mine", "sometimes", "kept"]}, primary="keep_primary"),
     handoff("sorted", "sorted_title", [{"when": ALWAYS, "key": "sorted_line"}], [], no_close=True),
     ask("one", "one_title", "one_hint", [field("focus", "value", where=IN_KEPT, own="focus_own")], [{"to": "step"}]),
     ask("one_kept", "one_title", "one_hint", [field("focus_kept", "value", where={"any": []}, profile="values")],

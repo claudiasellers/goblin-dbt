@@ -23,7 +23,7 @@ const values = (s, fieldId, c = ctx()) => {
   return M.optionGroups(c, f, s.answers).flatMap((g) => g.options.map((o) => o.value));
 };
 const offers = (s, c = ctx()) => M.offersFor(c, M.stepOf(skill, s.stepId), s);
-const SORTED = (c = ctx()) => run([next, pick("mine", "honesty"), pick("mine", "friendship"), pick("mine", "calm"), pick("mine", "fun"), next], c);
+const SORTED = (c = ctx()) => run([next, pick("mine", "honesty"), pick("mine", "friendship"), pick("mine", "calm"), pick("mine", "fun"), next, next], c);
 
 test("the skill: tool values-clarification, concept dbt_values_priorities, no close question, listed under Emotion Regulation", () => {
   assert.equal(skill.toolId, "values-clarification");
@@ -50,8 +50,8 @@ test("first time: the question, then the sort; nothing picked is a full answer (
   const cards = values(sort, "mine");
   assert.ok(cards.length >= 20 && cards.length <= 26, "about two dozen value cards");
   for (const v of ["friendship", "fairness", "honesty", "standing_up", "calm", "meaning"]) assert.ok(cards.includes(v), v);
-  const none = run([next], ctx(), sort);
-  assert.equal(none.stepId, "not_sure");
+  const none = run([next, next], ctx(), sort);
+  assert.equal(none.stepId, "not_sure", "nothing in either pile");
   assert.match(line(none), /^What matters can take a while to find/);
 });
 
@@ -196,4 +196,34 @@ test("values: a profile kind about me, one per person, own words encrypted, revi
   const cy = readFileSync("schema/skills.cypher", "utf8");
   for (const o of skill.options.value) assert.match(cy, new RegExp(`MERGE \\(o:SkillOption \\{id: "values:value:${o.value}"\\}\\)`), o.value);
   assert.match(readFileSync("functions/src/profile/slices.ts", "utf8"), /VALUE_OPTION = 'values:value:'/);
+});
+
+// The PRD's three piles (part 2): that's me, some of the time, and the rest (not now, never named).
+test("three piles: some of the time is a place for mixed feelings; never the same card twice; keep from either", async () => {
+  const mid = run([next, pick("mine", "honesty"), pick("mine", "friendship"), next]);
+  assert.equal(mid.stepId, "sometimes");
+  // How much it matters, never whether the person *is* a trait (gate 3), and *not now* never named.
+  assert.equal(title(mid), "Any that matter to you some of the time?");
+  assert.match(skill.copy.sometimes_hint, /^Mixed feelings about one are normal\. None is fine too/);
+  assert.doesNotMatch(skill.copy.sometimes_hint, /not now/i);
+  assert.equal(M.stepOf(skill, "sometimes").fields[0].max, 12, "a run records 12 picks per answer");
+  const cards = values(mid, "sometimes");
+  assert.ok(!cards.includes("honesty") && !cards.includes("friendship"), "a card in that's me isn't offered again");
+  assert.ok(cards.includes("calm"));
+  const keep = run([pick("sometimes", "calm"), next], ctx(), mid);
+  assert.equal(keep.stepId, "keep");
+  assert.deepEqual(values(keep, "kept").sort(), ["calm", "friendship", "honesty"], "keep from either pile");
+  const kept = M.keepFor(ctx(), M.stepOf(skill, "keep"), run([pick("kept", "honesty")], ctx(), keep));
+  assert.deepEqual(kept.value, { mineIds: ["honesty", "friendship"], sometimesIds: ["calm"], keptIds: ["honesty"] });
+  // Only the middle pile: still a sort worth keeping.
+  // Nothing in the first pile: a lower bar, not a re-ask.
+  assert.equal(title(run([next, next])), "Any that matter even a little, or some of the time?");
+  const onlyMid = run([next, next, pick("sometimes", "calm"), next]);
+  assert.equal(onlyMid.stepId, "keep");
+  const { PROFILE_KINDS } = await importTs("functions/src/profile/kinds.ts");
+  const k = PROFILE_KINDS.values;
+  assert.deepEqual(k.validate({ sometimesIds: ["calm"] }), { sometimesIds: ["calm"] });
+  assert.throws(() => k.validate({ sometimesOwn: "x" }), /Unexpected field/, "the middle pile takes cards only");
+  assert.throws(() => k.validate({}), /Nothing to keep/);
+  assert.match(readFileSync("functions/src/profile/me.ts", "utf8"), /mineAny \? list\('mineIds', 3\) : list\('sometimesIds', 3\)/, "Me names the middle pile only when the first holds nothing, own words included");
 });

@@ -1883,6 +1883,9 @@
     "back_title_own": "Earlier you picked: {rung}, for {area}.",
     "happened_label": "How did it go?",
     "done_title": "You did it.",
+    "done_twice_title": "Done again. The next one up is there if you want it.",
+    "done_twice_top_title": "Done again. That counts.",
+    "not_twice_title": "Not yet is a real answer. A smaller one may fit better right now.",
     "partly_title": "Part of it counts.",
     "done_hint": "That counts. It's evidence you can do things that feel hard.",
     "ican_label": "Keep this on your “I can” list in Me?",
@@ -2372,6 +2375,71 @@
      "title": [
       {
        "when": {
+        "all": [
+         {
+          "all": [
+           {
+            "eq": [
+             "$a.happened",
+             "done"
+            ]
+           },
+           {
+            "eq": [
+             "$prev.happened",
+             "done"
+            ]
+           },
+           {
+            "eq": [
+             "$prev.then",
+             "same"
+            ]
+           }
+          ]
+         },
+         {
+          "some": [
+           "rung",
+           {
+            "eq": [
+             "$opt.rung",
+             3
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       "key": "done_twice_top_title"
+      },
+      {
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.happened",
+           "done"
+          ]
+         },
+         {
+          "eq": [
+           "$prev.happened",
+           "done"
+          ]
+         },
+         {
+          "eq": [
+           "$prev.then",
+           "same"
+          ]
+         }
+        ]
+       },
+       "key": "done_twice_title"
+      },
+      {
+       "when": {
         "eq": [
          "$a.happened",
          "partly"
@@ -2578,7 +2646,36 @@
     {
      "id": "back_not",
      "kind": "ask",
-     "title": "not_title",
+     "title": [
+      {
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.happened",
+           "not_yet"
+          ]
+         },
+         {
+          "eq": [
+           "$prev.happened",
+           "not_yet"
+          ]
+         },
+         {
+          "eq": [
+           "$prev.again",
+           "same"
+          ]
+         }
+        ]
+       },
+       "key": "not_twice_title"
+      },
+      {
+       "key": "not_title"
+      }
+     ],
      "fields": [
       {
        "id": "again",
@@ -65396,6 +65493,9 @@
     "sort_title": "Which of these sound like you?",
     "sort_hint": "Pick as many as fit, then Next. None is a full answer: not sure yet.",
     "sort_own": "Add your own",
+    "sometimes_title": "Any that matter to you some of the time?",
+    "sometimes_title_none": "Any that matter even a little, or some of the time?",
+    "sometimes_hint": "Mixed feelings about one are normal. None is fine too: not sure yet is a full answer.",
     "keep_title": "Which ones matter most for now? Up to three.",
     "keep_hint": "Two can pull different ways. Both can matter. Not sure yet? Save with none picked. Your list is kept either way.",
     "keep_own": "In my words",
@@ -65613,9 +65713,63 @@
      "hint": "sort_hint",
      "next": [
       {
+       "to": "sometimes",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "sometimes",
+     "kind": "ask",
+     "title": [
+      {
+       "when": {
+        "not": {
+         "set": "$a.mine"
+        }
+       },
+       "key": "sometimes_title_none"
+      },
+      {
+       "key": "sometimes_title"
+      }
+     ],
+     "fields": [
+      {
+       "id": "sometimes",
+       "options": {
+        "list": "value",
+        "notIn": [
+         "$a.mine.ids"
+        ]
+       },
+       "max": 12,
+       "required": false,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "sometimes_hint",
+     "next": [
+      {
        "to": "keep",
        "when": {
-        "set": "$a.mine"
+        "any": [
+         {
+          "set": "$a.mine"
+         },
+         {
+          "set": "$a.sometimes"
+         }
+        ]
        }
       },
       {
@@ -65662,9 +65816,19 @@
        "options": {
         "list": "value",
         "where": {
-         "has": [
-          "$a.mine.ids",
-          "$opt.value"
+         "any": [
+          {
+           "has": [
+            "$a.mine.ids",
+            "$opt.value"
+           ]
+          },
+          {
+           "has": [
+            "$a.sometimes.ids",
+            "$opt.value"
+           ]
+          }
          ]
         }
        },
@@ -65691,6 +65855,7 @@
       "many": false,
       "from": [
        "mine",
+       "sometimes",
        "kept"
       ]
      },

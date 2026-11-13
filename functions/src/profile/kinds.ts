@@ -138,17 +138,18 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
     owner: 'ER', many: false, maxItems: 1, editor: null, ownFields: ['mineOwn', 'keptOwn'],
     validate: (v) => {
       const o = obj(v);
-      const most = { mine: 30, kept: 3 } as const;
+      const most = { mine: 30, sometimes: 30, kept: 3 } as const;
       const out: Record<string, unknown> = {};
-      for (const f of ['mine', 'kept'] as const) {
+      // `sometimes`: the sort's middle pile (ids only: own words go in *that's me*).
+      for (const f of ['mine', 'sometimes', 'kept'] as const) {
         const ids = o[`${f}Ids`];
         const own = o[`${f}Own`];
         if (ids !== undefined) out[`${f}Ids`] = strArray(ids, { max: most[f], item: (x) => str(x, { max: 40, pattern: OPTION_ID }) });
-        if (own !== undefined) out[`${f}Own`] = str(own, { max: 60 });
+        if (own !== undefined && f !== 'sometimes') out[`${f}Own`] = str(own, { max: 60 });
       }
-      for (const k of Object.keys(o)) if (!/^(mine|kept)(Ids|Own)$/.test(k)) throw new ValidationError('Unexpected field');
+      for (const k of Object.keys(o)) if (!/^(mine|kept)(Ids|Own)$|^sometimesIds$/.test(k)) throw new ValidationError('Unexpected field');
       const has = (k: string) => (Array.isArray(out[`${k}Ids`]) && (out[`${k}Ids`] as string[]).length > 0) || (typeof out[`${k}Own`] === 'string' && (out[`${k}Own`] as string).trim() !== '');
-      if (!has('mine')) throw new ValidationError('Nothing to keep');
+      if (!has('mine') && !has('sometimes')) throw new ValidationError('Nothing to keep');
       return out;
     },
   },

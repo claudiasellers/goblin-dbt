@@ -200,3 +200,36 @@ test("i_can: a profile kind about me, many, own words encrypted, named in Me fro
   assert.match(readFileSync("functions/src/profile/slices.ts", "utf8"), /RUNG_OPTION = 'build_mastery:rung:'/);
   assert.match(readFileSync("functions/src/profile/me.ts", "utf8"), /meta\.kind === 'i_can'/);
 });
+
+// Auto-adjust (PRD ER-11, part 2), within the visit's own loop: the last round is read as `$prev`, never a past visit.
+test("done again at the same rung offers the next one up; not yet again, a smaller one; nothing counted or pre-picked", () => {
+  const r1 = reopen(booked("admin_2"));
+  assert.equal(r1.answers["prev.happened"], undefined, "a first card has no last round");
+  const done1 = run([pick("happened", "done"), next], ctx(), r1);
+  assert.equal(title(done1), "You did it.", "once is once");
+  const again = run([pick("then", "same"), next, pick("when", "tomorrow"), pick("remind", "yes"), next], ctx(), done1);
+  const r2 = reopen(again);
+  assert.equal(r2.answers.happened, undefined, "asked fresh");
+  assert.equal(r2.answers.then, undefined, "the last round's chip isn't pre-picked");
+  const done2 = run([pick("happened", "done"), next], ctx(), r2);
+  assert.equal(title(done2), "Done again. The next one up is there if you want it.");
+  assert.ok(values(done2, "then").includes("up"), "offered, never pushed: every choice stays");
+  assert.ok(!M.runRecord(ctx(), done2).answers.some((x) => x.fieldId.startsWith("prev.")), "never recorded");
+  assert.equal(title(run([pick("happened", "partly"), next], ctx(), r2)), "Part of it counts.", "partly isn't done twice");
+  // Up a rung after one done: the next done there is a first.
+  const up = run([pick("then", "up"), next, pick("rung", "admin_3"), next, pick("when", "tomorrow"), pick("remind", "yes"), next], ctx(), done1);
+  assert.equal(title(run([pick("happened", "done"), next], ctx(), reopen(up))), "You did it.");
+  // At the top rung: no next one up to offer.
+  const top = reopen(run([pick("then", "same"), next, pick("when", "tomorrow"), pick("remind", "yes"), next], ctx(), run([pick("happened", "done"), next], ctx(), reopen(booked("admin_3")))));
+  assert.equal(title(run([pick("happened", "done"), next], ctx(), top)), "Done again. That counts.");
+  // Not yet, then the same again, then not yet: a smaller one may fit better.
+  const not1 = run([pick("happened", "not_yet"), next], ctx(), r1);
+  assert.equal(title(not1), "Not yet is a real answer.");
+  const r2n = reopen(run([pick("again", "same"), next, pick("when", "tomorrow"), pick("remind", "yes"), next], ctx(), not1));
+  const not2 = run([pick("happened", "not_yet"), next], ctx(), r2n);
+  assert.equal(title(not2), "Not yet is a real answer. A smaller one may fit better right now.");
+  for (const k of ["done_twice_title", "done_twice_top_title", "not_twice_title"]) assert.doesNotMatch(skill.copy[k], /twice|\d|times/i, "no counts");
+  assert.ok(values(not2, "again").includes("smaller") && values(not2, "again").includes("same"));
+  // A done between two not-yets breaks the run of two.
+  assert.equal(title(run([pick("happened", "not_yet"), next], ctx(), r2)), "Not yet is a real answer.");
+});
