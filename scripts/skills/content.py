@@ -37,6 +37,7 @@ import rehearse  # noqa: E402
 import crisis_kit  # noqa: E402
 import emotion_guide  # noqa: E402
 import emotion_myths  # noqa: E402
+import walk_the_wave  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
@@ -44,7 +45,7 @@ SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKIL
           ending_relationships.SKILL, cope_ahead.SKILL, hold_to_wait.SKILL, dear_man_debrief.SKILL, pros_cons.SKILL, first_body.SKILL,
           ride_it_out.SKILL, let_it_be.SKILL, mind_job.SKILL, say_no.SKILL, dear_man_one.SKILL, held.SKILL, thoughts_passing.SKILL, dear_man_prep.SKILL,
           opposite_action.SKILL, habit_plan.SKILL, please_skill.SKILL, give.SKILL, good_things.SKILL, *crisis_kit.SKILLS, values.SKILL, build_mastery.SKILL,
-          finding_connection.SKILL, notice_them.SKILL, rehearse.SKILL, emotion_guide.SKILL, emotion_myths.SKILL]
+          finding_connection.SKILL, notice_them.SKILL, rehearse.SKILL, emotion_guide.SKILL, emotion_myths.SKILL, walk_the_wave.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -106,6 +107,8 @@ EMBEDS = {
     # IE-10's two columns (plan C3b, the Wound PRD's primitive; IE-owned): what they did and what I added, side by side
     # on the paper, with an optional maybe line; read once, no input.
     "twoColumns": {"ids": ["read"]},
+    # ER-10 part 2: one episode on paper, the model's seven slots in order and the guess under them; read once.
+    "episodeStrip": {"ids": ["read"]},
     # IE-02's stage (plan C3b `rehearsalStage`, IE-owned): two figures, the script's replies, your moves, Stop. Reports
     # the moves used, whether a line was said out loud, how it ended, and how many exchanges.
     "rehearsalStage": {"ids": ["again", "acknowledge", "name", "middle", "turn", "break", "done", "aloud",
@@ -204,6 +207,16 @@ EMBED_PROPS = {
         "now": {"type": "copy"},
         "today": {"type": "copy"},
         "week": {"type": "copy"},
+    },
+    "episodeStrip": {
+        "fields": {"type": "fields"},
+        # The rows' names, split on " · ", in the order of `fields`; `blank` for a slot left out.
+        "names": {"type": "copy"},
+        "blank": {"type": "copy"},
+        # The guess, under the rows with its label (*Maybe: frustrated*).
+        "nameField": {"type": "field", "optional": True},
+        "nameLabel": {"type": "copy", "optional": True},
+        "next": {"type": "copy"},
     },
     "twoColumns": {
         "left": {"type": "field"},

@@ -120,7 +120,7 @@ test("the skill: tool emotion-guide on dbt_model_of_emotions, no close, listed u
   const tools = readFileSync("src/data/tools.ts", "utf8");
   assert.match(tools, /id: 'emotion-guide',\n\s+name: 'Know This Feeling',[\s\S]*?module: 'emotion-regulation'/);
   assert.match(tools, /label: 'Get to know a feeling', toolId: 'emotion-guide'/);
-  assert.match(readFileSync("src/lib/skillRuntime/playerTools.ts", "utf8"), /'emotion-guide': \['emotion_guide', 'emotion_myths'\]/);
+  assert.match(readFileSync("src/lib/skillRuntime/playerTools.ts", "utf8"), /'emotion-guide': \['emotion_guide', 'emotion_myths', 'walk_the_wave'\]/);
   assert.match(readFileSync("schema/app-tool-ids.cypher", "utf8"), /\{c: "dbt_model_of_emotions", t: "emotion-guide"\}/);
   assert.deepEqual(skill.emotionFields, ["feel", "closest"]);
   // It isn't working's myth-card exit opens part 4's frame.
