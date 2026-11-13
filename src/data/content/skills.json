@@ -65532,7 +65532,9 @@
           "step_hint": "Small enough that you'd likely do it, and safe to do. If it means facing someone who hurts you, that's not the step.",
           "step_own": "My own step",
           "step_title": "One small step this week.",
-          "when_title": "When could you do it?"
+          "when_title": "When could you do it?",
+          "sometimes_title": "Any that are you some of the time?",
+          "sometimes_hint": "Mixed feelings about one are normal. Skip if none. The rest can be not now."
         },
         "tables": {},
         "derive": [],
@@ -65715,9 +65717,28 @@
             "title": "sort_title",
             "next": [
               {
+                "to": "sometimes",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "sometimes",
+            "kind": "ask",
+            "title": "sometimes_title",
+            "next": [
+              {
                 "to": "keep",
                 "when": {
-                  "set": "$a.mine"
+                  "any": [
+                    {
+                      "set": "$a.mine"
+                    },
+                    {
+                      "set": "$a.sometimes"
+                    }
+                  ]
                 }
               },
               {
@@ -65725,21 +65746,47 @@
                 "when": null
               }
             ],
-            "offers": []
+            "offers": [],
+            "fields": [
+              {
+                "id": "sometimes",
+                "options": {
+                  "list": "value",
+                  "notIn": [
+                    "$a.mine.ids"
+                  ]
+                },
+                "max": 24,
+                "required": false,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "hint": "sometimes_hint"
           },
           {
             "id": "not_sure",
             "kind": "handoff",
+            "title": "not_sure_title",
+            "next": [],
+            "offers": [],
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "not_sure_line",
                 "when": {
                   "all": []
-                }
+                },
+                "key": "not_sure_line"
               }
             ],
+            "done": "done",
             "links": [
               {
                 "exit": "safety_open",
@@ -65749,54 +65796,11 @@
                 }
               }
             ],
-            "noClose": true,
-            "title": "not_sure_title",
-            "next": [],
-            "offers": []
+            "noClose": true
           },
           {
             "id": "keep",
             "kind": "ask",
-            "fields": [
-              {
-                "id": "kept",
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ],
-                "max": 3,
-                "options": {
-                  "list": "value",
-                  "where": {
-                    "has": [
-                      "$a.mine.ids",
-                      "$opt.value"
-                    ]
-                  }
-                },
-                "own": {
-                  "countsAsPick": true,
-                  "hint": "keep_own",
-                  "max": 60
-                },
-                "required": false
-              }
-            ],
-            "hint": "keep_hint",
-            "keep": {
-              "from": [
-                "mine",
-                "kept"
-              ],
-              "kind": "values",
-              "many": false
-            },
-            "primary": "keep_primary",
             "title": "keep_title",
             "next": [
               {
@@ -65816,21 +65820,75 @@
                 "when": null
               }
             ],
-            "offers": []
+            "offers": [],
+            "fields": [
+              {
+                "id": "kept",
+                "options": {
+                  "list": "value",
+                  "where": {
+                    "any": [
+                      {
+                        "has": [
+                          "$a.mine.ids",
+                          "$opt.value"
+                        ]
+                      },
+                      {
+                        "has": [
+                          "$a.sometimes.ids",
+                          "$opt.value"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "max": 3,
+                "required": false,
+                "own": {
+                  "hint": "keep_own",
+                  "countsAsPick": true,
+                  "max": 60
+                },
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "keep": {
+              "kind": "values",
+              "many": false,
+              "from": [
+                "mine",
+                "sometimes",
+                "kept"
+              ]
+            },
+            "primary": "keep_primary",
+            "hint": "keep_hint"
           },
           {
             "id": "sorted",
             "kind": "handoff",
+            "title": "sorted_title",
+            "next": [],
+            "offers": [],
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "sorted_line",
                 "when": {
                   "all": []
-                }
+                },
+                "key": "sorted_line"
               }
             ],
+            "done": "done",
             "links": [
               {
                 "exit": "safety_open",
@@ -65840,10 +65898,7 @@
                 }
               }
             ],
-            "noClose": true,
-            "title": "sorted_title",
-            "next": [],
-            "offers": []
+            "noClose": true
           },
           {
             "id": "one",
@@ -65870,12 +65925,12 @@
                     ]
                   }
                 },
+                "required": true,
                 "own": {
-                  "countsAsPick": true,
                   "hint": "focus_own",
+                  "countsAsPick": true,
                   "max": 60
-                },
-                "required": true
+                }
               }
             ],
             "hint": "one_hint",
@@ -65906,10 +65961,10 @@
                 "max": 1,
                 "options": {
                   "list": "value",
-                  "profile": "values",
                   "where": {
                     "any": []
-                  }
+                  },
+                  "profile": "values"
                 },
                 "required": true
               }
@@ -65927,23 +65982,9 @@
           {
             "id": "step",
             "kind": "ask",
-            "clears": [
-              "step",
-              "when",
-              "remind"
-            ],
             "fields": [
               {
                 "id": "step",
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ],
                 "max": 1,
                 "options": {
                   "list": "step",
@@ -65998,15 +66039,23 @@
                     ]
                   }
                 },
+                "required": true,
                 "own": {
-                  "countsAsPick": true,
                   "hint": "step_own",
+                  "countsAsPick": true,
                   "max": 60
                 },
-                "required": true
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
               }
             ],
-            "hint": "step_hint",
             "title": "step_title",
             "next": [
               {
@@ -66014,22 +66063,41 @@
                 "when": null
               }
             ],
-            "offers": []
+            "offers": [],
+            "clears": [
+              "step",
+              "when",
+              "remind"
+            ],
+            "hint": "step_hint"
           },
           {
             "id": "when",
             "kind": "ask",
+            "title": "when_title",
+            "next": [
+              {
+                "to": "set",
+                "when": null
+              }
+            ],
+            "offers": [],
             "fields": [
               {
                 "id": "when",
-                "max": 1,
                 "options": {
                   "list": "when"
                 },
+                "max": 1,
                 "required": true
               },
               {
                 "id": "remind",
+                "options": {
+                  "list": "remind"
+                },
+                "max": 1,
+                "required": false,
                 "label": "remind_label",
                 "links": [
                   {
@@ -66039,55 +66107,50 @@
                       "all": []
                     }
                   }
-                ],
-                "max": 1,
-                "options": {
-                  "list": "remind"
-                },
-                "required": false
+                ]
               }
             ],
             "followUp": {
               "type": "value_step",
+              "whenFrom": "when",
               "when": {
                 "eq": [
                   "$a.remind",
                   "yes"
                 ]
-              },
-              "whenFrom": "when"
-            },
-            "title": "when_title",
-            "next": [
-              {
-                "to": "set",
-                "when": null
               }
-            ],
-            "offers": []
+            }
           },
           {
             "id": "set",
             "kind": "handoff",
+            "title": "set_title",
+            "titleSlots": {
+              "step": {
+                "labelOf": "step"
+              }
+            },
+            "next": [],
+            "offers": [],
             "complete": true,
-            "done": "done",
             "lines": [
               {
-                "key": "set_remind",
                 "when": {
                   "eq": [
                     "$a.remind",
                     "yes"
                   ]
-                }
+                },
+                "key": "set_remind"
               },
               {
-                "key": "set_line",
                 "when": {
                   "all": []
-                }
+                },
+                "key": "set_line"
               }
             ],
+            "done": "done",
             "links": [
               {
                 "exit": "safety_open",
@@ -66096,46 +66159,11 @@
                   "all": []
                 }
               }
-            ],
-            "title": "set_title",
-            "titleSlots": {
-              "step": {
-                "labelOf": "step"
-              }
-            },
-            "next": [],
-            "offers": []
+            ]
           },
           {
             "id": "back",
             "kind": "ask",
-            "clears": [
-              "happened",
-              "again"
-            ],
-            "fields": [
-              {
-                "id": "happened",
-                "label": "happened_label",
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ],
-                "max": 1,
-                "options": {
-                  "list": "happened"
-                },
-                "required": true
-              }
-            ],
-            "reopens": {
-              "after": "when"
-            },
             "title": "back_title",
             "titleSlots": {
               "step": {
@@ -66166,7 +66194,34 @@
                 "when": null
               }
             ],
-            "offers": []
+            "offers": [],
+            "fields": [
+              {
+                "id": "happened",
+                "options": {
+                  "list": "happened"
+                },
+                "max": 1,
+                "required": true,
+                "label": "happened_label",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "reopens": {
+              "after": "when"
+            },
+            "clears": [
+              "happened",
+              "again"
+            ]
           },
           {
             "id": "back_yes",
@@ -66184,10 +66239,10 @@
                 }
               },
               {
-                "key": "back_yes_line",
                 "when": {
                   "all": []
-                }
+                },
+                "key": "back_yes_line"
               }
             ],
             "links": [
@@ -66202,21 +66257,23 @@
             "noClose": true,
             "title": [
               {
-                "key": "back_yes_title",
                 "when": {
                   "set": "$a.focus"
-                }
+                },
+                "key": "back_yes_title"
               },
               {
-                "key": "back_yes_title_kept",
                 "when": {
                   "set": "$a.focus_kept"
-                }
+                },
+                "key": "back_yes_title_kept"
               },
               {
                 "key": "back_yes_title_own"
               }
             ],
+            "next": [],
+            "offers": [],
             "titleSlots": {
               "focus": {
                 "labelOf": "focus"
@@ -66224,33 +66281,11 @@
               "focus_kept": {
                 "labelOf": "focus_kept"
               }
-            },
-            "next": [],
-            "offers": []
+            }
           },
           {
             "id": "back_hurt",
             "kind": "handoff",
-            "complete": true,
-            "done": "done",
-            "lines": [
-              {
-                "key": "back_hurt_line",
-                "when": {
-                  "all": []
-                }
-              }
-            ],
-            "links": [
-              {
-                "exit": "safety_open",
-                "label": "safety_open",
-                "when": {
-                  "all": []
-                }
-              }
-            ],
-            "noClose": true,
             "title": "back_hurt_title",
             "next": [],
             "offers": [
@@ -66266,31 +66301,31 @@
                   "all": []
                 }
               }
-            ]
+            ],
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "back_hurt_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true
           },
           {
             "id": "back_no",
             "kind": "ask",
-            "fields": [
-              {
-                "id": "again",
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ],
-                "max": 1,
-                "options": {
-                  "list": "again"
-                },
-                "required": true
-              }
-            ],
-            "hint": "back_no_hint",
             "title": "back_no_title",
             "next": [
               {
@@ -66307,21 +66342,42 @@
                 "when": null
               }
             ],
-            "offers": []
+            "offers": [],
+            "fields": [
+              {
+                "id": "again",
+                "options": {
+                  "list": "again"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "hint": "back_no_hint"
           },
           {
             "id": "back_end",
             "kind": "handoff",
             "complete": true,
-            "done": "done",
+            "title": null,
             "lines": [
               {
-                "key": "back_end_line",
                 "when": {
                   "all": []
-                }
+                },
+                "key": "back_end_line"
               }
             ],
+            "done": "done",
             "links": [
               {
                 "exit": "safety_open",
@@ -66332,7 +66388,6 @@
               }
             ],
             "noClose": true,
-            "title": null,
             "next": [],
             "offers": []
           }

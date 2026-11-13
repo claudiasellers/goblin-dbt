@@ -19920,7 +19920,7 @@ SET r += {list: "keepit", order: 39};
 
 // --- values (vc-v1) ---
 MERGE (s:Skill {id: "values"})
-SET s += {toolId: "values-clarification", version: "vc-v1", contentVersion: "skills-v1", start: "start", ownMax: 60, emotionFields: [], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"back_end_line\": \"It'll keep. Come back to it any time.\", \"back_hurt_line\": \"Doing it still counts. How it landed isn't all on you.\", \"back_hurt_title\": \"That took something, and it hurt.\", \"back_no_hint\": \"Values are directions, not rules. A smaller step still counts.\", \"back_no_title\": \"Not this time is a real answer.\", \"back_partly_line\": \"Part of it counts. Steps like that are what a value looks like from the outside.\", \"back_title\": \"Earlier you picked: {step}.\", \"back_yes_line\": \"Steps like that are what a value looks like from the outside.\", \"back_yes_title\": \"{focus}, in action.\", \"back_yes_title_kept\": \"{focus_kept}, in action.\", \"back_yes_title_own\": \"That was something that matters to you, in action.\", \"done\": \"Done\", \"focus_own\": \"One in my words\", \"happened_label\": \"Did it happen?\", \"heads_up_hint\": \"This works better once it settles a little.\", \"heads_up_title\": \"Your body's loud right now.\", \"keep_hint\": \"Two can pull different ways. Both can matter. Not sure yet? Save with none picked. Your list is kept either way.\", \"keep_own\": \"In my words\", \"keep_primary\": \"Keep these\", \"keep_title\": \"Which ones matter most for now? Up to three.\", \"next\": \"Next\", \"not_sure_line\": \"What matters can take a while to find. Come back any time.\", \"not_sure_title\": \"Not sure yet is fine.\", \"one_hint\": \"One is enough for this week.\", \"one_title\": \"Which one do you want to take a small step for?\", \"profile_unnamed\": \"something that matters to you\", \"remind_label\": \"Want me to ask how it went?\", \"safety_open\": \"Talk to someone now\", \"set_line\": \"It's a direction, not a rule. Doing part of it counts.\", \"set_remind\": \"I'll ask how it went. Doing part of it counts.\", \"set_title\": \"Your step: {step}.\", \"settle_line\": \"This will keep. Look after the next few minutes first.\", \"sort_hint\": \"Pick as many as fit, then Next. None is a full answer: not sure yet.\", \"sort_own\": \"Add your own\", \"sort_title\": \"Which of these sound like you?\", \"sorted_line\": \"Your sort is in Me. You can pick three another time.\", \"sorted_title\": \"Your list is kept.\", \"start_back_title\": \"You've kept a few things that matter to you.\", \"start_hint\": \"There are no right answers, and they can change.\", \"start_title\": \"What matters to you?\", \"step_hint\": \"Small enough that you'd likely do it, and safe to do. If it means facing someone who hurts you, that's not the step.\", \"step_own\": \"My own step\", \"step_title\": \"One small step this week.\", \"when_title\": \"When could you do it?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "values-clarification", version: "vc-v1", contentVersion: "skills-v1", start: "start", ownMax: 60, emotionFields: [], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"back_end_line\": \"It'll keep. Come back to it any time.\", \"back_hurt_line\": \"Doing it still counts. How it landed isn't all on you.\", \"back_hurt_title\": \"That took something, and it hurt.\", \"back_no_hint\": \"Values are directions, not rules. A smaller step still counts.\", \"back_no_title\": \"Not this time is a real answer.\", \"back_partly_line\": \"Part of it counts. Steps like that are what a value looks like from the outside.\", \"back_title\": \"Earlier you picked: {step}.\", \"back_yes_line\": \"Steps like that are what a value looks like from the outside.\", \"back_yes_title\": \"{focus}, in action.\", \"back_yes_title_kept\": \"{focus_kept}, in action.\", \"back_yes_title_own\": \"That was something that matters to you, in action.\", \"done\": \"Done\", \"focus_own\": \"One in my words\", \"happened_label\": \"Did it happen?\", \"heads_up_hint\": \"This works better once it settles a little.\", \"heads_up_title\": \"Your body's loud right now.\", \"keep_hint\": \"Two can pull different ways. Both can matter. Not sure yet? Save with none picked. Your list is kept either way.\", \"keep_own\": \"In my words\", \"keep_primary\": \"Keep these\", \"keep_title\": \"Which ones matter most for now? Up to three.\", \"next\": \"Next\", \"not_sure_line\": \"What matters can take a while to find. Come back any time.\", \"not_sure_title\": \"Not sure yet is fine.\", \"one_hint\": \"One is enough for this week.\", \"one_title\": \"Which one do you want to take a small step for?\", \"profile_unnamed\": \"something that matters to you\", \"remind_label\": \"Want me to ask how it went?\", \"safety_open\": \"Talk to someone now\", \"set_line\": \"It's a direction, not a rule. Doing part of it counts.\", \"set_remind\": \"I'll ask how it went. Doing part of it counts.\", \"set_title\": \"Your step: {step}.\", \"settle_line\": \"This will keep. Look after the next few minutes first.\", \"sometimes_hint\": \"Mixed feelings about one are normal. Skip if none. The rest can be not now.\", \"sometimes_title\": \"Any that are you some of the time?\", \"sort_hint\": \"Pick as many as fit, then Next. None is a full answer: not sure yet.\", \"sort_own\": \"Add your own\", \"sort_title\": \"Which of these sound like you?\", \"sorted_line\": \"Your sort is in Me. You can pick three another time.\", \"sorted_title\": \"Your list is kept.\", \"start_back_title\": \"You've kept a few things that matter to you.\", \"start_hint\": \"There are no right answers, and they can change.\", \"start_title\": \"What matters to you?\", \"step_hint\": \"Small enough that you'd likely do it, and safe to do. If it means facing someone who hurts you, that's not the step.\", \"step_own\": \"My own step\", \"step_title\": \"One small step this week.\", \"when_title\": \"When could you do it?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "dbt_values_priorities"}), (s:Skill {id: "values"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "values"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
@@ -19945,71 +19945,76 @@ SET n += {skillId: "values", step: "sort", kind: "ask", version: "vc-v1"}, n.spe
 MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:sort"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 3};
+MERGE (n:SkillStep {id: "values:sometimes"})
+SET n += {skillId: "values", step: "sometimes", kind: "ask", version: "vc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"sometimes\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 24, \"options\": {\"list\": \"value\", \"notIn\": [\"$a.mine.ids\"]}, \"required\": false}], \"hint\": \"sometimes_hint\", \"title\": \"sometimes_title\"}";
+MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:sometimes"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 4};
 MERGE (n:SkillStep {id: "values:not_sure"})
 SET n += {skillId: "values", step: "not_sure", kind: "handoff", version: "vc-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"not_sure_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"not_sure_title\"}";
 MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:not_sure"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 4};
+SET r += {order: 5};
 MERGE (n:SkillStep {id: "values:keep"})
-SET n += {skillId: "values", step: "keep", kind: "ask", version: "vc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"kept\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 3, \"options\": {\"list\": \"value\", \"where\": {\"has\": [\"$a.mine.ids\", \"$opt.value\"]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"keep_own\", \"max\": 60}, \"required\": false}], \"hint\": \"keep_hint\", \"keep\": {\"from\": [\"mine\", \"kept\"], \"kind\": \"values\", \"many\": false}, \"primary\": \"keep_primary\", \"title\": \"keep_title\"}";
+SET n += {skillId: "values", step: "keep", kind: "ask", version: "vc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"kept\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 3, \"options\": {\"list\": \"value\", \"where\": {\"any\": [{\"has\": [\"$a.mine.ids\", \"$opt.value\"]}, {\"has\": [\"$a.sometimes.ids\", \"$opt.value\"]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"keep_own\", \"max\": 60}, \"required\": false}], \"hint\": \"keep_hint\", \"keep\": {\"from\": [\"mine\", \"sometimes\", \"kept\"], \"kind\": \"values\", \"many\": false}, \"primary\": \"keep_primary\", \"title\": \"keep_title\"}";
 MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:keep"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 5};
+SET r += {order: 6};
 MERGE (n:SkillStep {id: "values:sorted"})
 SET n += {skillId: "values", step: "sorted", kind: "handoff", version: "vc-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"sorted_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"sorted_title\"}";
 MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:sorted"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 6};
+SET r += {order: 7};
 MERGE (n:SkillStep {id: "values:one"})
 SET n += {skillId: "values", step: "one", kind: "ask", version: "vc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"focus\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"value\", \"where\": {\"has\": [\"$a.kept.ids\", \"$opt.value\"]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"focus_own\", \"max\": 60}, \"required\": true}], \"hint\": \"one_hint\", \"title\": \"one_title\"}";
 MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:one"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 7};
+SET r += {order: 8};
 MERGE (n:SkillStep {id: "values:one_kept"})
 SET n += {skillId: "values", step: "one_kept", kind: "ask", version: "vc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"focus_kept\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"value\", \"profile\": \"values\", \"where\": {\"any\": []}}, \"required\": true}], \"hint\": \"one_hint\", \"title\": \"one_title\"}";
 MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:one_kept"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 8};
+SET r += {order: 9};
 MERGE (n:SkillStep {id: "values:step"})
 SET n += {skillId: "values", step: "step", kind: "ask", version: "vc-v1"}, n.specJson = "{\"clears\": [\"step\", \"when\", \"remind\"], \"fields\": [{\"id\": \"step\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"step\", \"where\": {\"any\": [{\"eq\": [\"$opt.value_id\", \"$a.focus\"]}, {\"eq\": [\"$opt.value_id\", \"$a.focus_kept\"]}, {\"all\": [{\"eq\": [\"$opt.value_id\", \"own\"]}, {\"any\": [{\"all\": [{\"not\": {\"set\": \"$a.focus.ids\"}}, {\"not\": {\"set\": \"$a.focus_kept.ids\"}}]}, {\"eq\": [\"$a.focus_kept\", \"own\"]}]}]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"step_own\", \"max\": 60}, \"required\": true}], \"hint\": \"step_hint\", \"title\": \"step_title\"}";
 MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:step"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 9};
+SET r += {order: 10};
 MERGE (n:SkillStep {id: "values:when"})
 SET n += {skillId: "values", step: "when", kind: "ask", version: "vc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"when\", \"max\": 1, \"options\": {\"list\": \"when\"}, \"required\": true}, {\"id\": \"remind\", \"label\": \"remind_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"remind\"}, \"required\": false}], \"followUp\": {\"type\": \"value_step\", \"when\": {\"eq\": [\"$a.remind\", \"yes\"]}, \"whenFrom\": \"when\"}, \"title\": \"when_title\"}";
 MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:when"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 10};
+SET r += {order: 11};
 MERGE (n:SkillStep {id: "values:set"})
 SET n += {skillId: "values", step: "set", kind: "handoff", version: "vc-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"set_remind\", \"when\": {\"eq\": [\"$a.remind\", \"yes\"]}}, {\"key\": \"set_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"title\": \"set_title\", \"titleSlots\": {\"step\": {\"labelOf\": \"step\"}}}";
 MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:set"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 11};
+SET r += {order: 12};
 MERGE (n:SkillStep {id: "values:back"})
 SET n += {skillId: "values", step: "back", kind: "ask", version: "vc-v1"}, n.specJson = "{\"clears\": [\"happened\", \"again\"], \"fields\": [{\"id\": \"happened\", \"label\": \"happened_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"happened\"}, \"required\": true}], \"reopens\": {\"after\": \"when\"}, \"title\": \"back_title\", \"titleSlots\": {\"step\": {\"labelOf\": \"step\"}}}";
 MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:back"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 12};
+SET r += {order: 13};
 MERGE (n:SkillStep {id: "values:back_yes"})
 SET n += {skillId: "values", step: "back_yes", kind: "handoff", version: "vc-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"back_partly_line\", \"when\": {\"eq\": [\"$a.happened\", \"partly\"]}}, {\"key\": \"back_yes_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": [{\"key\": \"back_yes_title\", \"when\": {\"set\": \"$a.focus\"}}, {\"key\": \"back_yes_title_kept\", \"when\": {\"set\": \"$a.focus_kept\"}}, {\"key\": \"back_yes_title_own\"}], \"titleSlots\": {\"focus\": {\"labelOf\": \"focus\"}, \"focus_kept\": {\"labelOf\": \"focus_kept\"}}}";
 MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:back_yes"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 13};
+SET r += {order: 14};
 MERGE (n:SkillStep {id: "values:back_hurt"})
 SET n += {skillId: "values", step: "back_hurt", kind: "handoff", version: "vc-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"back_hurt_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"back_hurt_title\"}";
 MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:back_hurt"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 14};
+SET r += {order: 15};
 MERGE (n:SkillStep {id: "values:back_no"})
 SET n += {skillId: "values", step: "back_no", kind: "ask", version: "vc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"again\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"again\"}, \"required\": true}], \"hint\": \"back_no_hint\", \"title\": \"back_no_title\"}";
 MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:back_no"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 15};
+SET r += {order: 16};
 MERGE (n:SkillStep {id: "values:back_end"})
 SET n += {skillId: "values", step: "back_end", kind: "handoff", version: "vc-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"back_end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": null}";
 MATCH (s:Skill {id: "values"}), (n:SkillStep {id: "values:back_end"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 16};
+SET r += {order: 17};
 MERGE (x:SkillExit {id: "values:cool_down"})
 SET x += {skillId: "values", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "values"}), (x:SkillExit {id: "values:cool_down"})
@@ -20060,15 +20065,21 @@ SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
 MATCH (a:SkillStep {id: "values:settle"}), (x:SkillExit {id: "values:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
-MATCH (a:SkillStep {id: "values:sort"}), (b:SkillStep {id: "values:keep"})
+MATCH (a:SkillStep {id: "values:sort"}), (b:SkillStep {id: "values:sometimes"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "{\"set\": \"$a.mine\"}";
-MATCH (a:SkillStep {id: "values:sort"}), (b:SkillStep {id: "values:not_sure"})
-MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "null";
+SET r += {order: 0}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "values:sort"}), (x:SkillExit {id: "values:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "mine", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "values:sometimes"}), (b:SkillStep {id: "values:keep"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"any\": [{\"set\": \"$a.mine\"}, {\"set\": \"$a.sometimes\"}]}";
+MATCH (a:SkillStep {id: "values:sometimes"}), (b:SkillStep {id: "values:not_sure"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "values:sometimes"}), (x:SkillExit {id: "values:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "sometimes", label: "safety_open"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "values:not_sure"}), (x:SkillExit {id: "values:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";

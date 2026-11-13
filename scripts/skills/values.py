@@ -48,6 +48,10 @@ COPY = {
     "sort_title": "Which of these sound like you?",
     "sort_hint": "Pick as many as fit, then Next. None is a full answer: not sure yet.",
     "sort_own": "Add your own",
+    # The PRD's middle pile (*that's me · sometimes · not now*): mixed feelings about a value get a place. The rest
+    # is *not now*, never named.
+    "sometimes_title": "Any that are you some of the time?",
+    "sometimes_hint": "Mixed feelings about one are normal. Skip if none. The rest can be not now.",
     "keep_title": "Which ones matter most for now? Up to three.",
     # Conflicting values (PRD risks) and identity diffusion: *not sure yet* is complete.
     "keep_hint": "Two can pull different ways. Both can matter. Not sure yet? Save with none picked. Your list is kept either way.",
@@ -166,7 +170,7 @@ AGAIN = [("smaller", "Pick a smaller one"), ("not_now", "Not now")]
 
 KEPT = {"set": a("kept")}
 # This visit's three, from the sort (a value can only be kept if it was sorted in).
-IN_SORT = {"has": [a("mine") + ".ids", "$opt.value"]}
+IN_SORT = {"any": [{"has": [a("mine") + ".ids", "$opt.value"]}, {"has": [a("sometimes") + ".ids", "$opt.value"]}]}
 IN_KEPT = {"has": [a("kept") + ".ids", "$opt.value"]}
 # The focus: this visit's pick, or one kept before. A step chip belongs to its value; a value in their own words
 # (typed here, kept in their words this visit, or kept before as `own`) gets the general ones.
@@ -215,13 +219,16 @@ STEPS = [
     handoff("settle", "heads_up_title", [{"when": ALWAYS, "key": "settle_line"}], [{"exit": "cool_down", "when": ALWAYS}],
             no_close=True),
     ask("sort", "sort_title", "sort_hint", [field("mine", "value", mx=len(VALUES) + 1, required=False, own="sort_own")],
-        [{"when": {"set": a("mine")}, "to": "keep"}, {"to": "not_sure"}]),
+        [{"to": "sometimes"}]),
+    ask("sometimes", "sometimes_title", "sometimes_hint",
+        [{**field("sometimes", "value", mx=len(VALUES), required=False), "options": {"list": "value", "notIn": [a("mine") + ".ids"]}}],
+        [{"when": {"any": [{"set": a("mine")}, {"set": a("sometimes")}]}, "to": "keep"}, {"to": "not_sure"}]),
     handoff("not_sure", "not_sure_title", [{"when": ALWAYS, "key": "not_sure_line"}], [], no_close=True),
     # Keep (R4) on *Keep these*: the sort and up to three. *Not sure yet* (none picked) keeps the sort.
     ask("keep", "keep_title", "keep_hint", [field("kept", "value", mx=3, required=False, own="keep_own", where=IN_SORT)],
         # Kept only in their own words: that's the value, straight to its step.
         [{"when": {"set": a("kept") + ".ids"}, "to": "one"}, {"when": KEPT, "to": "step"}, {"to": "sorted"}],
-        keep={"kind": "values", "many": False, "from": ["mine", "kept"]}, primary="keep_primary"),
+        keep={"kind": "values", "many": False, "from": ["mine", "sometimes", "kept"]}, primary="keep_primary"),
     handoff("sorted", "sorted_title", [{"when": ALWAYS, "key": "sorted_line"}], [], no_close=True),
     ask("one", "one_title", "one_hint", [field("focus", "value", where=IN_KEPT, own="focus_own")], [{"to": "step"}]),
     ask("one_kept", "one_title", "one_hint", [field("focus_kept", "value", where={"any": []}, profile="values")],

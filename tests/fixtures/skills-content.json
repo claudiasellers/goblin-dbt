@@ -65493,6 +65493,8 @@
     "sort_title": "Which of these sound like you?",
     "sort_hint": "Pick as many as fit, then Next. None is a full answer: not sure yet.",
     "sort_own": "Add your own",
+    "sometimes_title": "Any that are you some of the time?",
+    "sometimes_hint": "Mixed feelings about one are normal. Skip if none. The rest can be not now.",
     "keep_title": "Which ones matter most for now? Up to three.",
     "keep_hint": "Two can pull different ways. Both can matter. Not sure yet? Save with none picked. Your list is kept either way.",
     "keep_own": "In my words",
@@ -65710,9 +65712,51 @@
      "hint": "sort_hint",
      "next": [
       {
+       "to": "sometimes",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "sometimes",
+     "kind": "ask",
+     "title": "sometimes_title",
+     "fields": [
+      {
+       "id": "sometimes",
+       "options": {
+        "list": "value",
+        "notIn": [
+         "$a.mine.ids"
+        ]
+       },
+       "max": 24,
+       "required": false,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "sometimes_hint",
+     "next": [
+      {
        "to": "keep",
        "when": {
-        "set": "$a.mine"
+        "any": [
+         {
+          "set": "$a.mine"
+         },
+         {
+          "set": "$a.sometimes"
+         }
+        ]
        }
       },
       {
@@ -65759,9 +65803,19 @@
        "options": {
         "list": "value",
         "where": {
-         "has": [
-          "$a.mine.ids",
-          "$opt.value"
+         "any": [
+          {
+           "has": [
+            "$a.mine.ids",
+            "$opt.value"
+           ]
+          },
+          {
+           "has": [
+            "$a.sometimes.ids",
+            "$opt.value"
+           ]
+          }
          ]
         }
        },
@@ -65788,6 +65842,7 @@
       "many": false,
       "from": [
        "mine",
+       "sometimes",
        "kept"
       ]
      },

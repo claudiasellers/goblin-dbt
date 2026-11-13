@@ -1,6 +1,6 @@
 # What matters to me (ER-09)
 
-**Status:** built 12 Nov 2026 on the skill runtime (batch ER-B4 of [the modules plan](dbt-modules-plan.md), the
+**Status:** built 12 Nov 2026; the three piles (part 2) 13 Nov 2026 on the skill runtime (batch ER-B4 of [the modules plan](dbt-modules-plan.md), the
 third of its three skills). Tool `values-clarification`, listed under Emotion Regulation with the Tools intent *Work
 out what matters to me*, on the new concept `dbt_values_priorities` (`appToolId: 'values-clarification'`, PART_OF the
 ER module). Source: `scripts/skills/values.py`. Tests: `tests/skill-values.test.mjs`. New profile kind `values` and
@@ -26,8 +26,9 @@ person's own values become the measure of a good outcome, not the app's.
 | `start` | First time: *What matters to you?* (*There are no right answers, and they can change.*), Next to the sort, nothing to pick. With values kept: *You've kept a few things that matter to you.* Take a small step for one of them · Sort them again | Moment: `steady`, a quiet evening; 1 min later |
 | `heads_up` | A carried flooded reading: *Your body's loud right now.* (*This works better once it settles a little.*) Look after the next few minutes first → `settle` (First, the body) · Try it anyway | `steady` moment |
 | `sort` | *Which of these sound like you?* (*Pick as many as fit, then Next. None is a full answer: not sure yet.*) 24 value cards in plain words, or *Add your own* | Step 1, sort; *add your own* |
+| `sometimes` | *Any that are you some of the time?* (*Mixed feelings about one are normal. Skip if none. The rest can be not now.*) The cards not in the first pile (`options.notIn`), no own words. Nothing in either pile → `not_sure` (built 13 Nov, part 2) | Step 1's middle pile: *that's me · sometimes · not now* |
 | `not_sure` | Nothing picked: *Not sure yet is fine. What matters can take a while to find. Come back any time.* | Identity diffusion: *not sure yet* is a full answer |
-| `keep` | *Which ones matter most for now? Up to three.* (*Two can pull different ways. Both can matter. Not sure yet? Save with none picked. Your list is kept either way.*) Up to three of the sort, or own words. *Keep these* keeps `values` either way; kept only in their words goes straight to `step` | Step 2, keep three; conflicting values → both can matter |
+| `keep` | *Which ones matter most for now? Up to three.* (*Two can pull different ways. Both can matter. Not sure yet? Save with none picked. Your list is kept either way.*) Up to three from either pile, or own words. *Keep these* keeps `values` either way; kept only in their words goes straight to `step` | Step 2, keep three; conflicting values → both can matter |
 | `sorted` | None kept: *Your list is kept.* *Your sort is in Me. You can pick three another time.* | *not sure yet* saves the sort |
 | `one` / `one_kept` | *Which one do you want to take a small step for?* (*One is enough for this week.*) This visit's three (or *One in my words*), or (coming back) the ones kept before, named from the `values` slice | Step 3, one value |
 | `step` | *One small step this week.* (a smaller one after *Not this time* starts fresh) (*Small enough that you'd likely do it, and safe to do. If it means facing someone who hurts you, that's not the step.*) That value's three steps (a value in their own words gets three general ones), or own words | Steps 3–4, a direction and a step sized to succeed |
@@ -64,7 +65,7 @@ someone in my family, if that feels safe*); getting things done includes *Call o
 ## Saved
 
 - **`values`** (`ProfileFact`, one per person, About me, own words encrypted; `functions/src/profile/kinds.ts`): kept
-  on the keep screen's *Keep these* (`mineIds` / `mineOwn`: every card that sounded like them; `keptIds` / `keptOwn`: up to
+  on the keep screen's *Keep these* (`mineIds` / `mineOwn`: every card that sounded like them; `sometimesIds`: the middle pile; `keptIds` / `keptOwn`: up to
   three, or none). A re-sort replaces it. Revisited after 30 days in Me (*Are these still yours?*), the PRD's monthly
   re-sort as a sampling, not a declaration. The **`values`** slice (`PROFILE_NEEDS['values-clarification']`) returns
   the kept ones named from the graph (`SkillOption values:value:<id>`, never a copy), their own words with the id
@@ -87,7 +88,7 @@ someone in my family, if that feels safe*); getting things done includes *Call o
 
 | PRD | Built | Why | Batch |
 |---|---|---|---|
-| A pile sort, each card *that's me · sometimes · not now* (`pileSort`) | A chip sort: *sounds like me*, the rest unpicked (so no place yet for mixed feelings about a value, *sometimes*) | `pileSort` reports card ids, which the embed contract can't declare yet (a runtime change for the plan thread); the chips keep the PRD's *add your own* and *not sure yet* | ER-B4 part 2 |
+| A pile sort, each card *that's me · sometimes · not now* (`pileSort`) | **Built 13 Nov (part 2) as two chip screens**: *that's me*, then *some of the time* from the rest; the rest is *not now* and is never named. Saved as `sometimesIds` on `values` (cards only); Me names the middle pile only when nothing else is kept | A card-by-card embed is 24 decisions in a row; two chip screens hold the same three piles in two taps' worth of attention | — |
 | `ValueCard {id, label, theme}`, `ValueGoal`, `ValueStep`, `ValuesFlow` nodes | The skill's options (`SkillOption values:value:<id>`, steps with their `value_id`) | A skill's content lives in its options until a second reader needs the nodes (the PRD's `RELATES_TO` links will) | ER-B4 part 2 |
 | WMP dialectics for value conflicts | One line on the keep screen (*Both can matter*); no both/and step | Waits for WMP's dialectics | WMP / ER-B4 part 2 |
 | Fade: the person's own labels listed first | Not built (own words are the escape hatch on each screen) | Needs the sort to remember own words as chips | ER-B4 part 2 |
