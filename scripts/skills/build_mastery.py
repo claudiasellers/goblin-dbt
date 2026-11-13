@@ -24,8 +24,9 @@ Risks (PRD): failure → shame (sized to succeed; no streaks or counts; *not yet
 well*). Flooded: not the moment (a heads-up, never a lock).
 
 Departures from the PRD (docs/design/build-mastery.md lists them with the batch that picks each up): the person picks
-the next rung or a smaller one each time (no automatic *done twice → up*, which reads past visits; *Something keeps
-getting in the way* stands in for *not yet twice*); the I can list is kept on a yes, not a view over reps; no
+the next rung or a smaller one each time; part 2's auto-adjust only changes the card's title when the same rung went
+the same way on the last card (`$prev`: the previous round's record, which the reopened run reads back anyway; no
+chip is pre-picked and nothing is counted); the I can list is kept on a yes, not a view over reps; no
 `SkillPractice` rep, weekly *rung up?* card, morning slot or fade.
 
 Regenerate:  python3 scripts/skills/build.py > /tmp/s.cypher && mv /tmp/s.cypher schema/skills.cypher
@@ -68,11 +69,12 @@ COPY = {
     "back_title_own": "Earlier you picked: {rung}, for {area}.",
     "happened_label": "How did it go?",
     "done_title": "You did it.",
-    # PRD auto-adjust, within the visit's own loop (the last round read as `$prev`, never a past visit's log):
-    # done twice at the same rung offers the next one up; not yet twice, a smaller one. Offered, never pushed.
-    "done_twice_title": "Done twice now. The next one up is there when you're ready.",
-    "done_twice_top_title": "Done twice now. That's this one getting easier.",
-    "not_twice_title": "Not yet, twice. A smaller one may fit better right now.",
+    # PRD auto-adjust: the same rung again after the last card went the same way (the last round read as `$prev`).
+    # Done again offers the next one up; not yet again, a smaller one. Offered, never pushed; nothing is counted
+    # (no streaks or counts: Gates 2-3), and not yet keeps its validation.
+    "done_twice_title": "Done again. The next one up is there if you want it.",
+    "done_twice_top_title": "Done again. That counts.",
+    "not_twice_title": "Not yet is a real answer. A smaller one may fit better right now.",
     "partly_title": "Part of it counts.",
     "done_hint": "That counts. It's evidence you can do things that feel hard.",
     "ican_label": "Keep this on your \u201cI can\u201d list in Me?",

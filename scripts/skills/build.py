@@ -172,7 +172,9 @@ def check(skill):
     fields = {f["id"] for s in skill["steps"] for f in s.get("fields", [])} | {s["answerAs"] for s in skill["steps"] if s.get("answerAs")}
     derived = {d["name"] for d in skill["derive"]}
     global PREV_FIELDS
-    PREV_FIELDS = {f for s in skill["steps"] if s.get("reopens") for f in s.get("clears", [])}
+    # Only a field one reopens step clears: with several (Good things' cards), `$prev` couldn't say whose round it was.
+    cleared = [f for s in skill["steps"] if s.get("reopens") for f in s.get("clears", [])]
+    PREV_FIELDS = {f for f in cleared if cleared.count(f) == 1}
     steps = {s["id"] for s in skill["steps"]}
     exits = {e["id"] for e in skill["exits"]}
     lists = {o[0] for o in skill["options"]}
@@ -195,6 +197,8 @@ def check(skill):
                 float(k)  # a count's table is keyed by thresholds
         else:
             assert d.get("kind", "lookup") == "lookup" and isinstance(d.get("from"), str), (sid, d)
+            # Last round's answer never feeds a derived value (a `firstFrom` would order chips by it: a soft pre-fill).
+            assert not d["from"].startswith("$prev."), (sid, "a derive never reads $prev", d)
             if "field" in d:
                 # One field of a row: only feelingOf's (its fields are the runtime's FeelingRow).
                 assert d["table"] == "feelingOf" and d["field"] in FEELING_ROW_FIELDS and d.get("keep") != "key", (sid, "a derive field reads a feelingOf row", d)
