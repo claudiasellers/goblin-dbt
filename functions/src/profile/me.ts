@@ -205,6 +205,11 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
       for (const f of own) if (typeof value[f] === 'string') value[f] = decrypt(value[f]);
     }
     if (meta.kind === 'quiet_hours' && value) summary = `${value.start}–${value.end}`;
+    // A sleep anchor (ER-13): the wake time, said as the plan says it (`w0730` → *Up at 7:30, every day*).
+    if (meta.kind === 'sleep_anchor' && value && Array.isArray(value.wakeIds)) {
+      const m = /^w(\d{2})(\d{2})$/.exec(String(value.wakeIds[0] ?? ''));
+      if (m) summary = `Up at ${Number(m[1])}:${m[2]}, every day`;
+    }
     // A rewritten nightmare: its ending when the person wrote it; picked endings are ids (the title says enough).
     if (meta.kind === 'nightmare_script' && value && typeof value.endingOwn === 'string') summary = value.endingOwn;
     // A pros & cons card: the pull in their words when they wrote it, else their first reason in their words.

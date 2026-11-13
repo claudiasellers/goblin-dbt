@@ -59,6 +59,10 @@ KINDS = [
     # Running low (ER-07): the rows the person would rather it didn't ask about, set in Me. Never stale: a setting.
     ("please_rows", "my_body", "Left out of Running low", None,
      "", "Set aside. Running low asks every row again."),
+    # Sleep reset (ER-13): the wake time kept as an anchor on the plan's *Keep it in Me*. Revisited monthly: wake times
+    # change with jobs and seasons, and a stale anchor would lead the next plan.
+    ("sleep_anchor", "my_body", "My wake time", 30,
+     "Still your time?", "Set aside. Sleep reset asks for a time fresh until you bring it back."),
     # My crisis kit (DT-03): one per person, kept on *Keep it*. Never stale: theirs until they set it aside or change it.
     ("crisis_kit", "my_plans", "My crisis kit", None,
      "", "Set aside. The kit opens with the starter cards until you bring it back."),

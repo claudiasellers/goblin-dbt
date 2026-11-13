@@ -13,7 +13,7 @@ export const PROFILE_AREAS: readonly ProfileAreaId[] = ['about_me', 'my_people',
 export const SLICE_IDS = [
   'name', 'quietHours', 'patterns', 'ownLines', 'savedLines',
   'people', 'bodyFlags', 'values', 'goals', 'copeAheadPlans', 'boundaryLines', 'practicePrefs',
-  'fadeLevels', 'ownWords', 'thingsILike', 'thingsILikePicks', 'iCanRungs', 'crisisKit', 'safetyPlan', 'country',
+  'fadeLevels', 'ownWords', 'thingsILike', 'thingsILikePicks', 'iCanRungs', 'crisisKit', 'safetyPlan', 'country', 'sleepAnchor',
   'parts', 'partDetail', 'partAnchors', 'den', 'prosCons', 'pleaseRows',
 ] as const;
 export type SliceId = (typeof SLICE_IDS)[number];
@@ -91,6 +91,8 @@ export interface ProfileSlices {
    * when nothing is set.
    */
   pleaseRows: string[];
+  /** The wake time kept as an anchor (ER-13, kind `sleep_anchor`, one per person): a `WAKE` option id, or null. */
+  sleepAnchor: string | null;
   /**
    * The kept crisis kit (DT-03, kind `crisis_kit`, one per person), active only, or null: per section the option ids
    * and the person's own words as written (decrypted for them). The kit plays it one card at a time.
@@ -203,6 +205,7 @@ export const PROFILE_NEEDS = {
   'say-no': ['people'],                      // the picker (IE-03), before the skill (docs/design/say-no.md)
   'good-things': ['thingsILike', 'thingsILikePicks'],             // its pick step: the person's own things first (docs/design/good-things.md)
   'please-skill': ['pleaseRows'],            // the rows the person left out in Me (docs/design/running-low.md)
+  'sleep-reset': ['sleepAnchor'],            // the plan's wake step: a kept anchor first, *Still your time?* (docs/design/sleep-reset.md)
   'build-mastery': ['iCanRungs'],             // the done card: a step already on the I can list isn't offered again (docs/design/build-mastery.md)
   'give': ['people'],                        // the picker (IE-03), before the skill (docs/design/give.md)
   'mindfulness-of-others': ['people'],       // the picker (IE-03), before the skill (docs/design/notice-them.md)

@@ -236,3 +236,46 @@ test("hosts: Running low's sleep row and the nightmare clinician card open it (n
     assert.ok(!e.planned, id);
   }
 });
+
+// Part 2: the profile anchor (Me → My body). Kept on the plan's yes chip, listed first next time, never picked for them.
+test("the anchor: *Keep this wake time in Me?* keeps sleep_anchor on a yes only; the next plan lists it first, unpicked", async () => {
+  const title = (s, c = ctx()) => M.copyText(c, step(s.stepId).title, s, M.titleSlots(c, step(s.stepId), s));
+  const fieldIds = (s, c = ctx()) => M.shownFields(c, step(s.stepId), s).map((f) => f.id);
+  // First time: no anchor, the plain title, the keep chip offered.
+  const wind = run(PLAN("w0730"));
+  assert.equal(wind.stepId, "wind");
+  assert.ok(fieldIds(wind).includes("keep"));
+  assert.equal(M.keepFor(ctx(), step("wind"), wind), null, "no tap, no keep");
+  const kept = M.keepFor(ctx(), step("wind"), run([pick("keep", "keep_yes")], ctx(), wind));
+  assert.equal(kept.kind, "sleep_anchor");
+  assert.deepEqual(kept.value, { wakeIds: ["w0730"] });
+  assert.equal(step("wind").primary, "wind_primary");
+  assert.equal(skill.copy.wind_primary, "Next", "the chip is the yes; the button stays Next");
+  // Coming back with an anchor: *Still your time?*, the kept time first, nothing picked.
+  const withAnchor = { ...ctx(), profile: { sleepAnchor: "w0730" } };
+  const wake = run([pick("mode", "plan"), next], withAnchor);
+  assert.equal(wake.stepId, "wake");
+  assert.equal(title(wake, withAnchor), "Still your time? Your wake time from before is first.");
+  assert.equal(title(run([pick("mode", "plan"), next])), "What time will you get up, every day?");
+  const groups = M.optionGroups(withAnchor, step("wake").fields[0], wake.answers);
+  assert.equal(groups[0].options[0].value, "w0730", "the kept time leads");
+  assert.equal(groups[0].options.length, 8, "every time is still there");
+  assert.equal(wake.answers.wake, undefined, "never picked for them");
+  // The same time again: no keep chip. A new time: the chip again (keeping it replaces the old one).
+  assert.ok(!fieldIds(run([pick("wake", "w0730"), next, pick("wind", "dim")], withAnchor, wake), withAnchor).includes("keep"));
+  assert.ok(fieldIds(run([pick("wake", "w0800"), next, pick("wind", "dim")], withAnchor, wake), withAnchor).includes("keep"));
+  // The kind: one per person, My body, a wake id only; the slice is on the tool's needs; Me says it as the plan does.
+  const { PROFILE_KINDS } = await importTs("functions/src/profile/kinds.ts");
+  const k = PROFILE_KINDS.sleep_anchor;
+  assert.equal(k.many, false);
+  assert.equal(k.area, "my_body");
+  assert.deepEqual(k.ownFields, []);
+  assert.deepEqual(k.validate({ wakeIds: ["w0630"] }), { wakeIds: ["w0630"] });
+  assert.throws(() => k.validate({ wakeIds: ["w1100"] }));
+  assert.throws(() => k.validate({ wakeIds: [] }), /One wake time/);
+  assert.throws(() => k.validate({ wakeIds: ["w0700"], windIds: ["dim"] }), /Unexpected field/);
+  const types = await importTs("src/data/profileTypes.ts");
+  assert.deepEqual(types.PROFILE_NEEDS["sleep-reset"], ["sleepAnchor"]);
+  assert.match(readFileSync("functions/src/profile/me.ts", "utf8"), /meta\.kind === 'sleep_anchor'[\s\S]{0,200}Up at \$\{Number\(m\[1\]\)\}:\$\{m\[2\]\}, every day/);
+  assert.match(readFileSync("schema/profile-layer.cypher", "utf8"), /sleep_anchor/);
+});
