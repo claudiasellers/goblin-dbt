@@ -1,7 +1,7 @@
 {
   "source": {
     "file": "graph-content-only-2026-11-13.json",
-    "exportedAt": "2026-11-13T03:32:38.479Z"
+    "exportedAt": "2026-11-13T04:57:06.743Z"
   },
   "content": {
     "version": "skills-v1",
@@ -1870,6 +1870,8 @@
           "done": "Done",
           "done_hint": "That counts. It's evidence you can do things that feel hard.",
           "done_title": "You did it.",
+          "done_twice_title": "Done again. The next one up is there if you want it.",
+          "done_twice_top_title": "Done again. That counts.",
           "end_done": "That's done for now. Come back any time for another.",
           "end_kept": "It's on your “I can” list in Me.",
           "end_line": "It'll keep. Come back to it any time.",
@@ -1881,6 +1883,7 @@
           "next": "Next",
           "not_hint": "Smaller is still mastery. If it keeps not happening, the step may be too big or life too full right now. Neither is a failing.",
           "not_title": "Not yet is a real answer.",
+          "not_twice_title": "Not yet is a real answer. A smaller one may fit better right now.",
           "note_admin": "If something could bring bad news, pick a time with someone around.",
           "note_body": "Go by what your body can do today.",
           "note_caring": "If caring is already wearing you out, another area may suit today better. If someone there hurts you, this isn't the step.",
@@ -1902,10 +1905,7 @@
           "stuck_line": "Problem Solve can help find a way round it, or a smaller way in.",
           "stuck_title": "Something keeps getting in the way.",
           "then_label": "What next? No rush.",
-          "when_title": "When could you do it?",
-          "done_twice_title": "Done again. The next one up is there if you want it.",
-          "done_twice_top_title": "Done again. That counts.",
-          "not_twice_title": "Not yet is a real answer. A smaller one may fit better right now."
+          "when_title": "When could you do it?"
         },
         "tables": {},
         "derive": [],
@@ -2567,13 +2567,13 @@
                 }
               },
               {
+                "key": "partly_title",
                 "when": {
                   "eq": [
                     "$a.happened",
                     "partly"
                   ]
-                },
-                "key": "partly_title"
+                }
               },
               {
                 "key": "done_title"
@@ -2725,6 +2725,7 @@
             "hint": "not_hint",
             "title": [
               {
+                "key": "not_twice_title",
                 "when": {
                   "all": [
                     {
@@ -2746,8 +2747,7 @@
                       ]
                     }
                   ]
-                },
-                "key": "not_twice_title"
+                }
               },
               {
                 "key": "not_title"
@@ -26504,6 +26504,8 @@
           "after_mind": "If 'it won't last' or 'I don't deserve this' shows up next time, notice it and come back to what you're doing. That's part of the skill.",
           "after_title": "Compared to before, how are you?",
           "back_title": "Earlier you picked: {pick}.",
+          "back_w_title": "The good thing you planned: {pick}.",
+          "day_label": "Which day? I'll check in that evening.",
           "done": "Done",
           "energy_hint": "Any answer works. There's something for each.",
           "energy_title": "How much energy have you got right now?",
@@ -26520,6 +26522,7 @@
           "keep_primary": "Next",
           "keepit_label": "Add it to Things I like?",
           "mind_label": "Was your mind mostly here, or somewhere else?",
+          "more_label": "Another one?",
           "name_end": "You found one. Noticing it is the practice.",
           "name_end_kept": "It's in Things I like. A list like that grows slowly, one thing at a time.",
           "name_end_title": "Found one.",
@@ -26533,6 +26536,12 @@
           "pick_hint": "If nothing sounds good, that's part of feeling low. Pick the one that sounds least bad.",
           "pick_own": "Something else",
           "pick_title": "Pick one good thing.",
+          "picture_done": "That's the bit to look forward to.",
+          "picture_hint": "Where you are, what you can see and hear, the bit you'd like most. If nothing comes, picturing where you'll be is enough.",
+          "picture_label": "Start",
+          "picture_running": "Picturing it",
+          "picture_title": "Pick one of your good things. Picture the best ten seconds of it.",
+          "picture_title_1": "{wk1}: picture the best ten seconds of it.",
           "profile_unnamed": "something you like",
           "remind_label": "Want me to ask how it went?",
           "safety_open": "Talk to someone now",
@@ -26549,23 +26558,14 @@
           "stay_running": "Staying with it",
           "stay_title": "Stay with it for a few seconds. Notice one thing you like about it.",
           "stay_title_savour": "Stay with what's good for a few seconds. Notice one thing you like about it.",
-          "when_title": "When will you do it?",
+          "week_hint": "If nothing sounds good, that's part of feeling low. Pick one that feels doable. One is plenty.",
+          "week_set_line": "I'll check in on the evening of each day. Doing it counts, whether or not you enjoy it.",
+          "week_set_title": "Your good things are planned.",
+          "week_set_title_1": "Your good thing is planned.",
           "week_title_1": "Pick a good thing for this week.",
           "week_title_2": "And another?",
           "week_title_3": "One more?",
-          "week_hint": "If nothing sounds good, that's part of feeling low. Pick one that feels doable. One is plenty.",
-          "day_label": "Which day? I'll check in that evening.",
-          "more_label": "Another one?",
-          "picture_title": "Pick one of your good things. Picture the best ten seconds of it.",
-          "picture_label": "Start",
-          "picture_running": "Picturing it",
-          "picture_hint": "Where you are, what you can see and hear, the bit you'd like most. If nothing comes, picturing where you'll be is enough.",
-          "picture_done": "That's the bit to look forward to.",
-          "week_set_title_1": "Your good thing is planned.",
-          "week_set_line": "I'll check in on the evening of each day. Doing it counts, whether or not you enjoy it.",
-          "back_w_title": "The good thing you planned: {pick}.",
-          "picture_title_1": "{wk1}: picture the best ten seconds of it.",
-          "week_set_title": "Your good things are planned."
+          "when_title": "When will you do it?"
         },
         "tables": {},
         "derive": [],
@@ -27203,6 +27203,7 @@
                 "max": 1,
                 "options": {
                   "list": "activity",
+                  "profile": "thingsILike",
                   "where": {
                     "not": {
                       "has": [
@@ -27210,32 +27211,26 @@
                         "$opt.value"
                       ]
                     }
-                  },
-                  "profile": "thingsILike"
+                  }
                 },
-                "required": true,
                 "own": {
-                  "hint": "pick_own",
                   "countsAsPick": true,
+                  "hint": "pick_own",
                   "max": 40
-                }
+                },
+                "required": true
               },
               {
                 "id": "day1",
+                "label": "day_label",
+                "max": 1,
                 "options": {
                   "list": "day"
                 },
-                "max": 1,
-                "required": true,
-                "label": "day_label"
+                "required": true
               },
               {
                 "id": "more1",
-                "options": {
-                  "list": "more"
-                },
-                "max": 1,
-                "required": true,
                 "label": "more_label",
                 "links": [
                   {
@@ -27245,9 +27240,19 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "list": "more"
+                },
+                "required": true
               }
             ],
+            "followUp": {
+              "type": "good_week_one",
+              "whenFrom": "day1"
+            },
+            "hint": "week_hint",
             "title": "week_title_1",
             "next": [
               {
@@ -27264,12 +27269,7 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "followUp": {
-              "type": "good_week_one",
-              "whenFrom": "day1"
-            },
-            "hint": "week_hint"
+            "offers": []
           },
           {
             "id": "week_2",
@@ -27280,6 +27280,10 @@
                 "max": 1,
                 "options": {
                   "list": "activity",
+                  "notIn": [
+                    "$a.wk1.ids"
+                  ],
+                  "profile": "thingsILike",
                   "where": {
                     "not": {
                       "has": [
@@ -27287,18 +27291,14 @@
                         "$opt.value"
                       ]
                     }
-                  },
-                  "profile": "thingsILike",
-                  "notIn": [
-                    "$a.wk1.ids"
-                  ]
+                  }
                 },
-                "required": true,
                 "own": {
-                  "hint": "pick_own",
                   "countsAsPick": true,
+                  "hint": "pick_own",
                   "max": 40
-                }
+                },
+                "required": true
               },
               {
                 "id": "day2",
@@ -27311,11 +27311,6 @@
               },
               {
                 "id": "more2",
-                "options": {
-                  "list": "more"
-                },
-                "max": 1,
-                "required": true,
                 "label": "more_label",
                 "links": [
                   {
@@ -27325,9 +27320,18 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "list": "more"
+                },
+                "required": true
               }
             ],
+            "followUp": {
+              "type": "good_week_two",
+              "whenFrom": "day2"
+            },
             "title": "week_title_2",
             "next": [
               {
@@ -27344,11 +27348,7 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "followUp": {
-              "type": "good_week_two",
-              "whenFrom": "day2"
-            }
+            "offers": []
           },
           {
             "id": "week_3",
@@ -27359,6 +27359,11 @@
                 "max": 1,
                 "options": {
                   "list": "activity",
+                  "notIn": [
+                    "$a.wk1.ids",
+                    "$a.wk2.ids"
+                  ],
+                  "profile": "thingsILike",
                   "where": {
                     "not": {
                       "has": [
@@ -27366,27 +27371,17 @@
                         "$opt.value"
                       ]
                     }
-                  },
-                  "profile": "thingsILike",
-                  "notIn": [
-                    "$a.wk1.ids",
-                    "$a.wk2.ids"
-                  ]
+                  }
                 },
-                "required": true,
                 "own": {
-                  "hint": "pick_own",
                   "countsAsPick": true,
+                  "hint": "pick_own",
                   "max": 40
-                }
+                },
+                "required": true
               },
               {
                 "id": "day3",
-                "options": {
-                  "list": "day"
-                },
-                "max": 1,
-                "required": true,
                 "label": "day_label",
                 "links": [
                   {
@@ -27396,9 +27391,18 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "list": "day"
+                },
+                "required": true
               }
             ],
+            "followUp": {
+              "type": "good_week_three",
+              "whenFrom": "day3"
+            },
             "title": "week_title_3",
             "next": [
               {
@@ -27406,15 +27410,13 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "followUp": {
-              "type": "good_week_three",
-              "whenFrom": "day3"
-            }
+            "offers": []
           },
           {
             "id": "picture",
             "kind": "embed",
+            "answerAs": "picture",
+            "embed": "holdRing",
             "links": [
               {
                 "exit": "safety_open",
@@ -27424,42 +27426,40 @@
                 }
               }
             ],
+            "props": {
+              "doneLabel": "picture_done",
+              "hint": "picture_hint",
+              "label": "picture_label",
+              "next": "next",
+              "runningLabel": "picture_running",
+              "seconds": 10,
+              "variant": "timed"
+            },
             "title": [
               {
+                "key": "picture_title_1",
                 "when": {
                   "not": {
                     "set": "$a.wk2"
                   }
-                },
-                "key": "picture_title_1"
+                }
               },
               {
                 "key": "picture_title"
               }
             ],
+            "titleSlots": {
+              "wk1": {
+                "labelOf": "wk1"
+              }
+            },
             "next": [
               {
                 "to": "week_set",
                 "when": null
               }
             ],
-            "offers": [],
-            "embed": "holdRing",
-            "answerAs": "picture",
-            "props": {
-              "variant": "timed",
-              "seconds": 10,
-              "label": "picture_label",
-              "runningLabel": "picture_running",
-              "hint": "picture_hint",
-              "doneLabel": "picture_done",
-              "next": "next"
-            },
-            "titleSlots": {
-              "wk1": {
-                "labelOf": "wk1"
-              }
-            }
+            "offers": []
           },
           {
             "id": "week_set",
@@ -27485,10 +27485,10 @@
             ],
             "title": [
               {
+                "key": "week_set_title",
                 "when": {
                   "set": "$a.wk2"
-                },
-                "key": "week_set_title"
+                }
               },
               {
                 "key": "week_set_title_1"
@@ -27500,30 +27500,6 @@
           {
             "id": "back_w1",
             "kind": "ask",
-            "title": "back_w_title",
-            "fields": [
-              {
-                "id": "hap1",
-                "options": {
-                  "list": "happened"
-                },
-                "max": 1,
-                "required": true,
-                "label": "happened_label",
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
-              }
-            ],
-            "reopens": {
-              "after": "week_1"
-            },
             "clears": [
               "happened",
               "compared",
@@ -27536,6 +27512,30 @@
               "km2",
               "km3"
             ],
+            "fields": [
+              {
+                "id": "hap1",
+                "label": "happened_label",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "happened"
+                },
+                "required": true
+              }
+            ],
+            "reopens": {
+              "after": "week_1"
+            },
+            "title": "back_w_title",
             "titleSlots": {
               "pick": {
                 "labelOf": "wk1"
@@ -27561,30 +27561,6 @@
           {
             "id": "back_w2",
             "kind": "ask",
-            "title": "back_w_title",
-            "fields": [
-              {
-                "id": "hap2",
-                "options": {
-                  "list": "happened"
-                },
-                "max": 1,
-                "required": true,
-                "label": "happened_label",
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
-              }
-            ],
-            "reopens": {
-              "after": "week_2"
-            },
             "clears": [
               "happened",
               "compared",
@@ -27597,6 +27573,30 @@
               "km2",
               "km3"
             ],
+            "fields": [
+              {
+                "id": "hap2",
+                "label": "happened_label",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "happened"
+                },
+                "required": true
+              }
+            ],
+            "reopens": {
+              "after": "week_2"
+            },
+            "title": "back_w_title",
             "titleSlots": {
               "pick": {
                 "labelOf": "wk2"
@@ -27622,30 +27622,6 @@
           {
             "id": "back_w3",
             "kind": "ask",
-            "title": "back_w_title",
-            "fields": [
-              {
-                "id": "hap3",
-                "options": {
-                  "list": "happened"
-                },
-                "max": 1,
-                "required": true,
-                "label": "happened_label",
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
-              }
-            ],
-            "reopens": {
-              "after": "week_3"
-            },
             "clears": [
               "happened",
               "compared",
@@ -27658,6 +27634,30 @@
               "km2",
               "km3"
             ],
+            "fields": [
+              {
+                "id": "hap3",
+                "label": "happened_label",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "happened"
+                },
+                "required": true
+              }
+            ],
+            "reopens": {
+              "after": "week_3"
+            },
+            "title": "back_w_title",
             "titleSlots": {
               "pick": {
                 "labelOf": "wk3"
@@ -27683,15 +27683,9 @@
           {
             "id": "keep_more_w1",
             "kind": "ask",
-            "title": "keep_more_title",
             "fields": [
               {
                 "id": "km1",
-                "options": {
-                  "list": "keep_more"
-                },
-                "max": 1,
-                "required": true,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -27700,10 +27694,19 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "list": "keep_more"
+                },
+                "required": true
               }
             ],
+            "hint": "keep_more_hint",
             "keep": {
+              "from": [
+                "wk1"
+              ],
               "kind": "thing_i_like",
               "many": true,
               "when": {
@@ -27711,13 +27714,10 @@
                   "$a.km1",
                   "keep"
                 ]
-              },
-              "from": [
-                "wk1"
-              ]
+              }
             },
             "primary": "keep_primary",
-            "hint": "keep_more_hint",
+            "title": "keep_more_title",
             "next": [
               {
                 "to": "after_end",
@@ -27729,15 +27729,9 @@
           {
             "id": "keep_more_w2",
             "kind": "ask",
-            "title": "keep_more_title",
             "fields": [
               {
                 "id": "km2",
-                "options": {
-                  "list": "keep_more"
-                },
-                "max": 1,
-                "required": true,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -27746,10 +27740,19 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "list": "keep_more"
+                },
+                "required": true
               }
             ],
+            "hint": "keep_more_hint",
             "keep": {
+              "from": [
+                "wk2"
+              ],
               "kind": "thing_i_like",
               "many": true,
               "when": {
@@ -27757,13 +27760,10 @@
                   "$a.km2",
                   "keep"
                 ]
-              },
-              "from": [
-                "wk2"
-              ]
+              }
             },
             "primary": "keep_primary",
-            "hint": "keep_more_hint",
+            "title": "keep_more_title",
             "next": [
               {
                 "to": "after_end",
@@ -27775,15 +27775,9 @@
           {
             "id": "keep_more_w3",
             "kind": "ask",
-            "title": "keep_more_title",
             "fields": [
               {
                 "id": "km3",
-                "options": {
-                  "list": "keep_more"
-                },
-                "max": 1,
-                "required": true,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -27792,10 +27786,19 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "list": "keep_more"
+                },
+                "required": true
               }
             ],
+            "hint": "keep_more_hint",
             "keep": {
+              "from": [
+                "wk3"
+              ],
               "kind": "thing_i_like",
               "many": true,
               "when": {
@@ -27803,13 +27806,10 @@
                   "$a.km3",
                   "keep"
                 ]
-              },
-              "from": [
-                "wk3"
-              ]
+              }
             },
             "primary": "keep_primary",
-            "hint": "keep_more_hint",
+            "title": "keep_more_title",
             "next": [
               {
                 "to": "after_end",
@@ -27821,30 +27821,6 @@
           {
             "id": "back",
             "kind": "ask",
-            "title": "back_title",
-            "fields": [
-              {
-                "id": "happened",
-                "options": {
-                  "list": "happened"
-                },
-                "max": 1,
-                "required": true,
-                "label": "happened_label",
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
-              }
-            ],
-            "reopens": {
-              "after": "when"
-            },
             "clears": [
               "happened",
               "compared",
@@ -27857,6 +27833,30 @@
               "km2",
               "km3"
             ],
+            "fields": [
+              {
+                "id": "happened",
+                "label": "happened_label",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "happened"
+                },
+                "required": true
+              }
+            ],
+            "reopens": {
+              "after": "when"
+            },
+            "title": "back_title",
             "titleSlots": {
               "pick": {
                 "labelOf": "pick"
@@ -27882,23 +27882,17 @@
           {
             "id": "after",
             "kind": "ask",
-            "title": "after_title",
             "fields": [
               {
                 "id": "compared",
+                "max": 1,
                 "options": {
                   "list": "compared"
                 },
-                "max": 1,
                 "required": true
               },
               {
                 "id": "mind",
-                "options": {
-                  "list": "mind"
-                },
-                "max": 1,
-                "required": false,
                 "label": "mind_label",
                 "links": [
                   {
@@ -27908,9 +27902,15 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "list": "mind"
+                },
+                "required": false
               }
             ],
+            "title": "after_title",
             "next": [
               {
                 "to": "keep_more",
@@ -28070,15 +28070,9 @@
           {
             "id": "keep_more",
             "kind": "ask",
-            "title": "keep_more_title",
             "fields": [
               {
                 "id": "keep_more",
-                "options": {
-                  "list": "keep_more"
-                },
-                "max": 1,
-                "required": true,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -28087,10 +28081,19 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "list": "keep_more"
+                },
+                "required": true
               }
             ],
+            "hint": "keep_more_hint",
             "keep": {
+              "from": [
+                "pick"
+              ],
               "kind": "thing_i_like",
               "many": true,
               "when": {
@@ -28120,13 +28123,10 @@
                     ]
                   }
                 ]
-              },
-              "from": [
-                "pick"
-              ]
+              }
             },
             "primary": "keep_primary",
-            "hint": "keep_more_hint",
+            "title": "keep_more_title",
             "next": [
               {
                 "to": "after_end",
@@ -28139,9 +28139,10 @@
             "id": "after_end",
             "kind": "handoff",
             "complete": true,
-            "title": "after_end_title",
+            "done": "done",
             "lines": [
               {
+                "key": "after_kept",
                 "when": {
                   "any": [
                     {
@@ -28169,44 +28170,42 @@
                       ]
                     }
                   ]
-                },
-                "key": "after_kept"
+                }
               },
               {
+                "key": "after_heavier",
                 "when": {
                   "eq": [
                     "$a.compared",
                     "heavier"
                   ]
-                },
-                "key": "after_heavier"
+                }
               },
               {
+                "key": "after_mind",
                 "when": {
                   "eq": [
                     "$a.mind",
                     "elsewhere"
                   ]
-                },
-                "key": "after_mind"
+                }
               },
               {
+                "key": "after_lighter",
                 "when": {
                   "eq": [
                     "$a.compared",
                     "lighter"
                   ]
-                },
-                "key": "after_lighter"
+                }
               },
               {
+                "key": "after_flat",
                 "when": {
                   "all": []
-                },
-                "key": "after_flat"
+                }
               }
             ],
-            "done": "done",
             "links": [
               {
                 "exit": "safety_open",
@@ -28217,6 +28216,7 @@
               }
             ],
             "noClose": true,
+            "title": "after_end_title",
             "next": [],
             "offers": [
               {
@@ -28243,22 +28243,21 @@
             "id": "not_today",
             "kind": "handoff",
             "complete": true,
-            "title": "no_title",
+            "done": "done",
             "lines": [
               {
+                "key": "no_line",
                 "when": {
                   "all": []
-                },
-                "key": "no_line"
+                }
               },
               {
+                "key": "no_low",
                 "when": {
                   "all": []
-                },
-                "key": "no_low"
+                }
               }
             ],
-            "done": "done",
             "links": [
               {
                 "exit": "safety_open",
@@ -28269,6 +28268,7 @@
               }
             ],
             "noClose": true,
+            "title": "no_title",
             "next": [],
             "offers": [
               {
@@ -63351,6 +63351,7 @@
           "dream_title": "Back to the room first.",
           "hurt_end_line": "Sleep can wait. Someone to talk to is here, any hour.",
           "hurt_end_title": "Getting through the night is the job.",
+          "keep_label": "Keep this wake time in Me?",
           "mind_job_link": "Give my mind a job instead",
           "mode_hint": "For tonight, or for the nights ahead.",
           "mode_title": "What do you need?",
@@ -63361,6 +63362,7 @@
           "morning_line": "One fixed time to get up, every day, is most of it.",
           "morning_not_yet": "Getting up now still helps. Light and moving tell your body the day has started.",
           "morning_title": "Morning. How was the night?",
+          "morning_title_shift": "You're up. How was your sleep?",
           "next": "Next",
           "night_end_rest": "Eyes closed, phone face down. Resting still counts. If you start to stew, getting up for a bit helps.",
           "night_end_title": "Back to bed when your eyes get heavy.",
@@ -63388,14 +63390,12 @@
           "up_label": "Up at your time?",
           "up_title": "Try getting up for a bit.",
           "wake_hint": "The same time on days off too. It resets sleep more than any bedtime does. Work shifts or nights? Pick when you get up after your main sleep; if your shifts rotate, a doctor can help plan it.",
+          "wake_primary": "Next",
           "wake_title": "What time will you get up, every day?",
+          "wake_title_kept": "Still your time? It's at the top.",
           "wind_hint": "One thing is enough. Go to bed when you're sleepy, not before.",
           "wind_own": "Something else",
-          "wind_title": "Pick one thing for the hour before bed.",
-          "wake_title_kept": "Still your time? It's at the top.",
-          "keep_label": "Keep this wake time in Me?",
-          "wake_primary": "Next",
-          "morning_title_shift": "You're up. How was your sleep?"
+          "wind_title": "Pick one thing for the hour before bed."
         },
         "tables": {},
         "derive": [],
@@ -63968,8 +63968,8 @@
                 ],
                 "max": 1,
                 "options": {
-                  "list": "wake",
                   "firstFrom": "$p.sleepAnchor",
+                  "list": "wake",
                   "where": {
                     "any": [
                       {
@@ -64002,20 +64002,20 @@
               },
               {
                 "id": "hours",
+                "links": [],
+                "max": 1,
                 "options": {
                   "list": "hours"
-                },
-                "max": 1,
-                "links": []
+                }
               },
               {
                 "id": "keep",
+                "label": "keep_label",
+                "links": [],
+                "max": 1,
                 "options": {
                   "list": "keep"
                 },
-                "max": 1,
-                "links": [],
-                "label": "keep_label",
                 "showWhen": {
                   "not": {
                     "eq": [
@@ -64027,30 +64027,12 @@
               }
             ],
             "hint": "wake_hint",
-            "title": [
-              {
-                "when": {
-                  "set": "$p.sleepAnchor"
-                },
-                "key": "wake_title_kept"
-              },
-              {
-                "key": "wake_title"
-              }
-            ],
-            "next": [
-              {
-                "to": "wind",
-                "when": null
-              }
-            ],
-            "offers": [],
             "keep": {
-              "kind": "sleep_anchor",
-              "many": false,
               "from": [
                 "wake"
               ],
+              "kind": "sleep_anchor",
+              "many": false,
               "when": {
                 "any": [
                   {
@@ -64065,7 +64047,25 @@
                 ]
               }
             },
-            "primary": "wake_primary"
+            "primary": "wake_primary",
+            "title": [
+              {
+                "key": "wake_title_kept",
+                "when": {
+                  "set": "$p.sleepAnchor"
+                }
+              },
+              {
+                "key": "wake_title"
+              }
+            ],
+            "next": [
+              {
+                "to": "wind",
+                "when": null
+              }
+            ],
+            "offers": []
           },
           {
             "id": "wind",
@@ -64212,6 +64212,7 @@
             },
             "title": [
               {
+                "key": "morning_title_shift",
                 "when": {
                   "some": [
                     "wake",
@@ -64222,8 +64223,7 @@
                       ]
                     }
                   ]
-                },
-                "key": "morning_title_shift"
+                }
               },
               {
                 "key": "morning_title"
@@ -64271,6 +64271,12 @@
               "whenDefault": "w0700",
               "whenFrom": "wake",
               "whenMap": {
+                "w0000": "n0000",
+                "w0100": "n0100",
+                "w0200": "n0200",
+                "w0300": "n0300",
+                "w0400": "n0400",
+                "w0500": "n0500",
                 "w0600": "n0600",
                 "w0630": "n0630",
                 "w0700": "n0700",
@@ -64292,13 +64298,7 @@
                 "w2000": "n2000",
                 "w2100": "n2100",
                 "w2200": "n2200",
-                "w2300": "n2300",
-                "w0000": "n0000",
-                "w0100": "n0100",
-                "w0200": "n0200",
-                "w0300": "n0300",
-                "w0400": "n0400",
-                "w0500": "n0500"
+                "w2300": "n2300"
               }
             },
             "title": [
@@ -64555,6 +64555,90 @@
               "label": "I'd rather rest here"
             }
           ],
+          "wind": [
+            {
+              "value": "screens",
+              "label": "Screens away"
+            },
+            {
+              "value": "dim",
+              "label": "Lights low"
+            },
+            {
+              "value": "tomorrow",
+              "label": "Write tomorrow's list"
+            },
+            {
+              "value": "warm",
+              "label": "A warm shower or bath"
+            },
+            {
+              "value": "quiet",
+              "label": "A book, music or stretching"
+            }
+          ],
+          "hours": [
+            {
+              "value": "shift",
+              "label": "My hours are different (shifts or nights)"
+            }
+          ],
+          "remind": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            }
+          ],
+          "keep": [
+            {
+              "value": "keep_yes",
+              "label": "Yes, keep it"
+            }
+          ],
+          "slept": [
+            {
+              "value": "okay",
+              "label": "Slept okay"
+            },
+            {
+              "value": "broken",
+              "label": "Broken"
+            },
+            {
+              "value": "barely",
+              "label": "Barely slept"
+            }
+          ],
+          "up_at": [
+            {
+              "value": "up_yes",
+              "label": "Yes"
+            },
+            {
+              "value": "up_later",
+              "label": "Later than planned"
+            },
+            {
+              "value": "up_not_yet",
+              "label": "Not yet"
+            }
+          ],
+          "dream": [
+            {
+              "value": "dream_yes",
+              "label": "Yes"
+            }
+          ],
+          "again": [
+            {
+              "value": "again_yes",
+              "label": "Yes, check in tomorrow"
+            },
+            {
+              "value": "again_no",
+              "label": "Not tomorrow"
+            }
+          ],
           "wake": [
             {
               "value": "w0600",
@@ -64687,90 +64771,6 @@
               "value": "w0500",
               "label": "5:00",
               "shift": "yes"
-            }
-          ],
-          "wind": [
-            {
-              "value": "screens",
-              "label": "Screens away"
-            },
-            {
-              "value": "dim",
-              "label": "Lights low"
-            },
-            {
-              "value": "tomorrow",
-              "label": "Write tomorrow's list"
-            },
-            {
-              "value": "warm",
-              "label": "A warm shower or bath"
-            },
-            {
-              "value": "quiet",
-              "label": "A book, music or stretching"
-            }
-          ],
-          "remind": [
-            {
-              "value": "yes",
-              "label": "Yes"
-            }
-          ],
-          "slept": [
-            {
-              "value": "okay",
-              "label": "Slept okay"
-            },
-            {
-              "value": "broken",
-              "label": "Broken"
-            },
-            {
-              "value": "barely",
-              "label": "Barely slept"
-            }
-          ],
-          "up_at": [
-            {
-              "value": "up_yes",
-              "label": "Yes"
-            },
-            {
-              "value": "up_later",
-              "label": "Later than planned"
-            },
-            {
-              "value": "up_not_yet",
-              "label": "Not yet"
-            }
-          ],
-          "dream": [
-            {
-              "value": "dream_yes",
-              "label": "Yes"
-            }
-          ],
-          "again": [
-            {
-              "value": "again_yes",
-              "label": "Yes, check in tomorrow"
-            },
-            {
-              "value": "again_no",
-              "label": "Not tomorrow"
-            }
-          ],
-          "keep": [
-            {
-              "value": "keep_yes",
-              "label": "Yes, keep it"
-            }
-          ],
-          "hours": [
-            {
-              "value": "shift",
-              "label": "My hours are different (shifts or nights)"
             }
           ]
         }
@@ -65759,6 +65759,9 @@
           "set_remind": "I'll ask how it went. Doing part of it counts.",
           "set_title": "Your step: {step}.",
           "settle_line": "This will keep. Look after the next few minutes first.",
+          "sometimes_hint": "Mixed feelings about one are normal. None is fine too: not sure yet is a full answer.",
+          "sometimes_title": "Any that matter to you some of the time?",
+          "sometimes_title_none": "Any that matter even a little, or some of the time?",
           "sort_hint": "Pick as many as fit, then Next. None is a full answer: not sure yet.",
           "sort_own": "Add your own",
           "sort_title": "Which of these sound like you?",
@@ -65770,10 +65773,7 @@
           "step_hint": "Small enough that you'd likely do it, and safe to do. If it means facing someone who hurts you, that's not the step.",
           "step_own": "My own step",
           "step_title": "One small step this week.",
-          "when_title": "When could you do it?",
-          "sometimes_title": "Any that matter to you some of the time?",
-          "sometimes_hint": "Mixed feelings about one are normal. None is fine too: not sure yet is a full answer.",
-          "sometimes_title_none": "Any that matter even a little, or some of the time?"
+          "when_title": "When could you do it?"
         },
         "tables": {},
         "derive": [],
@@ -65965,14 +65965,37 @@
           {
             "id": "sometimes",
             "kind": "ask",
+            "fields": [
+              {
+                "id": "sometimes",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 12,
+                "options": {
+                  "list": "value",
+                  "notIn": [
+                    "$a.mine.ids"
+                  ]
+                },
+                "required": false
+              }
+            ],
+            "hint": "sometimes_hint",
             "title": [
               {
+                "key": "sometimes_title_none",
                 "when": {
                   "not": {
                     "set": "$a.mine"
                   }
-                },
-                "key": "sometimes_title_none"
+                }
               },
               {
                 "key": "sometimes_title"
@@ -65997,47 +66020,21 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "fields": [
-              {
-                "id": "sometimes",
-                "options": {
-                  "list": "value",
-                  "notIn": [
-                    "$a.mine.ids"
-                  ]
-                },
-                "max": 12,
-                "required": false,
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
-              }
-            ],
-            "hint": "sometimes_hint"
+            "offers": []
           },
           {
             "id": "not_sure",
             "kind": "handoff",
-            "title": "not_sure_title",
-            "next": [],
-            "offers": [],
             "complete": true,
+            "done": "done",
             "lines": [
               {
+                "key": "not_sure_line",
                 "when": {
                   "all": []
-                },
-                "key": "not_sure_line"
+                }
               }
             ],
-            "done": "done",
             "links": [
               {
                 "exit": "safety_open",
@@ -66047,34 +66044,27 @@
                 }
               }
             ],
-            "noClose": true
+            "noClose": true,
+            "title": "not_sure_title",
+            "next": [],
+            "offers": []
           },
           {
             "id": "keep",
             "kind": "ask",
-            "title": "keep_title",
-            "next": [
-              {
-                "to": "one",
-                "when": {
-                  "set": "$a.kept.ids"
-                }
-              },
-              {
-                "to": "step",
-                "when": {
-                  "set": "$a.kept"
-                }
-              },
-              {
-                "to": "sorted",
-                "when": null
-              }
-            ],
-            "offers": [],
             "fields": [
               {
                 "id": "kept",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 3,
                 "options": {
                   "list": "value",
                   "where": {
@@ -66094,52 +66084,59 @@
                     ]
                   }
                 },
-                "max": 3,
-                "required": false,
                 "own": {
-                  "hint": "keep_own",
                   "countsAsPick": true,
+                  "hint": "keep_own",
                   "max": 60
                 },
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
+                "required": false
               }
             ],
+            "hint": "keep_hint",
             "keep": {
-              "kind": "values",
-              "many": false,
               "from": [
                 "mine",
                 "sometimes",
                 "kept"
-              ]
+              ],
+              "kind": "values",
+              "many": false
             },
             "primary": "keep_primary",
-            "hint": "keep_hint"
+            "title": "keep_title",
+            "next": [
+              {
+                "to": "one",
+                "when": {
+                  "set": "$a.kept.ids"
+                }
+              },
+              {
+                "to": "step",
+                "when": {
+                  "set": "$a.kept"
+                }
+              },
+              {
+                "to": "sorted",
+                "when": null
+              }
+            ],
+            "offers": []
           },
           {
             "id": "sorted",
             "kind": "handoff",
-            "title": "sorted_title",
-            "next": [],
-            "offers": [],
             "complete": true,
+            "done": "done",
             "lines": [
               {
+                "key": "sorted_line",
                 "when": {
                   "all": []
-                },
-                "key": "sorted_line"
+                }
               }
             ],
-            "done": "done",
             "links": [
               {
                 "exit": "safety_open",
@@ -66149,7 +66146,10 @@
                 }
               }
             ],
-            "noClose": true
+            "noClose": true,
+            "title": "sorted_title",
+            "next": [],
+            "offers": []
           },
           {
             "id": "one",
@@ -66176,12 +66176,12 @@
                     ]
                   }
                 },
-                "required": true,
                 "own": {
-                  "hint": "focus_own",
                   "countsAsPick": true,
+                  "hint": "focus_own",
                   "max": 60
-                }
+                },
+                "required": true
               }
             ],
             "hint": "one_hint",
@@ -66212,10 +66212,10 @@
                 "max": 1,
                 "options": {
                   "list": "value",
+                  "profile": "values",
                   "where": {
                     "any": []
-                  },
-                  "profile": "values"
+                  }
                 },
                 "required": true
               }
@@ -66233,9 +66233,23 @@
           {
             "id": "step",
             "kind": "ask",
+            "clears": [
+              "step",
+              "when",
+              "remind"
+            ],
             "fields": [
               {
                 "id": "step",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
                 "max": 1,
                 "options": {
                   "list": "step",
@@ -66290,23 +66304,15 @@
                     ]
                   }
                 },
-                "required": true,
                 "own": {
-                  "hint": "step_own",
                   "countsAsPick": true,
+                  "hint": "step_own",
                   "max": 60
                 },
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
+                "required": true
               }
             ],
+            "hint": "step_hint",
             "title": "step_title",
             "next": [
               {
@@ -66314,41 +66320,22 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "clears": [
-              "step",
-              "when",
-              "remind"
-            ],
-            "hint": "step_hint"
+            "offers": []
           },
           {
             "id": "when",
             "kind": "ask",
-            "title": "when_title",
-            "next": [
-              {
-                "to": "set",
-                "when": null
-              }
-            ],
-            "offers": [],
             "fields": [
               {
                 "id": "when",
+                "max": 1,
                 "options": {
                   "list": "when"
                 },
-                "max": 1,
                 "required": true
               },
               {
                 "id": "remind",
-                "options": {
-                  "list": "remind"
-                },
-                "max": 1,
-                "required": false,
                 "label": "remind_label",
                 "links": [
                   {
@@ -66358,50 +66345,55 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "list": "remind"
+                },
+                "required": false
               }
             ],
             "followUp": {
               "type": "value_step",
-              "whenFrom": "when",
               "when": {
                 "eq": [
                   "$a.remind",
                   "yes"
                 ]
+              },
+              "whenFrom": "when"
+            },
+            "title": "when_title",
+            "next": [
+              {
+                "to": "set",
+                "when": null
               }
-            }
+            ],
+            "offers": []
           },
           {
             "id": "set",
             "kind": "handoff",
-            "title": "set_title",
-            "titleSlots": {
-              "step": {
-                "labelOf": "step"
-              }
-            },
-            "next": [],
-            "offers": [],
             "complete": true,
+            "done": "done",
             "lines": [
               {
+                "key": "set_remind",
                 "when": {
                   "eq": [
                     "$a.remind",
                     "yes"
                   ]
-                },
-                "key": "set_remind"
+                }
               },
               {
+                "key": "set_line",
                 "when": {
                   "all": []
-                },
-                "key": "set_line"
+                }
               }
             ],
-            "done": "done",
             "links": [
               {
                 "exit": "safety_open",
@@ -66410,11 +66402,46 @@
                   "all": []
                 }
               }
-            ]
+            ],
+            "title": "set_title",
+            "titleSlots": {
+              "step": {
+                "labelOf": "step"
+              }
+            },
+            "next": [],
+            "offers": []
           },
           {
             "id": "back",
             "kind": "ask",
+            "clears": [
+              "happened",
+              "again"
+            ],
+            "fields": [
+              {
+                "id": "happened",
+                "label": "happened_label",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "happened"
+                },
+                "required": true
+              }
+            ],
+            "reopens": {
+              "after": "when"
+            },
             "title": "back_title",
             "titleSlots": {
               "step": {
@@ -66445,34 +66472,7 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "fields": [
-              {
-                "id": "happened",
-                "options": {
-                  "list": "happened"
-                },
-                "max": 1,
-                "required": true,
-                "label": "happened_label",
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
-              }
-            ],
-            "reopens": {
-              "after": "when"
-            },
-            "clears": [
-              "happened",
-              "again"
-            ]
+            "offers": []
           },
           {
             "id": "back_yes",
@@ -66490,10 +66490,10 @@
                 }
               },
               {
+                "key": "back_yes_line",
                 "when": {
                   "all": []
-                },
-                "key": "back_yes_line"
+                }
               }
             ],
             "links": [
@@ -66508,23 +66508,21 @@
             "noClose": true,
             "title": [
               {
+                "key": "back_yes_title",
                 "when": {
                   "set": "$a.focus"
-                },
-                "key": "back_yes_title"
+                }
               },
               {
+                "key": "back_yes_title_kept",
                 "when": {
                   "set": "$a.focus_kept"
-                },
-                "key": "back_yes_title_kept"
+                }
               },
               {
                 "key": "back_yes_title_own"
               }
             ],
-            "next": [],
-            "offers": [],
             "titleSlots": {
               "focus": {
                 "labelOf": "focus"
@@ -66532,11 +66530,33 @@
               "focus_kept": {
                 "labelOf": "focus_kept"
               }
-            }
+            },
+            "next": [],
+            "offers": []
           },
           {
             "id": "back_hurt",
             "kind": "handoff",
+            "complete": true,
+            "done": "done",
+            "lines": [
+              {
+                "key": "back_hurt_line",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
             "title": "back_hurt_title",
             "next": [],
             "offers": [
@@ -66552,31 +66572,31 @@
                   "all": []
                 }
               }
-            ],
-            "complete": true,
-            "lines": [
-              {
-                "when": {
-                  "all": []
-                },
-                "key": "back_hurt_line"
-              }
-            ],
-            "done": "done",
-            "links": [
-              {
-                "exit": "safety_open",
-                "label": "safety_open",
-                "when": {
-                  "all": []
-                }
-              }
-            ],
-            "noClose": true
+            ]
           },
           {
             "id": "back_no",
             "kind": "ask",
+            "fields": [
+              {
+                "id": "again",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "again"
+                },
+                "required": true
+              }
+            ],
+            "hint": "back_no_hint",
             "title": "back_no_title",
             "next": [
               {
@@ -66593,42 +66613,21 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "fields": [
-              {
-                "id": "again",
-                "options": {
-                  "list": "again"
-                },
-                "max": 1,
-                "required": true,
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
-              }
-            ],
-            "hint": "back_no_hint"
+            "offers": []
           },
           {
             "id": "back_end",
             "kind": "handoff",
             "complete": true,
-            "title": null,
+            "done": "done",
             "lines": [
               {
+                "key": "back_end_line",
                 "when": {
                   "all": []
-                },
-                "key": "back_end_line"
+                }
               }
             ],
-            "done": "done",
             "links": [
               {
                 "exit": "safety_open",
@@ -66639,6 +66638,7 @@
               }
             ],
             "noClose": true,
+            "title": null,
             "next": [],
             "offers": []
           }
