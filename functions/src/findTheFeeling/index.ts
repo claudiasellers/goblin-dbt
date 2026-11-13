@@ -123,9 +123,12 @@ export const saveFindTheFeelingSession = onCall(
            FOREACH (ee IN CASE WHEN e IS NULL THEN [] ELSE [e] END |
              CREATE (s)-[:FOUND]->(ee)
              MERGE (u)-[fw:FOUND_WORD]->(ee)
-             ON CREATE SET fw.firstAt = datetime(), fw.count = 0, fw.ways = []
+             ON CREATE SET fw.firstAt = datetime(), fw.count = 0, fw.ways = [], fw.sources = []
              SET fw.lastAt = datetime(), fw.count = fw.count + 1,
-                 fw.ways = CASE WHEN $way IN fw.ways THEN fw.ways ELSE fw.ways + $way END)
+                 fw.ways = CASE WHEN $way IN coalesce(fw.ways, []) THEN fw.ways ELSE coalesce(fw.ways, []) + $way END,
+                 // Words everywhere (ER-10 part 3, userdata/foundWords.ts): which saves found it.
+                 fw.sources = CASE WHEN 'find-the-feeling' IN coalesce(fw.sources, []) THEN fw.sources
+                                   ELSE coalesce(fw.sources, []) + 'find-the-feeling' END)
            RETURN count(DISTINCT s) AS created`,
           {
             userId, key, id: data.id, contentVersion: data.contentVersion, entry: data.entry, way: data.way,

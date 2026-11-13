@@ -21,6 +21,7 @@ import { parseOrInvalid } from '../shared/errors';
 import { GUARDS } from '../userdata/lifecycle';
 import { MERGE_USER, userKey } from '../userdata/ownership';
 import { USER_DATA } from '../userdata/layers';
+import { foundWordsSource, recordFoundWords } from '../userdata/foundWords';
 import { legacyOutcome, readingProps } from '../capacity/reading';
 import { FITS_FACTS_TOOLS, validateAnswer, validateClose, validateRecord, validateStart, type CloseInput, type StartInput } from './validation';
 import { URGE_KINDS, type CloseKind, type DetailKind } from './types';
@@ -112,8 +113,12 @@ async function startTx(tx: ManagedTransaction, uid: string, email: string | null
   return res.records[0]?.get('toolUsageId') as string;
 }
 
-/** Close an open session (no-op + existing ids when already closed). Returns rep and follow-up ids. */
-async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Promise<{ reps: string[]; followUps: string[] }> {
+/**
+ * Close an open session (no-op + existing ids when already closed). Returns rep and follow-up ids. `findWords`: the
+ * close's emotion ids are words picked in the visit; a one-shot record's are the hand-off's, already counted where
+ * they were named (the check-in), so recordToolSession passes false.
+ */
+async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput, findWords = true): Promise<{ reps: string[]; followUps: string[] }> {
   const key = userKey(uid, c.id);
   const head = await tx.run(
     `MATCH (:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $key})
@@ -179,6 +184,9 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
       legacyOutcome: NOT_WHAT_HELPS.includes(rec.get('toolId') as string) ? null : legacyOutcome(thenVsNow),
     },
   );
+  // Words everywhere (ER-10 part 3): the words picked in this visit (never a hand-off's) join the person's words, once.
+  const wordSource = foundWordsSource(rec.get('toolId') as string);
+  if (findWords && wordSource) await recordFoundWords(tx, uid, 'ToolSession', key, c.emotionIds, wordSource);
   // A tool on the skill player whose old record still has readers writes it here, from the plaintext run (R14).
   await projectRun(tx, uid, c.id, rec.get('toolId') as string, c.ext);
   const followUps = await scheduleTx(tx, uid, c.schedule, { sourceSessionId: c.id, sourceToolId: rec.get('toolId') as string });
@@ -239,7 +247,7 @@ export const recordToolSession = callable<unknown, CloseToolSessionResponse & { 
     const { start, close } = parseOrInvalid(() => validateRecord(data, new Date()), 'Invalid session');
     const out = await writeTx(async (tx) => {
       const toolUsageId = await startTx(tx, uid as string, request.auth?.token?.email ?? null, start);
-      const closed = await closeTx(tx, uid as string, close);
+      const closed = await closeTx(tx, uid as string, close, false);
       return { toolUsageId, skillPracticeIds: closed.reps, followUpIds: closed.followUps };
     });
     return { id: start.id, ...out };
