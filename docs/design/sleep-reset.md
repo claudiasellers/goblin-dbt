@@ -41,7 +41,7 @@ an optional morning check.
 | `wind` | *Pick one thing for the hour before bed.* Screens away · Lights low · Write tomorrow's list · A warm shower or bath · A book, music or stretching, or their own words; *Check in with me in the morning?* | Wind down 30–60 min |
 | `plan_end` | *Up at 7:30, every day.* One line: the morning card when asked, *Caffeine after midday and alcohol at night both break sleep up.*, how to come back on a bad night, and *If sleep's been bad for weeks, a doctor can help.* | H20b's substances; referral, quietly |
 | `morning` | The `sleep_morning` card reopens the run here: *Morning. How was the night?* Slept okay · Broken · Barely slept; *Up at your time?*; *Did a bad dream wake you?* | The morning log |
-| `again` | *Up at your time. That's the reset working.* or *A late start doesn't undo the reset.* above *Same again tomorrow?* (yes books the card again at the same wake time) | |
+| `again` | *Up at your time. That's the reset working.* or *A late start doesn't undo the reset.* above *Same again tomorrow?* (yes books the card for tomorrow at the same wake time) | |
 | `morning_end` | *That's the reset.* One line, first that fits: barely slept (a nap can make tonight harder, short and early if needed, don't drive drowsy; barely sleeping and full of energy → tell your doctor soon), broken (weeks of it, or snoring, gasping, restless legs → a doctor), not up yet (light and moving), *Not tomorrow* (how to set it up again). A bad dream → Rewrite the nightmare (daylight); barely slept → Running low | ER-15, ER-07, referral |
 
 A hand-off shows one line (the first that fits), so each line is the whole card. *Talk to someone now* on every screen, once (the offer where someone to talk to is one). No screen asks for a
@@ -54,6 +54,8 @@ no marching).
 window whose chips are the wake times (`next_local`, a window kind added for it in `src/lib/spine/windows.ts`: the
 next time that clock time comes round, so a plan made at 1am books that morning). Booked on the plan's `wind` step when the person
 says yes, timed by the `wake` answer (`whenFrom`), and booked again only by the morning's *Same again tomorrow?*.
+That renewal maps the wake time to its `n` chip (`whenMap`, `at_local` a day on): the next clock time would be this
+morning again for someone who opens the card before their wake time (Codex on #135).
 Content-free on Today (*Morning check*, *From Sleep Reset. How was the night?*: no time). Stale after 8 hours.
 
 ## The links that now open it

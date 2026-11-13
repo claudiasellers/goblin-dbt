@@ -127,9 +127,12 @@ test("the plan: one wake time (the morning card's chips), one wind-down thing, t
   assert.equal(wake.required, true);
   const ft = spine.followUpTypes.find((x) => x.id === "sleep_morning");
   assert.ok(ft && ft.enabled);
-  assert.deepEqual(skill.options.wake.map((o) => o.value), Object.keys(ft.window.chips), "every wake time is a chip");
+  const chips = Object.keys(ft.window.chips);
+  assert.deepEqual(skill.options.wake.map((o) => o.value), chips.filter((c) => c.startsWith("w")), "every wake time is a chip");
+  assert.deepEqual(Object.values(step("again").followUp.whenMap).sort(), chips.filter((c) => c.startsWith("n")), "and each has its tomorrow chip");
   for (const [k, w] of Object.entries(ft.window.chips)) {
-    assert.equal(w.kind, "next_local", `${k}: the next time it comes round`);
+    assert.equal(w.kind, k.startsWith("w") ? "next_local" : "at_local", `${k}: the plan books the next one, the renewal tomorrow`);
+    if (k.startsWith("n")) assert.equal(w.days, 1, k);
     assert.equal(w.time.replace(":", ""), k.slice(1), k);
   }
   // Wind-down: never food, drink or pills.
@@ -168,7 +171,7 @@ test("the morning card: booked at the wake time only on a yes, the next morning,
   assert.match(readFileSync("schema/practice-spine.cypher", "utf8"), /sleep_morning/);
 });
 
-test("the morning: how was the night, up at your time; same again books the card again at the same wake time", () => {
+test("the morning: how was the night, up at your time; same again books the card for tomorrow at the same wake time", () => {
   const end = run([...PLAN("w0800"), next]);
   const rec = M.runRecord(ctx(), { ...end, scheduled: { wind: { type: "sleep_morning", id: "f1" } } });
   const r = M.resumeRun(ctx(), rec, "morning");
@@ -178,7 +181,14 @@ test("the morning: how was the night, up at your time; same again books the card
   assert.equal(atAgain.stepId, "again");
   assert.equal(M.copyText(ctx(), step("again").title, atAgain), skill.copy.again_title_up);
   const yes = run([pick("again", "again_yes")], ctx(), atAgain);
-  assert.deepEqual(M.followUpFor(ctx(), step("again"), yes), { type: "sleep_morning", chip: "w0800" }, "the wake time from the plan");
+  assert.deepEqual(M.followUpFor(ctx(), step("again"), yes), { type: "sleep_morning", chip: "n0800" }, "tomorrow at the wake time from the plan");
+  // Codex on #135: opened early (6:00 for an 8:00 wake), the renewal is still tomorrow, never this morning again.
+  const win = spine.followUpTypes.find((x) => x.id === "sleep_morning").window;
+  for (const [h, m] of [[6, 0], [7, 45], [8, 10], [11, 0]]) {
+    const due = W.dueAtFor(win, new Date(2026, 10, 13, h, m), "n0800");
+    assert.deepEqual([due.getDate(), due.getHours(), due.getMinutes()], [14, 8, 0], `${h}:${m}`);
+  }
+  assert.ok(readFileSync("functions/src/spine/validation.ts", "utf8").includes("'n0800'"), "the server accepts the renewal chips");
   assert.equal(M.followUpFor(ctx(), step("again"), run([pick("again", "again_no")], ctx(), atAgain)), null);
   const done = run([next], ctx(), yes);
   assert.equal(done.stepId, "morning_end");

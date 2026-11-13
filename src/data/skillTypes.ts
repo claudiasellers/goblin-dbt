@@ -46,8 +46,10 @@ export interface KeepAction {
 /**
  * `whenFrom` may name a field of an earlier step on an ask step (Cope Ahead's *When is it?* on screen 1 times the
  * keep step's *Want me to ask how it went?*); `whenDefault` is the chip used when that field wasn't answered.
+ * `whenMap` turns the field's answer into another chip of the same window (Sleep Reset's renewal: the wake time's
+ * *tomorrow at* chip, where the plan booked its *next* one).
  */
-export interface FollowUpAction { type: string; whenFrom?: string; whenDefault?: string; when?: Cond }
+export interface FollowUpAction { type: string; whenFrom?: string; whenDefault?: string; whenMap?: Record<string, string>; when?: Cond }
 
 /**
  * Inline (plan C3a R8, C1 rule 5): a skill another screen can run inside itself, from one of `enterAt`, giving
