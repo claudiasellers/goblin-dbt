@@ -61,9 +61,17 @@ polish batch, with Check the Facts' inline mini-card; "none" means it stays this
 
 - No `elsewhere` step: the doors offer only words Do the Opposite works on, and #48's start screen says the rest on
   screen. *None.*
-- `flood`: a settle hold before the goal, then the same flow. The small step is always listed first, for everyone; it
-  is never pre-selected (nothing is pre-filled), so there is no band- or then-vs-now-driven default and no deferred fit
-  check yet. *ER-B5* (the deferred fit check).
+- `flood`: a settle hold before the goal. Then, built 13 Nov (ER-B5), the fit check waits for the body instead of
+  the follow-up: *will it help?* comes before *does it fit?*, and *it won't help* (H10's own reason for the opposite,
+  whatever the fit) goes to the body cue and its hold; *does it fit?* is asked after the hold only once the pull is
+  weaker (`aftb` *A bit weaker* or *Much weaker*), with the line *Now that it's a little quieter, the facts are easier
+  to see.*, and its answer runs the table on *won't help* (fits, too big or doesn't fit → the step; not sure → the
+  clarify card, *You don't have to decide yet*, no body offer since the body was done). Not weaker, or no cue picked:
+  the fit stays unasked and only the small step is listed. *It would help* or *not sure* → the clarify card, the body
+  first, as before; guilt or shame with the repair goal never goes to the opposite unasked (repair needs the facts).
+  The projection records an unasked fit as `facts: ''`, `factsDeferred: true`, only on *won't help*. Asking it on the
+  `oa_try` card instead was rejected: a person who tries it now never gets that card, and the body-settled moment is
+  the one the handout means. *None.*
 - `bodyReset`: per-feeling cue chips (the urge's own body cues, or the parent's) and a press-and-hold of the one picked,
   instead of the hand-built page's card grid; the cue is optional (the old *None of these work for me*). The rich
   moment is the hold. *ER-B5* if the gallery shows the grid is missed.
@@ -103,7 +111,7 @@ as Problem Solve's `ps_graph.py` does), and every option keeps a `PRESENTS` edge
 | `door` | embed `doorPicker` | One door per DBT parent, led by its typical urge; the three other ways in (the urge, the body, not sure) and search, as in #48. Up to three, ranked loudest first | Answer `feel` (grid ids, loudest first). A hand-off's words arrive pre-ticked on their doors (carried, the same visit's), never chosen for the person: one carried word still needs its tap |
 | `elsewhere` | handoff | A word Do the Opposite doesn't cover: its alternative skill (`oaAlternativeSkill`) | Check the Facts built; `mindfulness-emotions`, `body-scan`, `please-skill`, `name-it` are planned exits (never offered until built); *Done* always |
 | `valid` *(per feeling)* | ask | **Validation first** (item 1): the parent's acknowledgment as the title, then *What is it pushing you to do?* (the parent's urges in `order`, plus own words) | The unblend line (`partsLine`, parts on) under the urge. `$ctx.urgeId` first, never selected |
-| `flood` *(per feeling, flooded only)* | embed `bodyReset` | A carried flooded reading (item 2): the body reset before anything else | Then straight to `step` with the small size first; the fit check is deferred to the follow-up |
+| `flood` *(per feeling, flooded only)* | embed `bodyReset` | A carried flooded reading (item 2): the body reset before anything else | Built as `calm`, then *will it help?* first; the fit check after the body once the pull is weaker (see *As built*) |
 | `want` *(per feeling)* | ask | **Do I want to change it?** (item 3): *Yes, turn it down · Not sure · No, I want to keep it* | *No* → `keep_it`. *Not sure* goes on; the readout asks again |
 | `keep_it` | handoff | "Some feelings are worth keeping. Want help acting on it well?" | Problem Solve, DEAR MAN, Ride it out. Nothing recorded as a failure; the visit is complete |
 | `fits` *(per feeling)* | ask | **Fits the facts as a card stack** (item 4): the parent's `fitsTheFactsWhen`, one per card, *Yes · Not really · Can't tell* (embed `fitStack`), then the verdict on the same screen | Verdict chips: fits · fits but too big · doesn't fit · can't tell. *Check the facts properly* is a quiet link (Check the Facts) |
@@ -122,7 +130,7 @@ as Problem Solve's `ps_graph.py` does), and every option keeps a `PRESENTS` edge
 | `try` | ask | Now: *Try it, then come back.* *I tried it · Plan it for later* | |
 | `after` *(per feeling)* | ask | *What happened?* (outcome), **What actually happened?** (the prediction chips), *The pull, compared with before?* (`thenVsNow`) | |
 | `readout` | embed `urgeReadout` | **Readout v3** (item 10): the behaviour fact first, then the prediction gap ("You expected it to go badly. It didn't."), then the urge as a then-vs-now bar. No "n/10" | *Not sure* on `want`: "Do you want to keep working on this one?" |
-| `review` | ask, `reopens: {after: 'when'}` | The follow-up (R9), from Today's `oa_plan` card: *Did you get to it?*, *What actually happened?*, missed reasons and their routes; for a flooded start, the deferred fit check | Opened by `?run=<id>&at=review` |
+| `review` | ask, `reopens: {after: 'when'}` | The follow-up (R9), from Today's `oa_plan` card: *Did you get to it?*, *What actually happened?*, missed reasons and their routes (the flooded start's fit check moved into the visit, after the body) | Opened by `?run=<id>&at=review` |
 
 **Interpersonal urges** (item 8, built in part 1): *Text them again* (love), *Check their profile* (jealousy, love),
 *Pull away from them* (shame, sadness), *Fire back* (anger), *Go quiet on them* (shame, sadness): new `ActionUrge`s with

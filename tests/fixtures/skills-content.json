@@ -40734,6 +40734,7 @@
     "clar_title_open": "One question is still open",
     "cdng_safe": "Your read of danger is the one that counts here. You don't have to check it against anything.",
     "clar_flooded": "Your body's loud right now. The facts can wait until it settles a little.",
+    "fits_quieter": "Now that it's a little quieter, the facts are easier to see.",
     "repr_title": "When guilt or shame fits, repair is the opposite of hiding",
     "repr_line": "Owning it and making it right is the skill here.",
     "cue_title": "Let your body go first",
@@ -41378,6 +41379,15 @@
        }
       },
       {
+       "to": "help",
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       }
+      },
+      {
        "to": "fits",
        "when": null
       }
@@ -41556,7 +41566,71 @@
        ]
       }
      ],
+     "lines": [
+      {
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$ctx.band",
+           "flooded"
+          ]
+         },
+         {
+          "set": "$a.help"
+         }
+        ]
+       },
+       "key": "fits_quieter"
+      }
+     ],
      "next": [
+      {
+       "to": "size",
+       "when": {
+        "all": [
+         {
+          "all": [
+           {
+            "eq": [
+             "$ctx.band",
+             "flooded"
+            ]
+           },
+           {
+            "set": "$a.help"
+           }
+          ]
+         },
+         {
+          "in": [
+           "$a.fits",
+           [
+            "fits",
+            "excessive",
+            "not_fit"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "clar",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$ctx.band",
+           "flooded"
+          ]
+         },
+         {
+          "set": "$a.help"
+         }
+        ]
+       }
+      },
       {
        "to": "help",
        "when": null
@@ -41731,17 +41805,53 @@
        "when": {
         "any": [
          {
-          "all": [
+          "any": [
            {
-            "eq": [
-             "$a.fits",
-             "excessive"
+            "all": [
+             {
+              "eq": [
+               "$a.fits",
+               "excessive"
+              ]
+             },
+             {
+              "eq": [
+               "$a.help",
+               "unhelpful"
+              ]
+             }
             ]
            },
            {
-            "eq": [
-             "$a.help",
-             "unhelpful"
+            "all": [
+             {
+              "eq": [
+               "$a.fits",
+               "fits"
+              ]
+             },
+             {
+              "eq": [
+               "$a.help",
+               "unhelpful"
+              ]
+             }
+            ]
+           },
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.fits",
+               "not_fit"
+              ]
+             },
+             {
+              "eq": [
+               "$a.help",
+               "unhelpful"
+              ]
+             }
             ]
            }
           ]
@@ -41749,9 +41859,18 @@
          {
           "all": [
            {
-            "eq": [
-             "$a.fits",
-             "fits"
+            "all": [
+             {
+              "eq": [
+               "$ctx.band",
+               "flooded"
+              ]
+             },
+             {
+              "not": {
+               "set": "$a.fits"
+              }
+             }
             ]
            },
            {
@@ -41759,22 +41878,27 @@
              "$a.help",
              "unhelpful"
             ]
-           }
-          ]
-         },
-         {
-          "all": [
-           {
-            "eq": [
-             "$a.fits",
-             "not_fit"
-            ]
            },
            {
-            "eq": [
-             "$a.help",
-             "unhelpful"
-            ]
+            "not": {
+             "all": [
+              {
+               "in": [
+                "$d.parent",
+                [
+                 "guilt",
+                 "shame"
+                ]
+               ]
+              },
+              {
+               "eq": [
+                "$a.goal",
+                "repair"
+               ]
+              }
+             ]
+            }
            }
           ]
          }
@@ -42210,9 +42334,29 @@
      "title": [
       {
        "when": {
-        "has": [
-         "$a.checked.ids",
-         "unsure"
+        "any": [
+         {
+          "has": [
+           "$a.checked.ids",
+           "unsure"
+          ]
+         },
+         {
+          "all": [
+           {
+            "eq": [
+             "$ctx.band",
+             "flooded"
+            ]
+           },
+           {
+            "eq": [
+             "$a.fits",
+             "unsure"
+            ]
+           }
+          ]
+         }
         ]
        },
        "key": "clar_title_unsure"
@@ -42295,6 +42439,11 @@
           "not": {
            "set": "$a.checked"
           }
+         },
+         {
+          "not": {
+           "set": "$a.fits"
+          }
          }
         ]
        },
@@ -42302,9 +42451,29 @@
       },
       {
        "when": {
-        "has": [
-         "$a.checked.ids",
-         "unsure"
+        "any": [
+         {
+          "has": [
+           "$a.checked.ids",
+           "unsure"
+          ]
+         },
+         {
+          "all": [
+           {
+            "eq": [
+             "$ctx.band",
+             "flooded"
+            ]
+           },
+           {
+            "eq": [
+             "$a.fits",
+             "unsure"
+            ]
+           }
+          ]
+         }
         ]
        },
        "key": "clar_unsure"
@@ -42487,6 +42656,11 @@
          {
           "not": {
            "set": "$a.checked"
+          }
+         },
+         {
+          "not": {
+           "set": "$a.fits"
           }
          }
         ]
@@ -42891,6 +43065,37 @@
      ],
      "next": [
       {
+       "to": "fits",
+       "when": {
+        "all": [
+         {
+          "all": [
+           {
+            "eq": [
+             "$ctx.band",
+             "flooded"
+            ]
+           },
+           {
+            "not": {
+             "set": "$a.fits"
+            }
+           }
+          ]
+         },
+         {
+          "in": [
+           "$a.tvnb",
+           [
+            "better",
+            "much_better"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
        "to": "size",
        "when": null
       }
@@ -43005,113 +43210,144 @@
        "options": {
         "list": "size",
         "where": {
-         "any": [
+         "all": [
           {
-           "all": [
+           "any": [
             {
-             "in": [
-              "$a.urge",
-              [
-               "anger-criticize",
-               "anger-destroy",
-               "anger-lash",
-               "anger-stonewall",
-               "check-profile",
-               "disgust-judge",
-               "disgust-leave",
-               "disgust-push",
-               "envy-compare",
-               "envy-give-up",
-               "envy-tear-down",
-               "fear-avoid",
-               "fear-cancel",
-               "fear-escape",
-               "fear-freeze",
-               "fire-back",
-               "go-quiet",
-               "guilt-apologize",
-               "guilt-avoid",
-               "guilt-punish",
-               "jealousy-check",
-               "jealousy-cling",
-               "jealousy-interrogate",
-               "love-idealize",
-               "love-proximity",
-               "love-reach-out",
-               "love-stalk",
-               "pull-away",
-               "sad-bed",
-               "sad-give-up",
-               "sad-isolate",
-               "sad-scroll",
-               "shame-avoid-people",
-               "shame-hide",
-               "shame-secret",
-               "shame-shrink",
-               "text-again"
-              ]
+             "all": [
+              {
+               "in": [
+                "$a.urge",
+                [
+                 "anger-criticize",
+                 "anger-destroy",
+                 "anger-lash",
+                 "anger-stonewall",
+                 "check-profile",
+                 "disgust-judge",
+                 "disgust-leave",
+                 "disgust-push",
+                 "envy-compare",
+                 "envy-give-up",
+                 "envy-tear-down",
+                 "fear-avoid",
+                 "fear-cancel",
+                 "fear-escape",
+                 "fear-freeze",
+                 "fire-back",
+                 "go-quiet",
+                 "guilt-apologize",
+                 "guilt-avoid",
+                 "guilt-punish",
+                 "jealousy-check",
+                 "jealousy-cling",
+                 "jealousy-interrogate",
+                 "love-idealize",
+                 "love-proximity",
+                 "love-reach-out",
+                 "love-stalk",
+                 "pull-away",
+                 "sad-bed",
+                 "sad-give-up",
+                 "sad-isolate",
+                 "sad-scroll",
+                 "shame-avoid-people",
+                 "shame-hide",
+                 "shame-secret",
+                 "shame-shrink",
+                 "text-again"
+                ]
+               ]
+              },
+              {
+               "eq": [
+                "$opt.urgeFor",
+                "$a.urge"
+               ]
+              }
              ]
             },
             {
-             "eq": [
-              "$opt.urgeFor",
-              "$a.urge"
+             "all": [
+              {
+               "not": {
+                "in": [
+                 "$a.urge",
+                 [
+                  "anger-criticize",
+                  "anger-destroy",
+                  "anger-lash",
+                  "anger-stonewall",
+                  "check-profile",
+                  "disgust-judge",
+                  "disgust-leave",
+                  "disgust-push",
+                  "envy-compare",
+                  "envy-give-up",
+                  "envy-tear-down",
+                  "fear-avoid",
+                  "fear-cancel",
+                  "fear-escape",
+                  "fear-freeze",
+                  "fire-back",
+                  "go-quiet",
+                  "guilt-apologize",
+                  "guilt-avoid",
+                  "guilt-punish",
+                  "jealousy-check",
+                  "jealousy-cling",
+                  "jealousy-interrogate",
+                  "love-idealize",
+                  "love-proximity",
+                  "love-reach-out",
+                  "love-stalk",
+                  "pull-away",
+                  "sad-bed",
+                  "sad-give-up",
+                  "sad-isolate",
+                  "sad-scroll",
+                  "shame-avoid-people",
+                  "shame-hide",
+                  "shame-secret",
+                  "shame-shrink",
+                  "text-again"
+                 ]
+                ]
+               }
+              },
+              {
+               "eq": [
+                "$opt.parent",
+                "$d.parent"
+               ]
+              }
              ]
             }
            ]
           },
           {
-           "all": [
+           "any": [
             {
              "not": {
-              "in": [
-               "$a.urge",
-               [
-                "anger-criticize",
-                "anger-destroy",
-                "anger-lash",
-                "anger-stonewall",
-                "check-profile",
-                "disgust-judge",
-                "disgust-leave",
-                "disgust-push",
-                "envy-compare",
-                "envy-give-up",
-                "envy-tear-down",
-                "fear-avoid",
-                "fear-cancel",
-                "fear-escape",
-                "fear-freeze",
-                "fire-back",
-                "go-quiet",
-                "guilt-apologize",
-                "guilt-avoid",
-                "guilt-punish",
-                "jealousy-check",
-                "jealousy-cling",
-                "jealousy-interrogate",
-                "love-idealize",
-                "love-proximity",
-                "love-reach-out",
-                "love-stalk",
-                "pull-away",
-                "sad-bed",
-                "sad-give-up",
-                "sad-isolate",
-                "sad-scroll",
-                "shame-avoid-people",
-                "shame-hide",
-                "shame-secret",
-                "shame-shrink",
-                "text-again"
-               ]
+              "all": [
+               {
+                "eq": [
+                 "$ctx.band",
+                 "flooded"
+                ]
+               },
+               {
+                "not": {
+                 "set": "$a.fits"
+                }
+               }
               ]
              }
             },
             {
              "eq": [
-              "$opt.parent",
-              "$d.parent"
+              "$opt.size",
+              "small"
              ]
             }
            ]

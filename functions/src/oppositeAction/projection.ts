@@ -10,7 +10,10 @@
  * `oppositeActionApplicable`), its urge one of its parent's, and its route the graph's `opposite` (safe, and not the
  * repair rule). For *I still do not know*, Check the Facts run inline (ER-B5) gives the verdict that stands in for the fit
  * (fits → fits, partly → excessive, doesn't fit → not fit) when it finished with nothing unsafe told (`checked`, recorded
- * as `factsChecked`). A pick that fails is skipped, never
+ * as `factsChecked`). A carried flooded reading asks *will it help?* first and the fit only after the body, once the
+ * pull is weaker (ER-B5): a pick whose fit was never asked counts only on *it won't help* (H10's own reason for the
+ * opposite, whatever the fit), never guilt or shame with the repair goal, and is recorded `facts: ''`, `factsDeferred`.
+ * A pick that fails is skipped, never
  * fatal: the close still saves.
  *
  * A reopened visit (the `oa_try` card: *Did you get to try it?*) doesn't write new records: it moves the first visit's
@@ -34,7 +37,8 @@ export interface OaPick {
   emotionId: string;
   urgeId: string; // an ActionUrge id, or 'custom' for own words
   actionSize: 'small' | 'medium' | 'bigger' | 'custom';
-  facts: string;
+  /** null: never asked (a flooded start whose body didn't settle; `factsDeferred`). */
+  facts: string | null;
   effectiveness: string;
   /** Check the Facts inline (ER-B5): its verdict when the check finished with nothing unsafe told, else null. */
   checked: CheckVerdict | null;
@@ -74,7 +78,8 @@ export function oaFromRun(run: Record<string, unknown>): OaRun {
     const urgeId = urge.ids[0] ?? (urge.own ? 'custom' : null);
     const facts = one('fits', emotionId);
     const effectiveness = one('help', emotionId);
-    if (!actionSize || !urgeId || !facts || !effectiveness) return;
+    // No fit answer only on the flooded start's *it won't help* (the skill asks it before the fit there).
+    if (!actionSize || !urgeId || !effectiveness || (!facts && effectiveness !== 'unhelpful')) return;
     // The inline check's outcome ids: a verdict counts only when the check finished (not left early, as the skill's
     // `ctf` sends `left` to the clarify card) and nothing unsafe came with it.
     const chk = get('checked', emotionId)?.ids ?? [];
@@ -178,13 +183,17 @@ export async function projectOppositeAction(tx: ManagedTransaction, { uid, toolS
     try { flow = JSON.parse(rec.get('flow') as string) as typeof flow; } catch { continue; }
     // An inline check's verdict stands in for *does it fit?* (the skill's `ctf` reads the same table on it).
     const facts = p.checked ? CHECK_FACTS[p.checked] : p.facts;
-    const route = flow.routes?.[`${facts}:${p.effectiveness}`];
-    if (route !== 'opposite' || repairRule(parentId, facts, oa.goal)) continue;
+    // A fit never asked: *won't help* is the opposite (the table's every known fit says so), but never for guilt or
+    // shame with the repair goal, which waits for the facts.
+    const deferred = facts === null;
+    if (deferred && (p.effectiveness !== 'unhelpful' || ((parentId === 'guilt' || parentId === 'shame') && oa.goal === 'repair'))) continue;
+    const route = deferred ? 'opposite' : flow.routes?.[`${facts}:${p.effectiveness}`];
+    if (route !== 'opposite' || (!deferred && repairRule(parentId, facts, oa.goal))) continue;
     const id = `${toolSessionId}-${p.index + 1}`;
     const data = {
       schemaVersion: 3, id, status: oa.status, emotionId: p.emotionId, parentId, urgeId: p.urgeId,
-      goal: oa.goal ?? '', safety: 'safe', facts: p.facts, effectiveness: p.effectiveness, actionSize: p.actionSize,
-      ...(p.checked ? { factsChecked: p.checked } : {}),
+      goal: oa.goal ?? '', safety: 'safe', facts: p.facts ?? '', effectiveness: p.effectiveness, actionSize: p.actionSize,
+      ...(p.checked ? { factsChecked: p.checked } : {}), ...(deferred ? { factsDeferred: true } : {}),
       cueId: oa.cueId ?? '', outcome: oa.status === 'practiced' ? oa.outcome ?? '' : '', predict: oa.predict ?? '',
       actual: oa.status === 'practiced' ? oa.actual ?? '' : '', thenVsNowBody: p.thenVsNowBody ?? '', missedReason: '',
     };
