@@ -17457,27 +17457,27 @@ MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:moved"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 4};
 MERGE (n:SkillStep {id: "please_skill:read_body"})
-SET n += {skillId: "please_skill", step: "read_body", kind: "embed", version: "pl-v1"}, n.specJson = "{\"answerAs\": \"tank\", \"embed\": \"batteryRead\", \"props\": {\"fields\": [\"sleep\", \"food\", \"body\", \"subs\", \"moved\"], \"low\": \"body\", \"names\": \"tank_names\", \"next\": \"next\"}, \"title\": \"vol_body\"}";
+SET n += {skillId: "please_skill", step: "read_body", kind: "embed", version: "pl-v1"}, n.specJson = "{\"answerAs\": \"tank\", \"embed\": \"batteryRead\", \"props\": {\"fields\": [\"sleep\", \"food\", \"body\", \"subs\", \"moved\"], \"hidden\": \"pleaseRows\", \"low\": \"body\", \"names\": \"tank_names\", \"next\": \"next\"}, \"title\": \"vol_body\"}";
 MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:read_body"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 5};
 MERGE (n:SkillStep {id: "please_skill:read_sleep"})
-SET n += {skillId: "please_skill", step: "read_sleep", kind: "embed", version: "pl-v1"}, n.specJson = "{\"answerAs\": \"tank\", \"embed\": \"batteryRead\", \"props\": {\"fields\": [\"sleep\", \"food\", \"body\", \"subs\", \"moved\"], \"low\": \"sleep\", \"names\": \"tank_names\", \"next\": \"next\"}, \"title\": \"vol_sleep\"}";
+SET n += {skillId: "please_skill", step: "read_sleep", kind: "embed", version: "pl-v1"}, n.specJson = "{\"answerAs\": \"tank\", \"embed\": \"batteryRead\", \"props\": {\"fields\": [\"sleep\", \"food\", \"body\", \"subs\", \"moved\"], \"hidden\": \"pleaseRows\", \"low\": \"sleep\", \"names\": \"tank_names\", \"next\": \"next\"}, \"title\": \"vol_sleep\"}";
 MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:read_sleep"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 6};
 MERGE (n:SkillStep {id: "please_skill:read_food"})
-SET n += {skillId: "please_skill", step: "read_food", kind: "embed", version: "pl-v1"}, n.specJson = "{\"answerAs\": \"tank\", \"embed\": \"batteryRead\", \"props\": {\"fields\": [\"sleep\", \"food\", \"body\", \"subs\", \"moved\"], \"low\": \"food\", \"names\": \"tank_names\", \"next\": \"next\"}, \"title\": \"vol_food\"}";
+SET n += {skillId: "please_skill", step: "read_food", kind: "embed", version: "pl-v1"}, n.specJson = "{\"answerAs\": \"tank\", \"embed\": \"batteryRead\", \"props\": {\"fields\": [\"sleep\", \"food\", \"body\", \"subs\", \"moved\"], \"hidden\": \"pleaseRows\", \"low\": \"food\", \"names\": \"tank_names\", \"next\": \"next\"}, \"title\": \"vol_food\"}";
 MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:read_food"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 7};
 MERGE (n:SkillStep {id: "please_skill:read_subs"})
-SET n += {skillId: "please_skill", step: "read_subs", kind: "embed", version: "pl-v1"}, n.specJson = "{\"answerAs\": \"tank\", \"embed\": \"batteryRead\", \"props\": {\"fields\": [\"sleep\", \"food\", \"body\", \"subs\", \"moved\"], \"low\": \"subs\", \"names\": \"tank_names\", \"next\": \"next\"}, \"title\": \"vol_subs\"}";
+SET n += {skillId: "please_skill", step: "read_subs", kind: "embed", version: "pl-v1"}, n.specJson = "{\"answerAs\": \"tank\", \"embed\": \"batteryRead\", \"props\": {\"fields\": [\"sleep\", \"food\", \"body\", \"subs\", \"moved\"], \"hidden\": \"pleaseRows\", \"low\": \"subs\", \"names\": \"tank_names\", \"next\": \"next\"}, \"title\": \"vol_subs\"}";
 MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:read_subs"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 8};
 MERGE (n:SkillStep {id: "please_skill:read_moved"})
-SET n += {skillId: "please_skill", step: "read_moved", kind: "embed", version: "pl-v1"}, n.specJson = "{\"answerAs\": \"tank\", \"embed\": \"batteryRead\", \"props\": {\"fields\": [\"sleep\", \"food\", \"body\", \"subs\", \"moved\"], \"low\": \"moved\", \"names\": \"tank_names\", \"next\": \"next\"}, \"title\": \"vol_moved\"}";
+SET n += {skillId: "please_skill", step: "read_moved", kind: "embed", version: "pl-v1"}, n.specJson = "{\"answerAs\": \"tank\", \"embed\": \"batteryRead\", \"props\": {\"fields\": [\"sleep\", \"food\", \"body\", \"subs\", \"moved\"], \"hidden\": \"pleaseRows\", \"low\": \"moved\", \"names\": \"tank_names\", \"next\": \"next\"}, \"title\": \"vol_moved\"}";
 MATCH (s:Skill {id: "please_skill"}), (n:SkillStep {id: "please_skill:read_moved"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 9};
@@ -17535,19 +17535,109 @@ MATCH (s:Skill {id: "please_skill"}), (x:SkillExit {id: "please_skill:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "please_skill:sleep"}), (b:SkillStep {id: "please_skill:food"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "null";
+SET r += {order: 0}, r.whenJson = "{\"not\": {\"has\": [\"$p.pleaseRows\", \"food\"]}}";
+MATCH (a:SkillStep {id: "please_skill:sleep"}), (b:SkillStep {id: "please_skill:body"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"not\": {\"has\": [\"$p.pleaseRows\", \"body\"]}}";
+MATCH (a:SkillStep {id: "please_skill:sleep"}), (b:SkillStep {id: "please_skill:subs"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "{\"not\": {\"has\": [\"$p.pleaseRows\", \"subs\"]}}";
+MATCH (a:SkillStep {id: "please_skill:sleep"}), (b:SkillStep {id: "please_skill:moved"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 3}, r.whenJson = "{\"not\": {\"has\": [\"$p.pleaseRows\", \"moved\"]}}";
+MATCH (a:SkillStep {id: "please_skill:sleep"}), (b:SkillStep {id: "please_skill:read_body"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 4}, r.whenJson = "{\"in\": [\"$a.body\", [\"body_ill\", \"body_pain\", \"body_meds\"]]}";
+MATCH (a:SkillStep {id: "please_skill:sleep"}), (b:SkillStep {id: "please_skill:read_sleep"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 5}, r.whenJson = "{\"in\": [\"$a.sleep\", [\"sleep_short\", \"sleep_broken\", \"sleep_much\"]]}";
+MATCH (a:SkillStep {id: "please_skill:sleep"}), (b:SkillStep {id: "please_skill:read_food"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 6}, r.whenJson = "{\"in\": [\"$a.food\", [\"food_skipped\", \"food_all_over\"]]}";
+MATCH (a:SkillStep {id: "please_skill:sleep"}), (b:SkillStep {id: "please_skill:read_subs"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 7}, r.whenJson = "{\"in\": [\"$a.subs\", [\"subs_some\"]]}";
+MATCH (a:SkillStep {id: "please_skill:sleep"}), (b:SkillStep {id: "please_skill:read_moved"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 8}, r.whenJson = "{\"in\": [\"$a.moved\", [\"moved_not_yet\"]]}";
+MATCH (a:SkillStep {id: "please_skill:sleep"}), (b:SkillStep {id: "please_skill:none"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 9}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "please_skill:sleep"}), (x:SkillExit {id: "please_skill:cool_down"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "sleep", label: "settle_first"}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
 MATCH (a:SkillStep {id: "please_skill:food"}), (b:SkillStep {id: "please_skill:body"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "null";
+SET r += {order: 0}, r.whenJson = "{\"not\": {\"has\": [\"$p.pleaseRows\", \"body\"]}}";
+MATCH (a:SkillStep {id: "please_skill:food"}), (b:SkillStep {id: "please_skill:subs"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"not\": {\"has\": [\"$p.pleaseRows\", \"subs\"]}}";
+MATCH (a:SkillStep {id: "please_skill:food"}), (b:SkillStep {id: "please_skill:moved"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "{\"not\": {\"has\": [\"$p.pleaseRows\", \"moved\"]}}";
+MATCH (a:SkillStep {id: "please_skill:food"}), (b:SkillStep {id: "please_skill:read_body"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 3}, r.whenJson = "{\"in\": [\"$a.body\", [\"body_ill\", \"body_pain\", \"body_meds\"]]}";
+MATCH (a:SkillStep {id: "please_skill:food"}), (b:SkillStep {id: "please_skill:read_sleep"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 4}, r.whenJson = "{\"in\": [\"$a.sleep\", [\"sleep_short\", \"sleep_broken\", \"sleep_much\"]]}";
+MATCH (a:SkillStep {id: "please_skill:food"}), (b:SkillStep {id: "please_skill:read_food"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 5}, r.whenJson = "{\"in\": [\"$a.food\", [\"food_skipped\", \"food_all_over\"]]}";
+MATCH (a:SkillStep {id: "please_skill:food"}), (b:SkillStep {id: "please_skill:read_subs"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 6}, r.whenJson = "{\"in\": [\"$a.subs\", [\"subs_some\"]]}";
+MATCH (a:SkillStep {id: "please_skill:food"}), (b:SkillStep {id: "please_skill:read_moved"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 7}, r.whenJson = "{\"in\": [\"$a.moved\", [\"moved_not_yet\"]]}";
+MATCH (a:SkillStep {id: "please_skill:food"}), (b:SkillStep {id: "please_skill:none"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 8}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "please_skill:body"}), (b:SkillStep {id: "please_skill:subs"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "null";
+SET r += {order: 0}, r.whenJson = "{\"not\": {\"has\": [\"$p.pleaseRows\", \"subs\"]}}";
+MATCH (a:SkillStep {id: "please_skill:body"}), (b:SkillStep {id: "please_skill:moved"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"not\": {\"has\": [\"$p.pleaseRows\", \"moved\"]}}";
+MATCH (a:SkillStep {id: "please_skill:body"}), (b:SkillStep {id: "please_skill:read_body"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "{\"in\": [\"$a.body\", [\"body_ill\", \"body_pain\", \"body_meds\"]]}";
+MATCH (a:SkillStep {id: "please_skill:body"}), (b:SkillStep {id: "please_skill:read_sleep"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 3}, r.whenJson = "{\"in\": [\"$a.sleep\", [\"sleep_short\", \"sleep_broken\", \"sleep_much\"]]}";
+MATCH (a:SkillStep {id: "please_skill:body"}), (b:SkillStep {id: "please_skill:read_food"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 4}, r.whenJson = "{\"in\": [\"$a.food\", [\"food_skipped\", \"food_all_over\"]]}";
+MATCH (a:SkillStep {id: "please_skill:body"}), (b:SkillStep {id: "please_skill:read_subs"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 5}, r.whenJson = "{\"in\": [\"$a.subs\", [\"subs_some\"]]}";
+MATCH (a:SkillStep {id: "please_skill:body"}), (b:SkillStep {id: "please_skill:read_moved"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 6}, r.whenJson = "{\"in\": [\"$a.moved\", [\"moved_not_yet\"]]}";
+MATCH (a:SkillStep {id: "please_skill:body"}), (b:SkillStep {id: "please_skill:none"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 7}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "please_skill:subs"}), (b:SkillStep {id: "please_skill:moved"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "null";
+SET r += {order: 0}, r.whenJson = "{\"not\": {\"has\": [\"$p.pleaseRows\", \"moved\"]}}";
+MATCH (a:SkillStep {id: "please_skill:subs"}), (b:SkillStep {id: "please_skill:read_body"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"in\": [\"$a.body\", [\"body_ill\", \"body_pain\", \"body_meds\"]]}";
+MATCH (a:SkillStep {id: "please_skill:subs"}), (b:SkillStep {id: "please_skill:read_sleep"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "{\"in\": [\"$a.sleep\", [\"sleep_short\", \"sleep_broken\", \"sleep_much\"]]}";
+MATCH (a:SkillStep {id: "please_skill:subs"}), (b:SkillStep {id: "please_skill:read_food"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 3}, r.whenJson = "{\"in\": [\"$a.food\", [\"food_skipped\", \"food_all_over\"]]}";
+MATCH (a:SkillStep {id: "please_skill:subs"}), (b:SkillStep {id: "please_skill:read_subs"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 4}, r.whenJson = "{\"in\": [\"$a.subs\", [\"subs_some\"]]}";
+MATCH (a:SkillStep {id: "please_skill:subs"}), (b:SkillStep {id: "please_skill:read_moved"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 5}, r.whenJson = "{\"in\": [\"$a.moved\", [\"moved_not_yet\"]]}";
+MATCH (a:SkillStep {id: "please_skill:subs"}), (b:SkillStep {id: "please_skill:none"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 6}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "please_skill:moved"}), (b:SkillStep {id: "please_skill:read_body"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"in\": [\"$a.body\", [\"body_ill\", \"body_pain\", \"body_meds\"]]}";

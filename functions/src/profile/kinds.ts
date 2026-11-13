@@ -16,6 +16,9 @@ import { isAskFreshField } from '../userdata/layers';
 import { HHMM } from './meta';
 import type { ProfileAreaId, SliceId } from './types';
 
+/** Running low's rows that Me can leave out (scripts/skills/please_skill.py HIDEABLE; a test keeps them equal). */
+export const PLEASE_HIDEABLE_ROWS = ['food', 'body', 'subs', 'moved'] as const;
+
 export interface ProfileKindDef {
   kind: string;
   /** Neo4j label (whitelisted: it is interpolated into Cypher). */
@@ -190,6 +193,18 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
       const has = ((out.rungIds as string[] | undefined)?.length ?? 0) > 0 || (typeof out.rungOwn === 'string' && out.rungOwn.trim() !== '');
       if (!has) throw new ValidationError('Nothing to keep');
       return out;
+    },
+  },
+  // Running low (ER-07, docs/design/running-low.md): the rows the person would rather not see, set in Me → My body (the
+  // tap there is the yes). Sleep, the opening screen, is always asked (and always skippable); the rest can be left out.
+  please_rows: {
+    kind: 'please_rows', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'my_body', slice: 'pleaseRows',
+    owner: 'ER', many: false, maxItems: 1, editor: 'please_rows', ownFields: [],
+    validate: (v) => {
+      const o = obj(v);
+      for (const k of Object.keys(o)) if (k !== 'hidden') throw new ValidationError('Unexpected field');
+      const hidden = strArray(o.hidden ?? [], { max: PLEASE_HIDEABLE_ROWS.length, item: (x) => oneOf(x, PLEASE_HIDEABLE_ROWS) });
+      return { hidden: [...new Set(hidden)] };
     },
   },
   crisis_kit: {

@@ -14,7 +14,7 @@ export const SLICE_IDS = [
   'name', 'quietHours', 'patterns', 'ownLines', 'savedLines',
   'people', 'bodyFlags', 'values', 'goals', 'copeAheadPlans', 'boundaryLines', 'practicePrefs',
   'fadeLevels', 'ownWords', 'thingsILike', 'thingsILikePicks', 'iCanRungs', 'crisisKit', 'safetyPlan', 'country',
-  'parts', 'partDetail', 'partAnchors', 'den', 'prosCons',
+  'parts', 'partDetail', 'partAnchors', 'den', 'prosCons', 'pleaseRows',
 ] as const;
 export type SliceId = (typeof SLICE_IDS)[number];
 
@@ -85,6 +85,12 @@ export interface ProfileSlices {
   thingsILikePicks: Array<{ id: string }>;
   /** The ladder ids already on the I can list (ER-11, kind `i_can`, `rungIds`): Build mastery doesn't offer them twice. */
   iCanRungs: Array<{ id: string }>;
+  /**
+   * Running low's rows the person would rather not see (ER-07, kind `please_rows`, set in Me → My body): row ids out of
+   * `PLEASE_HIDEABLE_ROWS` (food, body, subs, moved). Running low skips them and its readout leaves them out. Empty
+   * when nothing is set.
+   */
+  pleaseRows: string[];
   /**
    * The kept crisis kit (DT-03, kind `crisis_kit`, one per person), active only, or null: per section the option ids
    * and the person's own words as written (decrypted for them). The kit plays it one card at a time.
@@ -195,6 +201,7 @@ export const PROFILE_NEEDS = {
   'fast': ['parts'],                         // the tag row on its close (docs/design/fast.md)
   'say-no': ['people'],                      // the picker (IE-03), before the skill (docs/design/say-no.md)
   'good-things': ['thingsILike', 'thingsILikePicks'],             // its pick step: the person's own things first (docs/design/good-things.md)
+  'please-skill': ['pleaseRows'],            // the rows the person left out in Me (docs/design/running-low.md)
   'build-mastery': ['iCanRungs'],             // the done card: a step already on the I can list isn't offered again (docs/design/build-mastery.md)
   'give': ['people'],                        // the picker (IE-03), before the skill (docs/design/give.md)
   'mindfulness-of-others': ['people'],       // the picker (IE-03), before the skill (docs/design/notice-them.md)

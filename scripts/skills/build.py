@@ -21,7 +21,7 @@ REF = re.compile(r"^\$(a|d|opt|ctx|p)\.[A-Za-z_][A-Za-z0-9_]*(\.(ids|own))?$")
 PROFILE_SLICES = {
     "name", "quietHours", "patterns", "ownLines", "savedLines", "people", "bodyFlags", "values", "goals",
     "copeAheadPlans", "boundaryLines", "practicePrefs", "fadeLevels", "ownWords", "thingsILike", "thingsILikePicks", "iCanRungs", "crisisKit",
-    "safetyPlan", "country", "parts", "partDetail", "partAnchors", "den", "prosCons",
+    "safetyPlan", "country", "parts", "partDetail", "partAnchors", "den", "prosCons", "pleaseRows",
 }
 # Slices a field may list as options (src/data/skillTypes.ts ProfileOptionSlice).
 PROFILE_OPTION_SLICES = {"parts", "ownLines", "savedLines", "people", "values", "goals", "copeAheadPlans", "boundaryLines", "thingsILike"}

@@ -45718,6 +45718,110 @@
      "next": [
       {
        "to": "food",
+       "when": {
+        "not": {
+         "has": [
+          "$p.pleaseRows",
+          "food"
+         ]
+        }
+       }
+      },
+      {
+       "to": "body",
+       "when": {
+        "not": {
+         "has": [
+          "$p.pleaseRows",
+          "body"
+         ]
+        }
+       }
+      },
+      {
+       "to": "subs",
+       "when": {
+        "not": {
+         "has": [
+          "$p.pleaseRows",
+          "subs"
+         ]
+        }
+       }
+      },
+      {
+       "to": "moved",
+       "when": {
+        "not": {
+         "has": [
+          "$p.pleaseRows",
+          "moved"
+         ]
+        }
+       }
+      },
+      {
+       "to": "read_body",
+       "when": {
+        "in": [
+         "$a.body",
+         [
+          "body_ill",
+          "body_pain",
+          "body_meds"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "read_sleep",
+       "when": {
+        "in": [
+         "$a.sleep",
+         [
+          "sleep_short",
+          "sleep_broken",
+          "sleep_much"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "read_food",
+       "when": {
+        "in": [
+         "$a.food",
+         [
+          "food_skipped",
+          "food_all_over"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "read_subs",
+       "when": {
+        "in": [
+         "$a.subs",
+         [
+          "subs_some"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "read_moved",
+       "when": {
+        "in": [
+         "$a.moved",
+         [
+          "moved_not_yet"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "none",
        "when": null
       }
      ],
@@ -45739,6 +45843,99 @@
      "next": [
       {
        "to": "body",
+       "when": {
+        "not": {
+         "has": [
+          "$p.pleaseRows",
+          "body"
+         ]
+        }
+       }
+      },
+      {
+       "to": "subs",
+       "when": {
+        "not": {
+         "has": [
+          "$p.pleaseRows",
+          "subs"
+         ]
+        }
+       }
+      },
+      {
+       "to": "moved",
+       "when": {
+        "not": {
+         "has": [
+          "$p.pleaseRows",
+          "moved"
+         ]
+        }
+       }
+      },
+      {
+       "to": "read_body",
+       "when": {
+        "in": [
+         "$a.body",
+         [
+          "body_ill",
+          "body_pain",
+          "body_meds"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "read_sleep",
+       "when": {
+        "in": [
+         "$a.sleep",
+         [
+          "sleep_short",
+          "sleep_broken",
+          "sleep_much"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "read_food",
+       "when": {
+        "in": [
+         "$a.food",
+         [
+          "food_skipped",
+          "food_all_over"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "read_subs",
+       "when": {
+        "in": [
+         "$a.subs",
+         [
+          "subs_some"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "read_moved",
+       "when": {
+        "in": [
+         "$a.moved",
+         [
+          "moved_not_yet"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "none",
        "when": null
       }
      ],
@@ -45760,6 +45957,88 @@
      "next": [
       {
        "to": "subs",
+       "when": {
+        "not": {
+         "has": [
+          "$p.pleaseRows",
+          "subs"
+         ]
+        }
+       }
+      },
+      {
+       "to": "moved",
+       "when": {
+        "not": {
+         "has": [
+          "$p.pleaseRows",
+          "moved"
+         ]
+        }
+       }
+      },
+      {
+       "to": "read_body",
+       "when": {
+        "in": [
+         "$a.body",
+         [
+          "body_ill",
+          "body_pain",
+          "body_meds"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "read_sleep",
+       "when": {
+        "in": [
+         "$a.sleep",
+         [
+          "sleep_short",
+          "sleep_broken",
+          "sleep_much"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "read_food",
+       "when": {
+        "in": [
+         "$a.food",
+         [
+          "food_skipped",
+          "food_all_over"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "read_subs",
+       "when": {
+        "in": [
+         "$a.subs",
+         [
+          "subs_some"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "read_moved",
+       "when": {
+        "in": [
+         "$a.moved",
+         [
+          "moved_not_yet"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "none",
        "when": null
       }
      ],
@@ -45782,6 +46061,77 @@
      "next": [
       {
        "to": "moved",
+       "when": {
+        "not": {
+         "has": [
+          "$p.pleaseRows",
+          "moved"
+         ]
+        }
+       }
+      },
+      {
+       "to": "read_body",
+       "when": {
+        "in": [
+         "$a.body",
+         [
+          "body_ill",
+          "body_pain",
+          "body_meds"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "read_sleep",
+       "when": {
+        "in": [
+         "$a.sleep",
+         [
+          "sleep_short",
+          "sleep_broken",
+          "sleep_much"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "read_food",
+       "when": {
+        "in": [
+         "$a.food",
+         [
+          "food_skipped",
+          "food_all_over"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "read_subs",
+       "when": {
+        "in": [
+         "$a.subs",
+         [
+          "subs_some"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "read_moved",
+       "when": {
+        "in": [
+         "$a.moved",
+         [
+          "moved_not_yet"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "none",
        "when": null
       }
      ],
@@ -45884,6 +46234,7 @@
       ],
       "low": "body",
       "names": "tank_names",
+      "hidden": "pleaseRows",
       "next": "next"
      },
      "next": [
@@ -45910,6 +46261,7 @@
       ],
       "low": "sleep",
       "names": "tank_names",
+      "hidden": "pleaseRows",
       "next": "next"
      },
      "next": [
@@ -45936,6 +46288,7 @@
       ],
       "low": "food",
       "names": "tank_names",
+      "hidden": "pleaseRows",
       "next": "next"
      },
      "next": [
@@ -45962,6 +46315,7 @@
       ],
       "low": "subs",
       "names": "tank_names",
+      "hidden": "pleaseRows",
       "next": "next"
      },
      "next": [
@@ -45988,6 +46342,7 @@
       ],
       "low": "moved",
       "names": "tank_names",
+      "hidden": "pleaseRows",
       "next": "next"
      },
      "next": [

@@ -61,8 +61,10 @@ export const saveCheckIn = callable<unknown, SaveCheckInResponse>(
       // Words everywhere (ER-10 part 3): the words of a check-in whose result rendered join the person's words, once.
       // A word Find the feeling found inside the check-in was counted by that save (`countedWordIds`); every other
       // word counts here, a body-first pick after Find the feeling found nothing included (Codex, PR #129).
-      const counted = new Set(input.countedWordIds);
-      if (input.resultShown) {
+      // A client from before the field sends none: its Find the feeling check-ins keep the old skip (Codex, PR #130).
+      const counted = new Set(input.countedWordIds ?? []);
+      const legacyFtf = input.countedWordIds === null && input.source === 'ftf';
+      if (input.resultShown && !legacyFtf) {
         await recordFoundWords(tx, uid as string, 'CheckIn', key, emotionIds.filter((e) => !counted.has(e)), 'checkin');
       }
       // 2. Every result field (re-analysis overwrites them); a next-action stub keeps its next action.

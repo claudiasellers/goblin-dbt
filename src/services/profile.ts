@@ -11,7 +11,7 @@ export interface MeItem {
   meta: ProfileItemMeta;
   title: string;
   summary: string;
-  editor: 'quiet_hours' | null;
+  editor: 'quiet_hours' | 'please_rows' | null;
   value?: Record<string, unknown>;
   stillTrueCopy: string;
   setAsideCopy: string;

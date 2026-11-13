@@ -3,7 +3,7 @@ import { Suspense, lazy, useCallback, useEffect, useState, type ComponentProps }
 import { getToolById } from '../../data/tools';
 import type { ProfileAreaId } from '../../data/profileTypes';
 import {
-  confirmProfileItem, getMe, restoreProfileItem, setAsideProfileItem, upsertQuietHours,
+  confirmProfileItem, getMe, keepProfileItem, restoreProfileItem, setAsideProfileItem, upsertQuietHours,
   type GetMeResponse, type MeItem,
 } from '../../services/profile';
 import { profileCache } from '../../lib/profileCache';
@@ -13,6 +13,7 @@ import { QuietHoursEditor } from './QuietHoursEditor';
 import { KeptProsCons } from './KeptProsCons';
 import { KeptHabitPlan } from './KeptHabitPlan';
 import { KeptCrisisKit } from './KeptCrisisKit';
+import { KeptPleaseRows, PleaseRowsEditor, PleaseRowsNew } from './PleaseRows';
 import { PatternOfferCard } from './PatternOfferCard';
 import { useUserProfile } from '../../contexts/UserProfileContext';
 import { getPartsContent } from '../../services/partsContent';
@@ -88,6 +89,11 @@ export function MeSection() {
     setReload((r) => r + 1);
   }, []);
 
+  // Running low's rows (ER-07): one per person (the server's id is the kind), so a change or a re-keep after setting
+  // it aside is the same item.
+  const keepPleaseRows = (hidden: string[]) =>
+    after(keepProfileItem({ kind: 'please_rows', value: { hidden } }).then((r) => r.version));
+
   if (error) return <p className="text-sm text-[var(--color-text-secondary)]">Couldn't load Me right now.</p>;
   if (!me) return <div className="h-24 animate-pulse rounded-xl bg-[var(--color-bg-card)]" />;
 
@@ -125,6 +131,8 @@ export function MeSection() {
               ? <KeptProsCons value={i.value} />
               : i.meta.kind === 'abstinence_plan' && i.value
               ? <KeptHabitPlan value={i.value} />
+              : i.meta.kind === 'please_rows'
+              ? <KeptPleaseRows value={i.value} />
               : i.meta.kind === 'crisis_kit' && i.value
               ? <KeptCrisisKit value={i.value as Record<string, unknown>} />
               : i.meta.kind === 'safety_plan' && i.meta.status === 'active'
@@ -143,7 +151,7 @@ export function MeSection() {
           {i.label === 'Person' && (
             <ForgetPerson itemRef={ref(i)} after={after} />
           )}
-          {(i.label === 'OwnLine' || i.meta.kind === 'nightmare_script' || i.meta.kind === 'cope_ahead_plan' || i.meta.kind === 'pros_cons' || i.meta.kind === 'abstinence_plan' || i.meta.kind === 'thing_i_like' || i.meta.kind === 'crisis_kit' || i.meta.kind === 'safety_plan' || i.meta.kind === 'values' || i.meta.kind === 'i_can' || i.label === 'Person') && i.meta.status === 'active' && (
+          {(i.label === 'OwnLine' || i.meta.kind === 'nightmare_script' || i.meta.kind === 'cope_ahead_plan' || i.meta.kind === 'pros_cons' || i.meta.kind === 'abstinence_plan' || i.meta.kind === 'thing_i_like' || i.meta.kind === 'crisis_kit' || i.meta.kind === 'safety_plan' || i.meta.kind === 'values' || i.meta.kind === 'i_can' || i.meta.kind === 'please_rows' || i.label === 'Person') && i.meta.status === 'active' && (
             <button type="button" onClick={() => { after(setAsideProfileItem(ref(i))).catch(() => { /* stays */ }); }}
               className="min-h-11 text-sm text-[var(--color-text-tertiary)] underline underline-offset-2">
               Set aside
@@ -153,6 +161,8 @@ export function MeSection() {
         {editing === key && i.editor === 'quiet_hours' ? (
           <QuietHoursEditor value={i.value as { start: string; end: string } | undefined ?? null}
             onSave={(v) => after(upsertQuietHours(v))} onCancel={() => setEditing(null)} />
+        ) : editing === key && i.editor === 'please_rows' ? (
+          <PleaseRowsEditor value={i.value} onSave={keepPleaseRows} onCancel={() => setEditing(null)} />
         ) : (
           <StillTrue meta={i.meta} question={i.stillTrueCopy}
             onYes={() => after(confirmProfileItem(ref(i)))}
@@ -198,6 +208,10 @@ export function MeSection() {
                   Set quiet hours
                 </button>
               )
+          )}
+          {/* Set aside, it comes back with Restore on its row: the link is for nothing kept yet. */}
+          {a.id === 'my_body' && !a.items.some((i) => i.meta.kind === 'please_rows') && (
+            <PleaseRowsNew onSave={keepPleaseRows} />
           )}
           {a.id === 'my_words' && (
             me.readOnly.foundWords.length > 0 ? (

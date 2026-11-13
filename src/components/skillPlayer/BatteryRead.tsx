@@ -9,14 +9,15 @@ import type { EmbedProps } from './embeds';
  * cell (it claims nothing about that row: another row may be loud too), a skipped row a dashed outline, and the
  * loudest row (`low`) drains to a sliver as the screen opens, outlined in the warning colour. No numbers, no
  * percentages and no charge level: the picture says which row, never how much. The step's title is the readout,
- * so the whole picture is hidden from screen readers.
+ * so the whole picture is hidden from screen readers. A row the person left out in Me (`hidden` names the profile slice,
+ * Running low's `pleaseRows`) gets no cell: it was never asked.
  *
  * Output: `read`.
  */
 
 const text = (props: Record<string, unknown>, k: string) => (typeof props[k] === 'string' ? (props[k] as string) : '');
 
-export function BatteryRead({ props, answerIds = {}, onShown, onDone }: EmbedProps) {
+export function BatteryRead({ props, answerIds = {}, profile, onShown, onDone }: EmbedProps) {
   const shown = useRef(false);
   useEffect(() => {
     if (!shown.current) {
@@ -28,11 +29,13 @@ export function BatteryRead({ props, answerIds = {}, onShown, onDone }: EmbedPro
   const fields = Array.isArray(props.fields) ? (props.fields as string[]) : [];
   const names = text(props, 'names').split(' · ');
   const low = text(props, 'low');
+  const slice = typeof props.hidden === 'string' ? profile?.[props.hidden] : null;
+  const hidden = new Set(Array.isArray(slice) ? slice.filter((x): x is string => typeof x === 'string' && x !== low) : []);
   const cells = fields.map((f, i) => ({
     id: f,
     name: names[i] ?? '',
     state: f === low ? 'low' : (answerIds[f]?.length ?? 0) > 0 ? 'answered' : 'skipped',
-  }));
+  })).filter((c) => !hidden.has(c.id));
   return (
     <section className="space-y-5" data-testid="battery-read">
       <div aria-hidden="true" className="space-y-5">
