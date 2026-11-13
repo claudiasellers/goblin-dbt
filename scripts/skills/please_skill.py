@@ -16,7 +16,7 @@ Departures from the PRD, all listed in docs/design/running-low.md with a reason 
 - One check per visit, not one per day upserted (the diary is CORE's and isn't built; the record is `ext.run`, D2).
 - No weekly pattern card, no "sleep short 3 of 7 → Sleep reset" offer and no monthly *something you've been putting
   off*: each is an aggregate over past visits or a monthly schedule, which a live flow never reads (data layers).
-- Sleep reset (ER-13) from the sleep row is a planned exit until it's built (ER-B5).
+- Sleep reset (ER-13) is offered on the end card when sleep is loud (built 13 Nov 2026).
 - Rows hidden in settings (ER-B5): Me → My body can leave out food, body, alcohol or drugs and moving (kind
   `please_rows`, the `pleaseRows` slice); each row's transitions skip a hidden row and the readout leaves it out.
   Sleep, the opening screen, is always asked (and, like every row, can be skipped).
@@ -232,7 +232,7 @@ def steps():
 EXITS = [
     {"id": "cool_down", "toolId": "cool-down"},                              # DT-01 First, the body
     {"id": "find_the_feeling", "toolId": "find-the-feeling"},
-    {"id": "sleep_reset", "toolId": "sleep-reset", "planned": True},          # ER-13 Sleep reset (not built)
+    {"id": "sleep_reset", "toolId": "sleep-reset"},                           # ER-13 Sleep reset
     {"id": "done", "done": True},
 ]
 

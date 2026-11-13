@@ -29,6 +29,7 @@ export const TOOL_CLOSE_KIND: Record<string, { module: SpineModule; closeKind: C
   'er-troubleshoot': { module: 'er', closeKind: 'none' },
   'nightmare-rescript': { module: 'er', closeKind: 'none' },
   'please-skill': { module: 'er', closeKind: 'none' },
+  'sleep-reset': { module: 'er', closeKind: 'none' },
   'good-things': { module: 'er', closeKind: 'none' },
   'values-clarification': { module: 'er', closeKind: 'none' },
   'build-mastery': { module: 'er', closeKind: 'none' },

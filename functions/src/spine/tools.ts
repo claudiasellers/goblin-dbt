@@ -47,6 +47,9 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   // Running low (ER-07, docs/design/running-low.md): a body check and one fix for today. No close question (the
   // fix happens later, if at all); its outcome is the evening card's *Did it happen?* (`please_fix`).
   'please-skill': { module: 'er', closeKind: 'none' },
+  // Sleep reset (ER-13, docs/design/sleep-reset.md): no close question (a night isn't rated at 3am); its outcome is
+  // the morning card's *How was the night?* (`sleep_morning`).
+  'sleep-reset': { module: 'er', closeKind: 'none' },
   // Good things (ER-04, docs/design/good-things.md): no close question; *lighter · same · heavier* is asked on the
   // `good_thing` card's visit, after the thing was done (asking right after picking it would mean nothing).
   'good-things': { module: 'er', closeKind: 'none' },

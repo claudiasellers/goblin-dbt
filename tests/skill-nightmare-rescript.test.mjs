@@ -47,7 +47,7 @@ test("never for a replay: yes or partly goes to the clinician card, which rewrit
     const card = M.stepOf(skill, "clinician");
     assert.equal(card.kind, "handoff");
     assert.ok(card.noClose, "no close question after that");
-    assert.deepEqual(M.offersFor(ctx(), card, s), ["five_senses", "safety_open"], "Sleep reset is planned, so not shown yet");
+    assert.deepEqual(M.offersFor(ctx(), card, s), ["five_senses", "sleep_reset", "safety_open"], "Sleep reset (ER-13) for tonight");
     assert.match(M.handoffLine(ctx(), card, s), /clinician/);
   }
   for (const v of ["no", "unsure"]) assert.equal(run([pick("replay", v), next]).stepId, "settle", v);

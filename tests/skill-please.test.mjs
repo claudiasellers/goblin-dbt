@@ -190,11 +190,11 @@ test("nothing loud: no fix, a line that it may be a feeling, Find the feeling an
   assert.equal(M.stepOf(skill, "none").done, "done");
 });
 
-test("sleep loud: Sleep reset is written as a planned exit, never offered until ER-13 ships", () => {
+test("sleep loud: the set card offers Sleep reset (ER-13, built); not when sleep was fine", () => {
   const s = run([...toFix({ sleep: "sleep_broken" }), pick("fix", "fix_daylight"), next, pick("when", "now"), next]);
   assert.equal(s.stepId, "set");
-  assert.deepEqual(s.offered, []);
-  assert.ok(skill.exits.find((x) => x.id === "sleep_reset").planned);
+  assert.deepEqual(s.offered, ["sleep_reset"]);
+  assert.ok(!skill.exits.find((x) => x.id === "sleep_reset").planned);
 });
 
 test("a carried flooded reading offers settling the body first; going on is the default", () => {
