@@ -104,7 +104,13 @@ test("the route, per feeling: opposite, clarify (its own line for not fit + help
   assert.equal(prob.stepId, "prob");
   assert.deepEqual(offers(prob), ["problem_solve"]);
   assert.deepEqual(offers(to("angry", "excessive", "helpful")), ["cool_down", "problem_solve"]);
-  assert.equal(to("guilty", "fits", "unhelpful", "repair").stepId, "repr");
+  const repr = to("guilty", "fits", "unhelpful", "repair");
+  assert.equal(repr.stepId, "repr");
+  assert.deepEqual(offers(repr), ["problem_solve_repair"], "Problem Solve opened on repair (H11), not on its feeling screen's not-fit card");
+  const ex = skill.exits.find((e) => e.id === "problem_solve_repair");
+  assert.deepEqual([ex.toolId, ex.query, ex.planned ?? false], ["problem-solve", { frame: "repair" }, false]);
+  assert.deepEqual(M.carried(ex, repr, ctx()), ["guilty"], "the word goes with it, first on Problem Solve's feeling screen");
+  assert.ok(content.skills.find((x) => x.id === "problem_solve").accepts.includes("frame"));
   assert.equal(to("guilty", "fits", "unhelpful", "connection").stepId, "cue", "repair only with the repair goal");
   assert.equal(to("sad", "fits", "unhelpful", "repair").stepId, "cue", "repair only for guilt or shame");
 });

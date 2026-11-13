@@ -42746,7 +42746,7 @@
      "next": [],
      "offers": [
       {
-       "exit": "problem_solve",
+       "exit": "problem_solve_repair",
        "when": {
         "all": []
        }
@@ -43981,6 +43981,17 @@
      "toolId": "problem-solve",
      "query": {},
      "carry": [],
+     "done": false
+    },
+    {
+     "id": "problem_solve_repair",
+     "toolId": "problem-solve",
+     "query": {
+      "frame": "repair"
+     },
+     "carry": [
+      "feel"
+     ],
      "done": false
     },
     {
@@ -47094,7 +47105,8 @@
    "version": "ps-v1",
    "start": "feel",
    "accepts": [
-    "band"
+    "band",
+    "frame"
    ],
    "ownMax": 140,
    "emotionFields": [
@@ -47116,6 +47128,7 @@
     "ack_love": "The love is real, and something is in the way. Let's look at what's in the way.",
     "ack_sadness": "You've lost something, or something didn't go the way you needed. Let's see which parts you can do something about.",
     "ack_guilt": "Something you did doesn't sit right with your values. The move now is repair, not punishing yourself.",
+    "ack_repair": "You want to put something right. Owning it and repairing it is the opposite of hiding.",
     "problem_q": "Which of these sounds closest?",
     "ack_routed": "Something is asking a lot of you right now. Let's see what you can do about it.",
     "own_hint": "Say it your way",
@@ -47520,12 +47533,24 @@
       {
        "to": "not_fit",
        "when": {
-        "not": {
-         "eq": [
-          "$d.fit",
-          "fit"
-         ]
-        }
+        "all": [
+         {
+          "not": {
+           "eq": [
+            "$d.fit",
+            "fit"
+           ]
+          }
+         },
+         {
+          "not": {
+           "eq": [
+            "$ctx.frame",
+            "repair"
+           ]
+          }
+         }
+        ]
        }
       },
       {
@@ -47570,6 +47595,15 @@
      "id": "problem",
      "kind": "ask",
      "title": [
+      {
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "repair"
+        ]
+       },
+       "key": "ack_repair"
+      },
       {
        "when": {
         "in": [
@@ -47662,9 +47696,37 @@
         "where": {
          "any": [
           {
-           "eq": [
-            "$opt.parent",
-            "$d.parent"
+           "all": [
+            {
+             "not": {
+              "eq": [
+               "$ctx.frame",
+               "repair"
+              ]
+             }
+            },
+            {
+             "eq": [
+              "$opt.parent",
+              "$d.parent"
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$ctx.frame",
+              "repair"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.parent",
+              "guilt"
+             ]
+            }
            ]
           },
           {
@@ -47770,9 +47832,41 @@
         "where": {
          "all": [
           {
-           "eq": [
-            "$opt.parent",
-            "$d.parent"
+           "any": [
+            {
+             "all": [
+              {
+               "not": {
+                "eq": [
+                 "$ctx.frame",
+                 "repair"
+                ]
+               }
+              },
+              {
+               "eq": [
+                "$opt.parent",
+                "$d.parent"
+               ]
+              }
+             ]
+            },
+            {
+             "all": [
+              {
+               "eq": [
+                "$ctx.frame",
+                "repair"
+               ]
+              },
+              {
+               "eq": [
+                "$opt.parent",
+                "guilt"
+               ]
+              }
+             ]
+            }
            ]
           },
           {
@@ -48709,6 +48803,46 @@
              ]
             }
            ]
+          },
+          {
+           "all": [
+            {
+             "not": {
+              "any": [
+               {
+                "all": [
+                 {
+                  "set": "$a.problem.ids"
+                 },
+                 {
+                  "not": {
+                   "eq": [
+                    "$a.problem",
+                    "piling"
+                   ]
+                  }
+                 }
+                ]
+               },
+               {
+                "set": "$a.focus.ids"
+               }
+              ]
+             }
+            },
+            {
+             "eq": [
+              "$ctx.frame",
+              "repair"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.firstOf",
+              "guilt"
+             ]
+            }
+           ]
           }
          ]
         }
@@ -48834,6 +48968,46 @@
              "eq": [
               "$opt.firstOf",
               "$d.parent"
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "not": {
+              "any": [
+               {
+                "all": [
+                 {
+                  "set": "$a.problem.ids"
+                 },
+                 {
+                  "not": {
+                   "eq": [
+                    "$a.problem",
+                    "piling"
+                   ]
+                  }
+                 }
+                ]
+               },
+               {
+                "set": "$a.focus.ids"
+               }
+              ]
+             }
+            },
+            {
+             "eq": [
+              "$ctx.frame",
+              "repair"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.firstOf",
+              "guilt"
              ]
             }
            ]
@@ -49003,6 +49177,46 @@
                "eq": [
                 "$opt.firstOf",
                 "$d.parent"
+               ]
+              }
+             ]
+            },
+            {
+             "all": [
+              {
+               "not": {
+                "any": [
+                 {
+                  "all": [
+                   {
+                    "set": "$a.problem.ids"
+                   },
+                   {
+                    "not": {
+                     "eq": [
+                      "$a.problem",
+                      "piling"
+                     ]
+                    }
+                   }
+                  ]
+                 },
+                 {
+                  "set": "$a.focus.ids"
+                 }
+                ]
+               }
+              },
+              {
+               "eq": [
+                "$ctx.frame",
+                "repair"
+               ]
+              },
+              {
+               "eq": [
+                "$opt.firstOf",
+                "guilt"
                ]
               }
              ]

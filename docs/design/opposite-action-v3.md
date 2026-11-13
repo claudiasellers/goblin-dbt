@@ -80,7 +80,8 @@ polish batch, with Check the Facts' inline mini-card; "none" means it stays this
 - H10 step 5's "all the way" opposite thoughts and words: the body is worked (the cue and its hold) and the steps carry
   the action; the size step's hint brings in the rest (*Whichever step you pick, let your thoughts and words do the
   opposite too, along with your body.*, built 13 Nov). *None.*
-- `repr` opens Problem Solve with no frame (Problem Solve doesn't accept `repair` yet). *ER-B5.*
+- `repr` opens Problem Solve on repair (`?frame=repair`, carrying the word: guilt's problems, never its not-fit
+  card for a shame word; `docs/design/problem-solve.md`, *Opened on repair*), built 13 Nov. *None.*
 - `oa_plan` → `oa_try` (a skill follow-up whose card reopens the run, as `ps_review`; `followUpResume` is the runtime's
   R9 reopen); one card per visit, not per feeling. `ext.er.oaFacts / oaEffect / oaRoute` are not written (the run
   holds them; Reflect reads close answers). *None.*
@@ -111,7 +112,7 @@ as Problem Solve's `ps_graph.py` does), and every option keeps a `PRESENTS` edge
 | route | handoffs | **Route table v3** (item 5), graph-owned (`OppositeActionFlow.routes`, read into transitions at build): | |
 | | `clarify` | doesn't fit + helpful, or can't tell: "It may be serving a different goal." **Check the Facts** (item 6) | ER-B5 (built 12 Nov, Gates 2–3): *I still do not know* runs Check the Facts inline (the `ctf` step, *A closer look at {the feeling}*), never with a flooded reading (this card says the facts can wait, with First, the body). The verdict stands in for *does it fit?* in the graph's table with the earlier *will it help?* (fits → fits, partly → excessive, doesn't fit → not fit), after three rules: a danger chip or the safe card → this feeling's danger card (`cdng`: the other-person resources, the Punish banner kept, Ending careful, Pause, no close, no carry-on); guilt or shame that fits with the repair goal → repair; *Punish yourself* that fits → its own hand-off. A verdict that leaves a question gets this card with its own line and Wise mind; not sure is *You don't have to decide yet*; leaving early is *The facts will keep*, with the full check as a link. Every other clarify row keeps this card as it was. The projection reads the verdict through the same table and records a feeling that reached its step through the check with `factsChecked` (the verdict id; a check left early, or with anything unsafe told, records nothing). Leaving early is always this card, whatever the verdict screen held |
 | | `problem` | fits + helpful; fits-but-too-big + helpful gets the **down-regulation offer first** (First, the body), then Problem Solve | |
-| | `repair` | guilt or shame, fits, goal *repair harm* (H11): Problem Solve opened on repair | `?frame=repair` (planned exit until Problem Solve accepts the frame; until then Problem Solve with no frame) |
+| | `repair` | guilt or shame, fits, goal *repair harm* (H11): Problem Solve opened on repair | `?frame=repair` with the word (`problem_solve_repair`; built 13 Nov) |
 | | `support` | not safe, boundary, not sure | Pause (Hold to wait); danger keeps the `other_person` slot |
 | `body` *(once)* | embed `bodyReset` | The body reset (#48: up to three cues taken in turn from each feeling's urge, loudest first; `somaticReplace` honoured) | Output: cues done, the escape used |
 | `after_body` *(per feeling)* | ask | *The pull to {urge}, compared with before?* | `askFresh: thenVsNow` (the spine's four ids; no number) |

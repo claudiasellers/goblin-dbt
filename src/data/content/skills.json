@@ -42751,7 +42751,7 @@
             "next": [],
             "offers": [
               {
-                "exit": "problem_solve",
+                "exit": "problem_solve_repair",
                 "when": {
                   "all": []
                 }
@@ -43986,6 +43986,17 @@
             "toolId": "problem-solve",
             "query": {},
             "carry": [],
+            "done": false
+          },
+          {
+            "id": "problem_solve_repair",
+            "toolId": "problem-solve",
+            "query": {
+              "frame": "repair"
+            },
+            "carry": [
+              "feel"
+            ],
             "done": false
           },
           {
@@ -47099,7 +47110,8 @@
         "version": "ps-v1",
         "start": "feel",
         "accepts": [
-          "band"
+          "band",
+          "frame"
         ],
         "ownMax": 140,
         "emotionFields": [
@@ -47201,7 +47213,8 @@
           "sub_title": "Can you say a bit more?",
           "sub_title_tried": "You've been trying. That counts, even though it hasn't landed the way you needed. Can you say a bit more?",
           "triage_title": "When everything piles up, one thing is a foothold. Which would shift most if it moved even a little?",
-          "when_q": "Want me to ask how it went?"
+          "when_q": "Want me to ask how it went?",
+          "ack_repair": "You want to put something right. Owning it and repairing it is the opposite of hiding."
         },
         "tables": {
           "psFit": {
@@ -47525,12 +47538,24 @@
               {
                 "to": "not_fit",
                 "when": {
-                  "not": {
-                    "eq": [
-                      "$d.fit",
-                      "fit"
-                    ]
-                  }
+                  "all": [
+                    {
+                      "not": {
+                        "eq": [
+                          "$d.fit",
+                          "fit"
+                        ]
+                      }
+                    },
+                    {
+                      "not": {
+                        "eq": [
+                          "$ctx.frame",
+                          "repair"
+                        ]
+                      }
+                    }
+                  ]
                 }
               },
               {
@@ -47620,9 +47645,37 @@
                   "where": {
                     "any": [
                       {
-                        "eq": [
-                          "$opt.parent",
-                          "$d.parent"
+                        "all": [
+                          {
+                            "not": {
+                              "eq": [
+                                "$ctx.frame",
+                                "repair"
+                              ]
+                            }
+                          },
+                          {
+                            "eq": [
+                              "$opt.parent",
+                              "$d.parent"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "all": [
+                          {
+                            "eq": [
+                              "$ctx.frame",
+                              "repair"
+                            ]
+                          },
+                          {
+                            "eq": [
+                              "$opt.parent",
+                              "guilt"
+                            ]
+                          }
                         ]
                       },
                       {
@@ -47644,6 +47697,15 @@
               }
             ],
             "title": [
+              {
+                "key": "ack_repair",
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "repair"
+                  ]
+                }
+              },
               {
                 "key": "ack_routed",
                 "when": {
@@ -47808,9 +47870,41 @@
                   "where": {
                     "all": [
                       {
-                        "eq": [
-                          "$opt.parent",
-                          "$d.parent"
+                        "any": [
+                          {
+                            "all": [
+                              {
+                                "not": {
+                                  "eq": [
+                                    "$ctx.frame",
+                                    "repair"
+                                  ]
+                                }
+                              },
+                              {
+                                "eq": [
+                                  "$opt.parent",
+                                  "$d.parent"
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "all": [
+                              {
+                                "eq": [
+                                  "$ctx.frame",
+                                  "repair"
+                                ]
+                              },
+                              {
+                                "eq": [
+                                  "$opt.parent",
+                                  "guilt"
+                                ]
+                              }
+                            ]
+                          }
                         ]
                       },
                       {
@@ -48751,6 +48845,46 @@
                             ]
                           }
                         ]
+                      },
+                      {
+                        "all": [
+                          {
+                            "not": {
+                              "any": [
+                                {
+                                  "all": [
+                                    {
+                                      "set": "$a.problem.ids"
+                                    },
+                                    {
+                                      "not": {
+                                        "eq": [
+                                          "$a.problem",
+                                          "piling"
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                },
+                                {
+                                  "set": "$a.focus.ids"
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "eq": [
+                              "$ctx.frame",
+                              "repair"
+                            ]
+                          },
+                          {
+                            "eq": [
+                              "$opt.firstOf",
+                              "guilt"
+                            ]
+                          }
+                        ]
                       }
                     ]
                   }
@@ -48869,6 +49003,46 @@
                             "eq": [
                               "$opt.firstOf",
                               "$d.parent"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "all": [
+                          {
+                            "not": {
+                              "any": [
+                                {
+                                  "all": [
+                                    {
+                                      "set": "$a.problem.ids"
+                                    },
+                                    {
+                                      "not": {
+                                        "eq": [
+                                          "$a.problem",
+                                          "piling"
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                },
+                                {
+                                  "set": "$a.focus.ids"
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "eq": [
+                              "$ctx.frame",
+                              "repair"
+                            ]
+                          },
+                          {
+                            "eq": [
+                              "$opt.firstOf",
+                              "guilt"
                             ]
                           }
                         ]
@@ -49003,6 +49177,46 @@
                                 "eq": [
                                   "$opt.firstOf",
                                   "$d.parent"
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "all": [
+                              {
+                                "not": {
+                                  "any": [
+                                    {
+                                      "all": [
+                                        {
+                                          "set": "$a.problem.ids"
+                                        },
+                                        {
+                                          "not": {
+                                            "eq": [
+                                              "$a.problem",
+                                              "piling"
+                                            ]
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "set": "$a.focus.ids"
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "eq": [
+                                  "$ctx.frame",
+                                  "repair"
+                                ]
+                              },
+                              {
+                                "eq": [
+                                  "$opt.firstOf",
+                                  "guilt"
                                 ]
                               }
                             ]

@@ -381,7 +381,7 @@ STEPS = [
     # *Punish yourself*, kept or "helpful": a kinder way to make it right, or riding the urge out; never a plan for it.
     handoff("pun", "pun_title", [{"when": ALWAYS, "key": "pun_line"}],
             [{"exit": "problem_solve", "when": ALWAYS}, {"exit": "ride", "when": ALWAYS}]),
-    handoff("repr", "repr_title", [{"when": ALWAYS, "key": "repr_line"}], [{"exit": "problem_solve", "when": ALWAYS}]),
+    handoff("repr", "repr_title", [{"when": ALWAYS, "key": "repr_line"}], [{"exit": "problem_solve_repair", "when": ALWAYS}]),
     {
         "id": "cue", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "title": "cue_title", "hint": "cue_hint",
         # Optional (the hand-built page's *None of these work for me*): no cue, no hold, straight to the step.
@@ -517,7 +517,8 @@ COPY.update({"hold_title": "{cue}", "check_link": "Check the facts properly"})
 
 EXITS = [
     {"id": "check_the_facts", "toolId": "check-the-facts"},                        # clarify (ER-02)
-    {"id": "problem_solve", "toolId": "problem-solve"},                            # problem, repair, keep it (ER-12)
+    {"id": "problem_solve", "toolId": "problem-solve"},                            # problem, keep it (ER-12)
+    {"id": "problem_solve_repair", "toolId": "problem-solve", "query": {"frame": "repair"}, "carry": ["feel"]},  # repair (H11)
     {"id": "cool_down", "toolId": "cool-down"},                                    # too big: down first (DT-01)
     {"id": "dear_man", "toolId": "dear-man"},                                      # keep it, a boundary (IE-01)
     {"id": "fast", "toolId": "fast"},                                              # a boundary (IE-05)
