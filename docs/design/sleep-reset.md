@@ -38,12 +38,12 @@ an optional morning check.
 | `sleepy` | *Back to bed.* *Phone face down, out of reach.* Still awake after a while: get up for a bit; and the wake anchor | Stimulus control: no screens in bed |
 | `up` | *Try getting up for a bit.* (*A different room for a while often helps more than lying there.*) Another room, lights low · Something calm on paper · I'd rather rest here | Get out of bed; stimulus control |
 | `night_end` | Got up: *Back to bed when your eyes get heavy.* Phone face down, back when sleepy not by the clock, and the wake anchor. Resting: *Rest is enough for now.* Eyes closed, phone face down, getting up helps if you stew. Give your mind a job for a mind that won't stop | Don't give up and get up for the day |
-| `wake` | *What time will you get up, every day?* (with a kept anchor: *Still your time? It's at the top.*, the kept time first, never picked; *Keep this wake time in Me?* under the times when the pick isn't the kept one) 6:00 to 9:30 by half hours (*The same time on weekends too.* Shift workers: set it by your shift; a doctor can help plan it) | Regular schedule |
+| `wake` | *What time will you get up, every day?* (with a kept anchor: *Still your time? It's at the top.*, the kept time first, never picked; *Keep this wake time in Me?* under the times when the pick isn't the kept one) 6:00 to 9:30 by half hours; *My hours are different (shifts or nights)* under them adds every other hour of the day (10:00 to 5:00, by the hour; a kept shift time shows without the tap). Hint: *The same time on days off too.* Shifts or nights: the time you get up after your main sleep; rotating shifts, a doctor can help plan it | Regular schedule |
 | `wind` | *Pick one thing for the hour before bed.* Screens away · Lights low · Write tomorrow's list · A warm shower or bath · A book, music or stretching, or their own words; *Check in with me in the morning?* | Wind down 30–60 min |
-| `plan_end` | *Up at 7:30, every day.* One line: the morning card when asked, *Caffeine after midday and alcohol at night both break sleep up.*, how to come back on a bad night, and *If sleep's been bad for weeks, a doctor can help.* | H20b's substances; referral, quietly |
-| `morning` | The `sleep_morning` card reopens the run here: *Morning. How was the night?* Slept okay · Broken · Barely slept; *Up at your time?*; *Did a bad dream wake you?* | The morning log |
+| `plan_end` | *Up at 7:30, every day.* One line: the morning card when asked, *Caffeine in the hours before sleep and alcohol close to bedtime both break sleep up.* (it holds for day sleepers too), how to come back when you can't sleep, and *If sleep's been bad for weeks, a doctor can help.* | H20b's substances; referral, quietly |
+| `morning` | The `sleep_morning` card reopens the run here: *Morning. How was the night?* (when the time is a shift time, tapped open or kept: *You're up. How was your sleep?*) Slept okay · Broken · Barely slept; *Up at your time?*; *Did a bad dream wake you?* | The morning log |
 | `again` | *Up at your time. That's the reset working.* or *A late start doesn't undo the reset.* above *Same again tomorrow?* (yes books the card for tomorrow at the same wake time) | |
-| `morning_end` | *That's the reset.* One line, first that fits: barely slept (a nap can make tonight harder, short and early if needed, don't drive drowsy; barely sleeping and full of energy → tell your doctor soon), broken (weeks of it, or snoring, gasping, restless legs → a doctor), not up yet (light and moving), *Not tomorrow* (how to set it up again). A bad dream → Rewrite the nightmare (daylight); barely slept → Running low | ER-15, ER-07, referral |
+| `morning_end` | *That's the reset.* One line, first that fits: barely slept (a nap can make your next sleep harder, short and well before it if needed, don't drive drowsy; barely sleeping and full of energy → tell your doctor soon), broken (weeks of it, or snoring, gasping, restless legs → a doctor), not up yet (light and moving tell your body the day has started), *Not tomorrow* (how to set it up again). A bad dream → Rewrite the nightmare (daylight); barely slept → Running low | ER-15, ER-07, referral |
 
 A hand-off shows one line (the first that fits), so each line is the whole card. *Talk to someone now* on every screen, once (the offer where someone to talk to is one). No screen asks for a
 number of hours, a bedtime or a clock time on the night path, and nothing on it wakes the body (no cold water,
@@ -55,9 +55,9 @@ no marching).
 window whose chips are the wake times (`next_local`, a window kind added for it in `src/lib/spine/windows.ts`: the
 next time that clock time comes round, so a plan made at 1am books that morning). Booked on the plan's `wind` step when the person
 says yes, timed by the `wake` answer (`whenFrom`), and booked again only by the morning's *Same again tomorrow?*.
-That renewal maps the wake time to its `n` chip (`whenMap`, `at_local` a day on): the next clock time would be this
+That renewal maps the wake time to its `n` chip (`whenMap`; `next_local` with `minAheadHours: 12`: the next wake time at least 12 hours on, so a 23:00 waker answering at 0:30 still gets tonight's card, built 13 Nov; it was `at_local` a day on): the next clock time would be this
 morning again for someone who opens the card before their wake time (Codex on #135).
-Content-free on Today (*Morning check*, *From Sleep Reset. How was the night?*: no time). Stale after 8 hours.
+Content-free on Today (*Sleep check*, *From Sleep Reset. How was your sleep?*: no time, and no morning, since a shift worker's card may come at 22:00). Stale after 8 hours.
 
 ## The links that now open it
 
@@ -82,8 +82,12 @@ ask-fresh field, no projection. One keep, on the yes chip only: `sleep_anchor` (
   by the person's own tap. The chip is hidden when the picked time is already the kept one (that pick re-confirms it).
   The server's wake ids (`SLEEP_WAKE_IDS`) are test-pinned to the skill's `WAKE` options.
 - **Not** read by the morning card (it reads the run it reopens, as before), the night path or routing.
-- Open (part 2, Gate 3): the times run 6:00 to 9:30, so a night-shift worker can't keep their real time; wider times
-  or a *My hours change* chip that keeps nothing.
+- Shift hours (built 13 Nov, from Gate 3's open line; the lane was asked to ship it, not log it): the wake list's
+  shift times (`shift: 'yes'` on the option, `where` on the field) show on *My hours are different*, or when one is
+  the kept anchor, so a night-shift worker keeps their real time. Every hour of the day has a `sleep_morning` chip
+  (`w…` / `n…`, generated from `SLEEP_WAKE_TIMES` in `scripts/practice-spine/content.py`), the server's
+  `FOLLOW_UP_WINDOWS` and `SLEEP_WAKE_IDS` list the same 28, and nothing asks about work. Rotating shifts keep one
+  time or none; the hint sends them to a doctor for a plan.
 - Rejected: the chip on the wind-down screen (it asked about the screen before, beside the morning check); a separate *Still up at 7:30?* yes/no screen (one more tap, and the wake field still needs the answer for
   the card's time); keeping the wind-down too (it changes with the evening, and is one tap to pick again).
 
@@ -108,5 +112,5 @@ never where someone at 3am should land. Its entries are the Tools intent, Runnin
 
 ## Clinician pass (open)
 
-Whether *Being awake is uncomfortable, not dangerous* (cut from `up` in Gate 3) can come back with a qualifier for bipolar disorder, a *My hours change* chip for shift workers, the night screen's answers, whether *Barely slept* should ever skip Running low, the wake-time range (6:00 to 9:30)
-for shift workers, and the referral line's placement.
+Whether *Being awake is uncomfortable, not dangerous* (cut from `up` in Gate 3) can come back with a qualifier for bipolar disorder, whether rotating shifts need more than the hint, the night screen's answers, whether *Barely slept* should ever skip Running low, the shift hours' wording, and the night path's own night words (*Put it down for the night*, *leave it for the morning*, *in the daytime*) for day sleepers,
+and the referral line's placement.

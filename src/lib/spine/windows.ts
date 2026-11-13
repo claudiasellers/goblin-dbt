@@ -4,12 +4,13 @@
  *
  *   {kind: 'at_local', days: 1, time: '10:00'}   next day at 10:00 local
  *   {kind: 'next_local', time: '07:00'}          the next 07:00 local: today if it's still ahead, else tomorrow
+ *   {kind: 'next_local', time: '23:00', minAheadHours: 12}   the next 23:00 at least 12 h away (a renewal)
  *   {kind: 'after', minutes: 60}                  an hour from now
  *   {kind: 'chip', chips: {today: {...}, ...}}    the user picks one
  */
 export type WindowSpec =
   | { kind: 'at_local'; days: number; time: string }
-  | { kind: 'next_local'; time: string }
+  | { kind: 'next_local'; time: string; minAheadHours?: number }
   | { kind: 'after'; minutes: number }
   | { kind: 'chip'; chips: Record<string, WindowSpec> }
   | { kind: 'tool' | 'derived' };
@@ -32,7 +33,9 @@ export function dueAtFor(spec: WindowSpec | Record<string, unknown> | undefined,
     if (!m) return null;
     const d = new Date(now);
     d.setHours(Number(m[1]), Number(m[2]), 0, 0);
-    if (d.getTime() < now.getTime() + MIN_AHEAD_MS) d.setDate(d.getDate() + 1);
+    // A renewal (`minAheadHours`) skips the time just gone or about to come: the next one after that much rest.
+    const ahead = s.minAheadHours ? s.minAheadHours * 3_600_000 : MIN_AHEAD_MS;
+    if (d.getTime() < now.getTime() + ahead) d.setDate(d.getDate() + 1);
     return d;
   }
   if (s.kind === 'at_local') {

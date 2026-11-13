@@ -9,6 +9,11 @@
 VERSION = "spine-v1"
 REVIEW_STATUS = "draft"
 
+# Sleep reset's wake times (scripts/skills/sleep_reset.py `WAKE`, test-pinned): the mornings by half hours, then
+# shift and night times by the hour (ER-13 part 2: a night-shift worker's wake time is theirs too).
+SLEEP_WAKE_TIMES = [f"{h:02d}{m:02d}" for h in range(6, 10) for m in (0, 30)] + \
+    [f"{h:02d}00" for h in [*range(10, 24), *range(0, 6)]]
+
 # ---- Then-vs-now (ruling R3) -------------------------------------------------------------------
 # One canonical, direction-relative answer on every record that asks it:
 #   thenVsNow in worse | same | better | much_better, thenVsNowDir in down | orient | up.
@@ -192,30 +197,18 @@ FOLLOW_UP_TYPES = [
         # night. About one morning only, so it goes stale by the afternoon.
         "id": "sleep_morning", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
         "deepLinkTemplate": "/tool/sleep-reset?run={sourceSessionId}&at=morning&followUp={followUpId}",
-        "window": {"kind": "chip", "chips": {"w0600": {"kind": "next_local", "time": "06:00"},
-                                             "w0630": {"kind": "next_local", "time": "06:30"},
-                                             "w0700": {"kind": "next_local", "time": "07:00"},
-                                             "w0730": {"kind": "next_local", "time": "07:30"},
-                                             "w0800": {"kind": "next_local", "time": "08:00"},
-                                             "w0830": {"kind": "next_local", "time": "08:30"},
-                                             "w0900": {"kind": "next_local", "time": "09:00"},
-                                             "w0930": {"kind": "next_local", "time": "09:30"},
-                                             # The morning's renewal (*Same again tomorrow?*): tomorrow at the
-                                             # wake time, never the next clock time (a 6:00 answer for a 7:00 wake
-                                             # would book this morning again).
-                                             "n0600": {"kind": "at_local", "days": 1, "time": "06:00"},
-                                             "n0630": {"kind": "at_local", "days": 1, "time": "06:30"},
-                                             "n0700": {"kind": "at_local", "days": 1, "time": "07:00"},
-                                             "n0730": {"kind": "at_local", "days": 1, "time": "07:30"},
-                                             "n0800": {"kind": "at_local", "days": 1, "time": "08:00"},
-                                             "n0830": {"kind": "at_local", "days": 1, "time": "08:30"},
-                                             "n0900": {"kind": "at_local", "days": 1, "time": "09:00"},
-                                             "n0930": {"kind": "at_local", "days": 1, "time": "09:30"}}},
+        # Every wake time Sleep reset offers (its `WAKE`: the mornings by half hours, then shift and night
+        # times by the hour), the next time it comes round; then the morning's renewal (*Same again
+        # tomorrow?*): the next wake time at least 12 hours on (a 6:00 answer for a 7:00 wake would book this
+        # morning again; a 0:30 answer for a 23:00 wake still books tonight, not the night after).
+        "window": {"kind": "chip", "chips": {
+            **{f"w{t}": {"kind": "next_local", "time": f"{t[:2]}:{t[2:]}"} for t in SLEEP_WAKE_TIMES},
+            **{f"n{t}": {"kind": "next_local", "time": f"{t[:2]}:{t[2:]}", "minAheadHours": 12} for t in SLEEP_WAKE_TIMES}}},
         "staleAfterHours": 8, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
         "enabled": True,
-        "copy": {"title": "Morning check", "body": "From Sleep Reset. How was the night?"},
+        "copy": {"title": "Sleep check", "body": "From Sleep Reset. How was your sleep?"},
         "choices": [{"id": "dismiss", "label": "Not today", "status": "dismissed"}],
-        "notification": "Your morning check is ready.",
+        "notification": "Your sleep check is ready.",
     },
     {
         # What matters to me (ER-09, docs/design/values.md): the one small step for a value, checked when the person

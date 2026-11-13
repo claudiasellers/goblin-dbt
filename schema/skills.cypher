@@ -24397,7 +24397,7 @@ SET r += {list: "tvn", order: 28};
 
 // --- sleep_reset (sr-v1) ---
 MERGE (s:Skill {id: "sleep_reset"})
-SET s += {toolId: "sleep-reset", version: "sr-v1", contentVersion: "skills-v1", start: "mode", ownMax: 90, emotionFields: [], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"again_label\": \"Same again tomorrow?\", \"again_title\": \"A late start doesn't undo the reset.\", \"again_title_up\": \"Up at your time. That's the reset working.\", \"breathe_dizzy\": \"Light-headed? Breathe normally. That's fine too.\", \"breathe_done\": \"That's enough for now.\", \"breathe_in\": \"In\", \"breathe_out\": \"Out\", \"breathe_start\": \"Start\", \"breathe_step1\": \"Lie back, or sit somewhere dim.\", \"breathe_step2\": \"No need to check the time.\", \"breathe_title\": \"Slow breaths, out longer than in.\", \"done\": \"Done\", \"dream_label\": \"Did a bad dream wake you?\", \"dream_line\": \"Notice what's around you: the bed, the light, the sounds. Back to bed when you're ready. If it keeps coming back, there's help for that in the daytime.\", \"dream_title\": \"Back to the room first.\", \"hurt_end_line\": \"Sleep can wait. Someone to talk to is here, any hour.\", \"hurt_end_title\": \"Getting through the night is the job.\", \"keep_label\": \"Keep this wake time in Me?\", \"mind_job_link\": \"Give my mind a job instead\", \"mode_hint\": \"For tonight, or for the nights ahead.\", \"mode_title\": \"What do you need?\", \"morning_again_no\": \"One fixed time to get up, every day, is most of it. You can set it up again any time in Sleep Reset.\", \"morning_barely\": \"A short night is hard. A nap can make tonight harder; if you need one, keep it short and early, and don't drive drowsy. Barely sleeping and full of energy, not tired? Tell your doctor soon.\", \"morning_broken\": \"Broken nights add up. If it's been weeks, or there's loud snoring, gasping or restless legs, a doctor can help.\", \"morning_end_title\": \"That's the reset.\", \"morning_line\": \"One fixed time to get up, every day, is most of it.\", \"morning_not_yet\": \"Getting up now still helps. Light and moving tell your body it's morning.\", \"morning_title\": \"Morning. How was the night?\", \"next\": \"Next\", \"night_end_rest\": \"Eyes closed, phone face down. Resting still counts. If you start to stew, getting up for a bit helps.\", \"night_end_title\": \"Back to bed when your eyes get heavy.\", \"night_end_up\": \"Phone face down, out of reach. Go back when you're sleepy, not by the clock. Whatever time you fall asleep, get up at your usual time.\", \"night_hint\": \"You don't have to fix the night. Resting counts.\", \"night_title\": \"What's keeping you up?\", \"now_title\": \"How is it now?\", \"park_hint\": \"Name it and leave it for the morning. It'll keep.\", \"park_own\": \"In my words\", \"park_title\": \"Put it down for the night.\", \"plan_line\": \"Caffeine after midday and alcohol at night both break sleep up. On a night you can't sleep, open Sleep Reset again. If sleep's been bad for weeks, a doctor can help.\", \"plan_remind\": \"A morning check will be on Today. Caffeine after midday and alcohol at night both break sleep up. If sleep's been bad for weeks, a doctor can help.\", \"plan_title\": \"Up at {wake}, every day.\", \"reach_line\": \"Someone is there to talk to, right now.\", \"reach_title\": \"You don't have to do this part alone.\", \"remind_label\": \"Check in with me in the morning?\", \"rest_title\": \"Rest is enough for now.\", \"safe_hint\": \"The support is on this screen, any hour.\", \"safe_title\": \"Are you safe right now?\", \"safety_open\": \"Talk to someone now\", \"settle_first\": \"Settle my body first\", \"sleepy_line\": \"Phone face down, out of reach. If you're still awake after a while, get up for a bit. Whatever time you fall asleep, get up at your usual time.\", \"sleepy_title\": \"Back to bed.\", \"up_hint\": \"A different room for a while often helps more than lying there.\", \"up_label\": \"Up at your time?\", \"up_title\": \"Try getting up for a bit.\", \"wake_hint\": \"The same time on weekends too. It resets sleep more than any bedtime does. If your hours change with shifts, set it by your shift; a doctor can help plan it.\", \"wake_primary\": \"Next\", \"wake_title\": \"What time will you get up, every day?\", \"wake_title_kept\": \"Still your time? It's at the top.\", \"wind_hint\": \"One thing is enough. Go to bed when you're sleepy, not before.\", \"wind_own\": \"Something else\", \"wind_title\": \"Pick one thing for the hour before bed.\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "sleep-reset", version: "sr-v1", contentVersion: "skills-v1", start: "mode", ownMax: 90, emotionFields: [], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"again_label\": \"Same again tomorrow?\", \"again_title\": \"A late start doesn't undo the reset.\", \"again_title_up\": \"Up at your time. That's the reset working.\", \"breathe_dizzy\": \"Light-headed? Breathe normally. That's fine too.\", \"breathe_done\": \"That's enough for now.\", \"breathe_in\": \"In\", \"breathe_out\": \"Out\", \"breathe_start\": \"Start\", \"breathe_step1\": \"Lie back, or sit somewhere dim.\", \"breathe_step2\": \"No need to check the time.\", \"breathe_title\": \"Slow breaths, out longer than in.\", \"done\": \"Done\", \"dream_label\": \"Did a bad dream wake you?\", \"dream_line\": \"Notice what's around you: the bed, the light, the sounds. Back to bed when you're ready. If it keeps coming back, there's help for that in the daytime.\", \"dream_title\": \"Back to the room first.\", \"hurt_end_line\": \"Sleep can wait. Someone to talk to is here, any hour.\", \"hurt_end_title\": \"Getting through the night is the job.\", \"keep_label\": \"Keep this wake time in Me?\", \"mind_job_link\": \"Give my mind a job instead\", \"mode_hint\": \"For tonight, or for the nights ahead.\", \"mode_title\": \"What do you need?\", \"morning_again_no\": \"One fixed time to get up, every day, is most of it. You can set it up again any time in Sleep Reset.\", \"morning_barely\": \"A short night is hard. A nap can make your next sleep harder; if you need one, keep it short and well before it, and don't drive drowsy. Barely sleeping and full of energy, not tired? Tell your doctor soon.\", \"morning_broken\": \"Broken nights add up. If it's been weeks, or there's loud snoring, gasping or restless legs, a doctor can help.\", \"morning_end_title\": \"That's the reset.\", \"morning_line\": \"One fixed time to get up, every day, is most of it.\", \"morning_not_yet\": \"Getting up now still helps. Light and moving tell your body the day has started.\", \"morning_title\": \"Morning. How was the night?\", \"morning_title_shift\": \"You're up. How was your sleep?\", \"next\": \"Next\", \"night_end_rest\": \"Eyes closed, phone face down. Resting still counts. If you start to stew, getting up for a bit helps.\", \"night_end_title\": \"Back to bed when your eyes get heavy.\", \"night_end_up\": \"Phone face down, out of reach. Go back when you're sleepy, not by the clock. Whatever time you fall asleep, get up at your usual time.\", \"night_hint\": \"You don't have to fix the night. Resting counts.\", \"night_title\": \"What's keeping you up?\", \"now_title\": \"How is it now?\", \"park_hint\": \"Name it and leave it for the morning. It'll keep.\", \"park_own\": \"In my words\", \"park_title\": \"Put it down for the night.\", \"plan_line\": \"Caffeine in the hours before sleep and alcohol close to bedtime both break sleep up. When you can't sleep, open Sleep Reset again. If sleep's been bad for weeks, a doctor can help.\", \"plan_remind\": \"A check-in will be on Today when you get up. Caffeine in the hours before sleep and alcohol close to bedtime both break sleep up. If sleep's been bad for weeks, a doctor can help.\", \"plan_title\": \"Up at {wake}, every day.\", \"reach_line\": \"Someone is there to talk to, right now.\", \"reach_title\": \"You don't have to do this part alone.\", \"remind_label\": \"Check in with me in the morning?\", \"rest_title\": \"Rest is enough for now.\", \"safe_hint\": \"The support is on this screen, any hour.\", \"safe_title\": \"Are you safe right now?\", \"safety_open\": \"Talk to someone now\", \"settle_first\": \"Settle my body first\", \"sleepy_line\": \"Phone face down, out of reach. If you're still awake after a while, get up for a bit. Whatever time you fall asleep, get up at your usual time.\", \"sleepy_title\": \"Back to bed.\", \"up_hint\": \"A different room for a while often helps more than lying there.\", \"up_label\": \"Up at your time?\", \"up_title\": \"Try getting up for a bit.\", \"wake_hint\": \"The same time on days off too. It resets sleep more than any bedtime does. Work shifts or nights? Pick when you get up after your main sleep; if your shifts rotate, a doctor can help plan it.\", \"wake_primary\": \"Next\", \"wake_title\": \"What time will you get up, every day?\", \"wake_title_kept\": \"Still your time? It's at the top.\", \"wind_hint\": \"One thing is enough. Go to bed when you're sleepy, not before.\", \"wind_own\": \"Something else\", \"wind_title\": \"Pick one thing for the hour before bed.\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "dbt_sleep_hygiene"}), (s:Skill {id: "sleep_reset"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "sleep_reset"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
@@ -24463,7 +24463,7 @@ MATCH (s:Skill {id: "sleep_reset"}), (n:SkillStep {id: "sleep_reset:night_end"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 11};
 MERGE (n:SkillStep {id: "sleep_reset:wake"})
-SET n += {skillId: "sleep_reset", step: "wake", kind: "ask", version: "sr-v1"}, n.specJson = "{\"fields\": [{\"id\": \"wake\", \"links\": [], \"max\": 1, \"options\": {\"firstFrom\": \"$p.sleepAnchor\", \"list\": \"wake\"}, \"required\": true}, {\"id\": \"keep\", \"label\": \"keep_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"keep\"}, \"showWhen\": {\"not\": {\"eq\": [\"$a.wake\", \"$p.sleepAnchor\"]}}}], \"hint\": \"wake_hint\", \"keep\": {\"from\": [\"wake\"], \"kind\": \"sleep_anchor\", \"many\": false, \"when\": {\"any\": [{\"set\": \"$a.keep\"}, {\"eq\": [\"$a.wake\", \"$p.sleepAnchor\"]}]}}, \"primary\": \"wake_primary\", \"title\": [{\"key\": \"wake_title_kept\", \"when\": {\"set\": \"$p.sleepAnchor\"}}, {\"key\": \"wake_title\"}]}";
+SET n += {skillId: "sleep_reset", step: "wake", kind: "ask", version: "sr-v1"}, n.specJson = "{\"fields\": [{\"id\": \"wake\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"firstFrom\": \"$p.sleepAnchor\", \"list\": \"wake\", \"where\": {\"any\": [{\"not\": {\"eq\": [\"$opt.shift\", \"yes\"]}}, {\"set\": \"$a.hours\"}, {\"eq\": [\"$opt.value\", \"$p.sleepAnchor\"]}, {\"eq\": [\"$opt.value\", \"$a.wake\"]}]}}, \"required\": true}, {\"id\": \"hours\", \"links\": [], \"max\": 1, \"options\": {\"list\": \"hours\"}}, {\"id\": \"keep\", \"label\": \"keep_label\", \"links\": [], \"max\": 1, \"options\": {\"list\": \"keep\"}, \"showWhen\": {\"not\": {\"eq\": [\"$a.wake\", \"$p.sleepAnchor\"]}}}], \"hint\": \"wake_hint\", \"keep\": {\"from\": [\"wake\"], \"kind\": \"sleep_anchor\", \"many\": false, \"when\": {\"any\": [{\"set\": \"$a.keep\"}, {\"eq\": [\"$a.wake\", \"$p.sleepAnchor\"]}]}}, \"primary\": \"wake_primary\", \"title\": [{\"key\": \"wake_title_kept\", \"when\": {\"set\": \"$p.sleepAnchor\"}}, {\"key\": \"wake_title\"}]}";
 MATCH (s:Skill {id: "sleep_reset"}), (n:SkillStep {id: "sleep_reset:wake"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 12};
@@ -24478,12 +24478,12 @@ MATCH (s:Skill {id: "sleep_reset"}), (n:SkillStep {id: "sleep_reset:plan_end"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 14};
 MERGE (n:SkillStep {id: "sleep_reset:morning"})
-SET n += {skillId: "sleep_reset", step: "morning", kind: "ask", version: "sr-v1"}, n.specJson = "{\"clears\": [\"slept\", \"up_at\", \"dream\", \"again\"], \"fields\": [{\"id\": \"slept\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"slept\"}, \"required\": true}, {\"id\": \"up_at\", \"label\": \"up_label\", \"links\": [], \"max\": 1, \"options\": {\"list\": \"up_at\"}, \"required\": true}, {\"id\": \"dream\", \"label\": \"dream_label\", \"links\": [], \"max\": 1, \"options\": {\"list\": \"dream\"}}], \"reopens\": {\"after\": \"wind\", \"again\": [\"again\"]}, \"title\": \"morning_title\"}";
+SET n += {skillId: "sleep_reset", step: "morning", kind: "ask", version: "sr-v1"}, n.specJson = "{\"clears\": [\"slept\", \"up_at\", \"dream\", \"again\"], \"fields\": [{\"id\": \"slept\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"slept\"}, \"required\": true}, {\"id\": \"up_at\", \"label\": \"up_label\", \"links\": [], \"max\": 1, \"options\": {\"list\": \"up_at\"}, \"required\": true}, {\"id\": \"dream\", \"label\": \"dream_label\", \"links\": [], \"max\": 1, \"options\": {\"list\": \"dream\"}}], \"reopens\": {\"after\": \"wind\", \"again\": [\"again\"]}, \"title\": [{\"key\": \"morning_title_shift\", \"when\": {\"some\": [\"wake\", {\"eq\": [\"$opt.shift\", \"yes\"]}]}}, {\"key\": \"morning_title\"}]}";
 MATCH (s:Skill {id: "sleep_reset"}), (n:SkillStep {id: "sleep_reset:morning"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 15};
 MERGE (n:SkillStep {id: "sleep_reset:again"})
-SET n += {skillId: "sleep_reset", step: "again", kind: "ask", version: "sr-v1"}, n.specJson = "{\"fields\": [{\"id\": \"again\", \"label\": \"again_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"again\"}, \"required\": true}], \"followUp\": {\"type\": \"sleep_morning\", \"when\": {\"eq\": [\"$a.again\", \"again_yes\"]}, \"whenDefault\": \"w0700\", \"whenFrom\": \"wake\", \"whenMap\": {\"w0600\": \"n0600\", \"w0630\": \"n0630\", \"w0700\": \"n0700\", \"w0730\": \"n0730\", \"w0800\": \"n0800\", \"w0830\": \"n0830\", \"w0900\": \"n0900\", \"w0930\": \"n0930\"}}, \"title\": [{\"key\": \"again_title_up\", \"when\": {\"eq\": [\"$a.up_at\", \"up_yes\"]}}, {\"key\": \"again_title\"}]}";
+SET n += {skillId: "sleep_reset", step: "again", kind: "ask", version: "sr-v1"}, n.specJson = "{\"fields\": [{\"id\": \"again\", \"label\": \"again_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"again\"}, \"required\": true}], \"followUp\": {\"type\": \"sleep_morning\", \"when\": {\"eq\": [\"$a.again\", \"again_yes\"]}, \"whenDefault\": \"w0700\", \"whenFrom\": \"wake\", \"whenMap\": {\"w0000\": \"n0000\", \"w0100\": \"n0100\", \"w0200\": \"n0200\", \"w0300\": \"n0300\", \"w0400\": \"n0400\", \"w0500\": \"n0500\", \"w0600\": \"n0600\", \"w0630\": \"n0630\", \"w0700\": \"n0700\", \"w0730\": \"n0730\", \"w0800\": \"n0800\", \"w0830\": \"n0830\", \"w0900\": \"n0900\", \"w0930\": \"n0930\", \"w1000\": \"n1000\", \"w1100\": \"n1100\", \"w1200\": \"n1200\", \"w1300\": \"n1300\", \"w1400\": \"n1400\", \"w1500\": \"n1500\", \"w1600\": \"n1600\", \"w1700\": \"n1700\", \"w1800\": \"n1800\", \"w1900\": \"n1900\", \"w2000\": \"n2000\", \"w2100\": \"n2100\", \"w2200\": \"n2200\", \"w2300\": \"n2300\"}}, \"title\": [{\"key\": \"again_title_up\", \"when\": {\"eq\": [\"$a.up_at\", \"up_yes\"]}}, {\"key\": \"again_title\"}]}";
 MATCH (s:Skill {id: "sleep_reset"}), (n:SkillStep {id: "sleep_reset:again"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 16};
@@ -24646,7 +24646,7 @@ MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "sleep_reset:wake"}), (x:SkillExit {id: "sleep_reset:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 0, field: "keep", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+SET r += {order: 0, field: "wake", label: "safety_open"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "sleep_reset:wind"}), (b:SkillStep {id: "sleep_reset:plan_end"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
@@ -24767,123 +24767,228 @@ SET o:SkillOption, o += {skillId: "sleep_reset", list: "up", value: "rest", labe
 MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:up:rest"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "up", order: 17};
-MERGE (o:SkillOption {id: "sleep_reset:wake:w0600"})
-SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w0600", label: "6:00", version: "sr-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0600"})
-MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "wake", order: 18};
-MERGE (o:SkillOption {id: "sleep_reset:wake:w0630"})
-SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w0630", label: "6:30", version: "sr-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0630"})
-MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "wake", order: 19};
-MERGE (o:SkillOption {id: "sleep_reset:wake:w0700"})
-SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w0700", label: "7:00", version: "sr-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0700"})
-MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "wake", order: 20};
-MERGE (o:SkillOption {id: "sleep_reset:wake:w0730"})
-SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w0730", label: "7:30", version: "sr-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0730"})
-MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "wake", order: 21};
-MERGE (o:SkillOption {id: "sleep_reset:wake:w0800"})
-SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w0800", label: "8:00", version: "sr-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0800"})
-MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "wake", order: 22};
-MERGE (o:SkillOption {id: "sleep_reset:wake:w0830"})
-SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w0830", label: "8:30", version: "sr-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0830"})
-MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "wake", order: 23};
-MERGE (o:SkillOption {id: "sleep_reset:wake:w0900"})
-SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w0900", label: "9:00", version: "sr-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0900"})
-MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "wake", order: 24};
-MERGE (o:SkillOption {id: "sleep_reset:wake:w0930"})
-SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w0930", label: "9:30", version: "sr-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0930"})
-MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "wake", order: 25};
 MERGE (o:SkillOption {id: "sleep_reset:wind:screens"})
 SET o:SkillOption, o += {skillId: "sleep_reset", list: "wind", value: "screens", label: "Screens away", version: "sr-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wind:screens"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "wind", order: 26};
+SET r += {list: "wind", order: 18};
 MERGE (o:SkillOption {id: "sleep_reset:wind:dim"})
 SET o:SkillOption, o += {skillId: "sleep_reset", list: "wind", value: "dim", label: "Lights low", version: "sr-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wind:dim"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "wind", order: 27};
+SET r += {list: "wind", order: 19};
 MERGE (o:SkillOption {id: "sleep_reset:wind:tomorrow"})
 SET o:SkillOption, o += {skillId: "sleep_reset", list: "wind", value: "tomorrow", label: "Write tomorrow's list", version: "sr-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wind:tomorrow"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "wind", order: 28};
+SET r += {list: "wind", order: 20};
 MERGE (o:SkillOption {id: "sleep_reset:wind:warm"})
 SET o:SkillOption, o += {skillId: "sleep_reset", list: "wind", value: "warm", label: "A warm shower or bath", version: "sr-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wind:warm"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "wind", order: 29};
+SET r += {list: "wind", order: 21};
 MERGE (o:SkillOption {id: "sleep_reset:wind:quiet"})
 SET o:SkillOption, o += {skillId: "sleep_reset", list: "wind", value: "quiet", label: "A book, music or stretching", version: "sr-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wind:quiet"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "wind", order: 30};
+SET r += {list: "wind", order: 22};
+MERGE (o:SkillOption {id: "sleep_reset:hours:shift"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "hours", value: "shift", label: "My hours are different (shifts or nights)", version: "sr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:hours:shift"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "hours", order: 23};
 MERGE (o:SkillOption {id: "sleep_reset:remind:yes"})
 SET o:SkillOption, o += {skillId: "sleep_reset", list: "remind", value: "yes", label: "Yes", version: "sr-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:remind:yes"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "remind", order: 31};
+SET r += {list: "remind", order: 24};
 MERGE (o:SkillOption {id: "sleep_reset:keep:keep_yes"})
 SET o:SkillOption, o += {skillId: "sleep_reset", list: "keep", value: "keep_yes", label: "Yes, keep it", version: "sr-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:keep:keep_yes"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "keep", order: 32};
+SET r += {list: "keep", order: 25};
 MERGE (o:SkillOption {id: "sleep_reset:slept:okay"})
 SET o:SkillOption, o += {skillId: "sleep_reset", list: "slept", value: "okay", label: "Slept okay", version: "sr-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:slept:okay"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "slept", order: 33};
+SET r += {list: "slept", order: 26};
 MERGE (o:SkillOption {id: "sleep_reset:slept:broken"})
 SET o:SkillOption, o += {skillId: "sleep_reset", list: "slept", value: "broken", label: "Broken", version: "sr-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:slept:broken"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "slept", order: 34};
+SET r += {list: "slept", order: 27};
 MERGE (o:SkillOption {id: "sleep_reset:slept:barely"})
 SET o:SkillOption, o += {skillId: "sleep_reset", list: "slept", value: "barely", label: "Barely slept", version: "sr-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:slept:barely"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "slept", order: 35};
+SET r += {list: "slept", order: 28};
 MERGE (o:SkillOption {id: "sleep_reset:up_at:up_yes"})
 SET o:SkillOption, o += {skillId: "sleep_reset", list: "up_at", value: "up_yes", label: "Yes", version: "sr-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:up_at:up_yes"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "up_at", order: 36};
+SET r += {list: "up_at", order: 29};
 MERGE (o:SkillOption {id: "sleep_reset:up_at:up_later"})
 SET o:SkillOption, o += {skillId: "sleep_reset", list: "up_at", value: "up_later", label: "Later than planned", version: "sr-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:up_at:up_later"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "up_at", order: 37};
+SET r += {list: "up_at", order: 30};
 MERGE (o:SkillOption {id: "sleep_reset:up_at:up_not_yet"})
 SET o:SkillOption, o += {skillId: "sleep_reset", list: "up_at", value: "up_not_yet", label: "Not yet", version: "sr-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:up_at:up_not_yet"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "up_at", order: 38};
+SET r += {list: "up_at", order: 31};
 MERGE (o:SkillOption {id: "sleep_reset:dream:dream_yes"})
 SET o:SkillOption, o += {skillId: "sleep_reset", list: "dream", value: "dream_yes", label: "Yes", version: "sr-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:dream:dream_yes"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "dream", order: 39};
+SET r += {list: "dream", order: 32};
 MERGE (o:SkillOption {id: "sleep_reset:again:again_yes"})
 SET o:SkillOption, o += {skillId: "sleep_reset", list: "again", value: "again_yes", label: "Yes, check in tomorrow", version: "sr-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:again:again_yes"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "again", order: 40};
+SET r += {list: "again", order: 33};
 MERGE (o:SkillOption {id: "sleep_reset:again:again_no"})
 SET o:SkillOption, o += {skillId: "sleep_reset", list: "again", value: "again_no", label: "Not tomorrow", version: "sr-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:again:again_no"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "again", order: 41};
+SET r += {list: "again", order: 34};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w0600"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w0600", label: "6:00", version: "sr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0600"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 35};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w0630"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w0630", label: "6:30", version: "sr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0630"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 36};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w0700"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w0700", label: "7:00", version: "sr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0700"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 37};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w0730"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w0730", label: "7:30", version: "sr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0730"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 38};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w0800"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w0800", label: "8:00", version: "sr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0800"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 39};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w0830"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w0830", label: "8:30", version: "sr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0830"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 40};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w0900"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w0900", label: "9:00", version: "sr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0900"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 41};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w0930"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w0930", label: "9:30", version: "sr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0930"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 42};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w1000"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w1000", label: "10:00", version: "sr-v1"}, o.propsJson = "{\"shift\": \"yes\"}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w1000"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 43};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w1100"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w1100", label: "11:00", version: "sr-v1"}, o.propsJson = "{\"shift\": \"yes\"}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w1100"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 44};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w1200"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w1200", label: "12:00", version: "sr-v1"}, o.propsJson = "{\"shift\": \"yes\"}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w1200"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 45};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w1300"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w1300", label: "13:00", version: "sr-v1"}, o.propsJson = "{\"shift\": \"yes\"}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w1300"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 46};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w1400"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w1400", label: "14:00", version: "sr-v1"}, o.propsJson = "{\"shift\": \"yes\"}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w1400"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 47};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w1500"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w1500", label: "15:00", version: "sr-v1"}, o.propsJson = "{\"shift\": \"yes\"}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w1500"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 48};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w1600"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w1600", label: "16:00", version: "sr-v1"}, o.propsJson = "{\"shift\": \"yes\"}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w1600"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 49};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w1700"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w1700", label: "17:00", version: "sr-v1"}, o.propsJson = "{\"shift\": \"yes\"}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w1700"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 50};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w1800"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w1800", label: "18:00", version: "sr-v1"}, o.propsJson = "{\"shift\": \"yes\"}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w1800"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 51};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w1900"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w1900", label: "19:00", version: "sr-v1"}, o.propsJson = "{\"shift\": \"yes\"}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w1900"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 52};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w2000"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w2000", label: "20:00", version: "sr-v1"}, o.propsJson = "{\"shift\": \"yes\"}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w2000"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 53};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w2100"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w2100", label: "21:00", version: "sr-v1"}, o.propsJson = "{\"shift\": \"yes\"}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w2100"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 54};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w2200"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w2200", label: "22:00", version: "sr-v1"}, o.propsJson = "{\"shift\": \"yes\"}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w2200"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 55};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w2300"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w2300", label: "23:00", version: "sr-v1"}, o.propsJson = "{\"shift\": \"yes\"}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w2300"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 56};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w0000"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w0000", label: "0:00", version: "sr-v1"}, o.propsJson = "{\"shift\": \"yes\"}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0000"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 57};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w0100"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w0100", label: "1:00", version: "sr-v1"}, o.propsJson = "{\"shift\": \"yes\"}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0100"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 58};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w0200"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w0200", label: "2:00", version: "sr-v1"}, o.propsJson = "{\"shift\": \"yes\"}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0200"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 59};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w0300"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w0300", label: "3:00", version: "sr-v1"}, o.propsJson = "{\"shift\": \"yes\"}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0300"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 60};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w0400"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w0400", label: "4:00", version: "sr-v1"}, o.propsJson = "{\"shift\": \"yes\"}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0400"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 61};
+MERGE (o:SkillOption {id: "sleep_reset:wake:w0500"})
+SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w0500", label: "5:00", version: "sr-v1"}, o.propsJson = "{\"shift\": \"yes\"}";
+MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0500"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wake", order: 62};
