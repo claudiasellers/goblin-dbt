@@ -24284,7 +24284,7 @@ MATCH (s:Skill {id: "sleep_reset"}), (n:SkillStep {id: "sleep_reset:morning"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 15};
 MERGE (n:SkillStep {id: "sleep_reset:again"})
-SET n += {skillId: "sleep_reset", step: "again", kind: "ask", version: "sr-v1"}, n.specJson = "{\"fields\": [{\"id\": \"again\", \"label\": \"again_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"again\"}, \"required\": true}], \"followUp\": {\"type\": \"sleep_morning\", \"when\": {\"eq\": [\"$a.again\", \"again_yes\"]}, \"whenDefault\": \"w0700\", \"whenFrom\": \"wake\"}, \"title\": [{\"key\": \"again_title_up\", \"when\": {\"eq\": [\"$a.up_at\", \"up_yes\"]}}, {\"key\": \"again_title\"}]}";
+SET n += {skillId: "sleep_reset", step: "again", kind: "ask", version: "sr-v1"}, n.specJson = "{\"fields\": [{\"id\": \"again\", \"label\": \"again_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"again\"}, \"required\": true}], \"followUp\": {\"type\": \"sleep_morning\", \"when\": {\"eq\": [\"$a.again\", \"again_yes\"]}, \"whenDefault\": \"w0700\", \"whenFrom\": \"wake\", \"whenMap\": {\"w0600\": \"n0600\", \"w0630\": \"n0630\", \"w0700\": \"n0700\", \"w0730\": \"n0730\", \"w0800\": \"n0800\", \"w0830\": \"n0830\", \"w0900\": \"n0900\", \"w0930\": \"n0930\"}}, \"title\": [{\"key\": \"again_title_up\", \"when\": {\"eq\": [\"$a.up_at\", \"up_yes\"]}}, {\"key\": \"again_title\"}]}";
 MATCH (s:Skill {id: "sleep_reset"}), (n:SkillStep {id: "sleep_reset:again"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 16};

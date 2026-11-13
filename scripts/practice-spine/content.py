@@ -199,7 +199,18 @@ FOLLOW_UP_TYPES = [
                                              "w0800": {"kind": "next_local", "time": "08:00"},
                                              "w0830": {"kind": "next_local", "time": "08:30"},
                                              "w0900": {"kind": "next_local", "time": "09:00"},
-                                             "w0930": {"kind": "next_local", "time": "09:30"}}},
+                                             "w0930": {"kind": "next_local", "time": "09:30"},
+                                             # The morning's renewal (*Same again tomorrow?*): tomorrow at the
+                                             # wake time, never the next clock time (a 6:00 answer for a 7:00 wake
+                                             # would book this morning again).
+                                             "n0600": {"kind": "at_local", "days": 1, "time": "06:00"},
+                                             "n0630": {"kind": "at_local", "days": 1, "time": "06:30"},
+                                             "n0700": {"kind": "at_local", "days": 1, "time": "07:00"},
+                                             "n0730": {"kind": "at_local", "days": 1, "time": "07:30"},
+                                             "n0800": {"kind": "at_local", "days": 1, "time": "08:00"},
+                                             "n0830": {"kind": "at_local", "days": 1, "time": "08:30"},
+                                             "n0900": {"kind": "at_local", "days": 1, "time": "09:00"},
+                                             "n0930": {"kind": "at_local", "days": 1, "time": "09:30"}}},
         "staleAfterHours": 8, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
         "enabled": True,
         "copy": {"title": "Morning check", "body": "From Sleep Reset. How was the night?"},

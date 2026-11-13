@@ -377,11 +377,17 @@ def check(skill):
                 assert here or (s["kind"] == "ask" and fu.get("whenFrom") in fields), (w, "a chip window needs the field that picks it", fu)
                 f = next(f for st2 in skill["steps"] for f in st2.get("fields", []) if f["id"] == fu["whenFrom"])
                 values = {x[1] for x in skill["options"] if x[0] == f["options"].get("list")}
+                if "whenMap" in fu:
+                    # The answer names another chip of the same window (Sleep Reset's renewal: tomorrow at the wake time).
+                    assert set(fu["whenMap"]) == values, (w, "whenMap maps every one of the field's options", fu["whenMap"])
+                    assert set(fu["whenMap"].values()) <= set(t["window"]["chips"]), (w, "whenMap's chips are the window's", fu)
+                    assert "whenDefault" not in fu or fu["whenDefault"] in values, (w, "whenDefault is one of the field's options", fu)
+                    values = set(fu["whenMap"].values())
                 assert values and values <= set(t["window"]["chips"]), (w, "the field's options are the window's chips", values)
                 assert not here or "whenDefault" not in fu, (w, "whenDefault is for a field answered earlier", fu)
-                assert "whenDefault" not in fu or fu["whenDefault"] in values, (w, "whenDefault is one of the chips", fu)
+                assert "whenDefault" not in fu or fu["whenDefault"] in values or fu.get("whenMap", {}).get(fu["whenDefault"]), (w, "whenDefault is one of the chips", fu)
             else:
-                assert "whenFrom" not in fu and "whenDefault" not in fu, (w, "this type's window has no choice", fu)
+                assert not {"whenFrom", "whenDefault", "whenMap"} & set(fu), (w, "this type's window has no choice", fu)
             if "when" in fu:
                 check_cond(fu["when"], fields, derived, w, accepts)
         assert "noClose" not in s or (s["kind"] == "handoff" and s["noClose"] is True), (w, "noClose is a hand-off's", s.get("noClose"))

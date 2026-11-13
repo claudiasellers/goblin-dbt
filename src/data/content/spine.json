@@ -1754,6 +1754,46 @@
         ],
         "window": {
           "chips": {
+            "n0600": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "06:00"
+            },
+            "n0630": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "06:30"
+            },
+            "n0700": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "07:00"
+            },
+            "n0730": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "07:30"
+            },
+            "n0800": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "08:00"
+            },
+            "n0830": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "08:30"
+            },
+            "n0900": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "09:00"
+            },
+            "n0930": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "09:30"
+            },
             "w0600": {
               "kind": "next_local",
               "time": "06:00"

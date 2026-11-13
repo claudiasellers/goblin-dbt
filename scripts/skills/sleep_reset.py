@@ -236,7 +236,10 @@ STEPS = [
         "id": "again", "kind": "ask",
         "title": [{"when": {"eq": [a("up_at"), "up_yes"]}, "key": "again_title_up"}, {"key": "again_title"}],
         "fields": [field("again", label="again_label")],
+        # Tomorrow at the wake time: the plan's own chips book the *next* wake time, which before it would be this
+        # morning again (Codex on #135), so the renewal maps each to its `n` chip (at_local, a day on).
         "followUp": {"type": "sleep_morning", "whenFrom": "wake", "whenDefault": "w0700",
+                     "whenMap": {f"w{t}": f"n{t}" for t in ("0600", "0630", "0700", "0730", "0800", "0830", "0900", "0930")},
                      "when": {"eq": [a("again"), "again_yes"]}},
         "next": [{"to": "morning_end"}],
     },

@@ -142,7 +142,8 @@ export const FOLLOW_UP_WINDOWS = ['hour', 'afternoon', 'evening', 'tomorrow', 't
   // Give your mind a job (DT-06): a break's return in minutes, and the lid's reopen in a few days.
   'm5', 'm15', 'm30', 'm60', 'few_days',
   // Sleep reset (ER-13): the wake time the person set, for the next morning's check (`sleep_morning`).
-  'w0600', 'w0630', 'w0700', 'w0730', 'w0800', 'w0830', 'w0900', 'w0930'] as const;
+  'w0600', 'w0630', 'w0700', 'w0730', 'w0800', 'w0830', 'w0900', 'w0930',
+  'n0600', 'n0630', 'n0700', 'n0730', 'n0800', 'n0830', 'n0900', 'n0930'] as const;
 export type FollowUpWindow = (typeof FOLLOW_UP_WINDOWS)[number];
 const TYPE_ID = /^[a-z][a-z0-9_]{0,63}$/;
 const MINUTE = 60_000;
