@@ -78,8 +78,8 @@ polish batch, with Check the Facts' inline mini-card; "none" means it stays this
 - Parts lines (the unblend line under the urge, the goal line above `help`): not placed yet (the old page has them).
   *ER-B5*, with the parts lane.
 - H10 step 5's "all the way" opposite thoughts and words: the body is worked (the cue and its hold) and the steps carry
-  the action; the size step's hint brings in the rest (*All the way means your thoughts and words do the opposite too,
-  along with your body.*, built 13 Nov). *None.*
+  the action; the size step's hint brings in the rest (*Whichever step you pick, let your thoughts and words do the
+  opposite too, along with your body.*, built 13 Nov). *None.*
 - `repr` opens Problem Solve with no frame (Problem Solve doesn't accept `repair` yet). *ER-B5.*
 - `oa_plan` → `oa_try` (a skill follow-up whose card reopens the run, as `ps_review`; `followUpResume` is the runtime's
   R9 reopen); one card per visit, not per feeling. `ext.er.oaFacts / oaEffect / oaRoute` are not written (the run

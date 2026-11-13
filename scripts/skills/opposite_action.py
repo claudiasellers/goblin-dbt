@@ -122,7 +122,7 @@ COPY = {
 
     "size_own": "My own step",
     # H10 step 5, all the way (ER-B5): the steps carry the action; this line brings in the thoughts and words.
-    "size_hint": "All the way means your thoughts and words do the opposite too, along with your body.",
+    "size_hint": "Whichever step you pick, let your thoughts and words do the opposite too, along with your body.",
     # Once, after every feeling.
     "pred_title": "If you do it, what do you expect?",
     "when_title": "When will you try it?",
