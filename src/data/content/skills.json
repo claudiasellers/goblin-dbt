@@ -1,7 +1,7 @@
 {
   "source": {
     "file": "graph-content-only-2026-11-13.json",
-    "exportedAt": "2026-11-13T00:56:47.450Z"
+    "exportedAt": "2026-11-13T02:16:34.871Z"
   },
   "content": {
     "version": "skills-v1",
@@ -37829,6 +37829,10 @@
           "feel_more": "More words",
           "blank_title": "Back to the room first.",
           "blank_line": "When a feeling is hard to reach, watching it can wait. Noticing what's around you can help right now.",
+          "safe_title": "Is anyone hurting or threatening you right now?",
+          "safe_hint": "Letting a feeling be is never about staying somewhere you're being hurt.",
+          "unsafe_title": "When someone is hurting you, the feeling is telling you something.",
+          "unsafe_line": "Getting safe comes first. The support is on this screen. If it's someone close to you, Ending a relationship that's hurting you can help you think it through.",
           "heads_up_title": "Your body's loud right now.",
           "heads_up_hint": "A feeling is easier to watch once your body settles a little. You can still try.",
           "settle_line": "The feeling will keep. Settling your body comes first.",
@@ -37849,26 +37853,22 @@
           "bigger_title": "It's getting bigger.",
           "bigger_hint": "That can happen when you stop pushing a feeling away. You can give your body something, or keep watching.",
           "switch_line": "Let's give your body something first. The feeling will keep.",
+          "memory_line": "When a feeling pulls you into a memory, grounding comes first, not watching. If it happens a lot, someone trained in trauma can help.",
           "notice_title": "You're the one noticing it.",
           "notice_hint": "There's the feeling, and there's you, watching it.",
+          "notice_gone_title": "You were the one watching it.",
+          "notice_gone": "It came and went, and you stayed with it.",
           "close_title": "How is the feeling now?",
           "louder_line": "Letting a feeling in can make it louder for a bit. That happens.",
           "end_same": "It doesn't have to go anywhere. You let it be here, and that's the skill.",
           "end_quieter": "You let it rise and fall without pushing it away. You can do this again, anywhere.",
           "savour_end": "You let a good feeling be here, without needing it to last. That counts.",
+          "good_things_offer": "Keep it in Things I like",
           "safety_open": "Talk to someone now",
           "next": "Next",
           "done": "Done",
           "end_same_heavy": "It doesn't have to go anywhere. You let it be here, and that's the skill. Heavy feelings can come with thoughts of not being here. If they do, talk to someone now.",
           "end_quieter_heavy": "You let it rise and fall without pushing it away. You can do this again, anywhere. Heavy feelings can come with thoughts of not being here. If they do, talk to someone now.",
-          "safe_title": "Is anyone hurting or threatening you right now?",
-          "safe_hint": "Letting a feeling be is never about staying somewhere you're being hurt.",
-          "unsafe_title": "When someone is hurting you, the feeling is telling you something.",
-          "unsafe_line": "Getting safe comes first. The support is on this screen. If it's someone close to you, Ending a relationship that's hurting you can help you think it through.",
-          "memory_line": "When a feeling pulls you into a memory, grounding comes first, not watching. If it happens a lot, someone trained in trauma can help.",
-          "notice_gone_title": "You were the one watching it.",
-          "notice_gone": "It came and went, and you stayed with it.",
-          "good_things_offer": "Keep it in Things I like",
           "switch_heavy": "Let's give your body something first. The feeling will keep. Heavy feelings can come with thoughts of not being here. If they do, talk to someone now.",
           "louder_heavy": "Letting a feeling in can make it louder for a bit. That happens. Heavy feelings can come with thoughts of not being here. If they do, talk to someone now."
         },
@@ -37974,6 +37974,41 @@
             "id": "safe",
             "kind": "ask",
             "title": "safe_title",
+            "hint": "safe_hint",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "in": [
+                    "$a.safe",
+                    [
+                      "yes",
+                      "sometimes",
+                      "unsure"
+                    ]
+                  ]
+                }
+              }
+            ],
+            "fields": [
+              {
+                "id": "safe",
+                "options": {
+                  "list": "safe"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
             "next": [
               {
                 "to": "unsafe",
@@ -38015,62 +38050,11 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "hint": "safe_hint",
-            "crisis": [
-              {
-                "variant": "other_person",
-                "when": {
-                  "in": [
-                    "$a.safe",
-                    [
-                      "yes",
-                      "sometimes",
-                      "unsure"
-                    ]
-                  ]
-                }
-              }
-            ],
-            "fields": [
-              {
-                "id": "safe",
-                "options": {
-                  "list": "safe"
-                },
-                "max": 1,
-                "required": true,
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
-              }
-            ]
+            "offers": []
           },
           {
             "id": "unsafe",
             "kind": "handoff",
-            "title": "unsafe_title",
-            "next": [],
-            "offers": [
-              {
-                "exit": "safety_open",
-                "when": {
-                  "all": []
-                }
-              },
-              {
-                "exit": "ending",
-                "when": {
-                  "all": []
-                }
-              }
-            ],
             "complete": true,
             "lines": [
               {
@@ -38090,6 +38074,7 @@
                 }
               }
             ],
+            "title": "unsafe_title",
             "crisis": [
               {
                 "variant": "other_person",
@@ -38105,7 +38090,22 @@
                 }
               }
             ],
-            "noClose": true
+            "noClose": true,
+            "next": [],
+            "offers": [
+              {
+                "exit": "safety_open",
+                "when": {
+                  "all": []
+                }
+              },
+              {
+                "exit": "ending",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
           },
           {
             "id": "blank",
@@ -38205,25 +38205,6 @@
           {
             "id": "settle",
             "kind": "handoff",
-            "title": "heads_up_title",
-            "links": [
-              {
-                "exit": "safety_open",
-                "label": "safety_open",
-                "when": {
-                  "all": []
-                }
-              }
-            ],
-            "next": [],
-            "offers": [
-              {
-                "exit": "cool_down",
-                "when": {
-                  "all": []
-                }
-              }
-            ],
             "complete": true,
             "lines": [
               {
@@ -38234,13 +38215,49 @@
               }
             ],
             "done": "done",
-            "noClose": true
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "title": "heads_up_title",
+            "noClose": true,
+            "next": [],
+            "offers": [
+              {
+                "exit": "cool_down",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
           },
           {
             "id": "where",
             "kind": "ask",
             "title": "where_title",
             "hint": "where_hint",
+            "lines": [
+              {
+                "when": {
+                  "in": [
+                    "$a.feel",
+                    [
+                      "worthless",
+                      "despair",
+                      "helpless",
+                      "powerless",
+                      "depressed"
+                    ]
+                  ]
+                },
+                "key": "heavy_line"
+              }
+            ],
             "fields": [
               {
                 "id": "where",
@@ -38327,24 +38344,7 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "lines": [
-              {
-                "when": {
-                  "in": [
-                    "$a.feel",
-                    [
-                      "worthless",
-                      "despair",
-                      "helpless",
-                      "powerless",
-                      "depressed"
-                    ]
-                  ]
-                },
-                "key": "heavy_line"
-              }
-            ]
+            "offers": []
           },
           {
             "id": "wave",
@@ -38417,6 +38417,27 @@
           {
             "id": "bigger",
             "kind": "ask",
+            "title": "bigger_title",
+            "hint": "bigger_hint",
+            "fields": [
+              {
+                "id": "bigger",
+                "options": {
+                  "list": "bigger"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
             "next": [
               {
                 "to": "wave2",
@@ -38441,47 +38462,11 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "title": "bigger_title",
-            "hint": "bigger_hint",
-            "fields": [
-              {
-                "id": "bigger",
-                "options": {
-                  "list": "bigger"
-                },
-                "max": 1,
-                "required": true,
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
-              }
-            ]
+            "offers": []
           },
           {
             "id": "memory",
             "kind": "handoff",
-            "next": [],
-            "offers": [
-              {
-                "exit": "five_senses",
-                "when": {
-                  "all": []
-                }
-              },
-              {
-                "exit": "safety_open",
-                "when": {
-                  "all": []
-                }
-              }
-            ],
             "complete": true,
             "lines": [
               {
@@ -38501,11 +38486,29 @@
                 }
               }
             ],
-            "noClose": true
+            "noClose": true,
+            "next": [],
+            "offers": [
+              {
+                "exit": "five_senses",
+                "when": {
+                  "all": []
+                }
+              },
+              {
+                "exit": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
           },
           {
             "id": "wave2",
             "kind": "embed",
+            "embed": "urgeWave",
+            "answerAs": "again",
+            "title": "wave_again_title",
             "links": [
               {
                 "exit": "safety_open",
@@ -38515,6 +38518,18 @@
                 }
               }
             ],
+            "props": {
+              "checkSec": 30,
+              "maxChecks": 4,
+              "checkTitle": "check_title",
+              "riding": "riding",
+              "still_here": "still_here",
+              "fading": "fading",
+              "gone": "gone",
+              "bigger": "bigger",
+              "next": "wave_next",
+              "continueFrom": "wave"
+            },
             "next": [
               {
                 "to": "switch",
@@ -38530,22 +38545,7 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "embed": "urgeWave",
-            "answerAs": "again",
-            "title": "wave_again_title",
-            "props": {
-              "checkSec": 30,
-              "maxChecks": 4,
-              "checkTitle": "check_title",
-              "riding": "riding",
-              "still_here": "still_here",
-              "fading": "fading",
-              "gone": "gone",
-              "bigger": "bigger",
-              "next": "wave_next",
-              "continueFrom": "wave"
-            }
+            "offers": []
           },
           {
             "id": "switch",
@@ -38584,6 +38584,7 @@
                 }
               }
             ],
+            "noClose": true,
             "next": [],
             "offers": [
               {
@@ -38607,8 +38608,7 @@
                   "all": []
                 }
               }
-            ],
-            "noClose": true
+            ]
           },
           {
             "id": "close",
@@ -38637,22 +38637,6 @@
                 "key": "notice_title"
               }
             ],
-            "next": [
-              {
-                "to": "louder",
-                "when": {
-                  "eq": [
-                    "$a.close",
-                    "worse"
-                  ]
-                }
-              },
-              {
-                "to": "end",
-                "when": null
-              }
-            ],
-            "offers": [],
             "lines": [
               {
                 "when": {
@@ -38700,7 +38684,23 @@
                   }
                 ]
               }
-            ]
+            ],
+            "next": [
+              {
+                "to": "louder",
+                "when": {
+                  "eq": [
+                    "$a.close",
+                    "worse"
+                  ]
+                }
+              },
+              {
+                "to": "end",
+                "when": null
+              }
+            ],
+            "offers": []
           },
           {
             "id": "louder",
@@ -38976,6 +38976,27 @@
               "label": "Try it anyway"
             }
           ],
+          "safe": [
+            {
+              "value": "no",
+              "label": "No, I'm safe right now"
+            },
+            {
+              "value": "yes",
+              "label": "Yes",
+              "danger": "other"
+            },
+            {
+              "value": "sometimes",
+              "label": "Sometimes",
+              "danger": "other"
+            },
+            {
+              "value": "unsure",
+              "label": "I'm not sure",
+              "danger": "other"
+            }
+          ],
           "where": [
             {
               "value": "head",
@@ -39072,27 +39093,6 @@
             {
               "value": "much_better",
               "label": "Much quieter"
-            }
-          ],
-          "safe": [
-            {
-              "value": "no",
-              "label": "No, I'm safe right now"
-            },
-            {
-              "value": "yes",
-              "label": "Yes",
-              "danger": "other"
-            },
-            {
-              "value": "sometimes",
-              "label": "Sometimes",
-              "danger": "other"
-            },
-            {
-              "value": "unsure",
-              "label": "I'm not sure",
-              "danger": "other"
             }
           ]
         }
@@ -42053,6 +42053,7 @@
           "done": "Done",
           "due_label": "Roughly when?",
           "end_line": "Done for now.",
+          "fits_quieter": "Now that it's a little quieter, the facts are easier to see.",
           "fits_title": "Does this feeling fit the facts?",
           "fits_title_anger": "Does the anger fit the facts?",
           "fits_title_disgust": "Does the disgust fit the facts?",
@@ -42109,7 +42110,9 @@
           "safe": "Yes, it's safe to try",
           "safety_label": "Is it safe to try something different?",
           "safety_open": "Talk to someone now",
+          "size_hint": "Whichever step you pick, let your thoughts and words do the opposite too, along with your body.",
           "size_own": "My own step",
+          "size_small_only": "While your body's loud, a small step is the one to start with.",
           "size_title": "Pick a step for this feeling",
           "size_title_anger": "Pick a step for the anger",
           "size_title_disgust": "Pick a step for the disgust",
@@ -42143,9 +42146,6 @@
           "want_title_shame": "Do you want to turn the shame down?",
           "want_yes": "Yes, turn it down",
           "when_title": "When will you try it?",
-          "size_hint": "Whichever step you pick, let your thoughts and words do the opposite too, along with your body.",
-          "fits_quieter": "Now that it's a little quieter, the facts are easier to see.",
-          "size_small_only": "While your body's loud, a small step is the one to start with.",
           "wave_offer": "A minute with the feeling"
         },
         "tables": {},
@@ -42917,15 +42917,6 @@
             "fields": [
               {
                 "id": "fitl",
-                "max": 1,
-                "options": {
-                  "list": "fits"
-                },
-                "required": true,
-                "list": {
-                  "table": "fitsWhen",
-                  "key": "$d.fitsParent"
-                },
                 "links": [
                   {
                     "exit": "check_the_facts",
@@ -42934,7 +42925,24 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "list": {
+                  "key": "$d.fitsParent",
+                  "table": "fitsWhen"
+                },
+                "max": 1,
+                "options": {
+                  "list": "fits"
+                },
+                "required": true
+              }
+            ],
+            "lines": [
+              {
+                "key": "fits_quieter",
+                "when": {
+                  "all": []
+                }
               }
             ],
             "title": [
@@ -42993,31 +43001,31 @@
                 }
               },
               {
+                "key": "fits_title_love",
                 "when": {
                   "eq": [
                     "$d.parent",
                     "love"
                   ]
-                },
-                "key": "fits_title_love"
+                }
               },
               {
+                "key": "fits_title_sadness",
                 "when": {
                   "eq": [
                     "$d.parent",
                     "sadness"
                   ]
-                },
-                "key": "fits_title_sadness"
+                }
               },
               {
+                "key": "fits_title_shame",
                 "when": {
                   "eq": [
                     "$d.parent",
                     "shame"
                   ]
-                },
-                "key": "fits_title_shame"
+                }
               },
               {
                 "key": "fits_title"
@@ -43091,15 +43099,7 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "lines": [
-              {
-                "when": {
-                  "all": []
-                },
-                "key": "fits_quieter"
-              }
-            ]
+            "offers": []
           },
           {
             "id": "help",
@@ -43116,6 +43116,16 @@
               }
             ],
             "each": "feel",
+            "fields": [
+              {
+                "id": "help",
+                "max": 1,
+                "options": {
+                  "list": "help"
+                },
+                "required": true
+              }
+            ],
             "title": [
               {
                 "key": "help_title_connection",
@@ -43380,21 +43390,12 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "fields": [
-              {
-                "id": "help",
-                "options": {
-                  "list": "help"
-                },
-                "max": 1,
-                "required": true
-              }
-            ]
+            "offers": []
           },
           {
             "id": "ctf",
             "kind": "embed",
+            "answerAs": "checked",
             "crisis": [
               {
                 "variant": "crisis",
@@ -43407,87 +43408,101 @@
               }
             ],
             "each": "feel",
+            "embed": "inlineSkill",
+            "props": {
+              "ctx": {
+                "feelingId": "$each"
+              },
+              "enterAt": "event",
+              "outcomes": [
+                "fits",
+                "partly",
+                "doesnt_fit",
+                "unsure"
+              ],
+              "skill": "check_the_facts"
+            },
             "title": [
               {
+                "key": "ctf_title_anger",
                 "when": {
                   "eq": [
                     "$d.parent",
                     "anger"
                   ]
-                },
-                "key": "ctf_title_anger"
+                }
               },
               {
+                "key": "ctf_title_disgust",
                 "when": {
                   "eq": [
                     "$d.parent",
                     "disgust"
                   ]
-                },
-                "key": "ctf_title_disgust"
+                }
               },
               {
+                "key": "ctf_title_envy",
                 "when": {
                   "eq": [
                     "$d.parent",
                     "envy"
                   ]
-                },
-                "key": "ctf_title_envy"
+                }
               },
               {
+                "key": "ctf_title_fear",
                 "when": {
                   "eq": [
                     "$d.parent",
                     "fear"
                   ]
-                },
-                "key": "ctf_title_fear"
+                }
               },
               {
+                "key": "ctf_title_guilt",
                 "when": {
                   "eq": [
                     "$d.parent",
                     "guilt"
                   ]
-                },
-                "key": "ctf_title_guilt"
+                }
               },
               {
+                "key": "ctf_title_jealousy",
                 "when": {
                   "eq": [
                     "$d.parent",
                     "jealousy"
                   ]
-                },
-                "key": "ctf_title_jealousy"
+                }
               },
               {
+                "key": "ctf_title_love",
                 "when": {
                   "eq": [
                     "$d.parent",
                     "love"
                   ]
-                },
-                "key": "ctf_title_love"
+                }
               },
               {
+                "key": "ctf_title_sadness",
                 "when": {
                   "eq": [
                     "$d.parent",
                     "sadness"
                   ]
-                },
-                "key": "ctf_title_sadness"
+                }
               },
               {
+                "key": "ctf_title_shame",
                 "when": {
                   "eq": [
                     "$d.parent",
                     "shame"
                   ]
-                },
-                "key": "ctf_title_shame"
+                }
               },
               {
                 "key": "ctf_title"
@@ -43709,26 +43724,12 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "embed": "inlineSkill",
-            "answerAs": "checked",
-            "props": {
-              "skill": "check_the_facts",
-              "enterAt": "event",
-              "ctx": {
-                "feelingId": "$each"
-              },
-              "outcomes": [
-                "fits",
-                "partly",
-                "doesnt_fit",
-                "unsure"
-              ]
-            }
+            "offers": []
           },
           {
             "id": "cdng",
             "kind": "handoff",
+            "complete": true,
             "crisis": [
               {
                 "variant": "other_person",
@@ -43762,6 +43763,7 @@
                 }
               }
             ],
+            "noClose": true,
             "title": "danger_title",
             "next": [],
             "offers": [
@@ -43783,9 +43785,7 @@
                   "all": []
                 }
               }
-            ],
-            "complete": true,
-            "noClose": true
+            ]
           },
           {
             "id": "clar",
@@ -43966,6 +43966,7 @@
                 }
               },
               {
+                "key": "clar_checked_notfit_open",
                 "when": {
                   "all": [
                     {
@@ -43983,10 +43984,10 @@
                       }
                     }
                   ]
-                },
-                "key": "clar_checked_notfit_open"
+                }
               },
               {
+                "key": "clar_checked_open",
                 "when": {
                   "any": [
                     {
@@ -44002,10 +44003,10 @@
                       ]
                     }
                   ]
-                },
-                "key": "clar_checked_open"
+                }
               },
               {
+                "key": "clar_left",
                 "when": {
                   "any": [
                     {
@@ -44021,10 +44022,10 @@
                       ]
                     }
                   ]
-                },
-                "key": "clar_left"
+                }
               },
               {
+                "key": "clar_not_fit",
                 "when": {
                   "all": [
                     {
@@ -44053,10 +44054,10 @@
                       ]
                     }
                   ]
-                },
-                "key": "clar_not_fit"
+                }
               },
               {
+                "key": "clar_line",
                 "when": {
                   "all": [
                     {
@@ -44091,8 +44092,7 @@
                       }
                     }
                   ]
-                },
-                "key": "clar_line"
+                }
               }
             ],
             "title": [
@@ -44451,6 +44451,7 @@
                 }
               },
               {
+                "key": "prob_excessive",
                 "when": {
                   "all": [
                     {
@@ -44468,10 +44469,10 @@
                       }
                     }
                   ]
-                },
-                "key": "prob_excessive"
+                }
               },
               {
+                "key": "prob_line",
                 "when": {
                   "not": {
                     "any": [
@@ -44489,28 +44490,27 @@
                       }
                     ]
                   }
-                },
-                "key": "prob_line"
+                }
               }
             ],
             "title": [
               {
+                "key": "prob_title_partly",
                 "when": {
                   "has": [
                     "$a.checked.ids",
                     "partly"
                   ]
-                },
-                "key": "prob_title_partly"
+                }
               },
               {
+                "key": "prob_title_checked",
                 "when": {
                   "has": [
                     "$a.checked.ids",
                     "fits"
                   ]
-                },
-                "key": "prob_title_checked"
+                }
               },
               {
                 "key": "prob_title"
@@ -44590,6 +44590,7 @@
           {
             "id": "repr",
             "kind": "handoff",
+            "carryOn": "pred",
             "crisis": [
               {
                 "variant": "crisis",
@@ -44601,7 +44602,16 @@
                 }
               }
             ],
+            "done": "done",
             "each": "feel",
+            "lines": [
+              {
+                "key": "repr_line",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
             "title": "repr_title",
             "next": [],
             "offers": [
@@ -44611,17 +44621,7 @@
                   "all": []
                 }
               }
-            ],
-            "lines": [
-              {
-                "when": {
-                  "all": []
-                },
-                "key": "repr_line"
-              }
-            ],
-            "done": "done",
-            "carryOn": "pred"
+            ]
           },
           {
             "id": "cue",
@@ -44638,24 +44638,10 @@
               }
             ],
             "each": "feel",
-            "title": "cue_title",
-            "next": [
-              {
-                "to": "hold",
-                "when": {
-                  "set": "$a.cue"
-                }
-              },
-              {
-                "to": "size",
-                "when": null
-              }
-            ],
-            "offers": [],
-            "hint": "cue_hint",
             "fields": [
               {
                 "id": "cue",
+                "max": 1,
                 "options": {
                   "list": "cue",
                   "where": {
@@ -44689,10 +44675,24 @@
                       }
                     ]
                   }
-                },
-                "max": 1
+                }
               }
-            ]
+            ],
+            "hint": "cue_hint",
+            "title": "cue_title",
+            "next": [
+              {
+                "to": "hold",
+                "when": {
+                  "set": "$a.cue"
+                }
+              },
+              {
+                "to": "size",
+                "when": null
+              }
+            ],
+            "offers": []
           },
           {
             "id": "hold",
@@ -44709,28 +44709,28 @@
               }
             ],
             "each": "feel",
+            "embed": "holdRing",
+            "props": {
+              "hint": "hold_hint",
+              "label": "hold_label",
+              "next": "next",
+              "runningLabel": "hold_running",
+              "seconds": 3,
+              "variant": "press"
+            },
             "title": "hold_title",
+            "titleSlots": {
+              "cue": {
+                "labelOf": "cue"
+              }
+            },
             "next": [
               {
                 "to": "aftb",
                 "when": null
               }
             ],
-            "offers": [],
-            "embed": "holdRing",
-            "titleSlots": {
-              "cue": {
-                "labelOf": "cue"
-              }
-            },
-            "props": {
-              "variant": "press",
-              "seconds": 3,
-              "label": "hold_label",
-              "runningLabel": "hold_running",
-              "hint": "hold_hint",
-              "next": "next"
-            }
+            "offers": []
           },
           {
             "id": "aftb",
@@ -44749,13 +44749,13 @@
             "each": "feel",
             "fields": [
               {
+                "askFresh": "thenVsNow",
                 "id": "tvnb",
                 "max": 1,
                 "options": {
                   "list": "tvn"
                 },
-                "required": true,
-                "askFresh": "thenVsNow"
+                "required": true
               }
             ],
             "title": "after_body_title",
@@ -44797,6 +44797,18 @@
           {
             "id": "size",
             "kind": "ask",
+            "crisis": [
+              {
+                "variant": "crisis",
+                "when": {
+                  "eq": [
+                    "$a.urge",
+                    "guilt-punish"
+                  ]
+                }
+              }
+            ],
+            "each": "feel",
             "fields": [
               {
                 "id": "size",
@@ -45000,122 +45012,18 @@
                     ]
                   }
                 },
-                "required": true,
                 "own": {
-                  "hint": "size_own",
                   "countsAsPick": true,
+                  "hint": "size_own",
                   "max": 90
-                }
-              }
-            ],
-            "title": [
-              {
-                "when": {
-                  "eq": [
-                    "$d.parent",
-                    "anger"
-                  ]
                 },
-                "key": "size_title_anger"
-              },
-              {
-                "when": {
-                  "eq": [
-                    "$d.parent",
-                    "disgust"
-                  ]
-                },
-                "key": "size_title_disgust"
-              },
-              {
-                "when": {
-                  "eq": [
-                    "$d.parent",
-                    "envy"
-                  ]
-                },
-                "key": "size_title_envy"
-              },
-              {
-                "when": {
-                  "eq": [
-                    "$d.parent",
-                    "fear"
-                  ]
-                },
-                "key": "size_title_fear"
-              },
-              {
-                "when": {
-                  "eq": [
-                    "$d.parent",
-                    "guilt"
-                  ]
-                },
-                "key": "size_title_guilt"
-              },
-              {
-                "when": {
-                  "eq": [
-                    "$d.parent",
-                    "jealousy"
-                  ]
-                },
-                "key": "size_title_jealousy"
-              },
-              {
-                "when": {
-                  "eq": [
-                    "$d.parent",
-                    "love"
-                  ]
-                },
-                "key": "size_title_love"
-              },
-              {
-                "when": {
-                  "eq": [
-                    "$d.parent",
-                    "sadness"
-                  ]
-                },
-                "key": "size_title_sadness"
-              },
-              {
-                "when": {
-                  "eq": [
-                    "$d.parent",
-                    "shame"
-                  ]
-                },
-                "key": "size_title_shame"
-              },
-              {
-                "key": "size_title"
-              }
-            ],
-            "next": [
-              {
-                "to": "pred",
-                "when": null
-              }
-            ],
-            "offers": [],
-            "each": "feel",
-            "crisis": [
-              {
-                "variant": "crisis",
-                "when": {
-                  "eq": [
-                    "$a.urge",
-                    "guilt-punish"
-                  ]
-                }
+                "required": true
               }
             ],
             "hint": "size_hint",
             "lines": [
               {
+                "key": "size_small_only",
                 "when": {
                   "all": [
                     {
@@ -45181,10 +45089,102 @@
                       }
                     }
                   ]
-                },
-                "key": "size_small_only"
+                }
               }
-            ]
+            ],
+            "title": [
+              {
+                "key": "size_title_anger",
+                "when": {
+                  "eq": [
+                    "$d.parent",
+                    "anger"
+                  ]
+                }
+              },
+              {
+                "key": "size_title_disgust",
+                "when": {
+                  "eq": [
+                    "$d.parent",
+                    "disgust"
+                  ]
+                }
+              },
+              {
+                "key": "size_title_envy",
+                "when": {
+                  "eq": [
+                    "$d.parent",
+                    "envy"
+                  ]
+                }
+              },
+              {
+                "key": "size_title_fear",
+                "when": {
+                  "eq": [
+                    "$d.parent",
+                    "fear"
+                  ]
+                }
+              },
+              {
+                "key": "size_title_guilt",
+                "when": {
+                  "eq": [
+                    "$d.parent",
+                    "guilt"
+                  ]
+                }
+              },
+              {
+                "key": "size_title_jealousy",
+                "when": {
+                  "eq": [
+                    "$d.parent",
+                    "jealousy"
+                  ]
+                }
+              },
+              {
+                "key": "size_title_love",
+                "when": {
+                  "eq": [
+                    "$d.parent",
+                    "love"
+                  ]
+                }
+              },
+              {
+                "key": "size_title_sadness",
+                "when": {
+                  "eq": [
+                    "$d.parent",
+                    "sadness"
+                  ]
+                }
+              },
+              {
+                "key": "size_title_shame",
+                "when": {
+                  "eq": [
+                    "$d.parent",
+                    "shame"
+                  ]
+                }
+              },
+              {
+                "key": "size_title"
+              }
+            ],
+            "next": [
+              {
+                "to": "pred",
+                "when": null
+              }
+            ],
+            "offers": []
           },
           {
             "id": "pred",
@@ -45210,6 +45210,58 @@
           {
             "id": "when",
             "kind": "ask",
+            "fields": [
+              {
+                "id": "when",
+                "max": 1,
+                "options": {
+                  "list": "when"
+                },
+                "required": true
+              },
+              {
+                "id": "due",
+                "label": "due_label",
+                "max": 1,
+                "options": {
+                  "list": "due"
+                },
+                "showWhen": {
+                  "all": [
+                    {
+                      "set": "$a.when"
+                    },
+                    {
+                      "not": {
+                        "eq": [
+                          "$a.when",
+                          "now"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ],
+            "followUp": {
+              "type": "oa_try",
+              "when": {
+                "all": [
+                  {
+                    "not": {
+                      "eq": [
+                        "$a.when",
+                        "now"
+                      ]
+                    }
+                  },
+                  {
+                    "set": "$a.due"
+                  }
+                ]
+              },
+              "whenFrom": "due"
+            },
             "slots": [
               {
                 "after": "$title",
@@ -45236,63 +45288,23 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "fields": [
-              {
-                "id": "when",
-                "options": {
-                  "list": "when"
-                },
-                "max": 1,
-                "required": true
-              },
-              {
-                "id": "due",
-                "label": "due_label",
-                "options": {
-                  "list": "due"
-                },
-                "max": 1,
-                "showWhen": {
-                  "all": [
-                    {
-                      "set": "$a.when"
-                    },
-                    {
-                      "not": {
-                        "eq": [
-                          "$a.when",
-                          "now"
-                        ]
-                      }
-                    }
-                  ]
-                }
-              }
-            ],
-            "followUp": {
-              "type": "oa_try",
-              "whenFrom": "due",
-              "when": {
-                "all": [
-                  {
-                    "not": {
-                      "eq": [
-                        "$a.when",
-                        "now"
-                      ]
-                    }
-                  },
-                  {
-                    "set": "$a.due"
-                  }
-                ]
-              }
-            }
+            "offers": []
           },
           {
             "id": "try",
             "kind": "ask",
+            "hint": "try_hint",
+            "primary": "tried",
+            "slots": [
+              {
+                "after": "$title",
+                "embed": "oaSteps",
+                "record": "steps",
+                "showWhen": {
+                  "all": []
+                }
+              }
+            ],
             "title": "try_title",
             "next": [
               {
@@ -45300,19 +45312,7 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "hint": "try_hint",
-            "primary": "tried",
-            "slots": [
-              {
-                "after": "$title",
-                "embed": "oaSteps",
-                "showWhen": {
-                  "all": []
-                },
-                "record": "steps"
-              }
-            ]
+            "offers": []
           },
           {
             "id": "aftr",
@@ -45393,6 +45393,17 @@
                 }
               }
             ],
+            "fields": [
+              {
+                "askFresh": "thenVsNow",
+                "id": "tvna",
+                "max": 1,
+                "options": {
+                  "list": "tvn"
+                },
+                "required": true
+              }
+            ],
             "title": "tvn_label",
             "next": [
               {
@@ -45400,23 +45411,23 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "fields": [
-              {
-                "id": "tvna",
-                "options": {
-                  "list": "tvn"
-                },
-                "max": 1,
-                "required": true,
-                "askFresh": "thenVsNow"
-              }
-            ]
+            "offers": []
           },
           {
             "id": "read",
             "kind": "handoff",
             "complete": true,
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.outcome",
+                    "unsafe"
+                  ]
+                }
+              }
+            ],
             "done": "done",
             "lines": [
               {
@@ -45463,6 +45474,7 @@
                 }
               },
               {
+                "key": "read_worse_gap",
                 "when": {
                   "all": [
                     {
@@ -45493,10 +45505,10 @@
                       ]
                     }
                   ]
-                },
-                "key": "read_worse_gap"
+                }
               },
               {
+                "key": "read_react_gap",
                 "when": {
                   "all": [
                     {
@@ -45527,28 +45539,28 @@
                       ]
                     }
                   ]
-                },
-                "key": "read_react_gap"
+                }
               },
               {
+                "key": "read_part",
                 "when": {
                   "eq": [
                     "$a.outcome",
                     "partial"
                   ]
-                },
-                "key": "read_part"
+                }
               },
               {
+                "key": "read_unclear",
                 "when": {
                   "eq": [
                     "$a.outcome",
                     "unclear"
                   ]
-                },
-                "key": "read_unclear"
+                }
               },
               {
+                "key": "read_down",
                 "when": {
                   "in": [
                     "$a.tvna",
@@ -45557,10 +45569,10 @@
                       "much_better"
                     ]
                   ]
-                },
-                "key": "read_down"
+                }
               },
               {
+                "key": "read_same",
                 "when": {
                   "in": [
                     "$a.tvna",
@@ -45569,19 +45581,18 @@
                       "worse"
                     ]
                   ]
-                },
-                "key": "read_same"
+                }
               }
             ],
             "title": [
               {
+                "key": "read_unsafe_title",
                 "when": {
                   "eq": [
                     "$a.outcome",
                     "unsafe"
                   ]
-                },
-                "key": "read_unsafe_title"
+                }
               },
               {
                 "key": "read_title"
@@ -45607,42 +45618,36 @@
                   ]
                 }
               }
-            ],
-            "crisis": [
-              {
-                "variant": "other_person",
-                "when": {
-                  "eq": [
-                    "$a.outcome",
-                    "unsafe"
-                  ]
-                }
-              }
             ]
           },
           {
             "id": "plan",
             "kind": "handoff",
-            "title": "plan_title",
-            "next": [],
-            "offers": [],
             "complete": true,
+            "done": "done",
             "lines": [
               {
+                "key": "plan_line",
                 "when": {
                   "set": "$a.due"
-                },
-                "key": "plan_line"
+                }
               },
               {
                 "key": "plan_line_none"
               }
             ],
-            "done": "done"
+            "title": "plan_title",
+            "next": [],
+            "offers": []
           },
           {
             "id": "back",
             "kind": "ask",
+            "clears": [
+              "tried",
+              "outcome",
+              "actual"
+            ],
             "fields": [
               {
                 "id": "tried",
@@ -45651,6 +45656,19 @@
                   "list": "tried"
                 },
                 "required": true
+              }
+            ],
+            "reopens": {
+              "after": "when"
+            },
+            "slots": [
+              {
+                "after": "$title",
+                "embed": "oaSteps",
+                "record": "steps",
+                "showWhen": {
+                  "all": []
+                }
               }
             ],
             "title": "back_title",
@@ -45669,25 +45687,7 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "reopens": {
-              "after": "when"
-            },
-            "clears": [
-              "tried",
-              "outcome",
-              "actual"
-            ],
-            "slots": [
-              {
-                "after": "$title",
-                "embed": "oaSteps",
-                "showWhen": {
-                  "all": []
-                },
-                "record": "steps"
-              }
-            ]
+            "offers": []
           },
           {
             "id": "aft2",
@@ -45736,6 +45736,15 @@
                 }
               }
             ],
+            "fields": [
+              {
+                "id": "actual",
+                "max": 1,
+                "options": {
+                  "list": "actual"
+                }
+              }
+            ],
             "title": "actual_label",
             "next": [
               {
@@ -45743,21 +45752,23 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "fields": [
-              {
-                "id": "actual",
-                "options": {
-                  "list": "actual"
-                },
-                "max": 1
-              }
-            ]
+            "offers": []
           },
           {
             "id": "read2",
             "kind": "handoff",
             "complete": true,
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.outcome",
+                    "unsafe"
+                  ]
+                }
+              }
+            ],
             "done": "done",
             "lines": [
               {
@@ -45804,6 +45815,7 @@
                 }
               },
               {
+                "key": "read_worse_gap",
                 "when": {
                   "all": [
                     {
@@ -45834,10 +45846,10 @@
                       ]
                     }
                   ]
-                },
-                "key": "read_worse_gap"
+                }
               },
               {
+                "key": "read_react_gap",
                 "when": {
                   "all": [
                     {
@@ -45868,26 +45880,25 @@
                       ]
                     }
                   ]
-                },
-                "key": "read_react_gap"
+                }
               },
               {
+                "key": "read_part",
                 "when": {
                   "eq": [
                     "$a.outcome",
                     "partial"
                   ]
-                },
-                "key": "read_part"
+                }
               },
               {
+                "key": "read_unclear",
                 "when": {
                   "eq": [
                     "$a.outcome",
                     "unclear"
                   ]
-                },
-                "key": "read_unclear"
+                }
               },
               {
                 "key": "read_later"
@@ -45896,13 +45907,13 @@
             "noClose": true,
             "title": [
               {
+                "key": "read_unsafe_title",
                 "when": {
                   "eq": [
                     "$a.outcome",
                     "unsafe"
                   ]
-                },
-                "key": "read_unsafe_title"
+                }
               },
               {
                 "key": "read_title"
@@ -45919,40 +45930,29 @@
                   ]
                 }
               }
-            ],
-            "crisis": [
-              {
-                "variant": "other_person",
-                "when": {
-                  "eq": [
-                    "$a.outcome",
-                    "unsafe"
-                  ]
-                }
-              }
             ]
           },
           {
             "id": "miss",
             "kind": "handoff",
             "complete": true,
-            "noClose": true,
-            "title": "miss_title",
+            "done": "done",
             "lines": [
               {
+                "key": "miss_strong",
                 "when": {
                   "eq": [
                     "$a.tried",
                     "too_strong"
                   ]
-                },
-                "key": "miss_strong"
+                }
               },
               {
                 "key": "miss_line"
               }
             ],
-            "done": "done",
+            "noClose": true,
+            "title": "miss_title",
             "next": [],
             "offers": [
               {
@@ -48304,9 +48304,9 @@
                 "subs",
                 "moved"
               ],
+              "hidden": "pleaseRows",
               "low": "body",
               "names": "tank_names",
-              "hidden": "pleaseRows",
               "next": "next"
             },
             "title": "vol_body",
@@ -48331,9 +48331,9 @@
                 "subs",
                 "moved"
               ],
+              "hidden": "pleaseRows",
               "low": "sleep",
               "names": "tank_names",
-              "hidden": "pleaseRows",
               "next": "next"
             },
             "title": "vol_sleep",
@@ -48358,9 +48358,9 @@
                 "subs",
                 "moved"
               ],
+              "hidden": "pleaseRows",
               "low": "food",
               "names": "tank_names",
-              "hidden": "pleaseRows",
               "next": "next"
             },
             "title": "vol_food",
@@ -48385,9 +48385,9 @@
                 "subs",
                 "moved"
               ],
+              "hidden": "pleaseRows",
               "low": "subs",
               "names": "tank_names",
-              "hidden": "pleaseRows",
               "next": "next"
             },
             "title": "vol_subs",
@@ -48412,9 +48412,9 @@
                 "subs",
                 "moved"
               ],
+              "hidden": "pleaseRows",
               "low": "moved",
               "names": "tank_names",
-              "hidden": "pleaseRows",
               "next": "next"
             },
             "title": "vol_moved",
@@ -49181,6 +49181,7 @@
           "ack_guilt": "Something you did doesn't sit right with your values. The move now is repair, not punishing yourself.",
           "ack_jealousy": "Something in this relationship feels under threat. Let's look at what you can do, starting from what you need.",
           "ack_love": "The love is real, and something is in the way. Let's look at what's in the way.",
+          "ack_repair": "You want to put something right. Owning it and repairing it is the opposite of hiding.",
           "ack_routed": "Something is asking a lot of you right now. Let's see what you can do about it.",
           "ack_sadness": "You've lost something, or something didn't go the way you needed. Let's see which parts you can do something about.",
           "ambiv_title": "What does staying the same protect you from?",
@@ -49268,8 +49269,7 @@
           "sub_title": "Can you say a bit more?",
           "sub_title_tried": "You've been trying. That counts, even though it hasn't landed the way you needed. Can you say a bit more?",
           "triage_title": "When everything piles up, one thing is a foothold. Which would shift most if it moved even a little?",
-          "when_q": "Want me to ask how it went?",
-          "ack_repair": "You want to put something right. Owning it and repairing it is the opposite of hiding."
+          "when_q": "Want me to ask how it went?"
         },
         "tables": {
           "psFit": {
@@ -49551,8 +49551,8 @@
             "table": "startSmall"
           },
           {
-            "name": "dbtParent",
             "from": "$a.feel",
+            "name": "dbtParent",
             "table": "parentOf"
           }
         ],
