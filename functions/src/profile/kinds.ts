@@ -156,10 +156,12 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
   // Good things (ER-04, docs/design/good-things.md): one thing the person likes, kept on *Keep it* (a found thing:
   // `kind`, the chip, or a few words) or *Add it* (a good thing that left them lighter: `pick`, a catalogue id or a few
   // words). The runtime's keep (R4: `<field>Ids` / `<field>Own`). Read back by the `thingsILike` slice, named there
-  // (own words, else the option's label from the graph), so the next visit can offer it first.
+  // (own words, else the option's label from the graph), so the next visit can offer it first. The week plan's
+  // `wk<n>Own` are listed too: the validator stores them as `pickOwn`, but listing them keeps every own-words field
+  // a keep can send under encryption should that mapping ever change (skill-contracts C2).
   thing_i_like: {
     kind: 'thing_i_like', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'my_words', slice: 'thingsILike',
-    owner: 'ER', many: true, maxItems: 60, editor: null, ownFields: ['kindOwn', 'pickOwn'],
+    owner: 'ER', many: true, maxItems: 60, editor: null, ownFields: ['kindOwn', 'pickOwn', 'wk1Own', 'wk2Own', 'wk3Own'],
     validate: (v) => {
       const o = obj(v);
       const out: Record<string, unknown> = {};
