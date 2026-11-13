@@ -67,8 +67,16 @@ test('the check-in: its known words once the result rendered, source checkin; no
   assert.ok(!f.calls.some(isFound), 'no words, no query');
   f = checkInDriver();
   setDriver(f.driver);
-  await fns.saveCheckIn.run({ auth: auth(), data: { ...checkIn(), source: 'ftf', emotionIds: ['anxious'], resultShown: true } });
+  await fns.saveCheckIn.run({ auth: auth(), data: { ...checkIn(), source: 'ftf', emotionIds: ['anxious'], countedWordIds: ['anxious'], resultShown: true } });
   assert.ok(!f.calls.some(isFound), 'a word found in Find the feeling inside the check-in was counted by that save');
+  f = checkInDriver();
+  setDriver(f.driver);
+  await fns.saveCheckIn.run({ auth: auth(), data: { ...checkIn(), source: 'ftf', emotionIds: ['anxious', 'hurt'], countedWordIds: ['anxious'], resultShown: true } });
+  assert.deepEqual(f.calls.find(isFound).params.ids, ['hurt'], 'only the word Find the feeling saved is skipped');
+  f = checkInDriver();
+  setDriver(f.driver);
+  await fns.saveCheckIn.run({ auth: auth(), data: { ...checkIn(), source: 'ftf', emotionIds: ['hurt'], resultShown: true } });
+  assert.deepEqual(f.calls.find(isFound).params.ids, ['hurt'], 'Find the feeling found nothing, a body-first pick: it counts (Codex, PR #129)');
   f = checkInDriver({ open: false });
   setDriver(f.driver);
   await fns.saveCheckIn.run({ auth: auth(), data: { ...checkIn(), emotionIds: ['anxious'], resultShown: true } });

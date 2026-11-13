@@ -57,7 +57,11 @@ test("the check-in's word list: own words near the touch lead, most used first; 
   assert.deepEqual(square.ownWordsFirst(ranked, []).map((e) => e.id), ids);
   assert.equal(square.OWN_WORDS_WINDOW, 16, "two pages of the word list");
   assert.match(readFileSync("src/components/checkin/WordPick.tsx", "utf8"), /ownWordsFirst\(wordsNear\(point\), ownWords\)/);
-  assert.match(readFileSync("src/pages/CheckIn.tsx", "utf8"), /useProfileContext\('checkin'\)\.slices\?\.ownWords/);
+  const checkInSrc = readFileSync("src/pages/CheckIn.tsx", "utf8");
+  assert.match(checkInSrc, /useProfileContext\('checkin'\)\.slices\?\.ownWords/);
+  assert.match(checkInSrc, /setCountedWordIds\(emotion && r\.toolSessionId \? \[emotion\.id\] : \[\]\)/,
+    "only the word Find the feeling saved is left to its save; a body-first pick after it counts here");
+  assert.match(readFileSync("src/lib/spine/checkInPayload.ts", "utf8"), /if \(s\.countedWordIds\?\.length\) req\.countedWordIds = s\.countedWordIds;/);
 });
 
 test("Find the feeling: an own word among a family's two nearest is offered first; the family order stays the shape's", () => {

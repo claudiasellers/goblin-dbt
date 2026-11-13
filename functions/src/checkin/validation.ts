@@ -75,6 +75,8 @@ export interface SaveCheckInInput {
   resultShown: boolean;
   nextAction: CheckInNextAction | null;
   embeddedToolSessionIds: string[];
+  /** Words an embedded tool's own save already added to the person's words (Find the feeling's found word). */
+  countedWordIds: string[];
   /** 2–3 places on the feeling square with the words picked at each (null: one place, or not the grid). */
   spots: SpotInput[] | null;
 }
@@ -241,6 +243,7 @@ export function validateSaveCheckIn(raw: unknown, now: Date): SaveCheckInInput {
     resultShown: raw.resultShown === true,
     nextAction: parseNextAction(raw.nextAction),
     embeddedToolSessionIds: ids(raw.embeddedToolSessionIds, UUID, 3),
+    countedWordIds: ids(raw.countedWordIds, GRAPH_ID, 3),
     spots: parseSpots(raw.spots),
   };
 }
