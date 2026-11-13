@@ -63597,12 +63597,27 @@
                     },
                     {
                       "not": {
-                        "some": [
-                          "event",
+                        "any": [
                           {
-                            "eq": [
-                              "$opt.danger",
-                              "other"
+                            "some": [
+                              "event",
+                              {
+                                "eq": [
+                                  "$opt.danger",
+                                  "other"
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "some": [
+                              "urge",
+                              {
+                                "eq": [
+                                  "$opt.danger",
+                                  "self"
+                                ]
+                              }
                             ]
                           }
                         ]

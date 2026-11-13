@@ -23260,7 +23260,7 @@ MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}]";
 MATCH (a:SkillStep {id: "walk_the_wave:end"}), (x:SkillExit {id: "walk_the_wave:emotion_guide"})
 MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"all\": [{\"set\": \"$a.name\"}, {\"not\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}]}}]";
+SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"all\": [{\"set\": \"$a.name\"}, {\"not\": {\"any\": [{\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}, {\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}]}}]}}]";
 MATCH (a:SkillStep {id: "walk_the_wave:end"}), (x:SkillExit {id: "walk_the_wave:check_the_facts"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 3}, r.rowsJson = "[{\"order\": 3, \"when\": {\"all\": [{\"set\": \"$a.mind\"}, {\"not\": {\"any\": [{\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}, {\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}]}}]}}]";
