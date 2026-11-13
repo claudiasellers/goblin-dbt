@@ -40743,6 +40743,7 @@
     "hold_hint": "Press and hold while you do it",
     "after_body_title": "After that, the pull is…",
     "size_own": "My own step",
+    "size_hint": "All the way means your thoughts and words do the opposite too, along with your body.",
     "pred_title": "If you do it, what do you expect?",
     "when_title": "When will you try it?",
     "due_label": "Roughly when?",
@@ -42997,6 +42998,7 @@
        "key": "size_title"
       }
      ],
+     "hint": "size_hint",
      "fields": [
       {
        "id": "size",
