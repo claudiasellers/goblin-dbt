@@ -40735,6 +40735,7 @@
     "cdng_safe": "Your read of danger is the one that counts here. You don't have to check it against anything.",
     "clar_flooded": "Your body's loud right now. The facts can wait until it settles a little.",
     "fits_quieter": "Now that it's a little quieter, the facts are easier to see.",
+    "size_small_only": "While your body's loud, a small step is the one to start with.",
     "repr_title": "When guilt or shame fits, repair is the opposite of hiding",
     "repr_line": "Owning it and making it right is the skill here.",
     "cue_title": "Let your body go first",
@@ -41566,27 +41567,149 @@
        ]
       }
      ],
+     "next": [
+      {
+       "to": "help",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "lfit",
+     "kind": "ask",
+     "each": "feel",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.urge",
+         "guilt-punish"
+        ]
+       }
+      }
+     ],
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "anger"
+        ]
+       },
+       "key": "fits_title_anger"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "disgust"
+        ]
+       },
+       "key": "fits_title_disgust"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "envy"
+        ]
+       },
+       "key": "fits_title_envy"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "fear"
+        ]
+       },
+       "key": "fits_title_fear"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "guilt"
+        ]
+       },
+       "key": "fits_title_guilt"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "jealousy"
+        ]
+       },
+       "key": "fits_title_jealousy"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "love"
+        ]
+       },
+       "key": "fits_title_love"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "sadness"
+        ]
+       },
+       "key": "fits_title_sadness"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.parent",
+         "shame"
+        ]
+       },
+       "key": "fits_title_shame"
+      },
+      {
+       "key": "fits_title"
+      }
+     ],
      "lines": [
       {
        "when": {
-        "all": [
-         {
-          "eq": [
-           "$ctx.band",
-           "flooded"
-          ]
-         },
-         {
-          "set": "$a.help"
-         }
-        ]
+        "all": []
        },
        "key": "fits_quieter"
       }
      ],
+     "fields": [
+      {
+       "id": "fitl",
+       "options": {
+        "list": "fits"
+       },
+       "max": 1,
+       "required": true,
+       "list": {
+        "table": "fitsWhen",
+        "key": "$d.fitsParent"
+       },
+       "links": [
+        {
+         "exit": "check_the_facts",
+         "label": "check_link",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
      "next": [
       {
-       "to": "size",
+       "to": "clar",
        "when": {
         "all": [
          {
@@ -41598,41 +41721,57 @@
             ]
            },
            {
-            "set": "$a.help"
+            "set": "$a.fitl"
+           },
+           {
+            "in": [
+             "$a.tvnb",
+             [
+              "better",
+              "much_better"
+             ]
+            ]
+           },
+           {
+            "eq": [
+             "$a.help",
+             "unhelpful"
+            ]
+           },
+           {
+            "not": {
+             "all": [
+              {
+               "in": [
+                "$d.parent",
+                [
+                 "guilt",
+                 "shame"
+                ]
+               ]
+              },
+              {
+               "eq": [
+                "$a.goal",
+                "repair"
+               ]
+              }
+             ]
+            }
            }
           ]
          },
          {
-          "in": [
-           "$a.fits",
-           [
-            "fits",
-            "excessive",
-            "not_fit"
-           ]
-          ]
-         }
-        ]
-       }
-      },
-      {
-       "to": "clar",
-       "when": {
-        "all": [
-         {
           "eq": [
-           "$ctx.band",
-           "flooded"
+           "$a.fitl",
+           "unsure"
           ]
-         },
-         {
-          "set": "$a.help"
          }
         ]
        }
       },
       {
-       "to": "help",
+       "to": "size",
        "when": null
       }
      ],
@@ -41859,19 +41998,15 @@
          {
           "all": [
            {
-            "all": [
-             {
-              "eq": [
-               "$ctx.band",
-               "flooded"
-              ]
-             },
-             {
-              "not": {
-               "set": "$a.fits"
-              }
-             }
+            "eq": [
+             "$ctx.band",
+             "flooded"
             ]
+           },
+           {
+            "not": {
+             "set": "$a.fits"
+            }
            },
            {
             "eq": [
@@ -42344,14 +42479,57 @@
          {
           "all": [
            {
-            "eq": [
-             "$ctx.band",
-             "flooded"
+            "all": [
+             {
+              "eq": [
+               "$ctx.band",
+               "flooded"
+              ]
+             },
+             {
+              "set": "$a.fitl"
+             },
+             {
+              "in": [
+               "$a.tvnb",
+               [
+                "better",
+                "much_better"
+               ]
+              ]
+             },
+             {
+              "eq": [
+               "$a.help",
+               "unhelpful"
+              ]
+             },
+             {
+              "not": {
+               "all": [
+                {
+                 "in": [
+                  "$d.parent",
+                  [
+                   "guilt",
+                   "shame"
+                  ]
+                 ]
+                },
+                {
+                 "eq": [
+                  "$a.goal",
+                  "repair"
+                 ]
+                }
+               ]
+              }
+             }
             ]
            },
            {
             "eq": [
-             "$a.fits",
+             "$a.fitl",
              "unsure"
             ]
            }
@@ -42442,7 +42620,53 @@
          },
          {
           "not": {
-           "set": "$a.fits"
+           "all": [
+            {
+             "eq": [
+              "$ctx.band",
+              "flooded"
+             ]
+            },
+            {
+             "set": "$a.fitl"
+            },
+            {
+             "in": [
+              "$a.tvnb",
+              [
+               "better",
+               "much_better"
+              ]
+             ]
+            },
+            {
+             "eq": [
+              "$a.help",
+              "unhelpful"
+             ]
+            },
+            {
+             "not": {
+              "all": [
+               {
+                "in": [
+                 "$d.parent",
+                 [
+                  "guilt",
+                  "shame"
+                 ]
+                ]
+               },
+               {
+                "eq": [
+                 "$a.goal",
+                 "repair"
+                ]
+               }
+              ]
+             }
+            }
+           ]
           }
          }
         ]
@@ -42461,14 +42685,57 @@
          {
           "all": [
            {
-            "eq": [
-             "$ctx.band",
-             "flooded"
+            "all": [
+             {
+              "eq": [
+               "$ctx.band",
+               "flooded"
+              ]
+             },
+             {
+              "set": "$a.fitl"
+             },
+             {
+              "in": [
+               "$a.tvnb",
+               [
+                "better",
+                "much_better"
+               ]
+              ]
+             },
+             {
+              "eq": [
+               "$a.help",
+               "unhelpful"
+              ]
+             },
+             {
+              "not": {
+               "all": [
+                {
+                 "in": [
+                  "$d.parent",
+                  [
+                   "guilt",
+                   "shame"
+                  ]
+                 ]
+                },
+                {
+                 "eq": [
+                  "$a.goal",
+                  "repair"
+                 ]
+                }
+               ]
+              }
+             }
             ]
            },
            {
             "eq": [
-             "$a.fits",
+             "$a.fitl",
              "unsure"
             ]
            }
@@ -42660,7 +42927,53 @@
          },
          {
           "not": {
-           "set": "$a.fits"
+           "all": [
+            {
+             "eq": [
+              "$ctx.band",
+              "flooded"
+             ]
+            },
+            {
+             "set": "$a.fitl"
+            },
+            {
+             "in": [
+              "$a.tvnb",
+              [
+               "better",
+               "much_better"
+              ]
+             ]
+            },
+            {
+             "eq": [
+              "$a.help",
+              "unhelpful"
+             ]
+            },
+            {
+             "not": {
+              "all": [
+               {
+                "in": [
+                 "$d.parent",
+                 [
+                  "guilt",
+                  "shame"
+                 ]
+                ]
+               },
+               {
+                "eq": [
+                 "$a.goal",
+                 "repair"
+                ]
+               }
+              ]
+             }
+            }
+           ]
           }
          }
         ]
@@ -42718,6 +43031,65 @@
             "has": [
              "$a.checked.ids",
              "partly"
+            ]
+           }
+          ]
+         },
+         {
+          "all": [
+           {
+            "all": [
+             {
+              "eq": [
+               "$ctx.band",
+               "flooded"
+              ]
+             },
+             {
+              "set": "$a.fitl"
+             },
+             {
+              "in": [
+               "$a.tvnb",
+               [
+                "better",
+                "much_better"
+               ]
+              ]
+             },
+             {
+              "eq": [
+               "$a.help",
+               "unhelpful"
+              ]
+             },
+             {
+              "not": {
+               "all": [
+                {
+                 "in": [
+                  "$d.parent",
+                  [
+                   "guilt",
+                   "shame"
+                  ]
+                 ]
+                },
+                {
+                 "eq": [
+                  "$a.goal",
+                  "repair"
+                 ]
+                }
+               ]
+              }
+             }
+            ]
+           },
+           {
+            "eq": [
+             "$a.fitl",
+             "unsure"
             ]
            }
           ]
@@ -43065,23 +43437,19 @@
      ],
      "next": [
       {
-       "to": "fits",
+       "to": "lfit",
        "when": {
         "all": [
          {
-          "all": [
-           {
-            "eq": [
-             "$ctx.band",
-             "flooded"
-            ]
-           },
-           {
-            "not": {
-             "set": "$a.fits"
-            }
-           }
+          "eq": [
+           "$ctx.band",
+           "flooded"
           ]
+         },
+         {
+          "not": {
+           "set": "$a.fits"
+          }
          },
          {
           "in": [
@@ -43204,6 +43572,77 @@
       }
      ],
      "hint": "size_hint",
+     "lines": [
+      {
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$ctx.band",
+           "flooded"
+          ]
+         },
+         {
+          "not": {
+           "set": "$a.fits"
+          }
+         },
+         {
+          "not": {
+           "all": [
+            {
+             "eq": [
+              "$ctx.band",
+              "flooded"
+             ]
+            },
+            {
+             "set": "$a.fitl"
+            },
+            {
+             "in": [
+              "$a.tvnb",
+              [
+               "better",
+               "much_better"
+              ]
+             ]
+            },
+            {
+             "eq": [
+              "$a.help",
+              "unhelpful"
+             ]
+            },
+            {
+             "not": {
+              "all": [
+               {
+                "in": [
+                 "$d.parent",
+                 [
+                  "guilt",
+                  "shame"
+                 ]
+                ]
+               },
+               {
+                "eq": [
+                 "$a.goal",
+                 "repair"
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
+         }
+        ]
+       },
+       "key": "size_small_only"
+      }
+     ],
      "fields": [
       {
        "id": "size",
@@ -43339,6 +43778,57 @@
                {
                 "not": {
                  "set": "$a.fits"
+                }
+               },
+               {
+                "not": {
+                 "all": [
+                  {
+                   "eq": [
+                    "$ctx.band",
+                    "flooded"
+                   ]
+                  },
+                  {
+                   "set": "$a.fitl"
+                  },
+                  {
+                   "in": [
+                    "$a.tvnb",
+                    [
+                     "better",
+                     "much_better"
+                    ]
+                   ]
+                  },
+                  {
+                   "eq": [
+                    "$a.help",
+                    "unhelpful"
+                   ]
+                  },
+                  {
+                   "not": {
+                    "all": [
+                     {
+                      "in": [
+                       "$d.parent",
+                       [
+                        "guilt",
+                        "shame"
+                       ]
+                      ]
+                     },
+                     {
+                      "eq": [
+                       "$a.goal",
+                       "repair"
+                      ]
+                     }
+                    ]
+                   }
+                  }
+                 ]
                 }
                }
               ]
@@ -47725,6 +48215,11 @@
      "name": "startSmall",
      "from": "$a.sub",
      "table": "startSmall"
+    },
+    {
+     "name": "dbtParent",
+     "from": "$a.feel",
+     "table": "parentOf"
     }
    ],
    "steps": [
@@ -47780,9 +48275,22 @@
          },
          {
           "not": {
-           "eq": [
-            "$ctx.frame",
-            "repair"
+           "all": [
+            {
+             "eq": [
+              "$ctx.frame",
+              "repair"
+             ]
+            },
+            {
+             "in": [
+              "$d.dbtParent",
+              [
+               "guilt",
+               "shame"
+              ]
+             ]
+            }
            ]
           }
          }
@@ -47833,9 +48341,22 @@
      "title": [
       {
        "when": {
-        "eq": [
-         "$ctx.frame",
-         "repair"
+        "all": [
+         {
+          "eq": [
+           "$ctx.frame",
+           "repair"
+          ]
+         },
+         {
+          "in": [
+           "$d.dbtParent",
+           [
+            "guilt",
+            "shame"
+           ]
+          ]
+         }
         ]
        },
        "key": "ack_repair"
@@ -47935,9 +48456,22 @@
            "all": [
             {
              "not": {
-              "eq": [
-               "$ctx.frame",
-               "repair"
+              "all": [
+               {
+                "eq": [
+                 "$ctx.frame",
+                 "repair"
+                ]
+               },
+               {
+                "in": [
+                 "$d.dbtParent",
+                 [
+                  "guilt",
+                  "shame"
+                 ]
+                ]
+               }
               ]
              }
             },
@@ -47952,9 +48486,22 @@
           {
            "all": [
             {
-             "eq": [
-              "$ctx.frame",
-              "repair"
+             "all": [
+              {
+               "eq": [
+                "$ctx.frame",
+                "repair"
+               ]
+              },
+              {
+               "in": [
+                "$d.dbtParent",
+                [
+                 "guilt",
+                 "shame"
+                ]
+               ]
+              }
              ]
             },
             {
@@ -48073,9 +48620,22 @@
              "all": [
               {
                "not": {
-                "eq": [
-                 "$ctx.frame",
-                 "repair"
+                "all": [
+                 {
+                  "eq": [
+                   "$ctx.frame",
+                   "repair"
+                  ]
+                 },
+                 {
+                  "in": [
+                   "$d.dbtParent",
+                   [
+                    "guilt",
+                    "shame"
+                   ]
+                  ]
+                 }
                 ]
                }
               },
@@ -48090,9 +48650,22 @@
             {
              "all": [
               {
-               "eq": [
-                "$ctx.frame",
-                "repair"
+               "all": [
+                {
+                 "eq": [
+                  "$ctx.frame",
+                  "repair"
+                 ]
+                },
+                {
+                 "in": [
+                  "$d.dbtParent",
+                  [
+                   "guilt",
+                   "shame"
+                  ]
+                 ]
+                }
                ]
               },
               {
@@ -49067,9 +49640,22 @@
              }
             },
             {
-             "eq": [
-              "$ctx.frame",
-              "repair"
+             "all": [
+              {
+               "eq": [
+                "$ctx.frame",
+                "repair"
+               ]
+              },
+              {
+               "in": [
+                "$d.dbtParent",
+                [
+                 "guilt",
+                 "shame"
+                ]
+               ]
+              }
              ]
             },
             {
@@ -49235,9 +49821,22 @@
              }
             },
             {
-             "eq": [
-              "$ctx.frame",
-              "repair"
+             "all": [
+              {
+               "eq": [
+                "$ctx.frame",
+                "repair"
+               ]
+              },
+              {
+               "in": [
+                "$d.dbtParent",
+                [
+                 "guilt",
+                 "shame"
+                ]
+               ]
+              }
              ]
             },
             {
@@ -49444,9 +50043,22 @@
                }
               },
               {
-               "eq": [
-                "$ctx.frame",
-                "repair"
+               "all": [
+                {
+                 "eq": [
+                  "$ctx.frame",
+                  "repair"
+                 ]
+                },
+                {
+                 "in": [
+                  "$d.dbtParent",
+                  [
+                   "guilt",
+                   "shame"
+                  ]
+                 ]
+                }
                ]
               },
               {

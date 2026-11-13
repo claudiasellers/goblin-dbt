@@ -189,6 +189,16 @@ test('a flooded start (ER-B5): a fit never asked counts only on *won\'t help*, r
   tx = fakeTx((q, p) => (q === P.CHECK_PICK ? [{ parentId: 'guilt', urgeId: p.urgeId, flow: FLOW }] : undefined));
   await P.projectOppositeAction(tx, input(guilt));
   assert.equal(writes(tx).length, 0, 'repair waits for the facts');
+  // The late fit (after the body, the pull weaker): counted, marked late; with the pull not weaker, it never counts.
+  const late = (tvnb) => sadRun({ answers: sadRun().answers.filter((x) => x.fieldId !== 'fits' && x.fieldId !== 'tvnb')
+    .concat([at('fitl', 'sad', ['not_fit']), at('tvnb', 'sad', [tvnb])]) });
+  tx = fakeTx();
+  await P.projectOppositeAction(tx, input(late('better')));
+  const dl = JSON.parse(writes(tx)[0].params.dataJson);
+  assert.deepEqual([dl.facts, dl.factsLate, dl.factsDeferred], ['not_fit', true, undefined]);
+  tx = fakeTx();
+  await P.projectOppositeAction(tx, input(late('same')));
+  assert.equal(JSON.parse(writes(tx)[0].params.dataJson).factsDeferred, true, 'a late fit left from a weaker pull that was changed: deferred');
   // An answered fit is unchanged: no deferred flag.
   tx = fakeTx();
   await P.projectOppositeAction(tx, input(sadRun()));

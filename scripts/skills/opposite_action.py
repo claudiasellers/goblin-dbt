@@ -114,6 +114,7 @@ COPY = {
     "cdng_safe": "Your read of danger is the one that counts here. You don't have to check it against anything.",
     "clar_flooded": "Your body's loud right now. The facts can wait until it settles a little.",
     "fits_quieter": "Now that it's a little quieter, the facts are easier to see.",
+    "size_small_only": "While your body's loud, a small step is the one to start with.",
     "repr_title": "When guilt or shame fits, repair is the opposite of hiding",
     "repr_line": "Owning it and making it right is the skill here.",
     "cue_title": "Let your body go first",
@@ -230,14 +231,17 @@ CHECK_ENTER = {"all": [EQ("fits", "unsure"), {"not": FLOODED}]}
 # hold, then *does it fit?* once the pull is weaker (`aftb`), never before. Guilt or shame with the repair goal waits for
 # the facts (repair needs them, H11): the clarify card, the body first. Anything else (it would help, not sure) is the
 # clarify card as before.
-FIT_DEFERRED = {"all": [FLOODED, {"not": {"set": a("fits")}}]}
+# The late fit is its own field (`fitl`, its own step `lfit`), so going back can never leave a fit standing on a path
+# that didn't ask it: it counts only with *won't help* and a weaker pull, read on every screen that uses it.
 REPAIR_GOAL = {"all": [{"in": ["$d.parent", ["guilt", "shame"]]}, EQ("goal", "repair")]}
-DEFER_TO_CUE = {"all": [FIT_DEFERRED, EQ("help", "unhelpful"), {"not": REPAIR_GOAL}]}
+DEFER_TO_CUE = {"all": [FLOODED, {"not": {"set": a("fits")}}, EQ("help", "unhelpful"), {"not": REPAIR_GOAL}]}
 SETTLED = {"in": [a("tvnb"), ["better", "much_better"]]}
 # The check after the body, answered: the table on *won't help* (fits, too big or doesn't fit → the step; not sure →
 # the clarify card, the opposite can wait).
-LATE_FIT = {"all": [FLOODED, {"set": a("help")}]}
-LATE_UNSURE = {"all": [FLOODED, EQ("fits", "unsure")]}
+LATE_VALID = {"all": [FLOODED, {"set": a("fitl")}, SETTLED, EQ("help", "unhelpful"), {"not": REPAIR_GOAL}]}
+LATE_UNSURE = {"all": [LATE_VALID, EQ("fitl", "unsure")]}
+# The fit still unknown on a flooded start: the small step only.
+FIT_DEFERRED = {"all": [FLOODED, {"not": {"set": a("fits")}}, {"not": LATE_VALID}]}
 HELP_NEXT = [{"when": REPAIR, "to": "repr"}, {"when": {"all": [PUNISH, EQ("help", "helpful")]}, "to": "pun"},
              {"when": _route_to("prob"), "to": "prob"},
              {"when": {"any": [_route_to("cue"), DEFER_TO_CUE]}, "to": "cue"}, {"when": CHECK_ENTER, "to": "ctf"}, {"to": "clar"}]
@@ -342,10 +346,16 @@ STEPS = [
         "fields": [{"id": "fits", "options": {"list": "fits"}, "max": 1, "required": True,
                     "list": {"table": "fitsWhen", "key": "$d.fitsParent"},
                     "links": [{"exit": "check_the_facts", "label": "check_link", "when": ALWAYS}]}],
-        # After the body with a flooded reading (`aftb`, the pull weaker): asked late, and *won't help* was the answer.
-        "lines": [{"when": LATE_FIT, "key": "fits_quieter"}],
-        "next": [{"when": {"all": [LATE_FIT, {"in": [a("fits"), ["fits", "excessive", "not_fit"]]}]}, "to": "size"},
-                 {"when": LATE_FIT, "to": "clar"}, {"to": "help"}],
+        "next": [{"to": "help"}],
+    },
+    {
+        # A flooded start's fit check, after the body once the pull is weaker (`aftb`); *won't help* was the answer.
+        "id": "lfit", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "title": by_parent("fits_title"),
+        "lines": [{"when": ALWAYS, "key": "fits_quieter"}],
+        "fields": [{"id": "fitl", "options": {"list": "fits"}, "max": 1, "required": True,
+                    "list": {"table": "fitsWhen", "key": "$d.fitsParent"},
+                    "links": [{"exit": "check_the_facts", "label": "check_link", "when": ALWAYS}]}],
+        "next": [{"when": LATE_UNSURE, "to": "clar"}, {"to": "size"}],
     },
     {
         "id": "help", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS,
@@ -378,7 +388,7 @@ STEPS = [
                      {"when": {"any": [CHECKED("left"), CHECKED("finished")]}, "key": "clar_title_left"},
                      {"when": {"any": [CHECKED_FITS, {"all": [CHECKED("doesnt_fit"), {"not": EQ("help", "helpful")}]}]}, "key": "clar_title_open"},
                      {"key": "clar_title"}],
-            [{"when": {"all": [FLOODED, NOT_CHECKED, {"not": {"set": a("fits")}}]}, "key": "clar_flooded"},
+            [{"when": {"all": [FLOODED, NOT_CHECKED, {"not": LATE_VALID}]}, "key": "clar_flooded"},
              {"when": {"any": [CHECKED("unsure"), LATE_UNSURE]}, "key": "clar_unsure"},
              {"when": {"all": [CHECKED("doesnt_fit"), EQ("help", "helpful")]}, "key": "clar_checked_helpful"},
              {"when": {"all": [CHECKED("doesnt_fit"), {"not": EQ("help", "helpful")}]}, "key": "clar_checked_notfit_open"},
@@ -388,9 +398,9 @@ STEPS = [
              {"when": {"all": [NOT_CHECKED, {"not": FLOODED}, {"not": {"all": [EQ("fits", "not_fit"), EQ("help", "helpful")]}}]}, "key": "clar_line"}],
             # The full check as a link only when it didn't run to a verdict here; Wise mind after a verdict that leaves a
             # question; the body first with a flooded reading (the check is skipped then).
-            [{"exit": "cool_down", "when": {"all": [FLOODED, NOT_CHECKED, {"not": {"set": a("fits")}}]}},
+            [{"exit": "cool_down", "when": {"all": [FLOODED, NOT_CHECKED, {"not": LATE_VALID}]}},
              {"exit": "check_the_facts", "when": {"any": [NOT_CHECKED, CHECKED("left"), CHECKED("finished")]}},
-             {"exit": "wise_mind", "when": {"any": [CHECKED("unsure"), CHECKED("doesnt_fit"), CHECKED_FITS]}}]),
+             {"exit": "wise_mind", "when": {"any": [CHECKED("unsure"), CHECKED("doesnt_fit"), CHECKED_FITS, LATE_UNSURE]}}]),
     handoff("prob", [{"when": CHECKED("partly"), "key": "prob_title_partly"}, {"when": CHECKED("fits"), "key": "prob_title_checked"},
                      {"key": "prob_title"}],
             [{"when": CHECKED("partly"), "key": "prob_partly"},
@@ -417,10 +427,11 @@ STEPS = [
     {
         "id": "aftb", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "title": "after_body_title",
         "fields": [{"id": "tvnb", "options": {"list": "tvn"}, "max": 1, "required": True, "askFresh": "thenVsNow"}],
-        "next": [{"when": {"all": [FIT_DEFERRED, SETTLED]}, "to": "fits"}, {"to": "size"}],
+        "next": [{"when": {"all": [FLOODED, {"not": {"set": a("fits")}}, SETTLED]}, "to": "lfit"}, {"to": "size"}],
     },
     {
         "id": "size", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "title": by_parent("size_title"), "hint": "size_hint",
+        "lines": [{"when": FIT_DEFERRED, "key": "size_small_only"}],
         "fields": [{"id": "size", "options": {"list": "size", "where": {"all": [SIZE_WHERE, {"any": [{"not": FIT_DEFERRED}, {"eq": ["$opt.size", "small"]}]}]}},
                     "max": 1, "required": True,
                     "own": {"hint": "size_own", "countsAsPick": True, "max": OWN_MAX}}],

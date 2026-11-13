@@ -64,12 +64,15 @@ polish batch, with Check the Facts' inline mini-card; "none" means it stays this
 - `flood`: a settle hold before the goal. Then, built 13 Nov (ER-B5), the fit check waits for the body instead of
   the follow-up: *will it help?* comes before *does it fit?*, and *it won't help* (H10's own reason for the opposite,
   whatever the fit) goes to the body cue and its hold; *does it fit?* is asked after the hold only once the pull is
-  weaker (`aftb` *A bit weaker* or *Much weaker*), with the line *Now that it's a little quieter, the facts are easier
+  weaker (`aftb` *A bit weaker* or *Much weaker*), on its own step and field (`lfit` / `fitl`, so going back never
+  leaves a late fit standing: it counts only with *won't help* and a weaker pull, on every screen and in the
+  projection), with the line *Now that it's a little quieter, the facts are easier
   to see.*, and its answer runs the table on *won't help* (fits, too big or doesn't fit → the step; not sure → the
-  clarify card, *You don't have to decide yet*, no body offer since the body was done). Not weaker, or no cue picked:
-  the fit stays unasked and only the small step is listed. *It would help* or *not sure* → the clarify card, the body
+  clarify card, *You don't have to decide yet*, Check the Facts and Wise mind, no body offer since the body was done).
+  Not weaker, or no cue picked: the fit stays unasked and only the small step is listed, with *While your body's loud,
+  a small step is the one to start with.* *It would help* or *not sure* → the clarify card, the body
   first, as before; guilt or shame with the repair goal never goes to the opposite unasked (repair needs the facts).
-  The projection records an unasked fit as `facts: ''`, `factsDeferred: true`, only on *won't help*. Asking it on the
+  The projection records an unasked fit as `facts: ''`, `factsDeferred: true`, only on *won't help*; a late one is marked `factsLate`. Asking it on the
   `oa_try` card instead was rejected: a person who tries it now never gets that card, and the body-settled moment is
   the one the handout means. *None.*
 - `bodyReset`: per-feeling cue chips (the urge's own body cues, or the parent's) and a press-and-hold of the one picked,

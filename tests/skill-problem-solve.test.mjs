@@ -448,5 +448,11 @@ test("repair keeps every guard: flooded settles first, *too loud* still waits, a
   assert.equal(run([pick("feel", "ashamed"), next, pick("ready", "too_loud"), next], ctx({ frame: "repair" })).stepId, "not_now");
   assert.equal(run([pick("feel", "ashamed"), next]).stepId, "not_fit");
   assert.equal(run([pick("feel", "ashamed"), next], ctx({ frame: "other" })).stepId, "not_fit", "only repair opens the way");
+  // The word must be guilt's or shame's (Gate 1): another word on a repair link is Problem Solve as usual.
+  const fear = run([pick("feel", "anxious"), next, pick("ready", "can"), next], ctx({ frame: "repair" }));
+  assert.equal(M.copyText(ctx({ frame: "repair" }), M.stepOf(skill, "problem").title, { answers: fear.answers }), skill.copy.ack_fear);
+  assert.ok(M.optionGroups(ctx({ frame: "repair" }), M.stepOf(skill, "problem").fields[0], fear.answers).flatMap((g) => g.options.map((o) => o.value))
+    .every((v) => v === "piling" || ps.problemTypes.fear.some((p) => p.id === v)));
+  assert.equal(run([pick("feel", "sad"), next], ctx({ frame: "repair" })).stepId, "ready");
   assert.doesNotMatch(skill.copy.ack_repair, /\b(should|just|but|must)\b|!/i);
 });

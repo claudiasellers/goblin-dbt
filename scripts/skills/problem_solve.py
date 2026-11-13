@@ -227,8 +227,10 @@ def eq(ref, v):
 
 # Opened on repair (Do the Opposite's `repr`: guilt or shame that fits the facts, goal *repair harm*, H11). The fit
 # check already happened there, so a shame word isn't turned away here: the problems offered are guilt's (a harm, a
-# pattern, a values conflict), each picked by the person, never pre-filled.
-REPAIR = eq("$ctx.frame", "repair")
+# pattern, a values conflict), each picked by the person, never pre-filled. Shame that fits because of a group's
+# disapproval (H13: find people who accept you) isn't a repair, and Do the Opposite's repair goal doesn't send it here.
+# The word must be guilt's or shame's (the feeling screen still lets the person change it, and a link can be typed).
+REPAIR = {"all": [eq("$ctx.frame", "repair"), {"in": ["$d.dbtParent", ["guilt", "shame"]]}]}
 REPAIR_PARENT = "guilt"
 # The problem the person picked: on the problem screen, or the foothold they picked when everything piled up.
 PICKED_TYPE = {"any": [{"all": [{"set": "$a.problem.ids"}, {"not": eq(a("problem"), "piling")}]}, {"set": "$a.focus.ids"}]}
@@ -252,6 +254,7 @@ DERIVE = [
     {"name": "fit", "from": a("feel"), "table": "psFit", "default": "other"},
     {"name": "subGo", "from": a("sub"), "table": "subGo"},
     {"name": "startSmall", "from": a("sub"), "table": "startSmall"},
+    {"name": "dbtParent", "from": a("feel"), "table": "parentOf"},  # the shared table: the repair frame's check
 ]
 
 RUNNING_LOW = ("cant-no-energy", "tried-exhausted")  # what to say is *refill first*, so the first chip is to stop

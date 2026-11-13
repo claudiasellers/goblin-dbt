@@ -43,6 +43,8 @@ export interface OaPick {
   /** Check the Facts inline (ER-B5): its verdict when the check finished with nothing unsafe told, else null. */
   checked: CheckVerdict | null;
   thenVsNowBody: string | null;
+  /** The fit was asked after the body (a flooded start whose pull got weaker). */
+  lateFit?: true;
 }
 
 export interface OaRun {
@@ -76,7 +78,12 @@ export function oaFromRun(run: Record<string, unknown>): OaRun {
     const sizeId = size.ids[0] ?? null;
     const actionSize = sizeId ? (SIZES.find((s) => sizeId.endsWith(`:${s}`)) ?? null) : size.own ? 'custom' : null;
     const urgeId = urge.ids[0] ?? (urge.own ? 'custom' : null);
-    const facts = one('fits', emotionId);
+    // A flooded start's late fit (`fitl`, asked after the body): it counts only with a weaker pull and *won't help*,
+    // as the skill reads it (`LATE_VALID`); otherwise the fit was never asked.
+    const tvnb = one('tvnb', emotionId);
+    const late = one('fitl', emotionId);
+    const lateValid = late && (tvnb === 'better' || tvnb === 'much_better') && one('help', emotionId) === 'unhelpful' ? late : null;
+    const facts = one('fits', emotionId) ?? lateValid;
     const effectiveness = one('help', emotionId);
     // No fit answer only on the flooded start's *it won't help* (the skill asks it before the fit there).
     if (!actionSize || !urgeId || !effectiveness || (!facts && effectiveness !== 'unhelpful')) return;
@@ -85,7 +92,7 @@ export function oaFromRun(run: Record<string, unknown>): OaRun {
     const chk = get('checked', emotionId)?.ids ?? [];
     const verdict = (Object.keys(CHECK_FACTS) as CheckVerdict[]).find((v) => chk.includes(v)) ?? null;
     const checked = facts === 'unsure' && verdict && !chk.some((x) => x === 'unsafe' || x === 'stopped' || x === 'left') ? verdict : null;
-    picks.push({ index, emotionId, urgeId, actionSize, facts, effectiveness, checked, thenVsNowBody: one('tvnb', emotionId) });
+    picks.push({ index, emotionId, urgeId, actionSize, facts, effectiveness, checked, thenVsNowBody: tvnb, ...(lateValid ? { lateFit: true } : {}) });
   });
   const goal = one('goal');
   const cueId = one('when');
@@ -193,7 +200,7 @@ export async function projectOppositeAction(tx: ManagedTransaction, { uid, toolS
     const data = {
       schemaVersion: 3, id, status: oa.status, emotionId: p.emotionId, parentId, urgeId: p.urgeId,
       goal: oa.goal ?? '', safety: 'safe', facts: p.facts ?? '', effectiveness: p.effectiveness, actionSize: p.actionSize,
-      ...(p.checked ? { factsChecked: p.checked } : {}), ...(deferred ? { factsDeferred: true } : {}),
+      ...(p.checked ? { factsChecked: p.checked } : {}), ...(deferred ? { factsDeferred: true } : {}), ...(p.lateFit ? { factsLate: true } : {}),
       cueId: oa.cueId ?? '', outcome: oa.status === 'practiced' ? oa.outcome ?? '' : '', predict: oa.predict ?? '',
       actual: oa.status === 'practiced' ? oa.actual ?? '' : '', thenVsNowBody: p.thenVsNowBody ?? '', missedReason: '',
     };

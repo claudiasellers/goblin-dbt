@@ -72,7 +72,8 @@ at build time from the graph files, plus `ROUTED_IN`: the words the check-in's r
 and *rushed* with fear, as *stressed*; *helpless* with sadness), so nobody routed here is turned away on screen 1. A
 test keeps every routed word fitting. **For Claudia's review** with the routing words.
 
-**Opened on repair** (`?frame=repair`, ER-B5, 13 Nov 2026). Do the Opposite's `repr` card (guilt or shame that fits
+**Opened on repair** (`?frame=repair`, ER-B5, 13 Nov 2026; only for a guilt or shame word, through the shared
+`parentOf`: any other word on a repair link gets Problem Solve as usual). Do the Opposite's `repr` card (guilt or shame that fits
 the facts, with the goal *repair harm*, DBT ER Handout 11) opens Problem Solve on repair, carrying the word. The fit
 check already happened there, so a shame word isn't sent to `not_fit` (the graph's "shame isn't a problem to solve"
 is about shame over who you are; repair is about one thing you did, which `not_fit`'s own shame line already invites
@@ -80,7 +81,9 @@ back for). The problem screen says *You want to put something right. Owning it a
 hiding.* and offers guilt's problems (a clear harm, a pattern, a values conflict) and *everything feels like too
 much*, the person picking, nothing pre-filled; own words alone get guilt's general problem's directions (apologize,
 make amends, prevent it happening again). Everything else is unchanged: a carried flooded band and *too loud* still
-go to `not_now`, the hopeless link still holds, and without the frame a shame word still gets `not_fit`.
+go to `not_now`, the hopeless link still holds, and without the frame a shame word still gets `not_fit`. Shame that
+fits because of a group's disapproval (H13: find people who accept you) isn't a repair; Do the Opposite's repair goal
+doesn't send it here.
 
 **Safety.** *My safety is at risk* (`fear-safety-threat`: "Someone or something could hurt me or someone I love
 right now") is marked `danger: other`. It shows the `other_person` crisis slot (911, the DV hotline, 988) on the

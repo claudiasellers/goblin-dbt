@@ -388,21 +388,33 @@ test("a carried flooded reading (ER-B5): *will it help?* first, the fit check on
   const cue = chips(fc, s, "cue", "cue")[0];
   // The pull weaker after the hold: now the fit check, with its line.
   const settled = run([pick("cue", cue), next, held, pick("tvnb", "better"), next], fc, s);
-  assert.equal(settled.stepId, "fits");
-  assert.equal(M.handoffLine(fc, M.stepOf(skill, "fits"), { answers: M.answersOf(fc, settled) }), skill.copy.fits_quieter);
-  for (const v of ["fits", "excessive", "not_fit"]) assert.equal(run([pick("fits", v), next], fc, settled).stepId, "size", v);
-  const unsure = run([pick("fits", "unsure"), next], fc, settled);
+  assert.equal(settled.stepId, "lfit");
+  assert.equal(M.handoffLine(fc, M.stepOf(skill, "lfit"), { answers: M.answersOf(fc, settled) }), skill.copy.fits_quieter);
+  for (const v of ["fits", "excessive", "not_fit"]) assert.equal(run([pick("fitl", v), next], fc, settled).stepId, "size", v);
+  const unsure = run([pick("fitl", "unsure"), next], fc, settled);
   assert.equal(unsure.stepId, "clar", "not sure, even calmer: the opposite can wait");
   assert.equal(M.copyText(fc, M.stepOf(skill, "clar").title, { answers: M.answersOf(fc, unsure) }), skill.copy.clar_title_unsure);
   assert.equal(M.handoffLine(fc, M.stepOf(skill, "clar"), { answers: M.answersOf(fc, unsure) }), skill.copy.clar_unsure);
-  assert.ok(!M.offersFor(fc, M.stepOf(skill, "clar"), { answers: M.answersOf(fc, unsure) }).includes("cool_down"), "the body was already done");
+  assert.deepEqual(M.offersFor(fc, M.stepOf(skill, "clar"), { answers: M.answersOf(fc, unsure) }), ["check_the_facts", "wise_mind"], "the body was already done");
   // Not weaker: the fit stays unasked, and only the small step is offered.
   const loud = run([pick("cue", cue), next, held, pick("tvnb", "same"), next], fc, s);
   assert.equal(loud.stepId, "size");
   const sizes = chips(fc, loud, "size", "size");
   assert.ok(sizes.length >= 1 && sizes.every((v) => v.endsWith(":small")), sizes.join());
-  const settledSizes = chips(fc, run([pick("fits", "not_fit"), next], fc, settled), "size", "size");
+  assert.equal(M.handoffLine(fc, M.stepOf(skill, "size"), { answers: M.answersOf(fc, loud) }), skill.copy.size_small_only);
+  const settledSizes = chips(fc, run([pick("fitl", "not_fit"), next], fc, settled), "size", "size");
   assert.ok(settledSizes.some((v) => v.endsWith(":bigger")), "once the fit is known, every size");
+  // Going back never leaves a late fit standing (Gate 1): back to *the pull is…*, now the same → small only again;
+  // back to *will it help?*, now it would help → the clarify card with its flooded line and the body first.
+  const atSize = run([pick("fitl", "not_fit"), next], fc, settled);
+  const back = { type: "back" };
+  const sameNow = run([back, back, pick("tvnb", "same"), next], fc, atSize);
+  assert.equal(sameNow.stepId, "size");
+  assert.ok(chips(fc, sameNow, "size", "size").every((v) => v.endsWith(":small")));
+  const helpNow = run([back, back, back, back, back, pick("help", "helpful"), next], fc, atSize);
+  assert.equal(helpNow.stepId, "clar");
+  assert.equal(M.handoffLine(fc, M.stepOf(skill, "clar"), { answers: M.answersOf(fc, helpNow) }), skill.copy.clar_flooded);
+  assert.equal(M.offersFor(fc, M.stepOf(skill, "clar"), { answers: M.answersOf(fc, helpNow) })[0], "cool_down");
   // No cue picked: straight to the small step, the fit unasked.
   assert.equal(run([next], fc, s).stepId, "size");
   // It would help, or not sure: the clarify card, the body first (as before).
