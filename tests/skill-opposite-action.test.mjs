@@ -426,3 +426,10 @@ test("each screen says which feeling it's about: the parent's noun in titles, 1 
   const noCue = run([doors("sad"), ...SAFE, ...OPPOSITE("sad-bed"), next]);
   assert.equal(noCue.stepId, "size");
 });
+
+test("H10 step 5, all the way: the size step's hint brings in thoughts and words, alongside the body (ER-B5)", () => {
+  const size = skill.steps.find((x) => x.id === "size");
+  assert.equal(size.hint, "size_hint");
+  assert.match(skill.copy.size_hint, /thoughts and words do the opposite too/);
+  assert.doesNotMatch(skill.copy.size_hint, /\b(should|just|must)\b/i);
+});

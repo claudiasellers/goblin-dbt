@@ -121,6 +121,8 @@ COPY = {
     "after_body_title": "After that, the pull is…",
 
     "size_own": "My own step",
+    # H10 step 5, all the way (ER-B5): the steps carry the action; this line brings in the thoughts and words.
+    "size_hint": "Whichever step you pick, let your thoughts and words do the opposite too, along with your body.",
     # Once, after every feeling.
     "pred_title": "If you do it, what do you expect?",
     "when_title": "When will you try it?",
@@ -399,7 +401,7 @@ STEPS = [
         "next": [{"to": "size"}],
     },
     {
-        "id": "size", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "title": by_parent("size_title"),
+        "id": "size", "kind": "ask", "each": "feel", "crisis": PUNISH_CRISIS, "title": by_parent("size_title"), "hint": "size_hint",
         "fields": [{"id": "size", "options": {"list": "size", "where": SIZE_WHERE}, "max": 1, "required": True,
                     "own": {"hint": "size_own", "countsAsPick": True, "max": OWN_MAX}}],
         "next": [{"to": "pred"}],
