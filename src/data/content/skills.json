@@ -61999,18 +61999,18 @@
         ],
         "copy": {
           "start_title": "Where do you want to start?",
-          "start_hint": "Start where it's clearest. The rest can follow.",
+          "start_hint": "Start where it's clearest. Seven short questions; skip any.",
           "heads_up_title": "Your body's loud right now.",
           "heads_up_hint": "Walking through a feeling works better once it settles a little.",
           "settle_line": "Body first. This will be here when you're ready.",
           "before_title": "Before it, was anything already wearing you down?",
-          "before_hint": "Skip any you're not sure of.",
+          "before_hint": "Skip it if you're not sure.",
           "event_title": "What happened?",
-          "event_hint": "It can be small, or something inside, like a thought.",
+          "event_hint": "It can be small, or something inside, like a thought. A word is enough.",
           "mind_title": "What did your mind say about it?",
           "mind_hint": "The first thought, even if it's not fair.",
           "body_title": "Where did you feel it in your body?",
-          "body_hint": "Pick what fits, or skip it.",
+          "body_hint": "Skip it if you're not sure.",
           "urge_title": "What did it make you want to do?",
           "urge_hint": "A pull isn't something you have to act on.",
           "did_title": "What did you do?",
@@ -62018,6 +62018,11 @@
           "after_title": "And after?",
           "after_hint": "Sometimes a second feeling comes about the first.",
           "own_hint": "In your own words",
+          "too_much": "This is bringing it back",
+          "safe_title": "Are you safe right now?",
+          "safe_hint": "If the pull to hurt yourself is here now, someone can be with you in it.",
+          "reach_title": "Talk to someone now.",
+          "reach_line": "You don't have to hold this alone. Someone can talk with you right now.",
           "name_title": "If you had to guess, what was the feeling?",
           "name_hint": "A guess is fine, and so is none.",
           "name_more": "More words",
@@ -62027,9 +62032,11 @@
           "strip_name_label": "Maybe",
           "next": "Next",
           "end_title": "A feeling has a beginning, a middle and an end.",
+          "end_title_danger": "Thank you for laying that out.",
           "end_line": "Seeing the whole wave can make the next one easier to spot early.",
           "end_hurt": "If the pull to hurt yourself is still there, talk to someone now. Seeing the whole wave can make the next one easier to spot early.",
           "end_danger": "If someone is hurting you or scaring you, you don't have to plan around it alone.",
+          "end_both": "If someone is hurting you or scaring you, or the pull to hurt yourself is still there, talk to someone now. You don't have to hold this alone.",
           "offer_guide": "Get to know this feeling",
           "offer_facts": "Check the story your mind told",
           "offer_cope": "Plan for next time",
@@ -62244,20 +62251,6 @@
             "hint": "before_hint",
             "crisis": [
               {
-                "variant": "crisis",
-                "when": {
-                  "some": [
-                    "urge",
-                    {
-                      "eq": [
-                        "$opt.danger",
-                        "self"
-                      ]
-                    }
-                  ]
-                }
-              },
-              {
                 "variant": "other_person",
                 "when": {
                   "some": [
@@ -62266,6 +62259,33 @@
                       "eq": [
                         "$opt.danger",
                         "other"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "variant": "crisis",
+                "when": {
+                  "any": [
+                    {
+                      "some": [
+                        "urge",
+                        {
+                          "eq": [
+                            "$opt.danger",
+                            "self"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "in": [
+                        "$a.safe",
+                        [
+                          "unsure",
+                          "no"
+                        ]
                       ]
                     }
                   ]
@@ -62284,6 +62304,13 @@
                   {
                     "exit": "safety_open",
                     "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  },
+                  {
+                    "exit": "cool_down",
+                    "label": "too_much",
                     "when": {
                       "all": []
                     }
@@ -62331,20 +62358,6 @@
             "hint": "event_hint",
             "crisis": [
               {
-                "variant": "crisis",
-                "when": {
-                  "some": [
-                    "urge",
-                    {
-                      "eq": [
-                        "$opt.danger",
-                        "self"
-                      ]
-                    }
-                  ]
-                }
-              },
-              {
                 "variant": "other_person",
                 "when": {
                   "some": [
@@ -62353,6 +62366,33 @@
                       "eq": [
                         "$opt.danger",
                         "other"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "variant": "crisis",
+                "when": {
+                  "any": [
+                    {
+                      "some": [
+                        "urge",
+                        {
+                          "eq": [
+                            "$opt.danger",
+                            "self"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "in": [
+                        "$a.safe",
+                        [
+                          "unsure",
+                          "no"
+                        ]
                       ]
                     }
                   ]
@@ -62371,6 +62411,13 @@
                   {
                     "exit": "safety_open",
                     "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  },
+                  {
+                    "exit": "cool_down",
+                    "label": "too_much",
                     "when": {
                       "all": []
                     }
@@ -62418,20 +62465,6 @@
             "hint": "mind_hint",
             "crisis": [
               {
-                "variant": "crisis",
-                "when": {
-                  "some": [
-                    "urge",
-                    {
-                      "eq": [
-                        "$opt.danger",
-                        "self"
-                      ]
-                    }
-                  ]
-                }
-              },
-              {
                 "variant": "other_person",
                 "when": {
                   "some": [
@@ -62440,6 +62473,33 @@
                       "eq": [
                         "$opt.danger",
                         "other"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "variant": "crisis",
+                "when": {
+                  "any": [
+                    {
+                      "some": [
+                        "urge",
+                        {
+                          "eq": [
+                            "$opt.danger",
+                            "self"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "in": [
+                        "$a.safe",
+                        [
+                          "unsure",
+                          "no"
+                        ]
                       ]
                     }
                   ]
@@ -62458,6 +62518,13 @@
                   {
                     "exit": "safety_open",
                     "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  },
+                  {
+                    "exit": "cool_down",
+                    "label": "too_much",
                     "when": {
                       "all": []
                     }
@@ -62505,20 +62572,6 @@
             "hint": "body_hint",
             "crisis": [
               {
-                "variant": "crisis",
-                "when": {
-                  "some": [
-                    "urge",
-                    {
-                      "eq": [
-                        "$opt.danger",
-                        "self"
-                      ]
-                    }
-                  ]
-                }
-              },
-              {
                 "variant": "other_person",
                 "when": {
                   "some": [
@@ -62527,6 +62580,33 @@
                       "eq": [
                         "$opt.danger",
                         "other"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "variant": "crisis",
+                "when": {
+                  "any": [
+                    {
+                      "some": [
+                        "urge",
+                        {
+                          "eq": [
+                            "$opt.danger",
+                            "self"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "in": [
+                        "$a.safe",
+                        [
+                          "unsure",
+                          "no"
+                        ]
                       ]
                     }
                   ]
@@ -62545,6 +62625,13 @@
                   {
                     "exit": "safety_open",
                     "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  },
+                  {
+                    "exit": "cool_down",
+                    "label": "too_much",
                     "when": {
                       "all": []
                     }
@@ -62602,20 +62689,6 @@
             "hint": "urge_hint",
             "crisis": [
               {
-                "variant": "crisis",
-                "when": {
-                  "some": [
-                    "urge",
-                    {
-                      "eq": [
-                        "$opt.danger",
-                        "self"
-                      ]
-                    }
-                  ]
-                }
-              },
-              {
                 "variant": "other_person",
                 "when": {
                   "some": [
@@ -62624,6 +62697,33 @@
                       "eq": [
                         "$opt.danger",
                         "other"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "variant": "crisis",
+                "when": {
+                  "any": [
+                    {
+                      "some": [
+                        "urge",
+                        {
+                          "eq": [
+                            "$opt.danger",
+                            "self"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "in": [
+                        "$a.safe",
+                        [
+                          "unsure",
+                          "no"
+                        ]
                       ]
                     }
                   ]
@@ -62645,6 +62745,13 @@
                     "when": {
                       "all": []
                     }
+                  },
+                  {
+                    "exit": "cool_down",
+                    "label": "too_much",
+                    "when": {
+                      "all": []
+                    }
                   }
                 ],
                 "own": {
@@ -62654,6 +62761,20 @@
               }
             ],
             "next": [
+              {
+                "to": "safe",
+                "when": {
+                  "some": [
+                    "urge",
+                    {
+                      "eq": [
+                        "$opt.danger",
+                        "self"
+                      ]
+                    }
+                  ]
+                }
+              },
               {
                 "to": "did",
                 "when": {
@@ -62699,20 +62820,6 @@
             "hint": "did_hint",
             "crisis": [
               {
-                "variant": "crisis",
-                "when": {
-                  "some": [
-                    "urge",
-                    {
-                      "eq": [
-                        "$opt.danger",
-                        "self"
-                      ]
-                    }
-                  ]
-                }
-              },
-              {
                 "variant": "other_person",
                 "when": {
                   "some": [
@@ -62721,6 +62828,33 @@
                       "eq": [
                         "$opt.danger",
                         "other"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "variant": "crisis",
+                "when": {
+                  "any": [
+                    {
+                      "some": [
+                        "urge",
+                        {
+                          "eq": [
+                            "$opt.danger",
+                            "self"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "in": [
+                        "$a.safe",
+                        [
+                          "unsure",
+                          "no"
+                        ]
                       ]
                     }
                   ]
@@ -62739,6 +62873,13 @@
                   {
                     "exit": "safety_open",
                     "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  },
+                  {
+                    "exit": "cool_down",
+                    "label": "too_much",
                     "when": {
                       "all": []
                     }
@@ -62786,20 +62927,6 @@
             "hint": "after_hint",
             "crisis": [
               {
-                "variant": "crisis",
-                "when": {
-                  "some": [
-                    "urge",
-                    {
-                      "eq": [
-                        "$opt.danger",
-                        "self"
-                      ]
-                    }
-                  ]
-                }
-              },
-              {
                 "variant": "other_person",
                 "when": {
                   "some": [
@@ -62808,6 +62935,33 @@
                       "eq": [
                         "$opt.danger",
                         "other"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "variant": "crisis",
+                "when": {
+                  "any": [
+                    {
+                      "some": [
+                        "urge",
+                        {
+                          "eq": [
+                            "$opt.danger",
+                            "self"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "in": [
+                        "$a.safe",
+                        [
+                          "unsure",
+                          "no"
+                        ]
                       ]
                     }
                   ]
@@ -62826,6 +62980,13 @@
                   {
                     "exit": "safety_open",
                     "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  },
+                  {
+                    "exit": "cool_down",
+                    "label": "too_much",
                     "when": {
                       "all": []
                     }
@@ -62857,25 +63018,11 @@
             "offers": []
           },
           {
-            "id": "name",
+            "id": "safe",
             "kind": "ask",
-            "title": "name_title",
-            "hint": "name_hint",
+            "title": "safe_title",
+            "hint": "safe_hint",
             "crisis": [
-              {
-                "variant": "crisis",
-                "when": {
-                  "some": [
-                    "urge",
-                    {
-                      "eq": [
-                        "$opt.danger",
-                        "self"
-                      ]
-                    }
-                  ]
-                }
-              },
               {
                 "variant": "other_person",
                 "when": {
@@ -62885,6 +63032,222 @@
                       "eq": [
                         "$opt.danger",
                         "other"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "variant": "crisis",
+                "when": {
+                  "any": [
+                    {
+                      "some": [
+                        "urge",
+                        {
+                          "eq": [
+                            "$opt.danger",
+                            "self"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "in": [
+                        "$a.safe",
+                        [
+                          "unsure",
+                          "no"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "safetyFirst": {
+              "all": []
+            },
+            "fields": [
+              {
+                "id": "safe",
+                "options": {
+                  "list": "safe"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "reach",
+                "when": {
+                  "in": [
+                    "$a.safe",
+                    [
+                      "unsure",
+                      "no"
+                    ]
+                  ]
+                }
+              },
+              {
+                "to": "did",
+                "when": {
+                  "in": [
+                    "$a.start",
+                    [
+                      "event",
+                      "body",
+                      "before"
+                    ]
+                  ]
+                }
+              },
+              {
+                "to": "before",
+                "when": {
+                  "in": [
+                    "$a.start",
+                    [
+                      "urge"
+                    ]
+                  ]
+                }
+              },
+              {
+                "to": "after",
+                "when": {
+                  "in": [
+                    "$a.start",
+                    [
+                      "did"
+                    ]
+                  ]
+                }
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "reach",
+            "kind": "handoff",
+            "complete": true,
+            "noClose": true,
+            "title": "reach_title",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "some": [
+                    "event",
+                    {
+                      "eq": [
+                        "$opt.danger",
+                        "other"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "variant": "crisis",
+                "when": {
+                  "any": [
+                    {
+                      "some": [
+                        "urge",
+                        {
+                          "eq": [
+                            "$opt.danger",
+                            "self"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "in": [
+                        "$a.safe",
+                        [
+                          "unsure",
+                          "no"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "reach_line"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": [
+              {
+                "exit": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
+          },
+          {
+            "id": "name",
+            "kind": "ask",
+            "title": "name_title",
+            "hint": "name_hint",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "some": [
+                    "event",
+                    {
+                      "eq": [
+                        "$opt.danger",
+                        "other"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "variant": "crisis",
+                "when": {
+                  "any": [
+                    {
+                      "some": [
+                        "urge",
+                        {
+                          "eq": [
+                            "$opt.danger",
+                            "self"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "in": [
+                        "$a.safe",
+                        [
+                          "unsure",
+                          "no"
+                        ]
                       ]
                     }
                   ]
@@ -62939,20 +63302,6 @@
             "answerAs": "strip",
             "crisis": [
               {
-                "variant": "crisis",
-                "when": {
-                  "some": [
-                    "urge",
-                    {
-                      "eq": [
-                        "$opt.danger",
-                        "self"
-                      ]
-                    }
-                  ]
-                }
-              },
-              {
                 "variant": "other_person",
                 "when": {
                   "some": [
@@ -62961,6 +63310,33 @@
                       "eq": [
                         "$opt.danger",
                         "other"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "variant": "crisis",
+                "when": {
+                  "any": [
+                    {
+                      "some": [
+                        "urge",
+                        {
+                          "eq": [
+                            "$opt.danger",
+                            "self"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "in": [
+                        "$a.safe",
+                        [
+                          "unsure",
+                          "no"
+                        ]
                       ]
                     }
                   ]
@@ -63005,22 +63381,7 @@
             "kind": "handoff",
             "complete": true,
             "noClose": true,
-            "title": "end_title",
             "crisis": [
-              {
-                "variant": "crisis",
-                "when": {
-                  "some": [
-                    "urge",
-                    {
-                      "eq": [
-                        "$opt.danger",
-                        "self"
-                      ]
-                    }
-                  ]
-                }
-              },
               {
                 "variant": "other_person",
                 "when": {
@@ -63034,9 +63395,84 @@
                     }
                   ]
                 }
+              },
+              {
+                "variant": "crisis",
+                "when": {
+                  "any": [
+                    {
+                      "some": [
+                        "urge",
+                        {
+                          "eq": [
+                            "$opt.danger",
+                            "self"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "in": [
+                        "$a.safe",
+                        [
+                          "unsure",
+                          "no"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "title": [
+              {
+                "when": {
+                  "some": [
+                    "event",
+                    {
+                      "eq": [
+                        "$opt.danger",
+                        "other"
+                      ]
+                    }
+                  ]
+                },
+                "key": "end_title_danger"
+              },
+              {
+                "key": "end_title"
               }
             ],
             "lines": [
+              {
+                "key": "end_both",
+                "when": {
+                  "all": [
+                    {
+                      "some": [
+                        "event",
+                        {
+                          "eq": [
+                            "$opt.danger",
+                            "other"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "some": [
+                        "urge",
+                        {
+                          "eq": [
+                            "$opt.danger",
+                            "self"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
               {
                 "key": "end_danger",
                 "when": {
@@ -63078,7 +63514,32 @@
                 "exit": "safety_open",
                 "label": "safety_open",
                 "when": {
-                  "all": []
+                  "not": {
+                    "any": [
+                      {
+                        "some": [
+                          "urge",
+                          {
+                            "eq": [
+                              "$opt.danger",
+                              "self"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "some": [
+                          "event",
+                          {
+                            "eq": [
+                              "$opt.danger",
+                              "other"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
                 }
               }
             ],
@@ -63159,12 +63620,27 @@
                     },
                     {
                       "not": {
-                        "some": [
-                          "event",
+                        "any": [
                           {
-                            "eq": [
-                              "$opt.danger",
-                              "other"
+                            "some": [
+                              "event",
+                              {
+                                "eq": [
+                                  "$opt.danger",
+                                  "other"
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "some": [
+                              "urge",
+                              {
+                                "eq": [
+                                  "$opt.danger",
+                                  "self"
+                                ]
+                              }
                             ]
                           }
                         ]
@@ -63301,6 +63777,22 @@
               "label": "Walk it anyway"
             }
           ],
+          "safe": [
+            {
+              "value": "safe",
+              "label": "Yes, I'm safe for now"
+            },
+            {
+              "value": "unsure",
+              "label": "I'm not sure",
+              "danger": "self"
+            },
+            {
+              "value": "no",
+              "label": "No",
+              "danger": "self"
+            }
+          ],
           "before": [
             {
               "value": "before_sleep",
@@ -63388,6 +63880,10 @@
             {
               "value": "mind_cant_cope",
               "label": "I can't cope with this"
+            },
+            {
+              "value": "mind_leave",
+              "label": "They're going to leave me"
             }
           ],
           "body": [
@@ -63462,7 +63958,7 @@
             },
             {
               "value": "urge_hide",
-              "label": "Hide or get away"
+              "label": "Go quiet or hide"
             },
             {
               "value": "urge_snap",
@@ -63504,7 +64000,11 @@
             },
             {
               "value": "did_said",
-              "label": "Said something I regret"
+              "label": "Snapped or said something sharp"
+            },
+            {
+              "value": "did_showed",
+              "label": "It showed on my face"
             },
             {
               "value": "did_still",
@@ -63535,6 +64035,10 @@
             {
               "value": "after_angry_self",
               "label": "Angry at myself for feeling it"
+            },
+            {
+              "value": "after_ongoing",
+              "label": "It isn't over yet"
             },
             {
               "value": "after_unsure",

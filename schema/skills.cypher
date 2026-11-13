@@ -22966,7 +22966,7 @@ SET r += {list: "sits", order: 15};
 
 // --- walk_the_wave (ww-v1) ---
 MERGE (s:Skill {id: "walk_the_wave"})
-SET s += {toolId: "emotion-guide", version: "ww-v1", contentVersion: "skills-v1", start: "start", ownMax: 100, emotionFields: ["name"], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"after_hint\": \"Sometimes a second feeling comes about the first.\", \"after_title\": \"And after?\", \"before_hint\": \"Skip any you're not sure of.\", \"before_title\": \"Before it, was anything already wearing you down?\", \"body_hint\": \"Pick what fits, or skip it.\", \"body_title\": \"Where did you feel it in your body?\", \"did_hint\": \"Nothing here is a grade.\", \"did_title\": \"What did you do?\", \"done\": \"Done\", \"end_danger\": \"If someone is hurting you or scaring you, you don't have to plan around it alone.\", \"end_hurt\": \"If the pull to hurt yourself is still there, talk to someone now. Seeing the whole wave can make the next one easier to spot early.\", \"end_line\": \"Seeing the whole wave can make the next one easier to spot early.\", \"end_title\": \"A feeling has a beginning, a middle and an end.\", \"event_hint\": \"It can be small, or something inside, like a thought.\", \"event_title\": \"What happened?\", \"heads_up_hint\": \"Walking through a feeling works better once it settles a little.\", \"heads_up_title\": \"Your body's loud right now.\", \"mind_hint\": \"The first thought, even if it's not fair.\", \"mind_title\": \"What did your mind say about it?\", \"name_hint\": \"A guess is fine, and so is none.\", \"name_more\": \"More words\", \"name_title\": \"If you had to guess, what was the feeling?\", \"next\": \"Next\", \"offer_cope\": \"Plan for next time\", \"offer_facts\": \"Check the story your mind told\", \"offer_guide\": \"Get to know this feeling\", \"own_hint\": \"In your own words\", \"safety_open\": \"Talk to someone now\", \"settle_line\": \"Body first. This will be here when you're ready.\", \"start_hint\": \"Start where it's clearest. The rest can follow.\", \"start_title\": \"Where do you want to start?\", \"strip_blank\": \"Skipped\", \"strip_name_label\": \"Maybe\", \"strip_names\": \"Before · What happened · What my mind said · My body · The urge · What I did · After\", \"strip_title\": \"The whole wave\", \"urge_hint\": \"A pull isn't something you have to act on.\", \"urge_title\": \"What did it make you want to do?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "emotion-guide", version: "ww-v1", contentVersion: "skills-v1", start: "start", ownMax: 100, emotionFields: ["name"], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"after_hint\": \"Sometimes a second feeling comes about the first.\", \"after_title\": \"And after?\", \"before_hint\": \"Skip it if you're not sure.\", \"before_title\": \"Before it, was anything already wearing you down?\", \"body_hint\": \"Skip it if you're not sure.\", \"body_title\": \"Where did you feel it in your body?\", \"did_hint\": \"Nothing here is a grade.\", \"did_title\": \"What did you do?\", \"done\": \"Done\", \"end_both\": \"If someone is hurting you or scaring you, or the pull to hurt yourself is still there, talk to someone now. You don't have to hold this alone.\", \"end_danger\": \"If someone is hurting you or scaring you, you don't have to plan around it alone.\", \"end_hurt\": \"If the pull to hurt yourself is still there, talk to someone now. Seeing the whole wave can make the next one easier to spot early.\", \"end_line\": \"Seeing the whole wave can make the next one easier to spot early.\", \"end_title\": \"A feeling has a beginning, a middle and an end.\", \"end_title_danger\": \"Thank you for laying that out.\", \"event_hint\": \"It can be small, or something inside, like a thought. A word is enough.\", \"event_title\": \"What happened?\", \"heads_up_hint\": \"Walking through a feeling works better once it settles a little.\", \"heads_up_title\": \"Your body's loud right now.\", \"mind_hint\": \"The first thought, even if it's not fair.\", \"mind_title\": \"What did your mind say about it?\", \"name_hint\": \"A guess is fine, and so is none.\", \"name_more\": \"More words\", \"name_title\": \"If you had to guess, what was the feeling?\", \"next\": \"Next\", \"offer_cope\": \"Plan for next time\", \"offer_facts\": \"Check the story your mind told\", \"offer_guide\": \"Get to know this feeling\", \"own_hint\": \"In your own words\", \"reach_line\": \"You don't have to hold this alone. Someone can talk with you right now.\", \"reach_title\": \"Talk to someone now.\", \"safe_hint\": \"If the pull to hurt yourself is here now, someone can be with you in it.\", \"safe_title\": \"Are you safe right now?\", \"safety_open\": \"Talk to someone now\", \"settle_line\": \"Body first. This will be here when you're ready.\", \"start_hint\": \"Start where it's clearest. Seven short questions; skip any.\", \"start_title\": \"Where do you want to start?\", \"strip_blank\": \"Skipped\", \"strip_name_label\": \"Maybe\", \"strip_names\": \"Before · What happened · What my mind said · My body · The urge · What I did · After\", \"strip_title\": \"The whole wave\", \"too_much\": \"This is bringing it back\", \"urge_hint\": \"A pull isn't something you have to act on.\", \"urge_title\": \"What did it make you want to do?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "dbt_model_of_emotions"}), (s:Skill {id: "walk_the_wave"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "walk_the_wave"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
@@ -22987,55 +22987,65 @@ MATCH (s:Skill {id: "walk_the_wave"}), (n:SkillStep {id: "walk_the_wave:settle"}
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 2};
 MERGE (n:SkillStep {id: "walk_the_wave:before"})
-SET n += {skillId: "walk_the_wave", step: "before", kind: "ask", version: "ww-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}}, {\"variant\": \"other_person\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}], \"fields\": [{\"id\": \"before\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 3, \"options\": {\"list\": \"before\"}, \"own\": {\"hint\": \"own_hint\", \"max\": 100}, \"required\": false}], \"hint\": \"before_hint\", \"title\": \"before_title\"}";
+SET n += {skillId: "walk_the_wave", step: "before", kind: "ask", version: "ww-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}, {\"variant\": \"crisis\", \"when\": {\"any\": [{\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}, {\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}]}}], \"fields\": [{\"id\": \"before\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}, {\"exit\": \"cool_down\", \"label\": \"too_much\", \"when\": {\"all\": []}}], \"max\": 3, \"options\": {\"list\": \"before\"}, \"own\": {\"hint\": \"own_hint\", \"max\": 100}, \"required\": false}], \"hint\": \"before_hint\", \"title\": \"before_title\"}";
 MATCH (s:Skill {id: "walk_the_wave"}), (n:SkillStep {id: "walk_the_wave:before"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 3};
 MERGE (n:SkillStep {id: "walk_the_wave:event"})
-SET n += {skillId: "walk_the_wave", step: "event", kind: "ask", version: "ww-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}}, {\"variant\": \"other_person\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}], \"fields\": [{\"id\": \"event\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 2, \"options\": {\"list\": \"event\"}, \"own\": {\"hint\": \"own_hint\", \"max\": 100}, \"required\": false}], \"hint\": \"event_hint\", \"title\": \"event_title\"}";
+SET n += {skillId: "walk_the_wave", step: "event", kind: "ask", version: "ww-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}, {\"variant\": \"crisis\", \"when\": {\"any\": [{\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}, {\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}]}}], \"fields\": [{\"id\": \"event\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}, {\"exit\": \"cool_down\", \"label\": \"too_much\", \"when\": {\"all\": []}}], \"max\": 2, \"options\": {\"list\": \"event\"}, \"own\": {\"hint\": \"own_hint\", \"max\": 100}, \"required\": false}], \"hint\": \"event_hint\", \"title\": \"event_title\"}";
 MATCH (s:Skill {id: "walk_the_wave"}), (n:SkillStep {id: "walk_the_wave:event"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 4};
 MERGE (n:SkillStep {id: "walk_the_wave:mind"})
-SET n += {skillId: "walk_the_wave", step: "mind", kind: "ask", version: "ww-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}}, {\"variant\": \"other_person\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}], \"fields\": [{\"id\": \"mind\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 2, \"options\": {\"list\": \"mind\"}, \"own\": {\"hint\": \"own_hint\", \"max\": 100}, \"required\": false}], \"hint\": \"mind_hint\", \"title\": \"mind_title\"}";
+SET n += {skillId: "walk_the_wave", step: "mind", kind: "ask", version: "ww-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}, {\"variant\": \"crisis\", \"when\": {\"any\": [{\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}, {\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}]}}], \"fields\": [{\"id\": \"mind\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}, {\"exit\": \"cool_down\", \"label\": \"too_much\", \"when\": {\"all\": []}}], \"max\": 2, \"options\": {\"list\": \"mind\"}, \"own\": {\"hint\": \"own_hint\", \"max\": 100}, \"required\": false}], \"hint\": \"mind_hint\", \"title\": \"mind_title\"}";
 MATCH (s:Skill {id: "walk_the_wave"}), (n:SkillStep {id: "walk_the_wave:mind"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 5};
 MERGE (n:SkillStep {id: "walk_the_wave:body"})
-SET n += {skillId: "walk_the_wave", step: "body", kind: "ask", version: "ww-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}}, {\"variant\": \"other_person\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}], \"fields\": [{\"id\": \"body\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 3, \"options\": {\"list\": \"body\"}, \"own\": {\"hint\": \"own_hint\", \"max\": 100}, \"required\": false}], \"hint\": \"body_hint\", \"title\": \"body_title\"}";
+SET n += {skillId: "walk_the_wave", step: "body", kind: "ask", version: "ww-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}, {\"variant\": \"crisis\", \"when\": {\"any\": [{\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}, {\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}]}}], \"fields\": [{\"id\": \"body\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}, {\"exit\": \"cool_down\", \"label\": \"too_much\", \"when\": {\"all\": []}}], \"max\": 3, \"options\": {\"list\": \"body\"}, \"own\": {\"hint\": \"own_hint\", \"max\": 100}, \"required\": false}], \"hint\": \"body_hint\", \"title\": \"body_title\"}";
 MATCH (s:Skill {id: "walk_the_wave"}), (n:SkillStep {id: "walk_the_wave:body"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 6};
 MERGE (n:SkillStep {id: "walk_the_wave:urge"})
-SET n += {skillId: "walk_the_wave", step: "urge", kind: "ask", version: "ww-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}}, {\"variant\": \"other_person\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}], \"fields\": [{\"id\": \"urge\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 2, \"options\": {\"list\": \"urge\"}, \"own\": {\"hint\": \"own_hint\", \"max\": 100}, \"required\": false}], \"hint\": \"urge_hint\", \"title\": \"urge_title\"}";
+SET n += {skillId: "walk_the_wave", step: "urge", kind: "ask", version: "ww-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}, {\"variant\": \"crisis\", \"when\": {\"any\": [{\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}, {\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}]}}], \"fields\": [{\"id\": \"urge\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}, {\"exit\": \"cool_down\", \"label\": \"too_much\", \"when\": {\"all\": []}}], \"max\": 2, \"options\": {\"list\": \"urge\"}, \"own\": {\"hint\": \"own_hint\", \"max\": 100}, \"required\": false}], \"hint\": \"urge_hint\", \"title\": \"urge_title\"}";
 MATCH (s:Skill {id: "walk_the_wave"}), (n:SkillStep {id: "walk_the_wave:urge"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 7};
 MERGE (n:SkillStep {id: "walk_the_wave:did"})
-SET n += {skillId: "walk_the_wave", step: "did", kind: "ask", version: "ww-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}}, {\"variant\": \"other_person\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}], \"fields\": [{\"id\": \"did\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 2, \"options\": {\"list\": \"did\"}, \"own\": {\"hint\": \"own_hint\", \"max\": 100}, \"required\": false}], \"hint\": \"did_hint\", \"title\": \"did_title\"}";
+SET n += {skillId: "walk_the_wave", step: "did", kind: "ask", version: "ww-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}, {\"variant\": \"crisis\", \"when\": {\"any\": [{\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}, {\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}]}}], \"fields\": [{\"id\": \"did\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}, {\"exit\": \"cool_down\", \"label\": \"too_much\", \"when\": {\"all\": []}}], \"max\": 2, \"options\": {\"list\": \"did\"}, \"own\": {\"hint\": \"own_hint\", \"max\": 100}, \"required\": false}], \"hint\": \"did_hint\", \"title\": \"did_title\"}";
 MATCH (s:Skill {id: "walk_the_wave"}), (n:SkillStep {id: "walk_the_wave:did"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 8};
 MERGE (n:SkillStep {id: "walk_the_wave:after"})
-SET n += {skillId: "walk_the_wave", step: "after", kind: "ask", version: "ww-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}}, {\"variant\": \"other_person\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}], \"fields\": [{\"id\": \"after\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 2, \"options\": {\"list\": \"after\"}, \"own\": {\"hint\": \"own_hint\", \"max\": 100}, \"required\": false}], \"hint\": \"after_hint\", \"title\": \"after_title\"}";
+SET n += {skillId: "walk_the_wave", step: "after", kind: "ask", version: "ww-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}, {\"variant\": \"crisis\", \"when\": {\"any\": [{\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}, {\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}]}}], \"fields\": [{\"id\": \"after\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}, {\"exit\": \"cool_down\", \"label\": \"too_much\", \"when\": {\"all\": []}}], \"max\": 2, \"options\": {\"list\": \"after\"}, \"own\": {\"hint\": \"own_hint\", \"max\": 100}, \"required\": false}], \"hint\": \"after_hint\", \"title\": \"after_title\"}";
 MATCH (s:Skill {id: "walk_the_wave"}), (n:SkillStep {id: "walk_the_wave:after"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 9};
-MERGE (n:SkillStep {id: "walk_the_wave:name"})
-SET n += {skillId: "walk_the_wave", step: "name", kind: "ask", version: "ww-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}}, {\"variant\": \"other_person\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}], \"fields\": [{\"emotion\": true, \"id\": \"name\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"carriedFirst\": true, \"emotions\": [\"scared\", \"angry\", \"sad\", \"ashamed\", \"guilty\", \"disgusted\", \"jealous\", \"loving\", \"happy\"], \"moreKey\": \"name_more\"}, \"required\": false}], \"hint\": \"name_hint\", \"title\": \"name_title\"}";
-MATCH (s:Skill {id: "walk_the_wave"}), (n:SkillStep {id: "walk_the_wave:name"})
+MERGE (n:SkillStep {id: "walk_the_wave:safe"})
+SET n += {skillId: "walk_the_wave", step: "safe", kind: "ask", version: "ww-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}, {\"variant\": \"crisis\", \"when\": {\"any\": [{\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}, {\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}]}}], \"fields\": [{\"id\": \"safe\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"safe\"}, \"required\": true}], \"hint\": \"safe_hint\", \"safetyFirst\": {\"all\": []}, \"title\": \"safe_title\"}";
+MATCH (s:Skill {id: "walk_the_wave"}), (n:SkillStep {id: "walk_the_wave:safe"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 10};
-MERGE (n:SkillStep {id: "walk_the_wave:strip"})
-SET n += {skillId: "walk_the_wave", step: "strip", kind: "embed", version: "ww-v1"}, n.specJson = "{\"answerAs\": \"strip\", \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}}, {\"variant\": \"other_person\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}], \"embed\": \"episodeStrip\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"blank\": \"strip_blank\", \"fields\": [\"before\", \"event\", \"mind\", \"body\", \"urge\", \"did\", \"after\"], \"nameField\": \"name\", \"nameLabel\": \"strip_name_label\", \"names\": \"strip_names\", \"next\": \"next\"}, \"title\": \"strip_title\"}";
-MATCH (s:Skill {id: "walk_the_wave"}), (n:SkillStep {id: "walk_the_wave:strip"})
+MERGE (n:SkillStep {id: "walk_the_wave:reach"})
+SET n += {skillId: "walk_the_wave", step: "reach", kind: "handoff", version: "ww-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}, {\"variant\": \"crisis\", \"when\": {\"any\": [{\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}, {\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}]}}], \"done\": \"done\", \"lines\": [{\"key\": \"reach_line\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"reach_title\"}";
+MATCH (s:Skill {id: "walk_the_wave"}), (n:SkillStep {id: "walk_the_wave:reach"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 11};
-MERGE (n:SkillStep {id: "walk_the_wave:end"})
-SET n += {skillId: "walk_the_wave", step: "end", kind: "handoff", version: "ww-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}}, {\"variant\": \"other_person\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}], \"done\": \"done\", \"lines\": [{\"key\": \"end_danger\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}, {\"key\": \"end_hurt\", \"when\": {\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}}, {\"key\": \"end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"end_title\"}";
-MATCH (s:Skill {id: "walk_the_wave"}), (n:SkillStep {id: "walk_the_wave:end"})
+MERGE (n:SkillStep {id: "walk_the_wave:name"})
+SET n += {skillId: "walk_the_wave", step: "name", kind: "ask", version: "ww-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}, {\"variant\": \"crisis\", \"when\": {\"any\": [{\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}, {\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}]}}], \"fields\": [{\"emotion\": true, \"id\": \"name\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"carriedFirst\": true, \"emotions\": [\"scared\", \"angry\", \"sad\", \"ashamed\", \"guilty\", \"disgusted\", \"jealous\", \"loving\", \"happy\"], \"moreKey\": \"name_more\"}, \"required\": false}], \"hint\": \"name_hint\", \"title\": \"name_title\"}";
+MATCH (s:Skill {id: "walk_the_wave"}), (n:SkillStep {id: "walk_the_wave:name"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 12};
+MERGE (n:SkillStep {id: "walk_the_wave:strip"})
+SET n += {skillId: "walk_the_wave", step: "strip", kind: "embed", version: "ww-v1"}, n.specJson = "{\"answerAs\": \"strip\", \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}, {\"variant\": \"crisis\", \"when\": {\"any\": [{\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}, {\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}]}}], \"embed\": \"episodeStrip\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"blank\": \"strip_blank\", \"fields\": [\"before\", \"event\", \"mind\", \"body\", \"urge\", \"did\", \"after\"], \"nameField\": \"name\", \"nameLabel\": \"strip_name_label\", \"names\": \"strip_names\", \"next\": \"next\"}, \"title\": \"strip_title\"}";
+MATCH (s:Skill {id: "walk_the_wave"}), (n:SkillStep {id: "walk_the_wave:strip"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 13};
+MERGE (n:SkillStep {id: "walk_the_wave:end"})
+SET n += {skillId: "walk_the_wave", step: "end", kind: "handoff", version: "ww-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}, {\"variant\": \"crisis\", \"when\": {\"any\": [{\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}, {\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}]}}], \"done\": \"done\", \"lines\": [{\"key\": \"end_both\", \"when\": {\"all\": [{\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}, {\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}]}}, {\"key\": \"end_danger\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}, {\"key\": \"end_hurt\", \"when\": {\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}}, {\"key\": \"end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"not\": {\"any\": [{\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}, {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}]}}}], \"noClose\": true, \"title\": [{\"key\": \"end_title_danger\", \"when\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}, {\"key\": \"end_title\"}]}";
+MATCH (s:Skill {id: "walk_the_wave"}), (n:SkillStep {id: "walk_the_wave:end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 14};
 MERGE (x:SkillExit {id: "walk_the_wave:emotion_guide"})
 SET x += {skillId: "walk_the_wave", exit: "emotion_guide", toolId: "emotion-guide", done: false, carry: ["name"], planned: false, safety: false}, x.queryJson = "{}", x.label = "offer_guide";
 MATCH (s:Skill {id: "walk_the_wave"}), (x:SkillExit {id: "walk_the_wave:emotion_guide"})
@@ -23131,6 +23141,9 @@ SET r += {order: 1}, r.whenJson = "{\"in\": [\"$a.start\", [\"body\", \"urge\", 
 MATCH (a:SkillStep {id: "walk_the_wave:before"}), (x:SkillExit {id: "walk_the_wave:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "before", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "walk_the_wave:before"}), (x:SkillExit {id: "walk_the_wave:cool_down"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 1, field: "before", label: "too_much"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "walk_the_wave:event"}), (b:SkillStep {id: "walk_the_wave:before"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"in\": [\"$a.start\", [\"event\"]]}";
@@ -23140,6 +23153,9 @@ SET r += {order: 1}, r.whenJson = "{\"in\": [\"$a.start\", [\"body\", \"urge\", 
 MATCH (a:SkillStep {id: "walk_the_wave:event"}), (x:SkillExit {id: "walk_the_wave:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "event", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "walk_the_wave:event"}), (x:SkillExit {id: "walk_the_wave:cool_down"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 1, field: "event", label: "too_much"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "walk_the_wave:mind"}), (b:SkillStep {id: "walk_the_wave:body"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"in\": [\"$a.start\", [\"event\", \"urge\", \"did\", \"before\"]]}";
@@ -23149,6 +23165,9 @@ SET r += {order: 1}, r.whenJson = "{\"in\": [\"$a.start\", [\"body\"]]}";
 MATCH (a:SkillStep {id: "walk_the_wave:mind"}), (x:SkillExit {id: "walk_the_wave:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "mind", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "walk_the_wave:mind"}), (x:SkillExit {id: "walk_the_wave:cool_down"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 1, field: "mind", label: "too_much"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "walk_the_wave:body"}), (b:SkillStep {id: "walk_the_wave:urge"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"in\": [\"$a.start\", [\"event\", \"did\", \"before\"]]}";
@@ -23161,18 +23180,27 @@ SET r += {order: 2}, r.whenJson = "{\"in\": [\"$a.start\", [\"urge\"]]}";
 MATCH (a:SkillStep {id: "walk_the_wave:body"}), (x:SkillExit {id: "walk_the_wave:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "body", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "walk_the_wave:body"}), (x:SkillExit {id: "walk_the_wave:cool_down"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 1, field: "body", label: "too_much"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "walk_the_wave:urge"}), (b:SkillStep {id: "walk_the_wave:safe"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}";
 MATCH (a:SkillStep {id: "walk_the_wave:urge"}), (b:SkillStep {id: "walk_the_wave:did"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "{\"in\": [\"$a.start\", [\"event\", \"body\", \"before\"]]}";
+SET r += {order: 1}, r.whenJson = "{\"in\": [\"$a.start\", [\"event\", \"body\", \"before\"]]}";
 MATCH (a:SkillStep {id: "walk_the_wave:urge"}), (b:SkillStep {id: "walk_the_wave:before"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "{\"in\": [\"$a.start\", [\"urge\"]]}";
+SET r += {order: 2}, r.whenJson = "{\"in\": [\"$a.start\", [\"urge\"]]}";
 MATCH (a:SkillStep {id: "walk_the_wave:urge"}), (b:SkillStep {id: "walk_the_wave:after"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 2}, r.whenJson = "{\"in\": [\"$a.start\", [\"did\"]]}";
+SET r += {order: 3}, r.whenJson = "{\"in\": [\"$a.start\", [\"did\"]]}";
 MATCH (a:SkillStep {id: "walk_the_wave:urge"}), (x:SkillExit {id: "walk_the_wave:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "urge", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "walk_the_wave:urge"}), (x:SkillExit {id: "walk_the_wave:cool_down"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 1, field: "urge", label: "too_much"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "walk_the_wave:did"}), (b:SkillStep {id: "walk_the_wave:after"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"in\": [\"$a.start\", [\"event\", \"body\", \"urge\", \"before\"]]}";
@@ -23182,12 +23210,36 @@ SET r += {order: 1}, r.whenJson = "{\"in\": [\"$a.start\", [\"did\"]]}";
 MATCH (a:SkillStep {id: "walk_the_wave:did"}), (x:SkillExit {id: "walk_the_wave:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "did", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "walk_the_wave:did"}), (x:SkillExit {id: "walk_the_wave:cool_down"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 1, field: "did", label: "too_much"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "walk_the_wave:after"}), (b:SkillStep {id: "walk_the_wave:name"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"in\": [\"$a.start\", [\"event\", \"body\", \"urge\", \"did\", \"before\"]]}";
 MATCH (a:SkillStep {id: "walk_the_wave:after"}), (x:SkillExit {id: "walk_the_wave:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "after", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "walk_the_wave:after"}), (x:SkillExit {id: "walk_the_wave:cool_down"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 1, field: "after", label: "too_much"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "walk_the_wave:safe"}), (b:SkillStep {id: "walk_the_wave:reach"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}";
+MATCH (a:SkillStep {id: "walk_the_wave:safe"}), (b:SkillStep {id: "walk_the_wave:did"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"in\": [\"$a.start\", [\"event\", \"body\", \"before\"]]}";
+MATCH (a:SkillStep {id: "walk_the_wave:safe"}), (b:SkillStep {id: "walk_the_wave:before"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "{\"in\": [\"$a.start\", [\"urge\"]]}";
+MATCH (a:SkillStep {id: "walk_the_wave:safe"}), (b:SkillStep {id: "walk_the_wave:after"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 3}, r.whenJson = "{\"in\": [\"$a.start\", [\"did\"]]}";
+MATCH (a:SkillStep {id: "walk_the_wave:safe"}), (x:SkillExit {id: "walk_the_wave:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "safe", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "walk_the_wave:reach"}), (x:SkillExit {id: "walk_the_wave:safety_open"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
 MATCH (a:SkillStep {id: "walk_the_wave:name"}), (b:SkillStep {id: "walk_the_wave:strip"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
@@ -23211,13 +23263,13 @@ MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"all\": [{\"set\": \"$a.name\"}, {\"not\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}]}}]";
 MATCH (a:SkillStep {id: "walk_the_wave:end"}), (x:SkillExit {id: "walk_the_wave:check_the_facts"})
 MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 3}, r.rowsJson = "[{\"order\": 3, \"when\": {\"all\": [{\"set\": \"$a.mind\"}, {\"not\": {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}}]}}]";
+SET r += {order: 3}, r.rowsJson = "[{\"order\": 3, \"when\": {\"all\": [{\"set\": \"$a.mind\"}, {\"not\": {\"any\": [{\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}, {\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}]}}]}}]";
 MATCH (a:SkillStep {id: "walk_the_wave:end"}), (x:SkillExit {id: "walk_the_wave:cope_ahead"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 4}, r.rowsJson = "[{\"order\": 4, \"when\": {\"not\": {\"any\": [{\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}, {\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}]}}}]";
 MATCH (a:SkillStep {id: "walk_the_wave:end"}), (x:SkillExit {id: "walk_the_wave:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"not\": {\"any\": [{\"some\": [\"urge\", {\"eq\": [\"$opt.danger\", \"self\"]}]}, {\"some\": [\"event\", {\"eq\": [\"$opt.danger\", \"other\"]}]}]}}";
 MERGE (o:SkillOption {id: "walk_the_wave:start:event"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "start", value: "event", label: "What happened", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:start:event"})
@@ -23253,273 +23305,303 @@ SET o:SkillOption, o += {skillId: "walk_the_wave", list: "heads_up", value: "try
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:heads_up:try"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "heads_up", order: 6};
+MERGE (o:SkillOption {id: "walk_the_wave:safe:safe"})
+SET o:SkillOption, o += {skillId: "walk_the_wave", list: "safe", value: "safe", label: "Yes, I'm safe for now", version: "ww-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:safe:safe"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "safe", order: 7};
+MERGE (o:SkillOption {id: "walk_the_wave:safe:unsure"})
+SET o:SkillOption, o += {skillId: "walk_the_wave", list: "safe", value: "unsure", label: "I'm not sure", version: "ww-v1"}, o.propsJson = "{\"danger\": \"self\"}";
+MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:safe:unsure"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "safe", order: 8};
+MERGE (o:SkillOption {id: "walk_the_wave:safe:no"})
+SET o:SkillOption, o += {skillId: "walk_the_wave", list: "safe", value: "no", label: "No", version: "ww-v1"}, o.propsJson = "{\"danger\": \"self\"}";
+MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:safe:no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "safe", order: 9};
 MERGE (o:SkillOption {id: "walk_the_wave:before:before_sleep"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "before", value: "before_sleep", label: "Short or broken sleep", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:before:before_sleep"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "before", order: 7};
+SET r += {list: "before", order: 10};
 MERGE (o:SkillOption {id: "walk_the_wave:before:before_food"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "before", value: "before_food", label: "Skipped food", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:before:before_food"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "before", order: 8};
+SET r += {list: "before", order: 11};
 MERGE (o:SkillOption {id: "walk_the_wave:before:before_body"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "before", value: "before_body", label: "Ill or in pain", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:before:before_body"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "before", order: 9};
+SET r += {list: "before", order: 12};
 MERGE (o:SkillOption {id: "walk_the_wave:before:before_subs"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "before", value: "before_subs", label: "Alcohol or drugs", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:before:before_subs"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "before", order: 10};
+SET r += {list: "before", order: 13};
 MERGE (o:SkillOption {id: "walk_the_wave:before:before_stress"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "before", value: "before_stress", label: "Already stressed", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:before:before_stress"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "before", order: 11};
+SET r += {list: "before", order: 14};
 MERGE (o:SkillOption {id: "walk_the_wave:before:before_none"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "before", value: "before_none", label: "Nothing I can think of", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:before:before_none"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "before", order: 12};
+SET r += {list: "before", order: 15};
 MERGE (o:SkillOption {id: "walk_the_wave:event:said"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "event", value: "said", label: "Someone said something", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:event:said"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "event", order: 13};
+SET r += {list: "event", order: 16};
 MERGE (o:SkillOption {id: "walk_the_wave:event:didnt"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "event", value: "didnt", label: "Someone didn't do something", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:event:didnt"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "event", order: 14};
+SET r += {list: "event", order: 17};
 MERGE (o:SkillOption {id: "walk_the_wave:event:saw"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "event", value: "saw", label: "Something I saw or read", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:event:saw"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "event", order: 15};
+SET r += {list: "event", order: 18};
 MERGE (o:SkillOption {id: "walk_the_wave:event:thought"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "event", value: "thought", label: "A thought or a memory", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:event:thought"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "event", order: 16};
+SET r += {list: "event", order: 19};
 MERGE (o:SkillOption {id: "walk_the_wave:event:threatened"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "event", value: "threatened", label: "Someone threatened me", version: "ww-v1"}, o.propsJson = "{\"danger\": \"other\"}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:event:threatened"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "event", order: 17};
+SET r += {list: "event", order: 20};
 MERGE (o:SkillOption {id: "walk_the_wave:event:hurt_me"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "event", value: "hurt_me", label: "Someone hurt me", version: "ww-v1"}, o.propsJson = "{\"danger\": \"other\"}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:event:hurt_me"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "event", order: 18};
+SET r += {list: "event", order: 21};
 MERGE (o:SkillOption {id: "walk_the_wave:event:unsafe"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "event", value: "unsafe", label: "I'm not safe with them", version: "ww-v1"}, o.propsJson = "{\"danger\": \"other\"}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:event:unsafe"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "event", order: 19};
+SET r += {list: "event", order: 22};
 MERGE (o:SkillOption {id: "walk_the_wave:event:cant_name"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "event", value: "cant_name", label: "I can't name it", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:event:cant_name"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "event", order: 20};
+SET r += {list: "event", order: 23};
 MERGE (o:SkillOption {id: "walk_the_wave:mind:mind_bad_coming"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "mind", value: "mind_bad_coming", label: "Something bad is going to happen", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:mind:mind_bad_coming"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "mind", order: 21};
+SET r += {list: "mind", order: 24};
 MERGE (o:SkillOption {id: "walk_the_wave:mind:mind_dont_care"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "mind", value: "mind_dont_care", label: "They don't care about me", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:mind:mind_dont_care"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "mind", order: 22};
+SET r += {list: "mind", order: 25};
 MERGE (o:SkillOption {id: "walk_the_wave:mind:mind_unfair"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "mind", value: "mind_unfair", label: "This isn't fair", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:mind:mind_unfair"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "mind", order: 23};
+SET r += {list: "mind", order: 26};
 MERGE (o:SkillOption {id: "walk_the_wave:mind:mind_my_fault"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "mind", value: "mind_my_fault", label: "I did something wrong", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:mind:mind_my_fault"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "mind", order: 24};
+SET r += {list: "mind", order: 27};
 MERGE (o:SkillOption {id: "walk_the_wave:mind:mind_not_enough"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "mind", value: "mind_not_enough", label: "I'm not good enough", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:mind:mind_not_enough"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "mind", order: 25};
+SET r += {list: "mind", order: 28};
 MERGE (o:SkillOption {id: "walk_the_wave:mind:mind_cant_cope"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "mind", value: "mind_cant_cope", label: "I can't cope with this", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:mind:mind_cant_cope"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "mind", order: 26};
+SET r += {list: "mind", order: 29};
+MERGE (o:SkillOption {id: "walk_the_wave:mind:mind_leave"})
+SET o:SkillOption, o += {skillId: "walk_the_wave", list: "mind", value: "mind_leave", label: "They're going to leave me", version: "ww-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:mind:mind_leave"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "mind", order: 30};
 MERGE (o:SkillOption {id: "walk_the_wave:body:body_chest"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "body", value: "body_chest", label: "Tight chest", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:body:body_chest"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "body", order: 27};
+SET r += {list: "body", order: 31};
 MERGE (o:SkillOption {id: "walk_the_wave:body:body_heart"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "body", value: "body_heart", label: "Racing heart", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:body:body_heart"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "body", order: 28};
+SET r += {list: "body", order: 32};
 MERGE (o:SkillOption {id: "walk_the_wave:body:body_hot"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "body", value: "body_hot", label: "Hot face", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:body:body_hot"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "body", order: 29};
+SET r += {list: "body", order: 33};
 MERGE (o:SkillOption {id: "walk_the_wave:body:body_stomach"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "body", value: "body_stomach", label: "Knot in my stomach", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:body:body_stomach"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "body", order: 30};
+SET r += {list: "body", order: 34};
 MERGE (o:SkillOption {id: "walk_the_wave:body:body_tense"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "body", value: "body_tense", label: "Tense jaw or shoulders", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:body:body_tense"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "body", order: 31};
+SET r += {list: "body", order: 35};
 MERGE (o:SkillOption {id: "walk_the_wave:body:body_heavy"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "body", value: "body_heavy", label: "Heavy or tired", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:body:body_heavy"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "body", order: 32};
+SET r += {list: "body", order: 36};
 MERGE (o:SkillOption {id: "walk_the_wave:body:body_shaky"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "body", value: "body_shaky", label: "Shaky", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:body:body_shaky"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "body", order: 33};
+SET r += {list: "body", order: 37};
 MERGE (o:SkillOption {id: "walk_the_wave:body:body_tears"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "body", value: "body_tears", label: "Close to tears", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:body:body_tears"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "body", order: 34};
+SET r += {list: "body", order: 38};
 MERGE (o:SkillOption {id: "walk_the_wave:body:body_far"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "body", value: "body_far", label: "Numb or far away", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:body:body_far"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "body", order: 35};
+SET r += {list: "body", order: 39};
 MERGE (o:SkillOption {id: "walk_the_wave:urge:send"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "urge", value: "send", label: "Send or say something", version: "ww-v1"}, o.propsJson = "{\"urge\": \"send\"}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:urge:send"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "urge", order: 36};
+SET r += {list: "urge", order: 40};
 MERGE (o:SkillOption {id: "walk_the_wave:urge:check"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "urge", value: "check", label: "Check their page, or my phone", version: "ww-v1"}, o.propsJson = "{\"urge\": \"check\"}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:urge:check"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "urge", order: 37};
+SET r += {list: "urge", order: 41};
 MERGE (o:SkillOption {id: "walk_the_wave:urge:hurt"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "urge", value: "hurt", label: "Hurt myself", version: "ww-v1"}, o.propsJson = "{\"danger\": \"self\", \"urge\": \"self_harm\"}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:urge:hurt"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "urge", order: 38};
+SET r += {list: "urge", order: 42};
 MERGE (o:SkillOption {id: "walk_the_wave:urge:hit"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "urge", value: "hit", label: "Hit, throw or slam", version: "ww-v1"}, o.propsJson = "{\"urge\": \"hit\"}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:urge:hit"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "urge", order: 39};
+SET r += {list: "urge", order: 43};
 MERGE (o:SkillOption {id: "walk_the_wave:urge:leave"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "urge", value: "leave", label: "Leave, run or disappear", version: "ww-v1"}, o.propsJson = "{\"urge\": \"leave\"}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:urge:leave"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "urge", order: 40};
+SET r += {list: "urge", order: 44};
 MERGE (o:SkillOption {id: "walk_the_wave:urge:use"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "urge", value: "use", label: "Use, drink, binge or buy", version: "ww-v1"}, o.propsJson = "{\"urge\": \"use\"}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:urge:use"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "urge", order: 41};
+SET r += {list: "urge", order: 45};
 MERGE (o:SkillOption {id: "walk_the_wave:urge:urge_hide"})
-SET o:SkillOption, o += {skillId: "walk_the_wave", list: "urge", value: "urge_hide", label: "Hide or get away", version: "ww-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "walk_the_wave", list: "urge", value: "urge_hide", label: "Go quiet or hide", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:urge:urge_hide"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "urge", order: 42};
+SET r += {list: "urge", order: 46};
 MERGE (o:SkillOption {id: "walk_the_wave:urge:urge_snap"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "urge", value: "urge_snap", label: "Shout or snap", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:urge:urge_snap"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "urge", order: 43};
+SET r += {list: "urge", order: 47};
 MERGE (o:SkillOption {id: "walk_the_wave:urge:urge_cry"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "urge", value: "urge_cry", label: "Cry", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:urge:urge_cry"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "urge", order: 44};
+SET r += {list: "urge", order: 48};
 MERGE (o:SkillOption {id: "walk_the_wave:urge:urge_reach"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "urge", value: "urge_reach", label: "Reach out to someone", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:urge:urge_reach"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "urge", order: 45};
+SET r += {list: "urge", order: 49};
 MERGE (o:SkillOption {id: "walk_the_wave:urge:urge_freeze"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "urge", value: "urge_freeze", label: "Freeze", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:urge:urge_freeze"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "urge", order: 46};
+SET r += {list: "urge", order: 50};
 MERGE (o:SkillOption {id: "walk_the_wave:urge:urge_fix"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "urge", value: "urge_fix", label: "Fix it right now", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:urge:urge_fix"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "urge", order: 47};
+SET r += {list: "urge", order: 51};
 MERGE (o:SkillOption {id: "walk_the_wave:did:did_urge"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "did", value: "did_urge", label: "What the urge wanted", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:did:did_urge"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "did", order: 48};
+SET r += {list: "did", order: 52};
 MERGE (o:SkillOption {id: "walk_the_wave:did:did_held"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "did", value: "did_held", label: "Held off", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:did:did_held"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "did", order: 49};
+SET r += {list: "did", order: 53};
 MERGE (o:SkillOption {id: "walk_the_wave:did:did_else"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "did", value: "did_else", label: "Something else", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:did:did_else"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "did", order: 50};
+SET r += {list: "did", order: 54};
 MERGE (o:SkillOption {id: "walk_the_wave:did:did_pulled_away"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "did", value: "did_pulled_away", label: "Pulled away", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:did:did_pulled_away"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "did", order: 51};
+SET r += {list: "did", order: 55};
 MERGE (o:SkillOption {id: "walk_the_wave:did:did_said"})
-SET o:SkillOption, o += {skillId: "walk_the_wave", list: "did", value: "did_said", label: "Said something I regret", version: "ww-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "walk_the_wave", list: "did", value: "did_said", label: "Snapped or said something sharp", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:did:did_said"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "did", order: 52};
+SET r += {list: "did", order: 56};
+MERGE (o:SkillOption {id: "walk_the_wave:did:did_showed"})
+SET o:SkillOption, o += {skillId: "walk_the_wave", list: "did", value: "did_showed", label: "It showed on my face", version: "ww-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:did:did_showed"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "did", order: 57};
 MERGE (o:SkillOption {id: "walk_the_wave:did:did_still"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "did", value: "did_still", label: "It's still going on", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:did:did_still"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "did", order: 53};
+SET r += {list: "did", order: 58};
 MERGE (o:SkillOption {id: "walk_the_wave:after:after_relief"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "after", value: "after_relief", label: "Relief", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:after:after_relief"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "after", order: 54};
+SET r += {list: "after", order: 59};
 MERGE (o:SkillOption {id: "walk_the_wave:after:after_calmer"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "after", value: "after_calmer", label: "Calmer", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:after:after_calmer"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "after", order: 55};
+SET r += {list: "after", order: 60};
 MERGE (o:SkillOption {id: "walk_the_wave:after:after_stirred"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "after", value: "after_stirred", label: "Still stirred up", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:after:after_stirred"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "after", order: 56};
+SET r += {list: "after", order: 61};
 MERGE (o:SkillOption {id: "walk_the_wave:after:after_regret"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "after", value: "after_regret", label: "Regret", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:after:after_regret"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "after", order: 57};
+SET r += {list: "after", order: 62};
 MERGE (o:SkillOption {id: "walk_the_wave:after:after_ashamed"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "after", value: "after_ashamed", label: "Ashamed of how I felt", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:after:after_ashamed"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "after", order: 58};
+SET r += {list: "after", order: 63};
 MERGE (o:SkillOption {id: "walk_the_wave:after:after_angry_self"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "after", value: "after_angry_self", label: "Angry at myself for feeling it", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:after:after_angry_self"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "after", order: 59};
+SET r += {list: "after", order: 64};
+MERGE (o:SkillOption {id: "walk_the_wave:after:after_ongoing"})
+SET o:SkillOption, o += {skillId: "walk_the_wave", list: "after", value: "after_ongoing", label: "It isn't over yet", version: "ww-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:after:after_ongoing"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "after", order: 65};
 MERGE (o:SkillOption {id: "walk_the_wave:after:after_unsure"})
 SET o:SkillOption, o += {skillId: "walk_the_wave", list: "after", value: "after_unsure", label: "Too soon to tell", version: "ww-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "walk_the_wave"}), (o:SkillOption {id: "walk_the_wave:after:after_unsure"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "after", order: 60};
+SET r += {list: "after", order: 66};

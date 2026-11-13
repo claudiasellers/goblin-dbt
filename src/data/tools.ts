@@ -522,7 +522,7 @@ export const allIntents: Intent[] = [
   { id: 'what-matters', label: 'Work out what matters to me', toolId: 'values-clarification', emoji: '🧭' },
   { id: 'one-thing', label: 'Get one thing done', toolId: 'build-mastery', emoji: '🪜' },
   { id: 'know-feeling', label: 'Get to know a feeling', toolId: 'emotion-guide', emoji: '🔎' },
-  { id: 'feeling-wave', label: 'Make sense of a feeling that just happened', toolId: 'emotion-guide', query: 'frame=wave', emoji: '🌊' },
+  { id: 'feeling-wave', label: 'Look back at a feeling, start to finish', toolId: 'emotion-guide', query: 'frame=wave', emoji: '🌊' },
   { id: 'feeling-myths', label: 'A belief about feelings is in the way', toolId: 'emotion-guide', query: 'frame=myths', emoji: '🪞' },
   { id: 'nightmares', label: 'The same nightmare keeps coming back', toolId: 'nightmare-rescript', emoji: '🌙' },
 ];

@@ -78,7 +78,7 @@ never on the card either: only `kind: 'emotion'` urges reach it.
 
 DBT ER Handout 5, the model of emotions: one episode laid out start to finish, in calm. A third skill, `walk_the_wave`,
 under the same tool: `?frame=wave` picks it (`emotionGuideSkillFor`). Opened from a card on the tool's page (*Walk the
-wave*) and the Tools intent *Make sense of a feeling that just happened*.
+wave*) and the Tools intent *Look back at a feeling, start to finish*.
 
 1. **start**: *Where do you want to start?* what happened · my body · the urge · what I did · from the beginning.
    Starting at the body or the urge is for someone who can't name the feeling yet (the PRD's alexithymia path).
@@ -97,10 +97,17 @@ wave*) and the Tools intent *Make sense of a feeling that just happened*.
    carrying it), Check the Facts when the mind said something (*Check the story your mind told*, carrying the guess),
    and Cope Ahead (*Plan for next time*).
 
-Safety: danger from a person among what happened opens the `other_person` slot on every screen after it, and the end
-offers only someone to talk to and Ending in its careful frame (no plan to face them). *Hurt myself* among the urges
-opens the crisis banner on every screen after it, and the end says *talk to someone now* and offers only that.
-*Talk to someone now* on every screen. No close, no keep, no follow-up: the episode is the run (`ext.run`).
+Safety:
+- Danger from a person among what happened opens the `other_person` slot on every screen after it. The end is titled
+  *Thank you for laying that out.* and offers only someone to talk to and Ending in its careful frame (no plan to face
+  them, no card, no story check).
+- *Hurt myself* among the urges does what every sibling with that pull does: the resources open over the next screen
+  first (`safetyFirst`), then *Are you safe right now?* *Not sure* or *No* goes straight to someone to talk to and
+  Done; *safe for now* goes on with the walk, the crisis banner on every screen after. The end says *talk to someone
+  now* and offers only that (no story check or plan while the pull may be live).
+- Both: the `other_person` banner (it lists 988 too) and one line naming both.
+- *This is bringing it back* (First, the body) beside *Talk to someone now* on every slot: a way out mid-walk.
+- *Talk to someone now* on every screen, as a link or, where it's the way on, the offer itself. No close, no keep, no follow-up: the episode is the run (`ext.run`).
 
 ## The myth cards (`scripts/skills/emotion_myths.py`, part 4)
 

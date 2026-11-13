@@ -1,4 +1,4 @@
-import { useEffect, useId } from 'react';
+import { useEffect } from 'react';
 import { PaperCard } from '../shared/PaperCard';
 import { primaryButton } from '../tools/oppositeAction/styles';
 import type { EmbedProps } from './embeds';
@@ -21,7 +21,6 @@ export function EpisodeStrip({ props, picked, onShown, onDone }: EmbedProps) {
   const rows = fields.map((f, i) => ({ f, name: names[i] ?? '', lines: items(f) }));
   const guess = typeof props.nameField === 'string' ? items(props.nameField as string) : [];
   const any = rows.some((r) => r.lines.length > 0) || guess.length > 0;
-  const uid = useId();
   useEffect(() => { if (any) onShown(); }, [any, onShown]);
   const next = <button type="button" className={primaryButton} onClick={() => onDone?.({ ids: any ? ['read'] : [] })}>{text('next')}</button>;
   // Nothing walked at all: never strand the person on a whole-screen embed.
@@ -29,21 +28,21 @@ export function EpisodeStrip({ props, picked, onShown, onDone }: EmbedProps) {
 
   return (
     <div className="space-y-5" data-testid="episode-strip">
-      <PaperCard label={rows.map((r) => r.name).join(', ')} compact>
-        <ol className="space-y-3">
+      {/* The card's whole text as its name (PaperCard's label); the slots as a description list (Gate 1). */}
+      <PaperCard label={[...rows.map((r) => `${r.name}: ${r.lines.length ? r.lines.join(', ') : text('blank')}`),
+        ...(guess.length && text('nameLabel') ? [`${text('nameLabel')}: ${guess.join(', ')}`] : [])].join('. ')} compact>
+        <dl className="space-y-3">
           {rows.map((r) => (
-            <li key={r.f} className="grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)] gap-3">
-              <span id={`${uid}-${r.f}`} className="text-sm text-[var(--color-text-secondary)]">{r.name}</span>
+            <div key={r.f} className="grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)] gap-3">
+              <dt className="text-sm text-[var(--color-text-secondary)]">{r.name}</dt>
               {r.lines.length ? (
-                <span aria-labelledby={`${uid}-${r.f}`} className="font-serif text-base leading-snug text-[var(--color-text-primary)] [overflow-wrap:anywhere]">
-                  {r.lines.join(', ')}
-                </span>
+                <dd className="font-serif text-base leading-snug text-[var(--color-text-primary)] [overflow-wrap:anywhere]">{r.lines.join(', ')}</dd>
               ) : (
-                <span className="text-sm italic text-[var(--color-text-secondary)]">{text('blank')}</span>
+                <dd className="text-sm italic text-[var(--color-text-secondary)]">{text('blank')}</dd>
               )}
-            </li>
+            </div>
           ))}
-        </ol>
+        </dl>
         {guess.length > 0 && text('nameLabel') ? (
           <p className="mt-3 border-t border-[var(--color-border)] pt-3 font-serif text-base leading-snug text-[var(--color-text-primary)]">
             <span className="font-sans text-sm text-[var(--color-text-secondary)]">{text('nameLabel')}: </span>{guess.join(', ')}

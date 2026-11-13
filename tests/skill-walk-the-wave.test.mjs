@@ -45,7 +45,7 @@ test("the skill: emotion-guide on dbt_model_of_emotions, picked by ?frame=wave, 
   for (const st of skill.steps.filter((x) => x.kind === "handoff")) assert.ok(st.noClose && st.complete, st.id);
   const tools = readFileSync("src/data/tools.ts", "utf8");
   assert.match(tools, /key: 'wave', name: 'Walk the wave',[^}]*query: 'frame=wave'/);
-  assert.match(tools, /id: 'feeling-wave', label: 'Make sense of a feeling that just happened', toolId: 'emotion-guide', query: 'frame=wave'/);
+  assert.match(tools, /id: 'feeling-wave', label: 'Look back at a feeling, start to finish', toolId: 'emotion-guide', query: 'frame=wave'/);
 });
 
 test("the episodeStrip embed is registered on both sides with its props", () => {
@@ -112,17 +112,39 @@ test("danger from a person: the other_person slot from then on, Ending (careful)
   while (s.stepId !== "end") s = M.runNext(c, s, s.stepId === "strip" ? read : next);
   assert.equal(M.crisisFor(c, step(s), s)?.variant, "other_person");
   assert.equal(line(s), skill.copy.end_danger);
+  assert.equal(M.copyText(c, step(s).title, s, M.titleSlots(c, step(s), s)), skill.copy.end_title_danger);
   assert.deepEqual(offers(s), ["safety_open", "ending_careful"]);
 });
 
-test("Hurt myself: the crisis banner from then on, someone to talk to first, no plan for next time", () => {
+test("Hurt myself: the resources first and are you safe?; not sure → someone to talk to; safe → on, banner to the end", () => {
   const c = ctx();
-  let s = run([pick("start", "urge"), pick("urge", "send"), pick("urge", "hurt"), next], c);
+  let s = run([pick("start", "urge"), next, pick("urge", "send"), pick("urge", "hurt"), next], c);
+  assert.equal(s.stepId, "safe");
+  assert.ok(M.stepOf(skill, "safe").safetyFirst, "the resources open over the screen first");
   assert.equal(M.crisisFor(c, step(s), s)?.variant, "crisis");
+  const reach = [pick("safe", "unsure"), next].reduce((x, e) => M.runNext(c, x, e), s);
+  assert.equal(reach.stepId, "reach");
+  assert.deepEqual(offers(reach), ["safety_open"]);
+  s = [pick("safe", "safe"), next].reduce((x, e) => M.runNext(c, x, e), s);
+  assert.equal(s.stepId, "before", "the walk goes on from the urge");
+  while (s.stepId !== "mind") s = M.runNext(c, s, next);
+  s = M.runNext(c, s, pick("mind", "mind_cant_cope"));
   while (s.stepId !== "end") s = M.runNext(c, s, s.stepId === "strip" ? read : next);
   assert.equal(M.crisisFor(c, step(s), s)?.variant, "crisis");
   assert.match(line(s), /talk to someone now/);
-  assert.deepEqual(offers(s), ["safety_open"]);
+  assert.deepEqual(offers(s), ["safety_open"], "no story check, no plan, while the pull may be live");
+});
+
+test("both dangers: the other_person banner (it lists 988 too), one line naming both, no second Talk link", () => {
+  const c = ctx();
+  let s = run([pick("start", "event"), next, pick("event", "unsafe"), next], c);
+  while (s.stepId !== "urge") s = M.runNext(c, s, next);
+  s = [pick("urge", "hurt"), next, pick("safe", "safe"), next].reduce((x, e) => M.runNext(c, x, e), s);
+  while (s.stepId !== "end") s = M.runNext(c, s, s.stepId === "strip" ? read : next);
+  assert.equal(M.crisisFor(c, step(s), s)?.variant, "other_person");
+  assert.equal(line(s), skill.copy.end_both);
+  assert.deepEqual(offers(s), ["safety_open", "ending_careful"]);
+  assert.deepEqual(M.stepOf(skill, "end").links[0].when, { not: { any: [M.stepOf(skill, "urge").next[0].when, M.stepOf(skill, "event").crisis[0].when] } }, "the link hides when the offer is there");
 });
 
 test("a carried flooded reading: a heads-up after the start, the body or walk it anyway (never a lock)", () => {
@@ -136,9 +158,10 @@ test("a carried flooded reading: a heads-up after the start, the body or walk it
   assert.equal(run([pick("start", "urge"), next], ctx({ band: "stirred" })).stepId, "urge");
 });
 
-test("Talk to someone now on every screen", () => {
+test("Talk to someone now on every screen (a link, or the offer itself); a way out on every slot", () => {
   for (const st of skill.steps) {
-    const links = [...(st.links ?? []), ...(st.fields ?? []).flatMap((x) => x.links ?? [])];
+    const links = [...(st.links ?? []), ...(st.fields ?? []).flatMap((x) => x.links ?? []), ...(st.offers ?? [])];
     assert.ok(links.some((l) => l.exit === "safety_open"), st.id);
   }
+  for (const f of ORDER) assert.ok(M.stepOf(skill, f).fields[0].links.some((l) => l.exit === "cool_down" && l.label === "too_much"), f);
 });
