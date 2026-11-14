@@ -280,6 +280,9 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     labelB: { type: 'copy', optional: true },
     steadyNoteA: { type: 'copy', optional: true },
     steadyNoteB: { type: 'copy', optional: true },
+    // How firmly to ask (IE-07's sizing): the say card's first line, by condition; nothing when it wasn't asked.
+    levelNote: { type: 'copyWhen', optional: true },
+    levelLabel: { type: 'copy', optional: true },
   },
 
   rescriptCard: {

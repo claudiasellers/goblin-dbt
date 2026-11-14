@@ -107,6 +107,10 @@ COPY = {
     # Heavier after trying: no blame, and somewhere to go (the body, Running low, someone to talk to).
     "after_heavier": "That happens sometimes. It isn't a sign you did it wrong.",
     "no_title": "That's okay.",
+    # Not today: move it to another day (the same card, booked again), or leave it.
+    "move_title": "Want to try it another day?",
+    "move_hint": "Or leave it. Not today is a real answer.",
+    "move_line": "It's moved. A card will come that day.",
     "no_line": "A smaller one tomorrow still counts.",
     "no_low": "If energy's been low for a while, Running low looks at sleep, food and the body.",
     # Level 2 (PRD: plan good things for the week, one card each, the best ten seconds pictured).
@@ -202,6 +206,8 @@ FITS_ENERGY = {"any": [{"all": [{"eq": [a("energy"), e]}, {"in": ["$opt.energy",
 WHEN = [("hour", "Now"), ("afternoon", "This afternoon"), ("evening", "This evening"), ("tomorrow", "Tomorrow")]
 REMIND = [("yes", "Yes, ask me"), ("no", "No thanks")]
 HAPPENED = [("yes", "Yes"), ("partly", "Partly"), ("no", "Not today")]
+# Moving a missed good thing (both cards' window chips: good_thing has them too); skipping leaves it.
+MOVE = [("tomorrow", "Tomorrow"), ("day_after", "The day after tomorrow"), ("few_days", "In a few days")]
 COMPARED = [("lighter", "Lighter"), ("same", "About the same"), ("heavier", "Heavier")]
 MIND = [("here", "Mostly here"), ("partly", "Partly"), ("elsewhere", "Somewhere else")]
 KEEP_MORE = [("keep", "Add it"), ("not_now", "Not this time")]
@@ -213,8 +219,10 @@ MORE = [("enough", "That's enough for now"), ("more", "Add another")]
 SLOTS = (1, 2, 3)
 # The cards' type ids spell the slot (the spine's id parsers take letters and _).
 WORD = {1: "one", 2: "two", 3: "three"}
+MOVED = {"any": [{"set": "$a.move"}, *[{"set": f"$a.mv{n}"} for n in SLOTS]]}
 # Every review answer, cleared by each card's step: a reopened run is one round, about one good thing.
-REVIEW = ["happened", "compared", "mind", "keep_more", *[f"hap{n}" for n in SLOTS], *[f"km{n}" for n in SLOTS]]
+REVIEW = ["happened", "compared", "mind", "keep_more", "move", *[f"hap{n}" for n in SLOTS], *[f"km{n}" for n in SLOTS],
+          *[f"mv{n}" for n in SLOTS]]
 
 
 def ask(sid, title, hint, fields, nxt, **extra):
@@ -273,8 +281,14 @@ def week_step(n):
 def back_week(n):
     # The good_week_<one|two|three> card reopens the run here (R9), on a run that planned slot n.
     return ask(f"back_w{n}", "back_w_title", None, [field(f"hap{n}", "happened", label="happened_label")],
-               [{"when": {"eq": [a(f"hap{n}"), "no"]}, "to": "not_today"}, {"to": "after"}],
-               reopens={"after": f"week_{n}"}, clears=REVIEW, titleSlots={"pick": {"labelOf": f"wk{n}"}})
+               [{"when": {"eq": [a(f"hap{n}"), "no"]}, "to": f"move_w{n}"}, {"to": "after"}],
+               reopens={"after": f"week_{n}", "again": [f"move_w{n}"]}, clears=REVIEW, titleSlots={"pick": {"labelOf": f"wk{n}"}})
+
+
+def move_week(n):
+    # Not today on slot n's card: its own card again, on another day (or leave it).
+    return ask(f"move_w{n}", "move_title", "move_hint", [field(f"mv{n}", "move", required=False)], [{"to": "not_today"}],
+               followUp={"type": f"good_week_{WORD[n]}", "whenFrom": f"mv{n}"})
 
 
 def keep_more_week(n):
@@ -328,11 +342,12 @@ STEPS = [
     handoff("week_set", [{"when": {"set": a("wk2")}, "key": "week_set_title"}, {"key": "week_set_title_1"}],
             [{"when": ALWAYS, "key": "week_set_line"}], []),
     *[back_week(n) for n in SLOTS],
+    *[move_week(n) for n in SLOTS],
     *[keep_more_week(n) for n in SLOTS],
     # --- The good_thing card reopens the run here (R9), on a run that reached `when` ---
     ask("back", "back_title", None, [field("happened", "happened", label="happened_label")],
-        [{"when": {"eq": [a("happened"), "no"]}, "to": "not_today"}, {"to": "after"}],
-        reopens={"after": "when"}, clears=REVIEW,
+        [{"when": {"eq": [a("happened"), "no"]}, "to": "move"}, {"to": "after"}],
+        reopens={"after": "when", "again": ["move"]}, clears=REVIEW,
         titleSlots={"pick": {"labelOf": "pick"}}),
     ask("after", "after_title", None,
         [field("compared", "compared"), field("mind", "mind", required=False, label="mind_label")],
@@ -351,8 +366,11 @@ STEPS = [
         {"when": LIGHTER, "key": "after_lighter"},
         {"when": ALWAYS, "key": "after_flat"},
     ], [{"exit": "cool_down", "when": HEAVIER}, {"exit": "please_skill", "when": HEAVIER}], no_close=True),
-    handoff("not_today", "no_title", [{"when": ALWAYS, "key": "no_line"}, {"when": ALWAYS, "key": "no_low"}], [{"exit": "please_skill", "when": ALWAYS}],
-            no_close=True),
+    ask("move", "move_title", "move_hint", [field("move", "move", required=False)], [{"to": "not_today"}],
+        followUp={"type": "good_thing", "whenFrom": "move"}),
+    handoff("not_today", "no_title",
+            [{"when": MOVED, "key": "move_line"}, {"when": ALWAYS, "key": "no_line"}, {"when": ALWAYS, "key": "no_low"}],
+            [{"exit": "please_skill", "when": ALWAYS}], no_close=True),
 ]
 
 EXITS = [
@@ -373,6 +391,7 @@ def options():
     out += [("when", v, label, {}, None) for v, label in WHEN]
     out += [("remind", v, label, {}, None) for v, label in REMIND]
     out += [("happened", v, label, {}, None) for v, label in HAPPENED]
+    out += [("move", v, label, {}, None) for v, label in MOVE]
     out += [("compared", v, label, {}, None) for v, label in COMPARED]
     out += [("mind", v, label, {}, None) for v, label in MIND]
     out += [("keep_more", v, label, {}, None) for v, label in KEEP_MORE]

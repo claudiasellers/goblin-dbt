@@ -559,6 +559,12 @@ function embedProps(ctx: RunContext, st: RunState, name: string, props: Record<s
   const out = resolveEmbedProps(EMBED_PROPS[name], props, ctx.skill.copy);
   for (const [k, spec] of Object.entries(EMBED_PROPS[name] ?? {})) {
     if (spec.type === 'ctx' && k in out) out[k] = inlineCtxFor(ctx, st, { ctx: props?.[k] });
+    // A `copyWhen` prop: the first entry whose condition holds in this run, as text (or nothing).
+    if (spec.type === 'copyWhen' && k in out) {
+      const text = copyText(ctx, props?.[k] as StepDef['title'], st);
+      if (text) out[k] = text;
+      else delete out[k];
+    }
     // A `row` prop: the ref's value keys a shared table; the embed gets the row, or nothing (never the ref).
     if (spec.type === 'row' && k in out) {
       const row = sharedRow(ctx, spec.table, resolve(props?.[k], scope(ctx, st)));

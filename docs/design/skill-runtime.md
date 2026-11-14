@@ -145,7 +145,8 @@ Added by F1 (docs/design/dbt-modules-plan.md §4, 10 Nov 2026):
   and the whole report goes in `out`. Own words from an embed are kept once, in `out`.
 - **Embed props** (F2). Each embed declares what it takes in `EMBED_PROPS` (`copy`, `int` with a range, `enum`,
   `field`, `id`, and since ER-10 `row`: a ref whose value keys a shared table, the player handing the embed that
-  table's row, or no prop when nothing matches; any may be `optional`), mirrored in content.py. `build.py` refuses an undeclared, mistyped or
+  table's row, or no prop when nothing matches; and since IE-07's card `copyWhen`: a list of `{when?, key}` read like
+  a conditional title as it renders, the first that holds, or no prop; any may be `optional`), mirrored in content.py. `build.py` refuses an undeclared, mistyped or
   missing prop on any embed step or slot, and a `copy` prop must name a key in the skill's copy: the player
   passes its text (`resolveEmbedProps`), so an embed never carries its own words. Embeds also get `answerIds`.
   Shared embeds: `holdRing` (`press` · `timed` · `settle`; `src/lib/holdRing.ts`), `waitLock` (DT-02), `prosConsCard` / `prosConsReplay` (DT-10) and `witness` (the receive beat,

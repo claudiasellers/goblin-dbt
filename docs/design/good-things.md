@@ -71,7 +71,9 @@ step, so no new deep-link variable. The server accepts the new `day_after` chip.
 reopened at any of them keeps the path up to the latest plan step (`skill-runtime.md`, `reopens`), so reviewing the
 second thing first never stops the first or third card from reopening.
 
-**Not yet (from the gates):** moving a missed good thing to another day (*Not today* gets the kind line and Running low, as at level 1); weekday names on the day chips (chip labels are fixed). `thing_i_like` accepts `wk1`–`wk3` and stores
+**Moving a missed good thing (built 14 Nov 2026):** *Not today* on either card asks *Want to try it another day?* (*Tomorrow · The day after tomorrow · In a few days*, or leave it). A day books the same card again (`good_thing`, whose window gained `day_after` and `few_days`, or the slot's `good_week_<n>`; `move` / `move_w<n>` are each back step's `again`), and the end says *It's moved. A card will come that day.*; left, the kind line and Running low as before. The next card asks fresh.
+
+**Not yet (from the gates):** weekday names on the day chips (chip labels are fixed). `thing_i_like` accepts `wk1`–`wk3` and stores
 them as `pick`, one at a time.
 
 ### The catalogue

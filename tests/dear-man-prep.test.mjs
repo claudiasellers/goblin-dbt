@@ -309,3 +309,25 @@ test("skill: how hard to push (IE-07, Handout 8's ask column): five questions co
   assert.equal(play([pick("assert", "addr_follow_through"), next], flooded, toAssert(flooded)).stepId, "reinforce", "a carried flooded reading skips the sizing");
   assert.ok(Object.keys(skill.copy).filter((k) => k.startsWith("ask_level_") || k.startsWith("s_")).every((k) => !/\d/.test(skill.copy[k])), "never a number on screen (R10)");
 });
+
+test("pocket card: how firmly to ask, the level after the nudge, opens the say card (heads-up's firm asks once; none unsized)", () => {
+  const props = step("card").props;
+  assert.equal(props.levelLabel, "card_level");
+  const levelOf = (s, c = ctx()) => M.copyText(c, props.levelNote, s);
+  assert.equal(levelOf(toCard()), skill.copy.card_level_firm_hold, "every yes, that fits: firmly, and keep coming back to it");
+  const sized = (v, nudge, c = ctx()) => play([pick("assert", "addr_follow_through"), next, ...["s_able", "s_matters", "s_right", "s_timing", "s_ready"].map((f) => pick(f, v)), next,
+    pick("nudge", nudge), next], c, toAssert(c));
+  assert.equal(levelOf(sized("yes", "softer")), skill.copy.card_level_firm);
+  assert.equal(levelOf(sized("no", "firmer")), skill.copy.card_level_gentle);
+  assert.equal(levelOf(sized("no", "right")), skill.copy.card_level_hint);
+  const hu = ctx({ frame: "heads_up" });
+  assert.equal(levelOf(sized("yes", "right", hu), hu), skill.copy.card_level_firm_heads_up, "with someone it tends to go badly with: once");
+  assert.equal(levelOf(toAssert()), null, "not sized: no line");
+  // On the card: the level first on the say side, with its label; never a card on its own.
+  const lead = { label: skill.copy.card_level, text: skill.copy.card_level_plain };
+  const sides = PC.pocketSides({ say: props.say, lead }, { describe: ["They said they'd do something"] });
+  assert.deepEqual(sides[0].lines[0], lead);
+  assert.deepEqual(PC.pocketSides({ say: props.say, lead }, {}), []);
+  assert.match(PC.pocketText(sides, () => "SAY"), new RegExp(`^SAY\\n${skill.copy.card_level}: ${skill.copy.card_level_plain}\\n`));
+  assert.match(read("src/components/skillPlayer/SkillPlayer.tsx"), /spec\.type === 'copyWhen'/);
+});

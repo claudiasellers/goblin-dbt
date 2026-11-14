@@ -129,8 +129,8 @@ test("good_thing: registered, the deep link reopens at back, content-free, resol
   const spine = JSON.parse(readFileSync("src/data/content/spine.json", "utf8"));
   const t = spine.content.followUpTypes.find((x) => x.id === "good_thing");
   assert.equal(t.deepLinkTemplate, "/tool/good-things?run={sourceSessionId}&at=back&followUp={followUpId}");
-  assert.deepEqual(Object.keys(t.window.chips).sort(), ["afternoon", "evening", "hour", "tomorrow"]);
-  assert.deepEqual(skill.options.when.map((o) => o.value).sort(), Object.keys(t.window.chips).sort(), "each when is a chip");
+  assert.deepEqual(Object.keys(t.window.chips).sort(), ["afternoon", "day_after", "evening", "few_days", "hour", "tomorrow"], "moved after Not today too");
+  for (const o of [...skill.options.when, ...skill.options.move]) assert.ok(o.value in t.window.chips, `${o.value} is a chip`);
   assert.match(readFileSync("functions/src/spine/toolSession.ts", "utf8"), /OPEN_RESOLVES = \[[^\]]*'good_thing'/);
   assert.match(readFileSync("functions/src/spine/copeAheadAfter.ts", "utf8"), /good_thing: 'good-things'/);
   assert.match(readFileSync("schema/practice-spine.cypher", "utf8"), /MERGE \(t:FollowUpType \{id: "good_thing"\}\)/);
@@ -139,7 +139,7 @@ test("good_thing: registered, the deep link reopens at back, content-free, resol
 const booked = (c = ctx(), p = "outside") => run([pick("when", "evening"), pick("remind", "yes"), next], c, TO_WHEN("little", p, c));
 
 test("back: did it happen? names the pick; lighter offers Things I like; flat gets the reps line; not today → Running low", () => {
-  assert.deepEqual(M.stepOf(skill, "back").reopens, { after: "when" });
+  assert.deepEqual(M.stepOf(skill, "back").reopens, { after: "when", again: ["move"] });
   const r = M.resumeRun(ctx(), M.runRecord(ctx(), booked()), "back");
   assert.equal(r?.stepId, "back");
   assert.equal(title(r), "Earlier you picked: Step outside for five minutes.");
@@ -165,7 +165,9 @@ test("back: did it happen? names the pick; lighter offers Things I like; flat ge
   const ownBooked = run([pick("when", "evening"), pick("remind", "yes"), next], ctx(), run([own("pick", "Bake bread")], ctx(), run([pick("start", "one"), next, pick("energy", "little"), next])));
   const ownAfter = run([pick("happened", "yes"), next], ctx(), M.resumeRun(ctx(), M.runRecord(ctx(), run([next], ctx(), ownBooked)), "back"));
   assert.equal(run([pick("compared", "lighter"), next], ctx(), ownAfter).stepId, "after_end");
-  const no = run([pick("happened", "no"), next], ctx(), r);
+  const move = run([pick("happened", "no"), next], ctx(), r);
+  assert.equal(move.stepId, "move", "not today: move it to another day, or leave it");
+  const no = run([next], ctx(), move);
   assert.equal(no.stepId, "not_today");
   assert.equal(line(no), "A smaller one tomorrow still counts.");
   assert.deepEqual(offers(no), ["please_skill"]);
@@ -315,7 +317,7 @@ test("each card reopens its own good thing; reviewing one never cuts the others 
   assert.equal(line(flat), "Enjoying it comes later. Doing it is the rep.", "not the other round's kept line");
   const r3 = M.resumeRun(ctx(), M.runRecord(ctx(), flat), "back_w3");
   assert.equal(title(r3), "The good thing you planned: Send a message to someone you like.");
-  assert.equal(run([pick("hap3", "no"), next], ctx(), r3).stepId, "not_today");
+  assert.equal(run([pick("hap3", "no"), next, next], ctx(), r3).stepId, "not_today");
   // A slot never planned has no card to reopen.
   const onlyOne = run([pick("start", "week"), next, pick("wk1", "walk"), pick("day1", "tomorrow"), pick("more1", "enough"), next, done("held"), next]);
   assert.equal(M.resumeRun(ctx(), M.runRecord(ctx(), onlyOne), "back_w2"), null);
