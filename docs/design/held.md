@@ -67,7 +67,9 @@ drive, a blank pattern, so it gets no Held row. `tests/recommendation-select.tes
 - **Voice**: the trusted-voice memo and their own recorded encouragement (D13: text only for now).
 - **The soothe list** kept in the kit (DT-03's *soothe* section, built) offered back here.
 - DT-01's swap (`soothe?mode=hand`), the kit cards, MF-06's backdraft close, ER's night mode and Recover's
-  self-compassion step as hosts; an `enterAt` to open straight at the hand.
+  self-compassion step as hosts. **Built (14 Nov 2026):** the entry `?enterAt=hand` opens straight at where the
+  hands rest; First, the body's *someone* card (not quieter twice) offers *A hand on my heart* after the people and
+  the kit, and Hold to wait's move opens there too (its banner stays).
 - The WMP witness embed in place of the folded-in witness line (as Let it be defers it).
 - The fade: the diary card's *soothed yourself without the app?*; IE-06 as a host.
 - Backdraft counted across visits (part 1 counts within one visit), the calm-day follow-up after a night use, the

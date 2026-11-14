@@ -124,6 +124,17 @@ export function initialRun(skill: SkillDef, enterAt?: string | null): RunState {
 }
 
 /**
+ * A page run's first state: at the step the skill's `entries` maps the context's `enterAt` to (a host's exit query or
+ * a Tools link: Give your mind a job's lid, Held's hand, Let it be's willingness), else at its start.
+ */
+export function pageStart(ctx: RunContext): RunState {
+  const key = ctx.ctxIn?.enterAt;
+  const at = key ? ctx.skill.entries?.[key] : undefined;
+  if (!at || !ctx.skill.steps.some((st) => st.id === at)) return initialRun(ctx.skill);
+  return { ...initialRun(ctx.skill), stepId: at, path: [at] };
+}
+
+/**
  * An inline run's first state (R8): `initialRun` at `enterAt`, with the skill's `inline.seed` answers from the host's
  * context in (an emotion field takes a grid word, a list field one of its options; anything else is dropped). When
  * the entry's `inline.enterWhen` doesn't hold on them, or a seed is missing, the run starts at the skill's start with
@@ -935,18 +946,22 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { ke
  * or urge it was made in) over what the reopening link carries, so the run's answers are read in the frame they were
  * given in. A follow-up's link carries only `run`, `at` and `followUp`: without this, a plan made on Problem Solve's
  * repair frame lost its repair-only picks when *How did it go?* reopened it (Codex, #133). `enterAt` belongs to the
- * link that started the visit, never restored; only keys the skill accepts come back.
+ * link that started the visit, never restored, except a page entry's key (Codex, #141); only keys the skill accepts come back.
  */
 export function ctxForResume(skill: SkillDef, ctxIn: Readonly<Record<string, string>>, rec: unknown): Readonly<Record<string, string>> {
   const recCtx = rec && typeof rec === 'object' ? (rec as { ctx?: unknown }).ctx : null;
   if (!recCtx || typeof recCtx !== 'object') return ctxIn;
   const kept = contextIn(skill, Object.fromEntries(Object.entries(recCtx as Record<string, unknown>)
-    .filter(([k]) => k !== 'enterAt' && (RECORDED_CTX as readonly string[]).includes(k))));
+    // A page entry's key (`entries`: Let it be's willingness) steers the run's transitions, so it comes back; any
+    // other recorded enterAt was where that link's run picked up, never restored.
+    .filter(([k, v]) => (k !== 'enterAt' || (typeof v === 'string' && !!skill.entries && v in skill.entries))
+      && (RECORDED_CTX as readonly string[]).includes(k))));
   return Object.keys(kept).length ? { ...ctxIn, ...kept } : ctxIn;
 }
 
-export function ctxAfterResume(ctxIn: Readonly<Record<string, string>>, reopened: boolean): Readonly<Record<string, string>> {
-  if (reopened || !('enterAt' in ctxIn)) return ctxIn;
+export function ctxAfterResume(ctxIn: Readonly<Record<string, string>>, reopened: boolean, entries?: Readonly<Record<string, string>>): Readonly<Record<string, string>> {
+  // A page entry's key (`entries`) is for a fresh run: it stays, so the run's conditions can read it.
+  if (reopened || !('enterAt' in ctxIn) || (entries && ctxIn.enterAt in entries)) return ctxIn;
   return Object.fromEntries(Object.entries(ctxIn).filter(([k]) => k !== 'enterAt'));
 }
 

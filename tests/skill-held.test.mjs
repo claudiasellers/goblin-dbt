@@ -188,7 +188,7 @@ test("opened from Hold to wait's Hurt myself: the crisis banner on every screen,
   const st = run([...HEART, pick("close", "worse"), next], HURT);
   assert.deepEqual(ids(st, "stirred", HURT), ["press", "talk", "stop"]);
   const htw = content.skills.find((s) => s.id === "hold_to_wait");
-  assert.deepEqual(htw.exits.find((x) => x.id === "held").query, { frame: "hurt" });
+  assert.deepEqual(htw.exits.find((x) => x.id === "held").query, { frame: "hurt", enterAt: "hand" });
 });
 
 test("the hosts that hand on to Held: Hold to wait's hand on the heart and Let it be's grief", () => {

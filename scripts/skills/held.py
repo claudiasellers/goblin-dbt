@@ -330,7 +330,9 @@ def options():
 SKILL = {
     "id": ID, "toolId": TOOL_ID, "concept": CONCEPT, "version": VERSION, "start": "pick", "ownMax": OWN_MAX,
     # band: a host's or the carried reading (C6.2): flooded keeps the first screen to the hand, warmth and the chip.
-    "accepts": ["band", "frame"],
+    "accepts": ["band", "frame", "enterAt"],
+    # Page entries: First, the body's *A hand on my heart* and Hold to wait's move open at where the hands rest.
+    "entries": {"hand": "where"},
     "copy": COPY, "tables": {}, "derive": [], "steps": STEPS, "exits": EXITS, "options": options(),
     "emotionFields": [],
 }

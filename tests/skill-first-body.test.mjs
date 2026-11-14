@@ -138,7 +138,19 @@ test("twice not quieter: lower the demand, then someone to talk to on the screen
   const someone = run([did()], ctx(), s);
   assert.equal(someone.stepId, "someone");
   assert.equal(M.crisisFor(ctx(), M.stepOf(skill, "someone"), someone)?.variant, "crisis");
-  assert.deepEqual(offers(someone), ["safety_open", "crisis_kit"], "someone to talk to first, then the kit (DT-03)");
+  assert.deepEqual(offers(someone), ["safety_open", "crisis_kit", "held"], "someone to talk to first, then the kit (DT-03), then a hand on the heart (DT-07)");
+});
+
+test("frozen or far away twice: someone to talk to and the kit, never a hand on the heart (no calming mode, C6.3)", () => {
+  for (const state of ["frozen", "far_away"]) {
+    let s = run([pick("state", state), next, did()]);
+    s = run([pick(s.stepId, "same"), next, did()], ctx(), s);
+    s = run([pick(s.stepId, "worse"), next], ctx(), s);
+    assert.equal(s.stepId, "lower_here", state);
+    const someone = run([did()], ctx(), s);
+    assert.equal(someone.stepId, "someone", state);
+    assert.deepEqual(offers(someone), ["safety_open", "crisis_kit"], state);
+  }
 });
 
 test("chest pain or fainting: the emergency number, no body mode; a pull to do something: Hold to wait first", () => {

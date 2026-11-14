@@ -211,7 +211,7 @@ def after_round(step_id, again_to):
 STEPS = [
     {
         "id": "pull", "kind": "ask", "title": "pull_title", "hint": "pull_hint", "crisis": CRISIS,
-        "fields": [{"id": "pull", "options": {"list": "pull"}, "max": 1, "required": True,
+        "fields": [{"id": "pull", "options": {"list": "pull", "firstFrom": "$ctx.urgeId"}, "max": 1, "required": True,
                     "own": {"hint": "pull_own", "countsAsPick": True}, "links": [SAFETY_LINK]}],
         "next": [{"when": HURT, "to": "safe"}, {"when": FLOODED, "to": "heads_up"}, {"to": "ride"}],
     },
@@ -342,8 +342,8 @@ STEPS = [
 EXITS = [
     {"id": "cool_down", "toolId": "cool-down"},                          # DT-01 First, the body (bigger twice, flooded)
     {"id": "pause", "toolId": "pause"},                                  # DT-02 Hold to wait (bigger twice, flooded)
-    {"id": "pros_cons", "toolId": "pros-cons"},                          # DT-10 a card for a pull that keeps coming back
-    {"id": "habit_plan", "toolId": "habit-plan"},                        # DT-09 When it's a habit (use, check)
+    {"id": "pros_cons", "toolId": "pros-cons", "query": {"urgeId": "$a.pull"}},  # DT-10 a card for the same pull
+    {"id": "habit_plan", "toolId": "habit-plan", "query": {"urgeId": "$a.pull"}},  # DT-09 When it's a habit (use, check)
     {"id": "crisis_kit", "toolId": "crisis-kit", "query": {"frame": "crisis"}},       # DT-03 My crisis kit, opened from a crisis route (the banner on every card)
     {"id": "safety_open", "toolId": None, "safety": True},               # safety.open (R6)
     {"id": "done", "done": True},
@@ -362,9 +362,9 @@ def options():
 
 SKILL = {
     "id": ID, "toolId": TOOL_ID, "concept": CONCEPT, "version": VERSION, "start": "pull", "ownMax": OWN_MAX,
-    # band: a host's or the carried reading (C6.2). A host's pull (`urgeId`, Hold to wait's *Ride it out*) waits for
-    # the hosts batch, as DT-10's does.
-    "accepts": ["band"],
+    # band: a host's or the carried reading (C6.2). urgeId: a host's pull (Hold to wait's *Ride it out*), listed first
+    # on the pull step (`firstFrom`), never selected.
+    "accepts": ["band", "urgeId"],
     "copy": COPY, "tables": {}, "derive": [], "steps": STEPS, "exits": EXITS, "options": options(),
     "emotionFields": [],
 }

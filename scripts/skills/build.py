@@ -153,7 +153,7 @@ def check_embed_props(name, props, copy, fields, w, derived=frozenset(), accepts
             assert isinstance(v, str) and ID.match(v), (w, f"{name}.{k} is an id", v)
 
 
-RUNTIME_KEYS = ("persist", "quickExit", "resumeAt")
+RUNTIME_KEYS = ("persist", "quickExit", "resumeAt", "entries")
 # The feeling card's row (src/data/skillTypes.ts FeelingRow).
 FEELING_ROW_FIELDS = ("label", "functionLine", "prompts", "urges", "body", "ladder")
 
@@ -493,6 +493,14 @@ def check(skill):
     assert "quickExit" not in skill or skill["quickExit"] is True, (sid, "quickExit is true or absent")
     for at in skill.get("resumeAt", []):
         assert at in steps, (sid, "resumeAt names a step", at)
+    # Page entries (DT part 2): `?enterAt=<key>` starts a fresh run at a step. Only for a skill that accepts enterAt;
+    # never a reopens step, a per-pick step or the start itself.
+    for key, at in (skill.get("entries") or {}).items():
+        assert "enterAt" in accepts, (sid, "page entries need accepts enterAt")
+        assert re.match(r"^[a-z][a-z0-9_]{0,31}$", key), (sid, "entry key", key)
+        assert at in steps and at != skill["start"], (sid, "an entry names a step other than the start", key, at)
+        st = next(s for s in skill["steps"] if s["id"] == at)
+        assert "reopens" not in st and "each" not in st, (sid, "an entry isn't a reopens or per-pick step", at)
     every = json.dumps([copy, [o[2] for o in skill["options"]]], ensure_ascii=False)
     assert "!" not in every and not re.search(r"\b(should|just|but|overreact\w*)\b", every, re.I), (sid, "house voice")
     # An option's `urge` is the ActionUrge id the session records (spine urgeIds): one the graph has.

@@ -128,10 +128,13 @@ export const getSkillContent = callable<unknown, SkillsContent>(
 );
 
 /** The runtime switches a skill may carry (R15, quick exit, re-entry): only these keys are served. */
-function runtimeOf(r: Record<string, unknown>): Partial<Pick<SkillDef, 'persist' | 'quickExit' | 'resumeAt'>> {
-  const out: Partial<Pick<SkillDef, 'persist' | 'quickExit' | 'resumeAt'>> = {};
+function runtimeOf(r: Record<string, unknown>): Partial<Pick<SkillDef, 'persist' | 'quickExit' | 'resumeAt' | 'entries'>> {
+  const out: Partial<Pick<SkillDef, 'persist' | 'quickExit' | 'resumeAt' | 'entries'>> = {};
   if (r.persist && typeof r.persist === 'object') out.persist = r.persist as SkillDef['persist'];
   if (r.quickExit === true) out.quickExit = true;
   if (Array.isArray(r.resumeAt)) out.resumeAt = r.resumeAt.filter((x): x is string => typeof x === 'string');
+  if (r.entries && typeof r.entries === 'object' && !Array.isArray(r.entries)) {
+    out.entries = Object.fromEntries(Object.entries(r.entries as Record<string, unknown>).filter((e): e is [string, string] => typeof e[1] === 'string'));
+  }
   return out;
 }

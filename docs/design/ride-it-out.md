@@ -89,8 +89,9 @@ and nothing cold or squeezed for hurt myself (Gate 3: a sensation substitute kee
   motion engine with ER-08's `waveRoom`: the 2D fallback ships now. The body anchor (*where is it?*).
 - Backgrounded checks with a notification at each one (stirred, 5–20 min) and the morning card (*Last night: rode it
   out*); they need the follow-up action's push path.
-- A host's pull (`urgeId` from Hold to wait's *Ride it out*, FTF's chase, OA's urge up): asked again until the hosts
-  batch, as DT-10's is.
+- **Built 14 Nov 2026:** Hold to wait's *Ride it out* carries its pull (`urgeId`), listed first and never selected;
+  Ride it out hands its own pull on to Pros & cons and When it's a habit the same way. Still to come: FTF's chase,
+  OA's urge up.
 - Between checks: the optional hold ring and MF-01's noticing card (MF-01 isn't built).
 - `NotNowSwap` graph nodes `FOR_URGE`, `UrgeSurfFlow` copy and `HELPS_WITH_URGE`: the swaps are skill options for now.
 - `urge_surfing`'s `evidenceGrade` (Moderate for substances, Preliminary for emotion urges): graph content, with the

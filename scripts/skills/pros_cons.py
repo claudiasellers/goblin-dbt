@@ -189,7 +189,7 @@ PER_PULL = {"any": [
 STEPS = [
     {
         "id": "pull", "kind": "ask", "title": "pull_title", "hint": "pull_hint", "crisis": CRISIS,
-        "fields": [{"id": "pull", "options": {"list": "pull"}, "max": 1, "required": True,
+        "fields": [{"id": "pull", "options": {"list": "pull", "firstFrom": "$ctx.urgeId"}, "max": 1, "required": True,
                     "own": {"hint": "pull_own", "countsAsPick": True}, "links": [SAFETY_LINK]}],
         "next": [{"when": HURT, "to": "safe"}, {"when": FLOODED, "to": "heads_up"}, {"to": "long"}],
     },
@@ -311,8 +311,9 @@ def options():
 
 SKILL = {
     "id": ID, "toolId": TOOL_ID, "concept": CONCEPT, "version": VERSION, "start": "pull", "ownMax": OWN_MAX,
-    # band: a host's or the carried reading (C6.2). A host's pull (`urgeId`) waits for the first host (the kit).
-    "accepts": ["band"],
+    # band: a host's or the carried reading (C6.2). urgeId: a host's pull (Ride it out), listed
+    # first on the pull step (`firstFrom`), never selected.
+    "accepts": ["band", "urgeId"],
     "copy": COPY, "tables": {}, "derive": [], "steps": STEPS, "exits": EXITS, "options": options(),
     "emotionFields": [],
 }

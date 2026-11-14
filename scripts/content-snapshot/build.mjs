@@ -756,5 +756,8 @@ function runtimeOf(r) {
   if (r && typeof r.persist === 'object' && r.persist) out.persist = r.persist;
   if (r && r.quickExit === true) out.quickExit = true;
   if (r && Array.isArray(r.resumeAt)) out.resumeAt = r.resumeAt.filter((x) => typeof x === 'string');
+  if (r && r.entries && typeof r.entries === 'object' && !Array.isArray(r.entries)) {
+    out.entries = Object.fromEntries(Object.entries(r.entries).filter(([, v]) => typeof v === 'string'));
+  }
   return out;
 }

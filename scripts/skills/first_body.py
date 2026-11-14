@@ -127,6 +127,7 @@ COPY = {
     "end_accept": "That's a heavy thing to carry. You don't have to solve it right now.",
     "end_park": "Then it can wait, with a time to come back to it.",
     "end_through": "You got through it. That's the skill.",
+    "held_offer": "A hand on my heart",
     "safety_open": "Talk to someone now",
     "next": "Next",
     "done": "Done",
@@ -287,7 +288,8 @@ STEPS = [
         "crisis": [{"variant": "crisis", "when": ALWAYS}],
         "lines": [{"when": ALWAYS, "key": "someone_line"}],
         # People first, then the kit (DT-03): coping sits beside help, never before it (CORE-01's rule).
-        "offers": [{"exit": "safety_open", "when": ALWAYS}, {"exit": "crisis_kit", "when": ALWAYS}],
+        "offers": [{"exit": "safety_open", "when": ALWAYS}, {"exit": "crisis_kit", "when": ALWAYS},
+                   {"exit": "held", "when": {"not": HERE}}],  # never a calming move after frozen / far away
         "done": "done",
     },
     {
@@ -314,7 +316,8 @@ EXITS = [
     {"id": "dear_man", "toolId": "dear-man"},
     {"id": "opposite_action", "toolId": "opposite-action"},
     {"id": "let_it_be", "toolId": "let-it-be"},         # DT-04 (DT-B4): it's how things are
-    {"id": "mind_job", "toolId": "mind-job"},           # DT-06 Give your mind a job: not right now, with a return
+    {"id": "mind_job", "toolId": "mind-job", "query": {"enterAt": "lid"}},  # DT-06 the lid: not right now, with a return
+    {"id": "held", "toolId": "soothe", "query": {"enterAt": "hand", "frame": "hurt"}, "label": "held_offer"},  # DT-07 Held, at the hand
     {"id": "crisis_kit", "toolId": "crisis-kit", "query": {"frame": "crisis"}},       # DT-03 My crisis kit, opened from a crisis route (the banner on every card)
     {"id": "safety_open", "toolId": None, "safety": True},               # safety.open (R6)
     {"id": "done", "done": True},
@@ -334,7 +337,8 @@ def options():
 
 SKILL = {
     "id": ID, "toolId": TOOL_ID, "concept": CONCEPT, "version": VERSION, "start": "state", "ownMax": OWN_MAX,
-    # band: a host's or the carried reading (C6.2); nothing steers on it yet (Help me now's flooded entry is the next PR).
+    # band: a host's or the carried reading (C6.2), or Help me now (flooded). Every state already starts with one body
+    # mode and nothing to read, which is the flooded path; nothing else steers on it.
     "accepts": ["band"],
     "copy": COPY, "tables": {}, "derive": [], "steps": STEPS, "exits": EXITS, "options": options(),
     "emotionFields": [],

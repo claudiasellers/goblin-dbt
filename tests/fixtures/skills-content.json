@@ -22385,6 +22385,7 @@
     "end_accept": "That's a heavy thing to carry. You don't have to solve it right now.",
     "end_park": "Then it can wait, with a time to come back to it.",
     "end_through": "You got through it. That's the skill.",
+    "held_offer": "A hand on my heart",
     "safety_open": "Talk to someone now",
     "next": "Next",
     "done": "Done"
@@ -23911,6 +23912,20 @@
        "when": {
         "all": []
        }
+      },
+      {
+       "exit": "held",
+       "when": {
+        "not": {
+         "in": [
+          "$a.state",
+          [
+           "frozen",
+           "far_away"
+          ]
+         ]
+        }
+       }
       }
      ]
     },
@@ -24070,6 +24085,17 @@
      "done": true
     },
     {
+     "id": "held",
+     "toolId": "soothe",
+     "query": {
+      "enterAt": "hand",
+      "frame": "hurt"
+     },
+     "carry": [],
+     "done": false,
+     "label": "held_offer"
+    },
+    {
      "id": "let_it_be",
      "toolId": "let-it-be",
      "query": {},
@@ -24079,7 +24105,9 @@
     {
      "id": "mind_job",
      "toolId": "mind-job",
-     "query": {},
+     "query": {
+      "enterAt": "lid"
+     },
      "carry": [],
      "done": false
     },
@@ -28602,7 +28630,8 @@
    "version": "hp-v1",
    "start": "what",
    "accepts": [
-    "band"
+    "band",
+    "urgeId"
    ],
    "ownMax": 60,
    "emotionFields": [],
@@ -28681,7 +28710,8 @@
       {
        "id": "what",
        "options": {
-        "list": "what"
+        "list": "what",
+        "firstFrom": "$ctx.urgeId"
        },
        "max": 1,
        "required": true,
@@ -31159,7 +31189,8 @@
    "start": "pick",
    "accepts": [
     "band",
-    "frame"
+    "frame",
+    "enterAt"
    ],
    "ownMax": 72,
    "emotionFields": [],
@@ -32924,6 +32955,9 @@
       "label": "Not right now"
      }
     ]
+   },
+   "entries": {
+    "hand": "where"
    }
   },
   {
@@ -34170,7 +34204,9 @@
     {
      "id": "habit_plan",
      "toolId": "habit-plan",
-     "query": {},
+     "query": {
+      "urgeId": "$a.pull"
+     },
      "carry": [],
      "done": false
     },
@@ -34178,7 +34214,8 @@
      "id": "held",
      "toolId": "soothe",
      "query": {
-      "frame": "hurt"
+      "frame": "hurt",
+      "enterAt": "hand"
      },
      "carry": [],
      "done": false
@@ -34193,7 +34230,9 @@
     {
      "id": "mind_job",
      "toolId": "mind-job",
-     "query": {},
+     "query": {
+      "enterAt": "lid"
+     },
      "carry": [],
      "done": false
     },
@@ -34208,7 +34247,9 @@
     {
      "id": "urge_surfing",
      "toolId": "urge-surfing",
-     "query": {},
+     "query": {
+      "urgeId": "$a.pull"
+     },
      "carry": [],
      "done": false
     }
@@ -34479,7 +34520,8 @@
    "version": "lb-v1",
    "start": "checked",
    "accepts": [
-    "band"
+    "band",
+    "enterAt"
    ],
    "ownMax": 120,
    "emotionFields": [],
@@ -34495,6 +34537,7 @@
     "what_title": "It makes sense you're fighting this. It matters to you. What is it you can't change?",
     "what_hint": "Pick the closest, or say it your way.",
     "what_own": "Say it my way",
+    "what_title_willing": "It makes sense to dig in when something matters. What are you pushing against?",
     "inline_back": "Leave this for now",
     "still_title": "Is anyone still hurting you, or could this happen to you again?",
     "still_hint": "Letting it be is never about staying somewhere you're being hurt.",
@@ -34736,6 +34779,68 @@
        }
       },
       {
+       "to": "still",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$ctx.enterAt",
+           "willingness"
+          ]
+         },
+         {
+          "set": "$a.what"
+         },
+         {
+          "any": [
+           {
+            "in": [
+             "$a.what",
+             [
+              "happened",
+              "wont_change",
+              "wont_give",
+              "unfair"
+             ]
+            ]
+           },
+           {
+            "not": {
+             "in": [
+              "$a.what",
+              [
+               "happened",
+               "wont_change",
+               "wont_give",
+               "lost",
+               "limit",
+               "unfair"
+              ]
+             ]
+            }
+           }
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "willing",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$ctx.enterAt",
+           "willingness"
+          ]
+         },
+         {
+          "set": "$a.what"
+         }
+        ]
+       }
+      },
+      {
        "to": "what",
        "when": null
       }
@@ -34745,7 +34850,20 @@
     {
      "id": "what",
      "kind": "ask",
-     "title": "what_title",
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$ctx.enterAt",
+         "willingness"
+        ]
+       },
+       "key": "what_title_willing"
+      },
+      {
+       "key": "what_title"
+      }
+     ],
      "crisis": [
       {
        "variant": "other_person",
@@ -34787,6 +34905,30 @@
      "hint": "what_hint",
      "next": [
       {
+       "to": "heads_up",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$ctx.enterAt",
+           "willingness"
+          ]
+         },
+         {
+          "eq": [
+           "$ctx.band",
+           "flooded"
+          ]
+         },
+         {
+          "not": {
+           "set": "$a.heads_up"
+          }
+         }
+        ]
+       }
+      },
+      {
        "to": "still",
        "when": {
         "any": [
@@ -34816,6 +34958,15 @@
            ]
           }
          }
+        ]
+       }
+      },
+      {
+       "to": "willing",
+       "when": {
+        "eq": [
+         "$ctx.enterAt",
+         "willingness"
         ]
        }
       },
@@ -34899,6 +35050,15 @@
        }
       },
       {
+       "to": "willing",
+       "when": {
+        "eq": [
+         "$ctx.enterAt",
+         "willingness"
+        ]
+       }
+      },
+      {
        "to": "hands",
        "when": {
         "any": [
@@ -34977,6 +35137,15 @@
         "eq": [
          "$a.still_go",
          "stop"
+        ]
+       }
+      },
+      {
+       "to": "willing",
+       "when": {
+        "eq": [
+         "$ctx.enterAt",
+         "willingness"
         ]
        }
       },
@@ -35300,6 +35469,15 @@
       "next": "next"
      },
      "next": [
+      {
+       "to": "hands_still",
+       "when": {
+        "eq": [
+         "$ctx.enterAt",
+         "willingness"
+        ]
+       }
+      },
       {
        "to": "statement",
        "when": null
@@ -36529,6 +36707,9 @@
       }
      }
     ]
+   },
+   "entries": {
+    "willingness": "what"
    }
   },
   {
@@ -36537,7 +36718,8 @@
    "version": "mj-v1",
    "start": "what",
    "accepts": [
-    "band"
+    "band",
+    "enterAt"
    ],
    "ownMax": 36,
    "emotionFields": [],
@@ -38759,7 +38941,10 @@
    },
    "resumeAt": [
     "back"
-   ]
+   ],
+   "entries": {
+    "lid": "lid_pick"
+   }
   },
   {
    "id": "mindfulness_emotions",
@@ -56047,7 +56232,8 @@
    "version": "pc-v1",
    "start": "pull",
    "accepts": [
-    "band"
+    "band",
+    "urgeId"
    ],
    "ownMax": 90,
    "emotionFields": [],
@@ -56130,7 +56316,8 @@
       {
        "id": "pull",
        "options": {
-        "list": "pull"
+        "list": "pull",
+        "firstFrom": "$ctx.urgeId"
        },
        "max": 1,
        "required": true,
@@ -59510,7 +59697,8 @@
    "version": "ro-v1",
    "start": "pull",
    "accepts": [
-    "band"
+    "band",
+    "urgeId"
    ],
    "ownMax": 90,
    "emotionFields": [],
@@ -59620,7 +59808,8 @@
       {
        "id": "pull",
        "options": {
-        "list": "pull"
+        "list": "pull",
+        "firstFrom": "$ctx.urgeId"
        },
        "max": 1,
        "required": true,
@@ -61751,7 +61940,9 @@
     {
      "id": "habit_plan",
      "toolId": "habit-plan",
-     "query": {},
+     "query": {
+      "urgeId": "$a.pull"
+     },
      "carry": [],
      "done": false
     },
@@ -61765,7 +61956,9 @@
     {
      "id": "pros_cons",
      "toolId": "pros-cons",
-     "query": {},
+     "query": {
+      "urgeId": "$a.pull"
+     },
      "carry": [],
      "done": false
     },

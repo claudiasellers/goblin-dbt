@@ -76,7 +76,12 @@ All three are documented in [`skill-runtime.md`](skill-runtime.md).
 
 - `CrisisState` and `Intervention` graph nodes with `ROUTES_TO`; moving `src/data/microSteps.ts` (clinical content in
   the frontend) into them.
-- The hosts: Help me now (`HelpNowInterim`, entered as flooded), StateResult's *That feels like too much right now*,
+- **Built 14 Nov 2026:** the *someone* card offers Held at the hand (`?enterAt=hand&frame=hurt`: the banner stays, and
+  *stirred up* ends with someone to talk to, never back to the body) after the people and the kit, never after the
+  frozen or far-away path (no calming mode there); *Not right now* opens the lid (`?enterAt=lid`). Help me now does not
+  carry a flooded band: the kit's flooded filter would hide the person's own kept cards, and this skill doesn't steer
+  on the band.
+- The hosts: Help me now (`HelpNowInterim`), StateResult's *That feels like too much right now*,
   the inline `regulate` mode in other skills, and `five-senses` folded in as the orient mode.
 - Reps per mode and the fade (*Your usual: press*), and the two-far-away-visits referral line. The referral is an
   aggregate over sessions, so it waits on the fade's read path.
