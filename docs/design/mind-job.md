@@ -73,8 +73,17 @@ a different kind of swap. `schema/app-tool-ids.cypher` gives `dbt_accepts` its `
 - **The ladder remembered** (`AttentionLadderState`, the `attention_ladder` profile kind, §C2): the start level and
   graduation after easy visits. Part 1 lets the person pick the warmth each visit; remembering it needs a kept item
   and their yes.
-- **Level 3** into ER-04's directory (*things I like*), when ER-B4 builds it.
-- **The re-park heads-up** (*It's been put back a few times*) and counting re-parks.
+- ~~**Level 3**~~ **Built 14 Nov 2026:** *One of my things I like* on the warmth step, shown only once the person has
+  kept a thing they like (ER-04's `thingsILike` slice, in `PROFILE_NEEDS['mind-job']`): their own things with their
+  own labels, three minutes with one (`doseTimer`), then the return (*Back. Is it louder…?*).
+- ~~**The re-park heads-up**~~ **Built 14 Nov 2026:** when the last round was put back too (`$prev.reopen` *Not yet* or
+  `$prev.re_heads` *Put it back for now*), the repark title says *It's been put back before. That's okay.* Never a
+  count, never fewer choices. (The booking field's own answer isn't kept on a reopen, so the round's way to the shelf
+  is what's read.)
+- ~~**Per-feeling ceilings**~~ **Built 14 Nov 2026:** a carried word for shame (ashamed, embarrassed, humiliated,
+  ridiculed, worthless), grief (grief, abandoned) or rejection (rejected, excluded, lonely, isolated) keeps the ladder at
+  find and like: no *good* or level 3 on the warmth step, and *Could do more* from like stays at like. Read through the
+  runtime's new `$carried` ref; never named on screen.
 - **Worry time** and **therapist-session** reopen times: the chips must equal the follow-up's window chips, and
   neither has a time to compute yet.
 - **Comparisons with their own past** (*quieter than last time*), the Stage rooms' lid and the shelf as a place to
@@ -87,7 +96,7 @@ a different kind of swap. `schema/app-tool-ids.cypher` gives `dbt_accepts` its `
 
 | PRD | Built | Why |
 |---|---|---|
-| Per-emotion ceilings (shame, grief, rejection stay at levels 0–1) | Not built; the person picks the warmth, and the warmest tasks were reworded (*a kind moment*, not *someone who likes you*) | Needs the check-in's emotion carried in; part 2 |
+| Per-emotion ceilings (shame, grief, rejection stay at levels 0–1) | Built (part 2): a carried word in those families keeps find and like | Only a carried word steers it: a visit from the Tools list has none, so the person picks the warmth as before |
 | The `Thoughts` family (a 3-minute visuospatial puzzle) | Not offered | Needs its own embed |
 | Count back from seven in the room's objects | Four things with straight edges | Counting backwards reads as a test; the clinician pass can bring it back |
 | Label: three word guesses from Find the feeling's signatures | A fixed short list, or own words | The FTF signature read isn't on the runtime |
@@ -95,8 +104,8 @@ a different kind of swap. `schema/app-tool-ids.cypher` gives `dbt_accepts` its `
 | Reopen time: *I'll choose later* | Not offered: the lid always books a time | A lid with no time is the avoidance the PRD warns about |
 | Entry from the rumination results, the kit, Problem Solve's rumination guard, DT-09 | Not wired | Their hosts aren't built yet |
 | The ladder starts where the last visit left off | The person picks the warmth each visit | Remembering needs a profile kind and the person's yes (part 2) |
-| Level 3 (ER-04 things I like) | Not offered | ER-04 isn't built |
-| Re-park: a heads-up after the third | *Not yet* always puts it back, with a new time | Counting needs part 2's record; nothing locks |
+| Level 3 (ER-04 things I like) | Their own kept things I like, three minutes with one | Only what they kept: the catalogue isn't offered here (Good things is for that) |
+| Re-park: a heads-up after the third | A heads-up from the second, worded without a count; *Not yet* always puts it back | The runtime keeps one round back (`$prev`), not a count; nothing locks |
 | Reopen times: worry time, after therapy | Tonight · Tomorrow · In a few days | Neither has a time to compute yet |
 | *When I'm done* | A check-in after about an hour | A return card needs a time |
 | The wave (ER-08) on the reopen fork | Not offered | ER-08 isn't built (ER-B5) |

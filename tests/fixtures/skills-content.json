@@ -38816,6 +38816,15 @@
     "task_find_title": "Something to find. Pick one.",
     "task_like_title": "Something you like. Pick one.",
     "task_good_title": "Something good. Pick one.",
+    "task_mine_title": "One of your things. Pick one.",
+    "task_mine_hint": "From your things I like.",
+    "mine_title": "Give it a few minutes.",
+    "mine_step1": "Start it, or picture yourself starting it.",
+    "mine_step2": "Let your attention stay with it.",
+    "mine_step3": "Then come back and check.",
+    "mine_start": "Start",
+    "mine_running": "With it",
+    "mine_done": "That's it.",
     "do_title": "Eyes open.",
     "here": "You're here, and it's",
     "found": "Found one",
@@ -38875,6 +38884,7 @@
     "reopen_fork_title": "Can anything be done about it?",
     "repark_title": "When will you open it?",
     "repark_hint": "It's okay to wait. If it keeps coming back, someone can look at it with you.",
+    "repark_title_again": "It's been put back before. That's okay. When will you open it?",
     "reopen_change": "Then let's look at what can be done.",
     "reopen_facts": "Checking the facts can show how big it is now.",
     "reopen_cant": "Then the fight with it can ease. You can let the situation be, or let the feeling rise and fall.",
@@ -38998,7 +39008,113 @@
       {
        "id": "warmth",
        "options": {
-        "list": "warmth"
+        "list": "warmth",
+        "where": {
+         "all": [
+          {
+           "any": [
+            {
+             "not": {
+              "in": [
+               "$opt.value",
+               [
+                "good",
+                "mine"
+               ]
+              ]
+             }
+            },
+            {
+             "not": {
+              "any": [
+               {
+                "has": [
+                 "$carried",
+                 "ashamed"
+                ]
+               },
+               {
+                "has": [
+                 "$carried",
+                 "embarrassed"
+                ]
+               },
+               {
+                "has": [
+                 "$carried",
+                 "humiliated"
+                ]
+               },
+               {
+                "has": [
+                 "$carried",
+                 "ridiculed"
+                ]
+               },
+               {
+                "has": [
+                 "$carried",
+                 "worthless"
+                ]
+               },
+               {
+                "has": [
+                 "$carried",
+                 "grief"
+                ]
+               },
+               {
+                "has": [
+                 "$carried",
+                 "abandoned"
+                ]
+               },
+               {
+                "has": [
+                 "$carried",
+                 "rejected"
+                ]
+               },
+               {
+                "has": [
+                 "$carried",
+                 "excluded"
+                ]
+               },
+               {
+                "has": [
+                 "$carried",
+                 "lonely"
+                ]
+               },
+               {
+                "has": [
+                 "$carried",
+                 "isolated"
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          },
+          {
+           "any": [
+            {
+             "not": {
+              "eq": [
+               "$opt.value",
+               "mine"
+              ]
+             }
+            },
+            {
+             "set": "$p.thingsILike"
+            }
+           ]
+          }
+         ]
+        }
        },
        "max": 1,
        "required": true,
@@ -39041,6 +39157,75 @@
          "good"
         ]
        }
+      },
+      {
+       "to": "to_mine",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "to_mine",
+     "kind": "ask",
+     "title": "task_mine_title",
+     "hint": "task_mine_hint",
+     "fields": [
+      {
+       "id": "to_mine",
+       "options": {
+        "profile": "thingsILike"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "mine_do",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "mine_do",
+     "kind": "embed",
+     "embed": "doseTimer",
+     "answerAs": "mine_do",
+     "title": "mine_title",
+     "props": {
+      "seconds": 180,
+      "step1": "mine_step1",
+      "step2": "mine_step2",
+      "step3": "mine_step3",
+      "start": "mine_start",
+      "running": "mine_running",
+      "done": "mine_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "back",
+       "when": null
       }
      ],
      "offers": []
@@ -39754,6 +39939,78 @@
            "eq": [
             "$ctx.band",
             "flooded"
+           ]
+          }
+         },
+         {
+          "not": {
+           "any": [
+            {
+             "has": [
+              "$carried",
+              "ashamed"
+             ]
+            },
+            {
+             "has": [
+              "$carried",
+              "embarrassed"
+             ]
+            },
+            {
+             "has": [
+              "$carried",
+              "humiliated"
+             ]
+            },
+            {
+             "has": [
+              "$carried",
+              "ridiculed"
+             ]
+            },
+            {
+             "has": [
+              "$carried",
+              "worthless"
+             ]
+            },
+            {
+             "has": [
+              "$carried",
+              "grief"
+             ]
+            },
+            {
+             "has": [
+              "$carried",
+              "abandoned"
+             ]
+            },
+            {
+             "has": [
+              "$carried",
+              "rejected"
+             ]
+            },
+            {
+             "has": [
+              "$carried",
+              "excluded"
+             ]
+            },
+            {
+             "has": [
+              "$carried",
+              "lonely"
+             ]
+            },
+            {
+             "has": [
+              "$carried",
+              "isolated"
+             ]
+            }
            ]
           }
          }
@@ -40531,7 +40788,30 @@
     {
      "id": "repark",
      "kind": "ask",
-     "title": "repark_title",
+     "title": [
+      {
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$prev.reopen",
+           "not_yet"
+          ]
+         },
+         {
+          "eq": [
+           "$prev.re_heads",
+           "later"
+          ]
+         }
+        ]
+       },
+       "key": "repark_title_again"
+      },
+      {
+       "key": "repark_title"
+      }
+     ],
      "fields": [
       {
        "id": "repark",
@@ -40765,6 +41045,10 @@
      {
       "value": "good",
       "label": "Something good"
+     },
+     {
+      "value": "mine",
+      "label": "One of my things I like"
      }
     ],
     "task_find": [

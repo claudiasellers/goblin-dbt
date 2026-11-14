@@ -385,6 +385,7 @@ function scopeOf(ctx: RunContext, answers: Answers, derived: Record<string, unkn
     derived,
     ctx: ctx.ctxIn ?? {},
     profile: ctx.profile ?? null,
+    carried: (ctx.carried ?? []).filter((id) => ctx.gridIds?.has(id)),
     picked: (fieldId) => {
       const f = fieldOf(ctx.skill, fieldId);
       const list = f?.options.list ? ctx.skill.options[f.options.list] ?? [] : [];

@@ -195,7 +195,7 @@ export const PROFILE_NEEDS = {
   'safety': ['safetyPlan', 'crisisKit'],        // Help & safety and the safety route: the plan, and its step 2's kit (CORE-02)
   'urge-surfing': ['parts'],
   'let-it-be': ['parts'],                    // the tag row on its in-flow close (docs/design/let-it-be.md)
-  'mind-job': ['parts'],                     // the tag row on its in-flow close (docs/design/mind-job.md)
+  'mind-job': ['parts', 'thingsILike'],      // the tag row on its in-flow close; level 3, their own things I like (docs/design/mind-job.md)
   'soothe': ['parts'],                       // the tag row on its in-flow close (docs/design/held.md)
   'thoughts-passing': ['parts'],             // the tag row on its in-flow close (docs/design/thoughts-passing.md)
   'mindfulness-emotions': ['parts'],         // the tag row on its in-flow close (docs/design/mindfulness-emotions.md)

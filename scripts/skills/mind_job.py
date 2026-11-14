@@ -51,6 +51,16 @@ COPY = {
     "task_find_title": "Something to find. Pick one.",
     "task_like_title": "Something you like. Pick one.",
     "task_good_title": "Something good. Pick one.",
+    # Level 3 (DT-06 part 2): one of the person's own things I like (ER-04), for a few minutes, then the return.
+    "task_mine_title": "One of your things. Pick one.",
+    "task_mine_hint": "From your things I like.",
+    "mine_title": "Give it a few minutes.",
+    "mine_step1": "Start it, or picture yourself starting it.",
+    "mine_step2": "Let your attention stay with it.",
+    "mine_step3": "Then come back and check.",
+    "mine_start": "Start",
+    "mine_running": "With it",
+    "mine_done": "That's it.",
     "do_title": "Eyes open.",
     "here": "You're here, and it's",
     "found": "Found one",
@@ -114,6 +124,8 @@ COPY = {
     "reopen_fork_title": "Can anything be done about it?",
     "repark_title": "When will you open it?",
     "repark_hint": "It's okay to wait. If it keeps coming back, someone can look at it with you.",
+    # The re-park heads-up (DT-06 part 2): put back before, so said once, plainly; never a lock or a count.
+    "repark_title_again": "It's been put back before. That's okay. When will you open it?",
     "reopen_change": "Then let's look at what can be done.",
     "reopen_facts": "Checking the facts can show how big it is now.",
     # ER-08 (ER-B5): what the lid put away while flooded comes back here when steady (PRD ER-08, containment).
@@ -142,6 +154,14 @@ def FLOODED_ONLY(flag):
 
 
 CALM_TASKS = {"blue", "sound"}
+# Per-feeling ceilings (PRD DT-06): after shame, grief or rejection, warmer *good* tasks can sting (something that
+# reminds you of a kind moment), so a carried word in this set keeps the ladder at find and like. Never shown or said.
+CEILING_WORDS = ["ashamed", "embarrassed", "humiliated", "ridiculed", "worthless",  # shame
+                 "grief", "abandoned",                                               # grief
+                 "rejected", "excluded", "lonely", "isolated"]                       # rejection
+CEILING = {"any": [{"has": ["$carried", w]} for w in CEILING_WORDS]}
+HAS_THINGS = {"set": "$p.thingsILike"}
+PARKED_BEFORE = {"any": [{"eq": ["$prev.reopen", "not_yet"]}, {"eq": ["$prev.re_heads", "later"]}]}
 CALM_HOW = {"too_much", "enough"}
 SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
 
@@ -158,7 +178,13 @@ WARMTH = [
     ("find", "Something to find"),
     ("like", "Something I like"),
     ("good", "Something good"),
+    ("mine", "One of my things I like"),  # level 3: only with a kept thing I like (ER-04)
 ]
+# Which warmths show: good and mine never under a ceiling, mine only with kept things.
+WARMTH_WHERE = {"all": [
+    {"any": [{"not": {"in": ["$opt.value", ["good", "mine"]]}}, {"not": CEILING}]},
+    {"any": [{"not": {"eq": ["$opt.value", "mine"]}}, HAS_THINGS]},
+]}
 # AttentionTask: (value, label, level, variant, count, task copy, found copy). Level 0 neutral, 1 pleasant-neutral,
 # 2 positive (with a few seconds of staying with it). Every one is eyes open and outward (C6.3: nothing passive for a
 # loop).
@@ -275,7 +301,10 @@ def how_step(level):
     else:
         nxt.append({"when": {"eq": [a(f), "too_much"]}, "to": f"to_{cooler(level)}"})
     nxt.append({"when": {"all": [{"eq": [a(f), "more"]}, FLOODED]}, "to": "to_find"})
-    nxt.append({"when": {"all": [{"eq": [a(f), "more"]}, {"not": FLOODED}]}, "to": f"to_{warmer(level)}"})
+    # Warmer, unless the next level is past a ceiling (like → good after shame, grief or rejection: stay at like).
+    capped = level == "like"
+    nxt.append({"when": {"all": [{"eq": [a(f), "more"]}, {"not": FLOODED}, *([{"not": CEILING}] if capped else [])]},
+                "to": f"to_{warmer(level)}"})
     # The conditions are exclusive, so one jump per target: a jump to the default target is dropped (the default
     # catches it) and two jumps to the same target are joined with any.
     default = f"to_{level}"
@@ -310,7 +339,16 @@ STEPS = [
     ask("heads_up", "heads_up_title", "heads_up_hint", "heads_up", "heads_up",
         [{"when": {"eq": [a("heads_up"), "body"]}, "to": "settle"}, {"to": "to_find"}]),
     ask("warmth", "warmth_title", "warmth_hint", "warmth", "warmth",
-        [{"when": {"eq": [a("warmth"), lv]}, "to": f"to_{lv}"} for lv in LEVELS]),
+        [*[{"when": {"eq": [a("warmth"), lv]}, "to": f"to_{lv}"} for lv in LEVELS], {"to": "to_mine"}],
+        where=WARMTH_WHERE),
+    # Level 3: one of their own things I like, a few minutes with it, then the return.
+    {"id": "to_mine", "kind": "ask", "title": "task_mine_title", "hint": "task_mine_hint",
+     "fields": [{"id": "to_mine", "options": {"profile": "thingsILike"}, "max": 1, "required": True, "links": [SAFETY_LINK]}],
+     "next": [{"to": "mine_do"}]},
+    {"id": "mine_do", "kind": "embed", "embed": "doseTimer", "answerAs": "mine_do", "title": "mine_title",
+     "props": {"seconds": 180, "step1": "mine_step1", "step2": "mine_step2", "step3": "mine_step3", "start": "mine_start",
+               "running": "mine_running", "done": "mine_done", "next": "next"},
+     "links": [SAFETY_LINK], "next": [{"to": "back"}]},
     *[task_pick(lv) for lv in LEVELS],
     *[do_step(v, lv, variant, count, task, found) for v, _, lv, variant, count, task, found in TASKS],
     # Level 2: a few seconds of staying with it (savouring, briefly).
@@ -358,7 +396,9 @@ STEPS = [
         [{"when": {"eq": [a("re_heads"), "body"]}, "to": "settle"}, {"to": "repark"}]),
     ask("opened", "opened_title", "opened_hint", "opened", "label", [{"to": "can_do"}], required=False),
     ask("can_do", "reopen_fork_title", None, "can_do", "reopen_fork", [{"to": "lid_off"}]),
-    ask("repark", "repark_title", "repark_hint", "repark", "lid_when", [{"to": "lid_end"}],
+    # Put back last round too (`$prev`: a booking field's answer isn't kept, so the last round's way to the shelf is read).
+    ask("repark", [{"when": PARKED_BEFORE, "key": "repark_title_again"}, {"key": "repark_title"}],
+        "repark_hint", "repark", "lid_when", [{"to": "lid_end"}],
         extra={"followUp": {"type": "lid_reopen", "whenFrom": "repark"}}),
     handoff("lid_off",
             [{"when": {"eq": [a("reopen"), "gone"]}, "key": "reopen_skip"},
