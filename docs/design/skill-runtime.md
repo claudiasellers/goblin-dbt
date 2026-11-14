@@ -362,6 +362,8 @@ every other content file), and runs it inside the page's `ToolSessionProvider`:
   to one (its output becomes the step's answers); a slot places one inside a step. Cope Ahead's
   (`CopeAheadEmbeds.tsx`, ER-B2): `planSentence`, `rehearsal` (whole screen, reports `done`), `keepCard` and
   `partAnchor`, each composing the plan with `planLine` from the run's answers.
+  Let it be's `turnFork` (DT-04 part 2, `TurnFork.tsx` over `src/lib/turnFork.ts`): the turning-the-mind fork,
+  whole screen, reports `turned` · `skipped` with `doneCount` (the turns) and `durationSec`.
 - **A follow-up timed by an earlier answer** (ER-B2). An ask step's `followUp.whenFrom` may name a field of an earlier
   step (Cope Ahead's *When is it?* times the keep step's *Want me to ask how it went?*), with `whenDefault` the chip
   used when it wasn't answered. A hand-off's chips stay on its card.

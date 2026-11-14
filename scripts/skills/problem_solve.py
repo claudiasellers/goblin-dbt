@@ -135,6 +135,9 @@ COPY = {
     "l_self_validate": "Validate yourself",
     "l_others": "This part is about them. Work out what to say with DEAR MAN",
     "l_missing_links": "Find what got in the way",
+    # The accept card's ways into Let it be (exit labels).
+    "o_willingness": "Do what the moment needs anyway",
+    "o_turning_the_mind": "Turn my mind toward letting it be",
 }
 
 # --- Chip labels the house voice changes (build.py refuses "just" and "but"; the dash becomes a colon) ---
@@ -301,6 +304,13 @@ def tools_named():
 
 
 EXITS = [{"id": exit_id(t), "toolId": t, **({"carry": ["feel"]} if t in BUILT else {"planned": True})} for t in tools_named()]
+# Let it be's two other ways in (DT-04 part 2): the content names them as tools; they open Let it be at its entries.
+LET_IT_BE_ENTRIES = {"willingness": ("willingness", "o_willingness"), "turning-the-mind": ("turn", "o_turning_the_mind")}
+EXITS = [{**e, "toolId": "let-it-be", "query": {"enterAt": LET_IT_BE_ENTRIES[e["toolId"]][0]},
+          "label": LET_IT_BE_ENTRIES[e["toolId"]][1], "carry": ["feel"]} if e["toolId"] in LET_IT_BE_ENTRIES else e
+         for e in EXITS]
+for e in EXITS:
+    e.pop("planned", None) if e["toolId"] == "let-it-be" else None
 EXITS += [{"id": "safety_open", "safety": True}, {"id": "done", "done": True}]
 
 

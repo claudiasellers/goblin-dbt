@@ -2269,6 +2269,53 @@
         "notification": "A check-in you asked for is ready."
       },
       {
+        "id": "turn_mind",
+        "ownerModule": "dt",
+        "tier": "practice",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/let-it-be?run={sourceSessionId}&at=turn_back&followUp={followUpId}",
+        "staleAfterHours": 72,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "About a minute, for when the fight comes back.",
+          "title": "Turn your mind"
+        },
+        "choices": [
+          {
+            "id": "not_now",
+            "label": "Not now",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "chips": {
+            "few_days": {
+              "days": 3,
+              "kind": "at_local",
+              "time": "18:00"
+            },
+            "tomorrow": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "18:00"
+            },
+            "tonight": {
+              "days": 0,
+              "kind": "at_local",
+              "time": "20:00"
+            }
+          },
+          "kind": "chip"
+        },
+        "notification": "A minute to turn your mind, if you want it."
+      },
+      {
         "id": "two_pulls_checkback",
         "ownerModule": "mf",
         "tier": "quality",

@@ -198,7 +198,7 @@ test("outside my control: two questions over the problem's parts, one a screen; 
   assert.match(M.copyText(ctx(), M.stepOf(skill, "solutions").title, none), /start small/);
   const onlyTheirs = run([pick("others", ps.aspects["fear-anticipatory"][0].id), next], ctx(), t);
   assert.equal(onlyTheirs.stepId, "accept", "only other people's parts: carrying it");
-  assert.deepEqual(onlyTheirs.offered, ["dear_man", "let_it_be"], "what to say to them, or let it be (DT-04); willingness and turning the mind are planned");
+  assert.deepEqual(onlyTheirs.offered, ["dear_man", "let_it_be", "willingness", "turning_the_mind"], "what to say to them, or let it be (DT-04), its willingness and turning-the-mind entries (DT-04 part 2)");
   const mine = run([pick("mine", ps.aspects["fear-anticipatory"][0].id), next], ctx(), s);
   assert.equal(mine.stepId, "solutions");
   assert.match(M.copyText(ctx(), M.stepOf(skill, "solutions").title, mine), /in your hands/);
@@ -367,9 +367,14 @@ test("every dead link of the old page is a planned exit until its tool ships: re
   assert.ok(!planned.includes("please-skill"), "Running low shipped (ER-07)");
   assert.ok(!planned.includes("give"), "Keep it warm shipped (IE-06)");
   assert.ok(!planned.includes("build-mastery"), "Build mastery shipped (ER-11)");
-  for (const t of ["dialectics", "willingness", "turning-the-mind", "self-validate"]) {
+  for (const t of ["dialectics", "self-validate"]) {
     assert.ok(planned.includes(t), t);
   }
+  // Willingness and turning the mind open Let it be at its entries (DT-04 part 2).
+  const entry = (id) => skill.exits.find((x) => x.id === id);
+  assert.deepEqual([entry("willingness").toolId, entry("willingness").query], ["let-it-be", { enterAt: "willingness" }]);
+  assert.deepEqual([entry("turning_the_mind").toolId, entry("turning_the_mind").query], ["let-it-be", { enterAt: "turn" }]);
+  assert.ok(skill.copy[entry("willingness").label] && skill.copy[entry("turning_the_mind").label]);
   const tools = readFileSync("src/data/tools.ts", "utf8");
   for (const x of skill.exits.filter((e) => e.toolId && !e.planned)) assert.match(tools, new RegExp(`id: '${x.toolId}'`), x.toolId);
 });

@@ -34531,6 +34531,9 @@
         "ownMax": 120,
         "emotionFields": [],
         "copy": {
+          "back_hint": "You've turned it before. Every turn counts.",
+          "back_title": "The fight with it might be back. Turn your mind for a minute?",
+          "back_title_still": "The fight with what already happened might be back. Turn your mind for a minute?",
           "card_copied": "Copied",
           "card_copy": "Copy",
           "card_next": "Next",
@@ -34542,6 +34545,8 @@
           "checked_hint": "Letting it be is for the part that can't change right now.",
           "checked_title": "Some things can change and some can't. Have you looked at which this is?",
           "close_title": "Compared to when you started, the fight with it is…",
+          "cue_hint": "Knowing when helps you catch it. Skipping is fine.",
+          "cue_title": "When does the fight with it tend to come back?",
           "done": "Done",
           "end_body": "Look after your body tonight: rest, water, being gentle with yourself.",
           "end_boundary": "One line to hold your ground, for the next time.",
@@ -34575,6 +34580,10 @@
           "heart_title": "Hand on your heart.",
           "inline_back": "Leave this for now",
           "next": "Next",
+          "remind_again_title": "Want another reminder?",
+          "remind_hint": "It takes about a minute. The reminder never says what it's about.",
+          "remind_title": "Want a reminder to turn your mind, around then?",
+          "rest_line": "Then let it rest. Let it be is here whenever the fight comes back.",
           "safety_open": "Talk to someone now",
           "settle_line": "Body first. Let it be is here when you're ready.",
           "statement_hint": "Accepting isn't approving. It isn't giving up on what can change. One line is enough.",
@@ -34596,6 +34605,19 @@
           "threat_they_win": "That makes sense. Letting it be isn't saying they were right. It's choosing where your energy goes.",
           "threat_title": "What feels like it would happen if you let this be?",
           "too_much_line": "That's a lot. Let's look after your body first.",
+          "turn_again": "Turn it again",
+          "turn_card_title": "Your words, once more.",
+          "turn_done": "That's enough turns for now",
+          "turn_end_line": "You turned your mind. When it drifts back, you can turn it again.",
+          "turn_fight": "The fight",
+          "turn_hands_title": "Willing hands, for a few breaths.",
+          "turn_hint": "Each turn leaves a footprint. The mind turns back, and you turn it again.",
+          "turn_let": "Letting it be",
+          "turn_skip": "Go on without turning",
+          "turn_sr": "Tap to turn the figure toward the path of letting it be. Each turn leaves a footprint.",
+          "turn_title": "Turn your mind toward letting it be.",
+          "turn_turn": "Turn toward letting it be",
+          "turn_turned": "Turned. If it drifts back, turn it again.",
           "what_hint": "Pick the closest, or say it your way.",
           "what_own": "Say it my way",
           "what_title": "It makes sense you're fighting this. It matters to you. What is it you can't change?",
@@ -34603,8 +34625,18 @@
           "willing_hint": "Digging in makes sense. It's how we protect what matters.",
           "willing_title": "Right now, are you willing to let it be, or digging in against it?"
         },
-        "tables": {},
-        "derive": [],
+        "tables": {
+          "cueChip": {
+            "night": "tonight"
+          }
+        },
+        "derive": [
+          {
+            "name": "cueChip",
+            "from": "$a.cue",
+            "table": "cueChip"
+          }
+        ],
         "steps": [
           {
             "id": "checked",
@@ -34788,9 +34820,19 @@
                 "when": {
                   "all": [
                     {
-                      "eq": [
-                        "$ctx.enterAt",
-                        "willingness"
+                      "any": [
+                        {
+                          "eq": [
+                            "$ctx.enterAt",
+                            "willingness"
+                          ]
+                        },
+                        {
+                          "eq": [
+                            "$ctx.enterAt",
+                            "turn"
+                          ]
+                        }
                       ]
                     },
                     {
@@ -34837,6 +34879,22 @@
                       "eq": [
                         "$ctx.enterAt",
                         "willingness"
+                      ]
+                    },
+                    {
+                      "set": "$a.what"
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "turn",
+                "when": {
+                  "all": [
+                    {
+                      "eq": [
+                        "$ctx.enterAt",
+                        "turn"
                       ]
                     },
                     {
@@ -34914,9 +34972,19 @@
                 "when": {
                   "all": [
                     {
-                      "eq": [
-                        "$ctx.enterAt",
-                        "willingness"
+                      "any": [
+                        {
+                          "eq": [
+                            "$ctx.enterAt",
+                            "willingness"
+                          ]
+                        },
+                        {
+                          "eq": [
+                            "$ctx.enterAt",
+                            "turn"
+                          ]
+                        }
                       ]
                     },
                     {
@@ -34972,6 +35040,15 @@
                   "eq": [
                     "$ctx.enterAt",
                     "willingness"
+                  ]
+                }
+              },
+              {
+                "to": "turn",
+                "when": {
+                  "eq": [
+                    "$ctx.enterAt",
+                    "turn"
                   ]
                 }
               },
@@ -35064,6 +35141,15 @@
                 }
               },
               {
+                "to": "turn",
+                "when": {
+                  "eq": [
+                    "$ctx.enterAt",
+                    "turn"
+                  ]
+                }
+              },
+              {
                 "to": "hands",
                 "when": {
                   "any": [
@@ -35151,6 +35237,15 @@
                   "eq": [
                     "$ctx.enterAt",
                     "willingness"
+                  ]
+                }
+              },
+              {
+                "to": "turn",
+                "when": {
+                  "eq": [
+                    "$ctx.enterAt",
+                    "turn"
                   ]
                 }
               },
@@ -35710,6 +35805,15 @@
             "title": "statement_title",
             "next": [
               {
+                "to": "turn_card",
+                "when": {
+                  "eq": [
+                    "$ctx.enterAt",
+                    "turn"
+                  ]
+                }
+              },
+              {
                 "to": "statement_card",
                 "when": null
               }
@@ -35982,6 +36086,575 @@
             "next": [
               {
                 "to": "end",
+                "when": {
+                  "eq": [
+                    "$a.close",
+                    "worse"
+                  ]
+                }
+              },
+              {
+                "to": "cue",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "cue",
+            "kind": "ask",
+            "title": "cue_title",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "in": [
+                    "$a.still",
+                    [
+                      "yes",
+                      "sometimes",
+                      "unsure"
+                    ]
+                  ]
+                }
+              }
+            ],
+            "fields": [
+              {
+                "id": "cue",
+                "options": {
+                  "list": "cue"
+                },
+                "max": 1,
+                "required": false,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "hint": "cue_hint",
+            "next": [
+              {
+                "to": "remind",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "remind",
+            "kind": "ask",
+            "title": "remind_title",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "in": [
+                    "$a.still",
+                    [
+                      "yes",
+                      "sometimes",
+                      "unsure"
+                    ]
+                  ]
+                }
+              }
+            ],
+            "fields": [
+              {
+                "id": "remind",
+                "options": {
+                  "list": "remind",
+                  "firstFrom": "$d.cueChip"
+                },
+                "max": 1,
+                "required": false,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "hint": "remind_hint",
+            "followUp": {
+              "type": "turn_mind",
+              "whenFrom": "remind",
+              "when": {
+                "in": [
+                  "$a.remind",
+                  [
+                    "tonight",
+                    "tomorrow",
+                    "few_days"
+                  ]
+                ]
+              }
+            },
+            "next": [
+              {
+                "to": "end",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "turn",
+            "kind": "embed",
+            "embed": "turnFork",
+            "answerAs": "turn",
+            "title": "turn_title",
+            "hint": "turn_hint",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "in": [
+                    "$a.still",
+                    [
+                      "yes",
+                      "sometimes",
+                      "unsure"
+                    ]
+                  ]
+                }
+              }
+            ],
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "props": {
+              "turn": "turn_turn",
+              "again": "turn_again",
+              "turnedLine": "turn_turned",
+              "fightLabel": "turn_fight",
+              "letLabel": "turn_let",
+              "hint": "turn_sr",
+              "done": "turn_done",
+              "skip": "turn_skip"
+            },
+            "next": [
+              {
+                "to": "turn_card",
+                "when": {
+                  "set": "$a.statement"
+                }
+              },
+              {
+                "to": "statement",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "turn_card",
+            "kind": "embed",
+            "embed": "boundaryLine",
+            "title": "turn_card_title",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "in": [
+                    "$a.still",
+                    [
+                      "yes",
+                      "sometimes",
+                      "unsure"
+                    ]
+                  ]
+                }
+              }
+            ],
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "props": {
+              "field": "statement",
+              "shape": "line",
+              "next": "card_next",
+              "copyLabel": "card_copy",
+              "copiedLabel": "card_copied",
+              "selectedLabel": "card_selected"
+            },
+            "next": [
+              {
+                "to": "turn_hands",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "turn_hands",
+            "kind": "embed",
+            "embed": "bodyCard",
+            "title": "turn_hands_title",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "in": [
+                    "$a.still",
+                    [
+                      "yes",
+                      "sometimes",
+                      "unsure"
+                    ]
+                  ]
+                }
+              }
+            ],
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "props": {
+              "kind": "willing",
+              "seconds": 10,
+              "step1": "hands_step1",
+              "step2": "hands_step2",
+              "step3": "hands_step3",
+              "caution": "hands_caution",
+              "start": "hands_start",
+              "running": "hands_running",
+              "done": "hands_done",
+              "next": "next"
+            },
+            "next": [
+              {
+                "to": "close",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "turn_back",
+            "kind": "ask",
+            "title": [
+              {
+                "when": {
+                  "in": [
+                    "$a.still",
+                    [
+                      "yes",
+                      "sometimes",
+                      "unsure"
+                    ]
+                  ]
+                },
+                "key": "back_title_still"
+              },
+              {
+                "key": "back_title"
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "in": [
+                    "$a.still",
+                    [
+                      "yes",
+                      "sometimes",
+                      "unsure"
+                    ]
+                  ]
+                }
+              }
+            ],
+            "fields": [
+              {
+                "id": "turn_back",
+                "options": {
+                  "list": "turn_back"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "hint": "back_hint",
+            "reopens": {
+              "after": "remind",
+              "again": [
+                "remind_again"
+              ]
+            },
+            "clears": [
+              "turn_back",
+              "remind_again"
+            ],
+            "next": [
+              {
+                "to": "rest_end",
+                "when": {
+                  "eq": [
+                    "$a.turn_back",
+                    "rest"
+                  ]
+                }
+              },
+              {
+                "to": "remind_again",
+                "when": {
+                  "eq": [
+                    "$a.turn_back",
+                    "not_now"
+                  ]
+                }
+              },
+              {
+                "to": "turn_again",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "turn_again",
+            "kind": "embed",
+            "embed": "turnFork",
+            "answerAs": "turn_again",
+            "title": "turn_title",
+            "hint": "turn_hint",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "in": [
+                    "$a.still",
+                    [
+                      "yes",
+                      "sometimes",
+                      "unsure"
+                    ]
+                  ]
+                }
+              }
+            ],
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "props": {
+              "turn": "turn_turn",
+              "again": "turn_again",
+              "turnedLine": "turn_turned",
+              "fightLabel": "turn_fight",
+              "letLabel": "turn_let",
+              "hint": "turn_sr",
+              "done": "turn_done",
+              "skip": "turn_skip"
+            },
+            "next": [
+              {
+                "to": "turn_card_again",
+                "when": {
+                  "set": "$a.statement"
+                }
+              },
+              {
+                "to": "turn_hands_again",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "turn_card_again",
+            "kind": "embed",
+            "embed": "boundaryLine",
+            "title": "turn_card_title",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "in": [
+                    "$a.still",
+                    [
+                      "yes",
+                      "sometimes",
+                      "unsure"
+                    ]
+                  ]
+                }
+              }
+            ],
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "props": {
+              "field": "statement",
+              "shape": "line",
+              "next": "card_next",
+              "copyLabel": "card_copy",
+              "copiedLabel": "card_copied",
+              "selectedLabel": "card_selected"
+            },
+            "next": [
+              {
+                "to": "turn_hands_again",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "turn_hands_again",
+            "kind": "embed",
+            "embed": "bodyCard",
+            "title": "turn_hands_title",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "in": [
+                    "$a.still",
+                    [
+                      "yes",
+                      "sometimes",
+                      "unsure"
+                    ]
+                  ]
+                }
+              }
+            ],
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "props": {
+              "kind": "willing",
+              "seconds": 10,
+              "step1": "hands_step1",
+              "step2": "hands_step2",
+              "step3": "hands_step3",
+              "caution": "hands_caution",
+              "start": "hands_start",
+              "running": "hands_running",
+              "done": "hands_done",
+              "next": "next"
+            },
+            "next": [
+              {
+                "to": "remind_again",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "remind_again",
+            "kind": "ask",
+            "title": "remind_again_title",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "in": [
+                    "$a.still",
+                    [
+                      "yes",
+                      "sometimes",
+                      "unsure"
+                    ]
+                  ]
+                }
+              }
+            ],
+            "fields": [
+              {
+                "id": "remind_again",
+                "options": {
+                  "list": "remind"
+                },
+                "max": 1,
+                "required": false,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "hint": "remind_hint",
+            "followUp": {
+              "type": "turn_mind",
+              "whenFrom": "remind_again",
+              "when": {
+                "in": [
+                  "$a.remind_again",
+                  [
+                    "tonight",
+                    "tomorrow",
+                    "few_days"
+                  ]
+                ]
+              }
+            },
+            "next": [
+              {
+                "to": "turn_end",
                 "when": null
               }
             ],
@@ -36144,6 +36817,87 @@
                 }
               }
             ]
+          },
+          {
+            "id": "turn_end",
+            "kind": "handoff",
+            "complete": true,
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "in": [
+                    "$a.still",
+                    [
+                      "yes",
+                      "sometimes",
+                      "unsure"
+                    ]
+                  ]
+                }
+              }
+            ],
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "turn_end_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "next": [],
+            "offers": []
+          },
+          {
+            "id": "rest_end",
+            "kind": "handoff",
+            "complete": true,
+            "noClose": true,
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "in": [
+                    "$a.still",
+                    [
+                      "yes",
+                      "sometimes",
+                      "unsure"
+                    ]
+                  ]
+                }
+              }
+            ],
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "rest_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "next": [],
+            "offers": []
           },
           {
             "id": "too_much",
@@ -36672,6 +37426,56 @@
               "value": "much_better",
               "label": "Much quieter"
             }
+          ],
+          "cue": [
+            {
+              "value": "night",
+              "label": "At night"
+            },
+            {
+              "value": "page",
+              "label": "When I see their page"
+            },
+            {
+              "value": "alone",
+              "label": "When I'm alone"
+            },
+            {
+              "value": "mentioned",
+              "label": "When it's mentioned"
+            },
+            {
+              "value": "dont_know",
+              "label": "I don't know"
+            }
+          ],
+          "remind": [
+            {
+              "value": "tonight",
+              "label": "Tonight"
+            },
+            {
+              "value": "tomorrow",
+              "label": "Tomorrow"
+            },
+            {
+              "value": "few_days",
+              "label": "In a few days"
+            }
+          ],
+          "turn_back": [
+            {
+              "value": "now",
+              "label": "Turn it now"
+            },
+            {
+              "value": "not_now",
+              "label": "Not now"
+            },
+            {
+              "value": "rest",
+              "label": "It's quieter. Let it rest"
+            }
           ]
         },
         "inline": {
@@ -36714,7 +37518,8 @@
           "thenVsNowFrom": "close"
         },
         "entries": {
-          "willingness": "what"
+          "willingness": "what",
+          "turn": "what"
         }
       },
       {
@@ -50367,6 +51172,8 @@
           "not_fit_other": "Problem Solve works from a feeling that's pointing at a problem you can work on. This one might want something else first.",
           "not_fit_shame": "When a feeling says something is wrong with you, there's nothing there to solve. Lots of people feel this. Doing the opposite of hiding often helps more. If there's one thing you did that you want to put right, you can come back for that.",
           "not_now_line": "That makes sense. When a feeling is this loud, planning is harder. It may help to bring it down a little first, then come back to this.",
+          "o_turning_the_mind": "Turn my mind toward letting it be",
+          "o_willingness": "Do what the moment needs anyway",
           "others_title": "Which parts are up to someone else?",
           "own_direction": "My own idea",
           "own_hint": "Say it your way",
@@ -54206,11 +55013,15 @@
           },
           {
             "id": "turning_the_mind",
-            "toolId": "turning-the-mind",
-            "query": {},
-            "carry": [],
+            "toolId": "let-it-be",
+            "query": {
+              "enterAt": "turn"
+            },
+            "carry": [
+              "feel"
+            ],
             "done": false,
-            "planned": true
+            "label": "o_turning_the_mind"
           },
           {
             "id": "values_clarification",
@@ -54223,11 +55034,15 @@
           },
           {
             "id": "willingness",
-            "toolId": "willingness",
-            "query": {},
-            "carry": [],
+            "toolId": "let-it-be",
+            "query": {
+              "enterAt": "willingness"
+            },
+            "carry": [
+              "feel"
+            ],
             "done": false,
-            "planned": true
+            "label": "o_willingness"
           }
         ],
         "options": {

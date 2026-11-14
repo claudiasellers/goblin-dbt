@@ -110,6 +110,31 @@ COPY = {
     "hands_still_hint": "One thing is plenty. None is okay too.",
     # Step 8: the close, on the fight with it (then-vs-now, asked in the flow).
     "close_title": "Compared to when you started, the fight with it is…",
+    # Then the cue and the turning-the-mind reminder (DT-04 part 2; DT Handout 12: turn it again, and again).
+    "cue_title": "When does the fight with it tend to come back?",
+    "cue_hint": "Knowing when helps you catch it. Skipping is fine.",
+    "remind_title": "Want a reminder to turn your mind, around then?",
+    "remind_hint": "It takes about a minute. The reminder never says what it's about.",
+    # Turning the mind (the fork, then their statement, then willing hands for ten seconds).
+    "turn_title": "Turn your mind toward letting it be.",
+    "turn_hint": "Each turn leaves a footprint. The mind turns back, and you turn it again.",
+    "turn_turn": "Turn toward letting it be",
+    "turn_again": "Turn it again",
+    "turn_turned": "Turned. If it drifts back, turn it again.",
+    "turn_fight": "The fight",
+    "turn_let": "Letting it be",
+    "turn_sr": "Tap to turn the figure toward the path of letting it be. Each turn leaves a footprint.",
+    "turn_done": "That's enough turns for now",
+    "turn_skip": "Go on without turning",
+    "turn_card_title": "Your words, once more.",
+    "turn_hands_title": "Willing hands, for a few breaths.",
+    # A reminder reopened the run (`turn_mind`): the fight may be back.
+    "back_title": "The fight with it might be back. Turn your mind for a minute?",
+    "back_hint": "You've turned it before. Every turn counts.",
+    "back_title_still": "The fight with what already happened might be back. Turn your mind for a minute?",
+    "remind_again_title": "Want another reminder?",
+    "turn_end_line": "You turned your mind. When it drifts back, you can turn it again.",
+    "rest_line": "Then let it rest. Let it be is here whenever the fight comes back.",
     # The end card.
     "end_need": "Your need is still real. It can be met somewhere else.",
     "end_boundary": "One line to hold your ground, for the next time.",
@@ -133,6 +158,8 @@ FLOODED = {"eq": ["$ctx.band", "flooded"]}
 STIRRED = {"eq": ["$ctx.band", "stirred"]}
 SHORT = {"any": [STIRRED, {"eq": [a("heads_up"), "anyway"]}]}  # the PRD's ★ path
 WILLINGNESS = {"eq": ["$ctx.enterAt", "willingness"]}  # the willingness entry: what → willing → hands → still in my hands
+TURN = {"eq": ["$ctx.enterAt", "turn"]}  # the turning-the-mind entry: what → (still) → the fork → the statement → hands
+REMIND_CHIPS = ["tonight", "tomorrow", "few_days"]  # turn_mind's window chips
 STILL = {"in": [a("still"), ["yes", "sometimes", "unsure"]]}  # anything uncertain is the safety branch
 SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
 CRISIS = [{"variant": "other_person", "when": STILL}]
@@ -223,6 +250,24 @@ HANDS_STILL = [
     ("nothing", "Nothing right now, and that's okay"),
 ]
 TVN = [("worse", "Louder"), ("same", "About the same"), ("better", "Quieter"), ("much_better", "Much quieter")]
+# When the fight comes back (PRD step 8). A time cue puts that reminder chip first.
+CUES = [
+    ("night", "At night"),
+    ("page", "When I see their page"),
+    ("alone", "When I'm alone"),
+    ("mentioned", "When it's mentioned"),
+    ("dont_know", "I don't know"),
+]
+REMIND = [
+    ("tonight", "Tonight"),
+    ("tomorrow", "Tomorrow"),
+    ("few_days", "In a few days"),
+]  # skipping is no reminder
+TURN_BACK = [
+    ("now", "Turn it now"),
+    ("not_now", "Not now"),
+    ("rest", "It's quieter. Let it rest"),
+]
 
 PER_CAT = {"any": [
     *[{"all": [{"eq": [a("what"), c]}, {"eq": [f"$opt.{c}", True]}]} for c in CATS],
@@ -236,9 +281,10 @@ STATEMENT_WHERE = {"any": [
 THREAT_LINES = [{"when": {"eq": [a("threat"), v]}, "key": f"threat_{v}"} for v, _ in THREAT]
 
 
-def ask(step_id, title, hint, field, lst, nxt, *, max_=1, required=True, own=None, links=(), where=None, extra=None):
-    f = {"id": field, "options": {"list": lst, **({"where": where} if where else {})}, "max": max_, "required": required,
-         "links": [*links, SAFETY_LINK]}
+def ask(step_id, title, hint, field, lst, nxt, *, max_=1, required=True, own=None, links=(), where=None, extra=None,
+        field_extra=None):
+    f = {"id": field, "options": {"list": lst, **({"where": where} if where else {}), **(field_extra or {})}, "max": max_,
+         "required": required, "links": [*links, SAFETY_LINK]}
     if own:
         f["own"] = {"hint": own, "countsAsPick": True}
     s = {"id": step_id, "kind": "ask", "title": title, "crisis": CRISIS, "fields": [f], "next": nxt}
@@ -255,6 +301,23 @@ def card(step_id, title, kind, seconds, prefix, nxt):
             "next": nxt}
 
 
+def fork(step_id, nxt):
+    """Turning the mind (Handout 12): the fork, each turn a footprint on the letting-it-be path (`turnFork`)."""
+    return {"id": step_id, "kind": "embed", "embed": "turnFork", "answerAs": step_id, "title": "turn_title",
+            "hint": "turn_hint", "crisis": CRISIS, "links": [SAFETY_LINK],
+            "props": {"turn": "turn_turn", "again": "turn_again", "turnedLine": "turn_turned", "fightLabel": "turn_fight",
+                      "letLabel": "turn_let", "hint": "turn_sr", "done": "turn_done", "skip": "turn_skip"},
+            "next": nxt}
+
+
+def line_card(step_id, to):
+    """Their statement on paper, once more (the turn's second beat)."""
+    return {"id": step_id, "kind": "embed", "embed": "boundaryLine", "title": "turn_card_title", "crisis": CRISIS,
+            "links": [SAFETY_LINK], "props": {"field": "statement", "shape": "line", "next": "card_next",
+                                            "copyLabel": "card_copy", "copiedLabel": "card_copied", "selectedLabel": "card_selected"},
+            "next": [{"to": to}]}
+
+
 AFTER_STATEMENT = [{"when": SHORT, "to": "hands_still"}, {"to": "grief"}]
 
 STEPS = [
@@ -266,20 +329,22 @@ STEPS = [
         links=[{"exit": "problem_solve", "label": "check_first_ps", "when": ALWAYS}]),
     ask("heads_up", "heads_up_title", "heads_up_hint", "heads_up", "heads_up",
         [{"when": {"eq": [a("heads_up"), "body"]}, "to": "settle"},
-         # The willingness entry asks what it's about first, so a flooded reading meets the heads-up after it.
-         {"when": {"all": [WILLINGNESS, {"set": a("what")}, ASK_STILL]}, "to": "still"},
-         {"when": {"all": [WILLINGNESS, {"set": a("what")}]}, "to": "willing"}, {"to": "what"}]),
+         # The willingness and turn entries ask what it's about first, so a flooded reading meets the heads-up after it.
+         {"when": {"all": [{"any": [WILLINGNESS, TURN]}, {"set": a("what")}, ASK_STILL]}, "to": "still"},
+         {"when": {"all": [WILLINGNESS, {"set": a("what")}]}, "to": "willing"},
+         {"when": {"all": [TURN, {"set": a("what")}]}, "to": "turn"}, {"to": "what"}]),
     ask("what", [{"when": WILLINGNESS, "key": "what_title_willing"}, {"key": "what_title"}], "what_hint", "what", "what",
-        [{"when": {"all": [WILLINGNESS, FLOODED, {"not": {"set": a("heads_up")}}]}, "to": "heads_up"},
-         {"when": ASK_STILL, "to": "still"}, {"when": WILLINGNESS, "to": "willing"}, {"when": SHORT, "to": "hands"},
-         {"to": "fight"}], own="what_own"),
+        [{"when": {"all": [{"any": [WILLINGNESS, TURN]}, FLOODED, {"not": {"set": a("heads_up")}}]}, "to": "heads_up"},
+         {"when": ASK_STILL, "to": "still"}, {"when": WILLINGNESS, "to": "willing"}, {"when": TURN, "to": "turn"},
+         {"when": SHORT, "to": "hands"}, {"to": "fight"}], own="what_own"),
     ask("still", "still_title", "still_hint", "still", "still",
-        [{"when": STILL, "to": "still_line"}, {"when": WILLINGNESS, "to": "willing"}, {"when": SHORT, "to": "hands"},
-         {"to": "fight"}]),
+        [{"when": STILL, "to": "still_line"}, {"when": WILLINGNESS, "to": "willing"}, {"when": TURN, "to": "turn"},
+         {"when": SHORT, "to": "hands"}, {"to": "fight"}]),
     # Still happening: the line, the support on the screen (the crisis slot), Ending in its careful frame, and the
     # way on for what's already happened only.
     ask("still_line", "still_line_title", "still_line_hint", "still_go", "still_go",
         [{"when": {"eq": [a("still_go"), "stop"]}, "to": "still_stop"}, {"when": WILLINGNESS, "to": "willing"},
+         {"when": TURN, "to": "turn"},
          {"when": SHORT, "to": "hands"}, {"to": "fight"}],
         links=[{"exit": "ending", "label": "still_ending", "when": ALWAYS}]),
     ask("fight", "fight_title", "fight_hint", "fight", "fight", [{"to": "willing"}], max_=4),
@@ -290,8 +355,8 @@ STEPS = [
     # goes on either way.
     ask("threat_line", THREAT_LINES, "threat_line_hint", "landed", "landed", [{"to": "hands"}], required=False),
     card("hands", "hands_title", "willing", 45, "hands", [{"when": WILLINGNESS, "to": "hands_still"}, {"to": "statement"}]),
-    ask("statement", "statement_title", "statement_hint", "statement", "statement", [{"to": "statement_card"}],
-        own="statement_own", where=STATEMENT_WHERE),
+    ask("statement", "statement_title", "statement_hint", "statement", "statement",
+        [{"when": TURN, "to": "turn_card"}, {"to": "statement_card"}], own="statement_own", where=STATEMENT_WHERE),
     {
         # The statement on paper, read once (copyable: it's theirs to keep).
         "id": "statement_card", "kind": "embed", "embed": "boundaryLine", "title": "card_title", "crisis": CRISIS,
@@ -304,7 +369,26 @@ STEPS = [
          {"to": "hands_still"}]),
     card("heart", "heart_title", "hand_heart", 30, "heart", [{"to": "hands_still"}]),
     ask("hands_still", "hands_still_title", "hands_still_hint", "hands_still", "hands_still", [{"to": "close"}]),
-    ask("close", "close_title", None, "close", "tvn", [{"to": "end"}]),
+    ask("close", "close_title", None, "close", "tvn", [{"when": {"eq": [a("close"), "worse"]}, "to": "end"}, {"to": "cue"}]),
+    # When the fight comes back, and a reminder to turn the mind then (PRD step 8; Handout 12). Both skippable.
+    ask("cue", "cue_title", "cue_hint", "cue", "cue", [{"to": "remind"}], required=False),
+    ask("remind", "remind_title", "remind_hint", "remind", "remind", [{"to": "end"}], required=False,
+        extra={"followUp": {"type": "turn_mind", "whenFrom": "remind", "when": {"in": [a("remind"), REMIND_CHIPS]}}},
+        field_extra={"firstFrom": "$d.cueChip"}),
+    # Turning the mind (the `turn` entry, from Problem Solve or a Tools card): the fork, the statement, the hands.
+    fork("turn", [{"when": {"set": a("statement")}, "to": "turn_card"}, {"to": "statement"}]),
+    line_card("turn_card", "turn_hands"),
+    card("turn_hands", "turn_hands_title", "willing", 10, "hands", [{"to": "close"}]),
+    # A reminder reopened the run: the fork again, their statement if they had one, the hands, another reminder.
+    ask("turn_back", [{"when": STILL, "key": "back_title_still"}, {"key": "back_title"}], "back_hint", "turn_back", "turn_back",
+        [{"when": {"eq": [a("turn_back"), "rest"]}, "to": "rest_end"},
+         {"when": {"eq": [a("turn_back"), "not_now"]}, "to": "remind_again"}, {"to": "turn_again"}],
+        extra={"reopens": {"after": "remind", "again": ["remind_again"]}, "clears": ["turn_back", "remind_again"]}),
+    fork("turn_again", [{"when": {"set": a("statement")}, "to": "turn_card_again"}, {"to": "turn_hands_again"}]),
+    line_card("turn_card_again", "turn_hands_again"),
+    card("turn_hands_again", "turn_hands_title", "willing", 10, "hands", [{"to": "remind_again"}]),
+    ask("remind_again", "remind_again_title", "remind_hint", "remind_again", "remind", [{"to": "turn_end"}], required=False,
+        extra={"followUp": {"type": "turn_mind", "whenFrom": "remind_again", "when": {"in": [a("remind_again"), REMIND_CHIPS]}}}),
     {
         "id": "end", "kind": "handoff", "complete": True, "crisis": CRISIS,
         "lines": [
@@ -323,6 +407,15 @@ STEPS = [
             {"exit": "thoughts", "when": {"all": [{"set": a("threat")}, {"not": {"eq": [a("close"), "worse"]}}]}},
         ],
         "done": "done", "links": [SAFETY_LINK],
+    },
+    {
+        # A reopened turn: the close is asked as the visit closes (the spine's then-vs-now on the fight).
+        "id": "turn_end", "kind": "handoff", "complete": True, "crisis": CRISIS,
+        "lines": [{"when": ALWAYS, "key": "turn_end_line"}], "offers": [], "done": "done", "links": [SAFETY_LINK],
+    },
+    {
+        "id": "rest_end", "kind": "handoff", "complete": True, "noClose": True, "crisis": CRISIS,
+        "lines": [{"when": ALWAYS, "key": "rest_line"}], "offers": [], "done": "done", "links": [SAFETY_LINK],
     },
     {
         # Grief flooding (PRD step 6): the body first, no close.
@@ -379,6 +472,9 @@ def options():
     out += [("grief", v, label, {}, None) for v, label in GRIEF]
     out += [("hands_still", v, label, {}, "StillInMyHands") for v, label in HANDS_STILL]
     out += [("tvn", v, label, {}, None) for v, label in TVN]
+    out += [("cue", v, label, {}, None) for v, label in CUES]
+    out += [("remind", v, label, {}, None) for v, label in REMIND]
+    out += [("turn_back", v, label, {}, None) for v, label in TURN_BACK]
     return out
 
 
@@ -387,8 +483,10 @@ SKILL = {
     # band: a host's or the carried reading (C6.2): flooded gets the body first, stirred the short path.
     "accepts": ["band", "enterAt"],
     # Page entries: the willingness entry (the Tools intent, DT Handout 13) starts at what it's about.
-    "entries": {"willingness": "what"},
-    "copy": COPY, "tables": {}, "derive": [], "steps": STEPS, "exits": EXITS, "options": options(),
+    "entries": {"willingness": "what", "turn": "what"},
+    "copy": COPY, "tables": {"cueChip": {"night": "tonight"}},
+    "derive": [{"name": "cueChip", "from": a("cue"), "table": "cueChip"}],
+    "steps": STEPS, "exits": EXITS, "options": options(),
     "emotionFields": [],
     # R8, IE-B4: FAST's Let go runs it inline after a no, from *what can't change* (the no already says it can't,
     # for now), so the danger check still comes first for anything about a person. A hand-off gives back at once, so

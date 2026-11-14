@@ -146,7 +146,8 @@ test("grief is allowed; hand on heart; too much goes to the body, with no close"
 
 test("what's still in my hands routes; the close on the fight, then the end card", () => {
   const hs = run([...LOST, pick("fight", "replay"), next, pick("willing", "willing"), next, did(), pick("statement", "causes"), next, did("copied"), pick("grief", "ok"), next]);
-  const at = (v) => run([pick("hands_still", v), next, pick("close", "better"), next], ctx(), hs);
+  // After the close: when the fight comes back, and a reminder (both skippable, DT-04 part 2), then the end card.
+  const at = (v) => run([pick("hands_still", v), next, pick("close", "better"), next, next, next], ctx(), hs);
   assert.equal(run([pick("hands_still", "need"), next], ctx(), hs).stepId, "close");
   assert.equal(at("need").stepId, "end");
   assert.deepEqual(offers(at("need")), ["recover"]);
