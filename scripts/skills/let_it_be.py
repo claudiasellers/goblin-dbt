@@ -51,7 +51,7 @@ COPY = {
     "what_own": "Say it my way",
     # The willingness entry (DT Handout 13; `?enterAt=willingness`, the Tools intent *I keep digging in against
     # something*): willingness is doing what the moment needs, so it skips the changeability check and the statement.
-    "what_title_willing": "Digging in makes sense. What are you pushing against?",
+    "what_title_willing": "It makes sense to dig in when something matters. What are you pushing against?",
     # Inline (R8, inside FAST's Let go): the way back out, named apart from the safety screen's *Back to where I was*.
     "inline_back": "Leave this for now",
     # The danger check (PRD step 2), once, for person- or harm-related things.

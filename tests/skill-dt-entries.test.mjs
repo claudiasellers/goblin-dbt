@@ -59,7 +59,7 @@ test("a hand on the heart opens Held at where the hands rest; Hold to wait's kee
   const held = S("held");
   assert.deepEqual(held.entries, { hand: "where" });
   const fb = S("first_body");
-  assert.deepEqual(fb.exits.find((e) => e.id === "held").query, { enterAt: "hand" });
+  assert.deepEqual(fb.exits.find((e) => e.id === "held").query, { enterAt: "hand", frame: "hurt" });
   // Beside the people and the kit when the body didn't quieten twice, after them (people first).
   const offers = M.stepOf(fb, "someone").offers.map((o) => o.exit);
   assert.deepEqual(offers, ["safety_open", "crisis_kit", "held"]);

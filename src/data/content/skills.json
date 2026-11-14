@@ -24085,7 +24085,8 @@
             "id": "held",
             "toolId": "soothe",
             "query": {
-              "enterAt": "hand"
+              "enterAt": "hand",
+              "frame": "hurt"
             },
             "carry": [],
             "done": false,
@@ -34590,7 +34591,7 @@
           "what_hint": "Pick the closest, or say it your way.",
           "what_own": "Say it my way",
           "what_title": "It makes sense you're fighting this. It matters to you. What is it you can't change?",
-          "what_title_willing": "Digging in makes sense. What are you pushing against?",
+          "what_title_willing": "It makes sense to dig in when something matters. What are you pushing against?",
           "willing_hint": "Digging in makes sense. It's how we protect what matters.",
           "willing_title": "Right now, are you willing to let it be, or digging in against it?"
         },

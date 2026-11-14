@@ -77,7 +77,7 @@ All three are documented in [`skill-runtime.md`](skill-runtime.md).
 - `CrisisState` and `Intervention` graph nodes with `ROUTES_TO`; moving `src/data/microSteps.ts` (clinical content in
   the frontend) into them.
 - **Built 14 Nov 2026:** Help me now opens its tools with a flooded band (route state, never recorded), so the kit
-  shows body cards only; the *someone* card offers Held at the hand (`?enterAt=hand`) after the people and the kit;
+  shows body cards only; the *someone* card offers Held at the hand (`?enterAt=hand&frame=hurt`: the banner stays, and *stirred up* ends with someone to talk to, never back to the body) after the people and the kit;
   *Not right now* opens the lid (`?enterAt=lid`).
 - The hosts: Help me now (`HelpNowInterim`, entered as flooded; built, above), StateResult's *That feels like too much right now*,
   the inline `regulate` mode in other skills, and `five-senses` folded in as the orient mode.

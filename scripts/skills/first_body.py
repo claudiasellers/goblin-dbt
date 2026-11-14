@@ -317,7 +317,7 @@ EXITS = [
     {"id": "opposite_action", "toolId": "opposite-action"},
     {"id": "let_it_be", "toolId": "let-it-be"},         # DT-04 (DT-B4): it's how things are
     {"id": "mind_job", "toolId": "mind-job", "query": {"enterAt": "lid"}},  # DT-06 the lid: not right now, with a return
-    {"id": "held", "toolId": "soothe", "query": {"enterAt": "hand"}, "label": "held_offer"},  # DT-07 Held, at the hand
+    {"id": "held", "toolId": "soothe", "query": {"enterAt": "hand", "frame": "hurt"}, "label": "held_offer"},  # DT-07 Held, at the hand
     {"id": "crisis_kit", "toolId": "crisis-kit", "query": {"frame": "crisis"}},       # DT-03 My crisis kit, opened from a crisis route (the banner on every card)
     {"id": "safety_open", "toolId": None, "safety": True},               # safety.open (R6)
     {"id": "done", "done": True},
