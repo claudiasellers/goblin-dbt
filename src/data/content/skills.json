@@ -31255,7 +31255,7 @@
           "scan_hint": "Eyes open is fine. Pick one.",
           "scan_in_step1": "Your hands: warm, cool, tingling, or nothing much.",
           "scan_in_step2": "Your breath at the tip of your nose.",
-          "scan_in_step3": "Back to your feet whenever you like.",
+          "scan_in_step3": "Back to the outside whenever you like.",
           "scan_in_title": "A little further in, if that's okay.",
           "scan_press_step1": "Press down through your heels.",
           "scan_press_step2": "Notice the floor pushing back.",
@@ -32430,9 +32430,19 @@
               {
                 "to": "scan_press",
                 "when": {
-                  "eq": [
-                    "$a.scan_where",
-                    "partly"
+                  "any": [
+                    {
+                      "eq": [
+                        "$a.scan_where",
+                        "partly"
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$ctx.band",
+                        "flooded"
+                      ]
+                    }
                   ]
                 }
               },
@@ -33032,6 +33042,12 @@
                       ]
                     },
                     {
+                      "eq": [
+                        "$ctx.frame",
+                        "practice"
+                      ]
+                    },
+                    {
                       "not": {
                         "in": [
                           "$a.close",
@@ -33471,6 +33487,11 @@
           ],
           "scan": [
             {
+              "value": "heart",
+              "label": "A hand on my heart instead",
+              "flooded": true
+            },
+            {
               "value": "feet",
               "label": "My feet on the floor"
             },
@@ -33485,11 +33506,6 @@
             {
               "value": "hands",
               "label": "My hands on something"
-            },
-            {
-              "value": "heart",
-              "label": "A hand on my heart instead",
-              "flooded": true
             }
           ],
           "scan_where": [

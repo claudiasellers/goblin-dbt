@@ -514,7 +514,7 @@ FOLLOW_UP_TYPES = [
         # one. The card opens a fresh visit (not a reopen: the practice is a new minute). Opening it is the resolution.
         # Content-free: it never says what was hard.
         "id": "held_practice", "ownerModule": "dt", "tier": "practice", "resolveMode": "deeplink",
-        "deepLinkTemplate": "/tool/soothe?followUp={followUpId}",
+        "deepLinkTemplate": "/tool/soothe?frame=practice&followUp={followUpId}",
         "window": {"kind": "chip", "chips": {"tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
                                              "few_days": {"kind": "at_local", "days": 3, "time": "18:00"}}},
         "staleAfterHours": 48, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},

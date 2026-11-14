@@ -67,7 +67,7 @@ drive, a blank pattern, so it gets no Held row. `tests/recommendation-select.tes
   5-4-3-2-1 or First, the body, with a line to tell a doctor or therapist if it happens often, no close. Eyes open is
   said on the first screen; nothing asks to close them or hold a breath. Not on a carried flooded reading's first
   screen (the PRD's steady / stirred only); opened at its entry (`?enterAt=scan`) while flooded, it says the body's
-  loud and offers a hand on the heart first. Problem Solve's *body scan* for numb and Do the Opposite's numb
+  loud and offers a hand on the heart first, and *here* presses the feet rather than going further in. Problem Solve's *body scan* for numb and Do the Opposite's numb
   alternative open it at the entry (`body-scan` is no longer a dangling link). Still part 2: the night variant.
 - **The Held hands visual** (Shape room: the person's shape held by two cast hands, rocking ~6 a minute, warm hum
   opt-in; PRD open question 1).
@@ -79,7 +79,7 @@ drive, a blank pattern, so it gets no Held row. `tests/recommendation-select.tes
   the kit, and Hold to wait's move opens there too (its banner stays).
 - The WMP witness embed in place of the folded-in witness line (as Let it be defers it).
 - The fade: the diary card's *soothed yourself without the app?*; IE-06 as a host.
-- Backdraft counted across visits (part 1 counts within one visit), the calm-day follow-up after a night use (**built 14 Nov 2026** after any use that helped: once the close is *a bit* or *much easier* and the outward step is answered, *Want to practise this once when things are calmer?* with *Tomorrow · In a few days*, skippable; `held_practice` opens a fresh visit to Held, content-free, resolved by opening it; never after Hurt myself), the
+- Backdraft counted across visits (part 1 counts within one visit), the calm-day follow-up after a night use (**built 14 Nov 2026** after any use that helped: once the close is *a bit* or *much easier* and the outward step is answered, *Want to practise this once when things are calmer?* with *Tomorrow · In a few days*, skippable; `held_practice` opens a fresh visit to Held (`?frame=practice`, which never asks to book another), content-free, resolved by opening it; never after Hurt myself), the
   `soothe` / `body_scan` reps, the PRD's graph content as its own nodes (`SootheOption` with touch-aversion
   alternatives, `HeldFlow`; the options carry the `SootheOption` label now), `affective_touch`'s grade and
   `IMPLEMENTS` edge.

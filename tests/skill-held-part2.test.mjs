@@ -77,7 +77,9 @@ test("a carried flooded reading: the scan isn't on the first screen; opened at i
   const s0 = M.pageStart(c);
   assert.equal(s0.stepId, "scan");
   assert.equal(M.copyText(c, M.stepOf(skill, "scan").title, s0), skill.copy.scan_title_flooded);
-  assert.deepEqual(ids(s0, "scan", c), ["feet", "seat", "back", "hands", "heart"]);
+  assert.deepEqual(ids(s0, "scan", c), ["heart", "feet", "seat", "back", "hands"], "the hand leads");
+  const here = run([pick("scan", "feet"), next, done, done, pick("scan_where", "here"), next], c, s0);
+  assert.equal(here.stepId, "scan_press", "flooded: never further in");
   assert.equal(run([pick("scan", "heart"), next], c, s0).stepId, "where");
   assert.ok(!ids(M.pageStart(ctx({ enterAt: "scan" })), "scan").includes("heart"), "calm: contact points only");
 });
@@ -97,12 +99,15 @@ test("the calm-day practice: only after it helped, never after Hurt myself, skip
   const hurt = ctx({ frame: "hurt", enterAt: "hand" });
   const h = run([pick("where", "chest"), next, { type: "embedDone", output: { ids: ["done"], durationSec: 60 } }, pick("close", "much_better"), next, pick("reach", "not_now"), next], hurt, M.pageStart(hurt));
   assert.equal(h.stepId, "end", "never after Hurt myself");
+  const p = ctx({ frame: "practice" });
+  assert.equal(run([...SCAN, pick("scan_where", "here"), next, done, pick("close", "better"), next, pick("reach", "not_now"), next], p).stepId, "end",
+    "the practice visit never books another");
 });
 
 test("held_practice: a fresh visit to Held, content-free, resolved by opening it, bound to the soothe tool", () => {
   const t = spine.followUpTypes.find((x) => x.id === "held_practice");
   assert.ok(t && t.enabled);
-  assert.equal(t.deepLinkTemplate, "/tool/soothe?followUp={followUpId}");
+  assert.equal(t.deepLinkTemplate, "/tool/soothe?frame=practice&followUp={followUpId}");
   assert.deepEqual(Object.keys(t.window.chips).sort(), ["few_days", "tomorrow"]);
   assert.doesNotMatch(`${t.copy.title} ${t.copy.body} ${t.notification}`, /hurt|hard|upset|cry|panic/i);
   assert.match(readFileSync("functions/src/spine/toolSession.ts", "utf8"), /'held_practice'/);

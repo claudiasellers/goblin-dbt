@@ -823,7 +823,7 @@
         "ownerModule": "dt",
         "tier": "practice",
         "resolveMode": "deeplink",
-        "deepLinkTemplate": "/tool/soothe?followUp={followUpId}",
+        "deepLinkTemplate": "/tool/soothe?frame=practice&followUp={followUpId}",
         "staleAfterHours": 48,
         "missedPath": "none",
         "notify": {

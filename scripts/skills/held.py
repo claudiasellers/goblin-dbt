@@ -18,9 +18,10 @@ itself information ("this deserves care"), and the person's own hand, words and 
 - **Outward**: "Someone you could call or text?", always offered, never pushed.
 
 A carried flooded reading keeps the first screen to the hand on the heart, warmth and *I don't deserve this* (PRD:
-hand on heart or warmth only). docs/design/held.md lists what part 1 defers (the outside-in body scan `body-scan`,
-the Held hands visual, voice memos (D13: text only), the soothe list kept in the crisis kit, the night variant and the
-calm-day follow-up) and where it departs from the PRD.
+hand on heart or warmth only). Part 2 (14 Nov 2026) adds the outside-in body scan (a fifth way in and the `scan`
+entry: a contact point, the skin, *how here are you?*, far away back outside) and the calm-day practice
+(`held_practice`). docs/design/held.md lists what is still deferred (the Held hands visual, voice memos (D13: text
+only), the soothe list kept in the crisis kit, the scan's night variant) and where it departs from the PRD.
 
 Safety (plan C6): *Talk to someone now* on every screen; no food, alcohol or shopping among the soothers; nothing
 here asks the person to close their eyes.
@@ -134,7 +135,7 @@ COPY = {
     "scan_in_title": "A little further in, if that's okay.",
     "scan_in_step1": "Your hands: warm, cool, tingling, or nothing much.",
     "scan_in_step2": "Your breath at the tip of your nose.",
-    "scan_in_step3": "Back to your feet whenever you like.",
+    "scan_in_step3": "Back to the outside whenever you like.",
     "scan_press_title": "Press your feet into the floor.",
     "scan_press_step1": "Press down through your heels.",
     "scan_press_step2": "Notice the floor pushing back.",
@@ -170,6 +171,8 @@ SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
 # every screen (plan C6.5: a DT hold runs alongside resources, never instead of them).
 AFTER_HURT = {"eq": ["$ctx.frame", "hurt"]}
 CRISIS = [{"variant": "crisis", "when": AFTER_HURT}]
+# Opened from the calm-day practice card (`held_practice`): it doesn't ask to book another (no chain of reminders).
+PRACTICE = {"eq": ["$ctx.frame", "practice"]}
 
 PICK = [
     ("heart", "A hand on my heart", True),
@@ -239,11 +242,11 @@ AGAIN = [
 ]
 # Where the outside-in scan starts: a contact point (outside first; trauma-sensitive).
 SCAN = [
+    ("heart", "A hand on my heart instead", True),  # a carried flooded reading only, and first then
     ("feet", "My feet on the floor", False),
     ("seat", "Sitting on a chair or the bed", False),
     ("back", "My back against something", False),
     ("hands", "My hands on something", False),
-    ("heart", "A hand on my heart instead", True),  # a carried flooded reading only
 ]
 SCAN_WHERE = [
     ("here", "Here"),
@@ -329,7 +332,9 @@ STEPS = [
     card("scan_skin", "scan_skin_title", "doseTimer", None, 30, "scan_skin", [{"to": "scan_where"}],
          running="scan_running", done="scan_done"),
     ask("scan_where", "scan_where_title", "scan_where_hint", "scan_where", "scan_where",
-        [{"when": {"eq": [a("scan_where"), "far"]}, "to": "scan_far"}, {"when": {"eq": [a("scan_where"), "partly"]}, "to": "scan_press"},
+        # Inside only when steady or stirred (the PRD): flooded, *here* presses the feet too, never further in.
+        [{"when": {"eq": [a("scan_where"), "far"]}, "to": "scan_far"},
+         {"when": {"any": [{"eq": [a("scan_where"), "partly"]}, FLOODED]}, "to": "scan_press"},
          {"to": "scan_in"}]),
     card("scan_in", "scan_in_title", "doseTimer", None, 30, "scan_in", TO_CLOSE, running="scan_running", done="scan_done"),
     card("scan_press", "scan_press_title", "bodyCard", "press", 20, "scan_press", TO_CLOSE, running="scan_running",
@@ -360,8 +365,9 @@ STEPS = [
             [{"exit": "cool_down", "when": {"eq": [a("stirred"), "press"]}}, {"exit": "safety_open", "when": ALWAYS}], no_close=False),
     # Outward: always offered, never pushed.
     ask("reach", "reach_title", "reach_hint", "reach", "reach",
-        [{"when": {"any": [AFTER_HURT, {"not": {"in": [a("close"), ["better", "much_better"]]}}]}, "to": "end"}, {"to": "practise"}]),
-    # It helped: practise it once on a calmer day (`held_practice`, a fresh visit). Not after Hurt myself.
+        [{"when": {"any": [AFTER_HURT, PRACTICE, {"not": {"in": [a("close"), ["better", "much_better"]]}}]}, "to": "end"},
+         {"to": "practise"}]),
+    # It helped: practise it once on a calmer day (`held_practice`, a fresh visit). Not after Hurt myself, nor on the practice itself.
     ask("practise", "practise_title", "practise_hint", "practise", "practise", [{"to": "end"}], required=False,
         extra={"followUp": {"type": "held_practice", "whenFrom": "practise"}}),
     handoff("end",
