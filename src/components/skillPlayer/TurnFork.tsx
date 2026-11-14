@@ -21,11 +21,11 @@ export function TurnFork({ props, onShown, onDone }: EmbedProps) {
   const reduce = useReducedMotion();
   const [turns, setTurns] = useState(0);
   const [out, setOut] = useState(false);
-  const started = useRef(performance.now());
+  const started = useRef<number | null>(null);
   const back = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hintId = useId();
   const shown = useRef(false);
-  useEffect(() => { if (!shown.current) { shown.current = true; onShown(); } }, [onShown]);
+  useEffect(() => { if (!shown.current) { shown.current = true; started.current = performance.now(); onShown(); } }, [onShown]);
   useEffect(() => () => { if (back.current) clearTimeout(back.current); }, []);
 
   const turn = () => {
@@ -36,7 +36,7 @@ export function TurnFork({ props, onShown, onDone }: EmbedProps) {
     if (back.current) clearTimeout(back.current);
     back.current = setTimeout(() => setOut(false), 2200);
   };
-  const finish = () => onDone?.(turnOutput(turns, performance.now() - started.current));
+  const finish = () => onDone?.(turnOutput(turns, performance.now() - (started.current ?? performance.now())));
   const prints = Array.from({ length: turns }, (_, i) => printAt(i)).filter((p): p is NonNullable<ReturnType<typeof printAt>> => !!p);
   // The figure: at the fork, or a few steps up the letting-it-be path just after a turn.
   const fig = out ? { x: 150, y: 110 } : { x: 120, y: 156 };
