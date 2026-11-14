@@ -75,15 +75,20 @@ a different kind of swap. `schema/app-tool-ids.cypher` gives `dbt_accepts` its `
   and their yes.
 - ~~**Level 3**~~ **Built 14 Nov 2026:** *One of my things I like* on the warmth step, shown only once the person has
   kept a thing they like (ER-04's `thingsILike` slice, in `PROFILE_NEEDS['mind-job']`): their own things with their
-  own labels, three minutes with one (`doseTimer`), then the return (*Back. Is it louder…?*).
+  own labels, three minutes with one (`doseTimer`, *Start it now, where you are*: eyes open, never pictured), then the
+  return (*Back. Is it louder…?*). The hint asks for one they can do now that doesn't hurt them (kept own words can't
+  be filtered, and this tool never offers drink, shopping or scrolling); none doable now goes on to the like rung.
 - ~~**The re-park heads-up**~~ **Built 14 Nov 2026:** when the last round was put back too (`$prev.reopen` *Not yet* or
   `$prev.re_heads` *Put it back for now*), the repark title says *It's been put back before. That's okay.* Never a
   count, never fewer choices. (The booking field's own answer isn't kept on a reopen, so the round's way to the shelf
   is what's read.)
-- ~~**Per-feeling ceilings**~~ **Built 14 Nov 2026:** a carried word for shame (ashamed, embarrassed, humiliated,
-  ridiculed, worthless), grief (grief, abandoned) or rejection (rejected, excluded, lonely, isolated) keeps the ladder at
-  find and like: no *good* or level 3 on the warmth step, and *Could do more* from like stays at like. Read through the
-  runtime's new `$carried` ref; never named on screen.
+- ~~**Per-feeling ceilings**~~ **Built 14 Nov 2026:** a carried word for shame (every grid word the graph's `parentOf`
+  puts under shame, derived at build so it can't drift: ashamed, embarrassed, exposed, humiliated, inadequate, inferior,
+  insecure, insignificant, rejected, excluded, ridiculed, weak, worthless) or for grief and rejection's sadness (grief,
+  abandoned, despair, hurt, let down, lonely, isolated) keeps the ladder at find and like: no *good* or level 3 on the
+  warmth step, and *Could do more* from like stays at like. Read through the runtime's new `$carried` ref; never named
+  on screen. Only a carried word steers it: the check-in card's words and links that pass `feel` carry one; a skill's
+  hand-off carries only its exit's `carry` fields, and First, the body and Hold to wait open the lid, not the ladder.
 - **Worry time** and **therapist-session** reopen times: the chips must equal the follow-up's window chips, and
   neither has a time to compute yet.
 - **Comparisons with their own past** (*quieter than last time*), the Stage rooms' lid and the shelf as a place to

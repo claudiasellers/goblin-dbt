@@ -91,3 +91,40 @@ test("the re-park heads-up: put back before, said once plainly, never a lock", (
   assert.ok(M.shownFields(c, M.stepOf(skill, "repark"), again)[0].options.list === "lid_when", "the same times, nothing taken away");
   assert.doesNotMatch(skill.copy.repark_title_again, /\d|times/);
 });
+
+test("the re-park heads-up after a flooded reopen that chose later", () => {
+  const c = ctx();
+  const F = ctx({ ctxIn: { band: "flooded" } });
+  const LID = [pick("what", "lid"), next, pick("lid_pick", "tin"), next, shut, next, pick("lid_when", "tomorrow"), next];
+  const r1 = M.resumeRun(F, M.runRecord(c, run(LID, c)), "reopen");
+  const heads = run([pick("reopen", "open"), next], F, r1);
+  assert.equal(heads.stepId, "re_heads");
+  const parked = run([pick("re_heads", "later"), next], F, heads);
+  assert.equal(parked.stepId, "repark");
+  const r2 = M.resumeRun(c, M.runRecord(F, run([pick("repark", "few_days"), next], F, parked)), "reopen");
+  const again = run([pick("reopen", "not_yet"), next], c, r2);
+  assert.equal(M.copyText(c, M.stepOf(skill, "repark").title, again), skill.copy.repark_title_again);
+});
+
+test("level 3 is never a dead end, and nothing invites picturing: none doable now goes to the like rung", () => {
+  const c = ctx({ profile: THINGS });
+  const s = run([...LOOP, pick("warmth", "mine"), next], c);
+  assert.equal(run([next], c, s).stepId, "to_like");
+  assert.match(skill.copy.task_mine_hint, /doesn't hurt you/);
+  assert.doesNotMatch(Object.values(skill.copy).join(" "), /\bpicture\b|\bimagine\b/i);
+});
+
+test("the ceiling words: every shame word in the graph, and grief and rejection's sadness words", () => {
+  const parentOf = content.parentOf;
+  const words = skill.steps.find((st) => st.id === "warmth").fields[0].options.where;
+  const named = JSON.stringify(words);
+  for (const w of ["inadequate", "inferior", "insignificant", "exposed", "let_down", "hurt", "despair", "rejected"]) assert.ok(named.includes(`"${w}"`), w);
+  for (const w of ["anxious", "bored", "disappointed"]) assert.ok(!named.includes(`"${w}"`), w);
+  assert.equal(parentOf.inadequate, "shame");
+});
+
+test("only warmth, like and good itself lead to the good or own rungs", () => {
+  for (const st of skill.steps)
+    for (const n of st.next ?? [])
+      if (n.to === "to_good" || n.to === "to_mine") assert.ok(["warmth", "how_like", "how_good"].includes(st.id), `${st.id} → ${n.to}`);
+});

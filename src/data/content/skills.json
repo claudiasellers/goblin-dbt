@@ -38852,7 +38852,7 @@
           "mine_done": "That's it.",
           "mine_running": "With it",
           "mine_start": "Start",
-          "mine_step1": "Start it, or picture yourself starting it.",
+          "mine_step1": "Start it now, where you are.",
           "mine_step2": "Let your attention stay with it.",
           "mine_step3": "Then come back and check.",
           "mine_title": "Give it a few minutes.",
@@ -38893,7 +38893,7 @@
           "task_find_title": "Something to find. Pick one.",
           "task_good_title": "Something good. Pick one.",
           "task_like_title": "Something you like. Pick one.",
-          "task_mine_hint": "From your things I like.",
+          "task_mine_hint": "From your things I like. One you can do now, eyes open, that doesn't hurt you. None right now? Go on without one.",
           "task_mine_title": "One of your things. Pick one.",
           "too_much_line": "That was a lot. Let's look after your body first.",
           "warmth_hint": "Some days the warmer ones are harder. Any is fine.",
@@ -39044,7 +39044,19 @@
                                 {
                                   "has": [
                                     "$carried",
+                                    "abandoned"
+                                  ]
+                                },
+                                {
+                                  "has": [
+                                    "$carried",
                                     "ashamed"
+                                  ]
+                                },
+                                {
+                                  "has": [
+                                    "$carried",
+                                    "despair"
                                   ]
                                 },
                                 {
@@ -39056,19 +39068,13 @@
                                 {
                                   "has": [
                                     "$carried",
-                                    "humiliated"
+                                    "excluded"
                                   ]
                                 },
                                 {
                                   "has": [
                                     "$carried",
-                                    "ridiculed"
-                                  ]
-                                },
-                                {
-                                  "has": [
-                                    "$carried",
-                                    "worthless"
+                                    "exposed"
                                   ]
                                 },
                                 {
@@ -39080,19 +39086,49 @@
                                 {
                                   "has": [
                                     "$carried",
-                                    "abandoned"
+                                    "humiliated"
                                   ]
                                 },
                                 {
                                   "has": [
                                     "$carried",
-                                    "rejected"
+                                    "hurt"
                                   ]
                                 },
                                 {
                                   "has": [
                                     "$carried",
-                                    "excluded"
+                                    "inadequate"
+                                  ]
+                                },
+                                {
+                                  "has": [
+                                    "$carried",
+                                    "inferior"
+                                  ]
+                                },
+                                {
+                                  "has": [
+                                    "$carried",
+                                    "insecure"
+                                  ]
+                                },
+                                {
+                                  "has": [
+                                    "$carried",
+                                    "insignificant"
+                                  ]
+                                },
+                                {
+                                  "has": [
+                                    "$carried",
+                                    "isolated"
+                                  ]
+                                },
+                                {
+                                  "has": [
+                                    "$carried",
+                                    "let_down"
                                   ]
                                 },
                                 {
@@ -39104,7 +39140,25 @@
                                 {
                                   "has": [
                                     "$carried",
-                                    "isolated"
+                                    "rejected"
+                                  ]
+                                },
+                                {
+                                  "has": [
+                                    "$carried",
+                                    "ridiculed"
+                                  ]
+                                },
+                                {
+                                  "has": [
+                                    "$carried",
+                                    "weak"
+                                  ]
+                                },
+                                {
+                                  "has": [
+                                    "$carried",
+                                    "worthless"
                                   ]
                                 }
                               ]
@@ -39137,15 +39191,6 @@
             "title": "warmth_title",
             "next": [
               {
-                "to": "to_find",
-                "when": {
-                  "eq": [
-                    "$a.warmth",
-                    "find"
-                  ]
-                }
-              },
-              {
                 "to": "to_like",
                 "when": {
                   "eq": [
@@ -39165,6 +39210,15 @@
               },
               {
                 "to": "to_mine",
+                "when": {
+                  "eq": [
+                    "$a.warmth",
+                    "mine"
+                  ]
+                }
+              },
+              {
+                "to": "to_find",
                 "when": null
               }
             ],
@@ -39182,7 +39236,7 @@
                   "profile": "thingsILike"
                 },
                 "max": 1,
-                "required": true,
+                "required": false,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -39195,6 +39249,14 @@
               }
             ],
             "next": [
+              {
+                "to": "to_like",
+                "when": {
+                  "not": {
+                    "set": "$a.to_mine"
+                  }
+                }
+              },
               {
                 "to": "mine_do",
                 "when": null
@@ -39953,7 +40015,19 @@
                           {
                             "has": [
                               "$carried",
+                              "abandoned"
+                            ]
+                          },
+                          {
+                            "has": [
+                              "$carried",
                               "ashamed"
+                            ]
+                          },
+                          {
+                            "has": [
+                              "$carried",
+                              "despair"
                             ]
                           },
                           {
@@ -39965,19 +40039,13 @@
                           {
                             "has": [
                               "$carried",
-                              "humiliated"
+                              "excluded"
                             ]
                           },
                           {
                             "has": [
                               "$carried",
-                              "ridiculed"
-                            ]
-                          },
-                          {
-                            "has": [
-                              "$carried",
-                              "worthless"
+                              "exposed"
                             ]
                           },
                           {
@@ -39989,19 +40057,49 @@
                           {
                             "has": [
                               "$carried",
-                              "abandoned"
+                              "humiliated"
                             ]
                           },
                           {
                             "has": [
                               "$carried",
-                              "rejected"
+                              "hurt"
                             ]
                           },
                           {
                             "has": [
                               "$carried",
-                              "excluded"
+                              "inadequate"
+                            ]
+                          },
+                          {
+                            "has": [
+                              "$carried",
+                              "inferior"
+                            ]
+                          },
+                          {
+                            "has": [
+                              "$carried",
+                              "insecure"
+                            ]
+                          },
+                          {
+                            "has": [
+                              "$carried",
+                              "insignificant"
+                            ]
+                          },
+                          {
+                            "has": [
+                              "$carried",
+                              "isolated"
+                            ]
+                          },
+                          {
+                            "has": [
+                              "$carried",
+                              "let_down"
                             ]
                           },
                           {
@@ -40013,7 +40111,25 @@
                           {
                             "has": [
                               "$carried",
-                              "isolated"
+                              "rejected"
+                            ]
+                          },
+                          {
+                            "has": [
+                              "$carried",
+                              "ridiculed"
+                            ]
+                          },
+                          {
+                            "has": [
+                              "$carried",
+                              "weak"
+                            ]
+                          },
+                          {
+                            "has": [
+                              "$carried",
+                              "worthless"
                             ]
                           }
                         ]

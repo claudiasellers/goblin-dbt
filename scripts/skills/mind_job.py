@@ -28,6 +28,7 @@ reopen times, the Stage rooms) and where it departs from the PRD.
 Safety (plan C6): *Talk to someone now* on every screen; nothing passive for a loop (every task is eyes open and
 outward, the plan one included); no comparisons with other people; the lid always books a reopen.
 """
+import os
 
 ID = "mind_job"
 TOOL_ID = "mind-job"
@@ -53,9 +54,9 @@ COPY = {
     "task_good_title": "Something good. Pick one.",
     # Level 3 (DT-06 part 2): one of the person's own things I like (ER-04), for a few minutes, then the return.
     "task_mine_title": "One of your things. Pick one.",
-    "task_mine_hint": "From your things I like.",
+    "task_mine_hint": "From your things I like. One you can do now, eyes open, that doesn't hurt you. None right now? Go on without one.",
     "mine_title": "Give it a few minutes.",
-    "mine_step1": "Start it, or picture yourself starting it.",
+    "mine_step1": "Start it now, where you are.",
     "mine_step2": "Let your attention stay with it.",
     "mine_step3": "Then come back and check.",
     "mine_start": "Start",
@@ -156,9 +157,29 @@ def FLOODED_ONLY(flag):
 CALM_TASKS = {"blue", "sound"}
 # Per-feeling ceilings (PRD DT-06): after shame, grief or rejection, warmer *good* tasks can sting (something that
 # reminds you of a kind moment), so a carried word in this set keeps the ladder at find and like. Never shown or said.
-CEILING_WORDS = ["ashamed", "embarrassed", "humiliated", "ridiculed", "worthless",  # shame
-                 "grief", "abandoned",                                               # grief
-                 "rejected", "excluded", "lonely", "isolated"]                       # rejection
+# Shame is every grid word whose DBT parent is shame in the graph (parentOf: rejected and excluded sit there too);
+# grief and rejection's sadness words are named, since most of sadness (bored-ish, flat, disappointed) shouldn't cap.
+CEILING_SADNESS = ["abandoned", "despair", "grief", "hurt", "isolated", "let_down", "lonely"]
+
+
+def _ceiling_words():
+    import json
+    import subprocess
+    import sys
+    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    square = set(json.loads(subprocess.check_output([sys.executable, os.path.join(root, "scripts/emotions/build.py"), "--json"]))["square"])
+    saved = list(sys.path)
+    try:
+        from graph_tables import tables  # puts scripts/recommendations on the path; restore it after
+    finally:
+        sys.path[:] = saved
+    parent_of, _ = tables()
+    shame = {w for w, p in parent_of.items() if p == "shame" and w in square}
+    assert all(w in square and parent_of.get(w) == "sadness" for w in CEILING_SADNESS), "ceiling sadness words drifted"
+    return sorted(shame | set(CEILING_SADNESS))
+
+
+CEILING_WORDS = _ceiling_words()
 CEILING = {"any": [{"has": ["$carried", w]} for w in CEILING_WORDS]}
 HAS_THINGS = {"set": "$p.thingsILike"}
 PARKED_BEFORE = {"any": [{"eq": ["$prev.reopen", "not_yet"]}, {"eq": ["$prev.re_heads", "later"]}]}
@@ -339,12 +360,15 @@ STEPS = [
     ask("heads_up", "heads_up_title", "heads_up_hint", "heads_up", "heads_up",
         [{"when": {"eq": [a("heads_up"), "body"]}, "to": "settle"}, {"to": "to_find"}]),
     ask("warmth", "warmth_title", "warmth_hint", "warmth", "warmth",
-        [*[{"when": {"eq": [a("warmth"), lv]}, "to": f"to_{lv}"} for lv in LEVELS], {"to": "to_mine"}],
+        # Explicit for every rung but the coolest: an option added later falls to find, never warmer.
+        [*[{"when": {"eq": [a("warmth"), lv]}, "to": f"to_{lv}"} for lv in LEVELS if lv != "find"],
+         {"when": {"eq": [a("warmth"), "mine"]}, "to": "to_mine"}, {"to": "to_find"}],
         where=WARMTH_WHERE),
     # Level 3: one of their own things I like, a few minutes with it, then the return.
     {"id": "to_mine", "kind": "ask", "title": "task_mine_title", "hint": "task_mine_hint",
-     "fields": [{"id": "to_mine", "options": {"profile": "thingsILike"}, "max": 1, "required": True, "links": [SAFETY_LINK]}],
-     "next": [{"to": "mine_do"}]},
+     "fields": [{"id": "to_mine", "options": {"profile": "thingsILike"}, "max": 1, "required": False, "links": [SAFETY_LINK]}],
+     # None of them doable right now: the ladder's like rung instead (never stuck on level 3).
+     "next": [{"when": {"not": {"set": a("to_mine")}}, "to": "to_like"}, {"to": "mine_do"}]},
     {"id": "mine_do", "kind": "embed", "embed": "doseTimer", "answerAs": "mine_do", "title": "mine_title",
      "props": {"seconds": 180, "step1": "mine_step1", "step2": "mine_step2", "step3": "mine_step3", "start": "mine_start",
                "running": "mine_running", "done": "mine_done", "next": "next"},
