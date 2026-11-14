@@ -467,7 +467,7 @@ The first host of an inline run is another skill: FAST's Let go runs Let it be a
 - A way out of the sub-run (a link to another tool) leaves the page: the sub-run closes as left early and asks no
   close of its own, which would sit inside the host's screen without the step's crisis slot.
 - Context in (ER-B5): only what the host's step hands it in its `ctx` prop (context key → a ref in the host's run:
-  `$a.`, `$d.`, `$ctx.`, `$each`, read as the step renders), narrowed by the sub-skill's `accepts`; `build.py` checks
+  `$a.`, `$d.`, `$ctx.`, `$each`, read as the step renders, or a literal id the host always passes: FAST's `frame: hosted`), narrowed by the sub-skill's `accepts`; `build.py` checks
   both sides. Nothing else is carried (no band, frame or person), so a host runs it only where its own context makes
   that safe (Let go only after a host's no and never flooded: it accepts the band for that).
 - **Seeded entry** (`inline.seed`, `inline.enterWhen`): at one of its `enterAt` steps the sub-run starts with answers

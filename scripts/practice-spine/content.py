@@ -504,7 +504,7 @@ FOLLOW_UP_TYPES = [
                                              "few_days": {"kind": "at_local", "days": 3, "time": "18:00"}}},
         "staleAfterHours": 72, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
         "enabled": True,
-        "copy": {"title": "Turn your mind", "body": "About a minute, for when the fight comes back."},
+        "copy": {"title": "Turn your mind", "body": "About a minute, if you want it."},
         "choices": [{"id": "not_now", "label": "Not now", "status": "dismissed"}],
         "notification": "A minute to turn your mind, if you want it.",
     },

@@ -96,7 +96,16 @@ test("the reminder reopens the run at the fork: turn again, their words, the han
   const rest = run([pick("turn_back", "rest"), next], ctx(), r);
   assert.equal(rest.stepId, "rest_end");
   assert.equal(M.stepOf(skill, "rest_end").noClose, true);
-  assert.equal(run([pick("turn_back", "not_now"), next], ctx(), r).stepId, "remind_again");
+  const later = run([pick("turn_back", "not_now"), next], ctx(), r);
+  assert.equal(later.stepId, "remind_later");
+  const laterEnd = run([next], ctx(), later);
+  assert.equal(laterEnd.stepId, "later_end");
+  assert.equal(M.stepOf(skill, "later_end").noClose, true, "nothing was done: no close question");
+  assert.equal(M.handoffLine(ctx(), M.stepOf(skill, "later_end"), laterEnd), skill.copy.later_line, "claims nothing");
+  // Turned? The end card says so; went on without turning, it doesn't.
+  const skippedEnd = run([pick("turn_back", "now"), next, { type: "embedDone", output: { ids: ["skipped"], doneCount: 0, durationSec: 4 } }, did("copied"), did(), next], ctx(), r);
+  assert.equal(skippedEnd.stepId, "turn_end");
+  assert.equal(M.handoffLine(ctx(), M.stepOf(skill, "turn_end"), skippedEnd), skill.copy.turn_end_skipped);
   const again = M.resumeRun(ctx(), M.runRecord(ctx(), run([pick("remind_again", "tomorrow"), next], ctx(), s)), "turn_back");
   assert.equal(again?.stepId, "turn_back");
   assert.equal(again.answers.turn_back, undefined, "the last turn's answers don't come back");
@@ -112,6 +121,42 @@ test("a reopened visit made while harm was ongoing keeps the support on screen a
   assert.equal(r?.stepId, "turn_back");
   assert.equal(M.crisisFor(ctx(), M.stepOf(skill, "turn_back"), r)?.variant, "other_person");
   assert.equal(M.copyText(ctx(), M.stepOf(skill, "turn_back").title, r), skill.copy.back_title_still);
+  // The fork on the first visit said it's for what already happened.
+  const fork = run([pick("what", "unfair"), next, pick("still", "yes"), next, pick("still_go", "go_on"), next], TURN, M.pageStart(TURN));
+  assert.equal(fork.stepId, "turn");
+  assert.equal(M.copyText(TURN, M.stepOf(skill, "turn").title, fork), skill.copy.turn_title_still);
+});
+
+test("a reopened visit about a person asks the danger check again before any turn; anything but no is the safety card", () => {
+  const safe = run([pick("checked", "yes"), next, pick("what", "unfair"), next, pick("still", "no"), next]);
+  assert.equal(safe.stepId, "fight");
+  const toRemind = run([pick("fight", "replay"), next, pick("willing", "willing"), next, did(), pick("statement", firstIds(ctx(), run([pick("fight", "replay"), next, pick("willing", "willing"), next, did()], ctx(), safe), "statement")[0]), next, did("copied"), pick("grief", "ok"), next, pick("hands_still", "need"), next, pick("close", "better"), next, next, pick("remind", "tomorrow"), next], ctx(), safe);
+  assert.equal(toRemind.stepId, "end");
+  const r = M.resumeRun(ctx(), M.runRecord(ctx(), toRemind), "turn_back");
+  assert.equal(M.crisisFor(ctx(), M.stepOf(skill, "turn_back"), r), null, "safe then: no banner yet");
+  const again = run([pick("turn_back", "now"), next], ctx(), r);
+  assert.equal(again.stepId, "still_again");
+  const hurt = run([pick("still_again", "sometimes"), next], ctx(), again);
+  assert.equal(hurt.stepId, "still_again_end");
+  assert.equal(M.crisisFor(ctx(), M.stepOf(skill, "still_again_end"), hurt)?.variant, "other_person");
+  assert.deepEqual(hurt.offered, ["safety_open", "ending"]);
+  assert.equal(M.stepOf(skill, "still_again_end").noClose, true);
+  assert.equal(run([pick("still_again", "no"), next], ctx(), again).stepId, "turn_again");
+  // A limit or a loss: no danger check, straight to the fork.
+  const lost = M.resumeRun(ctx(), M.runRecord(ctx(), run([pick("close", "better"), next, next, pick("remind", "tomorrow"), next], ctx(), toClose())), "turn_back");
+  assert.equal(run([pick("turn_back", "now"), next], ctx(), lost).stepId, "turn_again");
+  // Flooded on the reopen: settle the body first, as a link.
+  const fl = ctx({ band: "flooded" });
+  assert.ok(M.fieldLinks(fl, M.stepOf(skill, "turn_back").fields[0], r).some((l) => l.exit.id === "cool_down"));
+  assert.ok(!M.fieldLinks(ctx(), M.stepOf(skill, "turn_back").fields[0], r).some((l) => l.exit.id === "cool_down"));
+});
+
+test("run inside FAST's Let go (frame hosted): no cue or reminder, the host's card follows", () => {
+  const fast = content.skills.find((x) => x.id === "fast_let_go");
+  assert.deepEqual(M.stepOf(fast, "accept").props.ctx, { frame: "hosted" });
+  const hosted = ctx({ frame: "hosted" });
+  const hs = run([...LOST, pick("fight", "replay"), next, pick("willing", "willing"), next, did(), pick("statement", "causes"), next, did("copied"), pick("grief", "ok"), next, pick("hands_still", "need"), next], hosted);
+  assert.equal(run([pick("close", "better"), next], hosted, hs).stepId, "end");
 });
 
 test("turn_mind: registered, reopens at turn_back, never names what's being accepted, resolved by opening, bound to let-it-be", () => {

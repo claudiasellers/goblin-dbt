@@ -63,8 +63,9 @@ export function TurnFork({ props, onShown, onDone }: EmbedProps) {
         </svg>
       </div>
       <span id={hintId} hidden>{text('hint')}</span>
-      <p className="sr-only" aria-live="polite">{turns > 0 ? text('turnedLine') : ''}</p>
-      {turns > 0 && <p className="text-center text-[var(--color-text-secondary)]">{text('turnedLine')}</p>}
+      {/* Announced on every turn without a digit: the text alternates with a trailing no-break space, so it changes. */}
+      <p className="sr-only" aria-live="polite">{turns > 0 ? `${text('turnedLine')}${turns % 2 ? '' : '\u00a0'}` : ''}</p>
+      {turns > 0 && <p aria-hidden="true" className="text-center text-[var(--color-text-secondary)]">{text('turnedLine')}</p>}
       <button type="button" aria-describedby={hintId} className={primaryButton} onClick={turn} data-turn="">
         {turns > 0 ? text('again') : text('turn')}
       </button>

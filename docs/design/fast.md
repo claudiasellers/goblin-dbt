@@ -121,7 +121,7 @@ close offers the tag row, like Check the Facts.
 
 After a host's no (`frame=let_go`), the line (or *I don't need to say anything*) leads to `room`: the
 acknowledgement, then *Do you want to make some room for it here, for a few minutes?* *Yes, here* runs Let it be
-inline from *what can't change* (`accept`, the `inlineSkill` embed); *Not now* goes to `after` (Recover). Where Let
+inline from *what can't change* (`accept`, the `inlineSkill` embed, with `frame: hosted` so Let it be's own turning-the-mind reminder is left out: a literal id in an inline `ctx`, 14 Nov); *Not now* goes to `after` (Recover). Where Let
 it be ended picks the card: its danger check said anything but no → `unsafe` (the `other_person` resources,
 `safety.open`, Ending in its careful frame); grief too much or the fight louder → `body` (First, the body);
 otherwise `after`. A flooded entry, with a frame or without, keeps `elsewhere`, with Let it be as a link (it asks about the body
