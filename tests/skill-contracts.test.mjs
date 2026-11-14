@@ -756,8 +756,11 @@ test("resume settled: a link's enterAt holds only for the run it reopened; a fre
   assert.deepEqual(m.ctxAfterResume(ctxIn, false), { band: "stirred" });
   assert.deepEqual(m.ctxAfterResume({ band: "stirred" }, false), { band: "stirred" });
   const player = read("src/components/skillPlayer/SkillPlayer.tsx");
-  assert.match(player, /else setCtxIn\(\(c\) => ctxAfterResume\(c, false\)\)/, "resume found nothing");
-  assert.match(player, /\.catch\(\(\) => setCtxIn\(\(c\) => ctxAfterResume\(c, false\)\)\)/, "resume read failed");
+  assert.match(player, /else setCtxIn\(\(c\) => ctxAfterResume\(c, false, skill\.entries\)\)/, "resume found nothing");
+  assert.match(player, /\.catch\(\(\) => setCtxIn\(\(c\) => ctxAfterResume\(c, false, skill\.entries\)\)\)/, "resume read failed");
+  // A page entry's key (DT part 2) is for a fresh run, so it stays; any other enterAt is still dropped.
+  assert.deepEqual(m.ctxAfterResume(ctxIn, false, { lid: "lid_pick" }), { band: "stirred" });
+  assert.deepEqual(m.ctxAfterResume({ enterAt: "lid" }, false, { lid: "lid_pick" }), { enterAt: "lid" });
 });
 
 test("own.seed: a chip writes its words into the open box to change; once the words are the person's, a tap never erases them", () => {
@@ -800,7 +803,7 @@ test("covered: P2 or safety.open over an embed step reaches the embed; a new ste
 });
 
 test("a link's enterAt without a run to reopen doesn't hold from the start", () => {
-  assert.match(read("src/components/skillPlayer/SkillPlayer.tsx"), /UUID\.test\(new URLSearchParams\(location\.search\)\.get\('run'\) \?\? ''\) \? c : ctxAfterResume\(c, false\)/);
+  assert.match(read("src/components/skillPlayer/SkillPlayer.tsx"), /UUID\.test\(new URLSearchParams\(location\.search\)\.get\('run'\) \?\? ''\) \? c : ctxAfterResume\(c, false, skill\.entries\)/);
 });
 
 test("an exit into a persist-nothing tool (R15) is never named in the host's record, and carries no host session", () => {

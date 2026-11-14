@@ -138,7 +138,7 @@ test("twice not quieter: lower the demand, then someone to talk to on the screen
   const someone = run([did()], ctx(), s);
   assert.equal(someone.stepId, "someone");
   assert.equal(M.crisisFor(ctx(), M.stepOf(skill, "someone"), someone)?.variant, "crisis");
-  assert.deepEqual(offers(someone), ["safety_open", "crisis_kit"], "someone to talk to first, then the kit (DT-03)");
+  assert.deepEqual(offers(someone), ["safety_open", "crisis_kit", "held"], "someone to talk to first, then the kit (DT-03), then a hand on the heart (DT-07)");
 });
 
 test("chest pain or fainting: the emergency number, no body mode; a pull to do something: Hold to wait first", () => {
