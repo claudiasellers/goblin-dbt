@@ -42,7 +42,8 @@ Stirred (a carried reading) and *Try it now* after the flooded heads-up take the
 The planned `let_it_be` exits in First, the body's fork (*No, it's how things are*), Check the Facts (fits but can't
 change), FAST's Let go, It isn't working (fit, willingness), DEAR MAN's debrief (*They had more power*), Rebel without
 the wreckage (*I can't change it*), Ending (the after check-in) and Problem Solve (*nothing in yours*, `let-it-be`)
-are built now. Problem Solve's `willingness` and `turning-the-mind` links stay planned (below).
+are built now. Problem Solve's `willingness` and `turning-the-mind` links open Let it be at its entries (14 Nov 2026,
+below), each with its own label on the *nothing in yours* card.
 
 ## What it records
 
@@ -70,8 +71,27 @@ Recover. A flooded entry to Let go, with a frame or without, keeps Let it be as 
 
 ## Deferred (DT-04 part 2, with DT-B4's rest)
 
-- **Turning the mind**: the 60 s card (`turnFork`, the Stage fork with footprints), the *When will the fight come
-  back?* cue and its reminders (a `FollowUpType`), and the `turning-the-mind` tool id Problem Solve links to.
+- ~~**Turning the mind**~~ **Built 14 Nov 2026** (DT Handout 12). After a visit's close (never after *Louder*, and
+  not when another skill runs it inline: FAST's Let go passes `frame: hosted`): *When does the fight with it tend to
+  come back?* (at night, when I'm alone, I don't know; *when I see their page* and *when it's mentioned* only for
+  person- or harm-related things; skippable), then *Want a reminder to turn your mind, around then?* (tomorrow,
+  tonight, in a few days; *at night* lists tonight first, never picked; skipping is no reminder). The `turn_mind` card
+  (content-free: *Turn your mind · About a minute, if you want it.*) reopens the run at *The fight with it might be
+  back. Turn your mind for a minute?* (a flooded reading gets *Settle my body first* as a link):
+  - *Turn it now*: for a person- or harm-related visit the danger check is asked again first (anything but no → the
+    safety card: `other_person` banner, someone to talk to and Ending in its careful frame, no turn, no close); then
+    the `turnFork` embed (the fight on one path, letting it be on the other, each tap a footprint on the letting-it-be
+    path and the figure drifting back, never a digit; reduced motion: footprints only; *Go on without turning* always
+    there), their statement on paper once more, willing hands for ten seconds, another reminder, and an end card that
+    says they turned it, or, when they didn't, *Some days it won't turn*.
+  - *Not now*: another reminder if they want one, and *Another time, then.* (no close).
+  - *It's quieter. Let it rest*: an end card, no close.
+  - A visit made while harm was ongoing keeps the `other_person` banner and says the turn is for what already
+    happened (the fork's title too).
+- The `turn` entry (`?enterAt=turn`, Problem Solve's *Turn my mind toward letting it be*): what it's about, then (a
+  flooded reading's heads-up and) the danger check for anything about a person, the fork, a statement on paper, the
+  hands and the close. No Tools intent: Let it be already has two, and every visit now offers the reminder. Still
+  part 2: the 60 s timed card, the `turn_mind` rep, the acceptance target below.
 - **The acceptance target** (`acceptance_target`, R4 keep): turns logged per target, *resting* after three quieter
   turns, the weekly review.
 - ~~**Willingness as its own entry**~~ **Built 14 Nov 2026** (`?enterAt=willingness`, the Tools intent *I keep digging
@@ -87,7 +107,7 @@ Recover. A flooded entry to Let go, with a frame or without, keeps Let it be as 
   `checked`, the graph nodes (`AcceptanceCategory`, `NonAcceptanceSign`, `WillfulnessThreat`, `AcceptanceStatement`,
   `StillInMyHands`, `AcceptanceFlow`; the options carry those labels now), the fade, CORE's crisis-context exclusion.
 - The PRD's other graph content: `ClinicalSource` nodes (Segal 2023/2025, Kohl 2012), `PracticeSkill` rows for
-  `dbt_willing_hands` / `dbt_half_smile`, `appToolId`s for `dbt_turning_mind` / `dbt_willingness`, the `turn_mind` rep.
+  `dbt_willing_hands` / `dbt_half_smile`, `appToolId`s for `dbt_turning_mind` / `dbt_willingness`.
 
 ## Departures from the PRD
 

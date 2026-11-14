@@ -292,7 +292,8 @@ LET_GO_STEPS = [
     },
     {
         "id": "accept", "kind": "embed", "embed": "inlineSkill", "answerAs": "accepted",
-        "props": {"skill": "let_it_be", "enterAt": "what"},
+        # `frame: hosted`: Let it be's own reminder (turning the mind) is left out; this card follows instead.
+        "props": {"skill": "let_it_be", "enterAt": "what", "ctx": {"frame": "hosted"}},
         "next": [
             {"when": {"any": [{"has": ["$a.accepted.ids", "unsafe"]}, {"has": ["$a.accepted.ids", "stopped"]}]}, "to": "unsafe"},
             {"when": {"has": ["$a.accepted.ids", "body"]}, "to": "body"},

@@ -72,7 +72,7 @@ test("a hand on the heart opens Held at where the hands rest; Hold to wait's kee
 
 test("the willingness entry: what it's about, the danger check still asked, willing, hands, then what's in your hands", () => {
   const lb = S("let_it_be");
-  assert.deepEqual(lb.entries, { willingness: "what" });
+  assert.deepEqual(lb.entries, { willingness: "what", turn: "what" });
   assert.match(readFileSync("src/data/tools.ts", "utf8"), /toolId: 'let-it-be', query: 'enterAt=willingness'/);
   const c = ctx(lb, { enterAt: "willingness" });
   const s0 = M.pageStart(c);

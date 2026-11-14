@@ -14,6 +14,7 @@ import { WaitLockEmbed } from './WaitLockEmbed';
 import { UrgeWave, WaveTrace } from './UrgeWave';
 import { DebriefWhoEmbed } from './DebriefWhoEmbed';
 import { LidShelf } from './LidShelf';
+import { TurnFork } from './TurnFork';
 import { MessageComposer } from './MessageComposer';
 import { DoorPickerEmbed } from './DoorPickerEmbed';
 import { OaStepsEmbed } from './OaStepsEmbed';
@@ -87,6 +88,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   urgeWave: UrgeWave,
   waveTrace: WaveTrace,
   lidShelf: LidShelf,
+  turnFork: TurnFork,
   messageComposer: MessageComposer,
   doorPicker: DoorPickerEmbed,
   oaSteps: OaStepsEmbed,
@@ -127,6 +129,7 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   },
   waveTrace: { ids: ['read'] },
   lidShelf: { ids: ['shut', 'partly', 'skipped'], measures: ['durationSec'] },
+  turnFork: { ids: ['turned', 'skipped'], measures: ['doneCount', 'durationSec'] },
   messageComposer: { ids: ['copied', 'opened', 'dropped_sorry'] },
   doorPicker: { emotions: 3 },
   oaSteps: {},
@@ -489,6 +492,18 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     done: { type: 'copy' },
     next: { type: 'copy' },
     /** The quiet way on after a let-go, worded as what it does (going on with the lid open). */
+    skip: { type: 'copy' },
+  },
+
+  turnFork: {
+    turn: { type: 'copy' },
+    again: { type: 'copy' },
+    turnedLine: { type: 'copy' },
+    fightLabel: { type: 'copy' },
+    letLabel: { type: 'copy' },
+    hint: { type: 'copy' },
+    done: { type: 'copy' },
+    /** The quiet way on before any turn. */
     skip: { type: 'copy' },
   },
 };

@@ -493,6 +493,22 @@ FOLLOW_UP_TYPES = [
         "notification": "Something you put on the shelf is ready to open.",
     },
     {
+        # Let it be's turning the mind (DT-04 part 2, DBT DT Handout 12): acceptance is chosen again and again, so the
+        # person can ask to be reminded (tonight, tomorrow, in a few days). The card reopens that visit at `turn_back`
+        # (R9 `reopens`: the fork, turn again, willing hands, book the next one). Opening it is the resolution. Never
+        # names what's being accepted (Today can be seen by others).
+        "id": "turn_mind", "ownerModule": "dt", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/let-it-be?run={sourceSessionId}&at=turn_back&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"tonight": {"kind": "at_local", "days": 0, "time": "20:00"},
+                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
+                                             "few_days": {"kind": "at_local", "days": 3, "time": "18:00"}}},
+        "staleAfterHours": 72, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Turn your mind", "body": "About a minute, if you want it."},
+        "choices": [{"id": "not_now", "label": "Not now", "status": "dismissed"}],
+        "notification": "A minute to turn your mind, if you want it.",
+    },
+    {
         # When it's a habit (DT-09, docs/design/habit-plan.md): the stretch the person committed to has ended. The chips
         # are the stretch itself (the next hour, the rest of today, three days, a week). The card reopens that visit at
         # `renew` (R9 `reopens`: kept to it → the next stretch; slipped → the lapse plan they wrote, then recommit).

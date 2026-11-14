@@ -143,7 +143,7 @@ def check_embed_props(name, props, copy, fields, w, derived=frozenset(), accepts
         elif t == "ctx":
             # Context key → a ref in this run; the sub-skill's `accepts` and the refs are checked with the host (R8 below).
             assert isinstance(v, dict) and v and set(v) <= CTX_KEYS, (w, f"{name}.{k} maps context keys", v)
-            assert all(isinstance(r, str) and (r == "$each" or re.match(r"^\$(a|d|ctx)\.[A-Za-z_][A-Za-z0-9_]*$", r)) for r in v.values()), (w, f"{name}.{k} maps to refs", v)
+            assert all(isinstance(r, str) and (r == "$each" or re.match(r"^\$(a|d|ctx)\.[A-Za-z_][A-Za-z0-9_]*$", r) or ID.match(r)) for r in v.values()), (w, f"{name}.{k} maps to refs or literal ids", v)
         elif t == "row":
             # A ref whose value keys a shared graph table (ER-10's feeling card reads its guide's feelingOf row).
             assert sp["table"] in GRAPH_TABLES, (w, f"{name}.{k} reads a shared table", sp)
@@ -631,7 +631,8 @@ def check_inline_hosts(skills):
                 host_derived = {d["name"] for d in sk.get("derive", [])}
                 for k, r in (st["props"].get("ctx") or {}).items():
                     assert k in sub.get("accepts", []), (w, "inline context the sub-skill accepts", k)
-                    assert (r == "$each" and st.get("each")) or (r.startswith("$a.") and r[3:] in host_fields) \
+                    # A literal id is a fixed value the host always passes (FAST's `frame: hosted`).
+                    assert (not r.startswith("$") and ID.match(r)) or (r == "$each" and st.get("each")) or (r.startswith("$a.") and r[3:] in host_fields) \
                         or (r.startswith("$d.") and r[3:] in host_derived) or (r.startswith("$ctx.") and r[5:] in sk.get("accepts", [])), (w, "inline context from this run", k, r)
                 # The sub-skill's own outcomes go on the step for the machine (written here, never by hand).
                 own = sub["inline"].get("outcomes") or []

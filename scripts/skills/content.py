@@ -93,6 +93,9 @@ EMBEDS = {
     # DT-06's lid (plan C3b `lidShelf`, DT-owned; src/components/skillPlayer/LidShelf.tsx): put it in, hold the lid
     # shut. `shut` when the hold finished, `partly` after a release, `skipped` when the way past came first.
     "lidShelf": {"ids": ["shut", "partly", "skipped"], "measures": ["durationSec"]},
+    # DT-04's turning the mind (plan C3b `turnFork`, DT-owned; src/components/skillPlayer/TurnFork.tsx): the fork, each
+    # turn a footprint on the letting-it-be path. `turned` after one turn or more, `skipped` before any; the turns.
+    "turnFork": {"ids": ["turned", "skipped"], "measures": ["doneCount", "durationSec"]},
     # IE-B3's message card (plan C3b `messageComposer`, IE-owned): the picks as one message, with the FAST strip (an
     # extra sorry, over-explaining) and the line to repeat; Copy and Open messages, never a send. Reports what was done.
     "messageComposer": {"ids": ["copied", "opened", "dropped_sorry"]},
@@ -439,6 +442,16 @@ EMBED_PROPS = {
         "holdSec": {"type": "int", "min": 1, "max": 10},
         "done": {"type": "copy"},
         "next": {"type": "copy"},
+        "skip": {"type": "copy"},
+    },
+    "turnFork": {
+        "turn": {"type": "copy"},
+        "again": {"type": "copy"},
+        "turnedLine": {"type": "copy"},
+        "fightLabel": {"type": "copy"},
+        "letLabel": {"type": "copy"},
+        "hint": {"type": "copy"},
+        "done": {"type": "copy"},
         "skip": {"type": "copy"},
     },
 }
