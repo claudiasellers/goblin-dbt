@@ -128,3 +128,19 @@ test("a host's pull rides along: first on the next tool's list, never selected",
 test("Help me now carries no band: the kit's flooded filter would hide the person's own kept cards", () => {
   assert.doesNotMatch(readFileSync("src/lib/spine/helpNow.ts", "utf8"), /band/);
 });
+
+test("a resumed willingness run keeps its entry key, so it goes on down the willingness path (Codex, #141)", () => {
+  const lb = S("let_it_be");
+  const c = ctx(lb, { enterAt: "willingness" });
+  const s = [pick("what", "limit"), next, pick("willing", "willing"), next].reduce((st, e) => M.runNext(c, st, e), M.pageStart(c));
+  assert.equal(s.stepId, "hands");
+  const rec = M.runRecord(c, s);
+  const back = M.ctxForResume(lb, {}, rec);
+  assert.equal(back.enterAt, "willingness");
+  const r = M.resumeRun(ctx(lb, back), rec, null);
+  const on = [{ type: "embedDone", output: { ids: ["done"], durationSec: 45 } }, next].reduce((st, e) => M.runNext(ctx(lb, back), st, e), r);
+  assert.equal(on.stepId, "hands_still", "never the acceptance statement");
+  // A resume-only enterAt (Rewrite the nightmare's) still never comes back.
+  const nr = S("nightmare_rescript");
+  assert.equal(M.ctxForResume(nr, {}, { ctx: { enterAt: "rehearse" } }).enterAt, undefined);
+});
