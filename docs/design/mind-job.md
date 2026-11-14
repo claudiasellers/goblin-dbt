@@ -62,6 +62,12 @@ Problem Solve after. It is `CONTRAINDICATED_FOR` dissociation, primary or alongs
 review's `side: acceptance`; its `skillKind` is `redirect` (it was `hold`), so it can sit beside Pause or Let it be as
 a different kind of swap. `schema/app-tool-ids.cypher` gives `dbt_accepts` its `appToolId`.
 
+## Part 2
+
+- **The park links open the lid** (14 Nov 2026, page entries): First, the body's *Not right now*, Hold to wait's
+  *checking* and the Tools intent *Put something away until later* open `?enterAt=lid`, straight at *Put it in
+  something*.
+
 ## Deferred (DT-06 part 2)
 
 - **The ladder remembered** (`AttentionLadderState`, the `attention_ladder` profile kind, §C2): the start level and
@@ -81,7 +87,6 @@ a different kind of swap. `schema/app-tool-ids.cypher` gives `dbt_accepts` its `
 
 | PRD | Built | Why |
 |---|---|---|
-| The park links (First, the body's *Not right now*, Hold to wait's *check*) open the lid | They open the first screen, where *Put it away until later* is one tap | The runtime has no page-level `enterAt` yet (also deferred for DT-04's willingness entry) |
 | Per-emotion ceilings (shame, grief, rejection stay at levels 0–1) | Not built; the person picks the warmth, and the warmest tasks were reworded (*a kind moment*, not *someone who likes you*) | Needs the check-in's emotion carried in; part 2 |
 | The `Thoughts` family (a 3-minute visuospatial puzzle) | Not offered | Needs its own embed |
 | Count back from seven in the room's objects | Four things with straight edges | Counting backwards reads as a test; the clinician pass can bring it back |

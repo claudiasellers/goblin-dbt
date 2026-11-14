@@ -230,6 +230,21 @@ Added by IE-08 (`docs/design/ending-relationships.md`, 10 Nov 2026):
 - **The carried band.** For a skill that accepts `band`, the player passes `band.current()` (≤ 20 min) when the
   route state carries none.
 - These switches live in one `Skill.runtimeJson` property and are spread onto the served skill.
+- **Page entries** (DT part 2, 14 Nov 2026). `entries: {<key>: stepId}` on a skill that accepts `enterAt`: a fresh page
+  run opened with `?enterAt=<key>` (a host exit's `query`, a Tools intent's) starts at that step (`pageStart`), with
+  `path: [step]`; any other key, or none, starts at `start`. The key stays in the run's context (and its record), so
+  conditions can read `$ctx.enterAt`; an `enterAt` that is not an entry key is still dropped from a fresh run, as
+  before (it is Rewrite the nightmare's resume-only key). `build.py` refuses an entry on a skill that doesn't accept
+  `enterAt`, at its start, or at a `reopens` or per-pick step. First users: Give your mind a job's lid
+  (`lid` → `lid_pick`: First, the body's *Not right now*, Hold to wait's *checking*, the Tools intent *Put something
+  away until later*), Held's hand (`hand` → `where`: First, the body's *A hand on my heart*, Hold to wait's move),
+  Let it be's willingness (`willingness` → `what`, the Tools intent *I keep digging in against something*). An entry
+  step must not need an answer from a step before it: the skill's own conditions route around what was skipped
+  (Let it be's willingness path still asks the danger check, and meets a flooded reading's heads-up after `what`).
+- **A host's pull rides along** (DT part 2). A host exit's `query: {urgeId: '$a.pull'}` carries the pull it asked
+  (Hold to wait → Ride it out and When it's a habit; Ride it out → Pros & cons and When it's a habit); the receiving
+  skill accepts `urgeId` and lists that pull first (`firstFrom: '$ctx.urgeId'`), never selected, so the person taps it
+  once and *Hurt myself* still opens `safety.open` first on the pick.
 - **Ways into a persist-nothing tool** (ER-12, with the plan thread). A host run that offers or takes an exit to a
   `deferSession` tool (Ending) records it as `private` in its own `ext.run` (`offeredExitIds`, `exitId`), never by
   the exit's or tool's id, and the player opens it without `linkTo`, so the visit carries no `hostSessionId` and a

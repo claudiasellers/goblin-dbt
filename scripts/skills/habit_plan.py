@@ -275,7 +275,7 @@ def handoff(sid, lines, offers, *, no_close=False, crisis=None):
 AFTER_WHAT = [{"when": {"any": [SUBSTANCE, OWN_WHAT]}, "to": "medical"}, {"when": {"eq": [a("what"), "binge"]}, "to": "eating"}, {"to": "span"}]
 
 STEPS = [
-    ask("what", "what_title", "what_hint", field("what", "what", own="what_own"),
+    ask("what", "what_title", "what_hint", {**field("what", "what", own="what_own"), "options": {"list": "what", "firstFrom": "$ctx.urgeId"}},
         [{"when": {"eq": [a("what"), "hurt"]}, "to": "harm"}, {"when": FLOODED, "to": "heads_up"}, *AFTER_WHAT]),
     # Hurting myself: the resources open over the card as it arrives (C6.5), the banner stays; no plan, no close.
     {**handoff("harm", [{"when": ALWAYS, "key": "harm_line"}], [{"exit": "safety_open", "when": ALWAYS}, {"exit": "crisis_kit", "when": ALWAYS}],
@@ -367,7 +367,7 @@ def options():
 
 SKILL = {
     "id": ID, "toolId": TOOL_ID, "concept": CONCEPT, "version": VERSION, "start": "what", "ownMax": OWN_MAX,
-    "accepts": ["band"],
+    "accepts": ["band", "urgeId"],
     "copy": COPY, "tables": {}, "derive": [], "steps": STEPS, "exits": EXITS, "options": options(),
     "emotionFields": [],
 }

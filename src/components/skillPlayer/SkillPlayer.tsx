@@ -17,7 +17,7 @@ import { closeQuestion, closeKindFor } from '../../lib/spine/close';
 import { emotionIdsFromLink } from '../../lib/spine/toolLink';
 import {
   answersOf, askFresh, canGoOn, carried as carriedOf, carryOnOthers, labelOfValue, offersFor, contextIn, inlineCarried, inlineCtxFor, inlineStart, visitEmotionIds, copyText, crisisFor, ctxAfterResume, seededFrom, stepLinks, emotionChoices, fieldLinks, fieldList, followUpFor,
-  ctxForResume, exitQuery, handoffLine, initialRun, inlineResult, keepFor, opensSafety, optionGroups, ownMaxOf, persistence, pickedLabels, pickTrack, resumeRun, runNext, runRecord,
+  ctxForResume, exitQuery, handoffLine, pageStart, inlineResult, keepFor, opensSafety, optionGroups, ownMaxOf, persistence, pickedLabels, pickTrack, resumeRun, runNext, runRecord,
   runUrgeIds,
   scope, sharedRow, shownFields, stepOf, titleSlots, visitUrgeIds,
   type Answer, type RunContext, type RunEvent, type RunState,
@@ -162,7 +162,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
   const [ctxIn, setCtxIn] = useState(() => {
     if (inline) return contextIn(skill, { ...(pageCtx ?? {}) });
     const c = contextFrom(skill, location.search, location.state, band.current()?.value ?? null, pageCtx);
-    return resumeRecord !== null && UUID.test(new URLSearchParams(location.search).get('run') ?? '') ? c : ctxAfterResume(c, false);
+    return resumeRecord !== null && UUID.test(new URLSearchParams(location.search).get('run') ?? '') ? c : ctxAfterResume(c, false, skill.entries);
   });
   const [carried] = useState(() => (inline
     ? inlineCarried({ skill, shared: { parentOf: content.parentOf, fitsWhen: content.fitsWhen, feelingOf: content.feelingOf, feelingGuideOf: content.feelingGuideOf }, carried: [], gridIds: GRID, emotionLabel, ctxIn })
@@ -176,7 +176,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
   const [safetyOpen, setSafetyOpen] = useState(false);
   // P2 (This is too much right now) over the step: an embed hears it as `covered`, with safety.open.
   const [p2Open, setP2Open] = useState(false);
-  const [st, setSt] = useState<RunState>(() => (inline ? inlineStart(ctx, inline.enterAt) : initialRun(skill)));
+  const [st, setSt] = useState<RunState>(() => (inline ? inlineStart(ctx, inline.enterAt) : pageStart(ctx)));
   // A new step starts uncovered (P2 left open by a path that didn't say so never stops a later clock).
   useEffect(() => { setP2Open(false); }, [st.stepId]);
   // Resume (R9): `?run=<sessionId>&at=<stepId>` reopens the person's own run of this tool, or starts fresh.
@@ -210,10 +210,10 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
           reopenUrges.current = reopenedRef.current ? runUrgeIds(ctx, r) : [];
           setSt(r);
         }
-        else setCtxIn((c) => ctxAfterResume(c, false));
+        else setCtxIn((c) => ctxAfterResume(c, false, skill.entries));
       })
       // Nothing to reopen: a fresh run, and a whole first visit (the link's enterAt was for the run it named).
-      .catch(() => setCtxIn((c) => ctxAfterResume(c, false)))
+      .catch(() => setCtxIn((c) => ctxAfterResume(c, false, skill.entries)))
       .finally(() => setResuming(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profileSettled]);

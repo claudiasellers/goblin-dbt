@@ -405,7 +405,10 @@ def options():
 SKILL = {
     "id": ID, "toolId": TOOL_ID, "concept": CONCEPT, "version": VERSION, "start": "what", "ownMax": OWN_MAX,
     # band: a host's or the carried reading (C6.2): flooded gets the body first, or the coolest find tasks only.
-    "accepts": ["band"],
+    "accepts": ["band", "enterAt"],
+    # Page entries: the park links (First, the body's *Not right now*, Hold to wait's *check*) and the Tools intent
+    # *Put something away until later* open the lid.
+    "entries": {"lid": "lid_pick"},
     # The return card (mind_job_back) reopens a break at its check, though the break's path never reached it.
     "resumeAt": ["back"],
     "copy": COPY, "tables": {}, "derive": [], "steps": STEPS, "exits": EXITS, "options": options(),

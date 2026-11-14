@@ -334,6 +334,12 @@ export interface SkillDef {
    * days later (Ending's `after`). Without this, a resume opens only at a step the run went through.
    */
   resumeAt?: string[];
+  /**
+   * Page entries (DT part 2): `?enterAt=<key>` (a host exit's query, or a Tools link) starts a fresh page run at the
+   * step this maps the key to, instead of `start`. Only a skill that accepts `enterAt` has them; a key not listed (or a
+   * resumed run) starts as usual. The entry's step never needs an answer from a step before it (build.py).
+   */
+  entries?: Record<string, string>;
 }
 
 /**

@@ -299,13 +299,13 @@ EXITS = [
     {"id": "dear_man", "toolId": "dear-man"},                           # IE: plan the ask for later
     {"id": "cool_down", "toolId": "cool-down"},                         # DT-01 First, the body
     {"id": "fast", "toolId": "fast"},                                   # IE-05 one line to hold your ground
-    {"id": "urge_surfing", "toolId": "urge-surfing"},                   # DT-05 Ride it out
+    {"id": "urge_surfing", "toolId": "urge-surfing", "query": {"urgeId": "$a.pull"}},  # DT-05 Ride it out (the pull first)
     {"id": "alternate_rebellion", "toolId": "alternate-rebellion"},     # DT-11 (the *blow it up* chip)
     {"id": "crisis_kit", "toolId": "crisis-kit", "query": {"frame": "crisis"}},      # DT-03 My crisis kit, opened from a crisis route (the banner on every card)
     {"id": "kit", "toolId": "crisis-kit"},                               # DT-03 My crisis kit (the use pull, no crisis frame)
-    {"id": "held", "toolId": "soothe", "query": {"frame": "hurt"}},      # DT-07 Held (hand on heart; its banner stays)
-    {"id": "mind_job", "toolId": "mind-job"},          # DT-06 Give your mind a job: park it, look once
-    {"id": "habit_plan", "toolId": "habit-plan"},                       # DT-09 When it's a habit (use, check)
+    {"id": "held", "toolId": "soothe", "query": {"frame": "hurt", "enterAt": "hand"}},  # DT-07 Held at the hand (its banner stays)
+    {"id": "mind_job", "toolId": "mind-job", "query": {"enterAt": "lid"}},  # DT-06 the lid: park it, look once
+    {"id": "habit_plan", "toolId": "habit-plan", "query": {"urgeId": "$a.pull"}},  # DT-09 When it's a habit (use, check)
     {"id": "safety_open", "toolId": None, "safety": True},              # safety.open (R6)
     {"id": "done", "done": True},
 ]

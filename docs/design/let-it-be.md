@@ -74,7 +74,11 @@ Recover. A flooded entry to Let go, with a frame or without, keeps Let it be as 
   back?* cue and its reminders (a `FollowUpType`), and the `turning-the-mind` tool id Problem Solve links to.
 - **The acceptance target** (`acceptance_target`, R4 keep): turns logged per target, *resting* after three quieter
   turns, the weekly review.
-- **Willingness as its own entry** (`willingness`, entering at the fight): needs a page-level `enterAt`.
+- ~~**Willingness as its own entry**~~ **Built 14 Nov 2026** (`?enterAt=willingness`, the Tools intent *I keep digging
+  in against something*): *Digging in makes sense. What are you pushing against?*, the danger check for anything
+  about a person (a flooded reading's heads-up after it), then willing or digging in (and its threat line), willing
+  hands, and *What's still in your hands?*: no changeability check and no acceptance statement, since willingness
+  (Handout 13) is doing what the moment needs, changeable or not.
 - **Inline mode** for Recover's *Let it land* (R8). FAST's Let go runs it inline since IE-B4 (below).
 - **The witness embed** (WMP lines with the 4 s receive hold): its lines are drafts awaiting sign-off (D16); the
   PRD's own line opens the `what` step until then.

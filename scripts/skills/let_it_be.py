@@ -49,6 +49,9 @@ COPY = {
     "what_title": "It makes sense you're fighting this. It matters to you. What is it you can't change?",
     "what_hint": "Pick the closest, or say it your way.",
     "what_own": "Say it my way",
+    # The willingness entry (DT Handout 13; `?enterAt=willingness`, the Tools intent *I keep digging in against
+    # something*): willingness is doing what the moment needs, so it skips the changeability check and the statement.
+    "what_title_willing": "Digging in makes sense. What are you pushing against?",
     # Inline (R8, inside FAST's Let go): the way back out, named apart from the safety screen's *Back to where I was*.
     "inline_back": "Leave this for now",
     # The danger check (PRD step 2), once, for person- or harm-related things.
@@ -129,6 +132,7 @@ ALWAYS = {"all": []}
 FLOODED = {"eq": ["$ctx.band", "flooded"]}
 STIRRED = {"eq": ["$ctx.band", "stirred"]}
 SHORT = {"any": [STIRRED, {"eq": [a("heads_up"), "anyway"]}]}  # the PRD's ★ path
+WILLINGNESS = {"eq": ["$ctx.enterAt", "willingness"]}  # the willingness entry: what → willing → hands → still in my hands
 STILL = {"in": [a("still"), ["yes", "sometimes", "unsure"]]}  # anything uncertain is the safety branch
 SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
 CRISIS = [{"variant": "other_person", "when": STILL}]
@@ -261,15 +265,22 @@ STEPS = [
         [{"when": FLOODED, "to": "heads_up"}, {"to": "what"}],
         links=[{"exit": "problem_solve", "label": "check_first_ps", "when": ALWAYS}]),
     ask("heads_up", "heads_up_title", "heads_up_hint", "heads_up", "heads_up",
-        [{"when": {"eq": [a("heads_up"), "body"]}, "to": "settle"}, {"to": "what"}]),
-    ask("what", "what_title", "what_hint", "what", "what",
-        [{"when": ASK_STILL, "to": "still"}, {"when": SHORT, "to": "hands"}, {"to": "fight"}], own="what_own"),
+        [{"when": {"eq": [a("heads_up"), "body"]}, "to": "settle"},
+         # The willingness entry asks what it's about first, so a flooded reading meets the heads-up after it.
+         {"when": {"all": [WILLINGNESS, {"set": a("what")}, ASK_STILL]}, "to": "still"},
+         {"when": {"all": [WILLINGNESS, {"set": a("what")}]}, "to": "willing"}, {"to": "what"}]),
+    ask("what", [{"when": WILLINGNESS, "key": "what_title_willing"}, {"key": "what_title"}], "what_hint", "what", "what",
+        [{"when": {"all": [WILLINGNESS, FLOODED, {"not": {"set": a("heads_up")}}]}, "to": "heads_up"},
+         {"when": ASK_STILL, "to": "still"}, {"when": WILLINGNESS, "to": "willing"}, {"when": SHORT, "to": "hands"},
+         {"to": "fight"}], own="what_own"),
     ask("still", "still_title", "still_hint", "still", "still",
-        [{"when": STILL, "to": "still_line"}, {"when": SHORT, "to": "hands"}, {"to": "fight"}]),
+        [{"when": STILL, "to": "still_line"}, {"when": WILLINGNESS, "to": "willing"}, {"when": SHORT, "to": "hands"},
+         {"to": "fight"}]),
     # Still happening: the line, the support on the screen (the crisis slot), Ending in its careful frame, and the
     # way on for what's already happened only.
     ask("still_line", "still_line_title", "still_line_hint", "still_go", "still_go",
-        [{"when": {"eq": [a("still_go"), "stop"]}, "to": "still_stop"}, {"when": SHORT, "to": "hands"}, {"to": "fight"}],
+        [{"when": {"eq": [a("still_go"), "stop"]}, "to": "still_stop"}, {"when": WILLINGNESS, "to": "willing"},
+         {"when": SHORT, "to": "hands"}, {"to": "fight"}],
         links=[{"exit": "ending", "label": "still_ending", "when": ALWAYS}]),
     ask("fight", "fight_title", "fight_hint", "fight", "fight", [{"to": "willing"}], max_=4),
     ask("willing", "willing_title", "willing_hint", "willing", "willing",
@@ -278,7 +289,7 @@ STEPS = [
     # Each threat met with its own line, then the one distinction (PRD step 3). Whether it landed is optional: Next
     # goes on either way.
     ask("threat_line", THREAT_LINES, "threat_line_hint", "landed", "landed", [{"to": "hands"}], required=False),
-    card("hands", "hands_title", "willing", 45, "hands", [{"to": "statement"}]),
+    card("hands", "hands_title", "willing", 45, "hands", [{"when": WILLINGNESS, "to": "hands_still"}, {"to": "statement"}]),
     ask("statement", "statement_title", "statement_hint", "statement", "statement", [{"to": "statement_card"}],
         own="statement_own", where=STATEMENT_WHERE),
     {
@@ -374,7 +385,9 @@ def options():
 SKILL = {
     "id": ID, "toolId": TOOL_ID, "concept": CONCEPT, "version": VERSION, "start": "checked", "ownMax": OWN_MAX,
     # band: a host's or the carried reading (C6.2): flooded gets the body first, stirred the short path.
-    "accepts": ["band"],
+    "accepts": ["band", "enterAt"],
+    # Page entries: the willingness entry (the Tools intent, DT Handout 13) starts at what it's about.
+    "entries": {"willingness": "what"},
     "copy": COPY, "tables": {}, "derive": [], "steps": STEPS, "exits": EXITS, "options": options(),
     "emotionFields": [],
     # R8, IE-B4: FAST's Let go runs it inline after a no, from *what can't change* (the no already says it can't,
