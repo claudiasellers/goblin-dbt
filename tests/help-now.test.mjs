@@ -16,8 +16,8 @@ test("uses the universally safe fallback set and two links that split direction"
   assert.deepEqual([...help.HELP_NOW_TOOL_IDS], ["cool-down", "five-senses", "crisis-kit"]);
   assert.equal(tools.SPINE_TOOLS["cool-down"].closeKind, "regulation_down");
   assert.equal(tools.SPINE_TOOLS["five-senses"].closeKind, "orienting");
-  assert.deepEqual(help.helpNowLinkState("h"), { spine: { entry: "checkin_grid", hostSessionId: "h" }, skillCtx: { band: "flooded" } });
-  assert.deepEqual(help.helpNowLinkState(null), { spine: { entry: "checkin_grid" }, skillCtx: { band: "flooded" } });
+  assert.deepEqual(help.helpNowLinkState("h"), { spine: { entry: "checkin_grid", hostSessionId: "h" } });
+  assert.deepEqual(help.helpNowLinkState(null), { spine: { entry: "checkin_grid" } });
   assert.ok(tools.RESERVED_ENTRIES["help-now"].includes("checkin_grid"));
 });
 

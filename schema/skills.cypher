@@ -9172,7 +9172,7 @@ MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
 MATCH (a:SkillStep {id: "first_body:someone"}), (x:SkillExit {id: "first_body:held"})
 MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"all\": []}}]";
+SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"not\": {\"in\": [\"$a.state\", [\"frozen\", \"far_away\"]]}}}]";
 MATCH (a:SkillStep {id: "first_body:fork"}), (b:SkillStep {id: "first_body:end"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";

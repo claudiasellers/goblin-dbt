@@ -337,7 +337,7 @@ export interface SkillDef {
   /**
    * Page entries (DT part 2): `?enterAt=<key>` (a host exit's query, or a Tools link) starts a fresh page run at the
    * step this maps the key to, instead of `start`. Only a skill that accepts `enterAt` has them; a key not listed (or a
-   * resumed run) starts as usual. The entry's step never needs an answer from a step before it (build.py).
+   * resumed run) starts as usual. The entry's step must not need an answer from a step before it (not checked by build.py).
    */
   entries?: Record<string, string>;
 }

@@ -244,7 +244,9 @@ Added by IE-08 (`docs/design/ending-relationships.md`, 10 Nov 2026):
 - **A host's pull rides along** (DT part 2). A host exit's `query: {urgeId: '$a.pull'}` carries the pull it asked
   (Hold to wait → Ride it out and When it's a habit; Ride it out → Pros & cons and When it's a habit); the receiving
   skill accepts `urgeId` and lists that pull first (`firstFrom: '$ctx.urgeId'`), never selected, so the person taps it
-  once and *Hurt myself* still opens `safety.open` first on the pick.
+  once and *Hurt myself* still opens `safety.open` first on the pick. `firstFrom` matches option ids, so a pull with no
+  option of the same id lists nothing first: Hold to wait's `use` covers six of When it's a habit's behaviours
+  (drinking, drugs, bingeing, …), so that one asks fresh; `check` lands on *Checking someone's page*.
 - **Ways into a persist-nothing tool** (ER-12, with the plan thread). A host run that offers or takes an exit to a
   `deferSession` tool (Ending) records it as `private` in its own `ext.run` (`offeredExitIds`, `exitId`), never by
   the exit's or tool's id, and the player opens it without `linkTo`, so the visit carries no `hostSessionId` and a

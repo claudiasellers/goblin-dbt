@@ -125,6 +125,6 @@ test("a host's pull rides along: first on the next tool's list, never selected",
   assert.deepEqual(M.exitQuery(ctx(h), h.exits.find((e) => e.id === "urge_surfing"), { answers: { pull: { ids: [], own: "x" } } }), {});
 });
 
-test("Help me now opens its tools on the flooded path (plan C6.2), never recorded", () => {
-  assert.match(readFileSync("src/lib/spine/helpNow.ts", "utf8"), /skillCtx: \{ band: 'flooded' as const \}/);
+test("Help me now carries no band: the kit's flooded filter would hide the person's own kept cards", () => {
+  assert.doesNotMatch(readFileSync("src/lib/spine/helpNow.ts", "utf8"), /band/);
 });

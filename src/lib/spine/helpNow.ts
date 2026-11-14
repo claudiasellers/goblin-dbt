@@ -14,11 +14,7 @@ export const HELP_NOW_TOOL_IDS = ['cool-down', 'five-senses', 'crisis-kit'] as c
 /** The link's query per tool: the kit opens as "right now" (`frame=now`: no *Make it yours* while someone is in it). */
 export const HELP_NOW_QUERY: Partial<Record<(typeof HELP_NOW_TOOL_IDS)[number], string>> = { 'crisis-kit': 'frame=now' };
 
-/**
- * Route state for a tool opened from Help me now. Help me now is the flooded entry (plan C6.2: the flooded path comes
- * from a carried or host band, or Help me now), so a skill that accepts the band runs its flooded path (the kit's body
- * cards only, First, the body without the contrast question). The band is never recorded (ask-fresh).
- */
+/** Route state for a tool opened from Help me now. */
 export function helpNowLinkState(hostSessionId: string | null) {
-  return { spine: { entry: 'checkin_grid' as const, ...(hostSessionId ? { hostSessionId } : {}) }, skillCtx: { band: 'flooded' as const } };
+  return { spine: { entry: 'checkin_grid' as const, ...(hostSessionId ? { hostSessionId } : {}) } };
 }

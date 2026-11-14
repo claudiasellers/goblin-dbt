@@ -23916,7 +23916,15 @@
       {
        "exit": "held",
        "when": {
-        "all": []
+        "not": {
+         "in": [
+          "$a.state",
+          [
+           "frozen",
+           "far_away"
+          ]
+         ]
+        }
        }
       }
      ]

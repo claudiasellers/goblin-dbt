@@ -311,7 +311,8 @@ def options():
 
 SKILL = {
     "id": ID, "toolId": TOOL_ID, "concept": CONCEPT, "version": VERSION, "start": "pull", "ownMax": OWN_MAX,
-    # band: a host's or the carried reading (C6.2). A host's pull (`urgeId`) waits for the first host (the kit).
+    # band: a host's or the carried reading (C6.2). urgeId: a host's pull (Ride it out), listed
+    # first on the pull step (`firstFrom`), never selected.
     "accepts": ["band", "urgeId"],
     "copy": COPY, "tables": {}, "derive": [], "steps": STEPS, "exits": EXITS, "options": options(),
     "emotionFields": [],

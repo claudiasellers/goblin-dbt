@@ -289,7 +289,7 @@ STEPS = [
         "lines": [{"when": ALWAYS, "key": "someone_line"}],
         # People first, then the kit (DT-03): coping sits beside help, never before it (CORE-01's rule).
         "offers": [{"exit": "safety_open", "when": ALWAYS}, {"exit": "crisis_kit", "when": ALWAYS},
-                   {"exit": "held", "when": ALWAYS}],
+                   {"exit": "held", "when": {"not": HERE}}],  # never a calming move after frozen / far away
         "done": "done",
     },
     {
