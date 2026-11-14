@@ -72,7 +72,7 @@ print(json.dumps(sorted({w for r in m.WORD_RULES if r["tool"]=="problem-solve" f
   assert.deepEqual(offers("ashamed"), ["opposite_action"], "self-validation is planned, so not shown");
   assert.deepEqual(offers("confused"), ["check_the_facts"]);
   assert.deepEqual(offers("happy"), ["mindfulness_emotions", "find_the_feeling"], "the wave (ER-08, built 13 Nov): savouring for a good feeling");
-  assert.deepEqual(offers("numb"), ["find_the_feeling"], "body scan is planned");
+  assert.deepEqual(offers("numb"), ["body_scan", "find_the_feeling"], "numb: Held's outside-in body scan (DT-07 part 2)");
   assert.equal(run([pick("feel", "anxious"), next]).stepId, "ready");
   assert.equal(run([pick("feel", "anxious"), next], ctx({ band: "flooded" })).stepId, "not_now", "a carried flooded reading settles first (C6.2)");
   // Hopelessness, wherever it lands: someone to talk to, one quiet tap away.

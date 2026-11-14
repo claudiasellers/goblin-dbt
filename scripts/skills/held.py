@@ -116,6 +116,36 @@ COPY = {
     "end_same": "Sometimes it doesn't shift much. You still gave yourself a minute of care.",
     "end_easier": "It eased. You stayed with it, gently.",
     "end_reach": "Even a short message counts. You could tell them it's been a hard day.",
+    # The outside-in body scan (DT-07 part 2; trauma-sensitive: eyes open, contact points first, outside before
+    # inside, a check on being here, far away goes back outside).
+    "scan_title": "Start with the outside. Where are you touching something solid?",
+    "scan_title_flooded": "Your body's loud right now. A hand on your heart may be easier first.",
+    "scan_hint": "Eyes open is fine. Pick one.",
+    "scan_contact_title": "Notice where you touch it.",
+    "scan_contact_step1": "Notice where your body meets it.",
+    "scan_contact_step2": "Pressure, temperature, texture: whatever's there.",
+    "scan_contact_step3": "Nothing to change.",
+    "scan_skin_title": "Now the outside of your body.",
+    "scan_skin_step1": "Your clothes against your skin.",
+    "scan_skin_step2": "The air on your face and hands.",
+    "scan_skin_step3": "Keep your eyes open if you like.",
+    "scan_where_title": "Right now, how here are you?",
+    "scan_where_hint": "Any answer is useful.",
+    "scan_in_title": "A little further in, if that's okay.",
+    "scan_in_step1": "Your hands: warm, cool, tingling, or nothing much.",
+    "scan_in_step2": "Your breath at the tip of your nose.",
+    "scan_in_step3": "Back to your feet whenever you like.",
+    "scan_press_title": "Press your feet into the floor.",
+    "scan_press_step1": "Press down through your heels.",
+    "scan_press_step2": "Notice the floor pushing back.",
+    "scan_press_step3": "Look at one thing in the room.",
+    "scan_far_line": "Far away is a sign to come back to the outside, not to go further in. Look around and name what you see.",
+    "scan_referral": "If you often feel far away, tell a doctor or therapist. It's common, and it can be helped.",
+    "scan_running": "Noticing",
+    "scan_done": "That's it.",
+    # The calm-day practice (DT-07 part 2): soothing works best practised when things are calmer.
+    "practise_title": "Want to practise this once when things are calmer?",
+    "practise_hint": "It comes more easily on a hard night if you've done it on an okay day.",
     "safety_open": "Talk to someone now",
     "next": "Next",
     "done": "Done",
@@ -146,6 +176,7 @@ PICK = [
     ("warm", "Something warm", True),
     ("sense", "Something for one of my senses", False),
     ("words", "Kind words", False),
+    ("scan", "Notice my body, from the outside in", False),
     ("deserve", "I don't deserve this", True),
 ]
 DESERVE = [
@@ -206,6 +237,24 @@ AGAIN = [
     ("easier", "A bit easier"),
     ("still", "Still stirred up"),
 ]
+# Where the outside-in scan starts: a contact point (outside first; trauma-sensitive).
+SCAN = [
+    ("feet", "My feet on the floor", False),
+    ("seat", "Sitting on a chair or the bed", False),
+    ("back", "My back against something", False),
+    ("hands", "My hands on something", False),
+    ("heart", "A hand on my heart instead", True),  # a carried flooded reading only
+]
+SCAN_WHERE = [
+    ("here", "Here"),
+    ("partly", "Partly here"),
+    ("far", "Far away"),
+]
+# The calm-day practice (held_practice's window chips); skipping is no reminder.
+PRACTISE = [
+    ("tomorrow", "Tomorrow"),
+    ("few_days", "In a few days"),
+]
 REACH = [
     ("yes", "Yes, someone I could message"),
     ("not_now", "Not right now"),
@@ -244,7 +293,7 @@ TO_CLOSE = [{"to": "close"}]
 
 STEPS = [
     ask("pick", "pick_title", "pick_hint", "pick", "pick",
-        [{"when": {"eq": [a("pick"), v]}, "to": to} for v, to in (("warm", "warm"), ("sense", "way"), ("words", "words"), ("deserve", "deserve"))] + [{"to": "where"}],
+        [{"when": {"eq": [a("pick"), v]}, "to": to} for v, to in (("warm", "warm"), ("sense", "way"), ("words", "words"), ("deserve", "deserve"), ("scan", "scan"))] + [{"to": "where"}],
         where=FLOODED_ONLY("calm")),
     # I don't deserve this: a thirty-second experiment, or not today (a real answer, no close).
     ask("deserve", "deserve_title", "deserve_hint", "deserve", "deserve",
@@ -271,6 +320,22 @@ STEPS = [
                "copiedLabel": "words_copied", "selectedLabel": "words_selected"},
      "links": [SAFETY_LINK], "next": [{"to": "land"}]},
     card("land", "land_title", "bodyCard", "hand_heart", 60, "land", TO_CLOSE),
+    # The outside-in scan: a contact point, the skin and clothes, then how here; far away goes back outside, no close.
+    ask("scan", [{"when": FLOODED, "key": "scan_title_flooded"}, {"key": "scan_title"}], "scan_hint", "scan", "scan",
+        [{"when": {"eq": [a("scan"), "heart"]}, "to": "where"}, {"to": "scan_contact"}],
+        where={"any": [{"all": [FLOODED, {"eq": ["$opt.flooded", True]}]}, {"not": {"eq": ["$opt.flooded", True]}}]}),
+    card("scan_contact", "scan_contact_title", "bodyCard", "still", 30, "scan_contact", [{"to": "scan_skin"}],
+         running="scan_running", done="scan_done"),
+    card("scan_skin", "scan_skin_title", "doseTimer", None, 30, "scan_skin", [{"to": "scan_where"}],
+         running="scan_running", done="scan_done"),
+    ask("scan_where", "scan_where_title", "scan_where_hint", "scan_where", "scan_where",
+        [{"when": {"eq": [a("scan_where"), "far"]}, "to": "scan_far"}, {"when": {"eq": [a("scan_where"), "partly"]}, "to": "scan_press"},
+         {"to": "scan_in"}]),
+    card("scan_in", "scan_in_title", "doseTimer", None, 30, "scan_in", TO_CLOSE, running="scan_running", done="scan_done"),
+    card("scan_press", "scan_press_title", "bodyCard", "press", 20, "scan_press", TO_CLOSE, running="scan_running",
+         done="scan_done"),
+    handoff("scan_far", [{"when": ALWAYS, "key": "scan_far_line"}, {"when": ALWAYS, "key": "scan_referral"}],
+            [{"exit": "five_senses", "when": ALWAYS}, {"exit": "cool_down", "when": ALWAYS}]),
     # The close, asked in the flow.
     ask("close", "close_title", None, "close", "tvn",
         [{"when": {"eq": [a("close"), "worse"]}, "to": "stirred"}, {"to": "reach"}],
@@ -294,7 +359,11 @@ STEPS = [
              {"when": ALWAYS, "key": "talk_line"}],
             [{"exit": "cool_down", "when": {"eq": [a("stirred"), "press"]}}, {"exit": "safety_open", "when": ALWAYS}], no_close=False),
     # Outward: always offered, never pushed.
-    ask("reach", "reach_title", "reach_hint", "reach", "reach", [{"to": "end"}]),
+    ask("reach", "reach_title", "reach_hint", "reach", "reach",
+        [{"when": {"any": [AFTER_HURT, {"not": {"in": [a("close"), ["better", "much_better"]]}}]}, "to": "end"}, {"to": "practise"}]),
+    # It helped: practise it once on a calmer day (`held_practice`, a fresh visit). Not after Hurt myself.
+    ask("practise", "practise_title", "practise_hint", "practise", "practise", [{"to": "end"}], required=False,
+        extra={"followUp": {"type": "held_practice", "whenFrom": "practise"}}),
     handoff("end",
             [{"when": {"eq": [a("again"), "easier"]}, "key": "end_easier"},
              {"when": {"all": [{"not": {"set": a("again")}}, {"in": [a("close"), ["better", "much_better"]]}]}, "key": "end_warmer"},
@@ -307,6 +376,7 @@ STEPS = [{**s, "crisis": CRISIS} for s in STEPS]
 
 EXITS = [
     {"id": "cool_down", "toolId": "cool-down"},                          # DT-01 First, the body (press, backdraft)
+    {"id": "five_senses", "toolId": "five-senses"},                      # 5-4-3-2-1: far away in the scan, back outside
     {"id": "safety_open", "toolId": None, "safety": True},               # safety.open (R6)
     {"id": "done", "done": True},
 ]
@@ -323,6 +393,9 @@ def options():
     out += [("tvn", v, label, {}, None) for v, label in TVN]
     out += [("stirred", v, label, {"afterHurt": ok}, None) for v, label, ok in STIRRED]
     out += [("again", v, label, {}, None) for v, label in AGAIN]
+    out += [("scan", v, label, {"flooded": True} if fl else {}, None) for v, label, fl in SCAN]
+    out += [("scan_where", v, label, {}, None) for v, label in SCAN_WHERE]
+    out += [("practise", v, label, {}, None) for v, label in PRACTISE]
     out += [("reach", v, label, {}, None) for v, label in REACH]
     return out
 
@@ -332,7 +405,7 @@ SKILL = {
     # band: a host's or the carried reading (C6.2): flooded keeps the first screen to the hand, warmth and the chip.
     "accepts": ["band", "frame", "enterAt"],
     # Page entries: First, the body's *A hand on my heart* and Hold to wait's move open at where the hands rest.
-    "entries": {"hand": "where"},
+    "entries": {"hand": "where", "scan": "scan"},
     "copy": COPY, "tables": {}, "derive": [], "steps": STEPS, "exits": EXITS, "options": options(),
     "emotionFields": [],
 }

@@ -43,6 +43,7 @@ export const FOLLOW_UP_SESSION_TOOL: Readonly<Record<string, string>> = {
   habit_renew: 'habit-plan',
   // Let it be's turning the mind (DT-04 part 2): only from a Let it be visit (it reopens that run).
   turn_mind: 'let-it-be',
+  held_practice: 'soothe',
   // Running low's evening check (ER-B4): only from a Running low visit.
   please_fix: 'please-skill',
   good_thing: 'good-things',

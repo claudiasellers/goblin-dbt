@@ -509,6 +509,21 @@ FOLLOW_UP_TYPES = [
         "notification": "A minute to turn your mind, if you want it.",
     },
     {
+        # Held (DT-07 part 2, docs/design/held.md): when being held helped, the person can ask to practise it once on a
+        # calmer day (tomorrow, in a few days), since soothing comes more easily on a hard night after a rep on an okay
+        # one. The card opens a fresh visit (not a reopen: the practice is a new minute). Opening it is the resolution.
+        # Content-free: it never says what was hard.
+        "id": "held_practice", "ownerModule": "dt", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/soothe?followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
+                                             "few_days": {"kind": "at_local", "days": 3, "time": "18:00"}}},
+        "staleAfterHours": 48, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "A calm-day practice", "body": "A minute of being held, while things are okay."},
+        "choices": [{"id": "not_now", "label": "Not now", "status": "dismissed"}],
+        "notification": "A minute of being held, if you want it.",
+    },
+    {
         # When it's a habit (DT-09, docs/design/habit-plan.md): the stretch the person committed to has ended. The chips
         # are the stretch itself (the next hour, the rest of today, three days, a week). The card reopens that visit at
         # `renew` (R9 `reopens`: kept to it → the next stretch; slipped → the lapse plan they wrote, then recommit).
