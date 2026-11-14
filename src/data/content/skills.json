@@ -1,7 +1,7 @@
 {
   "source": {
-    "file": "graph-content-only-2026-11-13.json",
-    "exportedAt": "2026-11-13T04:57:06.743Z"
+    "file": "graph-content-only-2026-11-14.json",
+    "exportedAt": "2026-11-14T23:05:09.546Z"
   },
   "content": {
     "version": "skills-v1",
@@ -28724,8 +28724,8 @@
                 ],
                 "max": 1,
                 "options": {
-                  "list": "what",
-                  "firstFrom": "$ctx.urgeId"
+                  "firstFrom": "$ctx.urgeId",
+                  "list": "what"
                 },
                 "own": {
                   "countsAsPick": true,
@@ -34219,8 +34219,8 @@
             "id": "held",
             "toolId": "soothe",
             "query": {
-              "frame": "hurt",
-              "enterAt": "hand"
+              "enterAt": "hand",
+              "frame": "hurt"
             },
             "carry": [],
             "done": false
@@ -34896,13 +34896,13 @@
             "hint": "what_hint",
             "title": [
               {
+                "key": "what_title_willing",
                 "when": {
                   "eq": [
                     "$ctx.enterAt",
                     "willingness"
                   ]
-                },
-                "key": "what_title_willing"
+                }
               },
               {
                 "key": "what_title"
@@ -56329,8 +56329,8 @@
                 ],
                 "max": 1,
                 "options": {
-                  "list": "pull",
-                  "firstFrom": "$ctx.urgeId"
+                  "firstFrom": "$ctx.urgeId",
+                  "list": "pull"
                 },
                 "own": {
                   "countsAsPick": true,
@@ -59821,8 +59821,8 @@
                 ],
                 "max": 1,
                 "options": {
-                  "list": "pull",
-                  "firstFrom": "$ctx.urgeId"
+                  "firstFrom": "$ctx.urgeId",
+                  "list": "pull"
                 },
                 "own": {
                   "countsAsPick": true,
