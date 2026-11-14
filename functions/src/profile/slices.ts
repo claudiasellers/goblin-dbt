@@ -101,6 +101,11 @@ export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
     WITH p ORDER BY p.confirmedAt DESC, p.id LIMIT 12
     RETURN p {.id, .kind, .area, .status, .source, .valueJson,
               confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p`,
+  // Kept habit plans (DT-09), active only, newest first; own words decrypted in the resolver (behaviour and lapse only).
+  abstinencePlans: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'abstinence_plan', status: 'active'})
+    WITH p ORDER BY p.confirmedAt DESC, p.id LIMIT 6
+    RETURN p {.id, .kind, .area, .status, .source, .valueJson,
+              confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p`,
   // Things I like (ER-04), active only, newest first; own words decrypted and ids named in the resolver.
   thingsILike: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'thing_i_like', status: 'active'})
     WITH p ORDER BY p.confirmedAt DESC, p.id LIMIT 60
@@ -418,6 +423,23 @@ const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
         id: String(p.id), pullIds: strings(v.pullIds), pullOwn: own('pullOwn'), longIds: strings(v.longIds), longOwn: own('longOwn'),
         givesIds: strings(v.givesIds), givesOwn: own('givesOwn'), costIds: strings(v.costIds), costOwn: own('costOwn'),
         keepsIds: strings(v.keepsIds), keepsOwn: own('keepsOwn'), meta: metaFrom(p, now),
+      });
+    }
+    return out;
+  },
+  abstinencePlans: async (tx, uid, now) => {
+    const r = await tx.run(SLICE_QUERIES.abstinencePlans!, { uid });
+    if (!r.records.length) return [];
+    const decrypt = await ownDecrypter(tx, uid);
+    const out: ProfileSlices['abstinencePlans'] = [];
+    for (const rec of r.records) {
+      const p = rec.get('p') as Record<string, unknown>;
+      let v: Record<string, unknown>;
+      try { v = JSON.parse(String(p.valueJson)) as Record<string, unknown>; } catch { continue; }
+      const own = (k: string) => (typeof v[k] === 'string' ? decrypt(v[k]) : null);
+      out.push({
+        id: String(p.id), whatIds: strings(v.whatIds), whatOwn: own('whatOwn'), lapseIds: strings(v.lapseIds), lapseOwn: own('lapseOwn'),
+        meta: metaFrom(p, now),
       });
     }
     return out;

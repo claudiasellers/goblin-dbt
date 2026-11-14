@@ -31,9 +31,11 @@ slipped* → "A slip isn't a relapse. Here's what you planned." (the lapse plan 
 for a stretch; *Not ready to go again* → the plan stays, no shame. The next stretch books the card again.
 
 Hosts: Hold to wait's next card and Ride it out's end cards offer it for the use and check pulls.
-docs/design/habit-plan.md lists what this batch defers (the weekly clear-mind check, the lapse plan shown inside
-Hold to wait / Ride it out after an acted yes, CORE-08's chain, BridgeTemplate / MindSign nodes) and where it departs
-from the PRD.
+Part 2 (14 Nov 2026): the weekly clear-mind check (`weekly` books `clear_mind`, which reopens the run at `clear`:
+addict and clean mind signs, *I did it* → the lapse plan, the week named by its loudest mind, never counted), and the
+lapse plan under Hold to wait's and Ride it out's close after an acted yes (src/lib/lapseSlot.ts, which reads this
+skill's `what` urge props, `lapse` labels and slip copy). docs/design/habit-plan.md lists what is still deferred
+(CORE-08's chain, BridgeTemplate / MindSign nodes) and where it departs from the PRD.
 
 Safety (plan C6): *Talk to someone now* on every screen. No chip is food, drink or shopping as a comfort; nothing
 counts days or calls a slip a failure; the plan never asks how much.
@@ -97,6 +99,16 @@ COPY = {
     # Renewal (R5): the stretch picked is when the card comes.
     "remind_title": "Want a check-in when the stretch ends?",
     "remind_hint": "It won't say what the plan is about.",
+    # The weekly clear-mind check (H17's clear mind, PRD step 6): booked here, reopened from `clear_mind`.
+    "weekly_title": "Want a short check once a week on how it's going?",
+    "weekly_hint": "Optional. About a minute, and it won't say what it's about.",
+    "clear_title": "Over the last week, did any of these show up?",
+    "clear_hint": "Pick any that fit. None of them? Go on without picking.",
+    "clear_addict": "The pull's been loud this week. That's addict mind, and your plan is still here.",
+    "clear_clean": "Feeling safe can be the risky part. That's clean mind: the bridges are still worth keeping burned.",
+    "clear_clear": "Off it, and still watching for the pull. That's clear mind.",
+    "clear_next_hint": "Check in again next week?",
+    "clear_end": "Clear mind isn't a finish line. It's watching, week by week.",
     "keep_title": "Keep this plan in Me?",
     "keep_primary": "Next",
     # The end card: the dialectic said plainly (PRD risk: harm reduction heard as permission).
@@ -238,6 +250,22 @@ REINFORCE = [
 ]
 REMIND = [("yes", "Yes, check in with me"), ("no", "No thanks")]
 KEEPIT = [("keep", "Keep it in Me"), ("not_now", "Not this time")]
+# The weekly check (H17: addict mind, clean mind, clear mind). Window chips of `clear_mind`; skipping books nothing.
+WEEKLY = [("week", "Yes, once a week")]
+CLEAR_NEXT = [("week", "Same time next week")]
+# Signs, tagged by the mind they point to. Never a count, never a score: the loudest kind names the week.
+MIND_SIGNS = [
+    ("did_it", "I did it", "addict"),
+    ("thinking", "Thinking about it a lot", "addict"),
+    ("secret", "Keeping it from people", "addict"),
+    ("excuses", "Telling myself it doesn't matter", "addict"),
+    ("beaten", "Feeling like I've beaten it", "clean"),
+    ("slide", "Letting the plan slide", "clean"),
+    ("way_back", "Leaving myself a way back, in case", "clean"),
+    ("near", "Going near old places or people", "clean"),
+]
+ADDICT = {"any": [{"has": [a("signs.ids"), v]} for v, _, m in MIND_SIGNS if m == "addict"]}
+CLEAN = {"any": [{"has": [a("signs.ids"), v]} for v, _, m in MIND_SIGNS if m == "clean"]}
 RENEW = [("held", "I kept to it"), ("slip", "I slipped"), ("stop", "I'm not ready to go again")]
 
 # A per-behaviour chip shows for the behaviour picked; with own words, the `other` ones.
@@ -307,8 +335,11 @@ STEPS = [
      # A list card: the lapse plan on paper, no Copy (nothing to send). One list, so it never mixes with the cravings.
      "props": {"field": "lapse", "shape": "list", "next": "card_next"},
      "links": [SAFETY_LINK], "next": [{"to": "remind"}]},
-    ask("remind", "remind_title", "remind_hint", field("remind", "remind"), [{"to": "keep"}],
+    ask("remind", "remind_title", "remind_hint", field("remind", "remind"), [{"to": "weekly"}],
         followUp={"type": "habit_renew", "whenFrom": "span", "when": {"eq": [a("remind"), "yes"]}}),
+    # The weekly clear-mind check, optional (skipping books nothing).
+    ask("weekly", "weekly_title", "weekly_hint", field("weekly", "weekly", required=False), [{"to": "keep"}],
+        followUp={"type": "clear_mind", "whenFrom": "weekly"}),
     # Keep (R4) on *Keep it in Me*: that tap is the yes (C2.2).
     ask("keep", "keep_title", None, field("keepit", "keepit"), [{"to": "end"}],
         keep={"kind": "abstinence_plan", "many": True, "when": KEPT,
@@ -334,6 +365,20 @@ STEPS = [
         followUp={"type": "habit_renew", "whenFrom": "again_span"}),
     handoff("again_end", [{"when": SLIP, "key": "again_end_slip"}, {"when": ALWAYS, "key": "again_end_held"}],
             [{"exit": "urge_surfing", "when": SLIP}]),
+    # --- The weekly check: the clear_mind card reopens the run here (R9) ---
+    ask("clear", "clear_title", "clear_hint", field("signs", "mind_signs", mx=4, required=False),
+        [{"when": {"has": [a("signs.ids"), "did_it"]}, "to": "slipped_week"}, {"to": "clear_next"}],
+        reopens={"after": "weekly", "again": ["clear_next"]}, clears=["signs", "slipped_week", "clear_next"]),
+    # Did it this week: the lapse plan they wrote, before anything else (as the renewal's slip).
+    {"id": "slipped_week", "kind": "embed", "embed": "boundaryLine", "answerAs": "slipped_week", "title": "slipped_title",
+     "props": {"field": "lapse", "shape": "list", "next": "slipped_next"},
+     "links": [SAFETY_LINK], "next": [{"to": "clear_next"}]},
+    # The week named by its loudest mind (addict first), then next week's check, optional.
+    ask("clear_next", [{"when": ADDICT, "key": "clear_addict"}, {"when": CLEAN, "key": "clear_clean"}, {"key": "clear_clear"}],
+        "clear_next_hint", field("clear_next", "clear_next", required=False), [{"to": "clear_end"}],
+        followUp={"type": "clear_mind", "whenFrom": "clear_next"}),
+    handoff("clear_end", [{"when": ALWAYS, "key": "clear_end"}],
+            [{"exit": "urge_surfing", "when": ADDICT}, {"exit": "pros_cons", "when": {"any": [ADDICT, CLEAN]}}]),
     handoff("stop", [{"when": ALWAYS, "key": "stop_line"}],
             [{"exit": "urge_surfing", "when": ALWAYS}, {"exit": "pros_cons", "when": ALWAYS}]),
 ]
@@ -362,6 +407,9 @@ def options():
     out += [("remind", v, label, {}, None) for v, label in REMIND]
     out += [("keepit", v, label, {}, None) for v, label in KEEPIT]
     out += [("renew", v, label, {}, None) for v, label in RENEW]
+    out += [("weekly", v, label, {}, None) for v, label in WEEKLY]
+    out += [("clear_next", v, label, {}, None) for v, label in CLEAR_NEXT]
+    out += [("mind_signs", v, label, {"mind": m}, None) for v, label, m in MIND_SIGNS]
     return out
 
 

@@ -41,6 +41,7 @@ export const FOLLOW_UP_SESSION_TOOL: Readonly<Record<string, string>> = {
   repair_outcome: 'give',
   // When it's a habit's renewal (DT-09, docs/design/habit-plan.md): only from a habit-plan visit (it reopens that run).
   habit_renew: 'habit-plan',
+  clear_mind: 'habit-plan',
   // Let it be's turning the mind (DT-04 part 2): only from a Let it be visit (it reopens that run).
   turn_mind: 'let-it-be',
   held_practice: 'soothe',

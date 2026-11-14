@@ -295,9 +295,10 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
   // behaviour (the minimal TargetBehavior until CORE-04 owns one). The runtime's keep (R4: `<field>Ids` / `<field>Own`):
   // the behaviour (`what`), the stretch committed to (`span`, the habit_renew chip), the lapse plan (`lapse`), bridges
   // burned (`burn`), what tends to lead back (`risky`), new bridges (`build`) and what not doing it gives (`reinforce`).
-  // No slice yet: the renewal reopens the visit's own run, and Me lists it.
+  // The `abstinencePlans` slice reads the behaviour and the lapse plan back for the urge tools' close (part 2); the
+  // renewal reopens the visit's own run, and Me lists it.
   abstinence_plan: {
-    kind: 'abstinence_plan', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'my_plans', slice: null,
+    kind: 'abstinence_plan', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'my_plans', slice: 'abstinencePlans',
     owner: 'DT', many: true, maxItems: 6, editor: null,
     ownFields: ['whatOwn', 'lapseOwn', 'burnOwn', 'riskyOwn', 'buildOwn', 'reinforceOwn'],
     validate: (v) => {

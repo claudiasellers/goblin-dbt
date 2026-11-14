@@ -73,9 +73,23 @@ No rows, by design: the plan is made in calm for one behaviour, and the vocabula
 
 ## Deferred (DT-09 part 2)
 
-- **The weekly clear-mind check** (PRD step 6, `MindSign` nodes) and its follow-up type.
-- **The lapse plan inside Hold to wait / Ride it out** after an acted *yes* on the same behaviour (needs an
-  `abstinencePlans` slice and the urge close's acted answer).
+- ~~**The weekly clear-mind check**~~ **Built 14 Nov 2026** (PRD step 6, H17): after the renewal question, *Want a
+  short check once a week on how it's going?* (optional; *Yes, once a week* books `clear_mind` seven days on). The card
+  reopens the run at `clear` (R9 `reopens`, again at `clear_next`): *Over the last week, did any of these show up?*,
+  eight signs tagged addict or clean mind (*I did it*, thinking about it a lot, keeping it from people, telling myself
+  it doesn't matter; feeling like I've beaten it, letting the plan slide, leaving myself a way back, going near old
+  places or people), none an answer. *I did it* shows the lapse plan first (as the renewal's slip). The week is named
+  by its loudest mind, addict first, then clean, then clear, never a count or score; then next week's check, optional.
+  Addict → Ride it out and the pros & cons card; clean → the pros & cons card. The signs are `SkillOption`s with a
+  `mind` prop (no `MindSign` nodes yet). The card never names the behaviour.
+- ~~**The lapse plan inside Hold to wait / Ride it out**~~ **Built 14 Nov 2026:** after their urge close says the
+  person acted (*yes* or *partly*), `LapsePlanSlot` (under the saved answer in `SessionClose`, pure in
+  `src/lib/lapseSlot.ts`) shows "A slip isn't a relapse. Here's what you planned." and the lapse plan of the newest
+  kept plan whose behaviour shares the visit's pull (When it's a habit's `what` options carry the urge id: `check` →
+  checking someone's page, `use` → drinking, drugs, smoking, bingeing, gambling or spending). Drink or drugs add the
+  overdose line (*After a break, your body can't take what it used to.*). A plan in their own words is never matched
+  by guesswork. Read through the new `abstinencePlans` slice (behaviour and lapse plan only, own words decrypted;
+  `PROFILE_NEEDS` `pause` and `urge-surfing`), fetched only once they said they acted.
 - **CORE-04 `TargetBehavior`** as the owner of the behaviour (this kind is the minimal one; a migration moves it), and
   CORE-08's next-day chain (*look at what led to it* is a self-action for now).
 - **The graph content as nodes:** `BridgeTemplate` per behaviour, `MindSign`, the other four concepts
@@ -90,7 +104,7 @@ No rows, by design: the plan is made in calm for one behaviour, and the vocabula
 | Self-harm *not handled here* | A *Hurting myself* chip that routes to the crisis banner and someone to talk to | People pick it here anyway; a route catches them instead of a dead end |
 | Medical heads-up: alcohol or benzodiazepines | Alcohol, benzos or opioids | Opioid withdrawal is dangerous too; the line is the same job |
 | Spans: *the next hour · today · until [day] · my own* | The next hour · the rest of today · three days · a week | The spans are the renewal's chips; a free date waits for a date chip in the runtime |
-| Lapse plan shown whenever an acted *yes* is logged | Shown at the renewal on *I slipped* | No slice or acted-yes hook yet (part 2) |
+| Lapse plan shown whenever an acted *yes* is logged | At the renewal and the weekly check on a slip, and under Hold to wait's and Ride it out's close after an acted yes on the same behaviour | Other urge hosts (Rebel, the kit) have no acted answer for a behaviour |
 | Burning bridges: done toggles | Picks, kept with the plan | No checklist embed yet |
 | Open question: substances at all? | Included | D14, Claudia, 12 Nov |
 | Flooded → DT-01 | A heads-up: the next few minutes first (the body, Ride it out) or make the plan anyway | The person decides; nothing locks |
