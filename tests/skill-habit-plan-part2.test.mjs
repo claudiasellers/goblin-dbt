@@ -92,12 +92,12 @@ test("the next week's card reopens again with a clean slate", () => {
 });
 
 const habit = skill;
-const plan = (whatIds, extra = {}) => ({ id: `p_${whatIds[0] ?? "own"}`, whatIds, whatOwn: null, lapseIds: ["tell", "kind"], lapseOwn: "Ring my sister", meta: {}, ...extra });
+const plan = (whatIds, extra = {}) => ({ id: `p_${whatIds[0] ?? "own"}`, whatIds, lapseIds: ["tell", "kind"], lapseOwn: "Ring my sister", meta: {}, ...extra });
 
 test("the lapse slot: an acted yes on the same behaviour shows their lapse plan, own words last", () => {
   const s = L.lapseSlotFor("pause", "yes", ["check"], [plan(["check"])], habit);
   assert.equal(s.title, habit.copy.slipped_title);
-  assert.deepEqual(s.items, ["Tell someone I trust", "Talk to myself like a friend would", "Ring my sister"]);
+  assert.deepEqual(s.plans, [{ planId: "p_check", behaviour: null, items: ["Tell someone I trust", "Talk to myself like a friend would", "Ring my sister"] }]);
   assert.equal(s.afterUse, null);
   assert.ok(L.lapseSlotFor("urge-surfing", "partly", ["check"], [plan(["check"])], habit), "partly counts");
 });
@@ -106,8 +106,11 @@ test("the lapse slot: use matches a substance or spending plan; drink and drugs 
   const s = L.lapseSlotFor("pause", "yes", ["use"], [plan(["drink"])], habit);
   assert.deepEqual(s.afterUse, { title: habit.copy.after_use_title, hint: habit.copy.after_use_hint });
   assert.equal(L.lapseSlotFor("pause", "yes", ["use"], [plan(["gamble"])], habit).afterUse, null);
-  // Newest first: the slice's order wins.
-  assert.equal(L.lapseSlotFor("pause", "yes", ["use"], [plan(["spend"]), plan(["drink"])], habit).planId, "p_spend");
+  // One pull, several behaviours: each one's newest plan, under its behaviour, and the overdose line if any is a substance.
+  const both = L.lapseSlotFor("pause", "yes", ["use"], [plan(["spend"]), plan(["drink"]), plan(["spend"], { id: "older" })], habit);
+  assert.deepEqual(both.plans.map((p) => [p.planId, p.behaviour]), [["p_spend", "Spending or buying"], ["p_drink", "Drinking"]]);
+  assert.ok(both.afterUse, "a drink plan among them: the overdose line");
+  assert.match(readFileSync("src/components/spine/LapsePlanSlot.tsx", "utf8"), /<CrisisBanner compact variant="medical" \/>/, "with the emergency number");
 });
 
 test("the lapse slot stays away: held off, another tool, another behaviour, own-words plans, nothing kept", () => {
@@ -131,5 +134,27 @@ test("the slice and its readers: kind, PROFILE_NEEDS, and the close mounts the s
   }
   const slices = readFileSync("functions/src/profile/slices.ts", "utf8");
   assert.match(slices, /abstinencePlans: `MATCH \(:User \{id: \$uid\}\)-\[:HAS_PROFILE_FACT\]->\(p:ProfileFact \{kind: 'abstinence_plan', status: 'active'\}\)/);
-  assert.match(readFileSync("src/components/spine/SessionClose.tsx", "utf8"), /<LapsePlanSlot toolId=\{session\.toolId\} acted=\{closeActed\} urgeIds=\{session\.visitUrgeIds\(\)\} \/>/);
+  const close = readFileSync("src/components/spine/SessionClose.tsx", "utf8");
+  assert.match(close, /<LapsePlanSlot toolId=\{session\.toolId\} acted=\{closeActed\} urgeIds=\{session\.visitUrgeIds\(\)\} \/>/);
+  assert.ok(close.indexOf("<LapsePlanSlot") < close.indexOf("<PartTagSlot"), "the lapse plan first after a slip");
+  assert.doesNotMatch(slices.slice(slices.indexOf("abstinencePlans: async")), /^[\s\S]{0,800}whatOwn/, "own-words behaviours are never read");
+});
+
+test("the weekly check's I did it: drink, drugs or own words get the overdose line and the medical banner first", () => {
+  const drink = run([pick("what", "drink"), next, next, pick("span", "few_days"), next, pick("lapse", "tell"), next, next, next, pick("build", "move"), next, next, read,
+    pick("remind", "no"), next, pick("weekly", "week"), next, pick("keepit", "keep"), next]);
+  const r = M.resumeRun(ctx(), M.runRecord(ctx(), drink), "clear");
+  assert.equal(r.stepId, "clear");
+  const au = run([pick("signs", "did_it"), next], ctx(), r);
+  assert.equal(au.stepId, "after_use_week");
+  assert.deepEqual(M.stepOf(skill, "after_use_week").crisis, [{ variant: "medical", when: { all: [] } }]);
+  assert.equal(title(au), skill.copy.after_use_title);
+  assert.equal(run([next], ctx(), au).stepId, "slipped_week");
+  // Gambling: straight to the lapse plan.
+  assert.equal(run([pick("signs", "did_it"), next], ctx(), reopened()).stepId, "slipped_week");
+});
+
+test("the DBT names are DBT's, never a label; every sign can be picked", () => {
+  for (const k of ["clear_addict", "clear_clean", "clear_clear"]) assert.match(skill.copy[k], /DBT calls that/);
+  assert.equal(M.stepOf(skill, "clear").fields[0].max, skill.options.mind_signs.length);
 });

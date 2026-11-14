@@ -99,14 +99,15 @@ COPY = {
     # Renewal (R5): the stretch picked is when the card comes.
     "remind_title": "Want a check-in when the stretch ends?",
     "remind_hint": "It won't say what the plan is about.",
-    # The weekly clear-mind check (H17's clear mind, PRD step 6): booked here, reopened from `clear_mind`.
+    # The weekly clear-mind check (H18 / 18a: clear mind, addict mind, clean mind; PRD step 6): booked here,
+    # reopened from `clear_mind`. The DBT names are said as DBT's, never as a label for the person.
     "weekly_title": "Want a short check once a week on how it's going?",
     "weekly_hint": "Optional. About a minute, and it won't say what it's about.",
     "clear_title": "Over the last week, did any of these show up?",
     "clear_hint": "Pick any that fit. None of them? Go on without picking.",
-    "clear_addict": "The pull's been loud this week. That's addict mind, and your plan is still here.",
-    "clear_clean": "Feeling safe can be the risky part. That's clean mind: the bridges are still worth keeping burned.",
-    "clear_clear": "Off it, and still watching for the pull. That's clear mind.",
+    "clear_addict": "It's had a pull on you this week. DBT calls that addict mind, and your plan is still here.",
+    "clear_clean": "Feeling safe can be the risky part. DBT calls that clean mind: the bridges are still worth keeping burned.",
+    "clear_clear": "Off it, and still watching for the pull. DBT calls that clear mind.",
     "clear_next_hint": "Check in again next week?",
     "clear_end": "Clear mind isn't a finish line. It's watching, week by week.",
     "keep_title": "Keep this plan in Me?",
@@ -250,7 +251,7 @@ REINFORCE = [
 ]
 REMIND = [("yes", "Yes, check in with me"), ("no", "No thanks")]
 KEEPIT = [("keep", "Keep it in Me"), ("not_now", "Not this time")]
-# The weekly check (H17: addict mind, clean mind, clear mind). Window chips of `clear_mind`; skipping books nothing.
+# The weekly check (H18 / 18a: addict mind, clean mind, clear mind). Window chips of `clear_mind`; skipping books nothing.
 WEEKLY = [("week", "Yes, once a week")]
 CLEAR_NEXT = [("week", "Same time next week")]
 # Signs, tagged by the mind they point to. Never a count, never a score: the loudest kind names the week.
@@ -264,6 +265,7 @@ MIND_SIGNS = [
     ("way_back", "Leaving myself a way back, in case", "clean"),
     ("near", "Going near old places or people", "clean"),
 ]
+DID_IT = {"has": [a("signs.ids"), "did_it"]}
 ADDICT = {"any": [{"has": [a("signs.ids"), v]} for v, _, m in MIND_SIGNS if m == "addict"]}
 CLEAN = {"any": [{"has": [a("signs.ids"), v]} for v, _, m in MIND_SIGNS if m == "clean"]}
 RENEW = [("held", "I kept to it"), ("slip", "I slipped"), ("stop", "I'm not ready to go again")]
@@ -351,7 +353,8 @@ STEPS = [
     ask("renew", "renew_title", "renew_hint", field("renew", "renew"),
         [{"when": {"all": [SLIP, {"any": [SUBSTANCE, OWN_WHAT]}]}, "to": "after_use"}, {"when": SLIP, "to": "slipped"},
          {"when": {"eq": [a("renew"), "stop"]}, "to": "stop"}, {"to": "again"}],
-        reopens={"after": "remind", "again": ["again"]}, clears=["renew", "after_use", "slipped", "again_span"]),
+        reopens={"after": "remind", "again": ["again"]},
+        clears=["renew", "after_use", "slipped", "again_span", "signs", "after_use_week", "slipped_week", "clear_next"]),
     # Drink or drugs (or own words) after a slip: the overdose risk first, with the medical banner (Gate 3).
     ask("after_use", [{"when": OWN_WHAT, "key": "after_use_title_own"}, {"key": "after_use_title"}], "after_use_hint",
         field("after_use", "ok_now", required=False), [{"to": "slipped"}],
@@ -366,9 +369,15 @@ STEPS = [
     handoff("again_end", [{"when": SLIP, "key": "again_end_slip"}, {"when": ALWAYS, "key": "again_end_held"}],
             [{"exit": "urge_surfing", "when": SLIP}]),
     # --- The weekly check: the clear_mind card reopens the run here (R9) ---
-    ask("clear", "clear_title", "clear_hint", field("signs", "mind_signs", mx=4, required=False),
-        [{"when": {"has": [a("signs.ids"), "did_it"]}, "to": "slipped_week"}, {"to": "clear_next"}],
-        reopens={"after": "weekly", "again": ["clear_next"]}, clears=["signs", "slipped_week", "clear_next"]),
+    ask("clear", "clear_title", "clear_hint", field("signs", "mind_signs", mx=len(MIND_SIGNS), required=False),
+        [{"when": {"all": [DID_IT, {"any": [SUBSTANCE, OWN_WHAT]}]}, "to": "after_use_week"},
+         {"when": DID_IT, "to": "slipped_week"}, {"to": "clear_next"}],
+        reopens={"after": "weekly", "again": ["clear_next"]},
+        clears=["signs", "after_use_week", "slipped_week", "clear_next", "renew", "after_use", "slipped", "again_span"]),
+    # Drink or drugs (or own words) after a slip this week: the overdose risk first, as at the renewal (Gate 3).
+    ask("after_use_week", [{"when": OWN_WHAT, "key": "after_use_title_own"}, {"key": "after_use_title"}], "after_use_hint",
+        field("after_use_week", "ok_now", required=False), [{"to": "slipped_week"}],
+        crisis=[{"variant": "medical", "when": ALWAYS}]),
     # Did it this week: the lapse plan they wrote, before anything else (as the renewal's slip).
     {"id": "slipped_week", "kind": "embed", "embed": "boundaryLine", "answerAs": "slipped_week", "title": "slipped_title",
      "props": {"field": "lapse", "shape": "list", "next": "slipped_next"},

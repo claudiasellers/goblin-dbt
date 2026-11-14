@@ -28683,9 +28683,9 @@
     "weekly_hint": "Optional. About a minute, and it won't say what it's about.",
     "clear_title": "Over the last week, did any of these show up?",
     "clear_hint": "Pick any that fit. None of them? Go on without picking.",
-    "clear_addict": "The pull's been loud this week. That's addict mind, and your plan is still here.",
-    "clear_clean": "Feeling safe can be the risky part. That's clean mind: the bridges are still worth keeping burned.",
-    "clear_clear": "Off it, and still watching for the pull. That's clear mind.",
+    "clear_addict": "It's had a pull on you this week. DBT calls that addict mind, and your plan is still here.",
+    "clear_clean": "Feeling safe can be the risky part. DBT calls that clean mind: the bridges are still worth keeping burned.",
+    "clear_clear": "Off it, and still watching for the pull. DBT calls that clear mind.",
     "clear_next_hint": "Check in again next week?",
     "clear_end": "Clear mind isn't a finish line. It's watching, week by week.",
     "keep_title": "Keep this plan in Me?",
@@ -30292,7 +30292,11 @@
       "renew",
       "after_use",
       "slipped",
-      "again_span"
+      "again_span",
+      "signs",
+      "after_use_week",
+      "slipped_week",
+      "clear_next"
      ],
      "hint": "renew_hint",
      "next": [
@@ -30563,7 +30567,7 @@
        "options": {
         "list": "mind_signs"
        },
-       "max": 4,
+       "max": 8,
        "required": false,
        "links": [
         {
@@ -30584,11 +30588,61 @@
      },
      "clears": [
       "signs",
+      "after_use_week",
       "slipped_week",
-      "clear_next"
+      "clear_next",
+      "renew",
+      "after_use",
+      "slipped",
+      "again_span"
      ],
      "hint": "clear_hint",
      "next": [
+      {
+       "to": "after_use_week",
+       "when": {
+        "all": [
+         {
+          "has": [
+           "$a.signs.ids",
+           "did_it"
+          ]
+         },
+         {
+          "any": [
+           {
+            "in": [
+             "$a.what",
+             [
+              "drink",
+              "drugs"
+             ]
+            ]
+           },
+           {
+            "not": {
+             "in": [
+              "$a.what",
+              [
+               "drink",
+               "drugs",
+               "smoke",
+               "binge",
+               "gamble",
+               "spend",
+               "scroll",
+               "check",
+               "porn",
+               "hurt"
+              ]
+             ]
+            }
+           }
+          ]
+         }
+        ]
+       }
+      },
       {
        "to": "slipped_week",
        "when": {
@@ -30600,6 +30654,72 @@
       },
       {
        "to": "clear_next",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "after_use_week",
+     "kind": "ask",
+     "title": [
+      {
+       "when": {
+        "not": {
+         "in": [
+          "$a.what",
+          [
+           "drink",
+           "drugs",
+           "smoke",
+           "binge",
+           "gamble",
+           "spend",
+           "scroll",
+           "check",
+           "porn",
+           "hurt"
+          ]
+         ]
+        }
+       },
+       "key": "after_use_title_own"
+      },
+      {
+       "key": "after_use_title"
+      }
+     ],
+     "fields": [
+      {
+       "id": "after_use_week",
+       "options": {
+        "list": "ok_now"
+       },
+       "max": 1,
+       "required": false,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "medical",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "hint": "after_use_hint",
+     "next": [
+      {
+       "to": "slipped_week",
        "when": null
       }
      ],

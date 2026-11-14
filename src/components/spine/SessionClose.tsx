@@ -59,9 +59,9 @@ export function SessionClose({ kind, planType, detail, onAnswered, onSkipped }: 
     return (
       <>
         <p role="status" className="mt-4 text-sm text-center text-[var(--color-text-tertiary)]">{content.closeFlow.saved}</p>
-        <PartTagSlot toolId={session.toolId} toolSessionId={session.id} thenVsNow={closeAnswer} actedOnUrge={closeActed} saved={saved} />
-        {/* After an acted yes on the urge tools: the habit plan's lapse plan for the same behaviour (DT-09 part 2). */}
+        {/* After an acted yes on the urge tools: the habit plan's lapse plan for the same behaviour (DT-09 part 2), first. */}
         <LapsePlanSlot toolId={session.toolId} acted={closeActed} urgeIds={session.visitUrgeIds()} />
+        <PartTagSlot toolId={session.toolId} toolSessionId={session.id} thenVsNow={closeAnswer} actedOnUrge={closeActed} saved={saved} />
       </>
     );
   }

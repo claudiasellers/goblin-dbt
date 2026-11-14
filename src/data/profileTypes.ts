@@ -169,12 +169,12 @@ export interface ProfileSlices {
     keepsIds: string[]; keepsOwn: string | null; meta: ProfileItemMeta;
   }>;
   /**
-   * Kept habit plans (DT-09, kind `abstinence_plan`), active only, newest first: the behaviour and the lapse plan
-   * only (ids and the person's own words, decrypted for them). The urge tools show the plan for the same behaviour
-   * after an acted *yes* (docs/design/habit-plan.md, part 2).
+   * Kept habit plans (DT-09, kind `abstinence_plan`), active only, newest first: the behaviour's ids and the lapse plan
+   * only (its own words decrypted for them). The urge tools show the plan for the same behaviour after an acted *yes*
+   * (docs/design/habit-plan.md, part 2); a behaviour in own words is never matched, so it isn't read.
    */
   abstinencePlans: Array<{
-    id: string; whatIds: string[]; whatOwn: string | null; lapseIds: string[]; lapseOwn: string | null; meta: ProfileItemMeta;
+    id: string; whatIds: string[]; lapseIds: string[]; lapseOwn: string | null; meta: ProfileItemMeta;
   }>;
 }
 

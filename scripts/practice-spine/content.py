@@ -541,7 +541,7 @@ FOLLOW_UP_TYPES = [
         "notification": "A stretch you committed to is up.",
     },
     {
-        # When it's a habit's weekly clear-mind check (DT-09 part 2, DBT DT Handout 17): booked on the plan's optional
+        # When it's a habit's weekly clear-mind check (DT-09 part 2, DBT DT Handouts 18 and 18a): booked on the plan's optional
         # *once a week*. The card reopens that visit at `clear` (R9 `reopens`: which signs showed up, the week named by
         # its loudest mind, the lapse plan after *I did it*, next week's check). Opening it is the resolution. Never
         # names the behaviour (Today can be seen by others).
