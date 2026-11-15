@@ -79,6 +79,8 @@ for (const sk of fixture.skills) {
       const target = fixture.skills.find((t) => t.toolId === x.toolId);
       if (!target) continue; // a page not on the runtime yet: its own entry contract (tests per tool)
       if (x.planned && waitsForFrame(x)) continue; // never opened until its frame is built
+      // Wise mind plays its check only on `frame=check` (isWiseMindCheck); any other link opens the hand-built practice.
+      if (x.toolId === "wise-mind" && x.query.frame !== "check") continue;
       // `mode` picks which of a tool's skills the page plays (DEAR MAN: debrief, one message, the prep); it isn't context.
       // `person` is the person picker's preset on a PersonFirstSkill page (a kept person whose safety answer is fresh
       // skips the picker; anyone else is asked), read by the page before the skill, never by the skill.
