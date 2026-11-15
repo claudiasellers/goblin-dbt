@@ -281,6 +281,21 @@ FOLLOW_UP_TYPES = [
         "notification": "Your practice is ready to check.",
     },
     {
+        # Notice it, name it (MF-01, docs/design/notice-and-name.md): an off-phone rep the person opted into on the end
+        # card (*Try one without the app?*), the next morning or evening. The card reopens that visit at `offphone` (R9
+        # `reopens`: *Did you get to notice something without the app?*); a yes is an off-phone rep (runRep). Opening it
+        # is the resolution. Content-free.
+        "id": "offphone_rep", "ownerModule": "mf", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/notice-and-name?run={sourceSessionId}&at=offphone&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"morning": {"kind": "at_local", "days": 1, "time": "09:00"},
+                                             "evening": {"kind": "at_local", "days": 1, "time": "19:00"}}},
+        "staleAfterHours": 48, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Your noticing practice", "body": "A minute of noticing, without the app. Did you get to try it?"},
+        "choices": [{"id": "dismiss", "label": "Not this time", "status": "dismissed"}],
+        "notification": "Your noticing practice is ready to check.",
+    },
+    {
         # Good things (ER-04, docs/design/good-things.md): the one good thing the person picked for today, at the time
         # they picked (now → an hour from now). The card reopens that visit at `back` (R9 `reopens`: *Did it happen?*,
         # then lighter / same / heavier and where the mind was). Opening it is the resolution. Content-free (PRD).
@@ -836,6 +851,14 @@ NEW_SKILLS = [
     ("cope_ahead", "Cope Ahead", "Moderate", "mind", "dbt_cope_ahead",
      "Deciding what you'll do at the hardest moment, and rehearsing it once in your mind, makes the plan easier to reach when it comes.",
      ["linehan_skills_2015"], ["cope-ahead"]),
+    # Notice what's here (MF-01, docs/design/notice-and-name.md): a completed visit is an observe and a describe rep.
+    # (Five senses stays orient only: counting it as observe too is the PRD's §2.2 note 2, left to MF-B3 with the DT lane.)
+    ("observe", "Observe", "Moderate", "mind", "dbt_observe",
+     "Giving attention one small job, and coming back each time it wanders, can make noticing easier when it matters.",
+     ["linehan_skills_2015"], ["notice-and-name"]),
+    ("describe", "Describe", "Moderate", "mind", "dbt_describe",
+     "Putting a plain word on what you noticed, a guess is fine, can help separate what happened from the story about it.",
+     ["linehan_skills_2015"], ["notice-and-name"]),
 ]
 
 SOURCES = [

@@ -25892,3 +25892,705 @@ SET o:SkillOption, o += {skillId: "sleep_reset", list: "wake", value: "w0500", l
 MATCH (s:Skill {id: "sleep_reset"}), (o:SkillOption {id: "sleep_reset:wake:w0500"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "wake", order: 62};
+
+// --- notice_and_name (nn-v1) ---
+MERGE (s:Skill {id: "notice_and_name"})
+SET s += {toolId: "notice-and-name", version: "nn-v1", contentVersion: "skills-v1", start: "way", ownMax: 40, emotionFields: [], accepts: ["band", "frame"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"back_to_room\": \"Back to the room\", \"body_first\": \"My body first\", \"bowl_done\": \"That's the time.\", \"bowl_dropped\": \"A pebble in the bowl.\", \"bowl_running\": \"A pebble for each time.\", \"bowl_skip\": \"Move on\", \"bowl_start\": \"Start\", \"came_back\": \"Came back\", \"close_title\": \"Compared to when you started, you feel…\", \"contact_done\": \"That's three.\", \"contact_drop\": \"Let go\", \"contact_press\": \"Pressing\", \"contact_start\": \"Hold to press\", \"contact_step1\": \"Hold the circle and press your feet down into the floor.\", \"contact_step2\": \"Let go, and notice the difference.\", \"contact_title\": \"Feet on the floor.\", \"done\": \"Done\", \"else_hint\": \"Tap any. Noticing them is part of it.\", \"else_title\": \"What else showed up while you did this?\", \"end_feeling_line\": \"A feeling showed up. If you want a word for it, Find the feeling can help.\", \"end_flooded_title\": \"You noticed something while your body was loud. That counts.\", \"end_found_title\": \"You noticed what was here. That counts.\", \"end_return_title\": \"Wandering is the practice. Each time you came back, that was the skill.\", \"end_thought_line\": \"A thought showed up. Watching it as a thought is its own practice.\", \"far_line\": \"Sometimes the mind steps back when things are a lot. Next time, looking or listening, eyes open, may suit you better. If it happens a lot, a doctor or therapist can help with it.\", \"far_safety\": \"If it comes with thoughts of hurting yourself\", \"far_title\": \"Feeling further away can happen when attention turns in.\", \"found\": \"Found one\", \"found_done\": \"That's three.\", \"here\": \"You're here, and it's\", \"inside_task\": \"Eyes open. Let your gaze rest low if you like. Notice what's there, without changing it. When your mind wanders, tap, and come back.\", \"inside_title\": \"{place}. Stay with it for a little while.\", \"inside_title_none\": \"Stay with where you touch the chair or the floor.\", \"inside_where_hint\": \"Start where you touch the chair or the floor, then a little further in. Roughly is fine. If you start to feel far away, the room is one tap away.\", \"inside_where_title\": \"Where is something most noticeable right now?\", \"listen_task\": \"Near or far, loud or soft. No need to find them. When your mind wanders, tap, and come back to listening.\", \"listen_title\": \"Let sounds come to you.\", \"look_task\": \"Tap each one as you find it.\", \"look_title\": \"Find three things that are {what}.\", \"look_what_hint\": \"Pick one. Any shade, any size.\", \"look_what_title\": \"Find three things that are…\", \"name_hint\": \"Pick one. A guess is fine, and so is no words.\", \"name_own\": \"My own word\", \"name_title\": \"What was it like?\", \"next\": \"Next\", \"offphone_not_line\": \"Not yet is fine. It'll be there next time you're waiting.\", \"offphone_q\": \"Try one without the app? Next time you're waiting, notice three sounds. I'll ask how it went.\", \"offphone_sort_line\": \"A few seconds of noticing is still noticing.\", \"offphone_title\": \"Did you get to notice something without the app?\", \"offphone_yes_line\": \"That's the practice moving off the phone.\", \"room_end_line\": \"Stopping when it's too much is part of it too. Looking or listening, eyes open, may suit you better next time.\", \"room_end_title\": \"Back in the room.\", \"room_task\": \"Find three things you can see.\", \"room_title\": \"Back to the room.\", \"safety_open\": \"Talk to someone now\", \"safety_urge\": \"If the urge is to hurt yourself\", \"touch_task\": \"Notice if it's warm or cool, smooth or rough. When your mind wanders, tap, and come back to it.\", \"touch_title\": \"Hold something near you.\", \"way_hint\": \"Eyes open, a minute or so. Your mind will wander. Coming back is the practice.\", \"way_hint_flooded\": \"Noticing works better once your body settles. You can look or listen for a minute, or start with your body.\", \"way_title\": \"Pick a way to notice.\", \"way_title_flooded\": \"Your body's loud right now.\"}", s.tablesJson = "{\"firstWayOf\": {\"blank\": \"contact\", \"far\": \"look\", \"listen\": \"listen\"}}", s.deriveJson = "[{\"from\": \"$ctx.frame\", \"name\": \"firstWay\", \"table\": \"firstWayOf\"}]";
+MATCH (t:TherapyConcept {id: "dbt_observe"}), (s:Skill {id: "notice_and_name"})
+MERGE (t)-[:HAS_SKILL]->(s);
+MATCH (:SkillStep {skillId: "notice_and_name"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
+MATCH (:Skill {id: "notice_and_name"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
+MERGE (n:SkillStep {id: "notice_and_name:way"})
+SET n += {skillId: "notice_and_name", step: "way", kind: "ask", version: "nn-v1"}, n.specJson = "{\"fields\": [{\"id\": \"way\", \"links\": [{\"exit\": \"cool_down\", \"label\": \"body_first\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}], \"max\": 1, \"options\": {\"firstFrom\": \"$d.firstWay\", \"list\": \"way\", \"where\": {\"all\": [{\"not\": {\"all\": [{\"eq\": [\"$opt.inward\", true]}, {\"any\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"eq\": [\"$ctx.frame\", \"far\"]}, {\"eq\": [\"$ctx.frame\", \"listen\"]}]}]}}, {\"not\": {\"all\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"not\": {\"eq\": [\"$opt.calm\", true]}}]}}]}}, \"required\": true}], \"lines\": [{\"key\": \"way_hint_flooded\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"way_hint\", \"when\": {\"not\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}}], \"title\": [{\"key\": \"way_title_flooded\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"way_title\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "notice_and_name"}), (n:SkillStep {id: "notice_and_name:way"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 0};
+MERGE (n:SkillStep {id: "notice_and_name:look_what"})
+SET n += {skillId: "notice_and_name", step: "look_what", kind: "ask", version: "nn-v1"}, n.specJson = "{\"fields\": [{\"id\": \"what\", \"max\": 1, \"options\": {\"list\": \"look_for\"}, \"required\": true}], \"hint\": \"look_what_hint\", \"title\": \"look_what_title\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (n:SkillStep {id: "notice_and_name:look_what"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 1};
+MERGE (n:SkillStep {id: "notice_and_name:look"})
+SET n += {skillId: "notice_and_name", step: "look", kind: "embed", version: "nn-v1"}, n.specJson = "{\"answerAs\": \"look\", \"embed\": \"orientFind\", \"props\": {\"count\": 3, \"done\": \"found_done\", \"foundLabel\": \"found\", \"here\": \"here\", \"next\": \"next\", \"task\": \"look_task\", \"variant\": \"find\"}, \"title\": \"look_title\", \"titleSlots\": {\"what\": {\"labelOf\": \"what\"}}}";
+MATCH (s:Skill {id: "notice_and_name"}), (n:SkillStep {id: "notice_and_name:look"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 2};
+MERGE (n:SkillStep {id: "notice_and_name:listen"})
+SET n += {skillId: "notice_and_name", step: "listen", kind: "embed", version: "nn-v1"}, n.specJson = "{\"answerAs\": \"listen\", \"embed\": \"pebbleBowl\", \"props\": {\"done\": \"bowl_done\", \"dropped\": \"bowl_dropped\", \"next\": \"next\", \"room\": \"back_to_room\", \"running\": \"bowl_running\", \"seconds\": 60, \"skip\": \"bowl_skip\", \"start\": \"bowl_start\", \"tapLabel\": \"came_back\", \"task\": \"listen_task\"}, \"title\": \"listen_title\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (n:SkillStep {id: "notice_and_name:listen"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 3};
+MERGE (n:SkillStep {id: "notice_and_name:touch"})
+SET n += {skillId: "notice_and_name", step: "touch", kind: "embed", version: "nn-v1"}, n.specJson = "{\"answerAs\": \"touch\", \"embed\": \"pebbleBowl\", \"props\": {\"done\": \"bowl_done\", \"dropped\": \"bowl_dropped\", \"next\": \"next\", \"room\": \"back_to_room\", \"running\": \"bowl_running\", \"seconds\": 45, \"skip\": \"bowl_skip\", \"start\": \"bowl_start\", \"tapLabel\": \"came_back\", \"task\": \"touch_task\"}, \"title\": \"touch_title\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (n:SkillStep {id: "notice_and_name:touch"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 4};
+MERGE (n:SkillStep {id: "notice_and_name:contact"})
+SET n += {skillId: "notice_and_name", step: "contact", kind: "embed", version: "nn-v1"}, n.specJson = "{\"answerAs\": \"contact\", \"embed\": \"squeezeRelease\", \"props\": {\"done\": \"contact_done\", \"dropLabel\": \"contact_drop\", \"next\": \"next\", \"rounds\": 3, \"squeezeLabel\": \"contact_press\", \"squeezeSec\": 5, \"start\": \"contact_start\", \"step1\": \"contact_step1\", \"step2\": \"contact_step2\"}, \"title\": \"contact_title\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (n:SkillStep {id: "notice_and_name:contact"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 5};
+MERGE (n:SkillStep {id: "notice_and_name:inside_where"})
+SET n += {skillId: "notice_and_name", step: "inside_where", kind: "ask", version: "nn-v1"}, n.specJson = "{\"fields\": [{\"id\": \"place\", \"max\": 1, \"options\": {\"list\": \"inside_where\"}, \"required\": true}], \"hint\": \"inside_where_hint\", \"title\": \"inside_where_title\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (n:SkillStep {id: "notice_and_name:inside_where"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 6};
+MERGE (n:SkillStep {id: "notice_and_name:inside"})
+SET n += {skillId: "notice_and_name", step: "inside", kind: "embed", version: "nn-v1"}, n.specJson = "{\"answerAs\": \"inside\", \"embed\": \"pebbleBowl\", \"props\": {\"done\": \"bowl_done\", \"dropped\": \"bowl_dropped\", \"next\": \"next\", \"room\": \"back_to_room\", \"running\": \"bowl_running\", \"seconds\": 30, \"skip\": \"bowl_skip\", \"start\": \"bowl_start\", \"tapLabel\": \"came_back\", \"task\": \"inside_task\"}, \"title\": [{\"key\": \"inside_title_none\", \"when\": {\"eq\": [\"$a.place\", \"none\"]}}, {\"key\": \"inside_title\", \"when\": {\"all\": []}}], \"titleSlots\": {\"place\": {\"labelOf\": \"place\"}}}";
+MATCH (s:Skill {id: "notice_and_name"}), (n:SkillStep {id: "notice_and_name:inside"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 7};
+MERGE (n:SkillStep {id: "notice_and_name:name"})
+SET n += {skillId: "notice_and_name", step: "name", kind: "ask", version: "nn-v1"}, n.specJson = "{\"fields\": [{\"id\": \"name\", \"max\": 1, \"options\": {\"list\": \"words\", \"where\": {\"any\": [{\"eq\": [\"$opt.channel\", \"$a.way\"]}, {\"eq\": [\"$opt.channel\", \"any\"]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"name_own\"}, \"required\": true}], \"hint\": \"name_hint\", \"title\": \"name_title\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (n:SkillStep {id: "notice_and_name:name"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 8};
+MERGE (n:SkillStep {id: "notice_and_name:else"})
+SET n += {skillId: "notice_and_name", step: "else", kind: "ask", version: "nn-v1"}, n.specJson = "{\"fields\": [{\"id\": \"else\", \"max\": 5, \"options\": {\"list\": \"else\"}, \"required\": false}], \"hint\": \"else_hint\", \"title\": \"else_title\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (n:SkillStep {id: "notice_and_name:else"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 9};
+MERGE (n:SkillStep {id: "notice_and_name:close"})
+SET n += {skillId: "notice_and_name", step: "close", kind: "ask", version: "nn-v1"}, n.specJson = "{\"fields\": [{\"askFresh\": \"thenVsNow\", \"id\": \"close\", \"max\": 1, \"options\": {\"list\": \"tvn\"}, \"required\": true}], \"title\": \"close_title\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (n:SkillStep {id: "notice_and_name:close"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 10};
+MERGE (n:SkillStep {id: "notice_and_name:room"})
+SET n += {skillId: "notice_and_name", step: "room", kind: "embed", version: "nn-v1"}, n.specJson = "{\"answerAs\": \"room\", \"embed\": \"orientFind\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"count\": 3, \"done\": \"found_done\", \"foundLabel\": \"found\", \"here\": \"here\", \"next\": \"next\", \"task\": \"room_task\", \"variant\": \"find\"}, \"title\": \"room_title\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (n:SkillStep {id: "notice_and_name:room"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 11};
+MERGE (n:SkillStep {id: "notice_and_name:far"})
+SET n += {skillId: "notice_and_name", step: "far", kind: "handoff", version: "nn-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"far_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"far_safety\", \"when\": {\"all\": []}}], \"title\": \"far_title\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (n:SkillStep {id: "notice_and_name:far"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 12};
+MERGE (n:SkillStep {id: "notice_and_name:room_stop"})
+SET n += {skillId: "notice_and_name", step: "room_stop", kind: "embed", version: "nn-v1"}, n.specJson = "{\"answerAs\": \"room_stop\", \"embed\": \"orientFind\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"count\": 3, \"done\": \"found_done\", \"foundLabel\": \"found\", \"here\": \"here\", \"next\": \"next\", \"task\": \"room_task\", \"variant\": \"find\"}, \"title\": \"room_title\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (n:SkillStep {id: "notice_and_name:room_stop"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 13};
+MERGE (n:SkillStep {id: "notice_and_name:room_end"})
+SET n += {skillId: "notice_and_name", step: "room_end", kind: "handoff", version: "nn-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"room_end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"far_safety\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"room_end_title\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (n:SkillStep {id: "notice_and_name:room_end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 14};
+MERGE (n:SkillStep {id: "notice_and_name:end"})
+SET n += {skillId: "notice_and_name", step: "end", kind: "handoff", version: "nn-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"fields\": [{\"id\": \"when\", \"label\": \"offphone_q\", \"max\": 1, \"options\": {\"list\": \"when\"}}], \"followUp\": {\"type\": \"offphone_rep\", \"whenFrom\": \"when\"}, \"lines\": [{\"key\": \"end_feeling_line\", \"when\": {\"has\": [\"$a.else.ids\", \"feeling\"]}}, {\"key\": \"end_thought_line\", \"when\": {\"has\": [\"$a.else.ids\", \"thought\"]}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_urge\", \"when\": {\"has\": [\"$a.else.ids\", \"urge\"]}}], \"title\": [{\"key\": \"end_found_title\", \"when\": {\"in\": [\"$a.way\", [\"look\", \"contact\"]]}}, {\"key\": \"end_return_title\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "notice_and_name"}), (n:SkillStep {id: "notice_and_name:end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 15};
+MERGE (n:SkillStep {id: "notice_and_name:end_flooded"})
+SET n += {skillId: "notice_and_name", step: "end_flooded", kind: "handoff", version: "nn-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [], \"title\": \"end_flooded_title\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (n:SkillStep {id: "notice_and_name:end_flooded"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 16};
+MERGE (n:SkillStep {id: "notice_and_name:offphone"})
+SET n += {skillId: "notice_and_name", step: "offphone", kind: "ask", version: "nn-v1"}, n.specJson = "{\"clears\": [\"offphone\"], \"fields\": [{\"id\": \"offphone\", \"max\": 1, \"options\": {\"list\": \"offphone\"}, \"required\": true}], \"reopens\": {\"after\": \"end\"}, \"title\": \"offphone_title\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (n:SkillStep {id: "notice_and_name:offphone"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 17};
+MERGE (n:SkillStep {id: "notice_and_name:offphone_end"})
+SET n += {skillId: "notice_and_name", step: "offphone_end", kind: "handoff", version: "nn-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"offphone_yes_line\", \"when\": {\"eq\": [\"$a.offphone\", \"yes\"]}}, {\"key\": \"offphone_sort_line\", \"when\": {\"eq\": [\"$a.offphone\", \"sort_of\"]}}, {\"key\": \"offphone_not_line\", \"when\": {\"all\": []}}], \"noClose\": true}";
+MATCH (s:Skill {id: "notice_and_name"}), (n:SkillStep {id: "notice_and_name:offphone_end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 18};
+MERGE (x:SkillExit {id: "notice_and_name:cool_down"})
+SET x += {skillId: "notice_and_name", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "notice_and_name"}), (x:SkillExit {id: "notice_and_name:cool_down"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "notice_and_name:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "notice_and_name:find_the_feeling"})
+SET x += {skillId: "notice_and_name", exit: "find_the_feeling", toolId: "find-the-feeling", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "notice_and_name"}), (x:SkillExit {id: "notice_and_name:find_the_feeling"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "notice_and_name:find_the_feeling"}), (t:TherapyConcept {appToolId: "find-the-feeling"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "notice_and_name:thoughts_passing"})
+SET x += {skillId: "notice_and_name", exit: "thoughts_passing", toolId: "thoughts-passing", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "notice_and_name"}), (x:SkillExit {id: "notice_and_name:thoughts_passing"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "notice_and_name:thoughts_passing"}), (t:TherapyConcept {appToolId: "thoughts-passing"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "notice_and_name:five_senses"})
+SET x += {skillId: "notice_and_name", exit: "five_senses", toolId: "five-senses", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "notice_and_name"}), (x:SkillExit {id: "notice_and_name:five_senses"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "notice_and_name:five_senses"}), (t:TherapyConcept {appToolId: "five-senses"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "notice_and_name:safety_open"})
+SET x += {skillId: "notice_and_name", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "notice_and_name"}), (x:SkillExit {id: "notice_and_name:safety_open"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MERGE (x:SkillExit {id: "notice_and_name:done"})
+SET x += {skillId: "notice_and_name", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "notice_and_name"}), (x:SkillExit {id: "notice_and_name:done"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (a:SkillStep {id: "notice_and_name:way"}), (b:SkillStep {id: "notice_and_name:look_what"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.way\", \"look\"]}";
+MATCH (a:SkillStep {id: "notice_and_name:way"}), (b:SkillStep {id: "notice_and_name:listen"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.way\", \"listen\"]}";
+MATCH (a:SkillStep {id: "notice_and_name:way"}), (b:SkillStep {id: "notice_and_name:touch"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "{\"eq\": [\"$a.way\", \"touch\"]}";
+MATCH (a:SkillStep {id: "notice_and_name:way"}), (b:SkillStep {id: "notice_and_name:contact"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 3}, r.whenJson = "{\"eq\": [\"$a.way\", \"contact\"]}";
+MATCH (a:SkillStep {id: "notice_and_name:way"}), (b:SkillStep {id: "notice_and_name:inside_where"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 4}, r.whenJson = "{\"eq\": [\"$a.way\", \"inside\"]}";
+MATCH (a:SkillStep {id: "notice_and_name:way"}), (x:SkillExit {id: "notice_and_name:cool_down"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "way", label: "body_first"}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
+MATCH (a:SkillStep {id: "notice_and_name:look_what"}), (b:SkillStep {id: "notice_and_name:look"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "notice_and_name:look"}), (b:SkillStep {id: "notice_and_name:close"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
+MATCH (a:SkillStep {id: "notice_and_name:look"}), (b:SkillStep {id: "notice_and_name:name"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "notice_and_name:listen"}), (b:SkillStep {id: "notice_and_name:room_stop"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.listen\", \"room\"]}";
+MATCH (a:SkillStep {id: "notice_and_name:listen"}), (b:SkillStep {id: "notice_and_name:close"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"any\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"eq\": [\"$a.listen\", \"skipped\"]}]}";
+MATCH (a:SkillStep {id: "notice_and_name:listen"}), (b:SkillStep {id: "notice_and_name:name"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "notice_and_name:touch"}), (b:SkillStep {id: "notice_and_name:room_stop"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.touch\", \"room\"]}";
+MATCH (a:SkillStep {id: "notice_and_name:touch"}), (b:SkillStep {id: "notice_and_name:close"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"any\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"eq\": [\"$a.touch\", \"skipped\"]}]}";
+MATCH (a:SkillStep {id: "notice_and_name:touch"}), (b:SkillStep {id: "notice_and_name:name"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "notice_and_name:contact"}), (b:SkillStep {id: "notice_and_name:close"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
+MATCH (a:SkillStep {id: "notice_and_name:contact"}), (b:SkillStep {id: "notice_and_name:name"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "notice_and_name:inside_where"}), (b:SkillStep {id: "notice_and_name:inside"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "notice_and_name:inside"}), (b:SkillStep {id: "notice_and_name:room_stop"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.inside\", \"room\"]}";
+MATCH (a:SkillStep {id: "notice_and_name:inside"}), (b:SkillStep {id: "notice_and_name:close"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"any\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"eq\": [\"$a.inside\", \"skipped\"]}]}";
+MATCH (a:SkillStep {id: "notice_and_name:inside"}), (b:SkillStep {id: "notice_and_name:name"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "notice_and_name:name"}), (b:SkillStep {id: "notice_and_name:else"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "notice_and_name:else"}), (b:SkillStep {id: "notice_and_name:close"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "notice_and_name:close"}), (b:SkillStep {id: "notice_and_name:room"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.close\", \"worse\"]}";
+MATCH (a:SkillStep {id: "notice_and_name:close"}), (b:SkillStep {id: "notice_and_name:end_flooded"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
+MATCH (a:SkillStep {id: "notice_and_name:close"}), (b:SkillStep {id: "notice_and_name:end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "notice_and_name:room"}), (b:SkillStep {id: "notice_and_name:far"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "notice_and_name:room"}), (x:SkillExit {id: "notice_and_name:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "notice_and_name:far"}), (x:SkillExit {id: "notice_and_name:five_senses"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "notice_and_name:far"}), (x:SkillExit {id: "notice_and_name:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "far_safety"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "notice_and_name:room_stop"}), (b:SkillStep {id: "notice_and_name:room_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "notice_and_name:room_stop"}), (x:SkillExit {id: "notice_and_name:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "notice_and_name:room_end"}), (x:SkillExit {id: "notice_and_name:five_senses"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "notice_and_name:room_end"}), (x:SkillExit {id: "notice_and_name:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "far_safety"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "notice_and_name:end"}), (x:SkillExit {id: "notice_and_name:find_the_feeling"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"has\": [\"$a.else.ids\", \"feeling\"]}}]";
+MATCH (a:SkillStep {id: "notice_and_name:end"}), (x:SkillExit {id: "notice_and_name:thoughts_passing"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": [{\"has\": [\"$a.else.ids\", \"thought\"]}, {\"not\": {\"any\": [{\"eq\": [\"$ctx.frame\", \"listen\"]}, {\"eq\": [\"$ctx.frame\", \"far\"]}]}}]}}]";
+MATCH (a:SkillStep {id: "notice_and_name:end"}), (x:SkillExit {id: "notice_and_name:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_urge"}, r.whenJson = "{\"has\": [\"$a.else.ids\", \"urge\"]}";
+MATCH (a:SkillStep {id: "notice_and_name:offphone"}), (b:SkillStep {id: "notice_and_name:offphone_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MERGE (o:SkillOption {id: "notice_and_name:way:look"})
+SET o:SkillOption:ObserveChannel, o += {skillId: "notice_and_name", list: "way", value: "look", label: "Look", version: "nn-v1"}, o.propsJson = "{\"calm\": true}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:way:look"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "way", order: 0};
+MERGE (o:SkillOption {id: "notice_and_name:way:listen"})
+SET o:SkillOption:ObserveChannel, o += {skillId: "notice_and_name", list: "way", value: "listen", label: "Listen", version: "nn-v1"}, o.propsJson = "{\"calm\": true}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:way:listen"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "way", order: 1};
+MERGE (o:SkillOption {id: "notice_and_name:way:touch"})
+SET o:SkillOption:ObserveChannel, o += {skillId: "notice_and_name", list: "way", value: "touch", label: "Touch", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:way:touch"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "way", order: 2};
+MERGE (o:SkillOption {id: "notice_and_name:way:contact"})
+SET o:SkillOption:ObserveChannel, o += {skillId: "notice_and_name", list: "way", value: "contact", label: "Feet on the floor", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:way:contact"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "way", order: 3};
+MERGE (o:SkillOption {id: "notice_and_name:way:inside"})
+SET o:SkillOption:ObserveChannel, o += {skillId: "notice_and_name", list: "way", value: "inside", label: "Inside the body", version: "nn-v1"}, o.propsJson = "{\"inward\": true}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:way:inside"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "way", order: 4};
+MERGE (o:SkillOption {id: "notice_and_name:look_for:blue"})
+SET o:SkillOption:LookPrompt, o += {skillId: "notice_and_name", list: "look_for", value: "blue", label: "blue", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:look_for:blue"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "look_for", order: 5};
+MERGE (o:SkillOption {id: "notice_and_name:look_for:round"})
+SET o:SkillOption:LookPrompt, o += {skillId: "notice_and_name", list: "look_for", value: "round", label: "round", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:look_for:round"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "look_for", order: 6};
+MERGE (o:SkillOption {id: "notice_and_name:look_for:soft"})
+SET o:SkillOption:LookPrompt, o += {skillId: "notice_and_name", list: "look_for", value: "soft", label: "soft", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:look_for:soft"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "look_for", order: 7};
+MERGE (o:SkillOption {id: "notice_and_name:look_for:old"})
+SET o:SkillOption:LookPrompt, o += {skillId: "notice_and_name", list: "look_for", value: "old", label: "old", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:look_for:old"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "look_for", order: 8};
+MERGE (o:SkillOption {id: "notice_and_name:inside_where:feet"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "inside_where", value: "feet", label: "Feet", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:inside_where:feet"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "inside_where", order: 9};
+MATCH (o:SkillOption {id: "notice_and_name:inside_where:feet"}), (c:BodyRegion {id: "feet"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:inside_where:legs"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "inside_where", value: "legs", label: "Legs", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:inside_where:legs"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "inside_where", order: 10};
+MATCH (o:SkillOption {id: "notice_and_name:inside_where:legs"}), (c:BodyRegion {id: "legs"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:inside_where:hands"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "inside_where", value: "hands", label: "Hands", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:inside_where:hands"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "inside_where", order: 11};
+MATCH (o:SkillOption {id: "notice_and_name:inside_where:hands"}), (c:BodyRegion {id: "hands"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:inside_where:lower_back"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "inside_where", value: "lower_back", label: "Lower back", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:inside_where:lower_back"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "inside_where", order: 12};
+MATCH (o:SkillOption {id: "notice_and_name:inside_where:lower_back"}), (c:BodyRegion {id: "lower_back"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:inside_where:arms"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "inside_where", value: "arms", label: "Arms", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:inside_where:arms"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "inside_where", order: 13};
+MATCH (o:SkillOption {id: "notice_and_name:inside_where:arms"}), (c:BodyRegion {id: "arms"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:inside_where:shoulders"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "inside_where", value: "shoulders", label: "Shoulders", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:inside_where:shoulders"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "inside_where", order: 14};
+MATCH (o:SkillOption {id: "notice_and_name:inside_where:shoulders"}), (c:BodyRegion {id: "shoulders"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:inside_where:upper_back"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "inside_where", value: "upper_back", label: "Upper back", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:inside_where:upper_back"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "inside_where", order: 15};
+MATCH (o:SkillOption {id: "notice_and_name:inside_where:upper_back"}), (c:BodyRegion {id: "upper_back"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:inside_where:stomach"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "inside_where", value: "stomach", label: "Stomach", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:inside_where:stomach"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "inside_where", order: 16};
+MATCH (o:SkillOption {id: "notice_and_name:inside_where:stomach"}), (c:BodyRegion {id: "stomach"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:inside_where:head"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "inside_where", value: "head", label: "Head", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:inside_where:head"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "inside_where", order: 17};
+MATCH (o:SkillOption {id: "notice_and_name:inside_where:head"}), (c:BodyRegion {id: "head"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:inside_where:face"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "inside_where", value: "face", label: "Face", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:inside_where:face"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "inside_where", order: 18};
+MATCH (o:SkillOption {id: "notice_and_name:inside_where:face"}), (c:BodyRegion {id: "face"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:inside_where:jaw"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "inside_where", value: "jaw", label: "Jaw", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:inside_where:jaw"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "inside_where", order: 19};
+MATCH (o:SkillOption {id: "notice_and_name:inside_where:jaw"}), (c:BodyRegion {id: "jaw"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:inside_where:neck"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "inside_where", value: "neck", label: "Neck", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:inside_where:neck"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "inside_where", order: 20};
+MATCH (o:SkillOption {id: "notice_and_name:inside_where:neck"}), (c:BodyRegion {id: "neck"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:inside_where:none"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "inside_where", value: "none", label: "Nothing stands out", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:inside_where:none"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "inside_where", order: 21};
+MERGE (o:SkillOption {id: "notice_and_name:words:look_bright"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "look_bright", label: "Bright", version: "nn-v1"}, o.propsJson = "{\"channel\": \"look\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:look_bright"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 22};
+MERGE (o:SkillOption {id: "notice_and_name:words:look_dull"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "look_dull", label: "Dull", version: "nn-v1"}, o.propsJson = "{\"channel\": \"look\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:look_dull"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 23};
+MERGE (o:SkillOption {id: "notice_and_name:words:look_still"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "look_still", label: "Still", version: "nn-v1"}, o.propsJson = "{\"channel\": \"look\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:look_still"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 24};
+MERGE (o:SkillOption {id: "notice_and_name:words:look_moving"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "look_moving", label: "Moving", version: "nn-v1"}, o.propsJson = "{\"channel\": \"look\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:look_moving"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 25};
+MERGE (o:SkillOption {id: "notice_and_name:words:look_near"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "look_near", label: "Near", version: "nn-v1"}, o.propsJson = "{\"channel\": \"look\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:look_near"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 26};
+MERGE (o:SkillOption {id: "notice_and_name:words:look_far"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "look_far", label: "Far", version: "nn-v1"}, o.propsJson = "{\"channel\": \"look\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:look_far"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 27};
+MERGE (o:SkillOption {id: "notice_and_name:words:look_sharp"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "look_sharp", label: "Sharp", version: "nn-v1"}, o.propsJson = "{\"channel\": \"look\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:look_sharp"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 28};
+MERGE (o:SkillOption {id: "notice_and_name:words:look_blurry"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "look_blurry", label: "Blurry", version: "nn-v1"}, o.propsJson = "{\"channel\": \"look\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:look_blurry"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 29};
+MERGE (o:SkillOption {id: "notice_and_name:words:listen_near"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "listen_near", label: "Near", version: "nn-v1"}, o.propsJson = "{\"channel\": \"listen\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:listen_near"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 30};
+MERGE (o:SkillOption {id: "notice_and_name:words:listen_far"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "listen_far", label: "Far", version: "nn-v1"}, o.propsJson = "{\"channel\": \"listen\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:listen_far"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 31};
+MERGE (o:SkillOption {id: "notice_and_name:words:listen_steady"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "listen_steady", label: "Steady", version: "nn-v1"}, o.propsJson = "{\"channel\": \"listen\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:listen_steady"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 32};
+MERGE (o:SkillOption {id: "notice_and_name:words:listen_coming_going"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "listen_coming_going", label: "Coming and going", version: "nn-v1"}, o.propsJson = "{\"channel\": \"listen\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:listen_coming_going"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 33};
+MERGE (o:SkillOption {id: "notice_and_name:words:listen_high"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "listen_high", label: "High", version: "nn-v1"}, o.propsJson = "{\"channel\": \"listen\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:listen_high"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 34};
+MERGE (o:SkillOption {id: "notice_and_name:words:listen_low"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "listen_low", label: "Low", version: "nn-v1"}, o.propsJson = "{\"channel\": \"listen\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:listen_low"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 35};
+MERGE (o:SkillOption {id: "notice_and_name:words:listen_loud"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "listen_loud", label: "Loud", version: "nn-v1"}, o.propsJson = "{\"channel\": \"listen\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:listen_loud"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 36};
+MERGE (o:SkillOption {id: "notice_and_name:words:listen_quiet"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "listen_quiet", label: "Quiet", version: "nn-v1"}, o.propsJson = "{\"channel\": \"listen\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:listen_quiet"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 37};
+MERGE (o:SkillOption {id: "notice_and_name:words:touch_warm"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "touch_warm", label: "Warm", version: "nn-v1"}, o.propsJson = "{\"channel\": \"touch\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:touch_warm"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 38};
+MERGE (o:SkillOption {id: "notice_and_name:words:touch_cool"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "touch_cool", label: "Cool", version: "nn-v1"}, o.propsJson = "{\"channel\": \"touch\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:touch_cool"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 39};
+MERGE (o:SkillOption {id: "notice_and_name:words:touch_smooth"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "touch_smooth", label: "Smooth", version: "nn-v1"}, o.propsJson = "{\"channel\": \"touch\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:touch_smooth"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 40};
+MERGE (o:SkillOption {id: "notice_and_name:words:touch_rough"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "touch_rough", label: "Rough", version: "nn-v1"}, o.propsJson = "{\"channel\": \"touch\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:touch_rough"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 41};
+MERGE (o:SkillOption {id: "notice_and_name:words:touch_soft"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "touch_soft", label: "Soft", version: "nn-v1"}, o.propsJson = "{\"channel\": \"touch\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:touch_soft"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 42};
+MERGE (o:SkillOption {id: "notice_and_name:words:touch_hard"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "touch_hard", label: "Hard", version: "nn-v1"}, o.propsJson = "{\"channel\": \"touch\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:touch_hard"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 43};
+MERGE (o:SkillOption {id: "notice_and_name:words:touch_heavy"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "touch_heavy", label: "Heavy", version: "nn-v1"}, o.propsJson = "{\"channel\": \"touch\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:touch_heavy"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 44};
+MERGE (o:SkillOption {id: "notice_and_name:words:touch_light"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "touch_light", label: "Light", version: "nn-v1"}, o.propsJson = "{\"channel\": \"touch\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:touch_light"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 45};
+MERGE (o:SkillOption {id: "notice_and_name:words:contact_solid"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "contact_solid", label: "Solid", version: "nn-v1"}, o.propsJson = "{\"channel\": \"contact\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:contact_solid"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 46};
+MERGE (o:SkillOption {id: "notice_and_name:words:contact_pressing"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "contact_pressing", label: "Pressing", version: "nn-v1"}, o.propsJson = "{\"channel\": \"contact\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:contact_pressing"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 47};
+MERGE (o:SkillOption {id: "notice_and_name:words:contact_heavy"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "contact_heavy", label: "Heavy", version: "nn-v1"}, o.propsJson = "{\"channel\": \"contact\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:contact_heavy"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 48};
+MERGE (o:SkillOption {id: "notice_and_name:words:contact_light"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "contact_light", label: "Light", version: "nn-v1"}, o.propsJson = "{\"channel\": \"contact\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:contact_light"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 49};
+MERGE (o:SkillOption {id: "notice_and_name:words:contact_warm"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "contact_warm", label: "Warm", version: "nn-v1"}, o.propsJson = "{\"channel\": \"contact\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:contact_warm"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 50};
+MERGE (o:SkillOption {id: "notice_and_name:words:contact_cool"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "contact_cool", label: "Cool", version: "nn-v1"}, o.propsJson = "{\"channel\": \"contact\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:contact_cool"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 51};
+MERGE (o:SkillOption {id: "notice_and_name:words:contact_tingly"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "contact_tingly", label: "Tingly", version: "nn-v1"}, o.propsJson = "{\"channel\": \"contact\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:contact_tingly"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 52};
+MERGE (o:SkillOption {id: "notice_and_name:words:contact_steady"})
+SET o:SkillOption:DescribeWord, o += {skillId: "notice_and_name", list: "words", value: "contact_steady", label: "Steady", version: "nn-v1"}, o.propsJson = "{\"channel\": \"contact\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:contact_steady"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 53};
+MERGE (o:SkillOption {id: "notice_and_name:words:inside_tension"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "words", value: "inside_tension", label: "Tight", version: "nn-v1"}, o.propsJson = "{\"channel\": \"inside\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:inside_tension"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 54};
+MATCH (o:SkillOption {id: "notice_and_name:words:inside_tension"}), (c:SensationType {id: "tension"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:words:inside_loose"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "words", value: "inside_loose", label: "Loose", version: "nn-v1"}, o.propsJson = "{\"channel\": \"inside\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:inside_loose"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 55};
+MATCH (o:SkillOption {id: "notice_and_name:words:inside_loose"}), (c:SensationType {id: "loose"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:words:inside_heaviness"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "words", value: "inside_heaviness", label: "Heavy", version: "nn-v1"}, o.propsJson = "{\"channel\": \"inside\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:inside_heaviness"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 56};
+MATCH (o:SkillOption {id: "notice_and_name:words:inside_heaviness"}), (c:SensationType {id: "heaviness"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:words:inside_lightness"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "words", value: "inside_lightness", label: "Light", version: "nn-v1"}, o.propsJson = "{\"channel\": \"inside\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:inside_lightness"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 57};
+MATCH (o:SkillOption {id: "notice_and_name:words:inside_lightness"}), (c:SensationType {id: "lightness"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:words:inside_warmth"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "words", value: "inside_warmth", label: "Warm", version: "nn-v1"}, o.propsJson = "{\"channel\": \"inside\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:inside_warmth"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 58};
+MATCH (o:SkillOption {id: "notice_and_name:words:inside_warmth"}), (c:SensationType {id: "warmth"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:words:inside_cold_sensation"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "words", value: "inside_cold_sensation", label: "Cold", version: "nn-v1"}, o.propsJson = "{\"channel\": \"inside\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:inside_cold_sensation"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 59};
+MATCH (o:SkillOption {id: "notice_and_name:words:inside_cold_sensation"}), (c:SensationType {id: "cold_sensation"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:words:inside_tingly"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "words", value: "inside_tingly", label: "Tingly", version: "nn-v1"}, o.propsJson = "{\"channel\": \"inside\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:inside_tingly"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 60};
+MATCH (o:SkillOption {id: "notice_and_name:words:inside_tingly"}), (c:SensationType {id: "tingly"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:words:inside_buzzing"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "words", value: "inside_buzzing", label: "Buzzing", version: "nn-v1"}, o.propsJson = "{\"channel\": \"inside\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:inside_buzzing"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 61};
+MATCH (o:SkillOption {id: "notice_and_name:words:inside_buzzing"}), (c:SensationType {id: "buzzing"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:words:inside_pressure"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "words", value: "inside_pressure", label: "Pressure", version: "nn-v1"}, o.propsJson = "{\"channel\": \"inside\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:inside_pressure"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 62};
+MATCH (o:SkillOption {id: "notice_and_name:words:inside_pressure"}), (c:SensationType {id: "pressure"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:words:inside_settled"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "words", value: "inside_settled", label: "Settled", version: "nn-v1"}, o.propsJson = "{\"channel\": \"inside\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:inside_settled"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 63};
+MATCH (o:SkillOption {id: "notice_and_name:words:inside_settled"}), (c:SensationType {id: "settled"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:words:inside_numbness_sensation"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "words", value: "inside_numbness_sensation", label: "Numb", version: "nn-v1"}, o.propsJson = "{\"channel\": \"inside\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:inside_numbness_sensation"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 64};
+MATCH (o:SkillOption {id: "notice_and_name:words:inside_numbness_sensation"}), (c:SensationType {id: "numbness_sensation"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:words:inside_achy"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "words", value: "inside_achy", label: "Achy", version: "nn-v1"}, o.propsJson = "{\"channel\": \"inside\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:inside_achy"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 65};
+MATCH (o:SkillOption {id: "notice_and_name:words:inside_achy"}), (c:SensationType {id: "achy"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "notice_and_name:words:no_words"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "words", value: "no_words", label: "No words today", version: "nn-v1"}, o.propsJson = "{\"channel\": \"any\"}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:words:no_words"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 66};
+MERGE (o:SkillOption {id: "notice_and_name:else:thought"})
+SET o:SkillOption:MentalEventType, o += {skillId: "notice_and_name", list: "else", value: "thought", label: "A thought", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:else:thought"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "else", order: 67};
+MERGE (o:SkillOption {id: "notice_and_name:else:feeling"})
+SET o:SkillOption:MentalEventType, o += {skillId: "notice_and_name", list: "else", value: "feeling", label: "A feeling", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:else:feeling"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "else", order: 68};
+MERGE (o:SkillOption {id: "notice_and_name:else:body"})
+SET o:SkillOption:MentalEventType, o += {skillId: "notice_and_name", list: "else", value: "body", label: "A body sensation", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:else:body"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "else", order: 69};
+MERGE (o:SkillOption {id: "notice_and_name:else:urge"})
+SET o:SkillOption:MentalEventType, o += {skillId: "notice_and_name", list: "else", value: "urge", label: "An urge", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:else:urge"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "else", order: 70};
+MERGE (o:SkillOption {id: "notice_and_name:else:nothing"})
+SET o:SkillOption:MentalEventType, o += {skillId: "notice_and_name", list: "else", value: "nothing", label: "Nothing much", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:else:nothing"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "else", order: 71};
+MERGE (o:SkillOption {id: "notice_and_name:tvn:worse"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "tvn", value: "worse", label: "Further away", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:tvn:worse"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "tvn", order: 72};
+MERGE (o:SkillOption {id: "notice_and_name:tvn:same"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "tvn", value: "same", label: "About the same", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:tvn:same"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "tvn", order: 73};
+MERGE (o:SkillOption {id: "notice_and_name:tvn:better"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "tvn", value: "better", label: "A bit more here", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:tvn:better"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "tvn", order: 74};
+MERGE (o:SkillOption {id: "notice_and_name:tvn:much_better"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "tvn", value: "much_better", label: "More here", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:tvn:much_better"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "tvn", order: 75};
+MERGE (o:SkillOption {id: "notice_and_name:when:morning"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "when", value: "morning", label: "Tomorrow morning", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:when:morning"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "when", order: 76};
+MERGE (o:SkillOption {id: "notice_and_name:when:evening"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "when", value: "evening", label: "Tomorrow evening", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:when:evening"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "when", order: 77};
+MERGE (o:SkillOption {id: "notice_and_name:offphone:yes"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "offphone", value: "yes", label: "Yes", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:offphone:yes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "offphone", order: 78};
+MERGE (o:SkillOption {id: "notice_and_name:offphone:sort_of"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "offphone", value: "sort_of", label: "Sort of", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:offphone:sort_of"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "offphone", order: 79};
+MERGE (o:SkillOption {id: "notice_and_name:offphone:not_yet"})
+SET o:SkillOption, o += {skillId: "notice_and_name", list: "offphone", value: "not_yet", label: "Not yet", version: "nn-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "notice_and_name"}), (o:SkillOption {id: "notice_and_name:offphone:not_yet"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "offphone", order: 80};

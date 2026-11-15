@@ -87,6 +87,8 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   // Wise mind (docs/design/wise-mind.md): "Further away … More here", unless it handed off. A skill:
   // a "More here" after it counts toward what helps (not in NOT_WHAT_HELPS).
   'wise-mind': { module: 'mf', closeKind: 'orienting' },
+  // Notice what's here (MF-01, docs/design/notice-and-name.md): the orienting close asked in the flow.
+  'notice-and-name': { module: 'mf', closeKind: 'orienting' },
   // Reserved spine ids (one-shots and embeds).
   'help-now': { module: 'core', closeKind: 'none' },
   'micro-step': { module: 'core', closeKind: 'none' },
