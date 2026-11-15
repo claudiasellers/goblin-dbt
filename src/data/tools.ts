@@ -528,7 +528,7 @@ export const tools: Tool[] = [
     id: 'moment-apart',
     name: 'Take a moment apart',
     tagline: 'What a moment was made of',
-    description: 'Pick one moment, good, hard or in between, and see what it was made of: what your body did, what went through your mind, what you felt, and whether you noticed it at the time.',
+    description: 'Pick one moment (good, hard or in between) and see what it was made of: what your body did, what went through your mind, what you felt, and whether you noticed it at the time.',
     whenToUse: 'In a calm minute, when a day was "good" or "bad" and you want to know what it was made of.',
     module: 'mindfulness',
     dbtBasis: 'DBT Mindfulness: pleasant and unpleasant events (Mindfulness Worksheets 8, 9)',

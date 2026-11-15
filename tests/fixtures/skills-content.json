@@ -47555,19 +47555,23 @@
     "which_hint": "One moment from today or lately. Small is fine.",
     "heads_up_title": "Your body's loud right now.",
     "heads_up_line": "This one works better once it has settled.",
-    "heads_up_hard_title": "A hard moment can stir things up again.",
-    "heads_up_hard_line": "You can take apart a good one instead, settle first, or go on.",
+    "body_first_title": "Settle your body first.",
+    "body_first_line": "This moment will keep. First, the body.",
+    "heads_up_hard_title": "You're already stirred up.",
+    "heads_up_hard_line": "Going back into a hard moment can stir things more. A good one might fit better today.",
     "what_title": "What was going on?",
     "what_hint": "Pick the closest.",
     "what_own": "Something else",
-    "recover_title": "Someone hurt you or put you down.",
-    "recover_line": "That's worth more than taking apart. Recover is made for it.",
+    "recover_title": "Someone put you down or brushed you off.",
+    "recover_line": "That needs more care than taking apart. Recover is made for it.",
     "stop_title": "Let's not go back into that one.",
-    "stop_line": "Something frightening deserves care, not a replay. Someone to talk to can help, or come back to the room first.",
+    "stop_line": "Something frightening deserves care, not a replay. You can talk to someone, or come back to the room first.",
+    "danger_line": "When someone threatened or hurt you, your safety comes first, not a replay. Support is here, and so is the room.",
+    "ending_careful": "Leaving someone who might hurt me",
     "hurt_title": "Thank you for saying it.",
     "hurt_line": "That matters more than this practice. Someone to talk to comes first.",
     "body_title": "What did your body do then?",
-    "body_hint": "Guesses are fine. Skip what you don't remember.",
+    "body_hint": "Guesses are fine. Up to two places and three words, or skip.",
     "where_label": "Where",
     "words_label": "What it felt like",
     "thoughts_title": "What went through your mind?",
@@ -47578,13 +47582,13 @@
     "unsure_label": "Or",
     "aware_title": "Were you aware of it while it was happening?",
     "aware_hint": "Noticing later counts. Noticing during gets easier with practice.",
-    "savour_title": "Stay with the good bit for a few seconds.",
-    "savour_label": "Staying with it",
-    "savour_running": "Let it be as big as it was",
-    "savour_hint": "Bring it back to mind. Notice one thing you liked about it.",
-    "savour_done": "That's it",
+    "savour_title": "Stay with the good bit for a few seconds. Notice one thing you liked about it.",
+    "savour_label": "Start",
+    "savour_running": "Staying with it",
+    "savour_hint": "Bring it back to mind. Notice one thing you liked about it. Let it be as big as it was.",
+    "savour_done": "You stayed with it.",
     "keep_title": "What was the good bit?",
-    "keep_hint": "Pick the closest, or name it in a few words.",
+    "keep_hint": "Pick the closest, or name it in a few words so you'll know it again.",
     "keep_own": "Name it",
     "keepit_label": "Keep it in Things I like?",
     "keep_primary": "Next",
@@ -47593,6 +47597,7 @@
     "end_hard": "That was hard. You took it apart instead of carrying it whole.",
     "end_mid": "You took one moment apart. That's the skill.",
     "end_aware_yes": "And you noticed it while it happened.",
+    "end_aware_partly": "And you caught some of it while it happened.",
     "end_aware_later": "Next time, see if you notice one while it's happening.",
     "more_label": "Plan more of this",
     "ftf_label": "Find the word for the feeling",
@@ -47757,19 +47762,9 @@
       {
        "to": "heads_up_hard",
        "when": {
-        "all": [
-         {
-          "eq": [
-           "$ctx.band",
-           "stirred"
-          ]
-         },
-         {
-          "eq": [
-           "$a.valence",
-           "hard"
-          ]
-         }
+        "eq": [
+         "$a.valence",
+         "hard"
         ]
        }
       },
@@ -47849,7 +47844,7 @@
        "when": {
         "all": []
        },
-       "key": "heads_up_line"
+       "key": "body_first_line"
       }
      ],
      "done": "done",
@@ -47863,7 +47858,7 @@
       }
      ],
      "noClose": true,
-     "title": "heads_up_title",
+     "title": "body_first_title",
      "next": [],
      "offers": [
       {
@@ -47912,9 +47907,19 @@
       {
        "variant": "crisis",
        "when": {
-        "eq": [
-         "$a.what",
-         "self_harm"
+        "any": [
+         {
+          "eq": [
+           "$a.what",
+           "self_harm"
+          ]
+         },
+         {
+          "has": [
+           "$a.thoughts.ids",
+           "self_harm_thought"
+          ]
+         }
         ]
        }
       },
@@ -47923,7 +47928,7 @@
        "when": {
         "eq": [
          "$a.what",
-         "frightening"
+         "threatened"
         ]
        }
       }
@@ -47932,9 +47937,28 @@
       {
        "to": "hurt",
        "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.what",
+           "self_harm"
+          ]
+         },
+         {
+          "has": [
+           "$a.thoughts.ids",
+           "self_harm_thought"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "danger",
+       "when": {
         "eq": [
          "$a.what",
-         "self_harm"
+         "threatened"
         ]
        }
       },
@@ -48016,6 +48040,38 @@
      "links": [],
      "noClose": true,
      "title": "stop_title",
+     "next": [],
+     "offers": [
+      {
+       "exit": "safety_open",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "five_senses",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "danger",
+     "kind": "handoff",
+     "complete": false,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "danger_line"
+      }
+     ],
+     "done": "done",
+     "links": [],
+     "noClose": true,
+     "title": "stop_title",
      "crisis": [
       {
        "variant": "other_person",
@@ -48028,6 +48084,12 @@
      "offers": [
       {
        "exit": "safety_open",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "ending_careful",
        "when": {
         "all": []
        }
@@ -48089,6 +48151,18 @@
        "label": "where_label",
        "links": [
         {
+         "exit": "five_senses",
+         "label": "back_room",
+         "when": {
+          "not": {
+           "eq": [
+            "$a.valence",
+            "good"
+           ]
+          }
+         }
+        },
+        {
          "exit": "safety_open",
          "label": "safety_open",
          "when": {
@@ -48130,11 +48204,29 @@
       {
        "id": "thoughts",
        "options": {
-        "list": "thoughts"
+        "list": "thoughts",
+        "where": {
+         "has": [
+          "$opt.v",
+          "$a.valence"
+         ]
+        }
        },
        "max": 2,
        "required": false,
        "links": [
+        {
+         "exit": "five_senses",
+         "label": "back_room",
+         "when": {
+          "not": {
+           "eq": [
+            "$a.valence",
+            "good"
+           ]
+          }
+         }
+        },
         {
          "exit": "safety_open",
          "label": "safety_open",
@@ -48146,7 +48238,27 @@
       }
      ],
      "hint": "thoughts_hint",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "has": [
+         "$a.thoughts.ids",
+         "self_harm_thought"
+        ]
+       }
+      }
+     ],
      "next": [
+      {
+       "to": "hurt",
+       "when": {
+        "has": [
+         "$a.thoughts.ids",
+         "self_harm_thought"
+        ]
+       }
+      },
       {
        "to": "feel",
        "when": null
@@ -48181,6 +48293,18 @@
        "required": false,
        "emotion": true,
        "links": [
+        {
+         "exit": "five_senses",
+         "label": "back_room",
+         "when": {
+          "not": {
+           "eq": [
+            "$a.valence",
+            "good"
+           ]
+          }
+         }
+        },
         {
          "exit": "safety_open",
          "label": "safety_open",
@@ -48222,6 +48346,18 @@
        "max": 1,
        "required": true,
        "links": [
+        {
+         "exit": "five_senses",
+         "label": "back_room",
+         "when": {
+          "not": {
+           "eq": [
+            "$a.valence",
+            "good"
+           ]
+          }
+         }
+        },
         {
          "exit": "safety_open",
          "label": "safety_open",
@@ -48275,6 +48411,15 @@
       }
      ],
      "next": [
+      {
+       "to": "end",
+       "when": {
+        "eq": [
+         "$a.savoured",
+         "skipped"
+        ]
+       }
+      },
       {
        "to": "keep",
        "when": null
@@ -48354,6 +48499,15 @@
         ]
        },
        "key": "end_aware_yes"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.aware",
+         "partly"
+        ]
+       },
+       "key": "end_aware_partly"
       },
       {
        "when": {
@@ -48465,6 +48619,15 @@
          }
         ]
        }
+      },
+      {
+       "exit": "five_senses",
+       "when": {
+        "eq": [
+         "$a.valence",
+         "hard"
+        ]
+       }
       }
      ]
     }
@@ -48485,11 +48648,22 @@
      "done": true
     },
     {
+     "id": "ending_careful",
+     "toolId": "ending-relationships",
+     "query": {
+      "frame": "careful"
+     },
+     "carry": [],
+     "done": false,
+     "label": "ending_careful"
+    },
+    {
      "id": "find_the_feeling",
      "toolId": "find-the-feeling",
      "query": {},
      "carry": [],
-     "done": false
+     "done": false,
+     "label": "ftf_label"
     },
     {
      "id": "five_senses",
@@ -48504,7 +48678,8 @@
      "toolId": "good-things",
      "query": {},
      "carry": [],
-     "done": false
+     "done": false,
+     "label": "more_label"
     },
     {
      "id": "recover",
@@ -48527,7 +48702,8 @@
      "toolId": "unpack-a-judgment",
      "query": {},
      "carry": [],
-     "done": false
+     "done": false,
+     "label": "unpack_label"
     }
    ],
    "options": {
@@ -48617,22 +48793,28 @@
      },
      {
       "value": "hurt_by",
-      "label": "Someone hurt me or put me down",
+      "label": "Someone put me down, brushed me off or left me out",
+      "v": [
+       "hard",
+       "mid"
+      ]
+     },
+     {
+      "value": "threatened",
+      "label": "Someone threatened me, scared me or hurt me",
       "v": [
        "hard",
        "mid"
       ],
-      "route": "recover"
+      "danger": "other"
      },
      {
       "value": "frightening",
-      "label": "Something frightening or violent happened",
+      "label": "Something frightening happened",
       "v": [
        "hard",
        "mid"
-      ],
-      "route": "stop",
-      "danger": "other"
+      ]
      },
      {
       "value": "self_harm",
@@ -48641,7 +48823,6 @@
        "hard",
        "mid"
       ],
-      "route": "hurt",
       "danger": "self"
      }
     ],
@@ -48772,15 +48953,6 @@
       ]
      },
      {
-      "value": "butterflies",
-      "label": "Fluttery",
-      "v": [
-       "good",
-       "hard",
-       "mid"
-      ]
-     },
-     {
       "value": "tingly",
       "label": "Tingly",
       "v": [
@@ -48886,6 +49058,15 @@
       ]
      },
      {
+      "value": "butterflies",
+      "label": "Fluttery",
+      "v": [
+       "good",
+       "hard",
+       "mid"
+      ]
+     },
+     {
       "value": "no_words",
       "label": "No words for it",
       "v": [
@@ -48898,23 +49079,57 @@
     "thoughts": [
      {
       "value": "me",
-      "label": "A thought about me"
+      "label": "About me",
+      "v": [
+       "good",
+       "hard",
+       "mid"
+      ]
      },
      {
       "value": "them",
-      "label": "About someone else"
+      "label": "About someone else",
+      "v": [
+       "good",
+       "hard",
+       "mid"
+      ]
      },
      {
       "value": "next",
-      "label": "About what happens next"
+      "label": "About what happens next",
+      "v": [
+       "good",
+       "hard",
+       "mid"
+      ]
      },
      {
       "value": "meant",
-      "label": "About what it meant"
+      "label": "About what it meant",
+      "v": [
+       "good",
+       "hard",
+       "mid"
+      ]
      },
      {
       "value": "none",
-      "label": "No thoughts I noticed"
+      "label": "No thoughts I noticed",
+      "v": [
+       "good",
+       "hard",
+       "mid"
+      ]
+     },
+     {
+      "value": "self_harm_thought",
+      "label": "Thoughts of hurting myself or not being here",
+      "v": [
+       "hard",
+       "mid"
+      ],
+      "danger": "self"
      }
     ],
     "unsure": [

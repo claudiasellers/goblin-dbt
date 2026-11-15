@@ -50,27 +50,72 @@ test("which moment: good, hard or in between; the situation chips, own words", (
   assert.equal(run([...GOOD, own("what", "the bus"), next]).stepId, "body");
 });
 
-test("a hard moment: hurt by someone → Recover instead of going on; frightening → stop, no replay; hurting myself → crisis", () => {
+test("a hard moment: put down → Recover; threatened or hurt → the danger route; frightening → stop, no replay; hurting myself → crisis", () => {
   const s = run(HARD);
-  assert.deepEqual(ids(s, "what").slice(-3), ["hurt_by", "frightening", "self_harm"]);
-  assert.deepEqual(ids(run(MID), "what").slice(-3), ["hurt_by", "frightening", "self_harm"], "in between too");
-  assert.ok(!ids(run(GOOD), "what").includes("frightening"), "never on a good moment");
+  const ROUTES = ["hurt_by", "threatened", "frightening", "self_harm"];
+  assert.deepEqual(ids(s, "what").slice(-4), ROUTES);
+  assert.deepEqual(ids(run(MID), "what").slice(-4), ROUTES, "in between too");
+  assert.ok(!ids(run(GOOD), "what").some((v) => ROUTES.includes(v)), "never on a good moment");
+  const labels = Object.fromEntries(skill.options.what.map((o) => [o.value, o.label]));
+  assert.equal(labels.hurt_by, "Someone put me down, brushed me off or left me out", "Recover's chip is never the danger chip");
+  assert.equal(labels.threatened, "Someone threatened me, scared me or hurt me");
   const rec = run([...HARD, pick("what", "hurt_by"), next]);
   assert.equal(rec.stepId, "recover");
   assert.deepEqual(M.offersFor(ctx(), step("recover"), rec), ["recover"]);
   assert.equal(skill.exits.find((x) => x.id === "recover").toolId, "recovering-from-invalidation");
+  const danger = run([...HARD, pick("what", "threatened"), next]);
+  assert.equal(danger.stepId, "danger");
+  assert.ok(step("danger").crisis.some((c) => c.variant === "other_person"));
+  assert.ok(step("what").crisis.some((c) => c.variant === "other_person" && JSON.stringify(c.when).includes("threatened")));
+  assert.deepEqual(M.offersFor(ctx(), step("danger"), danger), ["safety_open", "ending_careful", "five_senses"]);
+  assert.deepEqual(skill.exits.find((x) => x.id === "ending_careful").query, { frame: "careful" });
   const stop = run([...HARD, pick("what", "frightening"), next]);
   assert.equal(stop.stepId, "stop");
-  assert.ok(step("stop").crisis.some((c) => c.variant === "other_person"));
+  assert.ok(!(step("stop").crisis ?? []).some((c) => c.variant === "other_person"), "an accident gets no domestic-violence banner");
   assert.deepEqual(M.offersFor(ctx(), step("stop"), stop), ["safety_open", "five_senses"]);
   const hurt = run([...HARD, pick("what", "self_harm"), next]);
   assert.equal(hurt.stepId, "hurt");
   assert.ok(step("hurt").crisis.some((c) => c.variant === "crisis"));
   assert.ok(step("hurt").safetyFirst, "someone to talk to opens straight away");
-  for (const id of ["recover", "stop", "hurt"]) {
+  for (const id of ["recover", "danger", "stop", "hurt"]) {
     assert.equal(step(id).complete, false, `${id}: no rep, no close`);
     assert.equal(step(id).noClose, true, id);
   }
+});
+
+test("a thought of hurting myself is a route, not a kind of thought; back to the room while taking a hard moment apart", () => {
+  const thoughts = run([...HARD, pick("what", "alone"), next, next]);
+  assert.equal(thoughts.stepId, "thoughts");
+  assert.ok(ids(thoughts, "thoughts").includes("self_harm_thought"));
+  assert.ok(!ids(run([...GOOD, pick("what", "alone"), next, next]), "thoughts").includes("self_harm_thought"), "never on a good moment");
+  assert.ok(step("thoughts").crisis.some((c) => c.variant === "crisis"));
+  assert.equal(run([pick("thoughts", "self_harm_thought"), next], ctx(), thoughts).stepId, "hurt");
+  const roomOn = (st, s) => M.shownFields(ctx(), step(st), s).flatMap((f) => M.fieldLinks(ctx(), f, s)).some((l) => l.exit.id === "five_senses");
+  const hardBody = run([...HARD, pick("what", "alone"), next]);
+  const goodBody = run([...GOOD, pick("what", "alone"), next]);
+  for (const st of ["body", "thoughts", "feel", "aware"]) {
+    assert.ok(roomOn(st, hardBody), `${st}: back to the room on a hard moment`);
+    assert.ok(!roomOn(st, goodBody), `${st}: not on a good one`);
+  }
+});
+
+test("a hard moment on a flooded reading is offered a good one instead too; the end card's labels ship on the exits", () => {
+  const fl = ctx({ band: "flooded" });
+  const heads = run(HARD, fl);
+  assert.equal(heads.stepId, "heads_up");
+  assert.equal(run([pick("heads_up", "go"), next], fl, heads).stepId, "heads_up_hard");
+  const body = run([pick("heads_up", "body"), next], fl, heads);
+  assert.equal(title(body, fl), "Settle your body first.", "not the heads-up again");
+  for (const [id, label] of [["good_things", "more_label"], ["find_the_feeling", "ftf_label"], ["unpack", "unpack_label"]]) {
+    assert.equal(skill.exits.find((x) => x.id === id).label, label, id);
+  }
+  // A skipped savour doesn't ask for a good bit; Partly gets its own line.
+  const savour = run([...GOOD, pick("what", "alone"), next, next, next, next, pick("aware", "partly"), next]);
+  assert.equal(savour.stepId, "savour");
+  const end = run([{ type: "embedDone", output: { ids: ["skipped"], durationSec: 0 } }], ctx(), savour);
+  assert.equal(end.stepId, "end");
+  assert.equal(M.handoffLine(ctx(), step("end"), end), "And you caught some of it while it happened.");
+  assert.equal(run([held], ctx(), savour).stepId, "keep");
 });
 
 test("body, thoughts and feeling: each optional, words led by the moment's side; can't tell is a full answer", () => {
@@ -158,7 +203,7 @@ test("a carried flooded reading: the question stays, then the body first or go o
 test("Talk to someone now on every screen; no copy asks to be grateful", () => {
   for (const st of skill.steps) {
     if (st.kind === "ask") assert.ok(st.fields[0].links.some((l) => l.exit === "safety_open"), st.id);
-    else if (!["hurt", "stop"].includes(st.id)) assert.ok((st.links ?? []).some((l) => l.exit === "safety_open"), st.id);
+    else if (!["hurt", "stop", "danger"].includes(st.id)) assert.ok((st.links ?? []).some((l) => l.exit === "safety_open"), st.id);
   }
   assert.ok(!Object.values(skill.copy).some((t) => /grateful|gratitude|just /i.test(t)));
 });
