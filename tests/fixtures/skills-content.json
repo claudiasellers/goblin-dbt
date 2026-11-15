@@ -566,7 +566,7 @@
   {
    "id": "alternate_rebellion",
    "toolId": "alternate-rebellion",
-   "version": "ar-v2",
+   "version": "ar-v3",
    "start": "open",
    "accepts": [
     "band",
@@ -591,9 +591,21 @@
     "pick_own": "My own rebellion",
     "cost_q": "Will this cost you tomorrow?",
     "noticed_q": "Would they notice it?",
+    "undo_q": "Could you undo it later?",
+    "sleep_title": "That one can't be undone, so it waits a day. A card tomorrow asks if you still want it.",
+    "sleep_title_unsure": "That one might not undo, so it waits a day. A card tomorrow asks if you still want it.",
+    "sleep_hint": "Big choices land better after a night's sleep.",
+    "still_title": "A day later. Do you still want to do it?",
+    "still_title_treatment": "A day later. Changing treatment is a talk with your care team first. Do you still want to do it?",
+    "still_hint": "Whatever you pick, it's your call.",
     "heads_up_title": "That one might cost you tomorrow. Keep it, or pick something lighter?",
     "heads_up_scared_title": "If they'd notice it, it could cost you. Keep it, or pick a quiet one?",
     "card_title": "Here's your rebellion. When will you do it?",
+    "later_title": "Want a card later, to ask how it went?",
+    "later_skip": "No card",
+    "again_title": "Want another card, for another time?",
+    "back_title": "Your rebellion. Did you do it?",
+    "back_hint": "Any answer is fine. It's only to notice.",
     "itch_title": "Did it scratch the itch?",
     "itch_hint": "Go and do it first. This screen waits.",
     "real_title": "And the squeeze itself. Is it something you want to work on?",
@@ -602,6 +614,8 @@
     "next_say": "Saying it clearly, and keeping your self-respect, is a rebellion too.",
     "next_cant": "Some squeezes don't move. You still get to choose how much of you they take.",
     "next_not_now": "The rebellion's yours. The squeeze can wait until you're ready.",
+    "next_slept": "It's waiting a day. The squeeze can be looked at now, or later.",
+    "next_let_go": "Choosing not to, after sleeping on it, is a rebellion too.",
     "own_hint": "Say it your way",
     "next": "Next",
     "done": "Done",
@@ -914,6 +928,18 @@
          }
         ]
        }
+      },
+      {
+       "id": "undo",
+       "label": "undo_q",
+       "options": {
+        "list": "undo"
+       },
+       "max": 1,
+       "required": true,
+       "showWhen": {
+        "own": "pick"
+       }
       }
      ],
      "crisis": [
@@ -956,6 +982,30 @@
             ]
            }
           ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "sleep_on",
+       "when": {
+        "all": [
+         {
+          "in": [
+           "$a.undo",
+           [
+            "no",
+            "not_sure"
+           ]
+          ]
+         },
+         {
+          "not": {
+           "eq": [
+            "$a.still",
+            "yes"
+           ]
+          }
          }
         ]
        }
@@ -1041,7 +1091,105 @@
        }
       },
       {
+       "to": "sleep_on",
+       "when": {
+        "all": [
+         {
+          "in": [
+           "$a.undo",
+           [
+            "no",
+            "not_sure"
+           ]
+          ]
+         },
+         {
+          "not": {
+           "eq": [
+            "$a.still",
+            "yes"
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
        "to": "card",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "sleep_on",
+     "kind": "ask",
+     "hint": "sleep_hint",
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$a.undo",
+         "not_sure"
+        ]
+       },
+       "key": "sleep_title_unsure"
+      },
+      {
+       "key": "sleep_title"
+      }
+     ],
+     "fields": [
+      {
+       "id": "sleep",
+       "options": {
+        "list": "sleep"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "has": [
+         "$a.squeeze.ids",
+         "scared"
+        ]
+       }
+      }
+     ],
+     "followUp": {
+      "type": "rebellion_check",
+      "when": {
+       "eq": [
+        "$a.sleep",
+        "tomorrow"
+       ]
+      }
+     },
+     "next": [
+      {
+       "to": "pick",
+       "when": {
+        "eq": [
+         "$a.sleep",
+         "lighter"
+        ]
+       }
+      },
+      {
+       "to": "real",
        "when": null
       }
      ],
@@ -1087,6 +1235,88 @@
        }
       },
       {
+       "to": "later",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "later",
+     "kind": "ask",
+     "title": "later_title",
+     "secondary": "later_skip",
+     "fields": [
+      {
+       "id": "remind",
+       "options": {
+        "list": "remind",
+        "where": {
+         "any": [
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.when",
+              "today"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.today",
+              true
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.when",
+              "week"
+             ]
+            },
+            {
+             "eq": [
+              "$opt.week",
+              true
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "max": 1,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "has": [
+         "$a.squeeze.ids",
+         "scared"
+        ]
+       }
+      }
+     ],
+     "followUp": {
+      "type": "rebellion_after",
+      "whenFrom": "remind"
+     },
+     "next": [
+      {
        "to": "real",
        "when": null
       }
@@ -1121,6 +1351,240 @@
      "next": [
       {
        "to": "real",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "back",
+     "kind": "ask",
+     "title": "back_title",
+     "hint": "back_hint",
+     "fields": [
+      {
+       "id": "did",
+       "options": {
+        "list": "did"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "has": [
+         "$a.squeeze.ids",
+         "scared"
+        ]
+       }
+      }
+     ],
+     "reopens": {
+      "after": "later",
+      "again": [
+       "again_card"
+      ]
+     },
+     "clears": [
+      "did",
+      "itch",
+      "real",
+      "remind_again"
+     ],
+     "next": [
+      {
+       "to": "itch",
+       "when": {
+        "in": [
+         "$a.did",
+         [
+          "yes",
+          "a_bit"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "again_card",
+       "when": {
+        "eq": [
+         "$a.did",
+         "not_yet"
+        ]
+       }
+      },
+      {
+       "to": "real",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "again_card",
+     "kind": "ask",
+     "title": "again_title",
+     "secondary": "later_skip",
+     "fields": [
+      {
+       "id": "remind_again",
+       "options": {
+        "list": "remind"
+       },
+       "max": 1,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "has": [
+         "$a.squeeze.ids",
+         "scared"
+        ]
+       }
+      }
+     ],
+     "followUp": {
+      "type": "rebellion_after",
+      "whenFrom": "remind_again"
+     },
+     "next": [
+      {
+       "to": "real",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "still",
+     "kind": "ask",
+     "hint": "still_hint",
+     "title": [
+      {
+       "when": {
+        "has": [
+         "$a.squeeze.ids",
+         "treatment"
+        ]
+       },
+       "key": "still_title_treatment"
+      },
+      {
+       "key": "still_title"
+      }
+     ],
+     "fields": [
+      {
+       "id": "still",
+       "options": {
+        "list": "still"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "has": [
+         "$a.squeeze.ids",
+         "scared"
+        ]
+       }
+      }
+     ],
+     "reopens": {
+      "after": "sleep_on"
+     },
+     "clears": [
+      "still",
+      "sleep",
+      "cost",
+      "noticed",
+      "undo",
+      "heads_up",
+      "when",
+      "remind",
+      "remind_again",
+      "itch",
+      "real"
+     ],
+     "next": [
+      {
+       "to": "card",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.still",
+           "yes"
+          ]
+         },
+         {
+          "not": {
+           "any": [
+            {
+             "has": [
+              "$a.squeeze.ids",
+              "scared"
+             ]
+            },
+            {
+             "has": [
+              "$a.squeeze.ids",
+              "treatment"
+             ]
+            }
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "to": "real",
+       "when": {
+        "eq": [
+         "$a.still",
+         "no"
+        ]
+       }
+      },
+      {
+       "to": "pick",
        "when": null
       }
      ],
@@ -1183,6 +1647,24 @@
         ]
        },
        "key": "next_scared"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.still",
+         "no"
+        ]
+       },
+       "key": "next_let_go"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.sleep",
+         "tomorrow"
+        ]
+       },
+       "key": "next_slept"
       },
       {
        "when": {
@@ -1807,6 +2289,80 @@
      {
       "value": "keep",
       "label": "Keep it anyway"
+     }
+    ],
+    "undo": [
+     {
+      "value": "yes",
+      "label": "Yes"
+     },
+     {
+      "value": "not_sure",
+      "label": "Not sure"
+     },
+     {
+      "value": "no",
+      "label": "No"
+     }
+    ],
+    "sleep": [
+     {
+      "value": "tomorrow",
+      "label": "Ask me tomorrow"
+     },
+     {
+      "value": "lighter",
+      "label": "Pick one I can undo"
+     }
+    ],
+    "still": [
+     {
+      "value": "yes",
+      "label": "Yes, still mine"
+     },
+     {
+      "value": "lighter",
+      "label": "Something I can undo instead"
+     },
+     {
+      "value": "no",
+      "label": "Not any more"
+     }
+    ],
+    "remind": [
+     {
+      "value": "evening",
+      "label": "This evening",
+      "today": true
+     },
+     {
+      "value": "tomorrow",
+      "label": "Tomorrow",
+      "today": true,
+      "week": true
+     },
+     {
+      "value": "few_days",
+      "label": "In a few days",
+      "week": true
+     }
+    ],
+    "did": [
+     {
+      "value": "yes",
+      "label": "I did it"
+     },
+     {
+      "value": "a_bit",
+      "label": "Some of it"
+     },
+     {
+      "value": "not_yet",
+      "label": "Not yet"
+     },
+     {
+      "value": "no",
+      "label": "I let it go"
      }
     ],
     "itch": [
@@ -70961,7 +71517,7 @@
   {
    "id": "thoughts_passing",
    "toolId": "thoughts-passing",
-   "version": "tp-v1",
+   "version": "tp-v2",
    "start": "catch",
    "accepts": [
     "band"
@@ -70989,12 +71545,12 @@
     "frame_step2": "Once more: “I notice I'm having the thought that”, then the thought.",
     "frame_step3": "Notice any change in how close it feels.",
     "slow_title": "Slow it right down.",
-    "slow_step1": "Say the thought in your head, one word at a time.",
-    "slow_step2": "Leave a long gap between the words.",
+    "slow_step1": "Your thought arrives one word at a time.",
+    "slow_step2": "Say each word in your head as it comes, with a long gap.",
     "slow_step3": "Notice it's made of words.",
     "leaf_title": "Set it on a leaf.",
-    "leaf_step1": "Picture a stream with leaves floating past.",
-    "leaf_step2": "Put the thought on a leaf. Let it float at its own pace.",
+    "leaf_step1": "Your thought is on a leaf, on a stream.",
+    "leaf_step2": "Let it float at its own pace, and watch.",
     "leaf_step3": "If it stays or comes back, that's okay. Put it on the next leaf.",
     "screen_title": "Watch it on a screen.",
     "screen_step1": "Picture the thought as words on a screen across the room.",
@@ -71004,6 +71560,8 @@
     "running_frame": "Saying it",
     "running_slow": "Slowly",
     "running_leaf": "Floating",
+    "leaf_another": "Another leaf",
+    "leaf_empty": "The stream keeps going. If the thought comes back, it gets another leaf.",
     "running_screen": "Watching",
     "move_done": "That's it.",
     "room_title": "Back to the room.",
@@ -71443,10 +72001,12 @@
     {
      "id": "slow",
      "kind": "embed",
-     "embed": "doseTimer",
+     "embed": "thoughtDrift",
      "answerAs": "slow",
      "title": "slow_title",
      "props": {
+      "variant": "slow",
+      "field": "catch",
       "seconds": 30,
       "step1": "slow_step1",
       "step2": "slow_step2",
@@ -71476,10 +72036,12 @@
     {
      "id": "leaf",
      "kind": "embed",
-     "embed": "doseTimer",
+     "embed": "thoughtDrift",
      "answerAs": "leaf",
      "title": "leaf_title",
      "props": {
+      "variant": "leaf",
+      "field": "catch",
       "seconds": 45,
       "step1": "leaf_step1",
       "step2": "leaf_step2",
@@ -71487,7 +72049,9 @@
       "start": "start",
       "running": "running_leaf",
       "done": "move_done",
-      "next": "next"
+      "next": "next",
+      "another": "leaf_another",
+      "empty": "leaf_empty"
      },
      "links": [
       {

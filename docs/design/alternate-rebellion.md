@@ -67,15 +67,16 @@ explicitly in `schema/app-tool-ids.cypher`). Listed under Distress Tolerance for
 
 ## Departures from the PRD
 
-1. **Irreversible rebellions are not offered yet.** The PRD's tattoo, shaved head and big purchase need the
-   *sleep on it* 24-hour check, a follow-up (R5, F2). Until then the list is reversible only.
+1. **Irreversible rebellions are the person's own words only.** The curated list stays reversible; an own rebellion
+   that can't (or might not) be undone waits a day (part 2, 15 Nov 2026). The PRD's tattoo, shaved head and big
+   purchase as menu items wait for the clinician pass.
 2. **The witness line is the skill's own copy**, not the `witness` embed (F2, D16). When F2 ships, screen 1
    becomes the embed with this line as a signed-off host line; the skill already works with it absent.
 3. **Two squeeze chips the PRD doesn't list:** *Someone I'm scared of* (C6.4: an option that can carry danger
    from another person gets its own chip and slot, rather than putting an alarm on *someone controlling me*) and
    *Treatment I didn't pick* (the PRD's treatment risk, made a visible route).
-4. **The close asks the acted answer only.** The PRD's then-vs-now on the blow-up urge needs the two-part
-   `urge_change` close (R7, F2). The close is the spine's `urge` kind with its own wording until then.
+4. ~~**The close asks the acted answer only.**~~ Since part 2 (15 Nov 2026) the close is the two-part `urge_change`:
+   the acted answer on the blow-up urge, then then-vs-now on it.
 5. **The itch question adds *Not yet*** to the PRD's *yes · a bit · no*: the screen comes straight after *Now*, and
    someone who hasn't done it yet needs a true answer.
 6. **No *dessert first*.** Plan C6.7 excludes food from rebellions.
@@ -83,16 +84,16 @@ explicitly in `schema/app-tool-ids.cypher`). Listed under Distress Tolerance for
    exit, `OPENS` its tool).
 8. **The check-in entry is narrower than the PRD's** (*provoked, indignant* on Ready to fight, not the PRD's anger,
    frustration, irritation, angsty edges): see Routing. It answers the PRD's open question narrowly.
-9. **"Later" isn't scheduled yet.** *Later today* and *This week* are recorded (`when` in `ext.run`), and the
-   follow-up that asks how it went waits for R5 (F2).
+9. ~~**"Later" isn't scheduled yet.**~~ Since part 2 (15 Nov 2026) *Later today* and *This week* offer an optional
+   card (`rebellion_after`, chips that fit the answer), and *Not yet* on it can book another.
 
 ## Deferred (with the batch that lands it)
 
 | What | Needs | Lands |
 |---|---|---|
-| Scheduled rebellions and the 24-hour check on irreversible ones; irreversible options | R5 follow-up action, a `FollowUpType` row | DT lane, after F2 |
+| ~~Scheduled rebellions and the 24-hour check on irreversible ones~~ **Built 15 Nov 2026 (part 2):** a rebellion for later today or this week gets an optional card (`later`, *No card* the quiet way on; `rebellion_after`: this evening, tomorrow, in a few days) that reopens the visit at `back` (*Did you do it?* → the itch → the squeeze, asked fresh). An own rebellion asks *Could you undo it later?*; *no* or *not sure* waits a day (`sleep_on`: no card today, `rebellion_check` a full day later reopening at `still`: still yes → the card (with someone they're scared of or next to treatment, back through the list with its questions asked fresh; the wait is done, so *can't be undone* there reaches the card instead of another day's wait); something undoable → the list, cost and undo asked again; not any more → the squeeze, *Choosing not to, after sleeping on it, is a rebellion too.*). Both cards are content-free. **Still deferred:** curated irreversible options (the PRD's tattoo, shaved head): a menu of permanent body changes next to a destructive urge needs the clinician pass, so only the person's own words can be irreversible | — | — |
 | Witness embed on screen 1 | F2 `witness`, Claudia's sign-off of the line (D16) | after F2 |
-| Then-vs-now on the blow-up urge | R7 `urge_change` | after F2 (DT-02 brings R7's first use) |
+| ~~Then-vs-now on the blow-up urge~~ **Built 15 Nov 2026 (part 2):** the close is `urge_change`: *And the urge to blow it all up?* (held off · went ahead · still deciding), then *And that urge now, compared to when you started?* | — | — |
 | The rebellion menu (kit cards, section `rebellion`), own rebellions kept | R4 keep, `kit_card` kind | Safety batch (DT-03) |
 | Entry from DT-02's *blow it all up · quit · end it* chip (`urgeId`); *end it* can read as suicidal, so that entry carries `safety_open` from screen 1 | DT-02 | DT-B1, second PR |
 | Entry from IE when the urge is to end a relationship impulsively (PRD) | IE's entry point | IE lane |
@@ -116,7 +117,7 @@ One `ToolSession` per visit with `ext.run` (plan C1): the path, the picks (`sque
 `heads_up`, `itch`, `real`, and `when` from the card), own words only as `valueOwn`, the offered and taken exits.
 Own words are encrypted at close by #55 (`spine/extOwn.ts`), which is why this merges and deploys after it. The itch
 answer stays in `ext.run`, not on the spine: it's this skill's own question about the rebellion, not a
-then-vs-now on the urge, and nothing outside the skill reads it. The close writes `actedOnUrge`. No new label, no profile write.
+then-vs-now on the urge, and nothing outside the skill reads it. The close writes `actedOnUrge` and, since part 2, `thenVsNow` (`urge_change`). Part 2 adds `undo`, `sleep`, `remind`, `did` and `still` to `ext.run`. No new label, no profile write.
 
 ## Routing
 

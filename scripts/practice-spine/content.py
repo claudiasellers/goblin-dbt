@@ -66,11 +66,17 @@ CLOSE_FLOW = {
                 "choices": [{"id": k, "label": DIRECTION_LABELS["down"][k]} for k in THEN_VS_NOW],
             },
         },
-        # DT-11: the acted answer is on the destructive urge, not on the rebellion picked.
+        # DT-11: the acted answer is on the destructive urge, not on the rebellion picked; then how strong it is now.
         "alternate-rebellion": {
             "urge": {
                 "question": "And the urge to blow it all up?",
                 "choices": [{"id": "no", "label": "Held off"}, {"id": "yes", "label": "Went ahead"}, {"id": "not_yet", "label": "Still deciding"}],
+            },
+            # DT-11 part 2: the two-part close (urge_change, R7), as Hold to wait and Ride it out.
+            "regulation_down": {
+                "dir": "down",
+                "question": "And that urge now, compared to when you started?",
+                "choices": [{"id": k, "label": DIRECTION_LABELS["down"][k]} for k in THEN_VS_NOW],
             },
         },
     },
@@ -540,6 +546,35 @@ FOLLOW_UP_TYPES = [
         "copy": {"title": "A calm-day practice", "body": "A minute of being held, while things are okay."},
         "choices": [{"id": "not_now", "label": "Not now", "status": "dismissed"}],
         "notification": "A minute of being held, if you want it.",
+    },
+    {
+        # Rebel without the wreckage (DT-11 part 2, docs/design/alternate-rebellion.md): a rebellion picked for later
+        # today or this week, and the person asked for a card. It reopens that visit at `back` (R9: did you do it, did it
+        # scratch the itch, then the squeeze). Opening it is the resolution. Content-free: it never says what the
+        # rebellion is or what it's against.
+        "id": "rebellion_after", "ownerModule": "dt", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/alternate-rebellion?run={sourceSessionId}&at=back&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"evening": {"kind": "at_local", "days": 0, "time": "20:00"},
+                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
+                                             "few_days": {"kind": "at_local", "days": 3, "time": "18:00"}}},
+        "staleAfterHours": 48, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Something you picked earlier", "body": "Did it happen? A quick look back."},
+        "choices": [{"id": "not_now", "label": "Not now", "status": "dismissed"}],
+        "notification": "A check-in you asked for is ready.",
+    },
+    {
+        # Rebel without the wreckage (DT-11 part 2): the 24-hour check on a rebellion that can't be undone (PRD). A day
+        # after *Ask me tomorrow*, it reopens that visit at `still` (still yes → the card; something undoable → the
+        # list; not any more → the squeeze). Opening it is the resolution. Content-free.
+        "id": "rebellion_check", "ownerModule": "dt", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/alternate-rebellion?run={sourceSessionId}&at=still&followUp={followUpId}",
+        "window": {"kind": "after", "minutes": 1440},
+        "staleAfterHours": 72, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "A day later", "body": "Something you said you'd sleep on. Still want it?"},
+        "choices": [{"id": "not_now", "label": "Not now", "status": "dismissed"}],
+        "notification": "A check-in you asked for is ready.",
     },
     {
         # When it's a habit (DT-09, docs/design/habit-plan.md): the stretch the person committed to has ended. The chips

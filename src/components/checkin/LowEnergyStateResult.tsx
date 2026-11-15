@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getMicroStep, type MicroStep } from '../../data/microSteps';
+import { getMicroStep, type MicroStep } from '../../lib/microSteps';
 import { getActivityDefinition, PATTERN_CONTEXT } from '../../data/guidedActivities';
 import { GuidedActivity } from '../activities/GuidedActivity';
 import type { StateResult } from '../../services/neo4j';

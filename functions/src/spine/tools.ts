@@ -28,7 +28,7 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   // (askFresh thenVsNow, no SessionClose after it); making it ends with no close.
   'crisis-kit': { module: 'dt', closeKind: 'regulation_down' },
   // Rebel without the wreckage (DT-11): "And the urge to blow it up?", the acted answer on the destructive urge.
-  'alternate-rebellion': { module: 'dt', closeKind: 'urge' },
+  'alternate-rebellion': { module: 'dt', closeKind: 'urge_change' },
   'problem-solve': { module: 'er', closeKind: 'plan' },
   // Cope Ahead (docs/design/cope-ahead.md): screen 1 already asked when, so no close question; its outcome
   // is the cope_ahead_after card.

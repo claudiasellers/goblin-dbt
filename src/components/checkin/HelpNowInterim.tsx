@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { getMicroStep, type MicroStep } from '../../data/microSteps';
+import { getMicroStep, type MicroStep } from '../../lib/microSteps';
 import { getToolById } from '../../data/tools';
 import { useOfficialNames } from '../../hooks/useOfficialNames';
 import { recordToolSession } from '../../services/spine';

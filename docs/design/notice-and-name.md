@@ -63,6 +63,8 @@ Reduced motion: pebbles appear in place. Outputs: `done`, `partly`, `skipped`, `
 - **Ways in still to come** (`module-edges.json`, state MF-B3): First, the body's quieter close (frame `far`), Held,
   and the MF-01 card inside Hold to wait and Ride it out. Until then no host sends `far` or `blank`; the frames are
   ready for them.
+- **Not a part-tag host.** Its close is orienting, but *Was this a part you know?* after a noticing practice would turn
+  it inward, so it sits with Wise mind and Rehearse it in `NEVER_HOSTS` (`tests/part-tag.test.mjs`).
 
 ## Where it departs from the PRD
 

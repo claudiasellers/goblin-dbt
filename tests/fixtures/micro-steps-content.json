@@ -1,0 +1,370 @@
+{
+ "version": "micro-steps-v1",
+ "sets": {
+  "acute_alarm": [
+   {
+    "id": "aa-1",
+    "text": "Push your feet into the floor.",
+    "subtext": "Press down hard. Feel the pressure.",
+    "modality": "proprioceptive",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "aa-2",
+    "text": "Hold something cold.",
+    "subtext": "A glass, a can, ice — anything cool.",
+    "modality": "autonomic",
+    "requiresEnvironment": true
+   },
+   {
+    "id": "aa-3",
+    "text": "Press your palms against the wall.",
+    "subtext": "Push hard. Hold it there.",
+    "modality": "proprioceptive",
+    "requiresEnvironment": true
+   },
+   {
+    "id": "aa-4",
+    "text": "Squeeze your hands into fists.",
+    "subtext": "Hold tight. Then let go.",
+    "modality": "autonomic",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "aa-5",
+    "text": "Splash cold water on your face.",
+    "subtext": "Even a few drops will do.",
+    "modality": "autonomic",
+    "requiresEnvironment": true
+   }
+  ],
+  "chronic_vigilance": [
+   {
+    "id": "cv-1",
+    "text": "Feel your feet on the ground.",
+    "subtext": "You’re here. Right here.",
+    "modality": "proprioceptive",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "cv-2",
+    "text": "Name one thing you can hear.",
+    "subtext": "Just one. That’s enough.",
+    "modality": "attentional",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "cv-3",
+    "text": "Touch the surface nearest to you.",
+    "subtext": "Notice how it feels.",
+    "modality": "sensory",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "cv-4",
+    "text": "Look around. Find something soft.",
+    "subtext": "Just notice it’s there.",
+    "modality": "attentional",
+    "requiresEnvironment": false
+   }
+  ],
+  "conservation_freeze": [
+   {
+    "id": "cf-1",
+    "text": "Wiggle your toes.",
+    "subtext": "Just your toes. That’s all.",
+    "modality": "proprioceptive",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "cf-2",
+    "text": "Rub your hands together slowly.",
+    "subtext": "Feel the warmth build.",
+    "modality": "proprioceptive",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "cf-3",
+    "text": "Press your feet into the floor.",
+    "subtext": "Gently. Notice the pressure.",
+    "modality": "proprioceptive",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "cf-4",
+    "text": "Move your fingers one at a time.",
+    "subtext": "Slowly. There’s no rush.",
+    "modality": "proprioceptive",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "cf-5",
+    "text": "Tap your knees gently.",
+    "subtext": "Left, right, left, right.",
+    "modality": "proprioceptive",
+    "requiresEnvironment": false
+   }
+  ],
+  "dissociation_overmodulation": [
+   {
+    "id": "do-1",
+    "text": "Touch the surface nearest to you.",
+    "subtext": "What does it feel like?",
+    "modality": "sensory",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "do-2",
+    "text": "Take a sip of something.",
+    "subtext": "Notice the temperature in your mouth.",
+    "modality": "sensory",
+    "requiresEnvironment": true
+   },
+   {
+    "id": "do-3",
+    "text": "Rub your thumb across your fingertips.",
+    "subtext": "Slowly. Feel each one.",
+    "modality": "sensory",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "do-4",
+    "text": "Feel the weight of your hands.",
+    "subtext": "Just notice them resting.",
+    "modality": "proprioceptive",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "do-5",
+    "text": "Press your feet into the floor.",
+    "subtext": "Notice the feeling of being here.",
+    "modality": "proprioceptive",
+    "requiresEnvironment": false
+   }
+  ],
+  "emotional_flooding": [
+   {
+    "id": "ef-1",
+    "text": "Squeeze your hands tight.",
+    "subtext": "That’s it. Just squeeze.",
+    "modality": "autonomic",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "ef-2",
+    "text": "Hold something cold.",
+    "subtext": "Ice, cold water, a cold can.",
+    "modality": "autonomic",
+    "requiresEnvironment": true
+   },
+   {
+    "id": "ef-3",
+    "text": "Push your feet into the floor.",
+    "subtext": "Press down. Feel the ground.",
+    "modality": "proprioceptive",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "ef-4",
+    "text": "Put your hands under cold water.",
+    "subtext": "Just let it run over them.",
+    "modality": "autonomic",
+    "requiresEnvironment": true
+   }
+  ],
+  "fallback": [
+   {
+    "id": "fb-1",
+    "text": "Press your feet into the floor.",
+    "subtext": "Feel the ground under you.",
+    "modality": "proprioceptive",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "fb-2",
+    "text": "Squeeze your hands, then let go.",
+    "subtext": "Notice the difference.",
+    "modality": "autonomic",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "fb-3",
+    "text": "Touch the surface nearest to you.",
+    "subtext": "Just feel it.",
+    "modality": "sensory",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "fb-4",
+    "text": "Take one breath. Just one.",
+    "subtext": "You don’t have to do it a special way.",
+    "modality": "autonomic",
+    "requiresEnvironment": false
+   }
+  ],
+  "grief_yearning": [
+   {
+    "id": "gy-1",
+    "text": "Put your hand on your chest.",
+    "subtext": "Feel your heartbeat. You’re here.",
+    "modality": "proprioceptive",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "gy-2",
+    "text": "Feel the weight of your body.",
+    "subtext": "Wherever you are. Just notice.",
+    "modality": "proprioceptive",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "gy-3",
+    "text": "Touch something soft.",
+    "subtext": "A sleeve, a blanket, anything.",
+    "modality": "sensory",
+    "requiresEnvironment": false
+   }
+  ],
+  "reactive_aggression": [
+   {
+    "id": "ra-1",
+    "text": "Push your palms together hard.",
+    "subtext": "Hold it. Feel the effort.",
+    "modality": "autonomic",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "ra-2",
+    "text": "Squeeze your hands into fists.",
+    "subtext": "Tight as you can. Then release.",
+    "modality": "autonomic",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "ra-3",
+    "text": "Press your palms against the wall.",
+    "subtext": "Push hard. Hold it.",
+    "modality": "proprioceptive",
+    "requiresEnvironment": true
+   },
+   {
+    "id": "ra-4",
+    "text": "Push your feet into the floor.",
+    "subtext": "Hard. Feel the resistance.",
+    "modality": "proprioceptive",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "ra-5",
+    "text": "Hold something cold.",
+    "subtext": "Cold can, ice — anything.",
+    "modality": "autonomic",
+    "requiresEnvironment": true
+   }
+  ],
+  "reward_drive_low": [
+   {
+    "id": "rd-1",
+    "text": "Stretch your arms above your head.",
+    "subtext": "Just for a second.",
+    "modality": "proprioceptive",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "rd-2",
+    "text": "Take a sip of water.",
+    "subtext": "That’s one thing you did.",
+    "modality": "sensory",
+    "requiresEnvironment": true
+   },
+   {
+    "id": "rd-3",
+    "text": "Move one part of your body.",
+    "subtext": "Anything. A finger. Your head.",
+    "modality": "proprioceptive",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "rd-4",
+    "text": "Look at something nearby.",
+    "subtext": "Just let your eyes rest on it.",
+    "modality": "attentional",
+    "requiresEnvironment": false
+   }
+  ],
+  "rumination_loop": [
+   {
+    "id": "rl-1",
+    "text": "Look around. Find something blue.",
+    "subtext": "Any shade counts.",
+    "modality": "attentional",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "rl-2",
+    "text": "Listen. What’s the farthest sound?",
+    "subtext": "Just notice it.",
+    "modality": "attentional",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "rl-3",
+    "text": "Count backwards from ten.",
+    "subtext": "Out loud or in your head.",
+    "modality": "attentional",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "rl-4",
+    "text": "Name three things you can see.",
+    "subtext": "Anything at all.",
+    "modality": "attentional",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "rl-5",
+    "text": "Touch something nearby. Describe it.",
+    "subtext": "Smooth? Rough? Cool? Warm?",
+    "modality": "sensory",
+    "requiresEnvironment": false
+   }
+  ],
+  "social_threat_shame": [
+   {
+    "id": "ss-1",
+    "text": "Put your hand on your chest.",
+    "subtext": "Just hold it there. Gently.",
+    "modality": "proprioceptive",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "ss-2",
+    "text": "Feel your feet on the ground.",
+    "subtext": "You’re here. That’s enough.",
+    "modality": "proprioceptive",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "ss-3",
+    "text": "Look out a window if you can.",
+    "subtext": "Just look. Nothing else.",
+    "modality": "attentional",
+    "requiresEnvironment": true
+   },
+   {
+    "id": "ss-4",
+    "text": "Touch the surface nearest to you.",
+    "subtext": "Feel something outside yourself.",
+    "modality": "sensory",
+    "requiresEnvironment": false
+   },
+   {
+    "id": "ss-5",
+    "text": "Wrap your arms around yourself.",
+    "subtext": "Hold gently. You’re okay.",
+    "modality": "proprioceptive",
+    "requiresEnvironment": false
+   }
+  ]
+ }
+}

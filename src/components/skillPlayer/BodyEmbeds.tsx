@@ -36,7 +36,7 @@ function useShownOnce(onShown: () => void) {
 }
 
 /** The way on: a quiet link until the mode is done (nothing locks), then the button, which takes focus. */
-function WayOn({ done, label, onGo }: { done: boolean; label: string; onGo: () => void }) {
+export function WayOn({ done, label, onGo }: { done: boolean; label: string; onGo: () => void }) {
   const ref = useRef<HTMLButtonElement>(null);
   useEffect(() => { if (done) ref.current?.focus({ preventScroll: true }); }, [done]);
   return done
@@ -85,7 +85,7 @@ function TimedRing({ ms, leadIn = 0, label, running, leadLabel, onStop, onEnd, a
 }
 
 /** The steps and the caution line a dose or card shows above its ring. */
-function Steps({ props }: { props: Record<string, unknown> }) {
+export function Steps({ props }: { props: Record<string, unknown> }) {
   const steps = ['step1', 'step2', 'step3'].map((k) => text(props, k)).filter(Boolean);
   const caution = text(props, 'caution');
   if (!steps.length && !caution) return null;
