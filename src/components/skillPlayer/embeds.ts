@@ -26,6 +26,7 @@ import { TwoColumns } from './TwoColumns';
 import { RehearsalStage } from './RehearsalStage';
 import { FeelingCard } from './FeelingCard';
 import { EpisodeStrip } from './EpisodeStrip';
+import { PebbleBowl } from './PebbleBowl';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -100,6 +101,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   episodeStrip: EpisodeStrip,
   kitDeck: KitDeck,
   inlineSkill: InlineSkillEmbed,
+  pebbleBowl: PebbleBowl,
 };
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
@@ -143,6 +145,8 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   episodeStrip: { ids: ['read'] },
   kitDeck: { ids: ['body', 'hands', 'soothe', 'words', 'place', 'reasons', 'pros_cons', 'starter'], measures: ['durationSec', 'doneCount'] },
   inlineSkill: { ids: ['finished', 'left', 'stopped', 'body', 'unsafe'] },
+  // MF-01's bowl: the time noticed, and how many pebbles dropped (returns: a measure, never shown).
+  pebbleBowl: { ids: ['done', 'partly', 'skipped'], measures: ['durationSec', 'doneCount'] },
 };
 
 /**
@@ -505,5 +509,19 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     done: { type: 'copy' },
     /** The quiet way on before any turn. */
     skip: { type: 'copy' },
+  },
+
+  // MF-01 (docs/design/notice-and-name.md): one noticing task, a pebble per return, no number on screen.
+  pebbleBowl: {
+    seconds: { type: 'int', min: 10, max: 300 },
+    task: { type: 'copy' },
+    lead: { type: 'copy', optional: true },
+    start: { type: 'copy' },
+    tapLabel: { type: 'copy' },
+    running: { type: 'copy' },
+    /** What a screen reader hears per pebble (never the count). */
+    dropped: { type: 'copy' },
+    done: { type: 'copy' },
+    next: { type: 'copy' },
   },
 };

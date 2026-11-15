@@ -127,8 +127,8 @@ test("#10 Social threat: Recover + Do the Opposite (unhiding) in any band but fl
 });
 
 test("#11 On guard always has a card: 5-4-3-2-1 + Problem Solve; Ride it out for worry (12 Nov 2026)", async () => {
-  assert.deepEqual(pickIds(await cell("chronic_vigilance", "steady", { words: ["stressed"] })), ["five-senses", "problem-solve"]);
-  assert.deepEqual(pickIds(await cell("chronic_vigilance", "stirred", { words: ["stressed"] })), ["five-senses", "problem-solve"]);
+  assert.deepEqual(pickIds(await cell("chronic_vigilance", "steady", { words: ["stressed"] })), ["notice-and-name", "problem-solve"]);
+  assert.deepEqual(pickIds(await cell("chronic_vigilance", "stirred", { words: ["stressed"] })), ["notice-and-name", "problem-solve"]);
   assert.deepEqual(pickIds(await cell("chronic_vigilance", "flooded")), ["cool-down", "five-senses"]);
   assert.deepEqual(pickIds(await cell("chronic_vigilance", "stirred", { words: ["worried"] })), ["check-the-facts", "urge-surfing"], "worry: Check the Facts, Ride it out for the checking urge");
 });

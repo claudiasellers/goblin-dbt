@@ -82,7 +82,7 @@ Waves follow the index: 1 safety floor and platform, 2 validation and the transf
 | 13 | ER-02 | Check the facts | shipped | First skill on the runtime: [check-the-facts.md](design/check-the-facts.md), [skill-runtime.md](design/skill-runtime.md), `scripts/skills/check_the_facts.py`. Missing-fact step and safety chips added in ER-B1 (PRs #58, #67) |
 | 14 | ER-03 | Opposite Action fidelity pass (flow v3) | partial | OA v2 shipped (PR #12). Feeling doors / multi-emotion on PR #48 (open, conflicts) |
 | 15 | ER-06 | Route ER by state + engine change | shipped | rf-v2 switched on 5 Oct (PR #43); [checkin-routing-review.md](design/checkin-routing-review.md) |
-| 16 | MF-01 | Notice it, name it (observe → describe) | partial | Inside the check-in, body step and Find the feeling; no practice of its own |
+| 16 | MF-01 | Notice it, name it (observe → describe) | built (part 1) | *Notice what's here* on the skill runtime (MF-B1, 15 Nov): look, listen, touch, feet on the floor or inside, the pebble bowl, a word or two, the orienting close in the flow, an off-phone rep the next day; leads a watchful result on Listen ([design/notice-and-name.md](design/notice-and-name.md)). Fade levels and the Practice home are MF-02 |
 | 17 | MF-02 | Practice home, daily rep, fade | spec only | |
 | 18 | WMP-04 | Middle-path router v0 (receive first) | shipped | `receiveFirst` + side labels, on with rf-v2 |
 | 19 | MF-03 | Unpack a judgment | spec only | |

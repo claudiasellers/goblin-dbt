@@ -76,8 +76,9 @@ SIGNED_OFF = {
     "rf_acute_alarm_default_opposite-action": "2026-10-05",
     "rf_acute_alarm_flooded_cool-down": "2026-10-05",
     "rf_acute_alarm_flooded_five-senses": "2026-10-05",
-    "rf_chronic_vigilance_default_five-senses": "2026-10-05",
     "rf_chronic_vigilance_default_problem-solve": "2026-10-05",
+    "rf_chronic_vigilance_default_notice-and-name": "2026-11-15",
+    "rf_chronic_vigilance_backup_five-senses": "2026-11-15",
     "rf_chronic_vigilance_flooded_cool-down": "2026-10-05",
     "rf_chronic_vigilance_flooded_five-senses": "2026-10-05",
     "rf_emotional_flooding_flooded_cool-down": "2026-10-05",
@@ -225,6 +226,8 @@ CONCEPT_TAGS["soothe"] = {"concept": "dbt_self_soothe", "side": "acceptance", "s
 # word (self-worth, worried, judgmental) already shows two signed-off cards (12 Nov 2026). A row must add
 # CONTRAINDICATED_FOR the vigilance + rumination and dissociation + rumination co-occurrences (their
 # contraindicatedTools list mindfulness_of_thoughts, schema/pattern-co-occurrence.cypher).
+# Notice what's here (MF-01, docs/design/notice-and-name.md): eyes-open noticing, outside in; orienting, like Five senses.
+CONCEPT_TAGS["notice-and-name"] = {"concept": "dbt_observe", "side": "acceptance", "skillKind": "orient", "direction": "orient"}
 CONCEPT_TAGS["thoughts-passing"] = {"concept": "dbt_mindfulness_current_thoughts", "side": "acceptance", "skillKind": "hold", "direction": "neutral"}
 # Keep it warm (IE-06, appToolId 'give', docs/design/give.md) has shipped on the skill runtime: out of PLANNED, tagged,
 # and one word row, live (12 Nov 2026): *remorseful* on replay, beside Check the Facts (facts first, then repair). The
@@ -301,7 +304,8 @@ TABLE = {
         "flooded": ("cool-down", "five-senses", "Flooded: bottom-up only."),
     },
     "chronic_vigilance": {
-        "default": ("five-senses", "problem-solve", "Outward attention and Problem Solve for a solvable worry; the anxiety words lead with Do the Opposite (word rules below)."),
+        "default": ("notice-and-name", "problem-solve", "Outward attention (Notice what's here, opened on Listen: a non-threat framing for a watchful state, MF-01 and the Index ruling, 15 Nov 2026) and Problem Solve for a solvable worry; the anxiety words lead with Do the Opposite (word rules below)."),
+        "backup": ("five-senses", "Orienting stays available when Notice what's here is filtered."),
         "flooded": ("cool-down", "five-senses", "Flooded: DT-01 body first."),
     },
     "emotional_flooding": {

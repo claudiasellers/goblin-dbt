@@ -560,6 +560,24 @@ lanes, only the arrows in §5.4 hold anyone up.
 | ER-B6 (now, alongside ER-B1; **built**, its own PR after ER-B1's second) | **ER-15** Rewrite the nightmare (`holdRing` for the rehearsal; a `nightmare_script` kind in `kinds.ts` with its `ownFields` encrypted) | F2; D14 decided (Claudia, 10 Nov: build now, on the existing crisis banner) | Unparked by Claudia. Its clinical gate (§6) checks: the person writes the new ending, and no field asks what happened; a crisis slot on every step; *this is too much* reaches P2; no claim that it treats PTSD; one plain line that a clinician can help when nightmares follow a trauma |
 | Done already | **ER-01** (P2 is the player's), **ER-06** (rows land with each tool) | — | |
 
+### 5.3a MF lane (added 15 Nov 2026)
+
+A fourth lane, after the other three were mostly built: PRD – Mindfulness on the skill runtime (D3), one PR per
+batch, no capacity probe (D1), the orienting close asked in the flow, reps through the existing `PracticeSkill`
+`defaultFor` and `OFF_PHONE_SKILLS` (D2: no new per-visit labels).
+
+| Batch | Skills | Needs | Why this order |
+|---|---|---|---|
+| MF-B1 | **MF-01** Notice what's here (**built 15 Nov**, [`notice-and-name.md`](notice-and-name.md): the `pebbleBowl` embed, `observe` / `describe` reps, `offphone_rep`, leads `chronic_vigilance` on Listen); Mindfulness listed first on Tools | D1–D3 | The PRD's first skill and the daily default; every later practice reuses the bowl and the close |
+| MF-B2 | **MF-03** Unpack a judgment (intent *I'm being hard on myself*, `social_threat_shame` row) | MF-B1 | The PRD's second priority; Recover and Do the Opposite hand to it |
+| MF-B3 | **MF-02** Practice home (`/practice`, the daily card, `practice_daily`, the library by skill, catch-one, the positive-state line) | MF-B1 | Needs at least one practice to host |
+| MF-B4 | **MF-05** One thing (intent *Get out of my head*, `rumination_loop`) with MF-09's mode card | MF-B1 | |
+| MF-B5 | **MF-08** What works here (flips Problem Solve's `effectiveness` planned exits) | MF-B1 | |
+| MF-B6 | **MF-04** Wise mind check (the embed) and the 24-hour look-back | MF-B1 | Wise mind's practice already ships |
+| MF-B7 | **MF-07** Take a moment apart | MF-B1 | |
+| MF-B8 | **MF-06** Kind wishes (tiers, backdraft) | MF-B1 | |
+| MF-B9 | **MF-09** Doing mind, being mind; **MF-10** Join in | MF-B4 | |
+
 ### 5.4 How the lanes work together
 
 **The arrows that hold a lane up** (everything else runs in parallel):

@@ -43786,6 +43786,1259 @@
    }
   },
   {
+   "id": "notice_and_name",
+   "toolId": "notice-and-name",
+   "version": "nn-v1",
+   "start": "way",
+   "accepts": [
+    "band",
+    "frame"
+   ],
+   "ownMax": 40,
+   "emotionFields": [],
+   "copy": {
+    "way_title": "Pick a way to notice.",
+    "way_hint": "Eyes open, a minute or so. Your mind will wander. Coming back is the practice.",
+    "way_title_flooded": "Your body's loud right now.",
+    "way_hint_flooded": "Noticing works better once your body settles. You can look or listen for a minute, or start with your body.",
+    "body_first": "My body first",
+    "look_what_title": "Find three things that are…",
+    "look_what_hint": "Pick one. Any shade, any size.",
+    "look_title": "Find three things that are {what}.",
+    "here": "You're here, and it's",
+    "look_task": "Tap each one as you find it.",
+    "found": "Found one",
+    "found_done": "That's three.",
+    "listen_title": "Listen.",
+    "listen_task": "Each time a new sound arrives, tap. Near or far, loud or soft.",
+    "listen_tap": "A new sound",
+    "touch_title": "Hold something near you.",
+    "touch_task": "Is it warm or cool? Smooth or rough? When your mind wanders, tap, and come back to it.",
+    "inside_title": "Stay with your {place} for a little while.",
+    "inside_title_none": "Stay with where you touch the chair or the floor.",
+    "inside_task": "Notice what's there, without changing it. When your mind wanders, tap, and come back.",
+    "came_back": "Came back",
+    "bowl_start": "Start",
+    "bowl_running": "A pebble for each time.",
+    "bowl_dropped": "A pebble in the bowl.",
+    "bowl_done": "That's the time.",
+    "contact_title": "Feet on the floor.",
+    "contact_step1": "Hold the circle and press your feet down into the floor.",
+    "contact_step2": "Let go, and notice the difference.",
+    "contact_start": "Hold to press",
+    "contact_press": "Pressing",
+    "contact_drop": "Let go",
+    "contact_done": "That's three.",
+    "inside_where_title": "Start where you touch the chair or the floor. Then a little further in.",
+    "inside_where_hint": "Where is something most noticeable right now? Roughly is fine.",
+    "name_title": "What was it like?",
+    "name_hint": "Pick up to two. A guess is fine, and so is no words.",
+    "name_own": "My own word",
+    "else_title": "What else showed up while you did this?",
+    "else_hint": "Tap any. Noticing them is part of it.",
+    "close_title": "Compared to when you started, you feel…",
+    "room_title": "Back to the room.",
+    "room_task": "Find three things you can see.",
+    "far_line": "Feeling further away can happen when you notice. It isn't a failure. Looking and listening, eyes open, tend to suit better for now.",
+    "far_heavy_line": "If feeling far away comes with thoughts of hurting yourself, or happens a lot, talk to someone.",
+    "end_line": "Wandering is the practice. Each time you came back, that was the skill.",
+    "end_flooded_line": "You noticed something while your body was loud. That counts.",
+    "end_feeling_line": "A feeling showed up. If you want a word for it, Find the feeling can help.",
+    "end_thought_line": "A thought showed up. Watching it as a thought is its own practice.",
+    "offphone_q": "Try one without the app? Next time you're waiting for the kettle or a bus, notice three sounds. I'll ask how it went.",
+    "offphone_title": "Did you get to notice something without the app?",
+    "offphone_yes_line": "That's the practice moving off the phone, which is where it's meant to live.",
+    "offphone_sort_line": "Sort of counts. Noticing for a few seconds is still noticing.",
+    "offphone_not_line": "Not yet is fine. It'll be there next time you're waiting.",
+    "safety_open": "Talk to someone now",
+    "next": "Next",
+    "done": "Done"
+   },
+   "tables": {
+    "firstWayOf": {
+     "listen": "listen",
+     "far": "look",
+     "blank": "contact"
+    }
+   },
+   "derive": [
+    {
+     "name": "firstWay",
+     "from": "$ctx.frame",
+     "table": "firstWayOf"
+    }
+   ],
+   "steps": [
+    {
+     "id": "way",
+     "kind": "ask",
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       },
+       "key": "way_title_flooded"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "way_title"
+      }
+     ],
+     "fields": [
+      {
+       "id": "way",
+       "options": {
+        "list": "way",
+        "firstFrom": "$d.firstWay",
+        "where": {
+         "all": [
+          {
+           "not": {
+            "all": [
+             {
+              "eq": [
+               "$opt.inward",
+               true
+              ]
+             },
+             {
+              "any": [
+               {
+                "eq": [
+                 "$ctx.band",
+                 "flooded"
+                ]
+               },
+               {
+                "eq": [
+                 "$ctx.frame",
+                 "far"
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          },
+          {
+           "not": {
+            "all": [
+             {
+              "eq": [
+               "$ctx.band",
+               "flooded"
+              ]
+             },
+             {
+              "not": {
+               "eq": [
+                "$opt.calm",
+                true
+               ]
+              }
+             }
+            ]
+           }
+          }
+         ]
+        }
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "cool_down",
+         "label": "body_first",
+         "when": {
+          "eq": [
+           "$ctx.band",
+           "flooded"
+          ]
+         }
+        }
+       ]
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       },
+       "key": "way_hint_flooded"
+      },
+      {
+       "when": {
+        "not": {
+         "eq": [
+          "$ctx.band",
+          "flooded"
+         ]
+        }
+       },
+       "key": "way_hint"
+      }
+     ],
+     "next": [
+      {
+       "to": "look_what",
+       "when": {
+        "eq": [
+         "$a.way",
+         "look"
+        ]
+       }
+      },
+      {
+       "to": "listen",
+       "when": {
+        "eq": [
+         "$a.way",
+         "listen"
+        ]
+       }
+      },
+      {
+       "to": "touch",
+       "when": {
+        "eq": [
+         "$a.way",
+         "touch"
+        ]
+       }
+      },
+      {
+       "to": "contact",
+       "when": {
+        "eq": [
+         "$a.way",
+         "contact"
+        ]
+       }
+      },
+      {
+       "to": "inside_where",
+       "when": {
+        "eq": [
+         "$a.way",
+         "inside"
+        ]
+       }
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "look_what",
+     "kind": "ask",
+     "title": "look_what_title",
+     "fields": [
+      {
+       "id": "what",
+       "options": {
+        "list": "look_for"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "hint": "look_what_hint",
+     "next": [
+      {
+       "to": "look",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "look",
+     "kind": "embed",
+     "embed": "orientFind",
+     "answerAs": "look",
+     "title": "look_title",
+     "titleSlots": {
+      "what": {
+       "labelOf": "what"
+      }
+     },
+     "props": {
+      "variant": "find",
+      "count": 3,
+      "here": "here",
+      "task": "look_task",
+      "foundLabel": "found",
+      "done": "found_done",
+      "next": "next"
+     },
+     "next": [
+      {
+       "to": "close",
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       }
+      },
+      {
+       "to": "name",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "listen",
+     "kind": "embed",
+     "embed": "pebbleBowl",
+     "answerAs": "listen",
+     "title": "listen_title",
+     "props": {
+      "seconds": 60,
+      "task": "listen_task",
+      "start": "bowl_start",
+      "tapLabel": "listen_tap",
+      "running": "bowl_running",
+      "dropped": "bowl_dropped",
+      "done": "bowl_done",
+      "next": "next"
+     },
+     "next": [
+      {
+       "to": "close",
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       }
+      },
+      {
+       "to": "name",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "touch",
+     "kind": "embed",
+     "embed": "pebbleBowl",
+     "answerAs": "touch",
+     "title": "touch_title",
+     "props": {
+      "seconds": 45,
+      "task": "touch_task",
+      "start": "bowl_start",
+      "tapLabel": "came_back",
+      "running": "bowl_running",
+      "dropped": "bowl_dropped",
+      "done": "bowl_done",
+      "next": "next"
+     },
+     "next": [
+      {
+       "to": "close",
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       }
+      },
+      {
+       "to": "name",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "contact",
+     "kind": "embed",
+     "embed": "squeezeRelease",
+     "answerAs": "contact",
+     "title": "contact_title",
+     "props": {
+      "rounds": 3,
+      "squeezeSec": 5,
+      "step1": "contact_step1",
+      "step2": "contact_step2",
+      "start": "contact_start",
+      "squeezeLabel": "contact_press",
+      "dropLabel": "contact_drop",
+      "done": "contact_done",
+      "next": "next"
+     },
+     "next": [
+      {
+       "to": "close",
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       }
+      },
+      {
+       "to": "name",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "inside_where",
+     "kind": "ask",
+     "title": "inside_where_title",
+     "fields": [
+      {
+       "id": "place",
+       "options": {
+        "list": "inside_where"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "hint": "inside_where_hint",
+     "next": [
+      {
+       "to": "inside",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "inside",
+     "kind": "embed",
+     "embed": "pebbleBowl",
+     "answerAs": "inside",
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$a.place",
+         "none"
+        ]
+       },
+       "key": "inside_title_none"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "inside_title"
+      }
+     ],
+     "props": {
+      "seconds": 30,
+      "task": "inside_task",
+      "start": "bowl_start",
+      "tapLabel": "came_back",
+      "running": "bowl_running",
+      "dropped": "bowl_dropped",
+      "done": "bowl_done",
+      "next": "next"
+     },
+     "titleSlots": {
+      "place": {
+       "labelOf": "place"
+      }
+     },
+     "next": [
+      {
+       "to": "close",
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       }
+      },
+      {
+       "to": "name",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "name",
+     "kind": "ask",
+     "title": "name_title",
+     "fields": [
+      {
+       "id": "name",
+       "options": {
+        "list": "words",
+        "where": {
+         "any": [
+          {
+           "eq": [
+            "$opt.channel",
+            "$a.way"
+           ]
+          },
+          {
+           "eq": [
+            "$opt.channel",
+            "any"
+           ]
+          }
+         ]
+        }
+       },
+       "max": 2,
+       "required": true,
+       "own": {
+        "hint": "name_own",
+        "countsAsPick": true
+       }
+      }
+     ],
+     "hint": "name_hint",
+     "next": [
+      {
+       "to": "else",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "else",
+     "kind": "ask",
+     "title": "else_title",
+     "fields": [
+      {
+       "id": "else",
+       "options": {
+        "list": "else"
+       },
+       "max": 5,
+       "required": false
+      }
+     ],
+     "hint": "else_hint",
+     "next": [
+      {
+       "to": "close",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "close",
+     "kind": "ask",
+     "title": "close_title",
+     "fields": [
+      {
+       "id": "close",
+       "options": {
+        "list": "tvn"
+       },
+       "max": 1,
+       "required": true,
+       "askFresh": "thenVsNow"
+      }
+     ],
+     "next": [
+      {
+       "to": "room",
+       "when": {
+        "eq": [
+         "$a.close",
+         "worse"
+        ]
+       }
+      },
+      {
+       "to": "end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "room",
+     "kind": "embed",
+     "embed": "orientFind",
+     "answerAs": "room",
+     "title": "room_title",
+     "props": {
+      "variant": "find",
+      "count": 3,
+      "here": "here",
+      "task": "room_task",
+      "foundLabel": "found",
+      "done": "found_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "far",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "far",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "far_line"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "far_heavy_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": []
+    },
+    {
+     "id": "end",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       },
+       "key": "end_flooded_line"
+      },
+      {
+       "when": {
+        "has": [
+         "$a.else.ids",
+         "feeling"
+        ]
+       },
+       "key": "end_feeling_line"
+      },
+      {
+       "when": {
+        "has": [
+         "$a.else.ids",
+         "thought"
+        ]
+       },
+       "key": "end_thought_line"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "end_line"
+      }
+     ],
+     "done": "done",
+     "fields": [
+      {
+       "id": "when",
+       "label": "offphone_q",
+       "max": 1,
+       "options": {
+        "list": "when"
+       }
+      }
+     ],
+     "followUp": {
+      "type": "offphone_rep",
+      "whenFrom": "when"
+     },
+     "next": [],
+     "offers": [
+      {
+       "exit": "find_the_feeling",
+       "when": {
+        "all": [
+         {
+          "not": {
+           "eq": [
+            "$ctx.band",
+            "flooded"
+           ]
+          }
+         },
+         {
+          "has": [
+           "$a.else.ids",
+           "feeling"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "exit": "thoughts_passing",
+       "when": {
+        "all": [
+         {
+          "not": {
+           "eq": [
+            "$ctx.band",
+            "flooded"
+           ]
+          }
+         },
+         {
+          "has": [
+           "$a.else.ids",
+           "thought"
+          ]
+         }
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "id": "offphone",
+     "kind": "ask",
+     "title": "offphone_title",
+     "fields": [
+      {
+       "id": "offphone",
+       "options": {
+        "list": "offphone"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "reopens": {
+      "after": "end"
+     },
+     "clears": [
+      "offphone"
+     ],
+     "next": [
+      {
+       "to": "offphone_end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "offphone_end",
+     "kind": "handoff",
+     "complete": true,
+     "noClose": true,
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.offphone",
+         "yes"
+        ]
+       },
+       "key": "offphone_yes_line"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.offphone",
+         "sort_of"
+        ]
+       },
+       "key": "offphone_sort_line"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "offphone_not_line"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": []
+    }
+   ],
+   "exits": [
+    {
+     "id": "cool_down",
+     "toolId": "cool-down",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "done",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": true
+    },
+    {
+     "id": "find_the_feeling",
+     "toolId": "find-the-feeling",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "safety_open",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": false,
+     "safety": true
+    },
+    {
+     "id": "thoughts_passing",
+     "toolId": "thoughts-passing",
+     "query": {},
+     "carry": [],
+     "done": false
+    }
+   ],
+   "options": {
+    "way": [
+     {
+      "value": "look",
+      "label": "Look",
+      "calm": true
+     },
+     {
+      "value": "listen",
+      "label": "Listen",
+      "calm": true
+     },
+     {
+      "value": "touch",
+      "label": "Touch"
+     },
+     {
+      "value": "contact",
+      "label": "Feet on the floor"
+     },
+     {
+      "value": "inside",
+      "label": "Inside the body",
+      "inward": true
+     }
+    ],
+    "look_for": [
+     {
+      "value": "blue",
+      "label": "blue"
+     },
+     {
+      "value": "round",
+      "label": "round"
+     },
+     {
+      "value": "soft",
+      "label": "soft"
+     },
+     {
+      "value": "old",
+      "label": "old"
+     }
+    ],
+    "inside_where": [
+     {
+      "value": "head",
+      "label": "Head"
+     },
+     {
+      "value": "face",
+      "label": "Face"
+     },
+     {
+      "value": "jaw",
+      "label": "Jaw"
+     },
+     {
+      "value": "throat",
+      "label": "Throat"
+     },
+     {
+      "value": "neck",
+      "label": "Neck"
+     },
+     {
+      "value": "shoulders",
+      "label": "Shoulders"
+     },
+     {
+      "value": "chest",
+      "label": "Chest"
+     },
+     {
+      "value": "upper_back",
+      "label": "Upper back"
+     },
+     {
+      "value": "stomach",
+      "label": "Stomach"
+     },
+     {
+      "value": "lower_back",
+      "label": "Lower back"
+     },
+     {
+      "value": "arms",
+      "label": "Arms"
+     },
+     {
+      "value": "hands",
+      "label": "Hands"
+     },
+     {
+      "value": "legs",
+      "label": "Legs"
+     },
+     {
+      "value": "feet",
+      "label": "Feet"
+     },
+     {
+      "value": "body",
+      "label": "Whole body"
+     },
+     {
+      "value": "none",
+      "label": "Nothing stands out"
+     }
+    ],
+    "words": [
+     {
+      "value": "look_bright",
+      "label": "Bright",
+      "channel": "look"
+     },
+     {
+      "value": "look_dull",
+      "label": "Dull",
+      "channel": "look"
+     },
+     {
+      "value": "look_still",
+      "label": "Still",
+      "channel": "look"
+     },
+     {
+      "value": "look_moving",
+      "label": "Moving",
+      "channel": "look"
+     },
+     {
+      "value": "look_near",
+      "label": "Near",
+      "channel": "look"
+     },
+     {
+      "value": "look_far",
+      "label": "Far",
+      "channel": "look"
+     },
+     {
+      "value": "look_sharp",
+      "label": "Sharp",
+      "channel": "look"
+     },
+     {
+      "value": "look_blurry",
+      "label": "Blurry",
+      "channel": "look"
+     },
+     {
+      "value": "listen_near",
+      "label": "Near",
+      "channel": "listen"
+     },
+     {
+      "value": "listen_far",
+      "label": "Far",
+      "channel": "listen"
+     },
+     {
+      "value": "listen_steady",
+      "label": "Steady",
+      "channel": "listen"
+     },
+     {
+      "value": "listen_coming_going",
+      "label": "Coming and going",
+      "channel": "listen"
+     },
+     {
+      "value": "listen_high",
+      "label": "High",
+      "channel": "listen"
+     },
+     {
+      "value": "listen_low",
+      "label": "Low",
+      "channel": "listen"
+     },
+     {
+      "value": "listen_loud",
+      "label": "Loud",
+      "channel": "listen"
+     },
+     {
+      "value": "listen_quiet",
+      "label": "Quiet",
+      "channel": "listen"
+     },
+     {
+      "value": "touch_warm",
+      "label": "Warm",
+      "channel": "touch"
+     },
+     {
+      "value": "touch_cool",
+      "label": "Cool",
+      "channel": "touch"
+     },
+     {
+      "value": "touch_smooth",
+      "label": "Smooth",
+      "channel": "touch"
+     },
+     {
+      "value": "touch_rough",
+      "label": "Rough",
+      "channel": "touch"
+     },
+     {
+      "value": "touch_soft",
+      "label": "Soft",
+      "channel": "touch"
+     },
+     {
+      "value": "touch_hard",
+      "label": "Hard",
+      "channel": "touch"
+     },
+     {
+      "value": "touch_heavy",
+      "label": "Heavy",
+      "channel": "touch"
+     },
+     {
+      "value": "touch_light",
+      "label": "Light",
+      "channel": "touch"
+     },
+     {
+      "value": "contact_solid",
+      "label": "Solid",
+      "channel": "contact"
+     },
+     {
+      "value": "contact_pressing",
+      "label": "Pressing",
+      "channel": "contact"
+     },
+     {
+      "value": "contact_heavy",
+      "label": "Heavy",
+      "channel": "contact"
+     },
+     {
+      "value": "contact_light",
+      "label": "Light",
+      "channel": "contact"
+     },
+     {
+      "value": "contact_warm",
+      "label": "Warm",
+      "channel": "contact"
+     },
+     {
+      "value": "contact_cool",
+      "label": "Cool",
+      "channel": "contact"
+     },
+     {
+      "value": "contact_tingly",
+      "label": "Tingly",
+      "channel": "contact"
+     },
+     {
+      "value": "contact_steady",
+      "label": "Steady",
+      "channel": "contact"
+     },
+     {
+      "value": "inside_tension",
+      "label": "Tight",
+      "channel": "inside"
+     },
+     {
+      "value": "inside_loose",
+      "label": "Loose",
+      "channel": "inside"
+     },
+     {
+      "value": "inside_heaviness",
+      "label": "Heavy",
+      "channel": "inside"
+     },
+     {
+      "value": "inside_lightness",
+      "label": "Light",
+      "channel": "inside"
+     },
+     {
+      "value": "inside_warmth",
+      "label": "Warm",
+      "channel": "inside"
+     },
+     {
+      "value": "inside_cold_sensation",
+      "label": "Cold",
+      "channel": "inside"
+     },
+     {
+      "value": "inside_tingly",
+      "label": "Tingly",
+      "channel": "inside"
+     },
+     {
+      "value": "inside_buzzing",
+      "label": "Buzzing",
+      "channel": "inside"
+     },
+     {
+      "value": "inside_pressure",
+      "label": "Pressure",
+      "channel": "inside"
+     },
+     {
+      "value": "inside_settled",
+      "label": "Settled",
+      "channel": "inside"
+     },
+     {
+      "value": "inside_numbness_sensation",
+      "label": "Numb",
+      "channel": "inside"
+     },
+     {
+      "value": "inside_achy",
+      "label": "Achy",
+      "channel": "inside"
+     },
+     {
+      "value": "no_words",
+      "label": "No words today",
+      "channel": "any"
+     }
+    ],
+    "else": [
+     {
+      "value": "thought",
+      "label": "A thought"
+     },
+     {
+      "value": "feeling",
+      "label": "A feeling"
+     },
+     {
+      "value": "body",
+      "label": "A body sensation"
+     },
+     {
+      "value": "urge",
+      "label": "An urge"
+     },
+     {
+      "value": "nothing",
+      "label": "Nothing much"
+     }
+    ],
+    "tvn": [
+     {
+      "value": "worse",
+      "label": "Further away"
+     },
+     {
+      "value": "same",
+      "label": "About the same"
+     },
+     {
+      "value": "better",
+      "label": "A bit more here"
+     },
+     {
+      "value": "much_better",
+      "label": "More here"
+     }
+    ],
+    "when": [
+     {
+      "value": "morning",
+      "label": "Tomorrow morning"
+     },
+     {
+      "value": "evening",
+      "label": "Tomorrow evening"
+     }
+    ],
+    "offphone": [
+     {
+      "value": "yes",
+      "label": "Yes"
+     },
+     {
+      "value": "sort_of",
+      "label": "Sort of"
+     },
+     {
+      "value": "not_yet",
+      "label": "Not yet"
+     }
+    ]
+   }
+  },
+  {
    "id": "notice_them",
    "toolId": "mindfulness-of-others",
    "version": "nt-v1",
