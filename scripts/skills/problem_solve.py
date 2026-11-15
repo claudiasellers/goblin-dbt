@@ -138,6 +138,7 @@ COPY = {
     # The accept card's ways into Let it be (exit labels).
     "o_willingness": "Do what the moment needs anyway",
     "o_turning_the_mind": "Turn my mind toward letting it be",
+    "o_body_scan": "Notice my body, from the outside in",
 }
 
 # --- Chip labels the house voice changes (build.py refuses "just" and "but"; the dash becomes a colon) ---
@@ -304,13 +305,16 @@ def tools_named():
 
 
 EXITS = [{"id": exit_id(t), "toolId": t, **({"carry": ["feel"]} if t in BUILT else {"planned": True})} for t in tools_named()]
-# Let it be's two other ways in (DT-04 part 2): the content names them as tools; they open Let it be at its entries.
-LET_IT_BE_ENTRIES = {"willingness": ("willingness", "o_willingness"), "turning-the-mind": ("turn", "o_turning_the_mind")}
-EXITS = [{**e, "toolId": "let-it-be", "query": {"enterAt": LET_IT_BE_ENTRIES[e["toolId"]][0]},
-          "label": LET_IT_BE_ENTRIES[e["toolId"]][1], "carry": ["feel"]} if e["toolId"] in LET_IT_BE_ENTRIES else e
-         for e in EXITS]
-for e in EXITS:
-    e.pop("planned", None) if e["toolId"] == "let-it-be" else None
+# Tools the content names that are ways into a built skill (DT-04 part 2, DT-07 part 2): Let it be's willingness and
+# turning the mind open it at their entries, and the body scan opens Held at its outside-in scan.
+ENTRY_ALIASES = {
+    "willingness": ("let-it-be", "willingness", "o_willingness"),
+    "turning-the-mind": ("let-it-be", "turn", "o_turning_the_mind"),
+    "body-scan": ("soothe", "scan", "o_body_scan"),
+}
+EXITS = [{**{k: v for k, v in e.items() if k != "planned"}, "toolId": ENTRY_ALIASES[e["toolId"]][0],
+          "query": {"enterAt": ENTRY_ALIASES[e["toolId"]][1]}, "label": ENTRY_ALIASES[e["toolId"]][2], "carry": ["feel"]}
+         if e["toolId"] in ENTRY_ALIASES else e for e in EXITS]
 EXITS += [{"id": "safety_open", "safety": True}, {"id": "done", "done": True}]
 
 

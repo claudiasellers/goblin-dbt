@@ -31279,6 +31279,33 @@
           "end_same": "Sometimes it doesn't shift much. You still gave yourself a minute of care.",
           "end_easier": "It eased. You stayed with it, gently.",
           "end_reach": "Even a short message counts. You could tell them it's been a hard day.",
+          "scan_title": "Start with the outside. Where are you touching something solid?",
+          "scan_title_flooded": "Your body's loud right now. A hand on your heart may be easier first.",
+          "scan_hint": "Eyes open is fine. Pick one.",
+          "scan_contact_title": "Notice where you touch it.",
+          "scan_contact_step1": "Notice where your body meets it.",
+          "scan_contact_step2": "Pressure, temperature, texture: whatever's there.",
+          "scan_contact_step3": "Nothing to change.",
+          "scan_skin_title": "Now the outside of your body.",
+          "scan_skin_step1": "Your clothes against your skin.",
+          "scan_skin_step2": "The air on your face and hands.",
+          "scan_skin_step3": "Keep your eyes open if you like.",
+          "scan_where_title": "Right now, how here are you?",
+          "scan_where_hint": "Any answer is useful.",
+          "scan_in_title": "A little further in, if that's okay.",
+          "scan_in_step1": "Your hands: warm, cool, tingling, or nothing much.",
+          "scan_in_step2": "Your breath at the tip of your nose.",
+          "scan_in_step3": "Back to the outside whenever you like.",
+          "scan_press_title": "Press your feet into the floor.",
+          "scan_press_step1": "Press down through your heels.",
+          "scan_press_step2": "Notice the floor pushing back.",
+          "scan_press_step3": "Look at one thing in the room.",
+          "scan_far_line": "Far away is a sign to come back to the outside, not to go further in. Look around and name what you see.",
+          "scan_referral": "If you often feel far away, tell a doctor or therapist. It's common, and it can be helped.",
+          "scan_running": "Noticing",
+          "scan_done": "That's it.",
+          "practise_title": "Want to practise this once when things are calmer?",
+          "practise_hint": "It comes more easily on a hard night if you've done it on an okay day.",
           "safety_open": "Talk to someone now",
           "next": "Next",
           "done": "Done"
@@ -31373,6 +31400,15 @@
                   "eq": [
                     "$a.pick",
                     "deserve"
+                  ]
+                }
+              },
+              {
+                "to": "scan",
+                "when": {
+                  "eq": [
+                    "$a.pick",
+                    "scan"
                   ]
                 }
               },
@@ -32165,6 +32201,404 @@
             "offers": []
           },
           {
+            "id": "scan",
+            "kind": "ask",
+            "title": [
+              {
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "flooded"
+                  ]
+                },
+                "key": "scan_title_flooded"
+              },
+              {
+                "key": "scan_title"
+              }
+            ],
+            "fields": [
+              {
+                "id": "scan",
+                "options": {
+                  "list": "scan",
+                  "where": {
+                    "any": [
+                      {
+                        "all": [
+                          {
+                            "eq": [
+                              "$ctx.band",
+                              "flooded"
+                            ]
+                          },
+                          {
+                            "eq": [
+                              "$opt.flooded",
+                              true
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "not": {
+                          "eq": [
+                            "$opt.flooded",
+                            true
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "hint": "scan_hint",
+            "crisis": [
+              {
+                "variant": "crisis",
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "hurt"
+                  ]
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "where",
+                "when": {
+                  "eq": [
+                    "$a.scan",
+                    "heart"
+                  ]
+                }
+              },
+              {
+                "to": "scan_contact",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "scan_contact",
+            "kind": "embed",
+            "embed": "bodyCard",
+            "answerAs": "scan_contact",
+            "title": "scan_contact_title",
+            "props": {
+              "seconds": 30,
+              "step1": "scan_contact_step1",
+              "step2": "scan_contact_step2",
+              "step3": "scan_contact_step3",
+              "start": "start",
+              "running": "scan_running",
+              "done": "scan_done",
+              "next": "next",
+              "kind": "still"
+            },
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "crisis",
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "hurt"
+                  ]
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "scan_skin",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "scan_skin",
+            "kind": "embed",
+            "embed": "doseTimer",
+            "answerAs": "scan_skin",
+            "title": "scan_skin_title",
+            "props": {
+              "seconds": 30,
+              "step1": "scan_skin_step1",
+              "step2": "scan_skin_step2",
+              "step3": "scan_skin_step3",
+              "start": "start",
+              "running": "scan_running",
+              "done": "scan_done",
+              "next": "next"
+            },
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "crisis",
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "hurt"
+                  ]
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "scan_where",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "scan_where",
+            "kind": "ask",
+            "title": "scan_where_title",
+            "fields": [
+              {
+                "id": "scan_where",
+                "options": {
+                  "list": "scan_where"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "hint": "scan_where_hint",
+            "crisis": [
+              {
+                "variant": "crisis",
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "hurt"
+                  ]
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "scan_far",
+                "when": {
+                  "eq": [
+                    "$a.scan_where",
+                    "far"
+                  ]
+                }
+              },
+              {
+                "to": "scan_press",
+                "when": {
+                  "any": [
+                    {
+                      "eq": [
+                        "$a.scan_where",
+                        "partly"
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$ctx.band",
+                        "flooded"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "scan_in",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "scan_in",
+            "kind": "embed",
+            "embed": "doseTimer",
+            "answerAs": "scan_in",
+            "title": "scan_in_title",
+            "props": {
+              "seconds": 30,
+              "step1": "scan_in_step1",
+              "step2": "scan_in_step2",
+              "step3": "scan_in_step3",
+              "start": "start",
+              "running": "scan_running",
+              "done": "scan_done",
+              "next": "next"
+            },
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "crisis",
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "hurt"
+                  ]
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "close",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "scan_press",
+            "kind": "embed",
+            "embed": "bodyCard",
+            "answerAs": "scan_press",
+            "title": "scan_press_title",
+            "props": {
+              "seconds": 20,
+              "step1": "scan_press_step1",
+              "step2": "scan_press_step2",
+              "step3": "scan_press_step3",
+              "start": "start",
+              "running": "scan_running",
+              "done": "scan_done",
+              "next": "next",
+              "kind": "press"
+            },
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "crisis",
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "hurt"
+                  ]
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "close",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "scan_far",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "scan_far_line"
+              },
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "scan_referral"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
+            "crisis": [
+              {
+                "variant": "crisis",
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "hurt"
+                  ]
+                }
+              }
+            ],
+            "next": [],
+            "offers": [
+              {
+                "exit": "five_senses",
+                "when": {
+                  "all": []
+                }
+              },
+              {
+                "exit": "cool_down",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
+          },
+          {
             "id": "close",
             "kind": "ask",
             "title": "close_title",
@@ -32599,6 +33033,83 @@
             "next": [
               {
                 "to": "end",
+                "when": {
+                  "any": [
+                    {
+                      "eq": [
+                        "$ctx.frame",
+                        "hurt"
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$ctx.frame",
+                        "practice"
+                      ]
+                    },
+                    {
+                      "not": {
+                        "in": [
+                          "$a.close",
+                          [
+                            "better",
+                            "much_better"
+                          ]
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "practise",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "practise",
+            "kind": "ask",
+            "title": "practise_title",
+            "fields": [
+              {
+                "id": "practise",
+                "options": {
+                  "list": "practise"
+                },
+                "max": 1,
+                "required": false,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "hint": "practise_hint",
+            "followUp": {
+              "type": "held_practice",
+              "whenFrom": "practise"
+            },
+            "crisis": [
+              {
+                "variant": "crisis",
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "hurt"
+                  ]
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "end",
                 "when": null
               }
             ],
@@ -32708,6 +33219,13 @@
             "done": true
           },
           {
+            "id": "five_senses",
+            "toolId": "five-senses",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
             "id": "safety_open",
             "toolId": null,
             "query": {},
@@ -32735,6 +33253,10 @@
             {
               "value": "words",
               "label": "Kind words"
+            },
+            {
+              "value": "scan",
+              "label": "Notice my body, from the outside in"
             },
             {
               "value": "deserve",
@@ -32953,6 +33475,53 @@
               "label": "Still stirred up"
             }
           ],
+          "scan": [
+            {
+              "value": "heart",
+              "label": "A hand on my heart instead",
+              "flooded": true
+            },
+            {
+              "value": "feet",
+              "label": "My feet on the floor"
+            },
+            {
+              "value": "seat",
+              "label": "Sitting on a chair or the bed"
+            },
+            {
+              "value": "back",
+              "label": "My back against something"
+            },
+            {
+              "value": "hands",
+              "label": "My hands on something"
+            }
+          ],
+          "scan_where": [
+            {
+              "value": "here",
+              "label": "Here"
+            },
+            {
+              "value": "partly",
+              "label": "Partly here"
+            },
+            {
+              "value": "far",
+              "label": "Far away"
+            }
+          ],
+          "practise": [
+            {
+              "value": "tomorrow",
+              "label": "Tomorrow"
+            },
+            {
+              "value": "few_days",
+              "label": "In a few days"
+            }
+          ],
           "reach": [
             {
               "value": "yes",
@@ -32965,7 +33534,8 @@
           ]
         },
         "entries": {
-          "hand": "where"
+          "hand": "where",
+          "scan": "scan"
         }
       },
       {
@@ -54314,7 +54884,8 @@
           "l_others": "This part is about them. Work out what to say with DEAR MAN",
           "l_missing_links": "Find what got in the way",
           "o_willingness": "Do what the moment needs anyway",
-          "o_turning_the_mind": "Turn my mind toward letting it be"
+          "o_turning_the_mind": "Turn my mind toward letting it be",
+          "o_body_scan": "Notice my body, from the outside in"
         },
         "tables": {
           "psFit": {
@@ -57906,11 +58477,15 @@
         "exits": [
           {
             "id": "body_scan",
-            "toolId": "body-scan",
-            "query": {},
-            "carry": [],
+            "toolId": "soothe",
+            "query": {
+              "enterAt": "scan"
+            },
+            "carry": [
+              "feel"
+            ],
             "done": false,
-            "planned": true
+            "label": "o_body_scan"
           },
           {
             "id": "build_mastery",

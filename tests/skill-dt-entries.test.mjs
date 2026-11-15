@@ -57,7 +57,7 @@ test("the park links open the lid: First, the body's Not right now, Hold to wait
 
 test("a hand on the heart opens Held at where the hands rest; Hold to wait's keeps the crisis banner", () => {
   const held = S("held");
-  assert.deepEqual(held.entries, { hand: "where" });
+  assert.deepEqual(held.entries, { hand: "where", scan: "scan" });
   const fb = S("first_body");
   assert.deepEqual(fb.exits.find((e) => e.id === "held").query, { enterAt: "hand", frame: "hurt" });
   // Beside the people and the kit when the body didn't quieten twice, after them (people first).

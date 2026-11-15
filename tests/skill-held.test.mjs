@@ -46,7 +46,7 @@ test("the skill: tool soothe, named Held, its close asked in the flow, played by
 });
 
 test("pick how to be held; a carried flooded reading keeps it to the hand, warmth and the chip, two choices after", () => {
-  assert.deepEqual(ids(M.initialRun(skill), "pick"), ["heart", "warm", "sense", "words", "deserve"]);
+  assert.deepEqual(ids(M.initialRun(skill), "pick"), ["heart", "warm", "sense", "words", "scan", "deserve"]);
   assert.deepEqual(ids(M.initialRun(skill), "pick", FLOODED), ["heart", "warm", "deserve"], "PRD: hand on heart or warmth only");
   assert.equal(run([pick("pick", "heart"), next]).stepId, "where");
   assert.deepEqual(ids(run([pick("pick", "heart"), next], FLOODED), "where", FLOODED), ["chest", "mug"], "one of them touch-free");
@@ -122,7 +122,9 @@ test("the close in the flow: warmer or the same goes outward; the end says so, a
   const warmer = run([pick("close", "better"), next], ctx(), c);
   assert.equal(warmer.stepId, "reach");
   assert.deepEqual(M.askFresh(ctx(), warmer), { thenVsNow: "better" });
-  assert.equal(line(run([pick("reach", "not_now"), next], ctx(), warmer)), skill.copy.end_warmer);
+  const practise = run([pick("reach", "not_now"), next], ctx(), warmer);
+  assert.equal(practise.stepId, "practise", "it helped: practise it once on a calmer day");
+  assert.equal(line(run([next], ctx(), practise)), skill.copy.end_warmer);
   const same = run([pick("close", "same"), next, pick("reach", "not_now"), next], ctx(), c);
   assert.equal(same.stepId, "end");
   assert.equal(line(same), skill.copy.end_same);
@@ -165,7 +167,7 @@ test("outward: always offered, never pushed (skipping goes on)", () => {
   const r = run([...HEART, pick("close", "much_better"), next]);
   assert.equal(r.stepId, "reach");
   assert.deepEqual(ids(r, "reach"), ["yes", "not_now"], "not right now is a real answer");
-  assert.equal(run([pick("reach", "not_now"), next], ctx(), r).stepId, "end");
+  assert.equal(run([pick("reach", "not_now"), next], ctx(), r).stepId, "practise");
   const yes = run([pick("reach", "yes"), next], ctx(), r);
   assert.match(M.stepOf(skill, "end").lines.map((l) => l.key).join(" "), /end_reach/);
   assert.deepEqual(offers(yes), []);
