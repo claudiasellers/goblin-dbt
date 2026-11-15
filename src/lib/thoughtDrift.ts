@@ -12,7 +12,9 @@ export const LEAF_CHARS = 48;
 /** The share of the dose the words take to arrive; the whole line then sits for the rest. */
 export const ARRIVE_SHARE = 0.8;
 /** How long one leaf takes to cross the stream. Slow on purpose: the pace is the leaf's, not the person's. */
-export const LEAF_CROSS_MS = 18_000;
+export const LEAF_CROSS_MS = 30_000;
+/** The share of a crossing the leaf stays whole in view; it drifts out past the edge only at the end. */
+export const IN_VIEW_SHARE = 0.85;
 
 /** The thought as one line: the field's picks (labels, own words last), the first that has words. */
 export function thoughtLine(picks: readonly string[] | undefined): string {
@@ -46,4 +48,22 @@ export function leafLabel(line: string, max = LEAF_CHARS): string {
 /** Where a leaf is across the stream (0 upstream, 1 gone downstream), `ms` after it was set down. */
 export function leafAt(ms: number, crossMs = LEAF_CROSS_MS): number {
   return Math.min(1, Math.max(0, ms / crossMs));
+}
+
+/**
+ * Where to draw a leaf `x` across: `leftPct` of the stream's width and a shift of `shiftPct` of the leaf's own width.
+ * Whole in view from the left edge to the right edge for most of the crossing, then out past the right edge.
+ */
+export function leafPosition(x: number): { leftPct: number; shiftPct: number } {
+  const p = Math.min(1, Math.max(0, x) / IN_VIEW_SHARE);
+  const q = Math.min(1, Math.max(0, x - IN_VIEW_SHARE) / (1 - IN_VIEW_SHARE));
+  return { leftPct: p * 100, shiftPct: (q - p) * 100 };
+}
+
+/** A leaf on the water: when it was set down (dose ms). Each keeps floating at its own pace; a new one never replaces it. */
+export interface Leaf { key: number; fromMs: number }
+
+/** The leaves still on the water at `ms` (a leaf that has crossed is gone). */
+export function leavesOnWater(leaves: readonly Leaf[], ms: number, crossMs = LEAF_CROSS_MS): Leaf[] {
+  return leaves.filter((l) => leafAt(ms - l.fromMs, crossMs) < 1);
 }

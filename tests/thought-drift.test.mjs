@@ -36,7 +36,28 @@ test("the leaf: its words cut at a word, and it drifts across, never thrown", ()
   assert.equal(D.leafAt(-5), 0);
   assert.equal(D.leafAt(D.LEAF_CROSS_MS / 2), 0.5);
   assert.equal(D.leafAt(D.LEAF_CROSS_MS * 2), 1);
-  assert.ok(D.LEAF_CROSS_MS >= 15000, "slow on purpose: the leaf's pace, not the person's");
+  assert.ok(D.LEAF_CROSS_MS >= 25000, "slow on purpose: the leaf's pace, not the person's");
+});
+
+test("the leaf stays whole in view for most of its crossing, then drifts out past the edge", () => {
+  assert.deepEqual(D.leafPosition(0), { leftPct: 0, shiftPct: 0 });
+  const mid = D.leafPosition(0.5);
+  assert.ok(Math.abs(mid.leftPct + mid.shiftPct) < 1e-9, "left edge of the leaf at its share of the free width");
+  const edge = D.leafPosition(D.IN_VIEW_SHARE);
+  assert.equal(edge.leftPct, 100);
+  assert.equal(edge.shiftPct, -100, "right edge on the stream's right edge: still whole");
+  assert.deepEqual(D.leafPosition(1), { leftPct: 100, shiftPct: 0 }, "gone past the edge");
+});
+
+test("another leaf never takes one off the water: each floats until it has crossed", () => {
+  const leaves = [{ key: 1, fromMs: 0 }, { key: 2, fromMs: 10_000 }];
+  assert.deepEqual(D.leavesOnWater(leaves, 20_000).map((l) => l.key), [1, 2]);
+  assert.deepEqual(D.leavesOnWater(leaves, D.LEAF_CROSS_MS + 1).map((l) => l.key), [2]);
+  assert.deepEqual(D.leavesOnWater(leaves, D.LEAF_CROSS_MS + 10_001), []);
+  const comp = readFileSync("src/components/skillPlayer/ThoughtDrift.tsx", "utf8");
+  assert.match(comp, /\[\.\.\.leavesOnWater\(ls, at\), \{ key: setDown \+ 1, fromMs: at \}\]/, "the new leaf joins the ones still floating");
+  assert.match(comp, /overflow-wrap:anywhere/, "a long unbroken own-words thought wraps instead of scrolling the page");
+  assert.match(comp, /className="sr-only">\{words\.join/, "a screen reader hears the slowed thought once, whole");
 });
 
 test("the skill: slow and leaf show the caught thought; the leaf has Another leaf; the screen stays a timer", () => {
@@ -48,6 +69,8 @@ test("the skill: slow and leaf show the caught thought; the leaf has Another lea
     assert.equal(step(id).props.seconds, sec);
   }
   assert.equal(step("leaf").props.another, "leaf_another");
+  assert.equal(step("leaf").props.empty, "leaf_empty");
+  assert.match(skill.copy.leaf_empty, /keeps going/);
   assert.equal(step("slow").props.another, undefined);
   assert.equal(skill.copy.leaf_another, "Another leaf");
   assert.equal(step("screen").embed, "doseTimer");

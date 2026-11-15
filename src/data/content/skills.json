@@ -70128,6 +70128,7 @@
           "heads_up_title": "Your body's loud right now.",
           "here": "You're here, and it's",
           "leaf_another": "Another leaf",
+          "leaf_empty": "The stream keeps going. If the thought comes back, it gets another leaf.",
           "leaf_step1": "Your thought is on a leaf, on a stream.",
           "leaf_step2": "Let it float at its own pace, and watch.",
           "leaf_step3": "If it stays or comes back, that's okay. Put it on the next leaf.",
@@ -70629,6 +70630,7 @@
             "props": {
               "another": "leaf_another",
               "done": "move_done",
+              "empty": "leaf_empty",
               "field": "catch",
               "next": "next",
               "running": "running_leaf",

@@ -85,6 +85,7 @@ COPY = {
     "running_slow": "Slowly",
     "running_leaf": "Floating",
     "leaf_another": "Another leaf",
+    "leaf_empty": "The stream keeps going. If the thought comes back, it gets another leaf.",
     "running_screen": "Watching",
     "move_done": "That's it.",
     # Back to the room.
@@ -179,8 +180,9 @@ def drift(variant, seconds):
     """Slow it down and the leaf with the thought's own words on screen (`thoughtDrift`, part 2): the caught thought."""
     step = timer(variant, variant, seconds)
     step["embed"] = "thoughtDrift"
-    step["props"] = {"variant": variant, "field": "catch", **{k: v for k, v in step["props"].items()},
-                     **({"another": "leaf_another"} if variant == "leaf" else {})}
+    step["props"] = {"variant": variant, "field": "catch", **step["props"]}
+    if variant == "leaf":
+        step["props"].update({"another": "leaf_another", "empty": "leaf_empty"})
     return step
 
 

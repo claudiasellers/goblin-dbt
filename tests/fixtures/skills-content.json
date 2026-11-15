@@ -70136,6 +70136,7 @@
     "running_slow": "Slowly",
     "running_leaf": "Floating",
     "leaf_another": "Another leaf",
+    "leaf_empty": "The stream keeps going. If the thought comes back, it gets another leaf.",
     "running_screen": "Watching",
     "move_done": "That's it.",
     "room_title": "Back to the room.",
@@ -70624,7 +70625,8 @@
       "running": "running_leaf",
       "done": "move_done",
       "next": "next",
-      "another": "leaf_another"
+      "another": "leaf_another",
+      "empty": "leaf_empty"
      },
      "links": [
       {

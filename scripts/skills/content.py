@@ -376,6 +376,7 @@ EMBED_PROPS = {
         "start": {"type": "copy"},
         "running": {"type": "copy"},
         "another": {"type": "copy", "optional": True},
+        "empty": {"type": "copy", "optional": True},
         "done": {"type": "copy"},
         "next": {"type": "copy"},
     },

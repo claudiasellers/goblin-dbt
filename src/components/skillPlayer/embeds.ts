@@ -380,6 +380,7 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     start: { type: 'copy' },
     running: { type: 'copy' },
     another: { type: 'copy', optional: true },
+    empty: { type: 'copy', optional: true },
     done: { type: 'copy' },
     next: { type: 'copy' },
   },

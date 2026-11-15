@@ -71,13 +71,20 @@ one embed, `thoughtDrift` (`src/components/skillPlayer/ThoughtDrift.tsx` over th
 
 - **slow**: the words arrive one at a time across the first 80% of the dose, wide gaps and spaced letters, then the
   whole line sits. At most 24 words (a long paragraph turns it into reading).
-- **leaf**: a stream, the thought on a leaf (cut at a word to 48 characters) crossing in about 18 s, slow on purpose.
-  *Another leaf* puts it on the next one, any time while it runs (H15a: if it stays or comes back, that's okay).
-  `doneCount` is how many leaves went on the water, a measurement, never shown.
-- **Reduced motion**: the words appear without fading; the leaf rests mid-stream and a new leaf replaces it in place.
-- Departures from the deferred note: no dragging the thought onto the leaf (start puts it there: one gesture fewer,
+- **leaf**: a stream with the thought already resting on a leaf upstream (cut at a word to 48 characters); start sets
+  it floating. A leaf crosses in about 30 s, slow on purpose, whole in view for most of the way and drifting out past
+  the edge at the end. *Another leaf* puts the thought on the next one any time while it runs, and the one before keeps
+  floating: a new leaf never takes an old one off the water (H15a: if it stays or comes back, that's okay; up to four
+  on the water). An empty stream while it runs says *The stream keeps going. If the thought comes back, it gets another
+  leaf.* `doneCount` is how many leaves went on the water (a restart's fresh leaf included), a measurement, never shown.
+- **Reduced motion**: the words appear without fading; the leaf rests mid-stream and a new leaf replaces it in place
+  (nothing can drift, so nothing piles up).
+- **Long thoughts**: an unbroken own-words thought wraps anywhere rather than scrolling the page; a screen reader hears
+  the slowed thought once, whole (the arriving words are hidden from it), and the stream as the thought's label.
+- Departures from the deferred note: no dragging the thought onto the leaf (it is on one already: one gesture fewer,
   and dragging your own painful sentence reads as handling it); the screen move stays a timer (subtitles already sit
-  still; nothing to show that the three lines don't).
+  still; nothing to show that the three lines don't). *Slow it down* starts from an empty card, since the arrival is
+  the exercise.
 - Copy: the steps now describe what's on screen (*Your thought arrives one word at a time.*, *Your thought is on a
   leaf, on a stream.*); `leaf_another` *Another leaf*. Nothing pushes it away: no *float off*, test-pinned.
 
