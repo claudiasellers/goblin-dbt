@@ -212,36 +212,20 @@ All in `Goblin DBT/Research/` unless noted.
 
 ## 6. Branches
 
-Checked 11 Nov. 20 branches are not in `main`. Besides the active thread branches, none is safe to merge
-as it stands: each one conflicts with `main`, is overtaken, or was never meant for it. You approved the
-cleanup on 3 Nov; this session can't delete branches (pushes are limited to its own branch), so
-`/mnt/project-files/branch-cleanup/cleanup.sh` (in the project's Library)
-does it from `~/Documents/goblin-dbt`: it archives the overtaken branches as `archive/…` tags, then
-deletes them and the merged ones.
+Cleaned up 15 Nov (approved 3 Nov). The 12 overtaken branches were archived as `archive/<branch>` tags
+and deleted, along with the 31 branches already merged into `main`. To bring one back:
+`git push origin archive/<branch>:refs/heads/<branch>`. Left: `main`, the `claude/project-thread-*`
+and `lane/*` branches (active threads and the merge lane), and these five:
 
 | Branch | PR | Last commit | Call | Why |
 |---|---|---|---|---|
-| `claude/project-thread-d9xzcy`, `claude/project-thread-u7okch` | #70, #71 open | 11 Nov | **active** | IE-08 and Problem Solve lanes |
-| `claude/project-thread-jfrnbz` | #53 open | 11 Nov | **active** | This index |
 | `routing/ties-weights-safety-question` | #47 open | 5 Oct | **keep → safety batch** | The only safety-batch code (optional self-harm question on the spiral path, ties go to your words). One conflict (`discriminating-questions.json`, regenerate). Rebase when the batch resumes |
 | `fix/voice-rules-lighter` | #25 closed, unmerged | 1 Oct | **keep, decide** | Your corpus rewrite, rule 4 (never validate the intensity of a negative feeling) and a lighter lint. Never reached `main`. 8 conflicting files. If rule 4 stands, redo it on `main` as a small PR and close this |
 | `feat/please-running-low` | #33 closed, unmerged | 2 Oct | **keep, park** | *Running low* (ER-07 PLEASE), copy unsigned, 10 conflicts. Content source for ER-07 on the runtime |
 | `feat/oa-doors` | #48 open | 6 Oct | **keep, park** | OA feeling doors, three ways in, up to three feelings. 3 conflicts. Port when OA moves to the runtime |
 | `labs/exploits` | none | 29 Sep | **keep** | Exploits Lab v3 prototypes, "not for main yet" |
-| `claude/project-thread-dt1q1d` | #54 closed | 10 Nov | close | Only merge commits left; the skill runtime reached `main` another way |
-| `docs/parts-design` | none | 14 Oct | close | Overtaken: every file is on `main` in a later form |
-| `design/den-rooms` | none | 30 Sep | close | Overtaken: landed as PR #23 (`design/den`) |
-| `wip` | none | 23 Sep | close | The April Firestore migration and Neo4j audit-agent drafts; `main` stayed on Neo4j |
-| `phase-a/m0-harm-patches`, `phase-a/m1-foundations`, `phase-a/m2-platform`, `phase-a/m3-band-witness` | #14–#17 merged | 30 Sep | close | Only the stacked-PR merge commit; all content is on `main` |
-| `barbie-ui`, `checkin-avail-963f5`, `cursor/development-environment-setup-e68d`, `emotionquadrants` | old | Feb–Mar | close | From before `main`'s history restarted (no common ancestor); merged then as PRs #1–#11 |
 
-**Merged and left behind (delete):** `claude/fix-ifs-den-parts-saving-v67ryh`, `content/body-map-signoff`,
-`design/den`, `feat/body-map-content`, `feat/body-map-drag`, `feat/body-map-figure`, `feat/body-mirror`,
-`feat/checkin-no-waits`, `feat/circuit-breaker`, `feat/content-from-file`, `feat/felt-as-source`,
-`feat/graph-export-filters`, `feat/home-screen-app`, `feat/one-word-list`, `feat/routing-on`,
-`feat/routing-review`, `feat/today-off-the-square`, `fix/body-drag-touch`, `fix/body-map-load-error`,
-`fix/body-outlines-thumb`, `fix/continue-instant`, `fix/dearman-gate-close`, `fix/den-review`,
-`fix/den-test-clock`, `fix/lane-base-check`, `phase-a/m4-engine`, `phase-a/review-fixes`, `plan/body-map`,
-`reflect/r1-true-numbers`, `remove-capacity-question`, `ui-usability-prd`. Every commit on these is in
-`main`. Merged `claude/project-thread-*` branches and `lane/merge-queue` are left alone: their threads
-and the merge lane may still use them.
+**Archived (tag `archive/<branch>`):** `claude/project-thread-dt1q1d`, `docs/parts-design`,
+`design/den-rooms`, `wip`, `phase-a/m0-harm-patches`, `phase-a/m1-foundations`, `phase-a/m2-platform`,
+`phase-a/m3-band-witness`, `barbie-ui`, `checkin-avail-963f5`, `cursor/development-environment-setup-e68d`,
+`emotionquadrants`.

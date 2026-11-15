@@ -267,7 +267,7 @@ STEPS = [
     ask("back", "back_title", None, [field("back", "back")],
         [{"when": UNSAFE_PICK("back"), "to": "unsafe"}, {"when": {"eq": [a("back"), "not_yet"]}, "to": "again"},
          {"to": "back_end"}],
-        extra={"reopens": {"after": "end"}, "clears": ["back", "again"], "titleSlots": SLOT_MOVE,
+        extra={"reopens": {"after": "end", "again": ["again"]}, "clears": ["back", "again"], "titleSlots": SLOT_MOVE,
                "crisis": [{"variant": "other_person", "when": UNSAFE_PICK("back")}]}),
     # Not yet: the move is still there, and the card can come again (optional chips).
     ask("again", "back_not_yet", None, [field("again", "remind", required=False, label="remind_again")],
