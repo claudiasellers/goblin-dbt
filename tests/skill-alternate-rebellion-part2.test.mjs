@@ -47,9 +47,15 @@ test("the card later reopens the visit at back: did you do it → the itch → t
   const end = run([pick("itch", "a_bit"), next, pick("real", "cant"), next], ctx(), did);
   assert.equal(end.stepId, "next");
   assert.deepEqual(end.offered, ["let_it_be"]);
-  assert.equal(run([pick("did", "not_yet"), next], ctx(), r).stepId, "real", "not yet: no itch question");
+  // Not yet: another card if they want one (the same card; it reopens here again), or none.
+  const notYet = run([pick("did", "not_yet"), next], ctx(), r);
+  assert.equal(notYet.stepId, "again_card");
+  assert.deepEqual(M.followUpFor(ctx(), step("again_card"), run([pick("remind_again", "tomorrow")], ctx(), notYet)), { type: "rebellion_after", chip: "tomorrow" });
+  const again = run([pick("remind_again", "few_days"), next, pick("real", "not_now"), next], ctx(), notYet);
+  assert.equal(reopen(again, "back").stepId, "back", "the second card reopens it too");
+  assert.equal(run([pick("remind_again", "tomorrow"), { type: "next", quiet: true }], ctx(), notYet).stepId, "real");
   assert.equal(run([pick("did", "no"), next], ctx(), r).stepId, "real");
-  assert.deepEqual(step("back").reopens, { after: "later" });
+  assert.deepEqual(step("back").reopens, { after: "later", again: ["again_card"] });
 });
 
 test("an own rebellion that can't be undone waits a day: no card today, a card tomorrow asks if they still want it", () => {
@@ -93,6 +99,39 @@ test("a day later: still yes → the card; something undoable → the list, aske
   assert.deepEqual(step("still").reopens, { after: "sleep_on" });
 });
 
+test("the card's chips fit the answer: this evening for later today, a few days for this week", () => {
+  const atCard = run([...toPick(), pick("pick", "say_no"), next]);
+  const opts = (when) => M.optionGroups(ctx(), step("later").fields[0], M.runNext(ctx(), atCard, card(when)).answers)[0].options.map((o) => o.value);
+  assert.deepEqual(opts("today"), ["evening", "tomorrow"]);
+  assert.deepEqual(opts("week"), ["tomorrow", "few_days"]);
+});
+
+test("a second wait after the day-later card asks fresh: nothing booked unless tapped again, and the right end line", () => {
+  const slept = run([...toPick(), own("pick", "shave my head"), pick("cost", "no"), pick("undo", "no"), next, pick("sleep", "tomorrow"), next, pick("real", "not_now"), next]);
+  const r = reopen(slept, "still");
+  assert.equal(r.answers.sleep, undefined);
+  const again = run([pick("still", "lighter"), next, own("pick", "get a piercing"), pick("cost", "no"), pick("undo", "not_sure"), next], ctx(), r);
+  assert.equal(again.stepId, "sleep_on");
+  assert.equal(again.answers.sleep, undefined, "Ask me tomorrow isn't pre-picked");
+  assert.equal(M.followUpFor(ctx(), step("sleep_on"), again), null);
+  assert.equal(M.copyText(ctx(), step("sleep_on").title, again), skill.copy.sleep_title_unsure, "not sure isn't told it can't be undone");
+  const end = run([pick("sleep", "tomorrow"), next, pick("real", "not_now"), next], ctx(), again);
+  assert.equal(line(end), skill.copy.next_slept);
+});
+
+test("a day later with someone they're scared of, or next to treatment: yes goes back through the questions", () => {
+  const wait = (squeeze) => run([...toPick(squeeze), own("pick", "move out tonight"), pick("cost", "no"), ...(squeeze.includes("scared") ? [pick("noticed", "no")] : []),
+    pick("undo", "no"), next, pick("sleep", "tomorrow"), next, pick("real", "not_now"), next]);
+  const scared = reopen(wait(["scared"]), "still");
+  const yes = run([pick("still", "yes"), next], ctx(), scared);
+  assert.equal(yes.stepId, "pick");
+  assert.deepEqual(M.shownFields(ctx(), step("pick"), yes).map((f) => f.id), ["pick", "cost", "noticed", "undo"]);
+  assert.equal(M.canGoOn(ctx(), yes), false, "would they notice it is asked again");
+  const treat = reopen(wait(["treatment"]), "still");
+  assert.match(M.copyText(ctx(), step("still").title, treat), /care team first/);
+  assert.equal(run([pick("still", "yes"), next], ctx(), treat).stepId, "pick");
+});
+
 test("the two-part close: acted on the blow-up urge, then that urge now (urge_change)", () => {
   assert.match(readFileSync("functions/src/spine/tools.ts", "utf8"), /'alternate-rebellion': \{ module: 'dt', closeKind: 'urge_change' \}/);
   assert.match(readFileSync("src/lib/spine/close.ts", "utf8"), /'alternate-rebellion': \{ module: 'dt', closeKind: 'urge_change' \}/);
@@ -120,8 +159,8 @@ test("the cards: registered, content-free, resolved on open, only from a Rebel v
 });
 
 test("the new screens keep the safety link and the other-person resources", () => {
-  for (const id of ["sleep_on", "back", "still"]) {
+  for (const id of ["sleep_on", "later", "back", "again_card", "still"]) {
     assert.ok(step(id).fields.at(-1).links.some((l) => l.exit === "safety_open"), id);
   }
-  for (const id of ["sleep_on", "later", "back", "still"]) assert.deepEqual(step(id).crisis.map((c) => c.variant), ["other_person"], id);
+  for (const id of ["sleep_on", "later", "back", "again_card", "still"]) assert.deepEqual(step(id).crisis.map((c) => c.variant), ["other_person"], id);
 });

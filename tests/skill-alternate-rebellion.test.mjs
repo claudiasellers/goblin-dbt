@@ -31,7 +31,7 @@ const toReal = (squeeze, rebellion = "say_no", when = "today") => [...toPick(squ
 const step = (id) => skill.steps.find((s) => s.id === id);
 
 test("the screens, in order: open, squeeze, function, pick, (heads-up), (sleep on it), card, (itch | later), (back, still: reopened only), real, next", () => {
-  assert.deepEqual(skill.steps.map((s) => s.id), ["open", "squeeze", "function", "pick", "heads_up", "sleep_on", "card", "later", "itch", "back", "still", "real", "next"]);
+  assert.deepEqual(skill.steps.map((s) => s.id), ["open", "squeeze", "function", "pick", "heads_up", "sleep_on", "card", "later", "itch", "back", "again_card", "still", "real", "next"]);
   assert.equal(skill.toolId, "alternate-rebellion");
   const s = run([...toReal(["rules"], "say_no", "now"), pick("itch", "a_bit"), next, pick("real", "change"), next]);
   assert.deepEqual(s.path, ["open", "squeeze", "function", "pick", "card", "itch", "real", "next"]);

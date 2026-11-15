@@ -44,9 +44,11 @@ COPY = {
     # Own words that can't be undone wait a day (PRD: the 24-hour check on irreversible ones).
     "undo_q": "Could you undo it later?",
     "sleep_title": "That one can't be undone, so it waits a day. A card tomorrow asks if you still want it.",
+    "sleep_title_unsure": "That one might not undo, so it waits a day. A card tomorrow asks if you still want it.",
     "sleep_hint": "Big choices land better after a night's sleep.",
     # The card a day later (rebellion_check), and what follows.
     "still_title": "A day later. Do you still want to do it?",
+    "still_title_treatment": "A day later. Changing treatment is a talk with your care team first. Do you still want to do it?",
     "still_hint": "Whatever you pick, it's your call.",
     # Screen 4b: the heads-up on an own rebellion that would cost (PRD step 4).
     "heads_up_title": "That one might cost you tomorrow. Keep it, or pick something lighter?",
@@ -56,6 +58,7 @@ COPY = {
     # Later today or this week: a card to ask how it went (rebellion_after), or none.
     "later_title": "Want a card later, to ask how it went?",
     "later_skip": "No card",
+    "again_title": "Want another card, for another time?",
     "back_title": "Your rebellion. Did you do it?",
     "back_hint": "Any answer is fine. It's only to notice.",
     # Screen 6: did it scratch the itch (PRD step 6, the first half; the urge close is the second).
@@ -167,7 +170,9 @@ UNDO = [("yes", "Yes"), ("not_sure", "Not sure"), ("no", "No")]
 SLEEP = [("tomorrow", "Ask me tomorrow"), ("lighter", "Pick one I can undo")]
 STILL = [("yes", "Yes, still mine"), ("lighter", "Something I can undo instead"), ("no", "Not any more")]
 # rebellion_after's window chips (scripts/practice-spine/content.py), on the card for later today or this week.
-REMIND = [("evening", "This evening"), ("tomorrow", "Tomorrow"), ("few_days", "In a few days")]
+# Each fits the card's answer: this evening for later today, a few days for this week, tomorrow for either.
+REMIND = [("evening", "This evening", {"today": True}), ("tomorrow", "Tomorrow", {"today": True, "week": True}),
+          ("few_days", "In a few days", {"week": True})]
 DID = [("yes", "I did it"), ("a_bit", "Some of it"), ("not_yet", "Not yet"), ("no", "I let it go")]
 ITCH = [("yes", "Yes"), ("a_bit", "A bit"), ("no", "No"), ("not_yet", "Not yet")]
 REAL = [
@@ -183,6 +188,7 @@ def a(field):
 
 
 FLOODED = {"eq": ["$ctx.band", "flooded"]}
+REMIND_WHERE = {"any": [{"all": [{"eq": [a("when"), w]}, {"eq": [f"$opt.{w}", True]}]} for w in ("today", "week")]}
 ALWAYS = {"all": []}  # the condition language's true
 SCARED = {"has": [a("squeeze.ids"), "scared"]}
 TREATMENT = {"has": [a("squeeze.ids"), "treatment"]}
@@ -261,7 +267,8 @@ STEPS = [
     {
         # The 24-hour check (PRD): an own rebellion that can't be undone gets no card today. *Ask me tomorrow* books
         # rebellion_check, a day later; *Pick one I can undo* goes back to the list.
-        "id": "sleep_on", "kind": "ask", "title": "sleep_title", "hint": "sleep_hint",
+        "id": "sleep_on", "kind": "ask", "hint": "sleep_hint",
+        "title": [{"when": {"eq": [a("undo"), "not_sure"]}, "key": "sleep_title_unsure"}, {"key": "sleep_title"}],
         "fields": [{"id": "sleep", "options": {"list": "sleep"}, "max": 1, "required": True, "links": [SAFETY_LINK]}],
         "crisis": OTHER_PERSON,
         "followUp": {"type": "rebellion_check", "when": {"eq": [a("sleep"), "tomorrow"]}},
@@ -277,7 +284,7 @@ STEPS = [
     {
         # Later today or this week (DT-11 part 2): an optional card to ask how it went, never a must.
         "id": "later", "kind": "ask", "title": "later_title", "secondary": "later_skip",
-        "fields": [{"id": "remind", "options": {"list": "remind"}, "max": 1}],
+        "fields": [{"id": "remind", "options": {"list": "remind", "where": REMIND_WHERE}, "max": 1, "links": [SAFETY_LINK]}],
         "crisis": OTHER_PERSON,
         "followUp": {"type": "rebellion_after", "whenFrom": "remind"},
         "next": [{"to": "real"}],
@@ -293,17 +300,31 @@ STEPS = [
         "id": "back", "kind": "ask", "title": "back_title", "hint": "back_hint",
         "fields": [{"id": "did", "options": {"list": "did"}, "max": 1, "required": True, "links": [SAFETY_LINK]}],
         "crisis": OTHER_PERSON,
-        "reopens": {"after": "later"}, "clears": ["did", "itch", "real"],
-        "next": [{"when": {"in": [a("did"), ["yes", "a_bit"]]}, "to": "itch"}, {"to": "real"}],
+        "reopens": {"after": "later", "again": ["again_card"]}, "clears": ["did", "itch", "real", "remind_again"],
+        "next": [{"when": {"in": [a("did"), ["yes", "a_bit"]]}, "to": "itch"}, {"when": {"eq": [a("did"), "not_yet"]}, "to": "again_card"},
+                 {"to": "real"}],
+    },
+    {
+        # Not yet: another card, if they want one (the same card, booked again; it reopens at `back`).
+        "id": "again_card", "kind": "ask", "title": "again_title", "secondary": "later_skip",
+        # All three chips: the card's own answer (an embed's) isn't read back on a reopen.
+        "fields": [{"id": "remind_again", "options": {"list": "remind"}, "max": 1, "links": [SAFETY_LINK]}],
+        "crisis": OTHER_PERSON,
+        "followUp": {"type": "rebellion_after", "whenFrom": "remind_again"},
+        "next": [{"to": "real"}],
     },
     {
         # The card a day later (rebellion_check): still yes → the card (now or later); something undoable → the list;
-        # not any more → the squeeze. The cost and undo answers are asked again.
-        "id": "still", "kind": "ask", "title": "still_title", "hint": "still_hint",
+        # not any more → the squeeze. A yes with someone they're scared of, or next to treatment, goes back through the
+        # list so *Would they notice it?* and the cost and undo questions are asked again (they're cleared here); the
+        # first visit's record keeps the first answers.
+        "id": "still", "kind": "ask", "hint": "still_hint",
+        "title": [{"when": TREATMENT, "key": "still_title_treatment"}, {"key": "still_title"}],
         "fields": [{"id": "still", "options": {"list": "still"}, "max": 1, "required": True, "links": [SAFETY_LINK]}],
         "crisis": OTHER_PERSON,
-        "reopens": {"after": "sleep_on"}, "clears": ["still", "cost", "noticed", "undo", "heads_up", "when", "remind", "itch", "real"],
-        "next": [{"when": {"eq": [a("still"), "yes"]}, "to": "card"}, {"when": {"eq": [a("still"), "lighter"]}, "to": "pick"}, {"to": "real"}],
+        "reopens": {"after": "sleep_on"}, "clears": ["still", "sleep", "cost", "noticed", "undo", "heads_up", "when", "remind", "remind_again", "itch", "real"],
+        "next": [{"when": {"all": [{"eq": [a("still"), "yes"]}, {"not": {"any": [SCARED, TREATMENT]}}]}, "to": "card"},
+                 {"when": {"eq": [a("still"), "no"]}, "to": "real"}, {"to": "pick"}],
     },
     {
         "id": "real", "kind": "ask", "title": "real_title",
@@ -316,7 +337,7 @@ STEPS = [
         "lines": [
             {"when": SCARED, "key": "next_scared"},
             {"when": {"eq": [a("still"), "no"]}, "key": "next_let_go"},
-            {"when": {"all": [{"eq": [a("sleep"), "tomorrow"]}, {"not": {"set": a("still")}}]}, "key": "next_slept"},
+            {"when": {"eq": [a("sleep"), "tomorrow"]}, "key": "next_slept"},
             {"when": REAL_IS("change"), "key": "next_change"},
             {"when": REAL_IS("say"), "key": "next_say"},
             {"when": REAL_IS("cant"), "key": "next_cant"},
@@ -362,7 +383,7 @@ def options():
     out += [("undo", v, label, {}, None) for v, label in UNDO]
     out += [("sleep", v, label, {}, None) for v, label in SLEEP]
     out += [("still", v, label, {}, None) for v, label in STILL]
-    out += [("remind", v, label, {}, None) for v, label in REMIND]
+    out += [("remind", v, label, props, None) for v, label, props in REMIND]
     out += [("did", v, label, {}, None) for v, label in DID]
     out += [("itch", v, label, {}, None) for v, label in ITCH]
     out += [("real", v, label, {}, None) for v, label in REAL]

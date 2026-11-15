@@ -905,7 +905,7 @@ SET r += {list: "when", order: 114};
 
 // --- alternate_rebellion (ar-v3) ---
 MERGE (s:Skill {id: "alternate_rebellion"})
-SET s += {toolId: "alternate-rebellion", version: "ar-v3", contentVersion: "skills-v1", start: "open", ownMax: 140, emotionFields: [], accepts: ["band", "urgeId", "returnTo"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"back_hint\": \"Any answer is fine. It's only to notice.\", \"back_title\": \"Your rebellion. Did you do it?\", \"card_against\": \"Against\", \"card_fallback\": \"A rebellion built not to cost you tomorrow.\", \"card_for\": \"For\", \"card_now\": \"Now\", \"card_title\": \"Here's your rebellion. When will you do it?\", \"card_today\": \"Later today\", \"card_week\": \"This week\", \"card_when\": \"When?\", \"cost_q\": \"Will this cost you tomorrow?\", \"done\": \"Done\", \"flooded_cool\": \"Cool my body first\", \"flooded_pause\": \"Pause first\", \"flooded_title\": \"Your body's loud. Settle it a little first.\", \"function_title\": \"What would blowing it up give you?\", \"heads_up_scared_title\": \"If they'd notice it, it could cost you. Keep it, or pick a quiet one?\", \"heads_up_title\": \"That one might cost you tomorrow. Keep it, or pick something lighter?\", \"itch_hint\": \"Go and do it first. This screen waits.\", \"itch_title\": \"Did it scratch the itch?\", \"later_skip\": \"No card\", \"later_title\": \"Want a card later, to ask how it went?\", \"next\": \"Next\", \"next_cant\": \"Some squeezes don't move. You still get to choose how much of you they take.\", \"next_change\": \"When the squeeze can change, working on it is the bigger rebellion.\", \"next_let_go\": \"Choosing not to, after sleeping on it, is a rebellion too.\", \"next_not_now\": \"The rebellion's yours. The squeeze can wait until you're ready.\", \"next_say\": \"Saying it clearly, and keeping your self-respect, is a rebellion too.\", \"next_scared\": \"You named someone you're scared of. You don't have to work that out alone.\", \"next_slept\": \"It's waiting a day. The squeeze can be looked at now, or later.\", \"noticed_q\": \"Would they notice it?\", \"open_title\": \"Wanting to rebel usually means something's squeezing you. That's worth listening to.\", \"own_hint\": \"Say it your way\", \"pick_own\": \"My own rebellion\", \"pick_title\": \"Pick one that gives you that, without the wreckage.\", \"pick_title_scared\": \"Pick one that gives you that, and that nobody else has to see.\", \"pick_title_treatment\": \"Treatment you didn't pick is a real squeeze. Changing it is a talk with your care team first. Pick a rebellion built not to cost you tomorrow.\", \"pick_title_treatment_scared\": \"Treatment you didn't pick is a real squeeze. Changing it is a talk with your care team first. Pick one nobody else has to see.\", \"real_title\": \"And the squeeze itself. Is it something you want to work on?\", \"safety_open\": \"If the urge is to hurt yourself\", \"sleep_hint\": \"Big choices land better after a night's sleep.\", \"sleep_title\": \"That one can't be undone, so it waits a day. A card tomorrow asks if you still want it.\", \"squeeze_own\": \"Something else\", \"squeeze_title\": \"What's squeezing you?\", \"still_hint\": \"Whatever you pick, it's your call.\", \"still_title\": \"A day later. Do you still want to do it?\", \"undo_q\": \"Could you undo it later?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "alternate-rebellion", version: "ar-v3", contentVersion: "skills-v1", start: "open", ownMax: 140, emotionFields: [], accepts: ["band", "urgeId", "returnTo"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"again_title\": \"Want another card, for another time?\", \"back_hint\": \"Any answer is fine. It's only to notice.\", \"back_title\": \"Your rebellion. Did you do it?\", \"card_against\": \"Against\", \"card_fallback\": \"A rebellion built not to cost you tomorrow.\", \"card_for\": \"For\", \"card_now\": \"Now\", \"card_title\": \"Here's your rebellion. When will you do it?\", \"card_today\": \"Later today\", \"card_week\": \"This week\", \"card_when\": \"When?\", \"cost_q\": \"Will this cost you tomorrow?\", \"done\": \"Done\", \"flooded_cool\": \"Cool my body first\", \"flooded_pause\": \"Pause first\", \"flooded_title\": \"Your body's loud. Settle it a little first.\", \"function_title\": \"What would blowing it up give you?\", \"heads_up_scared_title\": \"If they'd notice it, it could cost you. Keep it, or pick a quiet one?\", \"heads_up_title\": \"That one might cost you tomorrow. Keep it, or pick something lighter?\", \"itch_hint\": \"Go and do it first. This screen waits.\", \"itch_title\": \"Did it scratch the itch?\", \"later_skip\": \"No card\", \"later_title\": \"Want a card later, to ask how it went?\", \"next\": \"Next\", \"next_cant\": \"Some squeezes don't move. You still get to choose how much of you they take.\", \"next_change\": \"When the squeeze can change, working on it is the bigger rebellion.\", \"next_let_go\": \"Choosing not to, after sleeping on it, is a rebellion too.\", \"next_not_now\": \"The rebellion's yours. The squeeze can wait until you're ready.\", \"next_say\": \"Saying it clearly, and keeping your self-respect, is a rebellion too.\", \"next_scared\": \"You named someone you're scared of. You don't have to work that out alone.\", \"next_slept\": \"It's waiting a day. The squeeze can be looked at now, or later.\", \"noticed_q\": \"Would they notice it?\", \"open_title\": \"Wanting to rebel usually means something's squeezing you. That's worth listening to.\", \"own_hint\": \"Say it your way\", \"pick_own\": \"My own rebellion\", \"pick_title\": \"Pick one that gives you that, without the wreckage.\", \"pick_title_scared\": \"Pick one that gives you that, and that nobody else has to see.\", \"pick_title_treatment\": \"Treatment you didn't pick is a real squeeze. Changing it is a talk with your care team first. Pick a rebellion built not to cost you tomorrow.\", \"pick_title_treatment_scared\": \"Treatment you didn't pick is a real squeeze. Changing it is a talk with your care team first. Pick one nobody else has to see.\", \"real_title\": \"And the squeeze itself. Is it something you want to work on?\", \"safety_open\": \"If the urge is to hurt yourself\", \"sleep_hint\": \"Big choices land better after a night's sleep.\", \"sleep_title\": \"That one can't be undone, so it waits a day. A card tomorrow asks if you still want it.\", \"sleep_title_unsure\": \"That one might not undo, so it waits a day. A card tomorrow asks if you still want it.\", \"squeeze_own\": \"Something else\", \"squeeze_title\": \"What's squeezing you?\", \"still_hint\": \"Whatever you pick, it's your call.\", \"still_title\": \"A day later. Do you still want to do it?\", \"still_title_treatment\": \"A day later. Changing treatment is a talk with your care team first. Do you still want to do it?\", \"undo_q\": \"Could you undo it later?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "dbt_alternate_rebellion"}), (s:Skill {id: "alternate_rebellion"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "alternate_rebellion"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
@@ -936,7 +936,7 @@ MATCH (s:Skill {id: "alternate_rebellion"}), (n:SkillStep {id: "alternate_rebell
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 4};
 MERGE (n:SkillStep {id: "alternate_rebellion:sleep_on"})
-SET n += {skillId: "alternate_rebellion", step: "sleep_on", kind: "ask", version: "ar-v3"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}], \"fields\": [{\"id\": \"sleep\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"sleep\"}, \"required\": true}], \"followUp\": {\"type\": \"rebellion_check\", \"when\": {\"eq\": [\"$a.sleep\", \"tomorrow\"]}}, \"hint\": \"sleep_hint\", \"title\": \"sleep_title\"}";
+SET n += {skillId: "alternate_rebellion", step: "sleep_on", kind: "ask", version: "ar-v3"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}], \"fields\": [{\"id\": \"sleep\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"sleep\"}, \"required\": true}], \"followUp\": {\"type\": \"rebellion_check\", \"when\": {\"eq\": [\"$a.sleep\", \"tomorrow\"]}}, \"hint\": \"sleep_hint\", \"title\": [{\"key\": \"sleep_title_unsure\", \"when\": {\"eq\": [\"$a.undo\", \"not_sure\"]}}, {\"key\": \"sleep_title\"}]}";
 MATCH (s:Skill {id: "alternate_rebellion"}), (n:SkillStep {id: "alternate_rebellion:sleep_on"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 5};
@@ -946,7 +946,7 @@ MATCH (s:Skill {id: "alternate_rebellion"}), (n:SkillStep {id: "alternate_rebell
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 6};
 MERGE (n:SkillStep {id: "alternate_rebellion:later"})
-SET n += {skillId: "alternate_rebellion", step: "later", kind: "ask", version: "ar-v3"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}], \"fields\": [{\"id\": \"remind\", \"max\": 1, \"options\": {\"list\": \"remind\"}}], \"followUp\": {\"type\": \"rebellion_after\", \"whenFrom\": \"remind\"}, \"secondary\": \"later_skip\", \"title\": \"later_title\"}";
+SET n += {skillId: "alternate_rebellion", step: "later", kind: "ask", version: "ar-v3"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}], \"fields\": [{\"id\": \"remind\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"remind\", \"where\": {\"any\": [{\"all\": [{\"eq\": [\"$a.when\", \"today\"]}, {\"eq\": [\"$opt.today\", true]}]}, {\"all\": [{\"eq\": [\"$a.when\", \"week\"]}, {\"eq\": [\"$opt.week\", true]}]}]}}}], \"followUp\": {\"type\": \"rebellion_after\", \"whenFrom\": \"remind\"}, \"secondary\": \"later_skip\", \"title\": \"later_title\"}";
 MATCH (s:Skill {id: "alternate_rebellion"}), (n:SkillStep {id: "alternate_rebellion:later"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 7};
@@ -956,25 +956,30 @@ MATCH (s:Skill {id: "alternate_rebellion"}), (n:SkillStep {id: "alternate_rebell
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 8};
 MERGE (n:SkillStep {id: "alternate_rebellion:back"})
-SET n += {skillId: "alternate_rebellion", step: "back", kind: "ask", version: "ar-v3"}, n.specJson = "{\"clears\": [\"did\", \"itch\", \"real\"], \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}], \"fields\": [{\"id\": \"did\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"did\"}, \"required\": true}], \"hint\": \"back_hint\", \"reopens\": {\"after\": \"later\"}, \"title\": \"back_title\"}";
+SET n += {skillId: "alternate_rebellion", step: "back", kind: "ask", version: "ar-v3"}, n.specJson = "{\"clears\": [\"did\", \"itch\", \"real\", \"remind_again\"], \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}], \"fields\": [{\"id\": \"did\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"did\"}, \"required\": true}], \"hint\": \"back_hint\", \"reopens\": {\"after\": \"later\", \"again\": [\"again_card\"]}, \"title\": \"back_title\"}";
 MATCH (s:Skill {id: "alternate_rebellion"}), (n:SkillStep {id: "alternate_rebellion:back"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 9};
-MERGE (n:SkillStep {id: "alternate_rebellion:still"})
-SET n += {skillId: "alternate_rebellion", step: "still", kind: "ask", version: "ar-v3"}, n.specJson = "{\"clears\": [\"still\", \"cost\", \"noticed\", \"undo\", \"heads_up\", \"when\", \"remind\", \"itch\", \"real\"], \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}], \"fields\": [{\"id\": \"still\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"still\"}, \"required\": true}], \"hint\": \"still_hint\", \"reopens\": {\"after\": \"sleep_on\"}, \"title\": \"still_title\"}";
-MATCH (s:Skill {id: "alternate_rebellion"}), (n:SkillStep {id: "alternate_rebellion:still"})
+MERGE (n:SkillStep {id: "alternate_rebellion:again_card"})
+SET n += {skillId: "alternate_rebellion", step: "again_card", kind: "ask", version: "ar-v3"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}], \"fields\": [{\"id\": \"remind_again\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"remind\"}}], \"followUp\": {\"type\": \"rebellion_after\", \"whenFrom\": \"remind_again\"}, \"secondary\": \"later_skip\", \"title\": \"again_title\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (n:SkillStep {id: "alternate_rebellion:again_card"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 10};
+MERGE (n:SkillStep {id: "alternate_rebellion:still"})
+SET n += {skillId: "alternate_rebellion", step: "still", kind: "ask", version: "ar-v3"}, n.specJson = "{\"clears\": [\"still\", \"sleep\", \"cost\", \"noticed\", \"undo\", \"heads_up\", \"when\", \"remind\", \"remind_again\", \"itch\", \"real\"], \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}], \"fields\": [{\"id\": \"still\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"still\"}, \"required\": true}], \"hint\": \"still_hint\", \"reopens\": {\"after\": \"sleep_on\"}, \"title\": [{\"key\": \"still_title_treatment\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"treatment\"]}}, {\"key\": \"still_title\"}]}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (n:SkillStep {id: "alternate_rebellion:still"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 11};
 MERGE (n:SkillStep {id: "alternate_rebellion:real"})
 SET n += {skillId: "alternate_rebellion", step: "real", kind: "ask", version: "ar-v3"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}], \"fields\": [{\"id\": \"real\", \"max\": 1, \"options\": {\"list\": \"real\"}, \"required\": true}], \"title\": \"real_title\"}";
 MATCH (s:Skill {id: "alternate_rebellion"}), (n:SkillStep {id: "alternate_rebellion:real"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 11};
+SET r += {order: 12};
 MERGE (n:SkillStep {id: "alternate_rebellion:next"})
-SET n += {skillId: "alternate_rebellion", step: "next", kind: "handoff", version: "ar-v3"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}], \"done\": \"done\", \"lines\": [{\"key\": \"next_scared\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}, {\"key\": \"next_let_go\", \"when\": {\"eq\": [\"$a.still\", \"no\"]}}, {\"key\": \"next_slept\", \"when\": {\"all\": [{\"eq\": [\"$a.sleep\", \"tomorrow\"]}, {\"not\": {\"set\": \"$a.still\"}}]}}, {\"key\": \"next_change\", \"when\": {\"eq\": [\"$a.real\", \"change\"]}}, {\"key\": \"next_say\", \"when\": {\"eq\": [\"$a.real\", \"say\"]}}, {\"key\": \"next_cant\", \"when\": {\"eq\": [\"$a.real\", \"cant\"]}}, {\"key\": \"next_not_now\", \"when\": {\"eq\": [\"$a.real\", \"not_now\"]}}]}";
+SET n += {skillId: "alternate_rebellion", step: "next", kind: "handoff", version: "ar-v3"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}], \"done\": \"done\", \"lines\": [{\"key\": \"next_scared\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}, {\"key\": \"next_let_go\", \"when\": {\"eq\": [\"$a.still\", \"no\"]}}, {\"key\": \"next_slept\", \"when\": {\"eq\": [\"$a.sleep\", \"tomorrow\"]}}, {\"key\": \"next_change\", \"when\": {\"eq\": [\"$a.real\", \"change\"]}}, {\"key\": \"next_say\", \"when\": {\"eq\": [\"$a.real\", \"say\"]}}, {\"key\": \"next_cant\", \"when\": {\"eq\": [\"$a.real\", \"cant\"]}}, {\"key\": \"next_not_now\", \"when\": {\"eq\": [\"$a.real\", \"not_now\"]}}]}";
 MATCH (s:Skill {id: "alternate_rebellion"}), (n:SkillStep {id: "alternate_rebellion:next"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 12};
+SET r += {order: 13};
 MERGE (x:SkillExit {id: "alternate_rebellion:problem_solve"})
 SET x += {skillId: "alternate_rebellion", exit: "problem_solve", toolId: "problem-solve", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "alternate_rebellion"}), (x:SkillExit {id: "alternate_rebellion:problem_solve"})
@@ -1082,25 +1087,37 @@ SET r += {order: 1}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "alternate_rebellion:later"}), (b:SkillStep {id: "alternate_rebellion:real"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "alternate_rebellion:later"}), (x:SkillExit {id: "alternate_rebellion:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "remind", label: "safety_open"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "alternate_rebellion:itch"}), (b:SkillStep {id: "alternate_rebellion:real"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "alternate_rebellion:back"}), (b:SkillStep {id: "alternate_rebellion:itch"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"in\": [\"$a.did\", [\"yes\", \"a_bit\"]]}";
+MATCH (a:SkillStep {id: "alternate_rebellion:back"}), (b:SkillStep {id: "alternate_rebellion:again_card"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.did\", \"not_yet\"]}";
 MATCH (a:SkillStep {id: "alternate_rebellion:back"}), (b:SkillStep {id: "alternate_rebellion:real"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "null";
+SET r += {order: 2}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "alternate_rebellion:back"}), (x:SkillExit {id: "alternate_rebellion:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "did", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "alternate_rebellion:again_card"}), (b:SkillStep {id: "alternate_rebellion:real"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "alternate_rebellion:again_card"}), (x:SkillExit {id: "alternate_rebellion:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "remind_again", label: "safety_open"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "alternate_rebellion:still"}), (b:SkillStep {id: "alternate_rebellion:card"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.still\", \"yes\"]}";
-MATCH (a:SkillStep {id: "alternate_rebellion:still"}), (b:SkillStep {id: "alternate_rebellion:pick"})
-MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.still\", \"lighter\"]}";
+SET r += {order: 0}, r.whenJson = "{\"all\": [{\"eq\": [\"$a.still\", \"yes\"]}, {\"not\": {\"any\": [{\"has\": [\"$a.squeeze.ids\", \"scared\"]}, {\"has\": [\"$a.squeeze.ids\", \"treatment\"]}]}}]}";
 MATCH (a:SkillStep {id: "alternate_rebellion:still"}), (b:SkillStep {id: "alternate_rebellion:real"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.still\", \"no\"]}";
+MATCH (a:SkillStep {id: "alternate_rebellion:still"}), (b:SkillStep {id: "alternate_rebellion:pick"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 2}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "alternate_rebellion:still"}), (x:SkillExit {id: "alternate_rebellion:safety_open"})
@@ -1478,17 +1495,17 @@ MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebe
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "still", order: 56};
 MERGE (o:SkillOption {id: "alternate_rebellion:remind:evening"})
-SET o:SkillOption, o += {skillId: "alternate_rebellion", list: "remind", value: "evening", label: "This evening", version: "ar-v3"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "alternate_rebellion", list: "remind", value: "evening", label: "This evening", version: "ar-v3"}, o.propsJson = "{\"today\": true}";
 MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:remind:evening"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "remind", order: 57};
 MERGE (o:SkillOption {id: "alternate_rebellion:remind:tomorrow"})
-SET o:SkillOption, o += {skillId: "alternate_rebellion", list: "remind", value: "tomorrow", label: "Tomorrow", version: "ar-v3"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "alternate_rebellion", list: "remind", value: "tomorrow", label: "Tomorrow", version: "ar-v3"}, o.propsJson = "{\"today\": true, \"week\": true}";
 MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:remind:tomorrow"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "remind", order: 58};
 MERGE (o:SkillOption {id: "alternate_rebellion:remind:few_days"})
-SET o:SkillOption, o += {skillId: "alternate_rebellion", list: "remind", value: "few_days", label: "In a few days", version: "ar-v3"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "alternate_rebellion", list: "remind", value: "few_days", label: "In a few days", version: "ar-v3"}, o.propsJson = "{\"week\": true}";
 MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:remind:few_days"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "remind", order: 59};

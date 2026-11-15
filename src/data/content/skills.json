@@ -581,6 +581,7 @@
         "ownMax": 140,
         "emotionFields": [],
         "copy": {
+          "again_title": "Want another card, for another time?",
           "back_hint": "Any answer is fine. It's only to notice.",
           "back_title": "Your rebellion. Did you do it?",
           "card_against": "Against",
@@ -623,10 +624,12 @@
           "safety_open": "If the urge is to hurt yourself",
           "sleep_hint": "Big choices land better after a night's sleep.",
           "sleep_title": "That one can't be undone, so it waits a day. A card tomorrow asks if you still want it.",
+          "sleep_title_unsure": "That one might not undo, so it waits a day. A card tomorrow asks if you still want it.",
           "squeeze_own": "Something else",
           "squeeze_title": "What's squeezing you?",
           "still_hint": "Whatever you pick, it's your call.",
           "still_title": "A day later. Do you still want to do it?",
+          "still_title_treatment": "A day later. Changing treatment is a talk with your care team first. Do you still want to do it?",
           "undo_q": "Could you undo it later?"
         },
         "tables": {},
@@ -1102,7 +1105,20 @@
           {
             "id": "sleep_on",
             "kind": "ask",
-            "title": "sleep_title",
+            "title": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.undo",
+                    "not_sure"
+                  ]
+                },
+                "key": "sleep_title_unsure"
+              },
+              {
+                "key": "sleep_title"
+              }
+            ],
             "hint": "sleep_hint",
             "fields": [
               {
@@ -1215,9 +1231,54 @@
               {
                 "id": "remind",
                 "options": {
-                  "list": "remind"
+                  "list": "remind",
+                  "where": {
+                    "any": [
+                      {
+                        "all": [
+                          {
+                            "eq": [
+                              "$a.when",
+                              "today"
+                            ]
+                          },
+                          {
+                            "eq": [
+                              "$opt.today",
+                              true
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "all": [
+                          {
+                            "eq": [
+                              "$a.when",
+                              "week"
+                            ]
+                          },
+                          {
+                            "eq": [
+                              "$opt.week",
+                              true
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
                 },
-                "max": 1
+                "max": 1,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
               }
             ],
             "crisis": [
@@ -1312,12 +1373,16 @@
               }
             ],
             "reopens": {
-              "after": "later"
+              "after": "later",
+              "again": [
+                "again_card"
+              ]
             },
             "clears": [
               "did",
               "itch",
-              "real"
+              "real",
+              "remind_again"
             ],
             "next": [
               {
@@ -1333,6 +1398,61 @@
                 }
               },
               {
+                "to": "again_card",
+                "when": {
+                  "eq": [
+                    "$a.did",
+                    "not_yet"
+                  ]
+                }
+              },
+              {
+                "to": "real",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "again_card",
+            "kind": "ask",
+            "title": "again_title",
+            "secondary": "later_skip",
+            "fields": [
+              {
+                "id": "remind_again",
+                "options": {
+                  "list": "remind"
+                },
+                "max": 1,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "has": [
+                    "$a.squeeze.ids",
+                    "scared"
+                  ]
+                }
+              }
+            ],
+            "followUp": {
+              "type": "rebellion_after",
+              "whenFrom": "remind_again"
+            },
+            "next": [
+              {
                 "to": "real",
                 "when": null
               }
@@ -1342,7 +1462,20 @@
           {
             "id": "still",
             "kind": "ask",
-            "title": "still_title",
+            "title": [
+              {
+                "when": {
+                  "has": [
+                    "$a.squeeze.ids",
+                    "treatment"
+                  ]
+                },
+                "key": "still_title_treatment"
+              },
+              {
+                "key": "still_title"
+              }
+            ],
             "hint": "still_hint",
             "fields": [
               {
@@ -1379,12 +1512,14 @@
             },
             "clears": [
               "still",
+              "sleep",
               "cost",
               "noticed",
               "undo",
               "heads_up",
               "when",
               "remind",
+              "remind_again",
               "itch",
               "real"
             ],
@@ -1392,23 +1527,45 @@
               {
                 "to": "card",
                 "when": {
-                  "eq": [
-                    "$a.still",
-                    "yes"
-                  ]
-                }
-              },
-              {
-                "to": "pick",
-                "when": {
-                  "eq": [
-                    "$a.still",
-                    "lighter"
+                  "all": [
+                    {
+                      "eq": [
+                        "$a.still",
+                        "yes"
+                      ]
+                    },
+                    {
+                      "not": {
+                        "any": [
+                          {
+                            "has": [
+                              "$a.squeeze.ids",
+                              "scared"
+                            ]
+                          },
+                          {
+                            "has": [
+                              "$a.squeeze.ids",
+                              "treatment"
+                            ]
+                          }
+                        ]
+                      }
+                    }
                   ]
                 }
               },
               {
                 "to": "real",
+                "when": {
+                  "eq": [
+                    "$a.still",
+                    "no"
+                  ]
+                }
+              },
+              {
+                "to": "pick",
                 "when": null
               }
             ],
@@ -1485,18 +1642,9 @@
               {
                 "key": "next_slept",
                 "when": {
-                  "all": [
-                    {
-                      "eq": [
-                        "$a.sleep",
-                        "tomorrow"
-                      ]
-                    },
-                    {
-                      "not": {
-                        "set": "$a.still"
-                      }
-                    }
+                  "eq": [
+                    "$a.sleep",
+                    "tomorrow"
                   ]
                 }
               },
@@ -2201,15 +2349,19 @@
           "remind": [
             {
               "value": "evening",
-              "label": "This evening"
+              "label": "This evening",
+              "today": true
             },
             {
               "value": "tomorrow",
-              "label": "Tomorrow"
+              "label": "Tomorrow",
+              "today": true,
+              "week": true
             },
             {
               "value": "few_days",
-              "label": "In a few days"
+              "label": "In a few days",
+              "week": true
             }
           ],
           "did": [

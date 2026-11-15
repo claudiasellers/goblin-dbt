@@ -67,15 +67,16 @@ explicitly in `schema/app-tool-ids.cypher`). Listed under Distress Tolerance for
 
 ## Departures from the PRD
 
-1. **Irreversible rebellions are not offered yet.** The PRD's tattoo, shaved head and big purchase need the
-   *sleep on it* 24-hour check, a follow-up (R5, F2). Until then the list is reversible only.
+1. **Irreversible rebellions are the person's own words only.** The curated list stays reversible; an own rebellion
+   that can't (or might not) be undone waits a day (part 2, 15 Nov 2026). The PRD's tattoo, shaved head and big
+   purchase as menu items wait for the clinician pass.
 2. **The witness line is the skill's own copy**, not the `witness` embed (F2, D16). When F2 ships, screen 1
    becomes the embed with this line as a signed-off host line; the skill already works with it absent.
 3. **Two squeeze chips the PRD doesn't list:** *Someone I'm scared of* (C6.4: an option that can carry danger
    from another person gets its own chip and slot, rather than putting an alarm on *someone controlling me*) and
    *Treatment I didn't pick* (the PRD's treatment risk, made a visible route).
-4. **The close asks the acted answer only.** The PRD's then-vs-now on the blow-up urge needs the two-part
-   `urge_change` close (R7, F2). The close is the spine's `urge` kind with its own wording until then.
+4. ~~**The close asks the acted answer only.**~~ Since part 2 (15 Nov 2026) the close is the two-part `urge_change`:
+   the acted answer on the blow-up urge, then then-vs-now on it.
 5. **The itch question adds *Not yet*** to the PRD's *yes · a bit · no*: the screen comes straight after *Now*, and
    someone who hasn't done it yet needs a true answer.
 6. **No *dessert first*.** Plan C6.7 excludes food from rebellions.
@@ -83,8 +84,8 @@ explicitly in `schema/app-tool-ids.cypher`). Listed under Distress Tolerance for
    exit, `OPENS` its tool).
 8. **The check-in entry is narrower than the PRD's** (*provoked, indignant* on Ready to fight, not the PRD's anger,
    frustration, irritation, angsty edges): see Routing. It answers the PRD's open question narrowly.
-9. **"Later" isn't scheduled yet.** *Later today* and *This week* are recorded (`when` in `ext.run`), and the
-   follow-up that asks how it went waits for R5 (F2).
+9. ~~**"Later" isn't scheduled yet.**~~ Since part 2 (15 Nov 2026) *Later today* and *This week* offer an optional
+   card (`rebellion_after`, chips that fit the answer), and *Not yet* on it can book another.
 
 ## Deferred (with the batch that lands it)
 
