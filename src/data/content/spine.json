@@ -1,7 +1,7 @@
 {
   "source": {
     "file": "graph-content-only-2026-11-15.json",
-    "exportedAt": "2026-11-15T22:50:15.990Z"
+    "exportedAt": "2026-11-15T23:21:44.809Z"
   },
   "content": {
     "version": "spine-v1",
@@ -2814,8 +2814,8 @@
         },
         "enabled": true,
         "copy": {
-          "title": "Looking back",
-          "body": "You checked with wise mind. Looking back, how was it?"
+          "body": "You checked with wise mind. Looking back, how was it?",
+          "title": "Looking back"
         },
         "choices": [
           {
@@ -2825,14 +2825,14 @@
           }
         ],
         "window": {
-          "kind": "chip",
           "chips": {
             "tomorrow": {
-              "kind": "at_local",
               "days": 1,
+              "kind": "at_local",
               "time": "09:30"
             }
-          }
+          },
+          "kind": "chip"
         },
         "notification": "A look back is ready when you are."
       }
