@@ -1,7 +1,7 @@
 {
   "source": {
     "file": "graph-content-only-2026-11-15.json",
-    "exportedAt": "2026-11-15T01:01:53.611Z"
+    "exportedAt": "2026-11-15T01:52:53.274Z"
   },
   "content": {
     "version": "skills-v1",
@@ -30133,15 +30133,9 @@
           {
             "id": "weekly",
             "kind": "ask",
-            "title": "weekly_title",
             "fields": [
               {
                 "id": "weekly",
-                "options": {
-                  "list": "weekly"
-                },
-                "max": 1,
-                "required": false,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -30150,7 +30144,12 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "list": "weekly"
+                },
+                "required": false
               }
             ],
             "followUp": {
@@ -30158,6 +30157,7 @@
               "whenFrom": "weekly"
             },
             "hint": "weekly_hint",
+            "title": "weekly_title",
             "next": [
               {
                 "to": "keep",
@@ -30565,32 +30565,6 @@
           {
             "id": "clear",
             "kind": "ask",
-            "title": "clear_title",
-            "fields": [
-              {
-                "id": "signs",
-                "options": {
-                  "list": "mind_signs"
-                },
-                "max": 8,
-                "required": false,
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
-              }
-            ],
-            "reopens": {
-              "after": "weekly",
-              "again": [
-                "clear_next"
-              ]
-            },
             "clears": [
               "signs",
               "after_use_week",
@@ -30601,7 +30575,33 @@
               "slipped",
               "again_span"
             ],
+            "fields": [
+              {
+                "id": "signs",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 8,
+                "options": {
+                  "list": "mind_signs"
+                },
+                "required": false
+              }
+            ],
             "hint": "clear_hint",
+            "reopens": {
+              "after": "weekly",
+              "again": [
+                "clear_next"
+              ]
+            },
+            "title": "clear_title",
             "next": [
               {
                 "to": "after_use_week",
@@ -30667,8 +30667,37 @@
           {
             "id": "after_use_week",
             "kind": "ask",
+            "crisis": [
+              {
+                "variant": "medical",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "fields": [
+              {
+                "id": "after_use_week",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "ok_now"
+                },
+                "required": false
+              }
+            ],
+            "hint": "after_use_hint",
             "title": [
               {
+                "key": "after_use_title_own",
                 "when": {
                   "not": {
                     "in": [
@@ -30687,41 +30716,12 @@
                       ]
                     ]
                   }
-                },
-                "key": "after_use_title_own"
+                }
               },
               {
                 "key": "after_use_title"
               }
             ],
-            "fields": [
-              {
-                "id": "after_use_week",
-                "options": {
-                  "list": "ok_now"
-                },
-                "max": 1,
-                "required": false,
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
-              }
-            ],
-            "crisis": [
-              {
-                "variant": "medical",
-                "when": {
-                  "all": []
-                }
-              }
-            ],
-            "hint": "after_use_hint",
             "next": [
               {
                 "to": "slipped_week",
@@ -30733,14 +30733,8 @@
           {
             "id": "slipped_week",
             "kind": "embed",
-            "embed": "boundaryLine",
             "answerAs": "slipped_week",
-            "title": "slipped_title",
-            "props": {
-              "field": "lapse",
-              "shape": "list",
-              "next": "slipped_next"
-            },
+            "embed": "boundaryLine",
             "links": [
               {
                 "exit": "safety_open",
@@ -30750,6 +30744,12 @@
                 }
               }
             ],
+            "props": {
+              "field": "lapse",
+              "next": "slipped_next",
+              "shape": "list"
+            },
+            "title": "slipped_title",
             "next": [
               {
                 "to": "clear_next",
@@ -30761,8 +30761,33 @@
           {
             "id": "clear_next",
             "kind": "ask",
+            "fields": [
+              {
+                "id": "clear_next",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "clear_next"
+                },
+                "required": false
+              }
+            ],
+            "followUp": {
+              "type": "clear_mind",
+              "whenFrom": "clear_next"
+            },
+            "hint": "clear_next_hint",
             "title": [
               {
+                "key": "clear_addict",
                 "when": {
                   "any": [
                     {
@@ -30790,10 +30815,10 @@
                       ]
                     }
                   ]
-                },
-                "key": "clear_addict"
+                }
               },
               {
+                "key": "clear_clean",
                 "when": {
                   "any": [
                     {
@@ -30821,37 +30846,12 @@
                       ]
                     }
                   ]
-                },
-                "key": "clear_clean"
+                }
               },
               {
                 "key": "clear_clear"
               }
             ],
-            "fields": [
-              {
-                "id": "clear_next",
-                "options": {
-                  "list": "clear_next"
-                },
-                "max": 1,
-                "required": false,
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
-              }
-            ],
-            "followUp": {
-              "type": "clear_mind",
-              "whenFrom": "clear_next"
-            },
-            "hint": "clear_next_hint",
             "next": [
               {
                 "to": "clear_end",
@@ -30864,15 +30864,15 @@
             "id": "clear_end",
             "kind": "handoff",
             "complete": true,
+            "done": "done",
             "lines": [
               {
+                "key": "clear_end",
                 "when": {
                   "all": []
-                },
-                "key": "clear_end"
+                }
               }
             ],
-            "done": "done",
             "links": [
               {
                 "exit": "safety_open",
