@@ -58,7 +58,7 @@ kept to the profile.
 
 The concept is tagged (`side: acceptance`, `skillKind: hold`, `direction: neutral`) so a row is one line, but it has no
 row yet. The two words where it fits best, the self-worth words on social threat (*worthless*, *inadequate*,
-*insecure*, …) and *worried* on chronic vigilance, already show two signed-off cards (Recover + Check the Facts; Check
+*insecure*, …) and *worried* on chronic vigilance, already show two signed-off cards (Recover + Check the Facts, now Recover + Unpack a judgment since MF-B2; Check
 the Facts + Ride it out), and a row would displace one of them. The vocabulary has no sticky or intrusive-thought word, and rows gate on words, not on the rumination answers. The only free second slots are on Low drive (*tired*, *bored*, *lonely*, …), where a thought taken as a fact isn't the moment. So no row (12 Nov 2026): it is reached from Tools, Let it be and the DEAR MAN debrief, and a row is one line once a fitting word exists. Such a row must also add `CONTRAINDICATED_FOR` the vigilance +
 rumination and dissociation + rumination co-occurrences, whose `contraindicatedTools` already list
 `mindfulness_of_thoughts` (`schema/pattern-co-occurrence.cypher`).

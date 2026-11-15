@@ -15688,7 +15688,7 @@ MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "opposite_action:wise_mind"}), (t:TherapyConcept {appToolId: "wise-mind"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "opposite_action:unpack"})
-SET x += {skillId: "opposite_action", exit: "unpack", toolId: "unpack-a-judgment", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+SET x += {skillId: "opposite_action", exit: "unpack", toolId: "unpack-a-judgment", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"after_facts\"}", x.label = null;
 MATCH (s:Skill {id: "opposite_action"}), (x:SkillExit {id: "opposite_action:unpack"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "opposite_action:unpack"}), (t:TherapyConcept {appToolId: "unpack-a-judgment"})
@@ -26676,7 +26676,7 @@ SET r += {list: "offphone", order: 80};
 
 // --- unpack_a_judgment (uj-v1) ---
 MERGE (s:Skill {id: "unpack_a_judgment"})
-SET s += {toolId: "unpack-a-judgment", version: "uj-v1", contentVersion: "skills-v1", start: "about", ownMax: 60, emotionFields: ["feel"], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"about_hint\": \"A judgment is a verdict in a few words, like “I'm pathetic” or “they're selfish”.\", \"about_title\": \"Who's the judgment about?\", \"back_to_room\": \"Back to the room\", \"cost_hint\": \"Up to two, or skip.\", \"cost_own\": \"Something else\", \"cost_title\": \"What did it cost, or what could it cost?\", \"danger_line\": \"Your read of danger is the one that counts here.\", \"danger_title\": \"That's about your safety, not a judgment to unpack.\", \"done\": \"Done\", \"end_line\": \"When it shows up again, noticing it as a judgment is the practice.\", \"end_them\": \"Not judging isn't agreeing. What you wanted still matters.\", \"end_title\": \"You took it apart instead of carrying it whole.\", \"end_want\": \"What you wanted is still there, without the verdict.\", \"facts_line\": \"If the feeling fits what happened, it asks for something to be done. Checking the facts sorts out which it is.\", \"facts_title\": \"When it feels like a fact, the facts come first.\", \"feel_hint\": \"A guess is fine. Up to two, or skip.\", \"feel_lead\": \"I feel\", \"feel_more\": \"Something else\", \"feel_title\": \"What might you be feeling, under the judgment?\", \"fix_title\": \"Which part would you change?\", \"hands_caution\": \"If it feels right, let your face soften too. You don't have to smile.\", \"hands_done\": \"That's it.\", \"hands_q_hint\": \"Willing hands: palms up, letting it be for a moment. Optional.\", \"hands_q_title\": \"To finish, twenty seconds with your hands open?\", \"hands_running\": \"Hands open\", \"hands_start\": \"Start\", \"hands_step1\": \"Arms loose by your sides or in your lap.\", \"hands_step2\": \"Turn your palms up, or rest them however feels safe.\", \"hands_step3\": \"Let your fingers relax. Breathe however you breathe.\", \"hands_title\": \"Willing hands.\", \"happened_fact\": \"It can feel like a fact. Start with what a camera would catch.\", \"happened_hint\": \"Only what could be filmed. Up to two, or skip.\", \"happened_own\": \"Something else\", \"happened_title\": \"What happened, the way a camera would see it?\", \"harm_line\": \"That's more than a judgment. Someone to talk to comes first.\", \"harm_title\": \"Thank you for saying it.\", \"judge_hint\": \"Pick the closest, or put it in your words.\", \"judge_own\": \"In my own words\", \"judge_title\": \"What's the judgment?\", \"kept_line\": \"You noticed it as a judgment. That's the skill.\", \"kept_title\": \"That's okay.\", \"next\": \"Next\", \"noticed_line\": \"That's the skill, even without taking it apart today.\", \"noticed_title\": \"You noticed it as a judgment.\", \"pick_hint\": \"One for now. The rest can wait.\", \"pick_title\": \"Which would help most to look at?\", \"rebuild_empty\": \"Go on\", \"rebuild_title\": \"Here's what you found.\", \"safety_chip\": \"It's more than a judgment. I'm thinking about hurting myself\", \"safety_open\": \"Talk to someone now\", \"see_hint\": \"That's a judgment, a verdict in a few words. You can set it down for a few minutes and look at what's under it.\", \"see_title\": \"“{judge}”\", \"set_down_line\": \"Your body's loud right now. Body first, then come back to it if you want.\", \"set_down_title\": \"That's a judgment. It can wait.\", \"sit_hint\": \"It isn't truer or better. It's described.\", \"sit_title\": \"How does that sit, next to the judgment?\", \"want_hint\": \"One is plenty, or skip.\", \"want_lead\": \"I wanted\", \"want_own\": \"In my own words\", \"want_them\": \"Not judging isn't agreeing. What you wanted still matters.\", \"want_title\": \"What did you want, or what matters to you here?\", \"witness_feeling\": \"Being hard on yourself for a feeling adds a second weight to the first.\", \"witness_me\": \"That's a heavy thing to be carrying.\", \"witness_should\": \"Something isn't the way you hoped or needed. That's hard.\", \"witness_them\": \"Something they did got to you. That counts.\"}", s.tablesJson = "{\"wantFirstOf\": {\"feeling\": \"understood\", \"me\": \"show_up\", \"should\": \"fair\", \"them\": \"safe\"}}", s.deriveJson = "[{\"from\": \"$a.about\", \"name\": \"wantFirst\", \"table\": \"wantFirstOf\"}]";
+SET s += {toolId: "unpack-a-judgment", version: "uj-v1", contentVersion: "skills-v1", start: "about", ownMax: 60, emotionFields: ["feel"], accepts: ["band", "frame"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"about_hint\": \"A judgment is a verdict in a few words, like “I'm too much” or “they don't care”.\", \"about_title\": \"What's the judgment about?\", \"back_to_room\": \"Back to the room\", \"cost_hint\": \"Up to two, or skip.\", \"cost_own\": \"Something else\", \"cost_title\": \"What did it cost, or what could it cost?\", \"danger_line\": \"Your read of danger is the one that counts here.\", \"danger_title\": \"That's about your safety, not a judgment to unpack.\", \"done\": \"Done\", \"end_line\": \"When it shows up again, noticing it as a judgment is the practice.\", \"end_them\": \"What you wanted still counts, whatever they did. Next time, noticing the judgment is the practice.\", \"end_title\": \"You took it apart instead of carrying it whole.\", \"end_want\": \"What you wanted is still there, without the verdict. Next time, noticing the judgment is the practice.\", \"facts_go_line\": \"It looks at the feeling and what happened. Nothing in it decides whether you're a bad person.\", \"facts_go_title\": \"Check the Facts, then.\", \"facts_hint\": \"Either is fine.\", \"facts_line\": \"Shame or guilt can fit what happened, and then it asks for something to be done. Checking the facts looks at the feeling, not at whether the verdict is true.\", \"facts_title\": \"It feels like a fact.\", \"feel_hint\": \"A guess is fine. Up to two, or skip.\", \"feel_lead\": \"I feel\", \"feel_more\": \"Something else\", \"feel_title\": \"What might you be feeling, under the judgment?\", \"fix_title\": \"Which part would you change?\", \"hands_caution\": \"If it feels right, let your face soften too. You don't have to smile.\", \"hands_done\": \"That's it.\", \"hands_q_hint\": \"Willing hands: palms up, letting this moment be what it is. It doesn't mean what happened was okay. Optional.\", \"hands_q_title\": \"To finish, twenty seconds with your hands open?\", \"hands_running\": \"Hands open\", \"hands_start\": \"Start\", \"hands_step1\": \"Arms loose by your sides or in your lap.\", \"hands_step2\": \"Turn your palms up, or rest them however feels safe.\", \"hands_step3\": \"Let your fingers relax. Breathe however you breathe.\", \"hands_title\": \"Willing hands.\", \"happened_fact\": \"It can feel like a fact. Start with what a camera would catch.\", \"happened_hint\": \"Only what could be filmed. Up to two, or skip.\", \"happened_own\": \"Something else\", \"happened_title\": \"What happened, the way a camera would see it?\", \"harm_line\": \"That's more than a judgment. Someone to talk to comes first.\", \"harm_title\": \"Thank you for saying it.\", \"heavy_line\": \"Heavy feelings can come with thoughts of not being here. If they do, talk to someone now.\", \"judge_hint\": \"Pick the closest, or put it in your words.\", \"judge_own\": \"In my own words\", \"judge_title\": \"What's the judgment?\", \"kept_line\": \"You noticed it as a judgment. That's the skill.\", \"kept_title\": \"That's okay.\", \"next\": \"Next\", \"noticed_line\": \"That's the skill, even without taking it apart today.\", \"noticed_title\": \"You noticed it as a judgment.\", \"pick_hint\": \"One for now. The rest can wait.\", \"pick_title\": \"Which would help most to look at?\", \"rebuild_empty\": \"Go on\", \"rebuild_title\": \"Here's what you found.\", \"safety_chip\": \"It's more than a judgment. I'm thinking about hurting myself or not being here\", \"safety_link\": \"Thoughts of hurting myself or not being here\", \"safety_open\": \"Talk to someone now\", \"see_hint\": \"That's a judgment, a verdict in a few words. Minds make them all the time. You can set it down for a few minutes and look at what's under it.\", \"see_title\": \"“{judge}”\", \"set_down_line\": \"Your body's loud right now. Body first, then come back to it if you want.\", \"set_down_title\": \"A judgment can wait.\", \"sit_hint\": \"It isn't truer or better. It's described.\", \"sit_title\": \"How does that sit, next to the judgment?\", \"want_hint\": \"One is plenty, or skip.\", \"want_lead\": \"I wanted\", \"want_own\": \"In my own words\", \"want_them\": \"Not judging isn't agreeing. What you wanted still matters.\", \"want_title\": \"What did you want, or what matters to you here?\", \"witness_feeling\": \"A feeling, and a verdict about it too. That's a lot at once.\", \"witness_me\": \"That's a heavy thing to be carrying.\", \"witness_should\": \"Something isn't the way you hoped or needed. That's hard.\", \"witness_them\": \"Something they did got to you. Setting the verdict down isn't agreeing with what they did.\"}", s.tablesJson = "{\"feelOf\": {\"feeling\": [\"ashamed\", \"embarrassed\", \"guilty\", \"sad\", \"hurt\", \"lonely\", \"angry\", \"frustrated\", \"disappointed\", \"anxious\"], \"me\": [\"ashamed\", \"embarrassed\", \"guilty\", \"sad\", \"hurt\", \"lonely\", \"angry\", \"frustrated\", \"disappointed\", \"anxious\"], \"should\": [\"disappointed\", \"sad\", \"frustrated\", \"angry\", \"hurt\", \"anxious\", \"lonely\"], \"them\": [\"angry\", \"hurt\", \"frustrated\", \"disappointed\", \"sad\", \"lonely\", \"anxious\", \"embarrassed\"]}, \"wantFirstOf\": {\"feeling\": \"understood\", \"me\": \"show_up\", \"should\": \"fair\", \"them\": \"safe\"}}", s.deriveJson = "[{\"from\": \"$a.about\", \"name\": \"wantFirst\", \"table\": \"wantFirstOf\"}, {\"from\": \"$a.about\", \"name\": \"feelFirst\", \"table\": \"feelOf\"}]";
 MATCH (t:TherapyConcept {id: "dbt_nonjudgmental"}), (s:Skill {id: "unpack_a_judgment"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "unpack_a_judgment"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
@@ -26692,95 +26692,100 @@ MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 1};
 MERGE (n:SkillStep {id: "unpack_a_judgment:judge"})
-SET n += {skillId: "unpack_a_judgment", step: "judge", kind: "ask", version: "uj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"judge\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_chip\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"judge\", \"where\": {\"has\": [\"$opt.t\", \"$a.about\"]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"judge_own\"}, \"required\": true}], \"hint\": \"judge_hint\", \"title\": \"judge_title\"}";
+SET n += {skillId: "unpack_a_judgment", step: "judge", kind: "ask", version: "uj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"judge\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_link\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"judge\", \"where\": {\"has\": [\"$opt.t\", \"$a.about\"]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"judge_own\"}, \"required\": true}], \"hint\": \"judge_hint\", \"title\": \"judge_title\"}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:judge"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 2};
 MERGE (n:SkillStep {id: "unpack_a_judgment:set_down"})
-SET n += {skillId: "unpack_a_judgment", step: "set_down", kind: "handoff", version: "uj-v1"}, n.specJson = "{\"complete\": false, \"done\": \"done\", \"lines\": [{\"key\": \"set_down_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_chip\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"set_down_title\"}";
+SET n += {skillId: "unpack_a_judgment", step: "set_down", kind: "handoff", version: "uj-v1"}, n.specJson = "{\"complete\": false, \"done\": \"done\", \"lines\": [{\"key\": \"set_down_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_link\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"set_down_title\"}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:set_down"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 3};
 MERGE (n:SkillStep {id: "unpack_a_judgment:see"})
-SET n += {skillId: "unpack_a_judgment", step: "see", kind: "ask", version: "uj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"see\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"back_to_room\", \"when\": {\"all\": []}}, {\"exit\": \"safety_open\", \"label\": \"safety_chip\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"see\"}, \"required\": true}], \"hint\": \"see_hint\", \"lines\": [{\"key\": \"witness_me\", \"when\": {\"eq\": [\"$a.about\", \"me\"]}}, {\"key\": \"witness_feeling\", \"when\": {\"eq\": [\"$a.about\", \"feeling\"]}}, {\"key\": \"witness_them\", \"when\": {\"eq\": [\"$a.about\", \"them\"]}}, {\"key\": \"witness_should\", \"when\": {\"eq\": [\"$a.about\", \"should\"]}}], \"title\": \"see_title\", \"titleSlots\": {\"judge\": {\"labelOf\": \"judge\"}}}";
+SET n += {skillId: "unpack_a_judgment", step: "see", kind: "ask", version: "uj-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.see\", \"threat\"]}}], \"fields\": [{\"id\": \"see\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"back_to_room\", \"when\": {\"all\": []}}, {\"exit\": \"safety_open\", \"label\": \"safety_link\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"see\", \"where\": {\"any\": [{\"not\": {\"set\": \"$opt.t\"}}, {\"has\": [\"$opt.t\", \"$a.about\"]}]}}, \"required\": true}], \"hint\": \"see_hint\", \"lines\": [{\"key\": \"witness_me\", \"when\": {\"eq\": [\"$a.about\", \"me\"]}}, {\"key\": \"witness_feeling\", \"when\": {\"eq\": [\"$a.about\", \"feeling\"]}}, {\"key\": \"witness_them\", \"when\": {\"eq\": [\"$a.about\", \"them\"]}}, {\"key\": \"witness_should\", \"when\": {\"eq\": [\"$a.about\", \"should\"]}}], \"title\": \"see_title\", \"titleSlots\": {\"judge\": {\"labelOf\": \"judge\"}}}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:see"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 4};
 MERGE (n:SkillStep {id: "unpack_a_judgment:facts"})
-SET n += {skillId: "unpack_a_judgment", step: "facts", kind: "handoff", version: "uj-v1"}, n.specJson = "{\"complete\": false, \"done\": \"done\", \"lines\": [{\"key\": \"facts_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_chip\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"facts_title\"}";
+SET n += {skillId: "unpack_a_judgment", step: "facts", kind: "ask", version: "uj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"facts\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"back_to_room\", \"when\": {\"all\": []}}, {\"exit\": \"safety_open\", \"label\": \"safety_link\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"facts\"}, \"required\": true}], \"hint\": \"facts_hint\", \"lines\": [{\"key\": \"facts_line\", \"when\": {\"all\": []}}], \"title\": \"facts_title\"}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:facts"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 5};
-MERGE (n:SkillStep {id: "unpack_a_judgment:pick"})
-SET n += {skillId: "unpack_a_judgment", step: "pick", kind: "ask", version: "uj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"pick\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"back_to_room\", \"when\": {\"all\": []}}, {\"exit\": \"safety_open\", \"label\": \"safety_chip\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"pick\"}, \"required\": true}], \"hint\": \"pick_hint\", \"title\": \"pick_title\"}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:pick"})
+MERGE (n:SkillStep {id: "unpack_a_judgment:facts_go"})
+SET n += {skillId: "unpack_a_judgment", step: "facts_go", kind: "handoff", version: "uj-v1"}, n.specJson = "{\"complete\": false, \"done\": \"done\", \"lines\": [{\"key\": \"facts_go_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_link\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"facts_go_title\"}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:facts_go"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 6};
-MERGE (n:SkillStep {id: "unpack_a_judgment:happened"})
-SET n += {skillId: "unpack_a_judgment", step: "happened", kind: "ask", version: "uj-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.happened.ids\", \"threat\"]}}], \"fields\": [{\"id\": \"happened\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"back_to_room\", \"when\": {\"all\": []}}, {\"exit\": \"safety_open\", \"label\": \"safety_chip\", \"when\": {\"all\": []}}], \"max\": 2, \"options\": {\"list\": \"happened\", \"where\": {\"has\": [\"$opt.t\", \"$a.about\"]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"happened_own\"}, \"required\": false}], \"hint\": \"happened_hint\", \"lines\": [{\"key\": \"happened_fact\", \"when\": {\"eq\": [\"$a.see\", \"fact\"]}}], \"title\": \"happened_title\"}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:happened"})
+MERGE (n:SkillStep {id: "unpack_a_judgment:pick"})
+SET n += {skillId: "unpack_a_judgment", step: "pick", kind: "ask", version: "uj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"pick\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"back_to_room\", \"when\": {\"all\": []}}, {\"exit\": \"safety_open\", \"label\": \"safety_link\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"pick\"}, \"required\": true}], \"hint\": \"pick_hint\", \"title\": \"pick_title\"}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:pick"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 7};
-MERGE (n:SkillStep {id: "unpack_a_judgment:danger"})
-SET n += {skillId: "unpack_a_judgment", step: "danger", kind: "handoff", version: "uj-v1"}, n.specJson = "{\"complete\": false, \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"all\": []}}], \"done\": \"done\", \"lines\": [{\"key\": \"danger_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_chip\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"danger_title\"}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:danger"})
+MERGE (n:SkillStep {id: "unpack_a_judgment:happened"})
+SET n += {skillId: "unpack_a_judgment", step: "happened", kind: "ask", version: "uj-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.happened.ids\", \"threat\"]}}], \"fields\": [{\"id\": \"happened\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"back_to_room\", \"when\": {\"all\": []}}, {\"exit\": \"safety_open\", \"label\": \"safety_link\", \"when\": {\"all\": []}}], \"max\": 2, \"options\": {\"list\": \"happened\", \"where\": {\"has\": [\"$opt.t\", \"$a.about\"]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"happened_own\"}, \"required\": false}], \"hint\": \"happened_hint\", \"lines\": [{\"key\": \"happened_fact\", \"when\": {\"eq\": [\"$a.see\", \"fact\"]}}], \"title\": \"happened_title\"}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:happened"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 8};
-MERGE (n:SkillStep {id: "unpack_a_judgment:cost"})
-SET n += {skillId: "unpack_a_judgment", step: "cost", kind: "ask", version: "uj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"cost\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"back_to_room\", \"when\": {\"all\": []}}, {\"exit\": \"safety_open\", \"label\": \"safety_chip\", \"when\": {\"all\": []}}], \"max\": 2, \"options\": {\"list\": \"cost\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"cost_own\"}, \"required\": false}], \"hint\": \"cost_hint\", \"title\": \"cost_title\"}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:cost"})
+MERGE (n:SkillStep {id: "unpack_a_judgment:danger"})
+SET n += {skillId: "unpack_a_judgment", step: "danger", kind: "handoff", version: "uj-v1"}, n.specJson = "{\"complete\": false, \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"all\": []}}], \"done\": \"done\", \"lines\": [{\"key\": \"danger_line\", \"when\": {\"all\": []}}], \"links\": [], \"noClose\": true, \"title\": \"danger_title\"}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:danger"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 9};
-MERGE (n:SkillStep {id: "unpack_a_judgment:feel"})
-SET n += {skillId: "unpack_a_judgment", step: "feel", kind: "ask", version: "uj-v1"}, n.specJson = "{\"fields\": [{\"emotion\": true, \"id\": \"feel\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"back_to_room\", \"when\": {\"all\": []}}, {\"exit\": \"safety_open\", \"label\": \"safety_chip\", \"when\": {\"all\": []}}], \"max\": 2, \"options\": {\"carriedFirst\": true, \"emotions\": [\"ashamed\", \"embarrassed\", \"guilty\", \"sad\", \"hurt\", \"lonely\", \"angry\", \"frustrated\", \"disappointed\", \"anxious\"], \"moreKey\": \"feel_more\"}, \"required\": false}], \"hint\": \"feel_hint\", \"title\": \"feel_title\"}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:feel"})
+MERGE (n:SkillStep {id: "unpack_a_judgment:cost"})
+SET n += {skillId: "unpack_a_judgment", step: "cost", kind: "ask", version: "uj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"cost\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"back_to_room\", \"when\": {\"all\": []}}, {\"exit\": \"safety_open\", \"label\": \"safety_link\", \"when\": {\"all\": []}}], \"max\": 2, \"options\": {\"list\": \"cost\", \"where\": {\"has\": [\"$opt.t\", \"$a.about\"]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"cost_own\"}, \"required\": false}], \"hint\": \"cost_hint\", \"title\": \"cost_title\"}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:cost"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 10};
-MERGE (n:SkillStep {id: "unpack_a_judgment:want"})
-SET n += {skillId: "unpack_a_judgment", step: "want", kind: "ask", version: "uj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"want\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"back_to_room\", \"when\": {\"all\": []}}, {\"exit\": \"safety_open\", \"label\": \"safety_chip\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"firstFrom\": \"$d.wantFirst\", \"list\": \"want\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"want_own\"}, \"required\": false}], \"hint\": \"want_hint\", \"lines\": [{\"key\": \"want_them\", \"when\": {\"eq\": [\"$a.about\", \"them\"]}}], \"title\": \"want_title\"}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:want"})
+MERGE (n:SkillStep {id: "unpack_a_judgment:feel"})
+SET n += {skillId: "unpack_a_judgment", step: "feel", kind: "ask", version: "uj-v1"}, n.specJson = "{\"fields\": [{\"emotion\": true, \"id\": \"feel\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"back_to_room\", \"when\": {\"all\": []}}, {\"exit\": \"safety_open\", \"label\": \"safety_link\", \"when\": {\"all\": []}}], \"max\": 2, \"options\": {\"carriedFirst\": true, \"emotions\": [\"ashamed\", \"embarrassed\", \"guilty\", \"sad\", \"hurt\", \"lonely\", \"angry\", \"frustrated\", \"disappointed\", \"anxious\"], \"emotionsFrom\": \"$d.feelFirst\", \"moreKey\": \"feel_more\"}, \"required\": false}], \"hint\": \"feel_hint\", \"title\": \"feel_title\"}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:feel"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 11};
-MERGE (n:SkillStep {id: "unpack_a_judgment:rebuild"})
-SET n += {skillId: "unpack_a_judgment", step: "rebuild", kind: "embed", version: "uj-v1"}, n.specJson = "{\"answerAs\": \"rebuild\", \"embed\": \"describeCard\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_chip\", \"when\": {\"all\": []}}], \"props\": {\"cost\": \"cost\", \"empty\": \"rebuild_empty\", \"feel\": \"feel\", \"feelLead\": \"feel_lead\", \"happened\": \"happened\", \"next\": \"next\", \"want\": \"want\", \"wantLead\": \"want_lead\"}, \"title\": \"rebuild_title\"}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:rebuild"})
+MERGE (n:SkillStep {id: "unpack_a_judgment:want"})
+SET n += {skillId: "unpack_a_judgment", step: "want", kind: "ask", version: "uj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"want\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"back_to_room\", \"when\": {\"all\": []}}, {\"exit\": \"safety_open\", \"label\": \"safety_link\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"firstFrom\": \"$d.wantFirst\", \"list\": \"want\", \"where\": {\"has\": [\"$opt.t\", \"$a.about\"]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"want_own\"}, \"required\": false}], \"hint\": \"want_hint\", \"lines\": [{\"key\": \"want_them\", \"when\": {\"eq\": [\"$a.about\", \"them\"]}}], \"title\": \"want_title\"}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:want"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 12};
-MERGE (n:SkillStep {id: "unpack_a_judgment:sit"})
-SET n += {skillId: "unpack_a_judgment", step: "sit", kind: "ask", version: "uj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"sit\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_chip\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"sit\"}, \"required\": true}], \"hint\": \"sit_hint\", \"title\": \"sit_title\"}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:sit"})
+MERGE (n:SkillStep {id: "unpack_a_judgment:rebuild"})
+SET n += {skillId: "unpack_a_judgment", step: "rebuild", kind: "embed", version: "uj-v1"}, n.specJson = "{\"answerAs\": \"rebuild\", \"embed\": \"describeCard\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"back_to_room\", \"when\": {\"all\": []}}, {\"exit\": \"safety_open\", \"label\": \"safety_link\", \"when\": {\"all\": []}}], \"props\": {\"cost\": \"cost\", \"empty\": \"rebuild_empty\", \"feel\": \"feel\", \"feelLead\": \"feel_lead\", \"happened\": \"happened\", \"next\": \"next\", \"want\": \"want\", \"wantLead\": \"want_lead\"}, \"title\": \"rebuild_title\"}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:rebuild"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 13};
-MERGE (n:SkillStep {id: "unpack_a_judgment:fix"})
-SET n += {skillId: "unpack_a_judgment", step: "fix", kind: "ask", version: "uj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"fix\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_chip\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"fix\", \"where\": {\"any\": [{\"not\": {\"eq\": [\"$ctx.band\", \"stirred\"]}}, {\"eq\": [\"$opt.short\", true]}]}}, \"required\": true}], \"title\": \"fix_title\"}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:fix"})
+MERGE (n:SkillStep {id: "unpack_a_judgment:sit"})
+SET n += {skillId: "unpack_a_judgment", step: "sit", kind: "ask", version: "uj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"sit\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"back_to_room\", \"when\": {\"all\": []}}, {\"exit\": \"safety_open\", \"label\": \"safety_link\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"sit\", \"where\": {\"any\": [{\"not\": {\"set\": \"$a.fix\"}}, {\"not\": {\"eq\": [\"$opt.once\", true]}}]}}, \"required\": true}], \"hint\": \"sit_hint\", \"title\": \"sit_title\"}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:sit"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 14};
-MERGE (n:SkillStep {id: "unpack_a_judgment:kept"})
-SET n += {skillId: "unpack_a_judgment", step: "kept", kind: "handoff", version: "uj-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"kept_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_chip\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"kept_title\"}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:kept"})
+MERGE (n:SkillStep {id: "unpack_a_judgment:fix"})
+SET n += {skillId: "unpack_a_judgment", step: "fix", kind: "ask", version: "uj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"fix\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"back_to_room\", \"when\": {\"all\": []}}, {\"exit\": \"safety_open\", \"label\": \"safety_link\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"fix\", \"where\": {\"any\": [{\"not\": {\"eq\": [\"$ctx.band\", \"stirred\"]}}, {\"eq\": [\"$opt.short\", true]}]}}, \"required\": true}], \"title\": \"fix_title\"}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:fix"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 15};
-MERGE (n:SkillStep {id: "unpack_a_judgment:noticed"})
-SET n += {skillId: "unpack_a_judgment", step: "noticed", kind: "handoff", version: "uj-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"noticed_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_chip\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"noticed_title\"}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:noticed"})
+MERGE (n:SkillStep {id: "unpack_a_judgment:kept"})
+SET n += {skillId: "unpack_a_judgment", step: "kept", kind: "handoff", version: "uj-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"heavy_line\", \"when\": {\"any\": [{\"has\": [\"$carried\", \"worthless\"]}, {\"has\": [\"$carried\", \"despair\"]}, {\"has\": [\"$carried\", \"helpless\"]}, {\"has\": [\"$carried\", \"powerless\"]}, {\"has\": [\"$carried\", \"hopeless\"]}]}}, {\"key\": \"kept_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_link\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"kept_title\"}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:kept"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 16};
-MERGE (n:SkillStep {id: "unpack_a_judgment:hands_q"})
-SET n += {skillId: "unpack_a_judgment", step: "hands_q", kind: "ask", version: "uj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"hands_q\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_chip\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"hands\"}, \"required\": true}], \"hint\": \"hands_q_hint\", \"title\": \"hands_q_title\"}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:hands_q"})
+MERGE (n:SkillStep {id: "unpack_a_judgment:noticed"})
+SET n += {skillId: "unpack_a_judgment", step: "noticed", kind: "handoff", version: "uj-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"heavy_line\", \"when\": {\"any\": [{\"has\": [\"$carried\", \"worthless\"]}, {\"has\": [\"$carried\", \"despair\"]}, {\"has\": [\"$carried\", \"helpless\"]}, {\"has\": [\"$carried\", \"powerless\"]}, {\"has\": [\"$carried\", \"hopeless\"]}]}}, {\"key\": \"noticed_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_link\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"noticed_title\"}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:noticed"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 17};
-MERGE (n:SkillStep {id: "unpack_a_judgment:hands"})
-SET n += {skillId: "unpack_a_judgment", step: "hands", kind: "embed", version: "uj-v1"}, n.specJson = "{\"answerAs\": \"hands\", \"embed\": \"bodyCard\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_chip\", \"when\": {\"all\": []}}], \"props\": {\"caution\": \"hands_caution\", \"done\": \"hands_done\", \"kind\": \"willing\", \"next\": \"next\", \"running\": \"hands_running\", \"seconds\": 20, \"start\": \"hands_start\", \"step1\": \"hands_step1\", \"step2\": \"hands_step2\", \"step3\": \"hands_step3\"}, \"title\": \"hands_title\"}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:hands"})
+MERGE (n:SkillStep {id: "unpack_a_judgment:hands_q"})
+SET n += {skillId: "unpack_a_judgment", step: "hands_q", kind: "ask", version: "uj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"hands_q\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_link\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"hands\"}, \"required\": true}], \"hint\": \"hands_q_hint\", \"title\": \"hands_q_title\"}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:hands_q"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 18};
-MERGE (n:SkillStep {id: "unpack_a_judgment:end"})
-SET n += {skillId: "unpack_a_judgment", step: "end", kind: "handoff", version: "uj-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"end_them\", \"when\": {\"all\": [{\"eq\": [\"$a.about\", \"them\"]}, {\"set\": \"$a.want\"}]}}, {\"key\": \"end_want\", \"when\": {\"set\": \"$a.want\"}}, {\"key\": \"end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_chip\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"end_title\"}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:end"})
+MERGE (n:SkillStep {id: "unpack_a_judgment:hands"})
+SET n += {skillId: "unpack_a_judgment", step: "hands", kind: "embed", version: "uj-v1"}, n.specJson = "{\"answerAs\": \"hands\", \"embed\": \"bodyCard\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_link\", \"when\": {\"all\": []}}], \"props\": {\"caution\": \"hands_caution\", \"done\": \"hands_done\", \"kind\": \"willing\", \"next\": \"next\", \"running\": \"hands_running\", \"seconds\": 20, \"start\": \"hands_start\", \"step1\": \"hands_step1\", \"step2\": \"hands_step2\", \"step3\": \"hands_step3\"}, \"title\": \"hands_title\"}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:hands"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 19};
+MERGE (n:SkillStep {id: "unpack_a_judgment:end"})
+SET n += {skillId: "unpack_a_judgment", step: "end", kind: "handoff", version: "uj-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"heavy_line\", \"when\": {\"any\": [{\"has\": [\"$carried\", \"worthless\"]}, {\"has\": [\"$carried\", \"despair\"]}, {\"has\": [\"$carried\", \"helpless\"]}, {\"has\": [\"$carried\", \"powerless\"]}, {\"has\": [\"$carried\", \"hopeless\"]}]}}, {\"key\": \"end_them\", \"when\": {\"all\": [{\"eq\": [\"$a.about\", \"them\"]}, {\"set\": \"$a.want\"}]}}, {\"key\": \"end_want\", \"when\": {\"set\": \"$a.want\"}}, {\"key\": \"end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_link\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"end_title\"}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (n:SkillStep {id: "unpack_a_judgment:end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 20};
 MERGE (x:SkillExit {id: "unpack_a_judgment:cool_down"})
 SET x += {skillId: "unpack_a_judgment", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "unpack_a_judgment"}), (x:SkillExit {id: "unpack_a_judgment:cool_down"})
@@ -26828,48 +26833,66 @@ MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "unpack_a_judgment:about"}), (b:SkillStep {id: "unpack_a_judgment:harm"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.about\", \"harm\"]}";
+MATCH (a:SkillStep {id: "unpack_a_judgment:about"}), (b:SkillStep {id: "unpack_a_judgment:set_down"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:about"}), (b:SkillStep {id: "unpack_a_judgment:judge"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "null";
+SET r += {order: 2}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "unpack_a_judgment:harm"}), (x:SkillExit {id: "unpack_a_judgment:safety_open"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
-MATCH (a:SkillStep {id: "unpack_a_judgment:judge"}), (b:SkillStep {id: "unpack_a_judgment:set_down"})
-MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:judge"}), (b:SkillStep {id: "unpack_a_judgment:see"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "null";
+SET r += {order: 0}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "unpack_a_judgment:judge"}), (x:SkillExit {id: "unpack_a_judgment:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 0, field: "judge", label: "safety_chip"}, r.whenJson = "{\"all\": []}";
+SET r += {order: 0, field: "judge", label: "safety_link"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:set_down"}), (x:SkillExit {id: "unpack_a_judgment:cool_down"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
 MATCH (a:SkillStep {id: "unpack_a_judgment:set_down"}), (x:SkillExit {id: "unpack_a_judgment:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 0, field: "", label: "safety_chip"}, r.whenJson = "{\"all\": []}";
+SET r += {order: 0, field: "", label: "safety_link"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "unpack_a_judgment:see"}), (b:SkillStep {id: "unpack_a_judgment:danger"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.see\", \"threat\"]}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:see"}), (b:SkillStep {id: "unpack_a_judgment:facts"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "{\"all\": [{\"eq\": [\"$a.see\", \"fact\"]}, {\"any\": [{\"some\": [\"judge\", {\"in\": [\"$opt.hint\", [\"shame\", \"guilt\"]]}]}, {\"has\": [\"$carried\", \"ashamed\"]}, {\"has\": [\"$carried\", \"embarrassed\"]}, {\"has\": [\"$carried\", \"guilty\"]}, {\"has\": [\"$carried\", \"remorseful\"]}, {\"has\": [\"$carried\", \"humiliated\"]}, {\"has\": [\"$carried\", \"worthless\"]}, {\"has\": [\"$carried\", \"inadequate\"]}, {\"has\": [\"$carried\", \"inferior\"]}, {\"has\": [\"$carried\", \"insecure\"]}]}]}";
+SET r += {order: 1}, r.whenJson = "{\"all\": [{\"eq\": [\"$a.see\", \"fact\"]}, {\"not\": {\"eq\": [\"$ctx.frame\", \"after_facts\"]}}, {\"any\": [{\"some\": [\"judge\", {\"in\": [\"$opt.hint\", [\"shame\", \"guilt\"]]}]}, {\"all\": [{\"any\": [{\"in\": [\"$a.about\", [\"me\", \"feeling\"]]}, {\"own\": \"judge\"}]}, {\"any\": [{\"has\": [\"$carried\", \"ashamed\"]}, {\"has\": [\"$carried\", \"embarrassed\"]}, {\"has\": [\"$carried\", \"guilty\"]}, {\"has\": [\"$carried\", \"remorseful\"]}, {\"has\": [\"$carried\", \"humiliated\"]}, {\"has\": [\"$carried\", \"worthless\"]}, {\"has\": [\"$carried\", \"inadequate\"]}, {\"has\": [\"$carried\", \"inferior\"]}, {\"has\": [\"$carried\", \"insecure\"]}, {\"has\": [\"$carried\", \"insignificant\"]}, {\"has\": [\"$carried\", \"weak\"]}, {\"has\": [\"$carried\", \"exposed\"]}]}]}]}]}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:see"}), (b:SkillStep {id: "unpack_a_judgment:pick"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"stirred\"]}";
+SET r += {order: 2}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"stirred\"]}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:see"}), (b:SkillStep {id: "unpack_a_judgment:happened"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 2}, r.whenJson = "null";
+SET r += {order: 3}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "unpack_a_judgment:see"}), (x:SkillExit {id: "unpack_a_judgment:five_senses"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "see", label: "back_to_room"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:see"}), (x:SkillExit {id: "unpack_a_judgment:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 1, field: "see", label: "safety_chip"}, r.whenJson = "{\"all\": []}";
-MATCH (a:SkillStep {id: "unpack_a_judgment:facts"}), (x:SkillExit {id: "unpack_a_judgment:check_the_facts"})
-MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+SET r += {order: 1, field: "see", label: "safety_link"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "unpack_a_judgment:facts"}), (b:SkillStep {id: "unpack_a_judgment:facts_go"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.facts\", \"check\"]}";
+MATCH (a:SkillStep {id: "unpack_a_judgment:facts"}), (b:SkillStep {id: "unpack_a_judgment:pick"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"stirred\"]}";
+MATCH (a:SkillStep {id: "unpack_a_judgment:facts"}), (b:SkillStep {id: "unpack_a_judgment:happened"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "unpack_a_judgment:facts"}), (x:SkillExit {id: "unpack_a_judgment:five_senses"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "facts", label: "back_to_room"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:facts"}), (x:SkillExit {id: "unpack_a_judgment:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 0, field: "", label: "safety_chip"}, r.whenJson = "{\"all\": []}";
+SET r += {order: 1, field: "facts", label: "safety_link"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "unpack_a_judgment:facts_go"}), (x:SkillExit {id: "unpack_a_judgment:check_the_facts"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "unpack_a_judgment:facts_go"}), (x:SkillExit {id: "unpack_a_judgment:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_link"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:pick"}), (b:SkillStep {id: "unpack_a_judgment:want"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.pick\", \"want\"]}";
@@ -26881,49 +26904,52 @@ MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "pick", label: "back_to_room"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:pick"}), (x:SkillExit {id: "unpack_a_judgment:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 1, field: "pick", label: "safety_chip"}, r.whenJson = "{\"all\": []}";
+SET r += {order: 1, field: "pick", label: "safety_link"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:happened"}), (b:SkillStep {id: "unpack_a_judgment:danger"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"has\": [\"$a.happened.ids\", \"threat\"]}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:happened"}), (b:SkillStep {id: "unpack_a_judgment:rebuild"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "{\"set\": \"$a.fix\"}";
+SET r += {order: 1}, r.whenJson = "{\"all\": [{\"set\": \"$a.fix\"}, {\"any\": [{\"set\": \"$a.happened\"}, {\"set\": \"$a.cost\"}, {\"set\": \"$a.feel\"}, {\"set\": \"$a.want\"}]}]}";
+MATCH (a:SkillStep {id: "unpack_a_judgment:happened"}), (b:SkillStep {id: "unpack_a_judgment:noticed"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "{\"set\": \"$a.fix\"}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:happened"}), (b:SkillStep {id: "unpack_a_judgment:cost"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 2}, r.whenJson = "null";
+SET r += {order: 3}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "unpack_a_judgment:happened"}), (x:SkillExit {id: "unpack_a_judgment:five_senses"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "happened", label: "back_to_room"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:happened"}), (x:SkillExit {id: "unpack_a_judgment:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 1, field: "happened", label: "safety_chip"}, r.whenJson = "{\"all\": []}";
+SET r += {order: 1, field: "happened", label: "safety_link"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:danger"}), (x:SkillExit {id: "unpack_a_judgment:ending"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
 MATCH (a:SkillStep {id: "unpack_a_judgment:danger"}), (x:SkillExit {id: "unpack_a_judgment:safety_open"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
-MATCH (a:SkillStep {id: "unpack_a_judgment:danger"}), (x:SkillExit {id: "unpack_a_judgment:safety_open"})
-MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 0, field: "", label: "safety_chip"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:cost"}), (b:SkillStep {id: "unpack_a_judgment:rebuild"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "{\"set\": \"$a.fix\"}";
+SET r += {order: 0}, r.whenJson = "{\"all\": [{\"set\": \"$a.fix\"}, {\"any\": [{\"set\": \"$a.happened\"}, {\"set\": \"$a.cost\"}, {\"set\": \"$a.feel\"}, {\"set\": \"$a.want\"}]}]}";
+MATCH (a:SkillStep {id: "unpack_a_judgment:cost"}), (b:SkillStep {id: "unpack_a_judgment:noticed"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"set\": \"$a.fix\"}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:cost"}), (b:SkillStep {id: "unpack_a_judgment:feel"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "null";
+SET r += {order: 2}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "unpack_a_judgment:cost"}), (x:SkillExit {id: "unpack_a_judgment:five_senses"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "cost", label: "back_to_room"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:cost"}), (x:SkillExit {id: "unpack_a_judgment:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 1, field: "cost", label: "safety_chip"}, r.whenJson = "{\"all\": []}";
+SET r += {order: 1, field: "cost", label: "safety_link"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:feel"}), (b:SkillStep {id: "unpack_a_judgment:rebuild"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "{\"any\": [{\"set\": \"$a.fix\"}, {\"all\": [{\"eq\": [\"$ctx.band\", \"stirred\"]}, {\"any\": [{\"set\": \"$a.happened\"}, {\"set\": \"$a.cost\"}, {\"set\": \"$a.feel\"}, {\"set\": \"$a.want\"}]}]}]}";
+SET r += {order: 0}, r.whenJson = "{\"all\": [{\"any\": [{\"set\": \"$a.fix\"}, {\"eq\": [\"$ctx.band\", \"stirred\"]}]}, {\"any\": [{\"set\": \"$a.happened\"}, {\"set\": \"$a.cost\"}, {\"set\": \"$a.feel\"}, {\"set\": \"$a.want\"}]}]}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:feel"}), (b:SkillStep {id: "unpack_a_judgment:noticed"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"stirred\"]}";
+SET r += {order: 1}, r.whenJson = "{\"any\": [{\"set\": \"$a.fix\"}, {\"eq\": [\"$ctx.band\", \"stirred\"]}]}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:feel"}), (b:SkillStep {id: "unpack_a_judgment:want"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 2}, r.whenJson = "null";
@@ -26932,7 +26958,7 @@ MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "feel", label: "back_to_room"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:feel"}), (x:SkillExit {id: "unpack_a_judgment:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 1, field: "feel", label: "safety_chip"}, r.whenJson = "{\"all\": []}";
+SET r += {order: 1, field: "feel", label: "safety_link"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:want"}), (b:SkillStep {id: "unpack_a_judgment:rebuild"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"any\": [{\"set\": \"$a.happened\"}, {\"set\": \"$a.cost\"}, {\"set\": \"$a.feel\"}, {\"set\": \"$a.want\"}]}";
@@ -26944,13 +26970,16 @@ MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "want", label: "back_to_room"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:want"}), (x:SkillExit {id: "unpack_a_judgment:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 1, field: "want", label: "safety_chip"}, r.whenJson = "{\"all\": []}";
+SET r += {order: 1, field: "want", label: "safety_link"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:rebuild"}), (b:SkillStep {id: "unpack_a_judgment:sit"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "unpack_a_judgment:rebuild"}), (x:SkillExit {id: "unpack_a_judgment:five_senses"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "back_to_room"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:rebuild"}), (x:SkillExit {id: "unpack_a_judgment:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 0, field: "", label: "safety_chip"}, r.whenJson = "{\"all\": []}";
+SET r += {order: 1, field: "", label: "safety_link"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:sit"}), (b:SkillStep {id: "unpack_a_judgment:fix"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.sit\", \"not_quite\"]}";
@@ -26963,9 +26992,12 @@ SET r += {order: 2}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"stirred\"]}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:sit"}), (b:SkillStep {id: "unpack_a_judgment:hands_q"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 3}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "unpack_a_judgment:sit"}), (x:SkillExit {id: "unpack_a_judgment:five_senses"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "sit", label: "back_to_room"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:sit"}), (x:SkillExit {id: "unpack_a_judgment:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 0, field: "sit", label: "safety_chip"}, r.whenJson = "{\"all\": []}";
+SET r += {order: 1, field: "sit", label: "safety_link"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:fix"}), (b:SkillStep {id: "unpack_a_judgment:happened"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.fix\", \"happened\"]}";
@@ -26978,15 +27010,18 @@ SET r += {order: 2}, r.whenJson = "{\"eq\": [\"$a.fix\", \"feel\"]}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:fix"}), (b:SkillStep {id: "unpack_a_judgment:want"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 3}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "unpack_a_judgment:fix"}), (x:SkillExit {id: "unpack_a_judgment:five_senses"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "fix", label: "back_to_room"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:fix"}), (x:SkillExit {id: "unpack_a_judgment:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 0, field: "fix", label: "safety_chip"}, r.whenJson = "{\"all\": []}";
+SET r += {order: 1, field: "fix", label: "safety_link"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:kept"}), (x:SkillExit {id: "unpack_a_judgment:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 0, field: "", label: "safety_chip"}, r.whenJson = "{\"all\": []}";
+SET r += {order: 0, field: "", label: "safety_link"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:noticed"}), (x:SkillExit {id: "unpack_a_judgment:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 0, field: "", label: "safety_chip"}, r.whenJson = "{\"all\": []}";
+SET r += {order: 0, field: "", label: "safety_link"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:hands_q"}), (b:SkillStep {id: "unpack_a_judgment:hands"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.hands_q\", \"yes\"]}";
@@ -26995,13 +27030,13 @@ MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 1}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "unpack_a_judgment:hands_q"}), (x:SkillExit {id: "unpack_a_judgment:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 0, field: "hands_q", label: "safety_chip"}, r.whenJson = "{\"all\": []}";
+SET r += {order: 0, field: "hands_q", label: "safety_link"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:hands"}), (b:SkillStep {id: "unpack_a_judgment:end"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "unpack_a_judgment:hands"}), (x:SkillExit {id: "unpack_a_judgment:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 0, field: "", label: "safety_chip"}, r.whenJson = "{\"all\": []}";
+SET r += {order: 0, field: "", label: "safety_link"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "unpack_a_judgment:end"}), (x:SkillExit {id: "unpack_a_judgment:values"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"set\": \"$a.want\"}}]";
@@ -27010,7 +27045,7 @@ MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"eq\": [\"$a.about\", \"them\"]}}]";
 MATCH (a:SkillStep {id: "unpack_a_judgment:end"}), (x:SkillExit {id: "unpack_a_judgment:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 0, field: "", label: "safety_chip"}, r.whenJson = "{\"all\": []}";
+SET r += {order: 0, field: "", label: "safety_link"}, r.whenJson = "{\"all\": []}";
 MERGE (o:SkillOption {id: "unpack_a_judgment:about:me"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "about", value: "me", label: "Me", version: "uj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:about:me"})
@@ -27032,7 +27067,7 @@ MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgmen
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "about", order: 3};
 MERGE (o:SkillOption {id: "unpack_a_judgment:about:harm"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "about", value: "harm", label: "It's more than a judgment. I'm thinking about hurting myself", version: "uj-v1"}, o.propsJson = "{\"danger\": \"self\"}";
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "about", value: "harm", label: "It's more than a judgment. I'm thinking about hurting myself or not being here", version: "uj-v1"}, o.propsJson = "{\"danger\": \"self\"}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:about:harm"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "about", order: 4};
@@ -27102,7 +27137,7 @@ MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgmen
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "judge", order: 17};
 MERGE (o:SkillOption {id: "unpack_a_judgment:see:down"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "see", value: "down", label: "Set it down for now", version: "uj-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "see", value: "down", label: "Set it down and look under it", version: "uj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:see:down"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "see", order: 18};
@@ -27111,258 +27146,298 @@ SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "see", value: "fact
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:see:fact"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "see", order: 19};
+MERGE (o:SkillOption {id: "unpack_a_judgment:see:threat"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "see", value: "threat", label: "They threatened me, scared me or hurt me", version: "uj-v1"}, o.propsJson = "{\"danger\": \"other\", \"t\": [\"them\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:see:threat"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "see", order: 20};
+MERGE (o:SkillOption {id: "unpack_a_judgment:facts:check"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "facts", value: "check", label: "Check the facts on the feeling", version: "uj-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:facts:check"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "facts", order: 21};
+MERGE (o:SkillOption {id: "unpack_a_judgment:facts:under"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "facts", value: "under", label: "Look at what's under it anyway", version: "uj-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:facts:under"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "facts", order: 22};
 MERGE (o:SkillOption {id: "unpack_a_judgment:pick:feel"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "pick", value: "feel", label: "What I feel", version: "uj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:pick:feel"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "pick", order: 20};
+SET r += {list: "pick", order: 23};
 MERGE (o:SkillOption {id: "unpack_a_judgment:pick:want"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "pick", value: "want", label: "What I wanted", version: "uj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:pick:want"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "pick", order: 21};
+SET r += {list: "pick", order: 24};
 MERGE (o:SkillOption {id: "unpack_a_judgment:happened:didnt_go"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "didnt_go", label: "I didn't go.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"me\", \"feeling\"]}";
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "didnt_go", label: "I didn't go.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"me\"]}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:didnt_go"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 22};
-MERGE (o:SkillOption {id: "unpack_a_judgment:happened:said_it"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "said_it", label: "I said something I wish I hadn't.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"me\"]}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:said_it"})
+SET r += {list: "happened", order: 25};
+MERGE (o:SkillOption {id: "unpack_a_judgment:happened:late"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "late", label: "I was late.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"me\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:late"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 23};
+SET r += {list: "happened", order: 26};
 MERGE (o:SkillOption {id: "unpack_a_judgment:happened:not_done"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "not_done", label: "I didn't get something done.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"me\"]}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:not_done"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 24};
-MERGE (o:SkillOption {id: "unpack_a_judgment:happened:mistake"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "mistake", label: "I made a mistake.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"me\"]}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:mistake"})
+SET r += {list: "happened", order: 27};
+MERGE (o:SkillOption {id: "unpack_a_judgment:happened:forgot_thing"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "forgot_thing", label: "I forgot something.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"me\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:forgot_thing"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 25};
+SET r += {list: "happened", order: 28};
 MERGE (o:SkillOption {id: "unpack_a_judgment:happened:stayed_in"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "stayed_in", label: "I stayed in bed.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"me\"]}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:stayed_in"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 26};
-MERGE (o:SkillOption {id: "unpack_a_judgment:happened:asked"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "asked", label: "I asked for help.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"me\", \"feeling\"]}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:asked"})
+SET r += {list: "happened", order: 29};
+MERGE (o:SkillOption {id: "unpack_a_judgment:happened:raised"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "raised", label: "I raised my voice.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"me\", \"feeling\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:raised"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 27};
+SET r += {list: "happened", order: 30};
 MERGE (o:SkillOption {id: "unpack_a_judgment:happened:cried"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "cried", label: "I cried.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"feeling\", \"me\"]}";
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "cried", label: "I cried.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"feeling\"]}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:cried"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 28};
+SET r += {list: "happened", order: 31};
 MERGE (o:SkillOption {id: "unpack_a_judgment:happened:strong"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "strong", label: "The feeling came on strong.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"feeling\"]}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:strong"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 29};
+SET r += {list: "happened", order: 32};
 MERGE (o:SkillOption {id: "unpack_a_judgment:happened:stayed"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "stayed", label: "The feeling has stayed a while.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"feeling\"]}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:stayed"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 30};
+SET r += {list: "happened", order: 33};
 MERGE (o:SkillOption {id: "unpack_a_judgment:happened:showed"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "showed", label: "Someone saw how I felt.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"feeling\"]}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:showed"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 31};
-MERGE (o:SkillOption {id: "unpack_a_judgment:happened:raised"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "raised", label: "I raised my voice.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"feeling\", \"me\"]}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:raised"})
+SET r += {list: "happened", order: 34};
+MERGE (o:SkillOption {id: "unpack_a_judgment:happened:asked"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "asked", label: "I asked for help.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"feeling\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:asked"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 32};
+SET r += {list: "happened", order: 35};
 MERGE (o:SkillOption {id: "unpack_a_judgment:happened:no_reply"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "no_reply", label: "They didn't reply.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"them\"]}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:no_reply"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 33};
+SET r += {list: "happened", order: 36};
 MERGE (o:SkillOption {id: "unpack_a_judgment:happened:cancelled"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "cancelled", label: "They cancelled.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"them\"]}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:cancelled"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 34};
-MERGE (o:SkillOption {id: "unpack_a_judgment:happened:said_hurtful"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "said_hurtful", label: "They said something that hurt.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"them\"]}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:said_hurtful"})
+SET r += {list: "happened", order: 37};
+MERGE (o:SkillOption {id: "unpack_a_judgment:happened:said_harsh"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "said_harsh", label: "They said something harsh to me.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"them\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:said_harsh"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 35};
+SET r += {list: "happened", order: 38};
 MERGE (o:SkillOption {id: "unpack_a_judgment:happened:forgot"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "forgot", label: "They forgot something that mattered to me.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"them\"]}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:forgot"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 36};
+SET r += {list: "happened", order: 39};
 MERGE (o:SkillOption {id: "unpack_a_judgment:happened:didnt_help"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "didnt_help", label: "They didn't help when I asked.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"them\"]}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:didnt_help"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 37};
+SET r += {list: "happened", order: 40};
 MERGE (o:SkillOption {id: "unpack_a_judgment:happened:threat"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "threat", label: "They threatened me or hurt me.", version: "uj-v1"}, o.propsJson = "{\"danger\": \"other\", \"t\": [\"them\"]}";
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "threat", label: "They threatened me, scared me or hurt me.", version: "uj-v1"}, o.propsJson = "{\"danger\": \"other\", \"t\": [\"them\"]}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:threat"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 38};
+SET r += {list: "happened", order: 41};
 MERGE (o:SkillOption {id: "unpack_a_judgment:happened:fell_through"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "fell_through", label: "A plan fell through.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"should\"]}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:fell_through"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 39};
+SET r += {list: "happened", order: 42};
 MERGE (o:SkillOption {id: "unpack_a_judgment:happened:taken"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "taken", label: "Something was taken away.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"should\"]}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:taken"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 40};
+SET r += {list: "happened", order: 43};
 MERGE (o:SkillOption {id: "unpack_a_judgment:happened:treated_differently"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "treated_differently", label: "I was treated differently from others.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"should\"]}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:treated_differently"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 41};
+SET r += {list: "happened", order: 44};
 MERGE (o:SkillOption {id: "unpack_a_judgment:happened:lost"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "lost", label: "I lost something that mattered.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"should\"]}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:lost"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 42};
+SET r += {list: "happened", order: 45};
 MERGE (o:SkillOption {id: "unpack_a_judgment:happened:counted_on"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "counted_on", label: "Something I counted on didn't happen.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"should\", \"them\"]}";
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "counted_on", label: "Something I counted on didn't happen.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"should\"]}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:counted_on"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 43};
+SET r += {list: "happened", order: 46};
 MERGE (o:SkillOption {id: "unpack_a_judgment:happened:keeps_happening"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "happened", value: "keeps_happening", label: "It keeps happening.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"should\"]}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:happened:keeps_happening"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "happened", order: 44};
-MERGE (o:SkillOption {id: "unpack_a_judgment:cost:missed_out"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "cost", value: "missed_out", label: "I missed out on something.", version: "uj-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:cost:missed_out"})
-MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "cost", order: 45};
-MERGE (o:SkillOption {id: "unpack_a_judgment:cost:snapped"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "cost", value: "snapped", label: "I snapped at someone.", version: "uj-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:cost:snapped"})
-MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "cost", order: 46};
-MERGE (o:SkillOption {id: "unpack_a_judgment:cost:didnt_talk"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "cost", value: "didnt_talk", label: "We didn't talk.", version: "uj-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:cost:didnt_talk"})
-MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "cost", order: 47};
-MERGE (o:SkillOption {id: "unpack_a_judgment:cost:pulled_away"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "cost", value: "pulled_away", label: "I pulled away from people.", version: "uj-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:cost:pulled_away"})
+SET r += {list: "happened", order: 47};
+MERGE (o:SkillOption {id: "unpack_a_judgment:cost:on_my_own"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "cost", value: "on_my_own", label: "I had to sort it out on my own.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"them\", \"should\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:cost:on_my_own"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "cost", order: 48};
-MERGE (o:SkillOption {id: "unpack_a_judgment:cost:lost_sleep"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "cost", value: "lost_sleep", label: "I lost sleep over it.", version: "uj-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:cost:lost_sleep"})
+MERGE (o:SkillOption {id: "unpack_a_judgment:cost:went_without"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "cost", value: "went_without", label: "I went without something I needed.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"them\", \"should\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:cost:went_without"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "cost", order: 49};
-MERGE (o:SkillOption {id: "unpack_a_judgment:cost:stuck"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "cost", value: "stuck", label: "I've been stuck on it.", version: "uj-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:cost:stuck"})
+MERGE (o:SkillOption {id: "unpack_a_judgment:cost:plans_changed"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "cost", value: "plans_changed", label: "My plans changed because of it.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"them\", \"should\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:cost:plans_changed"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "cost", order: 50};
-MERGE (o:SkillOption {id: "unpack_a_judgment:cost:gave_up"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "cost", value: "gave_up", label: "I gave up on something.", version: "uj-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:cost:gave_up"})
+MERGE (o:SkillOption {id: "unpack_a_judgment:cost:missed_out"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "cost", value: "missed_out", label: "I missed out on something.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"me\", \"feeling\", \"should\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:cost:missed_out"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "cost", order: 51};
-MERGE (o:SkillOption {id: "unpack_a_judgment:want:respected"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "want", value: "respected", label: "To be respected", version: "uj-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:want:respected"})
+MERGE (o:SkillOption {id: "unpack_a_judgment:cost:snapped"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "cost", value: "snapped", label: "I snapped at someone.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"me\", \"feeling\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:cost:snapped"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "want", order: 52};
-MERGE (o:SkillOption {id: "unpack_a_judgment:want:do_well"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "want", value: "do_well", label: "To do well", version: "uj-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:want:do_well"})
+SET r += {list: "cost", order: 52};
+MERGE (o:SkillOption {id: "unpack_a_judgment:cost:didnt_talk"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "cost", value: "didnt_talk", label: "We didn't talk.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"me\", \"feeling\", \"them\", \"should\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:cost:didnt_talk"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "want", order: 53};
-MERGE (o:SkillOption {id: "unpack_a_judgment:want:close"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "want", value: "close", label: "To be close to someone", version: "uj-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:want:close"})
+SET r += {list: "cost", order: 53};
+MERGE (o:SkillOption {id: "unpack_a_judgment:cost:pulled_away"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "cost", value: "pulled_away", label: "I pulled away from people.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"me\", \"feeling\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:cost:pulled_away"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "want", order: 54};
-MERGE (o:SkillOption {id: "unpack_a_judgment:want:safe"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "want", value: "safe", label: "To be safe", version: "uj-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:want:safe"})
+SET r += {list: "cost", order: 54};
+MERGE (o:SkillOption {id: "unpack_a_judgment:cost:lost_sleep"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "cost", value: "lost_sleep", label: "I lost sleep over it.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"me\", \"feeling\", \"them\", \"should\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:cost:lost_sleep"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "want", order: 55};
-MERGE (o:SkillOption {id: "unpack_a_judgment:want:show_up"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "want", value: "show_up", label: "To be someone who shows up", version: "uj-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:want:show_up"})
+SET r += {list: "cost", order: 55};
+MERGE (o:SkillOption {id: "unpack_a_judgment:cost:stuck"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "cost", value: "stuck", label: "I've been stuck on it.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"me\", \"feeling\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:cost:stuck"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "want", order: 56};
-MERGE (o:SkillOption {id: "unpack_a_judgment:want:understood"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "want", value: "understood", label: "To be understood", version: "uj-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:want:understood"})
+SET r += {list: "cost", order: 56};
+MERGE (o:SkillOption {id: "unpack_a_judgment:cost:gave_up"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "cost", value: "gave_up", label: "I gave up on something.", version: "uj-v1"}, o.propsJson = "{\"t\": [\"me\", \"should\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:cost:gave_up"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "want", order: 57};
-MERGE (o:SkillOption {id: "unpack_a_judgment:want:fair"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "want", value: "fair", label: "To be treated fairly", version: "uj-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:want:fair"})
+SET r += {list: "cost", order: 57};
+MERGE (o:SkillOption {id: "unpack_a_judgment:want:stop"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "want", value: "stop", label: "For it to stop", version: "uj-v1"}, o.propsJson = "{\"t\": [\"them\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:want:stop"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "want", order: 58};
-MERGE (o:SkillOption {id: "unpack_a_judgment:want:say"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "want", value: "say", label: "To have a say in what happens", version: "uj-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:want:say"})
+MERGE (o:SkillOption {id: "unpack_a_judgment:want:distance"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "want", value: "distance", label: "To have some distance", version: "uj-v1"}, o.propsJson = "{\"t\": [\"them\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:want:distance"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "want", order: 59};
-MERGE (o:SkillOption {id: "unpack_a_judgment:want:cared_for"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "want", value: "cared_for", label: "To be cared for", version: "uj-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:want:cared_for"})
+MERGE (o:SkillOption {id: "unpack_a_judgment:want:respected"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "want", value: "respected", label: "To be respected", version: "uj-v1"}, o.propsJson = "{\"t\": [\"me\", \"feeling\", \"them\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:want:respected"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "want", order: 60};
-MERGE (o:SkillOption {id: "unpack_a_judgment:want:rest"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "want", value: "rest", label: "To rest", version: "uj-v1"}, o.propsJson = "{}";
-MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:want:rest"})
+MERGE (o:SkillOption {id: "unpack_a_judgment:want:do_well"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "want", value: "do_well", label: "To do well", version: "uj-v1"}, o.propsJson = "{\"t\": [\"me\", \"should\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:want:do_well"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "want", order: 61};
+MERGE (o:SkillOption {id: "unpack_a_judgment:want:close"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "want", value: "close", label: "To be close to someone", version: "uj-v1"}, o.propsJson = "{\"t\": [\"feeling\", \"should\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:want:close"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "want", order: 62};
+MERGE (o:SkillOption {id: "unpack_a_judgment:want:safe"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "want", value: "safe", label: "To be safe", version: "uj-v1"}, o.propsJson = "{\"t\": [\"feeling\", \"them\", \"should\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:want:safe"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "want", order: 63};
+MERGE (o:SkillOption {id: "unpack_a_judgment:want:show_up"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "want", value: "show_up", label: "To be someone who shows up", version: "uj-v1"}, o.propsJson = "{\"t\": [\"me\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:want:show_up"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "want", order: 64};
+MERGE (o:SkillOption {id: "unpack_a_judgment:want:understood"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "want", value: "understood", label: "To be understood", version: "uj-v1"}, o.propsJson = "{\"t\": [\"me\", \"feeling\", \"them\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:want:understood"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "want", order: 65};
+MERGE (o:SkillOption {id: "unpack_a_judgment:want:fair"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "want", value: "fair", label: "To be treated fairly", version: "uj-v1"}, o.propsJson = "{\"t\": [\"them\", \"should\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:want:fair"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "want", order: 66};
+MERGE (o:SkillOption {id: "unpack_a_judgment:want:say"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "want", value: "say", label: "To have a say in what happens", version: "uj-v1"}, o.propsJson = "{\"t\": [\"should\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:want:say"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "want", order: 67};
+MERGE (o:SkillOption {id: "unpack_a_judgment:want:cared_for"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "want", value: "cared_for", label: "To be cared for", version: "uj-v1"}, o.propsJson = "{\"t\": [\"me\", \"feeling\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:want:cared_for"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "want", order: 68};
+MERGE (o:SkillOption {id: "unpack_a_judgment:want:rest"})
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "want", value: "rest", label: "To rest", version: "uj-v1"}, o.propsJson = "{\"t\": [\"me\", \"feeling\", \"should\"]}";
+MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:want:rest"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "want", order: 69};
 MERGE (o:SkillOption {id: "unpack_a_judgment:sit:closer"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "sit", value: "closer", label: "That's closer", version: "uj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:sit:closer"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "sit", order: 62};
+SET r += {list: "sit", order: 70};
 MERGE (o:SkillOption {id: "unpack_a_judgment:sit:not_quite"})
-SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "sit", value: "not_quite", label: "Not quite", version: "uj-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "sit", value: "not_quite", label: "Not quite", version: "uj-v1"}, o.propsJson = "{\"once\": true}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:sit:not_quite"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "sit", order: 63};
+SET r += {list: "sit", order: 71};
 MERGE (o:SkillOption {id: "unpack_a_judgment:sit:keep"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "sit", value: "keep", label: "I'll keep the judgment for now", version: "uj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:sit:keep"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "sit", order: 64};
+SET r += {list: "sit", order: 72};
 MERGE (o:SkillOption {id: "unpack_a_judgment:fix:happened"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "fix", value: "happened", label: "What happened", version: "uj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:fix:happened"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "fix", order: 65};
+SET r += {list: "fix", order: 73};
 MERGE (o:SkillOption {id: "unpack_a_judgment:fix:cost"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "fix", value: "cost", label: "What it cost", version: "uj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:fix:cost"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "fix", order: 66};
+SET r += {list: "fix", order: 74};
 MERGE (o:SkillOption {id: "unpack_a_judgment:fix:feel"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "fix", value: "feel", label: "What I feel", version: "uj-v1"}, o.propsJson = "{\"short\": true}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:fix:feel"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "fix", order: 67};
+SET r += {list: "fix", order: 75};
 MERGE (o:SkillOption {id: "unpack_a_judgment:fix:want"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "fix", value: "want", label: "What I wanted", version: "uj-v1"}, o.propsJson = "{\"short\": true}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:fix:want"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "fix", order: 68};
+SET r += {list: "fix", order: 76};
 MERGE (o:SkillOption {id: "unpack_a_judgment:hands:yes"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "hands", value: "yes", label: "Try it", version: "uj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:hands:yes"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "hands", order: 69};
+SET r += {list: "hands", order: 77};
 MERGE (o:SkillOption {id: "unpack_a_judgment:hands:no"})
 SET o:SkillOption, o += {skillId: "unpack_a_judgment", list: "hands", value: "no", label: "Not now", version: "uj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "unpack_a_judgment"}), (o:SkillOption {id: "unpack_a_judgment:hands:no"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "hands", order: 70};
+SET r += {list: "hands", order: 78};

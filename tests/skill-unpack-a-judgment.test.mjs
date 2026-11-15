@@ -12,7 +12,9 @@ const M = await importTs("src/lib/skillRuntime/machine.ts");
 const D = await importTs("src/lib/describeCard.ts");
 const content = JSON.parse(readFileSync("tests/fixtures/skills-content.json", "utf8"));
 const skill = content.skills.find((s) => s.id === "unpack_a_judgment");
-const GRID = ["ashamed", "embarrassed", "guilty", "sad", "hurt", "lonely", "angry", "frustrated", "disappointed", "anxious"];
+// The feel chips plus the carried words the routes read (a carried word off the grid is dropped, as in the app).
+const GRID = ["ashamed", "embarrassed", "guilty", "sad", "hurt", "lonely", "angry", "frustrated", "disappointed", "anxious",
+  "worthless", "insecure"];
 const embedOutputs = {
   describeCard: { ids: ["read"] },
   bodyCard: { ids: ["done", "partly", "skipped"], measures: ["durationSec"] },
@@ -64,6 +66,8 @@ test("who it's about, then the PRD's judgments for that target, or their own wor
   const s = run([pick("about", "me"), next, own("judge", "I'm a mess"), next]);
   assert.equal(s.stepId, "see");
   assert.equal(title(s), "“I'm a mess”", "received exactly as said");
+  const quoted = run([pick("about", "me"), next, own("judge", "“I'm a mess”"), next]);
+  assert.equal(title(quoted), "“I'm a mess”", "own words already in quotes aren't quoted twice");
 });
 
 test("the self-harm chip is on the first screen and a link on every screen after; it opens the crisis route, no unpacking", () => {
@@ -74,13 +78,20 @@ test("the self-harm chip is on the first screen and a link on every screen after
   for (const st of [run([pick("about", "me"), next]), run(ME), run(DOWN), run([...DOWN, next]), run([...DOWN, next, next])])
     assert.ok(links(st).includes("safety_open"), st.stepId);
   const link = M.stepOf(skill, "see").fields[0].links.find((l) => l.exit === "safety_open");
-  assert.equal(skill.copy[link.label], "It's more than a judgment. I'm thinking about hurting myself");
+  assert.equal(skill.copy[link.label], "Thoughts of hurting myself or not being here");
+  assert.equal(skill.options.about.find((o) => o.value === "harm").label,
+    "It's more than a judgment. I'm thinking about hurting myself or not being here", "passive thoughts count too");
+  // A heavy carried word (the self-worth row brings worthless here): the end cards say it plainly.
+  const heavy = ctx({}, ["worthless"]);
+  const kept = run([...PILES, read, pick("sit", "keep"), next], heavy);
+  assert.match(line(kept, heavy), /thoughts of not being here/);
 });
 
 test("seen as a judgment: a witness line for its target first, no correction; Back to the room on every unpacking screen", () => {
   assert.equal(line(run(ME)), "That's a heavy thing to be carrying.");
-  assert.equal(line(run([pick("about", "them"), next, pick("judge", "selfish"), next])), "Something they did got to you. That counts.");
+  assert.equal(line(run([pick("about", "them"), next, pick("judge", "selfish"), next])), "Something they did got to you. Setting the verdict down isn't agreeing with what they did.");
   assert.deepEqual(ids(run(ME), "see"), ["down", "fact"]);
+  assert.match(skill.copy.see_hint, /Minds make them all the time/, "don't judge the judging (Handout 5a)");
   assert.match(skill.copy.see_hint, /set it down/);
   for (const st of [run(ME), run(DOWN), run([...DOWN, next]), run([...DOWN, next, next]), run([...DOWN, next, next, next])])
     assert.ok(links(st).includes("five_senses"), st.stepId);
@@ -89,10 +100,19 @@ test("seen as a judgment: a witness line for its target first, no correction; Ba
   assert.doesNotMatch(all, /don't judge|is it true|really true|better thought/i, "never disputes the judgment (KB 5.5)");
 });
 
-test("It feels like a fact, with shame or guilt (the chip's hint or a carried word) → Check the Facts; otherwise on to the piles", () => {
+test("It feels like a fact, with shame or guilt (the chip's hint or a carried word) → Check the Facts or under it anyway; otherwise on to the piles", () => {
   const fact = run([...ME, pick("see", "fact"), next]);
   assert.equal(fact.stepId, "facts");
-  assert.deepEqual(offers(fact), ["check_the_facts"]);
+  assert.deepEqual(ids(fact, "facts"), ["check", "under"]);
+  assert.match(line(fact), /looks at the feeling, not at whether the verdict is true/);
+  const go = run([pick("facts", "check"), next], ctx(), fact);
+  assert.equal(go.stepId, "facts_go");
+  assert.deepEqual(offers(go), ["check_the_facts"]);
+  assert.equal(run([pick("facts", "under"), next], ctx(), fact).stepId, "happened", "staying with the skill is a choice");
+  assert.equal(run([...ME, pick("see", "fact"), next], ctx({ frame: "after_facts" })).stepId, "happened",
+    "from Do the Opposite's facts: never a second trip to Check the Facts");
+  const themCarried = [pick("about", "them"), next, pick("judge", "selfish"), next, pick("see", "fact"), next];
+  assert.equal(run(themCarried, ctx({}, ["insecure"])).stepId, "happened", "a carried shame word doesn't make a verdict about them shame");
   const ruin = run([pick("about", "me"), next, pick("judge", "ruin"), next, pick("see", "fact"), next]);
   assert.equal(ruin.stepId, "facts", "guilt");
   const them = run([pick("about", "them"), next, pick("judge", "selfish"), next, pick("see", "fact"), next]);
@@ -105,7 +125,15 @@ test("It feels like a fact, with shame or guilt (the chip's hint or a carried wo
 });
 
 test("the piles: what happened per target (a camera's view), what it cost, grid words as guesses, what I wanted; each optional", () => {
-  assert.deepEqual(ids(run(DOWN), "happened"), ["didnt_go", "said_it", "not_done", "mistake", "stayed_in", "asked", "cried", "raised"]);
+  assert.deepEqual(ids(run(DOWN), "happened"), ["didnt_go", "late", "not_done", "forgot_thing", "stayed_in", "raised"]);
+  for (const t of ["me", "feeling", "them", "should"]) {
+    const s = run([pick("about", t), next, own("judge", "x"), next, pick("see", "down"), next]);
+    assert.ok(ids(s, "happened").length <= 6 || t === "them", t);
+    assert.ok(ids(s, "happened").filter((v) => v !== "threat").length <= 6, t);
+    assert.ok(ids(run([next], ctx(), s), "cost").length <= 7, t);
+  }
+  const themCost = ids(run([pick("about", "them"), next, pick("judge", "selfish"), next, pick("see", "down"), next, next]), "cost");
+  assert.ok(themCost.includes("on_my_own") && !themCost.includes("snapped"), "what their action cost, not only my reactions");
   const themDown = [pick("about", "them"), next, pick("judge", "dont_care"), next, pick("see", "down"), next];
   assert.ok(ids(run(themDown), "happened").includes("threat"));
   assert.ok(!ids(run(DOWN), "happened").includes("threat"));
@@ -127,7 +155,7 @@ test("someone else: to be safe leads the values, Not judging isn't agreeing; a t
   const themDown = [pick("about", "them"), next, pick("judge", "dont_care"), next, pick("see", "down"), next];
   const want = run([...themDown, next, next, next]);
   assert.equal(want.stepId, "want");
-  assert.equal(ids(want, "want")[0], "safe");
+  assert.deepEqual(ids(want, "want").slice(0, 3), ["safe", "stop", "distance"], "safety and boundaries first");
   assert.equal(line(want), "Not judging isn't agreeing. What you wanted still matters.");
   assert.equal(ids(run([...DOWN, next, next, next]), "want")[0], "show_up");
   const danger = run([...themDown, pick("happened", "threat"), next]);
@@ -152,7 +180,7 @@ test("the rebuild: the person's picks as a plain first-person description, then 
   assert.equal(M.stepOf(skill, "kept").complete, true, "keeping it is a full answer");
 });
 
-test("not quite changes one pile and comes straight back to the rebuild", () => {
+test("not quite changes one pile, once, and comes straight back to the rebuild; emptying the last pile is still a rep", () => {
   const fix = run([...PILES, read, pick("sit", "not_quite"), next]);
   assert.equal(fix.stepId, "fix");
   assert.deepEqual(ids(fix, "fix"), ["happened", "cost", "feel", "want"]);
@@ -163,6 +191,10 @@ test("not quite changes one pile and comes straight back to the rebuild", () => 
   assert.deepEqual(M.pickedLabels(ctx(), back).feel, ["Ashamed", "Hurt"]);
   const cost = run([pick("fix", "cost"), next, next], ctx(), fix);
   assert.equal(cost.stepId, "rebuild", "a changed pile in the middle doesn't walk the rest again");
+  assert.deepEqual(ids(run([read], ctx(), back), "sit"), ["closer", "keep"], "one change a visit: no loop over the card");
+  const only = run([...ME, pick("see", "down"), next, next, next, pick("feel", "sad"), next, next, read, pick("sit", "not_quite"), next,
+    pick("fix", "feel"), next]);
+  assert.equal(run([{ type: "pick", fieldId: "feel", value: "sad" }, next], ctx(), only).stepId, "noticed", "nothing left: never an empty card");
 });
 
 test("closer: twenty optional seconds of willing hands, then the end card; values and Recover by what was found", () => {
@@ -181,14 +213,14 @@ test("closer: twenty optional seconds of willing hands, then the end card; value
     pick("happened", "no_reply"), next, next, next, pick("want", "respected"), next, read, pick("sit", "closer"), next,
     pick("hands_q", "no"), next]);
   assert.deepEqual(offers(them), ["values", "recover"]);
-  assert.equal(line(them), "Not judging isn't agreeing. What you wanted still matters.");
+  assert.equal(line(them), "What you wanted still counts, whatever they did. Next time, noticing the judgment is the practice.");
   assert.ok(!JSON.stringify(skill.steps).includes("unpack_another"), "one unpack a visit (PRD: shame spiral)");
 });
 
 test("a carried flooded reading sets it down (body first); a carried stirred reading unpacks one pile", () => {
-  const flooded = run(ME, ctx({ band: "flooded" }));
-  assert.equal(flooded.stepId, "set_down");
-  assert.equal(title(flooded, ctx({ band: "flooded" })), "That's a judgment. It can wait.");
+  const flooded = run([pick("about", "me"), next], ctx({ band: "flooded" }));
+  assert.equal(flooded.stepId, "set_down", "straight from the first screen: no rehearsing the verdict");
+  assert.equal(title(flooded, ctx({ band: "flooded" })), "A judgment can wait.");
   assert.deepEqual(offers(flooded, ctx({ band: "flooded" })), ["cool_down"]);
   const st = ctx({ band: "stirred" });
   const pickStep = run(DOWN, st);
@@ -200,21 +232,30 @@ test("a carried flooded reading sets it down (body first); a carried stirred rea
   assert.equal(sit.stepId, "end", "no willing hands on the short path");
   assert.deepEqual(ids(run([read, pick("sit", "not_quite"), next], st, felt), "fix", st), ["feel", "want"]);
   assert.equal(run([...DOWN, pick("pick", "want"), next, next], st).stepId, "noticed");
+  // The short path skips what happened, so a danger from a person is caught on the see step.
+  const themSee = run([pick("about", "them"), next, pick("judge", "on_purpose"), next], st);
+  assert.deepEqual(ids(themSee, "see", st), ["down", "fact", "threat"]);
+  const danger = run([pick("see", "threat"), next], st, themSee);
+  assert.equal(danger.stepId, "danger");
+  assert.ok(M.stepOf(skill, "see").crisis.some((c) => c.variant === "other_person"));
+  assert.deepEqual(links(danger), [], "the danger card offers someone to talk to itself");
 });
 
 test("the describe card's lines: sentences kept, feelings joined, *I* never lower-cased, own words kept", () => {
   const L = { feelLead: "I feel", wantLead: "I wanted" };
   assert.deepEqual(D.describeLines({ happened: ["I didn't go."], feel: ["Ashamed", "Hurt", "Sad"], want: ["To rest"] }, L),
     ["I didn't go.", "I feel ashamed, hurt and sad.", "I wanted to rest."]);
-  assert.deepEqual(D.describeLines({ happened: ["they left early"], feel: ["I don't know"] }, L), ["they left early.", "I feel I don't know."]);
+  assert.deepEqual(D.describeLines({ happened: ["they left early"], feel: ["I don't know"] }, L), ["They left early.", "I feel I don't know."]);
+  assert.deepEqual(D.describeLines({ want: ["I need them to stop", "I wanted a break", "Sam to call me", "to be heard"] }, L),
+    ["I need them to stop.", "I wanted a break.", "Sam to call me.", "I wanted to be heard."], "own words that don't read on from the lead stand as written");
   assert.deepEqual(D.describeLines({}, L), []);
   assert.equal(D.sentence("Done?"), "Done?");
 });
 
-test("reps: a completed visit is a nonjudge rep (Moderate, PRD MF-03); routes (facts, danger, harm, flooded) aren't completions", () => {
+test("reps: a completed visit is a nonjudge rep (Preliminary); routes (facts, danger, harm, flooded) aren't completions", () => {
   const ps = readFileSync("scripts/practice-spine/content.py", "utf8");
-  assert.match(ps, /\("nonjudge", "Nonjudgmentally", "Moderate", "mind", "dbt_nonjudgmental",[\s\S]*?\["unpack-a-judgment"\]\)/);
-  for (const id of ["facts", "danger", "harm", "set_down"]) assert.equal(M.stepOf(skill, id).complete, false, id);
+  assert.match(ps, /\("nonjudge", "Nonjudgmentally", "Preliminary", "mind", "dbt_nonjudgmental",[\s\S]*?\["unpack-a-judgment"\]\)/);
+  for (const id of ["facts_go", "danger", "harm", "set_down"]) assert.equal(M.stepOf(skill, id).complete, false, id);
   for (const id of ["kept", "noticed", "end"]) assert.equal(M.stepOf(skill, id).complete, true, id);
 });
 
@@ -222,7 +263,9 @@ test("routing: the swap beside Recover on the self-worth words (Social threat); 
   const rf = readFileSync("schema/recommended-for.cypher", "utf8");
   assert.match(rf, /\{id: "rf_social_threat_shame_words_self-worth_unpack-a-judgment", c: "dbt_nonjudgmental", p: "social_threat_shame"[^}]*active: true, review: "approved"/);
   const oa = content.skills.find((s) => s.id === "opposite_action");
-  assert.ok(oa.exits.some((e) => e.id === "unpack" && e.toolId === "unpack-a-judgment"));
+  assert.ok(oa.exits.some((e) => e.id === "unpack" && e.toolId === "unpack-a-judgment" && e.query?.frame === "after_facts"));
+  assert.match(readFileSync("scripts/recommendations/content.py", "utf8"),
+    /"unpack-a-judgment": \["dissociation_overmodulation", "conservation_freeze"\]/, "never in shame collapse or far away");
   const clar = oa.steps.find((s) => s.id === "clar");
   assert.ok(clar.offers.some((o) => o.exit === "unpack"));
 });

@@ -4509,7 +4509,7 @@
    "active": true,
    "version": "rf-v2",
    "reviewStatus": "approved",
-   "rationale": "Planned: Check the Facts beside Do the Opposite (unhiding) for shame about the self."
+   "rationale": "Check the Facts for shame about the self; since MF-B2 it shows where Unpack a judgment is filtered out (dissociation or freeze alongside), Unpack reaching it as its justified branch."
   },
   {
    "id": "rf_social_threat_shame_words_self-worth_unpack-a-judgment",
@@ -4550,6 +4550,14 @@
   },
   {
    "conceptId": "dbt_mindfulness_current_emotion",
+   "targetId": "dissociation_overmodulation"
+  },
+  {
+   "conceptId": "dbt_nonjudgmental",
+   "targetId": "conservation_freeze"
+  },
+  {
+   "conceptId": "dbt_nonjudgmental",
    "targetId": "dissociation_overmodulation"
   },
   {

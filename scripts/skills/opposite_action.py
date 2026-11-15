@@ -563,7 +563,7 @@ EXITS = [
     {"id": "ending", "toolId": "ending-relationships", "query": {"frame": "careful"}},  # danger from someone (IE-08)
     {"id": "er_troubleshoot", "toolId": "er-troubleshoot"},                        # the pull got stronger (ER-14)
     {"id": "wise_mind", "toolId": "wise-mind"},                                    # not sure, after the check (ER-B5)
-    {"id": "unpack", "toolId": "unpack-a-judgment"},                               # shame or guilt that doesn't fit (MF-03)
+    {"id": "unpack", "toolId": "unpack-a-judgment", "query": {"frame": "after_facts"}},  # shame or guilt that doesn't fit (MF-03)
     {"id": "safety_open", "toolId": None, "safety": True},                         # safety.open (R6)
     {"id": "done", "done": True},
 ]

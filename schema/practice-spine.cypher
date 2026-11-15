@@ -185,7 +185,7 @@ UNWIND ["linehan_skills_2015"] AS srcId
 MATCH (k:PracticeSkill {id: "describe"}), (s:ClinicalSource {id: srcId})
 MERGE (k)-[:SUPPORTED_BY]->(s);
 MERGE (k:PracticeSkill {id: "nonjudge"})
-SET k.name = "Nonjudgmentally", k.displayLabel = "Nonjudgmentally", k.evidenceGrade = "Moderate", k.evidenceBasis = null, k.family = "mind", k.why = "Taking a verdict apart into what happened, what you feel and what mattered can loosen its grip without arguing with it.", k.defaultFor = ["unpack-a-judgment"], k.reviewStatus = "draft";
+SET k.name = "Nonjudgmentally", k.displayLabel = "Nonjudgmentally", k.evidenceGrade = "Preliminary", k.evidenceBasis = "Limited trials", k.family = "mind", k.why = "Taking a verdict apart into what happened, what you feel and what mattered can loosen its grip without arguing with it.", k.defaultFor = ["unpack-a-judgment"], k.reviewStatus = "draft";
 MATCH (k:PracticeSkill {id: "nonjudge"}), (c:TherapyConcept {id: "dbt_nonjudgmental"})
 MERGE (k)-[:PRACTICES]->(c);
 UNWIND ["linehan_skills_2015"] AS srcId

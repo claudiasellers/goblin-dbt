@@ -874,9 +874,10 @@ NEW_SKILLS = [
      "Putting a plain word on what you noticed, a guess is fine, can help separate what happened from the story about it.",
      ["linehan_skills_2015"], ["notice-and-name"]),
     # Unpack a judgment (MF-03, docs/design/unpack-a-judgment.md): a completed visit is a nonjudge rep, whichever way
-    # the rebuild went (keeping the judgment for now is a full answer). Moderate as the PRD grades MF-03 (acceptance
-    # without judgment mediated NSSI reduction in DBT skills training: Krantz, McMain & Kuo 2018).
-    ("nonjudge", "Nonjudgmentally", "Moderate", "mind", "dbt_nonjudgmental",
+    # the rebuild went (keeping the judgment for now is a full answer). Preliminary, not the PRD's Moderate: the one
+    # study behind it (acceptance without judgment predicted NSSI change after 20 weeks of DBT skills group: Krantz,
+    # McMain & Kuo 2018) is a group programme, not a two-minute exercise (wise mind's precedent).
+    ("nonjudge", "Nonjudgmentally", "Preliminary", "mind", "dbt_nonjudgmental",
      "Taking a verdict apart into what happened, what you feel and what mattered can loosen its grip without arguing with it.",
      ["linehan_skills_2015"], ["unpack-a-judgment"]),
 ]

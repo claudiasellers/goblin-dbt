@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { PaperCard, paperLine } from '../shared/PaperCard';
-import { linkButton, primaryButton } from '../tools/oppositeAction/styles';
+import { primaryButton } from '../tools/oppositeAction/styles';
 import { describeLines } from '../../lib/describeCard';
 import type { EmbedProps } from './embeds';
 
@@ -24,13 +24,14 @@ export function DescribeCard({ props, picked, onShown, onDone }: EmbedProps) {
   if (!lines.length) {
     return (
       <div className="flex justify-center">
-        <button type="button" className={linkButton} onClick={() => onDone?.({ ids: [] })}>{text('empty') || text('next')}</button>
+        <button type="button" className={primaryButton} onClick={() => onDone?.({ ids: [] })}>{text('empty') || text('next')}</button>
       </div>
     );
   }
   return (
     <div className="space-y-5" data-testid="describe-card">
-      <PaperCard label={lines.join(' ')}>
+      {/* No group label: the list is read once, as itself (a label would read every line twice). */}
+      <PaperCard>
         <ul className="space-y-2">{lines.map((l, i) => <li key={i} className={paperLine}>{l}</li>)}</ul>
       </PaperCard>
       <button type="button" className={primaryButton} onClick={() => onDone?.({ ids: ['read'] })}>{text('next')}</button>

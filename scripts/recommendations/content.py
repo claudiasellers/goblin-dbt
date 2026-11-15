@@ -350,7 +350,10 @@ BACKUP = 3.0  # a pattern's backup row, used only when its first pick and altern
 # alongside another pattern.
 # Give your mind a job neither: pushing a feeling away while already disconnected deepens it (12 Nov 2026).
 CONTRAINDICATIONS = {"opposite-action": ["dissociation_overmodulation"], "mind-job": ["dissociation_overmodulation"],
-                     "mindfulness-emotions": ["dissociation_overmodulation"]}
+                     "mindfulness-emotions": ["dissociation_overmodulation"],
+                     # A self-focused verdict exercise never during shame collapse (social threat + freeze: "do not
+                     # start with self-focused tools", schema/pattern-co-occurrence.cypher) or far away (MF-03, KB).
+                     "unpack-a-judgment": ["dissociation_overmodulation", "conservation_freeze"]}
 
 # Emotion-gated rows. `addresses`: fires only when one of the user's words is in the concept's
 # ADDRESSES/REDUCES/TARGETS set; `none_named`: only when no emotion was named.
@@ -423,7 +426,7 @@ WORD_RULES = [
     {"key": "self-worth", "pattern": "social_threat_shame", "tool": "unpack-a-judgment", "priority": 1.45, "words": ["insecure", "inadequate", "inferior", "insignificant", "weak", "worthless"],
      "why": "MF-03 (PRD: the second card for Social threat): these words are verdicts about the self, often the only words a person has for shame, so Unpack a judgment takes the swap beside Recover. Check the Facts stays the next row and is its justified branch (It feels like a fact, with shame) (15 Nov 2026)."},
     {"key": "self-worth", "pattern": "social_threat_shame", "tool": "check-the-facts", "priority": 1.5, "words": ["insecure", "inadequate", "inferior", "insignificant", "weak", "worthless"],
-     "why": "Planned: Check the Facts beside Do the Opposite (unhiding) for shame about the self."},
+     "why": "Check the Facts for shame about the self; since MF-B2 it shows where Unpack a judgment is filtered out (dissociation or freeze alongside), Unpack reaching it as its justified branch."},
     {"key": "ask-for-it", "pattern": "social_threat_shame", "tool": "dear-man", "priority": 1.5, "words": ["let_down", "excluded"], "beside": ["recovering-from-invalidation"],
      "why": "DEAR MAN (ask for what you need) as the alternative to Recover after a let-down or being left out: the person's own ask, after the picker and the safety question (IE-01, D4). Not rejected or humiliated: a wound to recover from first."},
     {"key": "self-respect", "pattern": "social_threat_shame", "tool": "fast", "priority": 1.5, "words": ["betrayed", "disrespected"],

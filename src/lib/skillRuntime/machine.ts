@@ -986,8 +986,9 @@ export function titleSlots(ctx: RunContext, step: StepDef, s: StateLike): Record
   for (const [name, src] of Object.entries(step.titleSlots ?? {})) {
     const f = fieldOf(ctx.skill, src.labelOf);
     const a = answers[src.labelOf];
-    // The person's own words, when the field has them, are what they said (a starter they changed included).
-    if (f && a?.own?.trim()) { out[name] = a.own.trim(); continue; }
+    // The person's own words, when the field has them, are what they said (a starter they changed included). Quotes
+    // around the whole of them are dropped, so a title that quotes the slot never doubles them (MF-03's “{judge}”).
+    if (f && a?.own?.trim()) { out[name] = a.own.trim().replace(/^["“”'‘’]+(.*?)["“”'‘’]+$/su, '$1') || a.own.trim(); continue; }
     const v = a?.ids[0];
     // A kept item that's gone or set aside since (normalize dropped the pick) reads as the generic copy, never `{slot}`.
     if (f && !v && f.options.profile && ctx.skill.copy.profile_unnamed) { out[name] = ctx.skill.copy.profile_unnamed; continue; }
