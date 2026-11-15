@@ -30,7 +30,7 @@ export function PebbleBowl({ props, onShown, onDone, covered }: EmbedProps) {
   const [pebbles, setPebbles] = useState(0);
   const [said, setSaid] = useState(0);
   const coveredRef = useRef(!!covered);
-  coveredRef.current = !!covered;
+  useEffect(() => { coveredRef.current = !!covered; }, [covered]);
   const timer = useDeadlineTimer({ durationMs: ms, tickMs: 250, chime: false, onDone: () => { if (!coveredRef.current) buzz(30); setEnded(true); } });
   const running = timer.state === 'running';
   const tapRef = useRef<HTMLButtonElement>(null);
