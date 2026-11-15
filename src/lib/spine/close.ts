@@ -21,7 +21,7 @@ export const TOOL_CLOSE_KIND: Record<string, { module: SpineModule; closeKind: C
   // My crisis kit (DT-03, docs/design/crisis-kit.md): opening it asks how it is now in the flow, once, after the cards
   // (askFresh thenVsNow, no SessionClose after it); making it ends with no close.
   'crisis-kit': { module: 'dt', closeKind: 'regulation_down' },
-  'alternate-rebellion': { module: 'dt', closeKind: 'urge' },
+  'alternate-rebellion': { module: 'dt', closeKind: 'urge_change' },
   'problem-solve': { module: 'er', closeKind: 'plan' },
   'cope-ahead': { module: 'er', closeKind: 'none' },
   'find-the-feeling': { module: 'er', closeKind: 'regulation_down' },

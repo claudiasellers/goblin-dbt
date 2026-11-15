@@ -26,11 +26,12 @@ const own = (fieldId, text) => ({ type: "own", fieldId, text });
 const next = { type: "next" };
 const card = (when) => ({ type: "embedDone", output: { ids: [when] } });
 const toPick = (squeeze = ["rules"], fn = "freedom") => [next, ...squeeze.map((x) => pick("squeeze", x)), next, pick("function", fn), next];
-const toReal = (squeeze, rebellion = "say_no", when = "today") => [...toPick(squeeze, "freedom"), pick("pick", rebellion), next, card(when)];
+// Later today or this week: the *card later?* step, skipped here (its own test is skill-alternate-rebellion-part2).
+const toReal = (squeeze, rebellion = "say_no", when = "today") => [...toPick(squeeze, "freedom"), pick("pick", rebellion), next, card(when), ...(when === "now" ? [] : [next])];
 const step = (id) => skill.steps.find((s) => s.id === id);
 
-test("the screens, in order: open, squeeze, function, pick, (heads-up), card, (itch), real, next", () => {
-  assert.deepEqual(skill.steps.map((s) => s.id), ["open", "squeeze", "function", "pick", "heads_up", "card", "itch", "real", "next"]);
+test("the screens, in order: open, squeeze, function, pick, (heads-up), (sleep on it), card, (itch | later), (back, still: reopened only), real, next", () => {
+  assert.deepEqual(skill.steps.map((s) => s.id), ["open", "squeeze", "function", "pick", "heads_up", "sleep_on", "card", "later", "itch", "back", "again_card", "still", "real", "next"]);
   assert.equal(skill.toolId, "alternate-rebellion");
   const s = run([...toReal(["rules"], "say_no", "now"), pick("itch", "a_bit"), next, pick("real", "change"), next]);
   assert.deepEqual(s.path, ["open", "squeeze", "function", "pick", "card", "itch", "real", "next"]);
@@ -134,28 +135,28 @@ test("plan C6.7: no food, alcohol, shopping or scrolling in a rebellion, no amou
 
 test("an own rebellion asks if it'll cost tomorrow; yes gets a heads-up and a choice (lighter goes back, keep goes on)", () => {
   let s = run([...toPick(), own("pick", "quit my job by email tonight")]);
-  assert.deepEqual(M.shownFields(ctx(), step("pick"), s).map((f) => f.id), ["pick", "cost"]);
+  assert.deepEqual(M.shownFields(ctx(), step("pick"), s).map((f) => f.id), ["pick", "cost", "undo"]);
   assert.equal(M.canGoOn(ctx(), s), false, "the cost question is asked");
-  s = M.runNext(ctx(), M.runNext(ctx(), s, pick("cost", "yes")), next);
+  s = M.runNext(ctx(), M.runNext(ctx(), M.runNext(ctx(), s, pick("cost", "yes")), pick("undo", "yes")), next);
   assert.equal(s.stepId, "heads_up");
   const back = M.runNext(ctx(), M.runNext(ctx(), s, pick("heads_up", "lighter")), next);
   assert.equal(back.stepId, "pick");
   const kept = M.runNext(ctx(), M.runNext(ctx(), s, pick("heads_up", "keep")), next);
   assert.equal(kept.stepId, "card");
-  assert.equal(run([...toPick(), own("pick", "paint a wall"), pick("cost", "a_little"), next]).stepId, "card");
+  assert.equal(run([...toPick(), own("pick", "paint a wall"), pick("cost", "a_little"), pick("undo", "yes"), next]).stepId, "card");
   assert.equal(run([...toPick(), pick("pick", "say_no"), next]).stepId, "card", "a curated one isn't asked");
   assert.ok(step("pick").fields[0].own.max <= 90, "it fits on the card");
 });
 
 test("an own rebellion with someone they're scared of also asks whether they'd notice; yes or not sure gets the heads-up", () => {
   let s = run([...toPick(["scared"]), own("pick", "dye my hair blue")]);
-  assert.deepEqual(M.shownFields(ctx(), step("pick"), s).map((f) => f.id), ["pick", "cost", "noticed"]);
-  s = M.runNext(ctx(), M.runNext(ctx(), M.runNext(ctx(), s, pick("cost", "no")), pick("noticed", "not_sure")), next);
+  assert.deepEqual(M.shownFields(ctx(), step("pick"), s).map((f) => f.id), ["pick", "cost", "noticed", "undo"]);
+  s = M.runNext(ctx(), M.runNext(ctx(), M.runNext(ctx(), M.runNext(ctx(), s, pick("cost", "no")), pick("noticed", "not_sure")), pick("undo", "yes")), next);
   assert.equal(s.stepId, "heads_up");
   assert.match(M.copyText(ctx(), step("heads_up").title, s), /If they'd notice it/);
-  const quiet = run([...toPick(["scared"]), own("pick", "hum a song"), pick("cost", "no"), pick("noticed", "no"), next]);
+  const quiet = run([...toPick(["scared"]), own("pick", "hum a song"), pick("cost", "no"), pick("noticed", "no"), pick("undo", "yes"), next]);
   assert.equal(quiet.stepId, "card");
-  assert.deepEqual(M.shownFields(ctx(), step("pick"), run([...toPick(["rules"]), own("pick", "x")])).map((f) => f.id), ["pick", "cost"], "only with someone they're scared of");
+  assert.deepEqual(M.shownFields(ctx(), step("pick"), run([...toPick(["rules"]), own("pick", "x")])).map((f) => f.id), ["pick", "cost", "undo"], "only with someone they're scared of");
 });
 
 test("treatment: never a rebellion; screen 4 says to talk to the care team first, and nothing offered skips something", () => {
@@ -186,8 +187,8 @@ test("the card: the run's answers as labels for it; now asks if it scratched the
   assert.deepEqual(p.function, ["Control back"]);
   assert.deepEqual(p.pick, ["Rearrange your room tonight"]);
   assert.equal(M.runNext(ctx(), s, card("now")).stepId, "itch");
-  assert.equal(M.runNext(ctx(), s, card("week")).stepId, "real");
-  assert.equal(M.runNext(ctx(), s, card("never")).stepId, "real", "an undeclared id is dropped");
+  assert.equal(M.runNext(ctx(), s, card("week")).stepId, "later", "later: a card to ask how it went, optional");
+  assert.equal(M.runNext(ctx(), s, card("never")).stepId, "later", "an undeclared id is dropped");
 });
 
 test("on the player (F2): the tool plays this skill, no page of its own; the card's words are declared copy keys", () => {
@@ -212,7 +213,7 @@ test("the real squeeze (PRD step 6): change → Problem Solve, a person → DEAR
 });
 
 test("the record: no numbers, no free text but own words, within the server's schema; the urge close asks about the blow-up", () => {
-  const s = M.runNext(ctx(), run([...toPick(["rules"]), own("pick", "x".repeat(200)), pick("cost", "no"), next, card("today"), pick("real", "change"), next]),
+  const s = M.runNext(ctx(), run([...toPick(["rules"]), own("pick", "x".repeat(200)), pick("cost", "no"), pick("undo", "yes"), next, card("today"), next, pick("real", "change"), next]),
     { type: "exit", exitId: "problem_solve" });
   assert.equal(s.answers.pick.own.length, 90);
   const rec = M.runRecord(ctx(), s);
@@ -220,7 +221,7 @@ test("the record: no numbers, no free text but own words, within the server's sc
   assert.equal(rec.exitId, "problem_solve");
   const spine = JSON.parse(readFileSync("src/data/content/spine.json", "utf8")).content;
   assert.equal(spine.closeFlow.byTool["alternate-rebellion"].urge.question, "And the urge to blow it all up?");
-  assert.match(readFileSync("functions/src/spine/tools.ts", "utf8"), /'alternate-rebellion': \{ module: 'dt', closeKind: 'urge' \}/);
+  assert.match(readFileSync("functions/src/spine/tools.ts", "utf8"), /'alternate-rebellion': \{ module: 'dt', closeKind: 'urge_change' \}/, "the two-part close (part 2)");
 });
 
 test("the rebellion is clinical content in the graph: each option SERVES its functions", () => {

@@ -571,7 +571,7 @@
       {
         "id": "alternate_rebellion",
         "toolId": "alternate-rebellion",
-        "version": "ar-v2",
+        "version": "ar-v3",
         "start": "open",
         "accepts": [
           "band",
@@ -581,6 +581,9 @@
         "ownMax": 140,
         "emotionFields": [],
         "copy": {
+          "again_title": "Want another card, for another time?",
+          "back_hint": "Any answer is fine. It's only to notice.",
+          "back_title": "Your rebellion. Did you do it?",
           "card_against": "Against",
           "card_fallback": "A rebellion built not to cost you tomorrow.",
           "card_for": "For",
@@ -599,12 +602,16 @@
           "heads_up_title": "That one might cost you tomorrow. Keep it, or pick something lighter?",
           "itch_hint": "Go and do it first. This screen waits.",
           "itch_title": "Did it scratch the itch?",
+          "later_skip": "No card",
+          "later_title": "Want a card later, to ask how it went?",
           "next": "Next",
           "next_cant": "Some squeezes don't move. You still get to choose how much of you they take.",
           "next_change": "When the squeeze can change, working on it is the bigger rebellion.",
+          "next_let_go": "Choosing not to, after sleeping on it, is a rebellion too.",
           "next_not_now": "The rebellion's yours. The squeeze can wait until you're ready.",
           "next_say": "Saying it clearly, and keeping your self-respect, is a rebellion too.",
           "next_scared": "You named someone you're scared of. You don't have to work that out alone.",
+          "next_slept": "It's waiting a day. The squeeze can be looked at now, or later.",
           "noticed_q": "Would they notice it?",
           "open_title": "Wanting to rebel usually means something's squeezing you. That's worth listening to.",
           "own_hint": "Say it your way",
@@ -615,8 +622,15 @@
           "pick_title_treatment_scared": "Treatment you didn't pick is a real squeeze. Changing it is a talk with your care team first. Pick one nobody else has to see.",
           "real_title": "And the squeeze itself. Is it something you want to work on?",
           "safety_open": "If the urge is to hurt yourself",
+          "sleep_hint": "Big choices land better after a night's sleep.",
+          "sleep_title": "That one can't be undone, so it waits a day. A card tomorrow asks if you still want it.",
+          "sleep_title_unsure": "That one might not undo, so it waits a day. A card tomorrow asks if you still want it.",
           "squeeze_own": "Something else",
-          "squeeze_title": "What's squeezing you?"
+          "squeeze_title": "What's squeezing you?",
+          "still_hint": "Whatever you pick, it's your call.",
+          "still_title": "A day later. Do you still want to do it?",
+          "still_title_treatment": "A day later. Changing treatment is a talk with your care team first. Do you still want to do it?",
+          "undo_q": "Could you undo it later?"
         },
         "tables": {},
         "derive": [],
@@ -888,6 +902,18 @@
                     }
                   ]
                 }
+              },
+              {
+                "id": "undo",
+                "label": "undo_q",
+                "options": {
+                  "list": "undo"
+                },
+                "max": 1,
+                "required": true,
+                "showWhen": {
+                  "own": "pick"
+                }
               }
             ],
             "title": [
@@ -961,6 +987,30 @@
                           ]
                         }
                       ]
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "sleep_on",
+                "when": {
+                  "all": [
+                    {
+                      "in": [
+                        "$a.undo",
+                        [
+                          "no",
+                          "not_sure"
+                        ]
+                      ]
+                    },
+                    {
+                      "not": {
+                        "eq": [
+                          "$a.still",
+                          "yes"
+                        ]
+                      }
                     }
                   ]
                 }
@@ -1046,7 +1096,105 @@
                 }
               },
               {
+                "to": "sleep_on",
+                "when": {
+                  "all": [
+                    {
+                      "in": [
+                        "$a.undo",
+                        [
+                          "no",
+                          "not_sure"
+                        ]
+                      ]
+                    },
+                    {
+                      "not": {
+                        "eq": [
+                          "$a.still",
+                          "yes"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
                 "to": "card",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "sleep_on",
+            "kind": "ask",
+            "title": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.undo",
+                    "not_sure"
+                  ]
+                },
+                "key": "sleep_title_unsure"
+              },
+              {
+                "key": "sleep_title"
+              }
+            ],
+            "hint": "sleep_hint",
+            "fields": [
+              {
+                "id": "sleep",
+                "options": {
+                  "list": "sleep"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "has": [
+                    "$a.squeeze.ids",
+                    "scared"
+                  ]
+                }
+              }
+            ],
+            "followUp": {
+              "type": "rebellion_check",
+              "when": {
+                "eq": [
+                  "$a.sleep",
+                  "tomorrow"
+                ]
+              }
+            },
+            "next": [
+              {
+                "to": "pick",
+                "when": {
+                  "eq": [
+                    "$a.sleep",
+                    "lighter"
+                  ]
+                }
+              },
+              {
+                "to": "real",
                 "when": null
               }
             ],
@@ -1092,6 +1240,88 @@
                 }
               },
               {
+                "to": "later",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "later",
+            "kind": "ask",
+            "title": "later_title",
+            "secondary": "later_skip",
+            "fields": [
+              {
+                "id": "remind",
+                "options": {
+                  "list": "remind",
+                  "where": {
+                    "any": [
+                      {
+                        "all": [
+                          {
+                            "eq": [
+                              "$a.when",
+                              "today"
+                            ]
+                          },
+                          {
+                            "eq": [
+                              "$opt.today",
+                              true
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "all": [
+                          {
+                            "eq": [
+                              "$a.when",
+                              "week"
+                            ]
+                          },
+                          {
+                            "eq": [
+                              "$opt.week",
+                              true
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "max": 1,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "has": [
+                    "$a.squeeze.ids",
+                    "scared"
+                  ]
+                }
+              }
+            ],
+            "followUp": {
+              "type": "rebellion_after",
+              "whenFrom": "remind"
+            },
+            "next": [
+              {
                 "to": "real",
                 "when": null
               }
@@ -1126,6 +1356,240 @@
             "next": [
               {
                 "to": "real",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "back",
+            "kind": "ask",
+            "title": "back_title",
+            "hint": "back_hint",
+            "fields": [
+              {
+                "id": "did",
+                "options": {
+                  "list": "did"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "has": [
+                    "$a.squeeze.ids",
+                    "scared"
+                  ]
+                }
+              }
+            ],
+            "reopens": {
+              "after": "later",
+              "again": [
+                "again_card"
+              ]
+            },
+            "clears": [
+              "did",
+              "itch",
+              "real",
+              "remind_again"
+            ],
+            "next": [
+              {
+                "to": "itch",
+                "when": {
+                  "in": [
+                    "$a.did",
+                    [
+                      "yes",
+                      "a_bit"
+                    ]
+                  ]
+                }
+              },
+              {
+                "to": "again_card",
+                "when": {
+                  "eq": [
+                    "$a.did",
+                    "not_yet"
+                  ]
+                }
+              },
+              {
+                "to": "real",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "again_card",
+            "kind": "ask",
+            "title": "again_title",
+            "secondary": "later_skip",
+            "fields": [
+              {
+                "id": "remind_again",
+                "options": {
+                  "list": "remind"
+                },
+                "max": 1,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "has": [
+                    "$a.squeeze.ids",
+                    "scared"
+                  ]
+                }
+              }
+            ],
+            "followUp": {
+              "type": "rebellion_after",
+              "whenFrom": "remind_again"
+            },
+            "next": [
+              {
+                "to": "real",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "still",
+            "kind": "ask",
+            "title": [
+              {
+                "when": {
+                  "has": [
+                    "$a.squeeze.ids",
+                    "treatment"
+                  ]
+                },
+                "key": "still_title_treatment"
+              },
+              {
+                "key": "still_title"
+              }
+            ],
+            "hint": "still_hint",
+            "fields": [
+              {
+                "id": "still",
+                "options": {
+                  "list": "still"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "has": [
+                    "$a.squeeze.ids",
+                    "scared"
+                  ]
+                }
+              }
+            ],
+            "reopens": {
+              "after": "sleep_on"
+            },
+            "clears": [
+              "still",
+              "sleep",
+              "cost",
+              "noticed",
+              "undo",
+              "heads_up",
+              "when",
+              "remind",
+              "remind_again",
+              "itch",
+              "real"
+            ],
+            "next": [
+              {
+                "to": "card",
+                "when": {
+                  "all": [
+                    {
+                      "eq": [
+                        "$a.still",
+                        "yes"
+                      ]
+                    },
+                    {
+                      "not": {
+                        "any": [
+                          {
+                            "has": [
+                              "$a.squeeze.ids",
+                              "scared"
+                            ]
+                          },
+                          {
+                            "has": [
+                              "$a.squeeze.ids",
+                              "treatment"
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "real",
+                "when": {
+                  "eq": [
+                    "$a.still",
+                    "no"
+                  ]
+                }
+              },
+              {
+                "to": "pick",
                 "when": null
               }
             ],
@@ -1191,6 +1655,24 @@
                 }
               },
               {
+                "key": "next_let_go",
+                "when": {
+                  "eq": [
+                    "$a.still",
+                    "no"
+                  ]
+                }
+              },
+              {
+                "key": "next_slept",
+                "when": {
+                  "eq": [
+                    "$a.sleep",
+                    "tomorrow"
+                  ]
+                }
+              },
+              {
                 "key": "next_change",
                 "when": {
                   "eq": [
@@ -1209,22 +1691,22 @@
                 }
               },
               {
-                "key": "next_cant",
                 "when": {
                   "eq": [
                     "$a.real",
                     "cant"
                   ]
-                }
+                },
+                "key": "next_cant"
               },
               {
-                "key": "next_not_now",
                 "when": {
                   "eq": [
                     "$a.real",
                     "not_now"
                   ]
-                }
+                },
+                "key": "next_not_now"
               }
             ],
             "next": [],
@@ -1848,6 +2330,80 @@
             {
               "value": "not_now",
               "label": "Not right now"
+            }
+          ],
+          "undo": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "not_sure",
+              "label": "Not sure"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "sleep": [
+            {
+              "value": "tomorrow",
+              "label": "Ask me tomorrow"
+            },
+            {
+              "value": "lighter",
+              "label": "Pick one I can undo"
+            }
+          ],
+          "still": [
+            {
+              "value": "yes",
+              "label": "Yes, still mine"
+            },
+            {
+              "value": "lighter",
+              "label": "Something I can undo instead"
+            },
+            {
+              "value": "no",
+              "label": "Not any more"
+            }
+          ],
+          "remind": [
+            {
+              "value": "evening",
+              "label": "This evening",
+              "today": true
+            },
+            {
+              "value": "tomorrow",
+              "label": "Tomorrow",
+              "today": true,
+              "week": true
+            },
+            {
+              "value": "few_days",
+              "label": "In a few days",
+              "week": true
+            }
+          ],
+          "did": [
+            {
+              "value": "yes",
+              "label": "I did it"
+            },
+            {
+              "value": "a_bit",
+              "label": "Some of it"
+            },
+            {
+              "value": "not_yet",
+              "label": "Not yet"
+            },
+            {
+              "value": "no",
+              "label": "I let it go"
             }
           ]
         }
