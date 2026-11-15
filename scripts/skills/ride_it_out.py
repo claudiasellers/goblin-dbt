@@ -98,15 +98,15 @@ COPY = {
     "end_line": "You stayed with it. That's the skill.",
     # Hurt myself, safe for now: its own end card, with no "did you act on it?".
     "hurt_end_line": "You stayed with it. The support is still here if it comes back.",
-    # Part 2: the morning card (`ride_morning`, an in-tab card on Today the next 08:00 at least four hours on, so a ride
+    # Part 2: the morning card (`ride_morning`, an in-tab card on Today the next 08:00 at least three hours on, so a ride
     # at 2 a.m. gets it that morning). Offered before the end card, never after Hurt myself; *No card* the quiet way on.
     "morning_title": "Want a card in the morning, to look back on it?",
     "morning_hint": "Seeing it in daylight can show you got through it.",
     "morning_skip": "No card",
     # The card reopens the visit here (R9).
-    "back_title": "The urge you rode out. How is it this morning?",
+    "back_title": "The urge you rode out. How is it now?",
     "back_hint": "Any answer is fine. It's only to notice.",
-    "back_eased": "You rode it out, and here's the morning.",
+    "back_eased": "You rode it out, and here you are.",
     "back_same": "It's still around, and you still got through it.",
     "back_strong": "It's back. You've ridden it once, so you know you can. A card for next time could help too.",
     "ride_again": "Ride it out again",

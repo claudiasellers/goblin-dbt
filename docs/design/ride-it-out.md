@@ -93,9 +93,9 @@ and nothing cold or squeezed for hurt myself (Gate 3: a sensation substitute kee
 - **Built 15 Nov 2026 (part 2), the morning card, with no push and no new runtime condition:** after a ride, before the
   end card, *Want a card in the morning, to look back on it?* (`morning_ask`; *In the morning*, or *No card*, the quiet
   way on). Never after Hurt myself (its own end card) or on the not-safe route. *In the morning* books `ride_morning`,
-  an in-tab card on Today with the spine's `next_local` window (08:00, at least four hours ahead: a ride at 2 a.m. gets
-  it that morning, one at 5 a.m. or later the next), content-free copy (*This morning · Something you rode out. How is
-  it now?*). It reopens the visit at `morning` (R9, asked fresh): *gone · quieter · about the same · back, and strong*,
+  an in-tab card on Today with the spine's `next_local` window (08:00, at least three hours ahead: a ride before 5 a.m.
+  gets it that morning, one from 5 a.m. on the next), content-free copy (*Looking back · Something you rode out. How is
+  it now?*; no *this morning* anywhere, since a card can sit on Today for days). It reopens the visit at `morning` (R9, asked fresh): *gone · quieter · about the same · back, and strong*,
   then `morning_end` (no second close: the visit closed the night before) with a line for each answer; *about the
   same* or *back* offers a pros & cons card for the pull and, for check or use, a habit plan; *back* also offers
   *Ride it out again* (a fresh visit, the pull listed first).

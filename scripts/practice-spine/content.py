@@ -568,10 +568,10 @@ FOLLOW_UP_TYPES = [
         # the resolution. Content-free: it never names the urge. About one morning only, so it goes stale by evening.
         "id": "ride_morning", "ownerModule": "dt", "tier": "practice", "resolveMode": "deeplink",
         "deepLinkTemplate": "/tool/urge-surfing?run={sourceSessionId}&at=morning&followUp={followUpId}",
-        "window": {"kind": "next_local", "time": "08:00", "minAheadHours": 4},
+        "window": {"kind": "next_local", "time": "08:00", "minAheadHours": 3},
         "staleAfterHours": 10, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
         "enabled": True,
-        "copy": {"title": "This morning", "body": "Something you rode out. How is it now?"},
+        "copy": {"title": "Looking back", "body": "Something you rode out. How is it now?"},
         "choices": [{"id": "not_now", "label": "Not now", "status": "dismissed"}],
         "notification": "A check-in you asked for is ready.",
     },

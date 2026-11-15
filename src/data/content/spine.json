@@ -2029,7 +2029,7 @@
         "enabled": true,
         "copy": {
           "body": "Something you rode out. How is it now?",
-          "title": "This morning"
+          "title": "Looking back"
         },
         "choices": [
           {
@@ -2040,7 +2040,7 @@
         ],
         "window": {
           "kind": "next_local",
-          "minAheadHours": 4,
+          "minAheadHours": 3,
           "time": "08:00"
         },
         "notification": "A check-in you asked for is ready."

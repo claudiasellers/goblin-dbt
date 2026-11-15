@@ -65452,11 +65452,11 @@
         "copy": {
           "after_round_hint": "Any answer is fine.",
           "after_round_title": "How is it now?",
-          "back_eased": "You rode it out, and here's the morning.",
+          "back_eased": "You rode it out, and here you are.",
           "back_hint": "Any answer is fine. It's only to notice.",
           "back_same": "It's still around, and you still got through it.",
           "back_strong": "It's back. You've ridden it once, so you know you can. A card for next time could help too.",
-          "back_title": "The urge you rode out. How is it this morning?",
+          "back_title": "The urge you rode out. How is it now?",
           "bigger": "Bigger",
           "bigger_hint": "When it keeps growing, changing what you're doing can help.",
           "bigger_title": "It's getting bigger. Want to try something else for a bit?",

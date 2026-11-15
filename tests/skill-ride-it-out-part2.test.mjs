@@ -1,5 +1,5 @@
 // Ride it out part 2 (DT-05, docs/design/ride-it-out.md): the morning card. After a ride (never after Hurt myself, never
-// on the not-safe route) an optional `ride_morning` card on Today the next 08:00 at least four hours on: no push, no
+// on the not-safe route) an optional `ride_morning` card on Today the next 08:00 at least three hours on: no push, no
 // time-of-day condition, the spine's own `next_local` window. The card reopens the visit at `morning` (R9): how it is
 // this morning, asked fresh, then a line and, when it's back, ride again, a card for next time or a habit plan.
 import { test } from "node:test";
@@ -76,7 +76,7 @@ test("the card reopens the visit at morning, asked fresh; the visit's urge close
   assert.equal(reopen(run(RODE().slice(0, 2)), "morning"), null, "a visit that never reached the offer doesn't reopen here");
   assert.equal(step("morning_end").noClose, true);
   assert.equal(step("morning_end").complete, true);
-  assert.equal(M.copyText(ctx(), step("morning").title, r), "The urge you rode out. How is it this morning?");
+  assert.equal(M.copyText(ctx(), step("morning").title, r), "The urge you rode out. How is it now?");
 });
 
 test("this morning: a line for each answer; back and strong gets ride again, a card, a habit plan for check or use", () => {
@@ -84,7 +84,7 @@ test("this morning: a line for each answer; back and strong gets ride again, a c
   for (const a of ["gone", "quieter"]) {
     const s = at("check", a);
     assert.equal(s.stepId, "morning_end");
-    assert.equal(M.handoffLine(ctx(), step("morning_end"), s), "You rode it out, and here's the morning.");
+    assert.equal(M.handoffLine(ctx(), step("morning_end"), s), "You rode it out, and here you are.");
     assert.deepEqual(offers(s), []);
   }
   const same = at("check", "same");
@@ -103,17 +103,18 @@ test("the card: registered, content-free, resolved on open, a morning window wit
   const t = spine.followUpTypes.find((x) => x.id === "ride_morning");
   assert.ok(t && t.enabled);
   assert.equal(t.deepLinkTemplate, "/tool/urge-surfing?run={sourceSessionId}&at=morning&followUp={followUpId}");
-  assert.deepEqual(t.window, { kind: "next_local", time: "08:00", minAheadHours: 4 });
+  assert.deepEqual(t.window, { kind: "next_local", time: "08:00", minAheadHours: 3 });
   assert.doesNotMatch(`${t.copy.title} ${t.copy.body} ${t.notification}`, /urge|hurt|drink|\buse\b|\bsend\b|\bhit\b|checking/i, "never says what it was");
   assert.match(readFileSync("functions/src/spine/toolSession.ts", "utf8"), /'ride_morning'/);
   assert.match(readFileSync("functions/src/spine/copeAheadAfter.ts", "utf8"), /ride_morning: 'urge-surfing'/);
-  // A ride at 2 a.m. gets it that morning; one at 3 p.m. or 11 p.m., the next.
+  // A ride before 5 a.m. gets it that morning; one at 6 a.m., 3 p.m. or 11 p.m., the next.
   const due = (h) => Win.dueAtFor(t.window, new Date(2026, 10, 15, h, 0));
   assert.equal(due(2).getDate(), 15);
   assert.equal(due(2).getHours(), 8);
   assert.equal(due(15).getDate(), 16);
   assert.equal(due(23).getDate(), 16);
-  assert.equal(due(5).getDate(), 16, "within four hours of 08:00: the next morning, not in three hours");
+  assert.equal(due(4).getDate(), 15, "a ride at 4 a.m. still gets that morning");
+  assert.equal(due(6).getDate(), 16, "within three hours of 08:00: the next morning");
 });
 
 test("the new copy keeps the voice: no should, just, but or exclamation", () => {
