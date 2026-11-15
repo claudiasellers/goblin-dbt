@@ -513,8 +513,13 @@ def check(skill):
         assert at in steps and at != skill["start"], (sid, "an entry names a step other than the start", key, at)
         st = next(s for s in skill["steps"] if s["id"] == at)
         assert "reopens" not in st and "each" not in st, (sid, "an entry isn't a reopens or per-pick step", at)
-    every = json.dumps([copy, [o[2] for o in skill["options"]]], ensure_ascii=False)
+    # `voiceQuotes` (MF-03): option lists that quote the person's own verdicts ("I shouldn't feel this", "I'm
+    # overreacting"), received as said (PRD MF-03 step 1). Only those labels skip the word check; never copy, never "!".
+    quotes = set(skill.get("voiceQuotes", []))
+    assert quotes <= {o[0] for o in skill["options"]}, (sid, "voiceQuotes names option lists", quotes)
+    every = json.dumps([copy, [o[2] for o in skill["options"] if o[0] not in quotes]], ensure_ascii=False)
     assert "!" not in every and not re.search(r"\b(should|just|but|overreact\w*)\b", every, re.I), (sid, "house voice")
+    assert "!" not in json.dumps([o[2] for o in skill["options"] if o[0] in quotes], ensure_ascii=False), (sid, "house voice")
     # An option's `urge` is the ActionUrge id the session records (spine urgeIds): one the graph has.
     for o in skill["options"]:
         if "urge" in o[3]:

@@ -28,6 +28,7 @@ import { FeelingCard } from './FeelingCard';
 import { EpisodeStrip } from './EpisodeStrip';
 import { PebbleBowl } from './PebbleBowl';
 import { ThoughtDrift } from './ThoughtDrift';
+import { DescribeCard } from './DescribeCard';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -104,6 +105,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   kitDeck: KitDeck,
   inlineSkill: InlineSkillEmbed,
   pebbleBowl: PebbleBowl,
+  describeCard: DescribeCard,
 };
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
@@ -151,6 +153,8 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   // MF-01's bowl: the time noticed, and how many pebbles dropped (returns: a measure, never shown).
   // `room`: the person took the quiet *Back to the room* during the noticing (PRD MF rule 3).
   pebbleBowl: { ids: ['done', 'partly', 'skipped', 'room'], measures: ['durationSec', 'doneCount'] },
+  // MF-03's rebuild: read, then *How does that sit?*.
+  describeCard: { ids: ['read'] },
 };
 
 /**
@@ -551,5 +555,20 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     skip: { type: 'copy', optional: true },
     /** The quiet *Back to the room* while noticing; reports `room`. */
     room: { type: 'copy', optional: true },
+  },
+
+  // MF-03 (docs/design/unpack-a-judgment.md): the person's picks under the judgment, as a first-person description.
+  describeCard: {
+    happened: { type: 'field', optional: true },
+    cost: { type: 'field', optional: true },
+    feel: { type: 'field', optional: true },
+    want: { type: 'field', optional: true },
+    /** Before the feelings: *I feel*. */
+    feelLead: { type: 'copy' },
+    /** Before each thing that mattered: *I wanted*. */
+    wantLead: { type: 'copy' },
+    next: { type: 'copy' },
+    /** The way on when nothing was picked. */
+    empty: { type: 'copy' },
   },
 };

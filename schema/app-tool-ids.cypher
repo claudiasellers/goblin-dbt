@@ -22,6 +22,7 @@ UNWIND [
   {c: "dbt_recovering_from_invalidation", t: "recovering-from-invalidation"},
   {c: "dbt_wise_mind", t: "wise-mind"},
   {c: "dbt_observe", t: "notice-and-name"},
+  {c: "dbt_nonjudgmental", t: "unpack-a-judgment"},
   {c: "dbt_cope_ahead", t: "cope-ahead"},
   {c: "dbt_check_facts", t: "check-the-facts"},
   {c: "dbt_troubleshooting", t: "er-troubleshoot"},

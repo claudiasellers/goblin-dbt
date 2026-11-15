@@ -160,6 +160,9 @@ Added by F1 (docs/design/dbt-modules-plan.md §4, 10 Nov 2026):
 - **`safetyFirst`** (DT-02): a step's condition; when the run arrives at the step and it holds, the player opens
   `safety.open` over it before it can be answered (once per arrival, a resumed run landing on it included). `build.py` requires the
   `safety_open` exit and a crisis slot on the step. Hold to wait's *Hurt myself* → `safe` is the first user.
+- **`voiceQuotes`** (MF-03): option lists that quote the person's own verdicts (Unpack a judgment's *I shouldn't feel
+  this*, *I'm overreacting*). `build.py`'s house-voice word check (*should*, *just*, *but*, *overreact…*) skips only those
+  labels; the skill's copy is still checked, and no option may hold a *!*.
 - **Practice and `noClose`** (DT-02): a whole-screen embed's output other than `skipped` marks the session
   practiced; leaving a `noClose` card also dismisses Today's outcome card for the session (`answerToolOutcome`
   `dismissed`), so the question it didn't ask isn't asked later.

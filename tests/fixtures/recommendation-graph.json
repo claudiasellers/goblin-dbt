@@ -580,6 +580,17 @@
    "direction": null,
    "addresses": []
   },
+  "dbt_nonjudgmental": {
+   "appToolId": "unpack-a-judgment",
+   "name": "Non-judgmentally",
+   "description": "See without evaluating as good or bad; stick to facts",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": "acceptance",
+   "skillKind": "naming",
+   "direction": "neutral",
+   "addresses": []
+  },
   "dbt_observe": {
    "appToolId": "notice-and-name",
    "name": "Observe",
@@ -4498,7 +4509,38 @@
    "active": true,
    "version": "rf-v2",
    "reviewStatus": "approved",
-   "rationale": "Planned: Check the Facts beside Do the Opposite (unhiding) for shame about the self."
+   "rationale": "Check the Facts for shame about the self; since MF-B2 the fallback behind Unpack a judgment's row (Unpack's dissociation and freeze guard can't fire beside Social threat today), Unpack reaching it as its justified branch."
+  },
+  {
+   "id": "rf_social_threat_shame_words_self-worth_unpack-a-judgment",
+   "conceptId": "dbt_nonjudgmental",
+   "patternId": "social_threat_shame",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 1.45,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "insecure",
+    "inadequate",
+    "inferior",
+    "insignificant",
+    "weak",
+    "worthless"
+   ],
+   "beside": [],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "approved",
+   "rationale": "MF-03 (PRD: the second card for Social threat): these words are verdicts about the self, often the only words a person has for shame, so Unpack a judgment takes the swap beside Recover. Check the Facts stays the next row and is its justified branch (It feels like a fact, with shame) (15 Nov 2026)."
   }
  ],
  "contraindicated": [
@@ -4508,6 +4550,14 @@
   },
   {
    "conceptId": "dbt_mindfulness_current_emotion",
+   "targetId": "dissociation_overmodulation"
+  },
+  {
+   "conceptId": "dbt_nonjudgmental",
+   "targetId": "conservation_freeze"
+  },
+  {
+   "conceptId": "dbt_nonjudgmental",
    "targetId": "dissociation_overmodulation"
   },
   {

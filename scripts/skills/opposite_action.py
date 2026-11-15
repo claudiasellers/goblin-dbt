@@ -401,7 +401,11 @@ STEPS = [
             # question; the body first with a flooded reading (the check is skipped then).
             [{"exit": "cool_down", "when": {"all": [FLOODED, NOT_CHECKED, {"not": LATE_VALID}]}},
              {"exit": "check_the_facts", "when": {"any": [NOT_CHECKED, CHECKED("left"), CHECKED("finished")]}},
-             {"exit": "wise_mind", "when": {"any": [CHECKED("unsure"), CHECKED("doesnt_fit"), CHECKED_FITS, LATE_UNSURE]}}]),
+             {"exit": "wise_mind", "when": {"any": [CHECKED("unsure"), CHECKED("doesnt_fit"), CHECKED_FITS, LATE_UNSURE]}},
+             # Shame or guilt that doesn't fit is often a verdict about the self: unpack it (MF-03, PRD entry points).
+             # Never with the urge to punish myself: the crisis banner this screen shows wouldn't follow.
+             {"exit": "unpack", "when": {"all": [{"in": ["$d.parent", ["guilt", "shame"]]}, {"not": FLOODED}, {"not": PUNISH},
+                                                 {"any": [CHECKED("doesnt_fit"), EQ("fits", "not_fit")]}]}}]),
     handoff("prob", [{"when": CHECKED("partly"), "key": "prob_title_partly"}, {"when": CHECKED("fits"), "key": "prob_title_checked"},
                      {"key": "prob_title"}],
             [{"when": CHECKED("partly"), "key": "prob_partly"},
@@ -560,6 +564,7 @@ EXITS = [
     {"id": "ending", "toolId": "ending-relationships", "query": {"frame": "careful"}},  # danger from someone (IE-08)
     {"id": "er_troubleshoot", "toolId": "er-troubleshoot"},                        # the pull got stronger (ER-14)
     {"id": "wise_mind", "toolId": "wise-mind"},                                    # not sure, after the check (ER-B5)
+    {"id": "unpack", "toolId": "unpack-a-judgment", "query": {"frame": "after_facts"}},  # shame or guilt that doesn't fit (MF-03)
     {"id": "safety_open", "toolId": None, "safety": True},                         # safety.open (R6)
     {"id": "done", "done": True},
 ]

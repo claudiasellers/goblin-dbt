@@ -52706,6 +52706,54 @@
          }
         ]
        }
+      },
+      {
+       "exit": "unpack",
+       "when": {
+        "all": [
+         {
+          "in": [
+           "$d.parent",
+           [
+            "guilt",
+            "shame"
+           ]
+          ]
+         },
+         {
+          "not": {
+           "eq": [
+            "$ctx.band",
+            "flooded"
+           ]
+          }
+         },
+         {
+          "not": {
+           "eq": [
+            "$a.urge",
+            "guilt-punish"
+           ]
+          }
+         },
+         {
+          "any": [
+           {
+            "has": [
+             "$a.checked.ids",
+             "doesnt_fit"
+            ]
+           },
+           {
+            "eq": [
+             "$a.fits",
+             "not_fit"
+            ]
+           }
+          ]
+         }
+        ]
+       }
       }
      ]
     },
@@ -54344,6 +54392,15 @@
      "carry": [],
      "done": false,
      "safety": true
+    },
+    {
+     "id": "unpack",
+     "toolId": "unpack-a-judgment",
+     "query": {
+      "frame": "after_facts"
+     },
+     "carry": [],
+     "done": false
     },
     {
      "id": "wave",
@@ -73411,6 +73468,2520 @@
      {
       "value": "much_better",
       "label": "Much further away"
+     }
+    ]
+   }
+  },
+  {
+   "id": "unpack_a_judgment",
+   "toolId": "unpack-a-judgment",
+   "version": "uj-v1",
+   "start": "about",
+   "accepts": [
+    "band",
+    "frame"
+   ],
+   "ownMax": 60,
+   "emotionFields": [
+    "feel"
+   ],
+   "copy": {
+    "about_title": "What's the judgment about?",
+    "about_hint": "A judgment is a verdict in a few words, like “I'm too much” or “they don't care”.",
+    "judge_title": "What's the judgment?",
+    "judge_hint": "Pick the closest, or put it in your words.",
+    "judge_own": "In my own words",
+    "set_down_title": "A judgment can wait.",
+    "set_down_line": "Your body's loud right now. Body first, then come back to it if you want.",
+    "harm_title": "Thank you for saying it.",
+    "harm_line": "That's more than a judgment. Someone to talk to comes first.",
+    "see_title": "“{judge}”",
+    "witness_me": "That's a heavy thing to be carrying.",
+    "witness_feeling": "A feeling, and a verdict about it too. That's a lot at once.",
+    "witness_them": "Something they did got to you. Setting the verdict down isn't agreeing with what they did.",
+    "witness_should": "Something isn't the way you hoped or needed. That's hard.",
+    "see_hint": "That's a judgment, a verdict in a few words. Minds make them all the time. You can set it down for a few minutes and look at what's under it.",
+    "facts_title": "It feels like a fact.",
+    "facts_line": "Shame or guilt can fit what happened, and then it asks for something to be done. Checking the facts looks at the feeling, not at whether the verdict is true.",
+    "facts_hint": "Either is fine.",
+    "facts_go_title": "Check the Facts, then.",
+    "facts_go_line": "It looks at the feeling and what happened. Nothing in it decides whether you're a bad person.",
+    "pick_title": "Which would help most to look at?",
+    "pick_hint": "One for now. The rest can wait.",
+    "happened_title": "What happened, the way a camera would see it?",
+    "happened_hint": "Only what could be filmed. Up to two, or skip.",
+    "happened_fact": "It can feel like a fact. Start with what a camera would catch.",
+    "happened_own": "Something else",
+    "cost_title": "What did it cost, or what could it cost?",
+    "cost_hint": "Up to two, or skip.",
+    "cost_own": "Something else",
+    "feel_title": "What might you be feeling, under the judgment?",
+    "feel_hint": "A guess is fine. Up to two, or skip.",
+    "feel_more": "Something else",
+    "want_title": "What did you want, or what matters to you here?",
+    "want_hint": "One is plenty, or skip.",
+    "want_them": "Not judging isn't agreeing. What you wanted still matters.",
+    "want_own": "In my own words",
+    "danger_title": "That's about your safety, not a judgment to unpack.",
+    "danger_line": "Your read of danger is the one that counts here.",
+    "rebuild_title": "Here's what you found.",
+    "feel_lead": "I feel",
+    "want_lead": "I wanted",
+    "rebuild_empty": "Go on",
+    "sit_title": "How does that sit, next to the judgment?",
+    "sit_hint": "It isn't truer or better, only described.",
+    "fix_title": "Which part would you change?",
+    "kept_title": "That's okay.",
+    "kept_line": "You noticed it as a judgment. That's the skill.",
+    "noticed_title": "You noticed it as a judgment.",
+    "noticed_line": "That's the skill, even without taking it apart today.",
+    "hands_q_title": "To finish, twenty seconds with your hands open?",
+    "hands_q_hint": "Willing hands: palms up, letting this moment be what it is. It doesn't mean what happened was okay. Optional.",
+    "hands_title": "Willing hands.",
+    "hands_step1": "Arms loose by your sides or in your lap.",
+    "hands_step2": "Turn your palms up, or rest them however feels safe.",
+    "hands_step3": "Let your fingers relax. Breathe however you breathe.",
+    "hands_caution": "If it feels right, let your face soften too. You don't have to smile.",
+    "hands_start": "Start",
+    "hands_running": "Hands open",
+    "hands_done": "That's it.",
+    "end_title": "You took it apart instead of carrying it whole.",
+    "end_them": "What you wanted still counts, whatever they did. Next time, noticing the judgment is the practice.",
+    "end_want": "What you wanted is still there, without the verdict. Next time, noticing the judgment is the practice.",
+    "end_line": "When it shows up again, noticing it as a judgment is the practice.",
+    "safety_chip": "It's more than a judgment. I'm thinking about hurting myself or not being here",
+    "safety_link": "Thoughts of hurting myself or not being here",
+    "heavy_line": "Heavy feelings can come with thoughts of not being here. If they do, talk to someone now.",
+    "back_to_room": "Back to the room",
+    "safety_open": "Talk to someone now",
+    "next": "Next",
+    "done": "Done",
+    "kept_line_heavy": "You noticed it as a judgment. That's the skill. Heavy feelings can come with thoughts of not being here. If they do, talk to someone now.",
+    "noticed_line_heavy": "That's the skill, even without taking it apart today. Heavy feelings can come with thoughts of not being here. If they do, talk to someone now.",
+    "end_them_heavy": "What you wanted still counts, whatever they did. Next time, noticing the judgment is the practice. Heavy feelings can come with thoughts of not being here. If they do, talk to someone now.",
+    "end_want_heavy": "What you wanted is still there, without the verdict. Next time, noticing the judgment is the practice. Heavy feelings can come with thoughts of not being here. If they do, talk to someone now.",
+    "end_line_heavy": "When it shows up again, noticing it as a judgment is the practice. Heavy feelings can come with thoughts of not being here. If they do, talk to someone now."
+   },
+   "tables": {
+    "wantFirstOf": {
+     "me": "show_up",
+     "feeling": "understood",
+     "them": "safe",
+     "should": "fair"
+    },
+    "feelOf": {
+     "me": [
+      "ashamed",
+      "embarrassed",
+      "guilty",
+      "sad",
+      "hurt",
+      "lonely",
+      "angry",
+      "frustrated",
+      "disappointed",
+      "anxious"
+     ],
+     "feeling": [
+      "ashamed",
+      "embarrassed",
+      "guilty",
+      "sad",
+      "hurt",
+      "lonely",
+      "angry",
+      "frustrated",
+      "disappointed",
+      "anxious"
+     ],
+     "them": [
+      "angry",
+      "hurt",
+      "frustrated",
+      "disappointed",
+      "sad",
+      "lonely",
+      "anxious",
+      "embarrassed"
+     ],
+     "should": [
+      "disappointed",
+      "sad",
+      "frustrated",
+      "angry",
+      "hurt",
+      "anxious",
+      "lonely"
+     ]
+    }
+   },
+   "derive": [
+    {
+     "name": "wantFirst",
+     "from": "$a.about",
+     "table": "wantFirstOf"
+    },
+    {
+     "name": "feelFirst",
+     "from": "$a.about",
+     "table": "feelOf"
+    }
+   ],
+   "steps": [
+    {
+     "id": "about",
+     "kind": "ask",
+     "title": "about_title",
+     "fields": [
+      {
+       "id": "about",
+       "options": {
+        "list": "about"
+       },
+       "max": 1,
+       "required": true,
+       "links": []
+      }
+     ],
+     "hint": "about_hint",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.about",
+         "harm"
+        ]
+       }
+      },
+      {
+       "variant": "other_person",
+       "when": {
+        "eq": [
+         "$a.about",
+         "danger"
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "harm",
+       "when": {
+        "eq": [
+         "$a.about",
+         "harm"
+        ]
+       }
+      },
+      {
+       "to": "danger",
+       "when": {
+        "eq": [
+         "$a.about",
+         "danger"
+        ]
+       }
+      },
+      {
+       "to": "set_down",
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       }
+      },
+      {
+       "to": "judge",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "harm",
+     "kind": "handoff",
+     "complete": false,
+     "title": "harm_title",
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "harm_line"
+      }
+     ],
+     "done": "done",
+     "links": [],
+     "noClose": true,
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "judge",
+     "kind": "ask",
+     "title": "judge_title",
+     "fields": [
+      {
+       "id": "judge",
+       "options": {
+        "list": "judge",
+        "where": {
+         "has": [
+          "$opt.t",
+          "$a.about"
+         ]
+        }
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_link",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "own": {
+        "hint": "judge_own",
+        "countsAsPick": true
+       }
+      }
+     ],
+     "hint": "judge_hint",
+     "next": [
+      {
+       "to": "see",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "set_down",
+     "kind": "handoff",
+     "complete": false,
+     "title": "set_down_title",
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "set_down_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_link",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "next": [],
+     "offers": [
+      {
+       "exit": "cool_down",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "see",
+     "kind": "ask",
+     "title": "see_title",
+     "fields": [
+      {
+       "id": "see",
+       "options": {
+        "list": "see",
+        "where": {
+         "any": [
+          {
+           "not": {
+            "set": "$opt.t"
+           }
+          },
+          {
+           "has": [
+            "$opt.t",
+            "$a.about"
+           ]
+          }
+         ]
+        }
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "five_senses",
+         "label": "back_to_room",
+         "when": {
+          "all": []
+         }
+        },
+        {
+         "exit": "safety_open",
+         "label": "safety_link",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "see_hint",
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.about",
+         "me"
+        ]
+       },
+       "key": "witness_me"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.about",
+         "feeling"
+        ]
+       },
+       "key": "witness_feeling"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.about",
+         "them"
+        ]
+       },
+       "key": "witness_them"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.about",
+         "should"
+        ]
+       },
+       "key": "witness_should"
+      }
+     ],
+     "titleSlots": {
+      "judge": {
+       "labelOf": "judge"
+      }
+     },
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "in": [
+         "$a.see",
+         [
+          "threat",
+          "threat_any"
+         ]
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "danger",
+       "when": {
+        "in": [
+         "$a.see",
+         [
+          "threat",
+          "threat_any"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "facts",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.see",
+           "fact"
+          ]
+         },
+         {
+          "not": {
+           "eq": [
+            "$ctx.frame",
+            "after_facts"
+           ]
+          }
+         },
+         {
+          "any": [
+           {
+            "some": [
+             "judge",
+             {
+              "in": [
+               "$opt.hint",
+               [
+                "shame",
+                "guilt"
+               ]
+              ]
+             }
+            ]
+           },
+           {
+            "all": [
+             {
+              "any": [
+               {
+                "in": [
+                 "$a.about",
+                 [
+                  "me",
+                  "feeling"
+                 ]
+                ]
+               },
+               {
+                "own": "judge"
+               }
+              ]
+             },
+             {
+              "any": [
+               {
+                "has": [
+                 "$carried",
+                 "ashamed"
+                ]
+               },
+               {
+                "has": [
+                 "$carried",
+                 "embarrassed"
+                ]
+               },
+               {
+                "has": [
+                 "$carried",
+                 "guilty"
+                ]
+               },
+               {
+                "has": [
+                 "$carried",
+                 "remorseful"
+                ]
+               },
+               {
+                "has": [
+                 "$carried",
+                 "humiliated"
+                ]
+               },
+               {
+                "has": [
+                 "$carried",
+                 "worthless"
+                ]
+               },
+               {
+                "has": [
+                 "$carried",
+                 "inadequate"
+                ]
+               },
+               {
+                "has": [
+                 "$carried",
+                 "inferior"
+                ]
+               },
+               {
+                "has": [
+                 "$carried",
+                 "insecure"
+                ]
+               },
+               {
+                "has": [
+                 "$carried",
+                 "insignificant"
+                ]
+               },
+               {
+                "has": [
+                 "$carried",
+                 "weak"
+                ]
+               },
+               {
+                "has": [
+                 "$carried",
+                 "exposed"
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "pick",
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "stirred"
+        ]
+       }
+      },
+      {
+       "to": "happened",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "facts",
+     "kind": "ask",
+     "title": "facts_title",
+     "fields": [
+      {
+       "id": "facts",
+       "options": {
+        "list": "facts"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "five_senses",
+         "label": "back_to_room",
+         "when": {
+          "all": []
+         }
+        },
+        {
+         "exit": "safety_open",
+         "label": "safety_link",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "facts_hint",
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "facts_line"
+      }
+     ],
+     "next": [
+      {
+       "to": "facts_go",
+       "when": {
+        "eq": [
+         "$a.facts",
+         "check"
+        ]
+       }
+      },
+      {
+       "to": "pick",
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "stirred"
+        ]
+       }
+      },
+      {
+       "to": "happened",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "facts_go",
+     "kind": "handoff",
+     "complete": false,
+     "title": "facts_go_title",
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "facts_go_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_link",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "next": [],
+     "offers": [
+      {
+       "exit": "check_the_facts",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "pick",
+     "kind": "ask",
+     "title": "pick_title",
+     "fields": [
+      {
+       "id": "pick",
+       "options": {
+        "list": "pick"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "five_senses",
+         "label": "back_to_room",
+         "when": {
+          "all": []
+         }
+        },
+        {
+         "exit": "safety_open",
+         "label": "safety_link",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "pick_hint",
+     "next": [
+      {
+       "to": "want",
+       "when": {
+        "eq": [
+         "$a.pick",
+         "want"
+        ]
+       }
+      },
+      {
+       "to": "feel",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "happened",
+     "kind": "ask",
+     "title": "happened_title",
+     "fields": [
+      {
+       "id": "happened",
+       "options": {
+        "list": "happened",
+        "where": {
+         "has": [
+          "$opt.t",
+          "$a.about"
+         ]
+        }
+       },
+       "max": 2,
+       "required": false,
+       "links": [
+        {
+         "exit": "five_senses",
+         "label": "back_to_room",
+         "when": {
+          "all": []
+         }
+        },
+        {
+         "exit": "safety_open",
+         "label": "safety_link",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "own": {
+        "hint": "happened_own",
+        "countsAsPick": true
+       }
+      }
+     ],
+     "hint": "happened_hint",
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.see",
+         "fact"
+        ]
+       },
+       "key": "happened_fact"
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "any": [
+         {
+          "has": [
+           "$a.happened.ids",
+           "threat"
+          ]
+         },
+         {
+          "has": [
+           "$a.happened.ids",
+           "threat_any"
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "danger",
+       "when": {
+        "any": [
+         {
+          "has": [
+           "$a.happened.ids",
+           "threat"
+          ]
+         },
+         {
+          "has": [
+           "$a.happened.ids",
+           "threat_any"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "rebuild",
+       "when": {
+        "all": [
+         {
+          "set": "$a.fix"
+         },
+         {
+          "any": [
+           {
+            "set": "$a.happened"
+           },
+           {
+            "set": "$a.cost"
+           },
+           {
+            "set": "$a.feel"
+           },
+           {
+            "set": "$a.want"
+           }
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "noticed",
+       "when": {
+        "set": "$a.fix"
+       }
+      },
+      {
+       "to": "cost",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "danger",
+     "kind": "handoff",
+     "complete": false,
+     "title": "danger_title",
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "danger_line"
+      }
+     ],
+     "done": "done",
+     "links": [],
+     "noClose": true,
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "ending",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "cost",
+     "kind": "ask",
+     "title": "cost_title",
+     "fields": [
+      {
+       "id": "cost",
+       "options": {
+        "list": "cost",
+        "where": {
+         "has": [
+          "$opt.t",
+          "$a.about"
+         ]
+        }
+       },
+       "max": 2,
+       "required": false,
+       "links": [
+        {
+         "exit": "five_senses",
+         "label": "back_to_room",
+         "when": {
+          "all": []
+         }
+        },
+        {
+         "exit": "safety_open",
+         "label": "safety_link",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "own": {
+        "hint": "cost_own",
+        "countsAsPick": true
+       }
+      }
+     ],
+     "hint": "cost_hint",
+     "next": [
+      {
+       "to": "rebuild",
+       "when": {
+        "all": [
+         {
+          "set": "$a.fix"
+         },
+         {
+          "any": [
+           {
+            "set": "$a.happened"
+           },
+           {
+            "set": "$a.cost"
+           },
+           {
+            "set": "$a.feel"
+           },
+           {
+            "set": "$a.want"
+           }
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "noticed",
+       "when": {
+        "set": "$a.fix"
+       }
+      },
+      {
+       "to": "feel",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "feel",
+     "kind": "ask",
+     "title": "feel_title",
+     "fields": [
+      {
+       "id": "feel",
+       "options": {
+        "emotions": [
+         "ashamed",
+         "embarrassed",
+         "guilty",
+         "sad",
+         "hurt",
+         "lonely",
+         "angry",
+         "frustrated",
+         "disappointed",
+         "anxious"
+        ],
+        "emotionsFrom": "$d.feelFirst",
+        "carriedFirst": true,
+        "moreKey": "feel_more"
+       },
+       "max": 2,
+       "required": false,
+       "links": [
+        {
+         "exit": "five_senses",
+         "label": "back_to_room",
+         "when": {
+          "all": []
+         }
+        },
+        {
+         "exit": "safety_open",
+         "label": "safety_link",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "emotion": true
+      }
+     ],
+     "hint": "feel_hint",
+     "next": [
+      {
+       "to": "rebuild",
+       "when": {
+        "all": [
+         {
+          "any": [
+           {
+            "set": "$a.fix"
+           },
+           {
+            "eq": [
+             "$ctx.band",
+             "stirred"
+            ]
+           }
+          ]
+         },
+         {
+          "any": [
+           {
+            "set": "$a.happened"
+           },
+           {
+            "set": "$a.cost"
+           },
+           {
+            "set": "$a.feel"
+           },
+           {
+            "set": "$a.want"
+           }
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "noticed",
+       "when": {
+        "any": [
+         {
+          "set": "$a.fix"
+         },
+         {
+          "eq": [
+           "$ctx.band",
+           "stirred"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "want",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "want",
+     "kind": "ask",
+     "title": "want_title",
+     "fields": [
+      {
+       "id": "want",
+       "options": {
+        "list": "want",
+        "where": {
+         "has": [
+          "$opt.t",
+          "$a.about"
+         ]
+        },
+        "firstFrom": "$d.wantFirst"
+       },
+       "max": 1,
+       "required": false,
+       "links": [
+        {
+         "exit": "five_senses",
+         "label": "back_to_room",
+         "when": {
+          "all": []
+         }
+        },
+        {
+         "exit": "safety_open",
+         "label": "safety_link",
+         "when": {
+          "all": []
+         }
+        }
+       ],
+       "own": {
+        "hint": "want_own",
+        "countsAsPick": true
+       }
+      }
+     ],
+     "hint": "want_hint",
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.about",
+         "them"
+        ]
+       },
+       "key": "want_them"
+      }
+     ],
+     "next": [
+      {
+       "to": "rebuild",
+       "when": {
+        "any": [
+         {
+          "set": "$a.happened"
+         },
+         {
+          "set": "$a.cost"
+         },
+         {
+          "set": "$a.feel"
+         },
+         {
+          "set": "$a.want"
+         }
+        ]
+       }
+      },
+      {
+       "to": "noticed",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "rebuild",
+     "kind": "embed",
+     "embed": "describeCard",
+     "answerAs": "rebuild",
+     "title": "rebuild_title",
+     "props": {
+      "happened": "happened",
+      "cost": "cost",
+      "feel": "feel",
+      "want": "want",
+      "feelLead": "feel_lead",
+      "wantLead": "want_lead",
+      "next": "next",
+      "empty": "rebuild_empty"
+     },
+     "links": [
+      {
+       "exit": "five_senses",
+       "label": "back_to_room",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "safety_open",
+       "label": "safety_link",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "sit",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "sit",
+     "kind": "ask",
+     "title": "sit_title",
+     "fields": [
+      {
+       "id": "sit",
+       "options": {
+        "list": "sit",
+        "where": {
+         "any": [
+          {
+           "not": {
+            "set": "$a.fix"
+           }
+          },
+          {
+           "not": {
+            "eq": [
+             "$opt.once",
+             true
+            ]
+           }
+          }
+         ]
+        }
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "five_senses",
+         "label": "back_to_room",
+         "when": {
+          "all": []
+         }
+        },
+        {
+         "exit": "safety_open",
+         "label": "safety_link",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "sit_hint",
+     "next": [
+      {
+       "to": "fix",
+       "when": {
+        "eq": [
+         "$a.sit",
+         "not_quite"
+        ]
+       }
+      },
+      {
+       "to": "kept",
+       "when": {
+        "eq": [
+         "$a.sit",
+         "keep"
+        ]
+       }
+      },
+      {
+       "to": "end",
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "stirred"
+        ]
+       }
+      },
+      {
+       "to": "hands_q",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "fix",
+     "kind": "ask",
+     "title": "fix_title",
+     "fields": [
+      {
+       "id": "fix",
+       "options": {
+        "list": "fix",
+        "where": {
+         "any": [
+          {
+           "not": {
+            "eq": [
+             "$ctx.band",
+             "stirred"
+            ]
+           }
+          },
+          {
+           "eq": [
+            "$opt.short",
+            true
+           ]
+          }
+         ]
+        }
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "five_senses",
+         "label": "back_to_room",
+         "when": {
+          "all": []
+         }
+        },
+        {
+         "exit": "safety_open",
+         "label": "safety_link",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "happened",
+       "when": {
+        "eq": [
+         "$a.fix",
+         "happened"
+        ]
+       }
+      },
+      {
+       "to": "cost",
+       "when": {
+        "eq": [
+         "$a.fix",
+         "cost"
+        ]
+       }
+      },
+      {
+       "to": "feel",
+       "when": {
+        "eq": [
+         "$a.fix",
+         "feel"
+        ]
+       }
+      },
+      {
+       "to": "want",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "kept",
+     "kind": "handoff",
+     "complete": true,
+     "title": "kept_title",
+     "lines": [
+      {
+       "when": {
+        "any": [
+         {
+          "has": [
+           "$carried",
+           "worthless"
+          ]
+         },
+         {
+          "has": [
+           "$carried",
+           "despair"
+          ]
+         },
+         {
+          "has": [
+           "$carried",
+           "helpless"
+          ]
+         },
+         {
+          "has": [
+           "$carried",
+           "powerless"
+          ]
+         }
+        ]
+       },
+       "key": "kept_line_heavy"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "kept_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_link",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "next": [],
+     "offers": [
+      {
+       "exit": "safety_open",
+       "when": {
+        "any": [
+         {
+          "has": [
+           "$carried",
+           "worthless"
+          ]
+         },
+         {
+          "has": [
+           "$carried",
+           "despair"
+          ]
+         },
+         {
+          "has": [
+           "$carried",
+           "helpless"
+          ]
+         },
+         {
+          "has": [
+           "$carried",
+           "powerless"
+          ]
+         }
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "id": "noticed",
+     "kind": "handoff",
+     "complete": true,
+     "title": "noticed_title",
+     "lines": [
+      {
+       "when": {
+        "any": [
+         {
+          "has": [
+           "$carried",
+           "worthless"
+          ]
+         },
+         {
+          "has": [
+           "$carried",
+           "despair"
+          ]
+         },
+         {
+          "has": [
+           "$carried",
+           "helpless"
+          ]
+         },
+         {
+          "has": [
+           "$carried",
+           "powerless"
+          ]
+         }
+        ]
+       },
+       "key": "noticed_line_heavy"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "noticed_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_link",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "next": [],
+     "offers": [
+      {
+       "exit": "safety_open",
+       "when": {
+        "any": [
+         {
+          "has": [
+           "$carried",
+           "worthless"
+          ]
+         },
+         {
+          "has": [
+           "$carried",
+           "despair"
+          ]
+         },
+         {
+          "has": [
+           "$carried",
+           "helpless"
+          ]
+         },
+         {
+          "has": [
+           "$carried",
+           "powerless"
+          ]
+         }
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "id": "hands_q",
+     "kind": "ask",
+     "title": "hands_q_title",
+     "fields": [
+      {
+       "id": "hands_q",
+       "options": {
+        "list": "hands"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_link",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "hands_q_hint",
+     "next": [
+      {
+       "to": "hands",
+       "when": {
+        "eq": [
+         "$a.hands_q",
+         "yes"
+        ]
+       }
+      },
+      {
+       "to": "end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "hands",
+     "kind": "embed",
+     "embed": "bodyCard",
+     "answerAs": "hands",
+     "title": "hands_title",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_link",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "props": {
+      "kind": "willing",
+      "seconds": 20,
+      "step1": "hands_step1",
+      "step2": "hands_step2",
+      "step3": "hands_step3",
+      "caution": "hands_caution",
+      "start": "hands_start",
+      "running": "hands_running",
+      "done": "hands_done",
+      "next": "next"
+     },
+     "next": [
+      {
+       "to": "end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "end",
+     "kind": "handoff",
+     "complete": true,
+     "title": "end_title",
+     "lines": [
+      {
+       "when": {
+        "all": [
+         {
+          "any": [
+           {
+            "has": [
+             "$carried",
+             "worthless"
+            ]
+           },
+           {
+            "has": [
+             "$carried",
+             "despair"
+            ]
+           },
+           {
+            "has": [
+             "$carried",
+             "helpless"
+            ]
+           },
+           {
+            "has": [
+             "$carried",
+             "powerless"
+            ]
+           }
+          ]
+         },
+         {
+          "eq": [
+           "$a.about",
+           "them"
+          ]
+         },
+         {
+          "set": "$a.want"
+         }
+        ]
+       },
+       "key": "end_them_heavy"
+      },
+      {
+       "when": {
+        "all": [
+         {
+          "any": [
+           {
+            "has": [
+             "$carried",
+             "worthless"
+            ]
+           },
+           {
+            "has": [
+             "$carried",
+             "despair"
+            ]
+           },
+           {
+            "has": [
+             "$carried",
+             "helpless"
+            ]
+           },
+           {
+            "has": [
+             "$carried",
+             "powerless"
+            ]
+           }
+          ]
+         },
+         {
+          "set": "$a.want"
+         }
+        ]
+       },
+       "key": "end_want_heavy"
+      },
+      {
+       "when": {
+        "any": [
+         {
+          "has": [
+           "$carried",
+           "worthless"
+          ]
+         },
+         {
+          "has": [
+           "$carried",
+           "despair"
+          ]
+         },
+         {
+          "has": [
+           "$carried",
+           "helpless"
+          ]
+         },
+         {
+          "has": [
+           "$carried",
+           "powerless"
+          ]
+         }
+        ]
+       },
+       "key": "end_line_heavy"
+      },
+      {
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.about",
+           "them"
+          ]
+         },
+         {
+          "set": "$a.want"
+         }
+        ]
+       },
+       "key": "end_them"
+      },
+      {
+       "when": {
+        "set": "$a.want"
+       },
+       "key": "end_want"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "end_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_link",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "next": [],
+     "offers": [
+      {
+       "exit": "safety_open",
+       "when": {
+        "any": [
+         {
+          "has": [
+           "$carried",
+           "worthless"
+          ]
+         },
+         {
+          "has": [
+           "$carried",
+           "despair"
+          ]
+         },
+         {
+          "has": [
+           "$carried",
+           "helpless"
+          ]
+         },
+         {
+          "has": [
+           "$carried",
+           "powerless"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "exit": "values",
+       "when": {
+        "set": "$a.want"
+       }
+      },
+      {
+       "exit": "recover",
+       "when": {
+        "eq": [
+         "$a.about",
+         "them"
+        ]
+       }
+      }
+     ]
+    }
+   ],
+   "exits": [
+    {
+     "id": "check_the_facts",
+     "toolId": "check-the-facts",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "cool_down",
+     "toolId": "cool-down",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "done",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": true
+    },
+    {
+     "id": "ending",
+     "toolId": "ending-relationships",
+     "query": {
+      "frame": "careful"
+     },
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "five_senses",
+     "toolId": "five-senses",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "recover",
+     "toolId": "recovering-from-invalidation",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "safety_open",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": false,
+     "safety": true
+    },
+    {
+     "id": "values",
+     "toolId": "values-clarification",
+     "query": {},
+     "carry": [],
+     "done": false
+    }
+   ],
+   "options": {
+    "about": [
+     {
+      "value": "me",
+      "label": "Me"
+     },
+     {
+      "value": "feeling",
+      "label": "A feeling I'm having"
+     },
+     {
+      "value": "them",
+      "label": "Someone else"
+     },
+     {
+      "value": "should",
+      "label": "How things are"
+     },
+     {
+      "value": "harm",
+      "label": "It's more than a judgment. I'm thinking about hurting myself or not being here",
+      "danger": "self"
+     },
+     {
+      "value": "danger",
+      "label": "Someone threatened me, scared me or hurt me",
+      "danger": "other"
+     }
+    ],
+    "judge": [
+     {
+      "value": "too_much",
+      "label": "I'm too much",
+      "t": [
+       "me"
+      ],
+      "hint": "shame"
+     },
+     {
+      "value": "pathetic",
+      "label": "I'm pathetic",
+      "t": [
+       "me"
+      ],
+      "hint": "shame"
+     },
+     {
+      "value": "ruin",
+      "label": "I ruin everything",
+      "t": [
+       "me"
+      ],
+      "hint": "guilt"
+     },
+     {
+      "value": "lazy",
+      "label": "I'm lazy",
+      "t": [
+       "me"
+      ],
+      "hint": "shame"
+     },
+     {
+      "value": "wrong_with_me",
+      "label": "Something's wrong with me",
+      "t": [
+       "me"
+      ],
+      "hint": "shame"
+     },
+     {
+      "value": "shouldnt_feel",
+      "label": "I shouldn't feel this",
+      "t": [
+       "feeling"
+      ],
+      "hint": "shame"
+     },
+     {
+      "value": "overreacting",
+      "label": "I'm overreacting",
+      "t": [
+       "feeling"
+      ],
+      "hint": "shame"
+     },
+     {
+      "value": "dramatic",
+      "label": "I'm being dramatic",
+      "t": [
+       "feeling"
+      ],
+      "hint": "shame"
+     },
+     {
+      "value": "selfish",
+      "label": "They're selfish",
+      "t": [
+       "them"
+      ],
+      "hint": "anger"
+     },
+     {
+      "value": "dont_care",
+      "label": "They don't care",
+      "t": [
+       "them"
+      ],
+      "hint": "sadness"
+     },
+     {
+      "value": "on_purpose",
+      "label": "They're doing it on purpose",
+      "t": [
+       "them"
+      ],
+      "hint": "anger"
+     },
+     {
+      "value": "shouldnt_happen",
+      "label": "This shouldn't be happening",
+      "t": [
+       "should"
+      ],
+      "hint": "none"
+     },
+     {
+      "value": "not_fair",
+      "label": "It's not fair",
+      "t": [
+       "should"
+      ],
+      "hint": "anger"
+     }
+    ],
+    "see": [
+     {
+      "value": "down",
+      "label": "Set it down and look under it"
+     },
+     {
+      "value": "fact",
+      "label": "It feels like a fact"
+     },
+     {
+      "value": "threat",
+      "label": "They threatened me, scared me or hurt me",
+      "t": [
+       "them"
+      ],
+      "danger": "other"
+     },
+     {
+      "value": "threat_any",
+      "label": "Someone threatened me, scared me or hurt me",
+      "t": [
+       "me",
+       "feeling",
+       "should"
+      ],
+      "danger": "other"
+     }
+    ],
+    "facts": [
+     {
+      "value": "check",
+      "label": "Check the facts on the feeling"
+     },
+     {
+      "value": "under",
+      "label": "Look at what's under it anyway"
+     }
+    ],
+    "pick": [
+     {
+      "value": "feel",
+      "label": "What I feel"
+     },
+     {
+      "value": "want",
+      "label": "What I wanted"
+     }
+    ],
+    "happened": [
+     {
+      "value": "didnt_go",
+      "label": "I didn't go.",
+      "t": [
+       "me"
+      ]
+     },
+     {
+      "value": "late",
+      "label": "I was late.",
+      "t": [
+       "me"
+      ]
+     },
+     {
+      "value": "not_done",
+      "label": "I didn't get something done.",
+      "t": [
+       "me"
+      ]
+     },
+     {
+      "value": "forgot_thing",
+      "label": "I forgot something.",
+      "t": [
+       "me"
+      ]
+     },
+     {
+      "value": "stayed_in",
+      "label": "I stayed in bed.",
+      "t": [
+       "me"
+      ]
+     },
+     {
+      "value": "raised",
+      "label": "I raised my voice.",
+      "t": [
+       "me",
+       "feeling"
+      ]
+     },
+     {
+      "value": "cried",
+      "label": "I cried.",
+      "t": [
+       "feeling"
+      ]
+     },
+     {
+      "value": "strong",
+      "label": "The feeling came on strong.",
+      "t": [
+       "feeling"
+      ]
+     },
+     {
+      "value": "stayed",
+      "label": "The feeling has stayed a while.",
+      "t": [
+       "feeling"
+      ]
+     },
+     {
+      "value": "showed",
+      "label": "Someone saw how I felt.",
+      "t": [
+       "feeling"
+      ]
+     },
+     {
+      "value": "asked",
+      "label": "I asked for help.",
+      "t": [
+       "feeling"
+      ]
+     },
+     {
+      "value": "no_reply",
+      "label": "They didn't reply.",
+      "t": [
+       "them"
+      ]
+     },
+     {
+      "value": "cancelled",
+      "label": "They cancelled.",
+      "t": [
+       "them"
+      ]
+     },
+     {
+      "value": "said_harsh",
+      "label": "They said something harsh to me.",
+      "t": [
+       "them"
+      ]
+     },
+     {
+      "value": "forgot",
+      "label": "They forgot something that mattered to me.",
+      "t": [
+       "them"
+      ]
+     },
+     {
+      "value": "didnt_help",
+      "label": "They didn't help when I asked.",
+      "t": [
+       "them"
+      ]
+     },
+     {
+      "value": "threat",
+      "label": "They threatened me, scared me or hurt me.",
+      "t": [
+       "them"
+      ],
+      "danger": "other"
+     },
+     {
+      "value": "fell_through",
+      "label": "A plan fell through.",
+      "t": [
+       "should"
+      ]
+     },
+     {
+      "value": "taken",
+      "label": "Something was taken away.",
+      "t": [
+       "should"
+      ]
+     },
+     {
+      "value": "treated_differently",
+      "label": "I was treated differently from others.",
+      "t": [
+       "should"
+      ]
+     },
+     {
+      "value": "lost",
+      "label": "I lost something that mattered.",
+      "t": [
+       "should"
+      ]
+     },
+     {
+      "value": "counted_on",
+      "label": "Something I counted on didn't happen.",
+      "t": [
+       "should"
+      ]
+     },
+     {
+      "value": "keeps_happening",
+      "label": "It keeps happening.",
+      "t": [
+       "should"
+      ]
+     },
+     {
+      "value": "threat_any",
+      "label": "Someone threatened me, scared me or hurt me.",
+      "t": [
+       "me",
+       "feeling",
+       "should"
+      ],
+      "danger": "other"
+     }
+    ],
+    "cost": [
+     {
+      "value": "on_my_own",
+      "label": "I had to sort it out on my own.",
+      "t": [
+       "them",
+       "should"
+      ]
+     },
+     {
+      "value": "went_without",
+      "label": "I went without something I needed.",
+      "t": [
+       "them",
+       "should"
+      ]
+     },
+     {
+      "value": "plans_changed",
+      "label": "My plans changed because of it.",
+      "t": [
+       "them",
+       "should"
+      ]
+     },
+     {
+      "value": "missed_out",
+      "label": "I missed out on something.",
+      "t": [
+       "me",
+       "feeling",
+       "should"
+      ]
+     },
+     {
+      "value": "snapped",
+      "label": "I snapped at someone.",
+      "t": [
+       "me",
+       "feeling"
+      ]
+     },
+     {
+      "value": "didnt_talk",
+      "label": "We didn't talk.",
+      "t": [
+       "me",
+       "feeling",
+       "them",
+       "should"
+      ]
+     },
+     {
+      "value": "pulled_away",
+      "label": "I pulled away from people.",
+      "t": [
+       "me",
+       "feeling"
+      ]
+     },
+     {
+      "value": "lost_sleep",
+      "label": "I lost sleep over it.",
+      "t": [
+       "me",
+       "feeling",
+       "them",
+       "should"
+      ]
+     },
+     {
+      "value": "stuck",
+      "label": "I've been stuck on it.",
+      "t": [
+       "me",
+       "feeling"
+      ]
+     },
+     {
+      "value": "gave_up",
+      "label": "I gave up on something.",
+      "t": [
+       "me",
+       "should"
+      ]
+     }
+    ],
+    "want": [
+     {
+      "value": "stop",
+      "label": "For it to stop",
+      "t": [
+       "them"
+      ]
+     },
+     {
+      "value": "distance",
+      "label": "To have some distance",
+      "t": [
+       "them"
+      ]
+     },
+     {
+      "value": "respected",
+      "label": "To be respected",
+      "t": [
+       "me",
+       "feeling",
+       "them"
+      ]
+     },
+     {
+      "value": "do_well",
+      "label": "To do well",
+      "t": [
+       "me",
+       "should"
+      ]
+     },
+     {
+      "value": "close",
+      "label": "To be close to someone",
+      "t": [
+       "feeling",
+       "should"
+      ]
+     },
+     {
+      "value": "safe",
+      "label": "To be safe",
+      "t": [
+       "me",
+       "feeling",
+       "them",
+       "should"
+      ]
+     },
+     {
+      "value": "show_up",
+      "label": "To be someone who shows up",
+      "t": [
+       "me"
+      ]
+     },
+     {
+      "value": "understood",
+      "label": "To be understood",
+      "t": [
+       "me",
+       "feeling",
+       "them"
+      ]
+     },
+     {
+      "value": "fair",
+      "label": "To be treated fairly",
+      "t": [
+       "them",
+       "should"
+      ]
+     },
+     {
+      "value": "say",
+      "label": "To have a say in what happens",
+      "t": [
+       "should"
+      ]
+     },
+     {
+      "value": "cared_for",
+      "label": "To be cared for",
+      "t": [
+       "me",
+       "feeling"
+      ]
+     },
+     {
+      "value": "rest",
+      "label": "To rest",
+      "t": [
+       "me",
+       "feeling",
+       "should"
+      ]
+     }
+    ],
+    "sit": [
+     {
+      "value": "closer",
+      "label": "That's closer"
+     },
+     {
+      "value": "not_quite",
+      "label": "Not quite",
+      "once": true
+     },
+     {
+      "value": "keep",
+      "label": "I'll keep the judgment for now"
+     }
+    ],
+    "fix": [
+     {
+      "value": "happened",
+      "label": "What happened"
+     },
+     {
+      "value": "cost",
+      "label": "What it cost"
+     },
+     {
+      "value": "feel",
+      "label": "What I feel",
+      "short": true
+     },
+     {
+      "value": "want",
+      "label": "What I wanted",
+      "short": true
+     }
+    ],
+    "hands": [
+     {
+      "value": "yes",
+      "label": "Try it"
+     },
+     {
+      "value": "no",
+      "label": "Not now"
      }
     ]
    }

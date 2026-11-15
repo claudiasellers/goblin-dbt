@@ -977,6 +977,13 @@ export function copyText(ctx: RunContext, ref: StepDef['title'], s: Pick<RunStat
 }
 
 /** A step's title slots: `{labelOf: field}` is that field's first pick, as the person sees it. */
+
+/** Own words with one matching pair of quotes around the whole of them, without the pair (*“I'm a mess”* → *I'm a
+ *  mess*). A quote of the same kind inside means the pair isn't around the whole (*"lazy" and "stupid"*), so they stay. */
+export function unquoted(text: string): string {
+  const m = text.match(/^(?:"([^"]*)"|“([^“”"]*)[”"]|'([^']*)'|‘([^‘’']*)[’'])$/su);
+  return m ? (m[1] ?? m[2] ?? m[3] ?? m[4] ?? '').trim() : text;
+}
 export function titleSlots(ctx: RunContext, step: StepDef, s: StateLike): Record<string, string> {
   const out: Record<string, string> = {};
   const answers = answersOf(ctx, s);
@@ -986,8 +993,9 @@ export function titleSlots(ctx: RunContext, step: StepDef, s: StateLike): Record
   for (const [name, src] of Object.entries(step.titleSlots ?? {})) {
     const f = fieldOf(ctx.skill, src.labelOf);
     const a = answers[src.labelOf];
-    // The person's own words, when the field has them, are what they said (a starter they changed included).
-    if (f && a?.own?.trim()) { out[name] = a.own.trim(); continue; }
+    // The person's own words, when the field has them, are what they said (a starter they changed included). Quotes
+    // around the whole of them are dropped, so a title that quotes the slot never doubles them (MF-03's “{judge}”).
+    if (f && a?.own?.trim()) { out[name] = unquoted(a.own.trim()) || a.own.trim(); continue; }
     const v = a?.ids[0];
     // A kept item that's gone or set aside since (normalize dropped the pick) reads as the generic copy, never `{slot}`.
     if (f && !v && f.options.profile && ctx.skill.copy.profile_unnamed) { out[name] = ctx.skill.copy.profile_unnamed; continue; }
