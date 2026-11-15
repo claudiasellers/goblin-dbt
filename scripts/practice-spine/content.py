@@ -298,7 +298,10 @@ FOLLOW_UP_TYPES = [
         "window": {"kind": "chip", "chips": {"hour": {"kind": "after", "minutes": 60},
                                              "afternoon": {"kind": "at_local", "days": 0, "time": "16:00"},
                                              "evening": {"kind": "at_local", "days": 0, "time": "20:00"},
-                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"}}},
+                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
+                                             # Moved after *Not today* (ER-04): another day, in the evening.
+                                             "day_after": {"kind": "at_local", "days": 2, "time": "18:00"},
+                                             "few_days": {"kind": "at_local", "days": 3, "time": "18:00"}}},
         "staleAfterHours": 24, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
         "enabled": True,
         "copy": {"title": "Your good thing", "body": "Something good you picked earlier. Did it happen?"},

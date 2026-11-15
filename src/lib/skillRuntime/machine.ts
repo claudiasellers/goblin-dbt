@@ -87,7 +87,8 @@ export type RunEvent =
   | { type: 'pick'; fieldId: string; value: string }
   | { type: 'own'; fieldId: string; text: string }
   | { type: 'shown'; record: string }
-  | { type: 'next' }
+  /** `quiet`: the step's `secondary` (a quiet way on): goes on without the step's own answers, keep or follow-up. */
+  | { type: 'next'; quiet?: boolean }
   | { type: 'back' }
   | { type: 'exit'; exitId: string }
   | { type: 'embedDone'; output: EmbedOutput }
@@ -656,7 +657,7 @@ export function runNext(ctx: RunContext, s: RunState, e: RunEvent): RunState {
       const sc = scope(ctx, s);
       const visible = new Set(shownFields(ctx, step, s, sc).map((f) => f.id));
       const answers = { ...s.answers };
-      for (const f of step.fields ?? []) if (!visible.has(f.id)) delete answers[keyFor(ctx, s, f.id)];
+      for (const f of step.fields ?? []) if (e.quiet || !visible.has(f.id)) delete answers[keyFor(ctx, s, f.id)];
       const after = { ...s, answers: normalize(ctx, answers) };
       const t = step.next.find((x) => holds(x.when, scope(ctx, after)));
       if (!t) return s;

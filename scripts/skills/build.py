@@ -150,6 +150,12 @@ def check_embed_props(name, props, copy, fields, w, derived=frozenset(), accepts
             # Context key → a ref in this run; the sub-skill's `accepts` and the refs are checked with the host (R8 below).
             assert isinstance(v, dict) and v and set(v) <= CTX_KEYS, (w, f"{name}.{k} maps context keys", v)
             assert all(isinstance(r, str) and (r == "$each" or re.match(r"^\$(a|d|ctx)\.[A-Za-z_][A-Za-z0-9_]*$", r) or ID.match(r)) for r in v.values()), (w, f"{name}.{k} maps to refs or literal ids", v)
+        elif t == "copyWhen":
+            # Copy picked by condition (as a conditional title): every key in the skill's copy, every condition valid.
+            assert isinstance(v, list) and v and all(isinstance(e, dict) and set(e) <= {"when", "key"} and e.get("key") in copy for e in v), (w, f"{name}.{k} lists copy keys by condition", v)
+            for e in v:
+                if e.get("when") is not None:
+                    check_cond(e["when"], fields, derived, w, accepts)
         elif t == "row":
             # A ref whose value keys a shared graph table (ER-10's feeling card reads its guide's feelingOf row).
             assert sp["table"] in GRAPH_TABLES, (w, f"{name}.{k} reads a shared table", sp)

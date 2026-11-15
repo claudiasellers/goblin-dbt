@@ -542,10 +542,10 @@ function AskStep({ ctx, step, st, send, onExit, onShown, onPrimary, busy }: {
     <button type="button" className={primaryButton} disabled={busy || !canGoOn(ctx, st)} aria-busy={busy} onClick={onPrimary}>
       {(step.primary && c[step.primary]) || c.next || 'Next'}
     </button>
-    {/* `secondary`: a quiet way on that skips the step's keep and follow-up (the primary tap is the yes). */}
+    {/* `secondary`: a quiet way on that skips the step's answers, keep and follow-up (the primary tap is the yes). */}
     {step.secondary && c[step.secondary] && (
       <div className="flex justify-center">
-        <button type="button" className={linkButton} disabled={busy || !canGoOn(ctx, st)} onClick={() => send({ type: 'next' })}>{c[step.secondary]}</button>
+        <button type="button" className={linkButton} disabled={busy || !canGoOn(ctx, st)} onClick={() => send({ type: 'next', quiet: true })}>{c[step.secondary]}</button>
       </div>
     )}
   </>);
@@ -559,6 +559,12 @@ function embedProps(ctx: RunContext, st: RunState, name: string, props: Record<s
   const out = resolveEmbedProps(EMBED_PROPS[name], props, ctx.skill.copy);
   for (const [k, spec] of Object.entries(EMBED_PROPS[name] ?? {})) {
     if (spec.type === 'ctx' && k in out) out[k] = inlineCtxFor(ctx, st, { ctx: props?.[k] });
+    // A `copyWhen` prop: the first entry whose condition holds in this run, as text (or nothing).
+    if (spec.type === 'copyWhen' && k in out) {
+      const text = copyText(ctx, props?.[k] as StepDef['title'], st);
+      if (text) out[k] = text;
+      else delete out[k];
+    }
     // A `row` prop: the ref's value keys a shared table; the embed gets the row, or nothing (never the ref).
     if (spec.type === 'row' && k in out) {
       const row = sharedRow(ctx, spec.table, resolve(props?.[k], scope(ctx, st)));

@@ -11605,6 +11605,13 @@
     "card_prev": "Previous card",
     "card_skip": "Done with the cards",
     "card_felt": "I felt",
+    "card_level": "How firmly",
+    "card_level_hint": "A light first mention is enough",
+    "card_level_gentle": "Gently. A no can be okay for now",
+    "card_level_plain": "Plainly, and listen",
+    "card_level_firm": "Firmly, and keep asking",
+    "card_level_firm_hold": "Firmly, and keep coming back to it",
+    "card_level_firm_heads_up": "Firmly, once. Calmly again if needed",
     "card_middle": "Middle ground I could live with",
     "card_walk": "I won't accept",
     "card_drift": "If it drifts: say the ask again, same words.",
@@ -13437,7 +13444,389 @@
       "labelBField": "walk",
       "labelB": "card_walk",
       "steadyNoteA": "card_drift",
-      "steadyNoteB": "card_attack"
+      "steadyNoteB": "card_attack",
+      "levelNote": [
+       {
+        "when": {
+         "all": [
+          {
+           "eq": [
+            "$ctx.frame",
+            "heads_up"
+           ]
+          },
+          {
+           "any": [
+            {
+             "all": [
+              {
+               "eq": [
+                "$a.nudge",
+                "right"
+               ]
+              },
+              {
+               "in": [
+                "$d.ask_level",
+                [
+                 "firm",
+                 "firm_hold"
+                ]
+               ]
+              }
+             ]
+            },
+            {
+             "all": [
+              {
+               "eq": [
+                "$a.nudge",
+                "softer"
+               ]
+              },
+              {
+               "in": [
+                "$d.ask_softer",
+                [
+                 "firm",
+                 "firm_hold"
+                ]
+               ]
+              }
+             ]
+            },
+            {
+             "all": [
+              {
+               "eq": [
+                "$a.nudge",
+                "firmer"
+               ]
+              },
+              {
+               "in": [
+                "$d.ask_firmer",
+                [
+                 "firm",
+                 "firm_hold"
+                ]
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        "key": "card_level_firm_heads_up"
+       },
+       {
+        "when": {
+         "any": [
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "right"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_level",
+              [
+               "hint"
+              ]
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "softer"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_softer",
+              [
+               "hint"
+              ]
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "firmer"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_firmer",
+              [
+               "hint"
+              ]
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        "key": "card_level_hint"
+       },
+       {
+        "when": {
+         "any": [
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "right"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_level",
+              [
+               "gentle"
+              ]
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "softer"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_softer",
+              [
+               "gentle"
+              ]
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "firmer"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_firmer",
+              [
+               "gentle"
+              ]
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        "key": "card_level_gentle"
+       },
+       {
+        "when": {
+         "any": [
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "right"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_level",
+              [
+               "plain"
+              ]
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "softer"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_softer",
+              [
+               "plain"
+              ]
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "firmer"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_firmer",
+              [
+               "plain"
+              ]
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        "key": "card_level_plain"
+       },
+       {
+        "when": {
+         "any": [
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "right"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_level",
+              [
+               "firm"
+              ]
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "softer"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_softer",
+              [
+               "firm"
+              ]
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "firmer"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_firmer",
+              [
+               "firm"
+              ]
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        "key": "card_level_firm"
+       },
+       {
+        "when": {
+         "any": [
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "right"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_level",
+              [
+               "firm_hold"
+              ]
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "softer"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_softer",
+              [
+               "firm_hold"
+              ]
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "firmer"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_firmer",
+              [
+               "firm_hold"
+              ]
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        "key": "card_level_firm_hold"
+       }
+      ],
+      "levelLabel": "card_level"
      },
      "next": [
       {
@@ -13568,7 +13957,389 @@
       "labelBField": "walk",
       "labelB": "card_walk",
       "steadyNoteA": "card_drift",
-      "steadyNoteB": "card_attack"
+      "steadyNoteB": "card_attack",
+      "levelNote": [
+       {
+        "when": {
+         "all": [
+          {
+           "eq": [
+            "$ctx.frame",
+            "heads_up"
+           ]
+          },
+          {
+           "any": [
+            {
+             "all": [
+              {
+               "eq": [
+                "$a.nudge",
+                "right"
+               ]
+              },
+              {
+               "in": [
+                "$d.ask_level",
+                [
+                 "firm",
+                 "firm_hold"
+                ]
+               ]
+              }
+             ]
+            },
+            {
+             "all": [
+              {
+               "eq": [
+                "$a.nudge",
+                "softer"
+               ]
+              },
+              {
+               "in": [
+                "$d.ask_softer",
+                [
+                 "firm",
+                 "firm_hold"
+                ]
+               ]
+              }
+             ]
+            },
+            {
+             "all": [
+              {
+               "eq": [
+                "$a.nudge",
+                "firmer"
+               ]
+              },
+              {
+               "in": [
+                "$d.ask_firmer",
+                [
+                 "firm",
+                 "firm_hold"
+                ]
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        "key": "card_level_firm_heads_up"
+       },
+       {
+        "when": {
+         "any": [
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "right"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_level",
+              [
+               "hint"
+              ]
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "softer"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_softer",
+              [
+               "hint"
+              ]
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "firmer"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_firmer",
+              [
+               "hint"
+              ]
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        "key": "card_level_hint"
+       },
+       {
+        "when": {
+         "any": [
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "right"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_level",
+              [
+               "gentle"
+              ]
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "softer"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_softer",
+              [
+               "gentle"
+              ]
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "firmer"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_firmer",
+              [
+               "gentle"
+              ]
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        "key": "card_level_gentle"
+       },
+       {
+        "when": {
+         "any": [
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "right"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_level",
+              [
+               "plain"
+              ]
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "softer"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_softer",
+              [
+               "plain"
+              ]
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "firmer"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_firmer",
+              [
+               "plain"
+              ]
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        "key": "card_level_plain"
+       },
+       {
+        "when": {
+         "any": [
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "right"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_level",
+              [
+               "firm"
+              ]
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "softer"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_softer",
+              [
+               "firm"
+              ]
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "firmer"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_firmer",
+              [
+               "firm"
+              ]
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        "key": "card_level_firm"
+       },
+       {
+        "when": {
+         "any": [
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "right"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_level",
+              [
+               "firm_hold"
+              ]
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "softer"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_softer",
+              [
+               "firm_hold"
+              ]
+             ]
+            }
+           ]
+          },
+          {
+           "all": [
+            {
+             "eq": [
+              "$a.nudge",
+              "firmer"
+             ]
+            },
+            {
+             "in": [
+              "$d.ask_firmer",
+              [
+               "firm_hold"
+              ]
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        "key": "card_level_firm_hold"
+       }
+      ],
+      "levelLabel": "card_level"
      },
      "next": [
       {
@@ -26569,6 +27340,10 @@
     "after_mind": "If 'it won't last' or 'I don't deserve this' shows up next time, notice it and come back to what you're doing. That's part of the skill.",
     "after_heavier": "That happens sometimes. It isn't a sign you did it wrong.",
     "no_title": "That's okay.",
+    "move_title": "Want to try it another day?",
+    "move_hint": "Not today is a real answer.",
+    "move_leave": "Leave it",
+    "move_line": "It's moved. A card will come that day.",
     "no_line": "A smaller one tomorrow still counts.",
     "no_low": "If energy's been low for a while, Running low looks at sleep, food and the body.",
     "week_title_1": "Pick a good thing for this week.",
@@ -27548,19 +28323,26 @@
       }
      ],
      "reopens": {
-      "after": "week_1"
+      "after": "week_1",
+      "again": [
+       "move_w1"
+      ]
      },
      "clears": [
       "happened",
       "compared",
       "mind",
       "keep_more",
+      "move",
       "hap1",
       "hap2",
       "hap3",
       "km1",
       "km2",
-      "km3"
+      "km3",
+      "mv1",
+      "mv2",
+      "mv3"
      ],
      "titleSlots": {
       "pick": {
@@ -27569,7 +28351,7 @@
      },
      "next": [
       {
-       "to": "not_today",
+       "to": "move_w1",
        "when": {
         "eq": [
          "$a.hap1",
@@ -27609,19 +28391,26 @@
       }
      ],
      "reopens": {
-      "after": "week_2"
+      "after": "week_2",
+      "again": [
+       "move_w2"
+      ]
      },
      "clears": [
       "happened",
       "compared",
       "mind",
       "keep_more",
+      "move",
       "hap1",
       "hap2",
       "hap3",
       "km1",
       "km2",
-      "km3"
+      "km3",
+      "mv1",
+      "mv2",
+      "mv3"
      ],
      "titleSlots": {
       "pick": {
@@ -27630,7 +28419,7 @@
      },
      "next": [
       {
-       "to": "not_today",
+       "to": "move_w2",
        "when": {
         "eq": [
          "$a.hap2",
@@ -27670,19 +28459,26 @@
       }
      ],
      "reopens": {
-      "after": "week_3"
+      "after": "week_3",
+      "again": [
+       "move_w3"
+      ]
      },
      "clears": [
       "happened",
       "compared",
       "mind",
       "keep_more",
+      "move",
       "hap1",
       "hap2",
       "hap3",
       "km1",
       "km2",
-      "km3"
+      "km3",
+      "mv1",
+      "mv2",
+      "mv3"
      ],
      "titleSlots": {
       "pick": {
@@ -27691,7 +28487,7 @@
      },
      "next": [
       {
-       "to": "not_today",
+       "to": "move_w3",
        "when": {
         "eq": [
          "$a.hap3",
@@ -27701,6 +28497,117 @@
       },
       {
        "to": "after",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "move_w1",
+     "kind": "ask",
+     "title": "move_title",
+     "fields": [
+      {
+       "id": "mv1",
+       "options": {
+        "list": "move"
+       },
+       "max": 1,
+       "required": false,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "secondary": "move_leave",
+     "followUp": {
+      "type": "good_week_one",
+      "whenFrom": "mv1"
+     },
+     "hint": "move_hint",
+     "next": [
+      {
+       "to": "not_today",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "move_w2",
+     "kind": "ask",
+     "title": "move_title",
+     "fields": [
+      {
+       "id": "mv2",
+       "options": {
+        "list": "move"
+       },
+       "max": 1,
+       "required": false,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "secondary": "move_leave",
+     "followUp": {
+      "type": "good_week_two",
+      "whenFrom": "mv2"
+     },
+     "hint": "move_hint",
+     "next": [
+      {
+       "to": "not_today",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "move_w3",
+     "kind": "ask",
+     "title": "move_title",
+     "fields": [
+      {
+       "id": "mv3",
+       "options": {
+        "list": "move"
+       },
+       "max": 1,
+       "required": false,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "secondary": "move_leave",
+     "followUp": {
+      "type": "good_week_three",
+      "whenFrom": "mv3"
+     },
+     "hint": "move_hint",
+     "next": [
+      {
+       "to": "not_today",
        "when": null
       }
      ],
@@ -27869,19 +28776,26 @@
       }
      ],
      "reopens": {
-      "after": "when"
+      "after": "when",
+      "again": [
+       "move"
+      ]
      },
      "clears": [
       "happened",
       "compared",
       "mind",
       "keep_more",
+      "move",
       "hap1",
       "hap2",
       "hap3",
       "km1",
       "km2",
-      "km3"
+      "km3",
+      "mv1",
+      "mv2",
+      "mv3"
      ],
      "titleSlots": {
       "pick": {
@@ -27890,7 +28804,7 @@
      },
      "next": [
       {
-       "to": "not_today",
+       "to": "move",
        "when": {
         "eq": [
          "$a.happened",
@@ -28266,11 +29180,67 @@
      ]
     },
     {
+     "id": "move",
+     "kind": "ask",
+     "title": "move_title",
+     "fields": [
+      {
+       "id": "move",
+       "options": {
+        "list": "move"
+       },
+       "max": 1,
+       "required": false,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "secondary": "move_leave",
+     "followUp": {
+      "type": "good_thing",
+      "whenFrom": "move"
+     },
+     "hint": "move_hint",
+     "next": [
+      {
+       "to": "not_today",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
      "id": "not_today",
      "kind": "handoff",
      "complete": true,
      "title": "no_title",
      "lines": [
+      {
+       "when": {
+        "any": [
+         {
+          "set": "$a.move"
+         },
+         {
+          "set": "$a.mv1"
+         },
+         {
+          "set": "$a.mv2"
+         },
+         {
+          "set": "$a.mv3"
+         }
+        ]
+       },
+       "key": "move_line"
+      },
       {
        "when": {
         "all": []
@@ -28553,6 +29523,20 @@
      {
       "value": "no",
       "label": "Not today"
+     }
+    ],
+    "move": [
+     {
+      "value": "tomorrow",
+      "label": "Tomorrow"
+     },
+     {
+      "value": "day_after",
+      "label": "The day after tomorrow"
+     },
+     {
+      "value": "few_days",
+      "label": "In a few days"
      }
     ],
     "compared": [
