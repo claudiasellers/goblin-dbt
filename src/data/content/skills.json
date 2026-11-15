@@ -1,7 +1,7 @@
 {
   "source": {
     "file": "graph-content-only-2026-11-15.json",
-    "exportedAt": "2026-11-15T01:52:53.274Z"
+    "exportedAt": "2026-11-15T02:14:13.827Z"
   },
   "content": {
     "version": "skills-v1",
@@ -13428,6 +13428,7 @@
               "levelLabel": "card_level",
               "levelNote": [
                 {
+                  "key": "card_level_firm_heads_up",
                   "when": {
                     "all": [
                       {
@@ -13498,10 +13499,10 @@
                         ]
                       }
                     ]
-                  },
-                  "key": "card_level_firm_heads_up"
+                  }
                 },
                 {
+                  "key": "card_level_hint",
                   "when": {
                     "any": [
                       {
@@ -13559,10 +13560,10 @@
                         ]
                       }
                     ]
-                  },
-                  "key": "card_level_hint"
+                  }
                 },
                 {
+                  "key": "card_level_gentle",
                   "when": {
                     "any": [
                       {
@@ -13620,10 +13621,10 @@
                         ]
                       }
                     ]
-                  },
-                  "key": "card_level_gentle"
+                  }
                 },
                 {
+                  "key": "card_level_plain",
                   "when": {
                     "any": [
                       {
@@ -13681,10 +13682,10 @@
                         ]
                       }
                     ]
-                  },
-                  "key": "card_level_plain"
+                  }
                 },
                 {
+                  "key": "card_level_firm",
                   "when": {
                     "any": [
                       {
@@ -13742,10 +13743,10 @@
                         ]
                       }
                     ]
-                  },
-                  "key": "card_level_firm"
+                  }
                 },
                 {
+                  "key": "card_level_firm_hold",
                   "when": {
                     "any": [
                       {
@@ -13803,8 +13804,7 @@
                         ]
                       }
                     ]
-                  },
-                  "key": "card_level_firm_hold"
+                  }
                 }
               ],
               "next": "next",
@@ -13941,6 +13941,7 @@
               "levelLabel": "card_level",
               "levelNote": [
                 {
+                  "key": "card_level_firm_heads_up",
                   "when": {
                     "all": [
                       {
@@ -14011,10 +14012,10 @@
                         ]
                       }
                     ]
-                  },
-                  "key": "card_level_firm_heads_up"
+                  }
                 },
                 {
+                  "key": "card_level_hint",
                   "when": {
                     "any": [
                       {
@@ -14072,10 +14073,10 @@
                         ]
                       }
                     ]
-                  },
-                  "key": "card_level_hint"
+                  }
                 },
                 {
+                  "key": "card_level_gentle",
                   "when": {
                     "any": [
                       {
@@ -14133,10 +14134,10 @@
                         ]
                       }
                     ]
-                  },
-                  "key": "card_level_gentle"
+                  }
                 },
                 {
+                  "key": "card_level_plain",
                   "when": {
                     "any": [
                       {
@@ -14194,10 +14195,10 @@
                         ]
                       }
                     ]
-                  },
-                  "key": "card_level_plain"
+                  }
                 },
                 {
+                  "key": "card_level_firm",
                   "when": {
                     "any": [
                       {
@@ -14255,10 +14256,10 @@
                         ]
                       }
                     ]
-                  },
-                  "key": "card_level_firm"
+                  }
                 },
                 {
+                  "key": "card_level_firm_hold",
                   "when": {
                     "any": [
                       {
@@ -14316,8 +14317,7 @@
                         ]
                       }
                     ]
-                  },
-                  "key": "card_level_firm_hold"
+                  }
                 }
               ],
               "next": "next",
@@ -28510,15 +28510,9 @@
           {
             "id": "move_w1",
             "kind": "ask",
-            "title": "move_title",
             "fields": [
               {
                 "id": "mv1",
-                "options": {
-                  "list": "move"
-                },
-                "max": 1,
-                "required": false,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -28527,7 +28521,12 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "list": "move"
+                },
+                "required": false
               }
             ],
             "followUp": {
@@ -28535,27 +28534,22 @@
               "whenFrom": "mv1"
             },
             "hint": "move_hint",
+            "secondary": "move_leave",
+            "title": "move_title",
             "next": [
               {
                 "to": "not_today",
                 "when": null
               }
             ],
-            "offers": [],
-            "secondary": "move_leave"
+            "offers": []
           },
           {
             "id": "move_w2",
             "kind": "ask",
-            "title": "move_title",
             "fields": [
               {
                 "id": "mv2",
-                "options": {
-                  "list": "move"
-                },
-                "max": 1,
-                "required": false,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -28564,7 +28558,12 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "list": "move"
+                },
+                "required": false
               }
             ],
             "followUp": {
@@ -28572,27 +28571,22 @@
               "whenFrom": "mv2"
             },
             "hint": "move_hint",
+            "secondary": "move_leave",
+            "title": "move_title",
             "next": [
               {
                 "to": "not_today",
                 "when": null
               }
             ],
-            "offers": [],
-            "secondary": "move_leave"
+            "offers": []
           },
           {
             "id": "move_w3",
             "kind": "ask",
-            "title": "move_title",
             "fields": [
               {
                 "id": "mv3",
-                "options": {
-                  "list": "move"
-                },
-                "max": 1,
-                "required": false,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -28601,7 +28595,12 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "list": "move"
+                },
+                "required": false
               }
             ],
             "followUp": {
@@ -28609,14 +28608,15 @@
               "whenFrom": "mv3"
             },
             "hint": "move_hint",
+            "secondary": "move_leave",
+            "title": "move_title",
             "next": [
               {
                 "to": "not_today",
                 "when": null
               }
             ],
-            "offers": [],
-            "secondary": "move_leave"
+            "offers": []
           },
           {
             "id": "keep_more_w1",
@@ -29187,15 +29187,9 @@
           {
             "id": "move",
             "kind": "ask",
-            "title": "move_title",
             "fields": [
               {
                 "id": "move",
-                "options": {
-                  "list": "move"
-                },
-                "max": 1,
-                "required": false,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -29204,7 +29198,12 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "list": "move"
+                },
+                "required": false
               }
             ],
             "followUp": {
@@ -29212,14 +29211,15 @@
               "whenFrom": "move"
             },
             "hint": "move_hint",
+            "secondary": "move_leave",
+            "title": "move_title",
             "next": [
               {
                 "to": "not_today",
                 "when": null
               }
             ],
-            "offers": [],
-            "secondary": "move_leave"
+            "offers": []
           },
           {
             "id": "not_today",
@@ -29253,10 +29253,10 @@
                 }
               },
               {
+                "key": "no_low",
                 "when": {
                   "all": []
-                },
-                "key": "no_low"
+                }
               }
             ],
             "links": [
@@ -29530,6 +29530,20 @@
               "label": "Not today"
             }
           ],
+          "move": [
+            {
+              "value": "tomorrow",
+              "label": "Tomorrow"
+            },
+            {
+              "value": "day_after",
+              "label": "The day after tomorrow"
+            },
+            {
+              "value": "few_days",
+              "label": "In a few days"
+            }
+          ],
           "compared": [
             {
               "value": "lighter",
@@ -29598,20 +29612,6 @@
             {
               "value": "more",
               "label": "Add another"
-            }
-          ],
-          "move": [
-            {
-              "value": "tomorrow",
-              "label": "Tomorrow"
-            },
-            {
-              "value": "day_after",
-              "label": "The day after tomorrow"
-            },
-            {
-              "value": "few_days",
-              "label": "In a few days"
             }
           ]
         }
