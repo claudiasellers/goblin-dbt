@@ -84,7 +84,7 @@ function WishRing({ seconds, first, wishId, label, hint, covered, onStart, onEnd
   const labelId = useId();
   const ref = useRef<HTMLButtonElement>(null);
   const coveredRef = useRef(covered);
-  coveredRef.current = covered;
+  useEffect(() => { coveredRef.current = covered; }, [covered]);
   // The next wish's ring takes focus, so a keyboard or switch user keeps their place (never under a cover).
   useEffect(() => { if (!first && !covered) ref.current?.focus({ preventScroll: true }); }, [first, covered]);
   const timer = useDeadlineTimer({
