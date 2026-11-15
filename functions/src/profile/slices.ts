@@ -11,7 +11,7 @@ import { int } from '../shared/values';
 import { partSafetyCypher } from '../safety/partSafetyFlag';
 import { ownDecrypter } from '../shared/crypto';
 import { metaFrom } from './meta';
-import { PERSON_RISK, PERSON_SAFE, PLEASE_HIDEABLE_ROWS, SLEEP_WAKE_IDS, planContacts } from './kinds';
+import { PERSON_RISK, PERSON_SAFE, PLEASE_HIDEABLE_ROWS, PRACTICE_BREATH, PRACTICE_CUES, PRACTICE_TIMES, SLEEP_WAKE_IDS, planContacts } from './kinds';
 import { PROFILE_NEEDS, type ProfileConsumer, type ProfileSlices, type SliceId } from './types';
 
 /** Words everywhere: own words come first once there are this many distinct ones (PRD ER-10 part 3), and at most this many. */
@@ -131,6 +131,10 @@ export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
   // Running low (ER-07): the rows the person left out in Me (one per person).
   pleaseRows: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'please_rows', status: 'active'})
     RETURN p.valueJson AS valueJson LIMIT 1`,
+  // The Practice home (MF-02): when the daily minute comes and whether breath focus is okay (one per person).
+  practicePrefs: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'practice_prefs', status: 'active'})
+    RETURN p {.id, .kind, .area, .status, .source, .valueJson,
+              confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p LIMIT 1`,
   // Sleep reset (ER-13): the wake time kept as an anchor (one per person).
   sleepAnchor: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'sleep_anchor', status: 'active'})
     RETURN p.valueJson AS valueJson LIMIT 1`,
@@ -185,7 +189,7 @@ type Resolver<K extends SliceId> = (tx: ManagedTransaction, uid: string, now: nu
 
 const EMPTY: { [K in SliceId]?: () => ProfileSlices[K] } = {
   bodyFlags: () => null, goals: () => [], copeAheadPlans: () => [],
-  boundaryLines: () => [], practicePrefs: () => null, fadeLevels: () => ({}),
+  boundaryLines: () => [], fadeLevels: () => ({}),
   crisisKit: () => null, country: () => null,
 };
 
@@ -378,6 +382,18 @@ const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
       const id = strings((JSON.parse(String(r.records[0].get('valueJson'))) as Record<string, unknown>).wakeIds)[0];
       return id && (SLEEP_WAKE_IDS as readonly string[]).includes(id) ? id : null;
     } catch { return null; }
+  },
+  practicePrefs: async (tx, uid, now) => {
+    const r = await tx.run(SLICE_QUERIES.practicePrefs!, { uid });
+    if (!r.records.length) return null;
+    const p = r.records[0].get('p') as Record<string, unknown>;
+    let v: Record<string, unknown>;
+    try { v = JSON.parse(String(p.valueJson)) as Record<string, unknown>; } catch { return null; }
+    const time = (PRACTICE_TIMES as readonly unknown[]).includes(v.time) ? v.time as 'morning' | 'midday' | 'evening' : null;
+    const cue = (PRACTICE_CUES as readonly unknown[]).includes(v.cue) ? String(v.cue) : null;
+    const breath = (PRACTICE_BREATH as readonly unknown[]).includes(v.breath) ? v.breath as 'yes' | 'not_sure' | 'no' : 'no';
+    const cueOwn = cue === 'own' && typeof v.cueOwn === 'string' ? (await ownDecrypter(tx, uid))(v.cueOwn) : null;
+    return { time, cue, cueOwn, breath, meta: metaFrom(p, now) };
   },
   crisisKit: async (tx, uid, now) => {
     const r = await tx.run(SLICE_QUERIES.crisisKit!, { uid });

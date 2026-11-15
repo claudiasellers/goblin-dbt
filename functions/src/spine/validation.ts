@@ -132,8 +132,23 @@ export function validateClose(raw: unknown, now: Date, closeKind?: CloseKind): C
 export function validateRecord(raw: unknown, now: Date): { start: StartInput; close: CloseInput } {
   const start = validateStart(raw, now);
   const close = validateClose(raw, now, start.closeKind);
+  if (start.toolId === 'practice') {
+    // The Practice home's catch-one (MF-02): one tap, one rep. A caught judgment is a `nonjudge` catch; one done without
+    // the app is an off-phone `observe` rep. Nothing else rides on it: no words, follow-ups, feelings or detail.
+    const ok = close.status === 'completed' && close.skillIds?.length === 1 &&
+      PRACTICE_CATCHES.some(([skill, source]) => close.skillIds![0] === skill && close.repSource === source) &&
+      close.ext === null && close.schedule.length === 0 && close.detail === null && close.emotionIds.length === 0 &&
+      close.urgeIds.length === 0 && start.emotionIds.length === 0;
+    if (!ok) throw new ValidationError('Not a practice catch');
+  } else if (close.repSource === 'catch') throw new ValidationError('A catch is the Practice home\'s');
   return { start, close };
 }
+
+/** The Practice home's catch-one taps: [skill, rep source]. */
+export const PRACTICE_CATCHES: ReadonlyArray<readonly [string, 'catch' | 'followup_offphone']> = [
+  ['nonjudge', 'catch'],
+  ['observe', 'followup_offphone'],
+];
 
 
 // ---- Follow-ups (PR-S5) ----
@@ -147,6 +162,8 @@ export const FOLLOW_UP_WINDOWS = ['hour', 'afternoon', 'evening', 'tomorrow', 't
   'day_after',
   // Notice what's here (MF-01): the off-phone rep, tomorrow morning (`evening` above is tomorrow evening there).
   'morning',
+  // The Practice home's daily minute (MF-02): the middle of the day (`morning` and `evening` serve it too).
+  'midday',
   // Sleep reset (ER-13): the wake time the person set, for the next morning's check (`sleep_morning`): the mornings by
   // half hours, then shift and night times by the hour (part 2); `n…` is the renewal, a day on.
   'w0600', 'w0630', 'w0700', 'w0730', 'w0800', 'w0830', 'w0900', 'w0930',

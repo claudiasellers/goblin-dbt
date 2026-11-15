@@ -94,6 +94,9 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   'help-now': { module: 'core', closeKind: 'none' },
   'micro-step': { module: 'core', closeKind: 'none' },
   'guided-activity': { module: 'core', closeKind: 'none' },
+  // The Practice home's catch-one taps (MF-02, docs/design/practice-home.md): a zero-length one-shot whose only job is
+  // the rep (validateRecord pins its skills and source).
+  'practice': { module: 'mf', closeKind: 'none' },
 };
 
 /**
@@ -108,6 +111,7 @@ export const RESERVED_ENTRIES: Record<string, readonly ToolEntry[]> = {
   'help-now': ['checkin_grid', 'direct', 'today'],
   'micro-step': ['checkin_result', 'direct'],
   'guided-activity': ['checkin_result', 'direct'],
+  'practice': ['direct'],
 };
 
 /** then-vs-now direction of a close kind (R3); null when the kind doesn't ask it. */

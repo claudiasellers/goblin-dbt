@@ -217,7 +217,7 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput, findW
      RETURN collect(sp.id) AS ids`,
     {
       uid, key, id: c.id, skillIds: c.skillIds, repSource, blankPatterns: BLANK_PATTERNS,
-      durationSec: c.durationSec, offPhone, logged: offPhone ? 'self_report' : 'in_app',
+      durationSec: c.durationSec, offPhone, logged: offPhone || repSource === 'catch' ? 'self_report' : 'in_app',
     },
   );
   return { reps: (reps.records[0]?.get('ids') as string[] | undefined) ?? [], followUps };
@@ -227,6 +227,8 @@ export const startToolSession = callable<unknown, StartToolSessionResponse>(
   { auth: 'required', label: 'startToolSession', errorMessage: 'Could not start the session' },
   async ({ uid, data, request }) => {
     const s = parseOrInvalid(() => validateStart(data, new Date()), 'Invalid session');
+    // The Practice home's catch-one is a one-shot only (recordToolSession pins its skill and source).
+    if (s.toolId === 'practice') throw new HttpsError('invalid-argument', 'Invalid session');
     const toolUsageId = await writeTx((tx) => startTx(tx, uid as string, request.auth?.token?.email ?? null, s));
     return { id: s.id, toolUsageId };
   },
@@ -236,6 +238,7 @@ export const closeToolSession = callable<unknown, CloseToolSessionResponse>(
   { auth: 'required', label: 'closeToolSession', errorMessage: 'Could not save the session' },
   async ({ uid, data }) => {
     const c = parseOrInvalid(() => validateClose(data, new Date()), 'Invalid session');
+    if (c.repSource === 'catch') throw new HttpsError('invalid-argument', 'Invalid session');
     const out = await writeTx((tx) => closeTx(tx, uid as string, c));
     return { id: c.id, skillPracticeIds: out.reps, followUpIds: out.followUps };
   },

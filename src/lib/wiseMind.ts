@@ -73,7 +73,11 @@ export type WiseEvent =
   | { type: 'useMinds' };
 
 /** The parts of the content the machine decides by (ids, kinds, defaults), never the copy. */
-export type WiseContext = Pick<WiseMindContent, 'ownMax' | 'questions' | 'practices' | 'answers'>;
+/**
+ * `breathOk: false`: the person told the Practice home's setup that breath practices aren't okay (*No* or *Not sure*,
+ * `practice_prefs.breath`; MF-02): the drop-in never starts on a breath practice for them (they can still pick one).
+ */
+export type WiseContext = Pick<WiseMindContent, 'ownMax' | 'questions' | 'practices' | 'answers'> & { breathOk?: boolean };
 
 /**
  * What the link carried: the question chip it may put first (never pre-selected), `?first=<question id>`;
@@ -96,10 +100,15 @@ const own = (text: string, max: number): string | null => {
 
 /** The practice highlighted on screen 3: the question's (Ask and listen), else Stone on the lake. */
 export function defaultPracticeId(st: WiseState, ctx: WiseContext): string | null {
+  const drift = ctx.practices.find((p) => p.kind === 'drift')?.id ?? null;
   const q = ctx.questions.find((x) => x.id === st.questionId);
-  if (q) return q.defaultPracticeId;
-  if (st.questionOwn) return ctx.practices.find((p) => p.kind === 'ask')?.id ?? ctx.practices[0]?.id ?? null;
-  return ctx.practices.find((p) => p.kind === 'drift')?.id ?? ctx.practices[0]?.id ?? null;
+  const id = q ? q.defaultPracticeId
+    : st.questionOwn ? ctx.practices.find((p) => p.kind === 'ask')?.id ?? ctx.practices[0]?.id ?? null
+      : drift ?? ctx.practices[0]?.id ?? null;
+  // Breath not okay: a breath practice (hold, ask) is never the default; the stone is.
+  const kind = ctx.practices.find((p) => p.id === id)?.kind;
+  if (ctx.breathOk === false && (kind === 'hold' || kind === 'ask') && drift) return drift;
+  return id;
 }
 
 /** Both circles answered (a chip, own words or *Nothing comes*): the witness line shows. */

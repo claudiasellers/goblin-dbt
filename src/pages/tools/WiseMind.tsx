@@ -4,6 +4,7 @@ import type { HandoffResult } from '../../data/capacityTypes';
 import type { WiseMindContent } from '../../data/wiseMindTypes';
 import { getToolById } from '../../data/tools';
 import { useToolSession } from '../../hooks/useToolSession';
+import { useProfileContext } from '../../hooks/useProfileContext';
 import { handoffExt } from '../../lib/bandStore';
 import { newId } from '../../lib/spine/ids';
 import {
@@ -60,7 +61,10 @@ export function WiseMind({ stepBack = null }: {
 
 type OwnFor = 'question' | MindSide | 'answer' | null;
 
-function WiseVisit({ content, copy, stepBack }: { content: WiseMindContent; copy: WiseCopy; stepBack: StepBackSlot | null }) {
+function WiseVisit({ content: shipped, copy, stepBack }: { content: WiseMindContent; copy: WiseCopy; stepBack: StepBackSlot | null }) {
+  // MF-02: the Practice home's breath answer (only a kept *No* / *Not sure* changes anything).
+  const breath = useProfileContext('wise-mind').slices?.practicePrefs?.breath;
+  const content = useMemo(() => ({ ...shipped, breathOk: breath ? breath === 'yes' : undefined }), [shipped, breath]);
   const toolSession = useToolSession();
   const navigate = useNavigate();
   const location = useLocation();

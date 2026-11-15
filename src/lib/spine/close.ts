@@ -53,6 +53,7 @@ export const TOOL_CLOSE_KIND: Record<string, { module: SpineModule; closeKind: C
   'help-now': { module: 'core', closeKind: 'none' },
   'micro-step': { module: 'core', closeKind: 'none' },
   'guided-activity': { module: 'core', closeKind: 'none' },
+  'practice': { module: 'mf', closeKind: 'none' },
 };
 
 export function closeKindFor(toolId: string): CloseKind {

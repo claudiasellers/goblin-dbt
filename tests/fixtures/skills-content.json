@@ -24332,6 +24332,7 @@
     "end_park": "Then it can wait, with a time to come back to it.",
     "end_through": "You got through it. That's the skill.",
     "held_offer": "A hand on my heart",
+    "notice_offer": "A minute noticing what's around you",
     "safety_open": "Talk to someone now",
     "next": "Next",
     "done": "Done"
@@ -26002,6 +26003,17 @@
          "park"
         ]
        }
+      },
+      {
+       "exit": "notice",
+       "when": {
+        "not": {
+         "eq": [
+          "$a.fork",
+          "change"
+         ]
+        }
+       }
       }
      ]
     }
@@ -26056,6 +26068,16 @@
      },
      "carry": [],
      "done": false
+    },
+    {
+     "id": "notice",
+     "toolId": "notice-and-name",
+     "query": {
+      "frame": "far"
+     },
+     "carry": [],
+     "done": false,
+     "label": "notice_offer"
     },
     {
      "id": "opposite_action",
@@ -33979,6 +34001,7 @@
     "practise_title": "Want to practise this once when things are calmer?",
     "practise_hint": "It comes more easily on a hard night if you've done it on an okay day.",
     "safety_open": "Talk to someone now",
+    "notice_offer": "A minute noticing what's around you",
     "next": "Next",
     "done": "Done"
    },
@@ -35872,7 +35895,32 @@
       }
      ],
      "next": [],
-     "offers": []
+     "offers": [
+      {
+       "exit": "notice",
+       "when": {
+        "all": [
+         {
+          "not": {
+           "eq": [
+            "$ctx.frame",
+            "hurt"
+           ]
+          }
+         },
+         {
+          "in": [
+           "$a.close",
+           [
+            "better",
+            "much_better"
+           ]
+          ]
+         }
+        ]
+       }
+      }
+     ]
     }
    ],
    "exits": [
@@ -35896,6 +35944,14 @@
      "query": {},
      "carry": [],
      "done": false
+    },
+    {
+     "id": "notice",
+     "toolId": "notice-and-name",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "label": "notice_offer"
     },
     {
      "id": "safety_open",

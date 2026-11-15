@@ -1486,6 +1486,50 @@
         "notification": "Your check from Running low is ready."
       },
       {
+        "id": "practice_daily",
+        "ownerModule": "mf",
+        "tier": "practice",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/practice?followUp={followUpId}",
+        "staleAfterHours": 12,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "Today's practice is there if you want it.",
+          "title": "A minute, when you're ready"
+        },
+        "choices": [
+          {
+            "id": "dismiss",
+            "label": "Not today",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "chips": {
+            "evening": {
+              "kind": "next_local",
+              "time": "19:30"
+            },
+            "midday": {
+              "kind": "next_local",
+              "time": "12:30"
+            },
+            "morning": {
+              "kind": "next_local",
+              "time": "08:30"
+            }
+          },
+          "kind": "chip"
+        },
+        "notification": "A minute, when you're ready."
+      },
+      {
         "id": "profile_revisit",
         "ownerModule": "core",
         "tier": "skills",

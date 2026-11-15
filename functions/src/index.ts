@@ -48,3 +48,4 @@ export { setPartShape } from './parts';
 export { getDen, getDenSnapshot, updatePartLayout, linkParts, unlinkParts } from './parts';
 export { getPartStory } from './parts';
 export { saveSafetyCheck } from './safety';
+export { getPracticeHome } from './practice';

@@ -6,8 +6,10 @@ import type { ReactNode } from 'react';
  * eases each change over 700 ms (for values that step); a value updated every frame (a hold) passes false, or the
  * transition restarts each frame and the ring trails far behind the hold.
  */
-export function ProgressRing({ value, size = 120, stroke = 6, children, label, smooth = true }: {
-  value: number; size?: number; stroke?: number; children?: ReactNode; label?: string; smooth?: boolean;
+export function ProgressRing({ value, size = 120, stroke = 6, children, label, valueText, smooth = true }: {
+  value: number; size?: number; stroke?: number; children?: ReactNode; label?: string;
+  /** Words for a screen reader in place of the percentage (a ring that must never read as a number). */
+  valueText?: string; smooth?: boolean;
 }) {
   const r = 50 - stroke;
   const c = 2 * Math.PI * r;
@@ -15,7 +17,7 @@ export function ProgressRing({ value, size = 120, stroke = 6, children, label, s
     <div className="relative grid place-items-center shrink-0" style={{ width: size, height: size }}
       role={label ? 'progressbar' : undefined} aria-label={label}
       aria-valuemin={label ? 0 : undefined} aria-valuemax={label ? 100 : undefined}
-      aria-valuenow={label ? Math.round(value * 100) : undefined}>
+      aria-valuenow={label ? Math.round(value * 100) : undefined} aria-valuetext={label ? valueText : undefined}>
       <svg viewBox="0 0 100 100" className="absolute inset-0 -rotate-90" aria-hidden="true">
         <circle cx="50" cy="50" r={r} fill="none" stroke="var(--color-border)" strokeWidth={stroke} />
         <circle cx="50" cy="50" r={r} fill="none" stroke="var(--color-accent)" strokeWidth={stroke} strokeLinecap="round"
