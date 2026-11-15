@@ -186,8 +186,8 @@ Then the regulation close: *"How strong is it now, compared to when you started?
     parts line (`cf_unblend`) is a draft until it's signed off (every other parts line was, 17 Oct).
 - **The concept:** `dbt_check_facts.appToolId = 'check-the-facts'`, taken out of `PLANNED`. Its routing
   rows are live (12 Nov). Since MF-B2 (15 Nov) the self-worth row (*insecure, inadequate, inferior, insignificant,
-  weak, worthless*) shows only where Unpack a judgment is filtered out (dissociation or freeze alongside): Unpack takes
-  that second card and reaches Check the Facts through its justified branch (`docs/design/unpack-a-judgment.md`).
+  weak, worthless*) is the fallback should Unpack a judgment's row come off (its dissociation and freeze guard can't fire
+  beside Social threat today, so the row doesn't show on these words): Unpack takes that second card and reaches Check the Facts through its justified branch (`docs/design/unpack-a-judgment.md`).
 - **The visit:** a `ToolSession` with `ext.cf`:
   - `emotionId`;
   - `eventKind`, `eventOwn`;

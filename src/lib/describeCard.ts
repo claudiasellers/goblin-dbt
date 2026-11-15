@@ -9,8 +9,11 @@
  *
  * Own words are kept as written, apart from a capital first letter and a closing full stop when they have none. An
  * own-words want gets the lead only when it reads on from it (*to …*, as every chip does); one that's already a
- * sentence (*I need them to stop*, *I wanted …*, *Sam to call me*) stands as written.
+ * sentence (*I need them to stop*, *I wanted …*, *Sam to call me*) stands as written; *for … to …* drops its *for*
+ * (*For it to stop* → *I wanted it to stop.*). Quotes around the whole of own words are dropped.
  */
+import { unquoted } from './skillRuntime/machine';
+
 export interface DescribePicks { happened?: readonly string[]; cost?: readonly string[]; feel?: readonly string[]; want?: readonly string[] }
 export interface DescribeLeads { feelLead: string; wantLead: string }
 
@@ -42,15 +45,19 @@ export function joinAnd(items: string[]): string {
 }
 
 export function describeLines(p: DescribePicks, leads: DescribeLeads): string[] {
-  const clean = (xs?: readonly string[]) => (xs ?? []).map((x) => x.trim()).filter(Boolean);
+  // Quotes around the whole of own words are dropped (as titleSlots does), so the lead and the full stop land right.
+  const clean = (xs?: readonly string[]) =>
+    (xs ?? []).map((x) => unquoted(x.trim())).filter(Boolean);
   const out: string[] = [];
   for (const x of clean(p.happened)) out.push(sentence(capital(x)));
   for (const x of clean(p.cost)) out.push(sentence(capital(x)));
   const feel = clean(p.feel).map((x) => midSentence(x).replace(/[.!?…]+$/u, ''));
   if (feel.length) out.push(sentence(`${leads.feelLead} ${joinAnd(feel)}`));
   for (const x of clean(p.want)) {
-    out.push(/^to\b/iu.test(x)
-      ? sentence(`${leads.wantLead} ${midSentence(x).replace(/[.!?…]+$/u, '')}`)
+    // *For it to stop* reads on from the lead without its *for*: *I wanted it to stop.*
+    const w = x.replace(/^for\s+(?=\S.*\bto\b)/iu, '');
+    out.push(/^to\b/iu.test(x) || w !== x
+      ? sentence(`${leads.wantLead} ${midSentence(w).replace(/[.!?…]+$/u, '')}`)
       : sentence(capital(x)));
   }
   return out;

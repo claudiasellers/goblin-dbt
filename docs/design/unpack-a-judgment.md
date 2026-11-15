@@ -22,19 +22,19 @@ minutes; one judgment a visit.
 
 | Step | What the person sees | PRD MF-03 |
 |---|---|---|
-| `about` | *What's the judgment about?* (*A judgment is a verdict in a few words, like “I'm too much” or “they don't care”.*) Me · A feeling I'm having · Someone else · How things are, and *It's more than a judgment. I'm thinking about hurting myself or not being here* as a chip | Step 1, the targets; the always-visible safety chip |
+| `about` | *What's the judgment about?* (*A judgment is a verdict in a few words, like “I'm too much” or “they don't care”.*) Me · A feeling I'm having · Someone else · How things are, and *It's more than a judgment. I'm thinking about hurting myself or not being here* and *Someone threatened me, scared me or hurt me* as chips (→ `harm`, → `danger`, both before the flooded set-down) | Step 1, the targets; the always-visible safety chips |
 | `harm` | The crisis banner, *Thank you for saying it. That's more than a judgment. Someone to talk to comes first.*, Talk to someone now. No unpacking | CORE's route |
 | `set_down` | A carried flooded reading, straight from `about` (no naming the verdict first): *A judgment can wait. Your body's loud right now. Body first, then come back to it if you want.* First, the body | Flooded: not run |
 | `judge` | *What's the judgment?* The PRD's chips for that target (*I'm too much · I'm pathetic · I ruin everything · I'm lazy · Something's wrong with me*; *I shouldn't feel this · I'm overreacting · I'm being dramatic*; *They're selfish · They don't care · They're doing it on purpose*; *This shouldn't be happening · It's not fair*) or their own words | Step 1 |
-| `see` | The judgment in quotes, exactly as said; a witness line for its target (*That's a heavy thing to be carrying.*; for someone else *Something they did got to you. Setting the verdict down isn't agreeing with what they did.*); *That's a judgment, a verdict in a few words. Minds make them all the time. You can set it down for a few minutes and look at what's under it.* Set it down and look under it · It feels like a fact · for someone else, *They threatened me, scared me or hurt me* (→ `danger`, so the short path has it too) | Steps 1–2 |
+| `see` | The judgment in quotes, exactly as said; a witness line for its target (*That's a heavy thing to be carrying.*; for someone else *Something they did got to you. Setting the verdict down isn't agreeing with what they did.*); *That's a judgment, a verdict in a few words. Minds make them all the time. You can set it down for a few minutes and look at what's under it.* Set it down and look under it · It feels like a fact · *They threatened me, scared me or hurt me* for someone else, *Someone threatened me, scared me or hurt me* for every other target (→ `danger`, so the short path has it too: a verdict about me or how things are can be someone's words taken in, or harm that keeps happening) | Steps 1–2 |
 | `facts` | *It feels like a fact* with shame or guilt (the chip's hint, or a carried shame or guilt word for a verdict about me, a feeling or in own words), unless Do the Opposite's facts just said it doesn't fit (`frame=after_facts`): *It feels like a fact. Shame or guilt can fit what happened, and then it asks for something to be done. Checking the facts looks at the feeling, not at whether the verdict is true.* Check the facts on the feeling · Look at what's under it anyway | Step 2, the justified branch |
 | `facts_go` | *Check the Facts, then. It looks at the feeling and what happened. Nothing in it decides whether you're a bad person.* Check the Facts | |
 | `pick` | A carried stirred reading: *Which would help most to look at?* What I feel · What I wanted | Stirred: one pile |
-| `happened` | *What happened, the way a camera would see it?* Up to two of six per target (*I was late.*, *They didn't reply.*, *A plan fell through.*), or own words; skippable. *They threatened me, scared me or hurt me.* goes to `danger` | Step 3, facts |
+| `happened` | *What happened, the way a camera would see it?* Up to two of six per target (*I was late.*, *They didn't reply.*, *A plan fell through.*), or own words; skippable. *They threatened me, scared me or hurt me.* (someone else) or *Someone threatened me, scared me or hurt me.* (the other targets) goes to `danger` | Step 3, facts |
 | `danger` | The `other_person` banner, *That's about your safety, not a judgment to unpack. Your read of danger is the one that counts here.* Ending (careful), Talk to someone now | Risks: never a softening move |
 | `cost` | *What did it cost, or what could it cost?* Up to two, by target: for someone else or how things are, what the event cost the person (*I had to sort it out on my own.*) as well as their own reactions; own words; skippable | Step 3, consequence |
 | `feel` | *What might you be feeling, under the judgment?* Grid words as guesses, led by the target (shame first for me, anger and hurt first for someone else, disappointment first for how things are), a carried word first, *Something else* for the full list; up to two; skippable. These are the session's emotion ids | Step 3, feeling as hypotheses |
-| `want` | *What did you want, or what matters to you here?* Six or seven preference and value chips per target, one first (*To be safe*, then *For it to stop* and *To have some distance*, for someone else); *Not judging isn't agreeing. What you wanted still matters.* for someone else; skippable | Step 3, preference and value |
+| `want` | *What did you want, or what matters to you here?* Six or seven preference and value chips per target, one first (*To be safe*, then *For it to stop* and *To have some distance*, for someone else; *To be safe* is offered for every target); *Not judging isn't agreeing. What you wanted still matters.* for someone else; skippable | Step 3, preference and value |
 | `rebuild` | `describeCard`: *Here's what you found.* The picks as plain first-person lines on the paper (*I didn't go. I missed out on something. I feel ashamed. I wanted to be someone who shows up.*) | Step 4 |
 | `sit` | *How does that sit, next to the judgment?* (*It isn't truer or better. It's described.*) That's closer · Not quite · I'll keep the judgment for now | Step 4 |
 | `fix` | Not quite (once a visit): *Which part would you change?* One pile, then straight back to the rebuild; a change that empties the last pile lands on `noticed` | Step 4, edit |
@@ -44,9 +44,10 @@ minutes; one judgment a visit.
 | `end` | *You took it apart instead of carrying it whole.* A line by what was found, with the practice (*Next time, noticing the judgment is the practice.*); What matters to me when something mattered, Recover when it was about someone else | Step 5 |
 
 After `about`, every screen carries *Thoughts of hurting myself or not being here* as a link (the danger and harm cards
-offer someone to talk to themselves). With a heavy carried word (*worthless*, *despair*, *helpless*, *powerless*,
-*hopeless*) the end cards say *Heavy feelings can come with thoughts of not being here. If they do, talk to someone
-now.* (as Let it be a wave does). Every screen from `see` to `fix` carries *Back to the room* (Five senses), the rebuild
+offer someone to talk to themselves). With a heavy carried word (*worthless*, *despair*, *helpless*, *powerless*) the
+end cards (`kept`, `noticed`, `end`) keep their own line and add *Heavy feelings can come with thoughts of not being
+here. If they do, talk to someone now.* (combined `*_heavy` copy, as Let it be a wave does, since a hand-off shows one
+line), with Talk to someone now as an offer. Every screen from `see` to `fix` carries *Back to the room* (Five senses), the rebuild
 included, where reading it back can sting. No *unpack another* and one *Not quite*: one judgment a visit, no loop over
 the card (PRD: shame spiral).
 
@@ -72,8 +73,10 @@ by the card and the tests.
   inferior, insignificant, weak, worthless*) get Unpack a judgment as the swap beside Recover. **This takes Check the
   Facts' card off those six words** (signed off 12 Nov): a result shows two cards, and Unpack ranks above it. Why
   that's acceptable: the words are verdicts about the self, the PRD's case for MF-03, and Check the Facts is still one
-  tap away as Unpack's justified branch (*It feels like a fact*). Check the Facts' row stays in the table, so it comes
-  back wherever Unpack is filtered out. `CONTRAINDICATED_FOR` dissociation and freeze (primary or alongside): a
+  tap away as Unpack's justified branch (*It feels like a fact*). Check the Facts' row stays in the table as the
+  fallback should Unpack's row come off; today it never shows on these words. `CONTRAINDICATED_FOR` dissociation and
+  freeze (primary or alongside) is a guard: a secondary pattern comes from the same quadrant, so neither can sit beside
+  Social threat now, but the edge holds if that changes. Its reason: a
   self-focused verdict exercise never during shame collapse (social threat with freeze: *do not start with
   self-focused tools*, `schema/pattern-co-occurrence.cypher`) or far away (KB). Tags: acceptance, naming, neutral. No
   `ADDRESSES` edges, so the legacy ranker behind the kill switch is unchanged.
@@ -104,8 +107,9 @@ by the card and the tests.
   is part 2).
 - **The witness line** is a line on the seeing screen, not a three-second hold before it.
 - **Danger from a person.** No person picker, so `Person.safe` isn't read; instead *They threatened me, scared me or
-  hurt me* is a choice on the seeing screen and a fact chip for someone else that opens the danger route, and *To be
-  safe*, *For it to stop* and *To have some distance* lead their values.
+  hurt me* is a chip on the first screen (so a flooded reading has it), a choice on the seeing screen and a fact chip,
+  for every target, that opens the danger route; *To be safe*, *For it to stop* and *To have some distance* lead the
+  values for someone else, and *To be safe* is offered for every target.
 - **The justified branch is a choice.** *It feels like a fact* with shame or guilt offers Check the Facts or *Look at
   what's under it anyway*: every self-verdict chip carries a shame or guilt hint, and feeling like a fact isn't the
   same as fitting the facts.

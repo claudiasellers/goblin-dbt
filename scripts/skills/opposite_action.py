@@ -403,7 +403,8 @@ STEPS = [
              {"exit": "check_the_facts", "when": {"any": [NOT_CHECKED, CHECKED("left"), CHECKED("finished")]}},
              {"exit": "wise_mind", "when": {"any": [CHECKED("unsure"), CHECKED("doesnt_fit"), CHECKED_FITS, LATE_UNSURE]}},
              # Shame or guilt that doesn't fit is often a verdict about the self: unpack it (MF-03, PRD entry points).
-             {"exit": "unpack", "when": {"all": [{"in": ["$d.parent", ["guilt", "shame"]]}, {"not": FLOODED},
+             # Never with the urge to punish myself: the crisis banner this screen shows wouldn't follow.
+             {"exit": "unpack", "when": {"all": [{"in": ["$d.parent", ["guilt", "shame"]]}, {"not": FLOODED}, {"not": PUNISH},
                                                  {"any": [CHECKED("doesnt_fit"), EQ("fits", "not_fit")]}]}}]),
     handoff("prob", [{"when": CHECKED("partly"), "key": "prob_title_partly"}, {"when": CHECKED("fits"), "key": "prob_title_checked"},
                      {"key": "prob_title"}],

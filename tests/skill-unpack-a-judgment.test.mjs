@@ -57,7 +57,7 @@ test("the skill: tool unpack-a-judgment on dbt_nonjudgmental, listed under Mindf
 
 test("who it's about, then the PRD's judgments for that target, or their own words", () => {
   const s0 = M.initialRun(skill);
-  assert.deepEqual(ids(s0, "about"), ["me", "feeling", "them", "should", "harm"]);
+  assert.deepEqual(ids(s0, "about"), ["me", "feeling", "them", "should", "harm", "danger"]);
   const at = (t) => ids(run([pick("about", t), next]), "judge");
   assert.deepEqual(at("me"), ["too_much", "pathetic", "ruin", "lazy", "wrong_with_me"]);
   assert.deepEqual(at("feeling"), ["shouldnt_feel", "overreacting", "dramatic"]);
@@ -84,13 +84,20 @@ test("the self-harm chip is on the first screen and a link on every screen after
   // A heavy carried word (the self-worth row brings worthless here): the end cards say it plainly.
   const heavy = ctx({}, ["worthless"]);
   const kept = run([...PILES, read, pick("sit", "keep"), next], heavy);
-  assert.match(line(kept, heavy), /thoughts of not being here/);
+  assert.match(line(kept, heavy), /^You noticed it as a judgment\. That's the skill\. Heavy feelings .*thoughts of not being here/,
+    "its own line stays, heavy_line after it");
+  assert.deepEqual(offers(kept, heavy), ["safety_open"], "the line says talk to someone now: the offer is there");
+  assert.deepEqual(offers(kept), []);
+  const end = run([...PILES, read, pick("sit", "closer"), next, pick("hands_q", "no"), next], heavy);
+  assert.equal(end.stepId, "end");
+  assert.match(line(end, heavy), /^What you wanted is still there.*Heavy feelings/);
+  assert.equal(offers(end, heavy)[0], "safety_open");
 });
 
 test("seen as a judgment: a witness line for its target first, no correction; Back to the room on every unpacking screen", () => {
   assert.equal(line(run(ME)), "That's a heavy thing to be carrying.");
   assert.equal(line(run([pick("about", "them"), next, pick("judge", "selfish"), next])), "Something they did got to you. Setting the verdict down isn't agreeing with what they did.");
-  assert.deepEqual(ids(run(ME), "see"), ["down", "fact"]);
+  assert.deepEqual(ids(run(ME), "see"), ["down", "fact", "threat_any"], "a danger from a person, whoever the verdict is about");
   assert.match(skill.copy.see_hint, /Minds make them all the time/, "don't judge the judging (Handout 5a)");
   assert.match(skill.copy.see_hint, /set it down/);
   for (const st of [run(ME), run(DOWN), run([...DOWN, next]), run([...DOWN, next, next]), run([...DOWN, next, next, next])])
@@ -125,11 +132,10 @@ test("It feels like a fact, with shame or guilt (the chip's hint or a carried wo
 });
 
 test("the piles: what happened per target (a camera's view), what it cost, grid words as guesses, what I wanted; each optional", () => {
-  assert.deepEqual(ids(run(DOWN), "happened"), ["didnt_go", "late", "not_done", "forgot_thing", "stayed_in", "raised"]);
+  assert.deepEqual(ids(run(DOWN), "happened"), ["didnt_go", "late", "not_done", "forgot_thing", "stayed_in", "raised", "threat_any"]);
   for (const t of ["me", "feeling", "them", "should"]) {
     const s = run([pick("about", t), next, own("judge", "x"), next, pick("see", "down"), next]);
-    assert.ok(ids(s, "happened").length <= 6 || t === "them", t);
-    assert.ok(ids(s, "happened").filter((v) => v !== "threat").length <= 6, t);
+    assert.ok(ids(s, "happened").filter((v) => !v.startsWith("threat")).length <= 6, t);
     assert.ok(ids(run([next], ctx(), s), "cost").length <= 7, t);
   }
   const themCost = ids(run([pick("about", "them"), next, pick("judge", "selfish"), next, pick("see", "down"), next, next]), "cost");
@@ -137,6 +143,14 @@ test("the piles: what happened per target (a camera's view), what it cost, grid 
   const themDown = [pick("about", "them"), next, pick("judge", "dont_care"), next, pick("see", "down"), next];
   assert.ok(ids(run(themDown), "happened").includes("threat"));
   assert.ok(!ids(run(DOWN), "happened").includes("threat"));
+  // A danger from a person for every target: the first screen, the see step, and what happened; never a pile.
+  const shouldDown = [pick("about", "should"), next, pick("judge", "shouldnt_happen"), next, pick("see", "down"), next];
+  assert.equal(run([...shouldDown, pick("happened", "threat_any"), next]).stepId, "danger");
+  assert.equal(run([...ME, pick("see", "threat_any"), next]).stepId, "danger");
+  const first = run([pick("about", "danger"), next], ctx({ band: "flooded" }));
+  assert.equal(first.stepId, "danger", "before the flooded set-down");
+  assert.ok(M.stepOf(skill, "about").crisis.some((c) => c.variant === "other_person"));
+  assert.ok(ids(run([...DOWN, next, next, next]), "want").includes("safe"), "to be safe for a verdict about me too");
   for (const [step, f] of [["happened", "happened"], ["cost", "cost"], ["feel", "feel"], ["want", "want"]]) {
     const fld = M.stepOf(skill, step).fields.find((x) => x.id === f);
     assert.equal(fld.required, false, `${f} can be skipped`);
@@ -248,6 +262,8 @@ test("the describe card's lines: sentences kept, feelings joined, *I* never lowe
   assert.deepEqual(D.describeLines({ happened: ["they left early"], feel: ["I don't know"] }, L), ["They left early.", "I feel I don't know."]);
   assert.deepEqual(D.describeLines({ want: ["I need them to stop", "I wanted a break", "Sam to call me", "to be heard"] }, L),
     ["I need them to stop.", "I wanted a break.", "Sam to call me.", "I wanted to be heard."], "own words that don't read on from the lead stand as written");
+  assert.deepEqual(D.describeLines({ want: ["For it to stop", "“to be left alone”"], happened: ['"he shouted at me"'] }, L),
+    ["He shouted at me.", "I wanted it to stop.", "I wanted to be left alone."], "*for … to* reads on from the lead; wrapping quotes go");
   assert.deepEqual(D.describeLines({}, L), []);
   assert.equal(D.sentence("Done?"), "Done?");
 });

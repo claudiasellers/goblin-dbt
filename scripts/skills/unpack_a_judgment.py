@@ -87,7 +87,7 @@ COPY = {
     "want_lead": "I wanted",
     "rebuild_empty": "Go on",
     "sit_title": "How does that sit, next to the judgment?",
-    "sit_hint": "It isn't truer or better. It's described.",
+    "sit_hint": "It isn't truer or better, only described.",
     "fix_title": "Which part would you change?",
     # Keep the judgment for now: a full answer (PRD: "That's okay. You noticed it; that's the skill.").
     "kept_title": "That's okay.",
@@ -122,6 +122,9 @@ COPY = {
     "next": "Next",
     "done": "Done",
 }
+# A heavy carried word: each end card keeps its own line and adds heavy_line (handoffLine shows one line only).
+COPY.update({f"{k}_heavy": f"{COPY[k]} {COPY['heavy_line']}"
+             for k in ("kept_line", "noticed_line", "end_them", "end_want", "end_line")})
 
 
 def a(field):
@@ -147,6 +150,8 @@ ABOUT = [
     ("them", "Someone else", {}),
     ("should", "How things are", {}),
     ("harm", COPY["safety_chip"], {"danger": "self"}),
+    # A danger from a person is a route from the first screen too, so a flooded reading (set down at once) has it.
+    ("danger", "Someone threatened me, scared me or hurt me", {"danger": "other"}),
 ]
 # JudgmentChip (PRD MF-03 step 1, in its order). `t`: the target it's listed under. `hint`: the emotion family it
 # often stands for (PRD HINTS_EMOTION), read only by the justified route: shame or guilt + *It feels like a fact* →
@@ -170,12 +175,14 @@ JUDGMENTS = [
 SHAME_GUILT_WORDS = ["ashamed", "embarrassed", "guilty", "remorseful", "humiliated", "worthless", "inadequate",
                      "inferior", "insecure", "insignificant", "weak", "exposed"]
 # Heavy words the self-worth routing row brings here: the end cards carry heavy_line.
-HEAVY_WORDS = ["worthless", "despair", "helpless", "powerless", "hopeless"]
+HEAVY_WORDS = ["worthless", "despair", "helpless", "powerless"]
 SEE = [
     ("down", "Set it down and look under it", {}),
     ("fact", "It feels like a fact", {}),
     # A danger from a person is caught here too, so the short (stirred) path, which skips what happened, has it.
     ("threat", "They threatened me, scared me or hurt me", {"t": ["them"], "danger": "other"}),
+    # Every target: a verdict about me, a feeling or how things are can be someone's words taken in, or ongoing harm.
+    ("threat_any", "Someone threatened me, scared me or hurt me", {"t": ["me", "feeling", "should"], "danger": "other"}),
 ]
 FACTS = [
     ("check", "Check the facts on the feeling", {}),
@@ -211,6 +218,7 @@ HAPPENED = [
     ("lost", "I lost something that mattered.", {"t": ["should"]}),
     ("counted_on", "Something I counted on didn't happen.", {"t": ["should"]}),
     ("keeps_happening", "It keeps happening.", {"t": ["should"]}),
+    ("threat_any", "Someone threatened me, scared me or hurt me.", {"t": ["me", "feeling", "should"], "danger": "other"}),
 ]
 # What it cost or could cost (PRD consequence chips).
 ALL = ["me", "feeling", "them", "should"]
@@ -238,7 +246,7 @@ WANT = [
     ("respected", "To be respected", {"t": ["me", "feeling", "them"]}),
     ("do_well", "To do well", {"t": ["me", "should"]}),
     ("close", "To be close to someone", {"t": ["feeling", "should"]}),
-    ("safe", "To be safe", {"t": ["feeling", "them", "should"]}),
+    ("safe", "To be safe", {"t": ["me", "feeling", "them", "should"]}),
     ("show_up", "To be someone who shows up", {"t": ["me"]}),
     ("understood", "To be understood", {"t": ["me", "feeling", "them"]}),
     ("fair", "To be treated fairly", {"t": ["them", "should"]}),
@@ -279,7 +287,14 @@ JUSTIFIED = {"all": [EQ("see", "fact"),
                               {"all": [{"any": [{"in": [a("about"), ["me", "feeling"]]}, {"own": "judge"}]},
                                        {"any": [{"has": ["$carried", w]} for w in SHAME_GUILT_WORDS]}]}]}]}
 HEAVY = {"any": [{"has": ["$carried", w]} for w in HEAVY_WORDS]}
-HEAVY_LINE = {"when": HEAVY, "key": "heavy_line"}
+HEAVY_OFFER = {"exit": "safety_open", "when": HEAVY}
+SEE_THREAT = {"in": [a("see"), ["threat", "threat_any"]]}
+HAPPENED_THREAT = {"any": [{"has": [a("happened") + ".ids", t]} for t in ("threat", "threat_any")]}
+
+
+def heavy(key):
+    """An end card's own line, with heavy_line after it when a heavy word was carried (only one line shows)."""
+    return [{"when": HEAVY, "key": f"{key}_heavy"}, {"when": ALWAYS, "key": key}]
 AFTER_SEE = [{"when": STIRRED, "to": "pick"}, {"to": "happened"}]
 ANY_PILE = {"any": [{"set": a(f)} for f in ("happened", "cost", "feel", "want")]}
 FIXING = {"set": a("fix")}
@@ -318,8 +333,10 @@ def pile_next(nxt):
 
 STEPS = [
     {**ask("about", "about_title", "about_hint", "about", "about",
-           [{"when": EQ("about", "harm"), "to": "harm"}, {"when": FLOODED, "to": "set_down"}, {"to": "judge"}], links=[]),
-     "crisis": [{"variant": "crisis", "when": EQ("about", "harm")}]},
+           [{"when": EQ("about", "harm"), "to": "harm"}, {"when": EQ("about", "danger"), "to": "danger"},
+            {"when": FLOODED, "to": "set_down"}, {"to": "judge"}], links=[]),
+     "crisis": [{"variant": "crisis", "when": EQ("about", "harm")},
+                {"variant": "other_person", "when": EQ("about", "danger")}]},
     {**handoff("harm", "harm_title", [{"when": ALWAYS, "key": "harm_line"}], [{"exit": "safety_open", "when": ALWAYS}],
                complete=False, links=[]),
      "crisis": [{"variant": "crisis", "when": ALWAYS}]},
@@ -329,10 +346,10 @@ STEPS = [
             [{"exit": "cool_down", "when": ALWAYS}], complete=False),
     {**ask("see", "see_title", "see_hint", "see",
            {"list": "see", "where": {"any": [{"not": {"set": "$opt.t"}}, {"has": ["$opt.t", a("about")]}]}},
-           [{"when": EQ("see", "threat"), "to": "danger"}, {"when": JUSTIFIED, "to": "facts"}] + AFTER_SEE,
+           [{"when": SEE_THREAT, "to": "danger"}, {"when": JUSTIFIED, "to": "facts"}] + AFTER_SEE,
            links=PILE_LINKS, title_slots={"judge": {"labelOf": "judge"}},
            lines=[{"when": EQ("about", t), "key": f"witness_{t}"} for t in ("me", "feeling", "them", "should")]),
-     "crisis": [{"variant": "other_person", "when": EQ("see", "threat")}]},
+     "crisis": [{"variant": "other_person", "when": SEE_THREAT}]},
     ask("facts", "facts_title", "facts_hint", "facts", "facts",
         [{"when": EQ("facts", "check"), "to": "facts_go"}] + AFTER_SEE,
         links=PILE_LINKS, lines=[{"when": ALWAYS, "key": "facts_line"}]),
@@ -342,10 +359,10 @@ STEPS = [
         [{"when": EQ("pick", "want"), "to": "want"}, {"to": "feel"}], links=PILE_LINKS),
     {**ask("happened", "happened_title", "happened_hint", "happened",
         {"list": "happened", "where": {"has": ["$opt.t", a("about")]}},
-        [{"when": {"has": [a("happened") + ".ids", "threat"]}, "to": "danger"}] + pile_next([{"to": "cost"}]),
+        [{"when": HAPPENED_THREAT, "to": "danger"}] + pile_next([{"to": "cost"}]),
         required=False, own="happened_own", links=PILE_LINKS, max_picks=2,
         lines=[{"when": EQ("see", "fact"), "key": "happened_fact"}]),
-     "crisis": [{"variant": "other_person", "when": {"has": [a("happened") + ".ids", "threat"]}}]},
+     "crisis": [{"variant": "other_person", "when": HAPPENED_THREAT}]},
     handoff("danger", "danger_title", [{"when": ALWAYS, "key": "danger_line"}],
             [{"exit": "ending", "when": ALWAYS}, {"exit": "safety_open", "when": ALWAYS}], complete=False,
             crisis=[{"variant": "other_person", "when": ALWAYS}], links=[]),
@@ -371,8 +388,8 @@ STEPS = [
          {"when": STIRRED, "to": "end"}, {"to": "hands_q"}], links=PILE_LINKS),
     ask("fix", "fix_title", None, "fix", {"list": "fix", "where": {"any": [{"not": STIRRED}, {"eq": ["$opt.short", True]}]}},
         [{"when": EQ("fix", f), "to": f} for f, _, _ in FIX[:-1]] + [{"to": "want"}], links=PILE_LINKS),
-    handoff("kept", "kept_title", [HEAVY_LINE, {"when": ALWAYS, "key": "kept_line"}], []),
-    handoff("noticed", "noticed_title", [HEAVY_LINE, {"when": ALWAYS, "key": "noticed_line"}], []),
+    handoff("kept", "kept_title", heavy("kept_line"), [HEAVY_OFFER]),
+    handoff("noticed", "noticed_title", heavy("noticed_line"), [HEAVY_OFFER]),
     ask("hands_q", "hands_q_title", "hands_q_hint", "hands_q", "hands",
         [{"when": EQ("hands_q", "yes"), "to": "hands"}, {"to": "end"}]),
     {"id": "hands", "kind": "embed", "embed": "bodyCard", "answerAs": "hands", "title": "hands_title", "links": LINKS,
@@ -381,11 +398,13 @@ STEPS = [
                "next": "next"},
      "next": [{"to": "end"}]},
     handoff("end", "end_title",
-            [HEAVY_LINE,
+            [{"when": {"all": [HEAVY, EQ("about", "them"), {"set": a("want")}]}, "key": "end_them_heavy"},
+             {"when": {"all": [HEAVY, {"set": a("want")}]}, "key": "end_want_heavy"},
+             {"when": HEAVY, "key": "end_line_heavy"},
              {"when": {"all": [EQ("about", "them"), {"set": a("want")}]}, "key": "end_them"},
              {"when": {"set": a("want")}, "key": "end_want"},
              {"when": ALWAYS, "key": "end_line"}],
-            [{"exit": "values", "when": {"set": a("want")}}, {"exit": "recover", "when": EQ("about", "them")}]),
+            [HEAVY_OFFER, {"exit": "values", "when": {"set": a("want")}}, {"exit": "recover", "when": EQ("about", "them")}]),
 ]
 
 EXITS = [

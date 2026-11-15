@@ -426,7 +426,7 @@ WORD_RULES = [
     {"key": "self-worth", "pattern": "social_threat_shame", "tool": "unpack-a-judgment", "priority": 1.45, "words": ["insecure", "inadequate", "inferior", "insignificant", "weak", "worthless"],
      "why": "MF-03 (PRD: the second card for Social threat): these words are verdicts about the self, often the only words a person has for shame, so Unpack a judgment takes the swap beside Recover. Check the Facts stays the next row and is its justified branch (It feels like a fact, with shame) (15 Nov 2026)."},
     {"key": "self-worth", "pattern": "social_threat_shame", "tool": "check-the-facts", "priority": 1.5, "words": ["insecure", "inadequate", "inferior", "insignificant", "weak", "worthless"],
-     "why": "Check the Facts for shame about the self; since MF-B2 it shows where Unpack a judgment is filtered out (dissociation or freeze alongside), Unpack reaching it as its justified branch."},
+     "why": "Check the Facts for shame about the self; since MF-B2 the fallback behind Unpack a judgment's row (Unpack's dissociation and freeze guard can't fire beside Social threat today), Unpack reaching it as its justified branch."},
     {"key": "ask-for-it", "pattern": "social_threat_shame", "tool": "dear-man", "priority": 1.5, "words": ["let_down", "excluded"], "beside": ["recovering-from-invalidation"],
      "why": "DEAR MAN (ask for what you need) as the alternative to Recover after a let-down or being left out: the person's own ask, after the picker and the safety question (IE-01, D4). Not rejected or humiliated: a wound to recover from first."},
     {"key": "self-respect", "pattern": "social_threat_shame", "tool": "fast", "priority": 1.5, "words": ["betrayed", "disrespected"],

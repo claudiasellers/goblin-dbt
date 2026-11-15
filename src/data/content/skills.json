@@ -52734,6 +52734,14 @@
                       }
                     },
                     {
+                      "not": {
+                        "eq": [
+                          "$a.urge",
+                          "guilt-punish"
+                        ]
+                      }
+                    },
+                    {
                       "any": [
                         {
                           "has": [
@@ -73526,7 +73534,7 @@
           "want_lead": "I wanted",
           "rebuild_empty": "Go on",
           "sit_title": "How does that sit, next to the judgment?",
-          "sit_hint": "It isn't truer or better. It's described.",
+          "sit_hint": "It isn't truer or better, only described.",
           "fix_title": "Which part would you change?",
           "kept_title": "That's okay.",
           "kept_line": "You noticed it as a judgment. That's the skill.",
@@ -73552,7 +73560,12 @@
           "back_to_room": "Back to the room",
           "safety_open": "Talk to someone now",
           "next": "Next",
-          "done": "Done"
+          "done": "Done",
+          "kept_line_heavy": "You noticed it as a judgment. That's the skill. Heavy feelings can come with thoughts of not being here. If they do, talk to someone now.",
+          "noticed_line_heavy": "That's the skill, even without taking it apart today. Heavy feelings can come with thoughts of not being here. If they do, talk to someone now.",
+          "end_them_heavy": "What you wanted still counts, whatever they did. Next time, noticing the judgment is the practice. Heavy feelings can come with thoughts of not being here. If they do, talk to someone now.",
+          "end_want_heavy": "What you wanted is still there, without the verdict. Next time, noticing the judgment is the practice. Heavy feelings can come with thoughts of not being here. If they do, talk to someone now.",
+          "end_line_heavy": "When it shows up again, noticing it as a judgment is the practice. Heavy feelings can come with thoughts of not being here. If they do, talk to someone now."
         },
         "tables": {
           "wantFirstOf": {
@@ -73645,6 +73658,15 @@
                     "harm"
                   ]
                 }
+              },
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.about",
+                    "danger"
+                  ]
+                }
               }
             ],
             "next": [
@@ -73654,6 +73676,15 @@
                   "eq": [
                     "$a.about",
                     "harm"
+                  ]
+                }
+              },
+              {
+                "to": "danger",
+                "when": {
+                  "eq": [
+                    "$a.about",
+                    "danger"
                   ]
                 }
               },
@@ -73876,9 +73907,12 @@
               {
                 "variant": "other_person",
                 "when": {
-                  "eq": [
+                  "in": [
                     "$a.see",
-                    "threat"
+                    [
+                      "threat",
+                      "threat_any"
+                    ]
                   ]
                 }
               }
@@ -73887,9 +73921,12 @@
               {
                 "to": "danger",
                 "when": {
-                  "eq": [
+                  "in": [
                     "$a.see",
-                    "threat"
+                    [
+                      "threat",
+                      "threat_any"
+                    ]
                   ]
                 }
               },
@@ -74247,9 +74284,19 @@
               {
                 "variant": "other_person",
                 "when": {
-                  "has": [
-                    "$a.happened.ids",
-                    "threat"
+                  "any": [
+                    {
+                      "has": [
+                        "$a.happened.ids",
+                        "threat"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$a.happened.ids",
+                        "threat_any"
+                      ]
+                    }
                   ]
                 }
               }
@@ -74258,9 +74305,19 @@
               {
                 "to": "danger",
                 "when": {
-                  "has": [
-                    "$a.happened.ids",
-                    "threat"
+                  "any": [
+                    {
+                      "has": [
+                        "$a.happened.ids",
+                        "threat"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$a.happened.ids",
+                        "threat_any"
+                      ]
+                    }
                   ]
                 }
               },
@@ -74848,16 +74905,10 @@
                         "$carried",
                         "powerless"
                       ]
-                    },
-                    {
-                      "has": [
-                        "$carried",
-                        "hopeless"
-                      ]
                     }
                   ]
                 },
-                "key": "heavy_line"
+                "key": "kept_line_heavy"
               },
               {
                 "when": {
@@ -74878,7 +74929,39 @@
             ],
             "noClose": true,
             "next": [],
-            "offers": []
+            "offers": [
+              {
+                "exit": "safety_open",
+                "when": {
+                  "any": [
+                    {
+                      "has": [
+                        "$carried",
+                        "worthless"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "despair"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "helpless"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "powerless"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
           },
           {
             "id": "noticed",
@@ -74912,16 +74995,10 @@
                         "$carried",
                         "powerless"
                       ]
-                    },
-                    {
-                      "has": [
-                        "$carried",
-                        "hopeless"
-                      ]
                     }
                   ]
                 },
-                "key": "heavy_line"
+                "key": "noticed_line_heavy"
               },
               {
                 "when": {
@@ -74942,7 +75019,39 @@
             ],
             "noClose": true,
             "next": [],
-            "offers": []
+            "offers": [
+              {
+                "exit": "safety_open",
+                "when": {
+                  "any": [
+                    {
+                      "has": [
+                        "$carried",
+                        "worthless"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "despair"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "helpless"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "powerless"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
           },
           {
             "id": "hands_q",
@@ -75028,6 +75137,88 @@
             "lines": [
               {
                 "when": {
+                  "all": [
+                    {
+                      "any": [
+                        {
+                          "has": [
+                            "$carried",
+                            "worthless"
+                          ]
+                        },
+                        {
+                          "has": [
+                            "$carried",
+                            "despair"
+                          ]
+                        },
+                        {
+                          "has": [
+                            "$carried",
+                            "helpless"
+                          ]
+                        },
+                        {
+                          "has": [
+                            "$carried",
+                            "powerless"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$a.about",
+                        "them"
+                      ]
+                    },
+                    {
+                      "set": "$a.want"
+                    }
+                  ]
+                },
+                "key": "end_them_heavy"
+              },
+              {
+                "when": {
+                  "all": [
+                    {
+                      "any": [
+                        {
+                          "has": [
+                            "$carried",
+                            "worthless"
+                          ]
+                        },
+                        {
+                          "has": [
+                            "$carried",
+                            "despair"
+                          ]
+                        },
+                        {
+                          "has": [
+                            "$carried",
+                            "helpless"
+                          ]
+                        },
+                        {
+                          "has": [
+                            "$carried",
+                            "powerless"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "set": "$a.want"
+                    }
+                  ]
+                },
+                "key": "end_want_heavy"
+              },
+              {
+                "when": {
                   "any": [
                     {
                       "has": [
@@ -75052,16 +75243,10 @@
                         "$carried",
                         "powerless"
                       ]
-                    },
-                    {
-                      "has": [
-                        "$carried",
-                        "hopeless"
-                      ]
                     }
                   ]
                 },
-                "key": "heavy_line"
+                "key": "end_line_heavy"
               },
               {
                 "when": {
@@ -75105,6 +75290,37 @@
             "noClose": true,
             "next": [],
             "offers": [
+              {
+                "exit": "safety_open",
+                "when": {
+                  "any": [
+                    {
+                      "has": [
+                        "$carried",
+                        "worthless"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "despair"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "helpless"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "powerless"
+                      ]
+                    }
+                  ]
+                }
+              },
               {
                 "exit": "values",
                 "when": {
@@ -75206,6 +75422,11 @@
               "value": "harm",
               "label": "It's more than a judgment. I'm thinking about hurting myself or not being here",
               "danger": "self"
+            },
+            {
+              "value": "danger",
+              "label": "Someone threatened me, scared me or hurt me",
+              "danger": "other"
             }
           ],
           "judge": [
@@ -75328,6 +75549,16 @@
               "label": "They threatened me, scared me or hurt me",
               "t": [
                 "them"
+              ],
+              "danger": "other"
+            },
+            {
+              "value": "threat_any",
+              "label": "Someone threatened me, scared me or hurt me",
+              "t": [
+                "me",
+                "feeling",
+                "should"
               ],
               "danger": "other"
             }
@@ -75515,6 +75746,16 @@
               "t": [
                 "should"
               ]
+            },
+            {
+              "value": "threat_any",
+              "label": "Someone threatened me, scared me or hurt me.",
+              "t": [
+                "me",
+                "feeling",
+                "should"
+              ],
+              "danger": "other"
             }
           ],
           "cost": [
@@ -75648,6 +75889,7 @@
               "value": "safe",
               "label": "To be safe",
               "t": [
+                "me",
                 "feeling",
                 "them",
                 "should"
