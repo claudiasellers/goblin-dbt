@@ -30,7 +30,7 @@ from hold_to_wait import PULLS, SAFE
 ID = "ride_it_out"
 TOOL_ID = "urge-surfing"
 CONCEPT = "urge_surfing"
-VERSION = "ro-v1"
+VERSION = "ro-v2"
 OWN_MAX = 90  # one line: the pull in their words
 
 COPY = {
@@ -98,6 +98,18 @@ COPY = {
     "end_line": "You stayed with it. That's the skill.",
     # Hurt myself, safe for now: its own end card, with no "did you act on it?".
     "hurt_end_line": "You stayed with it. The support is still here if it comes back.",
+    # Part 2: the morning card (`ride_morning`, an in-tab card on Today the next 08:00 at least three hours on, so a ride
+    # at 2 a.m. gets it that morning). Offered before the end card, never after Hurt myself; *No card* the quiet way on.
+    "morning_title": "Want a card in the morning, to look back on it?",
+    "morning_hint": "Seeing it in daylight can show you got through it.",
+    "morning_skip": "No card",
+    # The card reopens the visit here (R9).
+    "back_title": "The urge you rode out. How is it now?",
+    "back_hint": "Any answer is fine. It's only to notice.",
+    "back_eased": "You rode it out, and here you are.",
+    "back_same": "It's still around, and you still got through it.",
+    "back_strong": "It's back. You've ridden it once, so you know you can. A card for next time could help too.",
+    "ride_again": "Ride it out again",
     "reach_line": "Please reach out to someone now, using the support on this screen. You don't have to hold this alone.",
     "safety_open": "Talk to someone now",
     "next": "Next",
@@ -121,6 +133,8 @@ OWN_PULL = {"not": {"in": [a("pull"), URGES]}}
 HABIT_OFFER = {"exit": "habit_plan", "when": {"in": [a("pull"), ["use", "check"]]}}
 
 SAMPLES = ["still_here", "fading", "gone", "bigger"]
+ROUND_PASSED = {"any": [{"eq": [a("after_round"), "passed"]}, {"eq": [a("after_round2"), "passed"]}]}
+MORNING_IS = lambda *v: {"in": [a("morning"), list(v)]}  # noqa: E731
 
 
 def ended(field, how):
@@ -157,6 +171,8 @@ SWAPS = [
     ("hands", "Give my hands a job", ["send", "check", "use", "other"]),
     ("just_wait", "Five minutes, nothing else", EVERY),
 ]
+REMIND = [("morning", "In the morning")]
+MORNING = [("gone", "Gone"), ("quieter", "Quieter"), ("same", "About the same"), ("strong", "Back, and strong")]
 AFTER_ROUND = [
     ("passed", "Gone or fading"),
     ("again", "Five more minutes"),
@@ -184,8 +200,8 @@ def wave(step_id, answer_as, title, not_now, nxt, leave_title=None):
 
 
 def to_end():
-    """Where a ride goes once it's over: hurt myself to its own card, else the end card."""
-    return [{"when": HURT, "to": "hurt_end"}, {"to": "end"}]
+    """Where a ride goes once it's over: hurt myself to its own card, else the morning card's offer, then the end card."""
+    return [{"when": HURT, "to": "hurt_end"}, {"to": "morning_ask"}]
 
 
 def round_step(step_id, nxt):
@@ -203,7 +219,7 @@ def after_round(step_id, again_to):
             "next": [{"when": {"all": [{"eq": [a(step_id), "passed"]}, HURT]}, "to": "hurt_end"},
                      # It passed: the wave that came before the round is drawn first (PRD step 5), if there was one.
                      {"when": {"all": [{"eq": [a(step_id), "passed"]}, sampled("ride")]}, "to": "shape"},
-                     {"when": {"eq": [a(step_id), "passed"]}, "to": "passed"},
+                     {"when": {"eq": [a(step_id), "passed"]}, "to": "morning_ask"},
                      {"when": {"eq": [a(step_id), "again"]}, "to": again_to},
                      {"to": "ride2"}]}
 
@@ -267,7 +283,7 @@ STEPS = [
                     "max": 1, "required": True, "links": [SAFETY_LINK]}],
         "next": [{"when": {"all": [{"eq": [a("after_round2"), "passed"]}, HURT]}, "to": "hurt_end"},
                  {"when": {"all": [{"eq": [a("after_round2"), "passed"]}, sampled("ride")]}, "to": "shape"},
-                 {"when": {"eq": [a("after_round2"), "passed"]}, "to": "passed"}, {"to": "ride2"}],
+                 {"when": {"eq": [a("after_round2"), "passed"]}, "to": "morning_ask"}, {"to": "ride2"}],
     },
     # The second ride: no *not now* button (a round was had, or *keep riding* was picked); bigger twice again goes to
     # the switch, whatever was picked before.
@@ -284,9 +300,16 @@ STEPS = [
         "props": {"rideField": "ride", "againField": "again", "downLine": "shape_down", "riseLine": "shape_rise",
                   "heldLine": "shape_held",
                   "next": "shape_next"},
-        "next": [{"when": HURT, "to": "hurt_end"},
-                 {"when": {"any": [{"eq": [a("after_round"), "passed"]}, {"eq": [a("after_round2"), "passed"]}]}, "to": "passed"},
-                 {"to": "end"}],
+        "next": [{"when": HURT, "to": "hurt_end"}, {"to": "morning_ask"}],
+    },
+    {
+        # Part 2 (the PRD's morning card): an optional card the next morning, never a must. Never after Hurt myself
+        # (that path ends on its own card). Then the end card: *not now* worked, or the ride's own.
+        "id": "morning_ask", "kind": "ask", "title": "morning_title", "hint": "morning_hint", "secondary": "morning_skip",
+        "crisis": CRISIS,
+        "fields": [{"id": "remind", "options": {"list": "remind"}, "max": 1, "links": [SAFETY_LINK]}],
+        "followUp": {"type": "ride_morning", "when": {"eq": [a("remind"), "morning"]}},
+        "next": [{"when": ROUND_PASSED, "to": "passed"}, {"to": "end"}],
     },
     {
         # Not now worked: the round passed. Straight to the end card (the wave has nothing new to draw).
@@ -330,6 +353,24 @@ STEPS = [
         "done": "done", "links": [SAFETY_LINK],
     },
     {
+        # The morning card (ride_morning) reopens the visit here (R9): how it is this morning, asked fresh each time.
+        "id": "morning", "kind": "ask", "title": "back_title", "hint": "back_hint", "crisis": CRISIS,
+        "fields": [{"id": "morning", "options": {"list": "morning"}, "max": 1, "required": True, "links": [SAFETY_LINK]}],
+        "reopens": {"after": "morning_ask"}, "clears": ["morning"],
+        "next": [{"to": "morning_end"}],
+    },
+    {
+        # The visit closed the night before (its urge close was asked then), so no second close here.
+        "id": "morning_end", "kind": "handoff", "complete": True, "noClose": True, "crisis": CRISIS,
+        "lines": [{"when": MORNING_IS("gone", "quieter"), "key": "back_eased"}, {"when": MORNING_IS("same"), "key": "back_same"},
+                  {"when": MORNING_IS("strong"), "key": "back_strong"}],
+        # Back and strong: ride it again (a fresh visit, the same pull first), a card for next time, a habit plan.
+        "offers": [{"exit": "ride_again", "when": MORNING_IS("strong")},
+                   {"exit": "pros_cons", "when": MORNING_IS("same", "strong")},
+                   {"exit": "habit_plan", "when": {"all": [MORNING_IS("same", "strong"), {"in": [a("pull"), ["use", "check"]]}]}}],
+        "done": "done", "links": [SAFETY_LINK],
+    },
+    {
         # Not safe or not sure: someone to talk to first (S9), nothing to ride.
         "id": "reach", "kind": "handoff", "complete": True, "noClose": True, "crisis": CRISIS,
         "lines": [{"when": ALWAYS, "key": "reach_line"}],
@@ -345,6 +386,7 @@ EXITS = [
     {"id": "pros_cons", "toolId": "pros-cons", "query": {"urgeId": "$a.pull"}},  # DT-10 a card for the same pull
     {"id": "habit_plan", "toolId": "habit-plan", "query": {"urgeId": "$a.pull"}},  # DT-09 When it's a habit (use, check)
     {"id": "crisis_kit", "toolId": "crisis-kit", "query": {"frame": "crisis"}},       # DT-03 My crisis kit, opened from a crisis route (the banner on every card)
+    {"id": "ride_again", "toolId": "urge-surfing", "query": {"urgeId": "$a.pull"}, "label": "ride_again"},  # a fresh ride, the same pull first
     {"id": "safety_open", "toolId": None, "safety": True},               # safety.open (R6)
     {"id": "done", "done": True},
 ]
@@ -357,6 +399,8 @@ def options():
     out += [("bigger", v, label, {}, None) for v, label in BIGGER]
     out += [("swap", v, label, {u: True for u in pulls}, None) for v, label, pulls in SWAPS]
     out += [("after_round", v, label, {"again": v == "again"}, None) for v, label in AFTER_ROUND]
+    out += [("remind", v, label, {}, None) for v, label in REMIND]
+    out += [("morning", v, label, {}, None) for v, label in MORNING]
     return out
 
 

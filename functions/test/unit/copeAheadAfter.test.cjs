@@ -88,6 +88,7 @@ test('a close\'s schedule: another tool\'s session skips cope_ahead_after (like 
     reach_out_outcome: 'finding-connection',
     notice_back: 'mindfulness-of-others',
     sleep_morning: 'sleep-reset',
+    ride_morning: 'urge-surfing',
   });
   const ending = { ...item, type: 'ending_after' };
   assert.deepEqual(await scheduleTx(tx, 'u1', [ending], { sourceSessionId: TS, sourceToolId: 'cope-ahead' }), [], 'an Ending check-in only from an Ending session');

@@ -577,6 +577,20 @@ FOLLOW_UP_TYPES = [
         "notification": "A check-in you asked for is ready.",
     },
     {
+        # Ride it out (DT-05 part 2, docs/design/ride-it-out.md): the PRD's morning card, offered before the end card of a
+        # ride (never after Hurt myself). The next 08:00 at least four hours on, so a ride at 2 a.m. gets it that morning
+        # and one at 3 p.m. the next. It reopens that visit at `morning` (R9: *How is it this morning?*). Opening it is
+        # the resolution. Content-free: it never names the urge. About one morning only, so it goes stale by evening.
+        "id": "ride_morning", "ownerModule": "dt", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/urge-surfing?run={sourceSessionId}&at=morning&followUp={followUpId}",
+        "window": {"kind": "next_local", "time": "08:00", "minAheadHours": 3},
+        "staleAfterHours": 10, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Looking back", "body": "Something you rode out. How is it now?"},
+        "choices": [{"id": "not_now", "label": "Not now", "status": "dismissed"}],
+        "notification": "A check-in you asked for is ready.",
+    },
+    {
         # When it's a habit (DT-09, docs/design/habit-plan.md): the stretch the person committed to has ended. The chips
         # are the stretch itself (the next hour, the rest of today, three days, a week). The card reopens that visit at
         # `renew` (R9 `reopens`: kept to it → the next stretch; slipped → the lapse plan they wrote, then recommit).

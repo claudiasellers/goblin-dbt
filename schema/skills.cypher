@@ -9540,108 +9540,123 @@ MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:fork:through
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "fork", order: 23};
 
-// --- ride_it_out (ro-v1) ---
+// --- ride_it_out (ro-v2) ---
 MERGE (s:Skill {id: "ride_it_out"})
-SET s += {toolId: "urge-surfing", version: "ro-v1", contentVersion: "skills-v1", start: "pull", ownMax: 90, emotionFields: [], accepts: ["band", "urgeId"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"after_round_hint\": \"Any answer is fine.\", \"after_round_title\": \"How is it now?\", \"bigger\": \"Bigger\", \"bigger_hint\": \"When it keeps growing, changing what you're doing can help.\", \"bigger_title\": \"It's getting bigger. Want to try something else for a bit?\", \"check_title\": \"How is it now?\", \"done\": \"Done\", \"end_gone\": \"You watched it come down.\", \"end_line\": \"You stayed with it. That's the skill.\", \"end_passed\": \"You told it not now, and it eased.\", \"fading\": \"Fading\", \"gone\": \"Gone\", \"heads_up_hint\": \"You can settle your body first, or ride it now.\", \"heads_up_title\": \"Your body's loud right now. It can help to settle it first.\", \"hurt_end_line\": \"You stayed with it. The support is still here if it comes back.\", \"next\": \"Next\", \"not_now\": \"Tell it: not now\", \"not_now_hint\": \"Pick one, or five minutes with nothing else.\", \"not_now_title\": \"Tell it: not now. Want something else instead?\", \"pull_hint\": \"Pick the closest. There's no wrong answer here.\", \"pull_own\": \"Say it your way\", \"pull_title\": \"What's the urge?\", \"reach_line\": \"Please reach out to someone now, using the support on this screen. You don't have to hold this alone.\", \"ride_again_title\": \"Back to watching it.\", \"ride_next\": \"Stop here\", \"ride_title\": \"Urges rise and fall. The job is not to act while it's high.\", \"ride_title_leave\": \"Urges rise and fall. If you need to get away to be safe, go. This is for when you don't.\", \"riding\": \"Watch it. You don't have to do anything with it.\", \"round_call\": \"Not now. Call or text someone safe for five minutes.\", \"round_cold\": \"Not now. Hold something cool for five minutes.\", \"round_done\": \"That's five minutes.\", \"round_hands\": \"Not now. Give your hands a job for five minutes.\", \"round_lead\": \"Get ready\", \"round_next\": \"Next\", \"round_phone\": \"Not now. Phone in another room for five minutes.\", \"round_running\": \"Not now\", \"round_squeeze\": \"Not now. Squeeze a pillow or a ball for five minutes.\", \"round_start\": \"Start five minutes\", \"round_title\": \"Not now. Five minutes.\", \"round_walk\": \"Not now. A walk for five minutes, even round the room.\", \"round_wash\": \"Not now. Cool water on your hands, then five minutes.\", \"safe_again_title\": \"It's getting stronger. Right now, are you still safe from acting on it?\", \"safe_hint\": \"You can answer honestly. Whatever you say, the support stays on the screen.\", \"safe_title\": \"Thank you for saying it. Right now, are you safe from acting on it?\", \"safety_open\": \"Talk to someone now\", \"settle_hurt\": \"Your body's loud. Settle it first. If the pull comes back, your support is right here.\", \"settle_line\": \"Settle first. Ride it out is here when you're ready.\", \"shape_down\": \"It came down.\", \"shape_held\": \"You rode it as far as it went today.\", \"shape_next\": \"Next\", \"shape_rise\": \"It rose, crested and came down.\", \"shape_title\": \"Here's the wave you rode.\", \"still_here\": \"Still here\", \"switch_line\": \"Let's change what you're doing. Your body first, or a way to wait.\", \"switch_line_hurt\": \"Let's change what you're doing. Something for your body first. Your support is still here.\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "urge-surfing", version: "ro-v2", contentVersion: "skills-v1", start: "pull", ownMax: 90, emotionFields: [], accepts: ["band", "urgeId"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"after_round_hint\": \"Any answer is fine.\", \"after_round_title\": \"How is it now?\", \"back_eased\": \"You rode it out, and here you are.\", \"back_hint\": \"Any answer is fine. It's only to notice.\", \"back_same\": \"It's still around, and you still got through it.\", \"back_strong\": \"It's back. You've ridden it once, so you know you can. A card for next time could help too.\", \"back_title\": \"The urge you rode out. How is it now?\", \"bigger\": \"Bigger\", \"bigger_hint\": \"When it keeps growing, changing what you're doing can help.\", \"bigger_title\": \"It's getting bigger. Want to try something else for a bit?\", \"check_title\": \"How is it now?\", \"done\": \"Done\", \"end_gone\": \"You watched it come down.\", \"end_line\": \"You stayed with it. That's the skill.\", \"end_passed\": \"You told it not now, and it eased.\", \"fading\": \"Fading\", \"gone\": \"Gone\", \"heads_up_hint\": \"You can settle your body first, or ride it now.\", \"heads_up_title\": \"Your body's loud right now. It can help to settle it first.\", \"hurt_end_line\": \"You stayed with it. The support is still here if it comes back.\", \"morning_hint\": \"Seeing it in daylight can show you got through it.\", \"morning_skip\": \"No card\", \"morning_title\": \"Want a card in the morning, to look back on it?\", \"next\": \"Next\", \"not_now\": \"Tell it: not now\", \"not_now_hint\": \"Pick one, or five minutes with nothing else.\", \"not_now_title\": \"Tell it: not now. Want something else instead?\", \"pull_hint\": \"Pick the closest. There's no wrong answer here.\", \"pull_own\": \"Say it your way\", \"pull_title\": \"What's the urge?\", \"reach_line\": \"Please reach out to someone now, using the support on this screen. You don't have to hold this alone.\", \"ride_again\": \"Ride it out again\", \"ride_again_title\": \"Back to watching it.\", \"ride_next\": \"Stop here\", \"ride_title\": \"Urges rise and fall. The job is not to act while it's high.\", \"ride_title_leave\": \"Urges rise and fall. If you need to get away to be safe, go. This is for when you don't.\", \"riding\": \"Watch it. You don't have to do anything with it.\", \"round_call\": \"Not now. Call or text someone safe for five minutes.\", \"round_cold\": \"Not now. Hold something cool for five minutes.\", \"round_done\": \"That's five minutes.\", \"round_hands\": \"Not now. Give your hands a job for five minutes.\", \"round_lead\": \"Get ready\", \"round_next\": \"Next\", \"round_phone\": \"Not now. Phone in another room for five minutes.\", \"round_running\": \"Not now\", \"round_squeeze\": \"Not now. Squeeze a pillow or a ball for five minutes.\", \"round_start\": \"Start five minutes\", \"round_title\": \"Not now. Five minutes.\", \"round_walk\": \"Not now. A walk for five minutes, even round the room.\", \"round_wash\": \"Not now. Cool water on your hands, then five minutes.\", \"safe_again_title\": \"It's getting stronger. Right now, are you still safe from acting on it?\", \"safe_hint\": \"You can answer honestly. Whatever you say, the support stays on the screen.\", \"safe_title\": \"Thank you for saying it. Right now, are you safe from acting on it?\", \"safety_open\": \"Talk to someone now\", \"settle_hurt\": \"Your body's loud. Settle it first. If the pull comes back, your support is right here.\", \"settle_line\": \"Settle first. Ride it out is here when you're ready.\", \"shape_down\": \"It came down.\", \"shape_held\": \"You rode it as far as it went today.\", \"shape_next\": \"Next\", \"shape_rise\": \"It rose, crested and came down.\", \"shape_title\": \"Here's the wave you rode.\", \"still_here\": \"Still here\", \"switch_line\": \"Let's change what you're doing. Your body first, or a way to wait.\", \"switch_line_hurt\": \"Let's change what you're doing. Something for your body first. Your support is still here.\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "urge_surfing"}), (s:Skill {id: "ride_it_out"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "ride_it_out"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
 MATCH (:Skill {id: "ride_it_out"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
 MERGE (n:SkillStep {id: "ride_it_out:pull"})
-SET n += {skillId: "ride_it_out", step: "pull", kind: "ask", version: "ro-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"fields\": [{\"id\": \"pull\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"firstFrom\": \"$ctx.urgeId\", \"list\": \"pull\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"pull_own\"}, \"required\": true}], \"hint\": \"pull_hint\", \"title\": \"pull_title\"}";
+SET n += {skillId: "ride_it_out", step: "pull", kind: "ask", version: "ro-v2"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"fields\": [{\"id\": \"pull\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"firstFrom\": \"$ctx.urgeId\", \"list\": \"pull\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"pull_own\"}, \"required\": true}], \"hint\": \"pull_hint\", \"title\": \"pull_title\"}";
 MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:pull"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 0};
 MERGE (n:SkillStep {id: "ride_it_out:safe"})
-SET n += {skillId: "ride_it_out", step: "safe", kind: "ask", version: "ro-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"fields\": [{\"id\": \"safe\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"safe\"}, \"required\": true}], \"hint\": \"safe_hint\", \"safetyFirst\": {\"all\": []}, \"title\": \"safe_title\"}";
+SET n += {skillId: "ride_it_out", step: "safe", kind: "ask", version: "ro-v2"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"fields\": [{\"id\": \"safe\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"safe\"}, \"required\": true}], \"hint\": \"safe_hint\", \"safetyFirst\": {\"all\": []}, \"title\": \"safe_title\"}";
 MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:safe"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 1};
 MERGE (n:SkillStep {id: "ride_it_out:safe_again"})
-SET n += {skillId: "ride_it_out", step: "safe_again", kind: "ask", version: "ro-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"fields\": [{\"id\": \"safe_again\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"safe\"}, \"required\": true}], \"hint\": \"safe_hint\", \"safetyFirst\": {\"all\": []}, \"title\": \"safe_again_title\"}";
+SET n += {skillId: "ride_it_out", step: "safe_again", kind: "ask", version: "ro-v2"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"fields\": [{\"id\": \"safe_again\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"safe\"}, \"required\": true}], \"hint\": \"safe_hint\", \"safetyFirst\": {\"all\": []}, \"title\": \"safe_again_title\"}";
 MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:safe_again"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 2};
 MERGE (n:SkillStep {id: "ride_it_out:heads_up"})
-SET n += {skillId: "ride_it_out", step: "heads_up", kind: "ask", version: "ro-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"fields\": [{\"id\": \"heads_up\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"heads_up\"}, \"required\": true}], \"hint\": \"heads_up_hint\", \"title\": \"heads_up_title\"}";
+SET n += {skillId: "ride_it_out", step: "heads_up", kind: "ask", version: "ro-v2"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"fields\": [{\"id\": \"heads_up\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"heads_up\"}, \"required\": true}], \"hint\": \"heads_up_hint\", \"title\": \"heads_up_title\"}";
 MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:heads_up"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 3};
 MERGE (n:SkillStep {id: "ride_it_out:ride"})
-SET n += {skillId: "ride_it_out", step: "ride", kind: "embed", version: "ro-v1"}, n.specJson = "{\"answerAs\": \"ride\", \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"embed\": \"urgeWave\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"bigger\": \"bigger\", \"checkSec\": 75, \"checkTitle\": \"check_title\", \"fading\": \"fading\", \"gone\": \"gone\", \"maxChecks\": 10, \"next\": \"ride_next\", \"notNow\": \"not_now\", \"riding\": \"riding\", \"still_here\": \"still_here\"}, \"title\": [{\"key\": \"ride_title_leave\", \"when\": {\"eq\": [\"$a.pull\", \"leave\"]}}, {\"key\": \"ride_title\"}]}";
+SET n += {skillId: "ride_it_out", step: "ride", kind: "embed", version: "ro-v2"}, n.specJson = "{\"answerAs\": \"ride\", \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"embed\": \"urgeWave\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"bigger\": \"bigger\", \"checkSec\": 75, \"checkTitle\": \"check_title\", \"fading\": \"fading\", \"gone\": \"gone\", \"maxChecks\": 10, \"next\": \"ride_next\", \"notNow\": \"not_now\", \"riding\": \"riding\", \"still_here\": \"still_here\"}, \"title\": [{\"key\": \"ride_title_leave\", \"when\": {\"eq\": [\"$a.pull\", \"leave\"]}}, {\"key\": \"ride_title\"}]}";
 MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:ride"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 4};
 MERGE (n:SkillStep {id: "ride_it_out:bigger"})
-SET n += {skillId: "ride_it_out", step: "bigger", kind: "ask", version: "ro-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"fields\": [{\"id\": \"bigger\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"bigger\"}, \"required\": true}], \"hint\": \"bigger_hint\", \"title\": \"bigger_title\"}";
+SET n += {skillId: "ride_it_out", step: "bigger", kind: "ask", version: "ro-v2"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"fields\": [{\"id\": \"bigger\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"bigger\"}, \"required\": true}], \"hint\": \"bigger_hint\", \"title\": \"bigger_title\"}";
 MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:bigger"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 5};
 MERGE (n:SkillStep {id: "ride_it_out:not_now"})
-SET n += {skillId: "ride_it_out", step: "not_now", kind: "ask", version: "ro-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"fields\": [{\"id\": \"swap\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"swap\", \"where\": {\"any\": [{\"all\": [{\"eq\": [\"$a.pull\", \"send\"]}, {\"eq\": [\"$opt.send\", true]}]}, {\"all\": [{\"eq\": [\"$a.pull\", \"check\"]}, {\"eq\": [\"$opt.check\", true]}]}, {\"all\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"eq\": [\"$opt.hurt\", true]}]}, {\"all\": [{\"eq\": [\"$a.pull\", \"hit\"]}, {\"eq\": [\"$opt.hit\", true]}]}, {\"all\": [{\"eq\": [\"$a.pull\", \"leave\"]}, {\"eq\": [\"$opt.leave\", true]}]}, {\"all\": [{\"eq\": [\"$a.pull\", \"use\"]}, {\"eq\": [\"$opt.use\", true]}]}, {\"all\": [{\"not\": {\"in\": [\"$a.pull\", [\"send\", \"check\", \"hurt\", \"hit\", \"leave\", \"use\"]]}}, {\"eq\": [\"$opt.other\", true]}]}]}}, \"required\": true}], \"hint\": \"not_now_hint\", \"title\": \"not_now_title\"}";
+SET n += {skillId: "ride_it_out", step: "not_now", kind: "ask", version: "ro-v2"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"fields\": [{\"id\": \"swap\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"swap\", \"where\": {\"any\": [{\"all\": [{\"eq\": [\"$a.pull\", \"send\"]}, {\"eq\": [\"$opt.send\", true]}]}, {\"all\": [{\"eq\": [\"$a.pull\", \"check\"]}, {\"eq\": [\"$opt.check\", true]}]}, {\"all\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"eq\": [\"$opt.hurt\", true]}]}, {\"all\": [{\"eq\": [\"$a.pull\", \"hit\"]}, {\"eq\": [\"$opt.hit\", true]}]}, {\"all\": [{\"eq\": [\"$a.pull\", \"leave\"]}, {\"eq\": [\"$opt.leave\", true]}]}, {\"all\": [{\"eq\": [\"$a.pull\", \"use\"]}, {\"eq\": [\"$opt.use\", true]}]}, {\"all\": [{\"not\": {\"in\": [\"$a.pull\", [\"send\", \"check\", \"hurt\", \"hit\", \"leave\", \"use\"]]}}, {\"eq\": [\"$opt.other\", true]}]}]}}, \"required\": true}], \"hint\": \"not_now_hint\", \"title\": \"not_now_title\"}";
 MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:not_now"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 6};
 MERGE (n:SkillStep {id: "ride_it_out:round"})
-SET n += {skillId: "ride_it_out", step: "round", kind: "embed", version: "ro-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"embed\": \"doseTimer\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"art\": \"none\", \"done\": \"round_done\", \"lead\": \"round_lead\", \"leadIn\": 3, \"next\": \"round_next\", \"running\": \"round_running\", \"seconds\": 300, \"start\": \"round_start\"}, \"title\": [{\"key\": \"round_walk\", \"when\": {\"eq\": [\"$a.swap\", \"walk\"]}}, {\"key\": \"round_wash\", \"when\": {\"eq\": [\"$a.swap\", \"wash\"]}}, {\"key\": \"round_call\", \"when\": {\"eq\": [\"$a.swap\", \"call\"]}}, {\"key\": \"round_cold\", \"when\": {\"eq\": [\"$a.swap\", \"cold\"]}}, {\"key\": \"round_squeeze\", \"when\": {\"eq\": [\"$a.swap\", \"squeeze\"]}}, {\"key\": \"round_phone\", \"when\": {\"eq\": [\"$a.swap\", \"phone\"]}}, {\"key\": \"round_hands\", \"when\": {\"eq\": [\"$a.swap\", \"hands\"]}}, {\"key\": \"round_title\"}]}";
+SET n += {skillId: "ride_it_out", step: "round", kind: "embed", version: "ro-v2"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"embed\": \"doseTimer\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"art\": \"none\", \"done\": \"round_done\", \"lead\": \"round_lead\", \"leadIn\": 3, \"next\": \"round_next\", \"running\": \"round_running\", \"seconds\": 300, \"start\": \"round_start\"}, \"title\": [{\"key\": \"round_walk\", \"when\": {\"eq\": [\"$a.swap\", \"walk\"]}}, {\"key\": \"round_wash\", \"when\": {\"eq\": [\"$a.swap\", \"wash\"]}}, {\"key\": \"round_call\", \"when\": {\"eq\": [\"$a.swap\", \"call\"]}}, {\"key\": \"round_cold\", \"when\": {\"eq\": [\"$a.swap\", \"cold\"]}}, {\"key\": \"round_squeeze\", \"when\": {\"eq\": [\"$a.swap\", \"squeeze\"]}}, {\"key\": \"round_phone\", \"when\": {\"eq\": [\"$a.swap\", \"phone\"]}}, {\"key\": \"round_hands\", \"when\": {\"eq\": [\"$a.swap\", \"hands\"]}}, {\"key\": \"round_title\"}]}";
 MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:round"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 7};
 MERGE (n:SkillStep {id: "ride_it_out:after_round"})
-SET n += {skillId: "ride_it_out", step: "after_round", kind: "ask", version: "ro-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"fields\": [{\"id\": \"after_round\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"after_round\"}, \"required\": true}], \"hint\": \"after_round_hint\", \"title\": \"after_round_title\"}";
+SET n += {skillId: "ride_it_out", step: "after_round", kind: "ask", version: "ro-v2"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"fields\": [{\"id\": \"after_round\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"after_round\"}, \"required\": true}], \"hint\": \"after_round_hint\", \"title\": \"after_round_title\"}";
 MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:after_round"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 8};
 MERGE (n:SkillStep {id: "ride_it_out:round2"})
-SET n += {skillId: "ride_it_out", step: "round2", kind: "embed", version: "ro-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"embed\": \"doseTimer\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"art\": \"none\", \"done\": \"round_done\", \"lead\": \"round_lead\", \"leadIn\": 3, \"next\": \"round_next\", \"running\": \"round_running\", \"seconds\": 300, \"start\": \"round_start\"}, \"title\": [{\"key\": \"round_walk\", \"when\": {\"eq\": [\"$a.swap\", \"walk\"]}}, {\"key\": \"round_wash\", \"when\": {\"eq\": [\"$a.swap\", \"wash\"]}}, {\"key\": \"round_call\", \"when\": {\"eq\": [\"$a.swap\", \"call\"]}}, {\"key\": \"round_cold\", \"when\": {\"eq\": [\"$a.swap\", \"cold\"]}}, {\"key\": \"round_squeeze\", \"when\": {\"eq\": [\"$a.swap\", \"squeeze\"]}}, {\"key\": \"round_phone\", \"when\": {\"eq\": [\"$a.swap\", \"phone\"]}}, {\"key\": \"round_hands\", \"when\": {\"eq\": [\"$a.swap\", \"hands\"]}}, {\"key\": \"round_title\"}]}";
+SET n += {skillId: "ride_it_out", step: "round2", kind: "embed", version: "ro-v2"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"embed\": \"doseTimer\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"art\": \"none\", \"done\": \"round_done\", \"lead\": \"round_lead\", \"leadIn\": 3, \"next\": \"round_next\", \"running\": \"round_running\", \"seconds\": 300, \"start\": \"round_start\"}, \"title\": [{\"key\": \"round_walk\", \"when\": {\"eq\": [\"$a.swap\", \"walk\"]}}, {\"key\": \"round_wash\", \"when\": {\"eq\": [\"$a.swap\", \"wash\"]}}, {\"key\": \"round_call\", \"when\": {\"eq\": [\"$a.swap\", \"call\"]}}, {\"key\": \"round_cold\", \"when\": {\"eq\": [\"$a.swap\", \"cold\"]}}, {\"key\": \"round_squeeze\", \"when\": {\"eq\": [\"$a.swap\", \"squeeze\"]}}, {\"key\": \"round_phone\", \"when\": {\"eq\": [\"$a.swap\", \"phone\"]}}, {\"key\": \"round_hands\", \"when\": {\"eq\": [\"$a.swap\", \"hands\"]}}, {\"key\": \"round_title\"}]}";
 MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:round2"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 9};
 MERGE (n:SkillStep {id: "ride_it_out:after_round2"})
-SET n += {skillId: "ride_it_out", step: "after_round2", kind: "ask", version: "ro-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"fields\": [{\"id\": \"after_round2\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"after_round\", \"where\": {\"not\": {\"eq\": [\"$opt.again\", true]}}}, \"required\": true}], \"hint\": \"after_round_hint\", \"title\": \"after_round_title\"}";
+SET n += {skillId: "ride_it_out", step: "after_round2", kind: "ask", version: "ro-v2"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"fields\": [{\"id\": \"after_round2\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"after_round\", \"where\": {\"not\": {\"eq\": [\"$opt.again\", true]}}}, \"required\": true}], \"hint\": \"after_round_hint\", \"title\": \"after_round_title\"}";
 MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:after_round2"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 10};
 MERGE (n:SkillStep {id: "ride_it_out:ride2"})
-SET n += {skillId: "ride_it_out", step: "ride2", kind: "embed", version: "ro-v1"}, n.specJson = "{\"answerAs\": \"again\", \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"embed\": \"urgeWave\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"bigger\": \"bigger\", \"checkSec\": 75, \"checkTitle\": \"check_title\", \"continueFrom\": \"ride\", \"fading\": \"fading\", \"gone\": \"gone\", \"maxChecks\": 10, \"next\": \"ride_next\", \"riding\": \"riding\", \"still_here\": \"still_here\"}, \"title\": \"ride_again_title\"}";
+SET n += {skillId: "ride_it_out", step: "ride2", kind: "embed", version: "ro-v2"}, n.specJson = "{\"answerAs\": \"again\", \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"embed\": \"urgeWave\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"bigger\": \"bigger\", \"checkSec\": 75, \"checkTitle\": \"check_title\", \"continueFrom\": \"ride\", \"fading\": \"fading\", \"gone\": \"gone\", \"maxChecks\": 10, \"next\": \"ride_next\", \"riding\": \"riding\", \"still_here\": \"still_here\"}, \"title\": \"ride_again_title\"}";
 MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:ride2"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 11};
 MERGE (n:SkillStep {id: "ride_it_out:shape"})
-SET n += {skillId: "ride_it_out", step: "shape", kind: "embed", version: "ro-v1"}, n.specJson = "{\"answerAs\": \"shape\", \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"embed\": \"waveTrace\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"againField\": \"again\", \"downLine\": \"shape_down\", \"heldLine\": \"shape_held\", \"next\": \"shape_next\", \"rideField\": \"ride\", \"riseLine\": \"shape_rise\"}, \"title\": \"shape_title\"}";
+SET n += {skillId: "ride_it_out", step: "shape", kind: "embed", version: "ro-v2"}, n.specJson = "{\"answerAs\": \"shape\", \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"embed\": \"waveTrace\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"againField\": \"again\", \"downLine\": \"shape_down\", \"heldLine\": \"shape_held\", \"next\": \"shape_next\", \"rideField\": \"ride\", \"riseLine\": \"shape_rise\"}, \"title\": \"shape_title\"}";
 MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:shape"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 12};
-MERGE (n:SkillStep {id: "ride_it_out:passed"})
-SET n += {skillId: "ride_it_out", step: "passed", kind: "handoff", version: "ro-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"done\": \"done\", \"lines\": [{\"key\": \"end_passed\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}]}";
-MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:passed"})
+MERGE (n:SkillStep {id: "ride_it_out:morning_ask"})
+SET n += {skillId: "ride_it_out", step: "morning_ask", kind: "ask", version: "ro-v2"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"fields\": [{\"id\": \"remind\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"remind\"}}], \"followUp\": {\"type\": \"ride_morning\", \"when\": {\"eq\": [\"$a.remind\", \"morning\"]}}, \"hint\": \"morning_hint\", \"secondary\": \"morning_skip\", \"title\": \"morning_title\"}";
+MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:morning_ask"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 13};
-MERGE (n:SkillStep {id: "ride_it_out:end"})
-SET n += {skillId: "ride_it_out", step: "end", kind: "handoff", version: "ro-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"done\": \"done\", \"lines\": [{\"key\": \"end_gone\", \"when\": {\"any\": [{\"has\": [\"$a.ride.ids\", \"ended_gone\"]}, {\"has\": [\"$a.again.ids\", \"ended_gone\"]}]}}, {\"key\": \"end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}]}";
-MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:end"})
+MERGE (n:SkillStep {id: "ride_it_out:passed"})
+SET n += {skillId: "ride_it_out", step: "passed", kind: "handoff", version: "ro-v2"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"done\": \"done\", \"lines\": [{\"key\": \"end_passed\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:passed"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 14};
-MERGE (n:SkillStep {id: "ride_it_out:switch"})
-SET n += {skillId: "ride_it_out", step: "switch", kind: "handoff", version: "ro-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"done\": \"done\", \"lines\": [{\"key\": \"switch_line_hurt\", \"when\": {\"eq\": [\"$a.pull\", \"hurt\"]}}, {\"key\": \"switch_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true}";
-MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:switch"})
+MERGE (n:SkillStep {id: "ride_it_out:end"})
+SET n += {skillId: "ride_it_out", step: "end", kind: "handoff", version: "ro-v2"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"done\": \"done\", \"lines\": [{\"key\": \"end_gone\", \"when\": {\"any\": [{\"has\": [\"$a.ride.ids\", \"ended_gone\"]}, {\"has\": [\"$a.again.ids\", \"ended_gone\"]}]}}, {\"key\": \"end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:end"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 15};
-MERGE (n:SkillStep {id: "ride_it_out:settle"})
-SET n += {skillId: "ride_it_out", step: "settle", kind: "handoff", version: "ro-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"done\": \"done\", \"lines\": [{\"key\": \"settle_hurt\", \"when\": {\"eq\": [\"$a.pull\", \"hurt\"]}}, {\"key\": \"settle_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true}";
-MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:settle"})
+MERGE (n:SkillStep {id: "ride_it_out:switch"})
+SET n += {skillId: "ride_it_out", step: "switch", kind: "handoff", version: "ro-v2"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"done\": \"done\", \"lines\": [{\"key\": \"switch_line_hurt\", \"when\": {\"eq\": [\"$a.pull\", \"hurt\"]}}, {\"key\": \"switch_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true}";
+MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:switch"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 16};
-MERGE (n:SkillStep {id: "ride_it_out:hurt_end"})
-SET n += {skillId: "ride_it_out", step: "hurt_end", kind: "handoff", version: "ro-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"done\": \"done\", \"lines\": [{\"key\": \"hurt_end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true}";
-MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:hurt_end"})
+MERGE (n:SkillStep {id: "ride_it_out:settle"})
+SET n += {skillId: "ride_it_out", step: "settle", kind: "handoff", version: "ro-v2"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"done\": \"done\", \"lines\": [{\"key\": \"settle_hurt\", \"when\": {\"eq\": [\"$a.pull\", \"hurt\"]}}, {\"key\": \"settle_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true}";
+MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:settle"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 17};
-MERGE (n:SkillStep {id: "ride_it_out:reach"})
-SET n += {skillId: "ride_it_out", step: "reach", kind: "handoff", version: "ro-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"done\": \"done\", \"lines\": [{\"key\": \"reach_line\", \"when\": {\"all\": []}}], \"noClose\": true}";
-MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:reach"})
+MERGE (n:SkillStep {id: "ride_it_out:hurt_end"})
+SET n += {skillId: "ride_it_out", step: "hurt_end", kind: "handoff", version: "ro-v2"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"done\": \"done\", \"lines\": [{\"key\": \"hurt_end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true}";
+MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:hurt_end"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 18};
+MERGE (n:SkillStep {id: "ride_it_out:morning"})
+SET n += {skillId: "ride_it_out", step: "morning", kind: "ask", version: "ro-v2"}, n.specJson = "{\"clears\": [\"morning\"], \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"fields\": [{\"id\": \"morning\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"morning\"}, \"required\": true}], \"hint\": \"back_hint\", \"reopens\": {\"after\": \"morning_ask\"}, \"title\": \"back_title\"}";
+MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:morning"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 19};
+MERGE (n:SkillStep {id: "ride_it_out:morning_end"})
+SET n += {skillId: "ride_it_out", step: "morning_end", kind: "handoff", version: "ro-v2"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"done\": \"done\", \"lines\": [{\"key\": \"back_eased\", \"when\": {\"in\": [\"$a.morning\", [\"gone\", \"quieter\"]]}}, {\"key\": \"back_same\", \"when\": {\"in\": [\"$a.morning\", [\"same\"]]}}, {\"key\": \"back_strong\", \"when\": {\"in\": [\"$a.morning\", [\"strong\"]]}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true}";
+MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:morning_end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 20};
+MERGE (n:SkillStep {id: "ride_it_out:reach"})
+SET n += {skillId: "ride_it_out", step: "reach", kind: "handoff", version: "ro-v2"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"any\": [{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}, {\"in\": [\"$a.safe_again\", [\"unsure\", \"no\"]]}]}]}}], \"done\": \"done\", \"lines\": [{\"key\": \"reach_line\", \"when\": {\"all\": []}}], \"noClose\": true}";
+MATCH (s:Skill {id: "ride_it_out"}), (n:SkillStep {id: "ride_it_out:reach"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 21};
 MERGE (x:SkillExit {id: "ride_it_out:cool_down"})
 SET x += {skillId: "ride_it_out", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "ride_it_out"}), (x:SkillExit {id: "ride_it_out:cool_down"})
@@ -9671,6 +9686,12 @@ SET x += {skillId: "ride_it_out", exit: "crisis_kit", toolId: "crisis-kit", done
 MATCH (s:Skill {id: "ride_it_out"}), (x:SkillExit {id: "ride_it_out:crisis_kit"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "ride_it_out:crisis_kit"}), (t:TherapyConcept {appToolId: "crisis-kit"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "ride_it_out:ride_again"})
+SET x += {skillId: "ride_it_out", exit: "ride_again", toolId: "urge-surfing", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"urgeId\": \"$a.pull\"}", x.label = "ride_again";
+MATCH (s:Skill {id: "ride_it_out"}), (x:SkillExit {id: "ride_it_out:ride_again"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "ride_it_out:ride_again"}), (t:TherapyConcept {appToolId: "urge-surfing"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "ride_it_out:safety_open"})
 SET x += {skillId: "ride_it_out", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
@@ -9737,7 +9758,7 @@ SET r += {order: 3}, r.whenJson = "{\"any\": [{\"has\": [\"$a.ride.ids\", \"stil
 MATCH (a:SkillStep {id: "ride_it_out:ride"}), (b:SkillStep {id: "ride_it_out:hurt_end"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 4}, r.whenJson = "{\"eq\": [\"$a.pull\", \"hurt\"]}";
-MATCH (a:SkillStep {id: "ride_it_out:ride"}), (b:SkillStep {id: "ride_it_out:end"})
+MATCH (a:SkillStep {id: "ride_it_out:ride"}), (b:SkillStep {id: "ride_it_out:morning_ask"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 5}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "ride_it_out:ride"}), (x:SkillExit {id: "ride_it_out:safety_open"})
@@ -9770,7 +9791,7 @@ SET r += {order: 0}, r.whenJson = "{\"all\": [{\"eq\": [\"$a.after_round\", \"pa
 MATCH (a:SkillStep {id: "ride_it_out:after_round"}), (b:SkillStep {id: "ride_it_out:shape"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 1}, r.whenJson = "{\"all\": [{\"eq\": [\"$a.after_round\", \"passed\"]}, {\"any\": [{\"has\": [\"$a.ride.ids\", \"still_here\"]}, {\"has\": [\"$a.ride.ids\", \"fading\"]}, {\"has\": [\"$a.ride.ids\", \"gone\"]}, {\"has\": [\"$a.ride.ids\", \"bigger\"]}]}]}";
-MATCH (a:SkillStep {id: "ride_it_out:after_round"}), (b:SkillStep {id: "ride_it_out:passed"})
+MATCH (a:SkillStep {id: "ride_it_out:after_round"}), (b:SkillStep {id: "ride_it_out:morning_ask"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 2}, r.whenJson = "{\"eq\": [\"$a.after_round\", \"passed\"]}";
 MATCH (a:SkillStep {id: "ride_it_out:after_round"}), (b:SkillStep {id: "ride_it_out:round2"})
@@ -9794,7 +9815,7 @@ SET r += {order: 0}, r.whenJson = "{\"all\": [{\"eq\": [\"$a.after_round2\", \"p
 MATCH (a:SkillStep {id: "ride_it_out:after_round2"}), (b:SkillStep {id: "ride_it_out:shape"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 1}, r.whenJson = "{\"all\": [{\"eq\": [\"$a.after_round2\", \"passed\"]}, {\"any\": [{\"has\": [\"$a.ride.ids\", \"still_here\"]}, {\"has\": [\"$a.ride.ids\", \"fading\"]}, {\"has\": [\"$a.ride.ids\", \"gone\"]}, {\"has\": [\"$a.ride.ids\", \"bigger\"]}]}]}";
-MATCH (a:SkillStep {id: "ride_it_out:after_round2"}), (b:SkillStep {id: "ride_it_out:passed"})
+MATCH (a:SkillStep {id: "ride_it_out:after_round2"}), (b:SkillStep {id: "ride_it_out:morning_ask"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 2}, r.whenJson = "{\"eq\": [\"$a.after_round2\", \"passed\"]}";
 MATCH (a:SkillStep {id: "ride_it_out:after_round2"}), (b:SkillStep {id: "ride_it_out:ride2"})
@@ -9815,7 +9836,7 @@ SET r += {order: 2}, r.whenJson = "{\"any\": [{\"any\": [{\"has\": [\"$a.ride.id
 MATCH (a:SkillStep {id: "ride_it_out:ride2"}), (b:SkillStep {id: "ride_it_out:hurt_end"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 3}, r.whenJson = "{\"eq\": [\"$a.pull\", \"hurt\"]}";
-MATCH (a:SkillStep {id: "ride_it_out:ride2"}), (b:SkillStep {id: "ride_it_out:end"})
+MATCH (a:SkillStep {id: "ride_it_out:ride2"}), (b:SkillStep {id: "ride_it_out:morning_ask"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 4}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "ride_it_out:ride2"}), (x:SkillExit {id: "ride_it_out:safety_open"})
@@ -9824,15 +9845,21 @@ SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []
 MATCH (a:SkillStep {id: "ride_it_out:shape"}), (b:SkillStep {id: "ride_it_out:hurt_end"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.pull\", \"hurt\"]}";
-MATCH (a:SkillStep {id: "ride_it_out:shape"}), (b:SkillStep {id: "ride_it_out:passed"})
+MATCH (a:SkillStep {id: "ride_it_out:shape"}), (b:SkillStep {id: "ride_it_out:morning_ask"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "{\"any\": [{\"eq\": [\"$a.after_round\", \"passed\"]}, {\"eq\": [\"$a.after_round2\", \"passed\"]}]}";
-MATCH (a:SkillStep {id: "ride_it_out:shape"}), (b:SkillStep {id: "ride_it_out:end"})
-MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 2}, r.whenJson = "null";
+SET r += {order: 1}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "ride_it_out:shape"}), (x:SkillExit {id: "ride_it_out:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "ride_it_out:morning_ask"}), (b:SkillStep {id: "ride_it_out:passed"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"any\": [{\"eq\": [\"$a.after_round\", \"passed\"]}, {\"eq\": [\"$a.after_round2\", \"passed\"]}]}";
+MATCH (a:SkillStep {id: "ride_it_out:morning_ask"}), (b:SkillStep {id: "ride_it_out:end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "ride_it_out:morning_ask"}), (x:SkillExit {id: "ride_it_out:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "remind", label: "safety_open"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "ride_it_out:passed"}), (x:SkillExit {id: "ride_it_out:pros_cons"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
@@ -9881,6 +9908,24 @@ SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"all\": []}}]";
 MATCH (a:SkillStep {id: "ride_it_out:hurt_end"}), (x:SkillExit {id: "ride_it_out:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "ride_it_out:morning"}), (b:SkillStep {id: "ride_it_out:morning_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "ride_it_out:morning"}), (x:SkillExit {id: "ride_it_out:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "morning", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "ride_it_out:morning_end"}), (x:SkillExit {id: "ride_it_out:ride_again"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"in\": [\"$a.morning\", [\"strong\"]]}}]";
+MATCH (a:SkillStep {id: "ride_it_out:morning_end"}), (x:SkillExit {id: "ride_it_out:pros_cons"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"in\": [\"$a.morning\", [\"same\", \"strong\"]]}}]";
+MATCH (a:SkillStep {id: "ride_it_out:morning_end"}), (x:SkillExit {id: "ride_it_out:habit_plan"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"all\": [{\"in\": [\"$a.morning\", [\"same\", \"strong\"]]}, {\"in\": [\"$a.pull\", [\"use\", \"check\"]]}]}}]";
+MATCH (a:SkillStep {id: "ride_it_out:morning_end"}), (x:SkillExit {id: "ride_it_out:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "ride_it_out:reach"}), (x:SkillExit {id: "ride_it_out:safety_open"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
@@ -9888,130 +9933,155 @@ MATCH (a:SkillStep {id: "ride_it_out:reach"}), (x:SkillExit {id: "ride_it_out:cr
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
 MERGE (o:SkillOption {id: "ride_it_out:pull:send"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "pull", value: "send", label: "Send or say something", version: "ro-v1"}, o.propsJson = "{\"urge\": \"send\"}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "pull", value: "send", label: "Send or say something", version: "ro-v2"}, o.propsJson = "{\"urge\": \"send\"}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:pull:send"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "pull", order: 0};
 MERGE (o:SkillOption {id: "ride_it_out:pull:check"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "pull", value: "check", label: "Check their page, or my phone", version: "ro-v1"}, o.propsJson = "{\"urge\": \"check\"}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "pull", value: "check", label: "Check their page, or my phone", version: "ro-v2"}, o.propsJson = "{\"urge\": \"check\"}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:pull:check"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "pull", order: 1};
 MERGE (o:SkillOption {id: "ride_it_out:pull:hurt"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "pull", value: "hurt", label: "Hurt myself", version: "ro-v1"}, o.propsJson = "{\"danger\": \"self\", \"urge\": \"self_harm\"}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "pull", value: "hurt", label: "Hurt myself", version: "ro-v2"}, o.propsJson = "{\"danger\": \"self\", \"urge\": \"self_harm\"}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:pull:hurt"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "pull", order: 2};
 MERGE (o:SkillOption {id: "ride_it_out:pull:hit"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "pull", value: "hit", label: "Hit, throw or slam", version: "ro-v1"}, o.propsJson = "{\"urge\": \"hit\"}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "pull", value: "hit", label: "Hit, throw or slam", version: "ro-v2"}, o.propsJson = "{\"urge\": \"hit\"}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:pull:hit"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "pull", order: 3};
 MERGE (o:SkillOption {id: "ride_it_out:pull:leave"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "pull", value: "leave", label: "Leave, run or disappear", version: "ro-v1"}, o.propsJson = "{\"urge\": \"leave\"}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "pull", value: "leave", label: "Leave, run or disappear", version: "ro-v2"}, o.propsJson = "{\"urge\": \"leave\"}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:pull:leave"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "pull", order: 4};
 MERGE (o:SkillOption {id: "ride_it_out:pull:use"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "pull", value: "use", label: "Use, drink, binge or buy", version: "ro-v1"}, o.propsJson = "{\"urge\": \"use\"}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "pull", value: "use", label: "Use, drink, binge or buy", version: "ro-v2"}, o.propsJson = "{\"urge\": \"use\"}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:pull:use"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "pull", order: 5};
 MERGE (o:SkillOption {id: "ride_it_out:safe:safe"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "safe", value: "safe", label: "Yes, I'm safe for now", version: "ro-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "safe", value: "safe", label: "Yes, I'm safe for now", version: "ro-v2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:safe:safe"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "safe", order: 6};
 MERGE (o:SkillOption {id: "ride_it_out:safe:unsure"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "safe", value: "unsure", label: "I'm not sure", version: "ro-v1"}, o.propsJson = "{\"danger\": \"self\"}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "safe", value: "unsure", label: "I'm not sure", version: "ro-v2"}, o.propsJson = "{\"danger\": \"self\"}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:safe:unsure"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "safe", order: 7};
 MERGE (o:SkillOption {id: "ride_it_out:safe:no"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "safe", value: "no", label: "No", version: "ro-v1"}, o.propsJson = "{\"danger\": \"self\"}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "safe", value: "no", label: "No", version: "ro-v2"}, o.propsJson = "{\"danger\": \"self\"}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:safe:no"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "safe", order: 8};
 MERGE (o:SkillOption {id: "ride_it_out:heads_up:body"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "heads_up", value: "body", label: "My body first", version: "ro-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "heads_up", value: "body", label: "My body first", version: "ro-v2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:heads_up:body"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "heads_up", order: 9};
 MERGE (o:SkillOption {id: "ride_it_out:heads_up:now"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "heads_up", value: "now", label: "Ride it now", version: "ro-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "heads_up", value: "now", label: "Ride it now", version: "ro-v2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:heads_up:now"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "heads_up", order: 10};
 MERGE (o:SkillOption {id: "ride_it_out:bigger:body"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "bigger", value: "body", label: "Something for my body", version: "ro-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "bigger", value: "body", label: "Something for my body", version: "ro-v2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:bigger:body"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "bigger", order: 11};
 MERGE (o:SkillOption {id: "ride_it_out:bigger:hold"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "bigger", value: "hold", label: "A way to wait", version: "ro-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "bigger", value: "hold", label: "A way to wait", version: "ro-v2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:bigger:hold"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "bigger", order: 12};
 MERGE (o:SkillOption {id: "ride_it_out:bigger:keep"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "bigger", value: "keep", label: "Keep riding it", version: "ro-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "bigger", value: "keep", label: "Keep riding it", version: "ro-v2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:bigger:keep"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "bigger", order: 13};
 MERGE (o:SkillOption {id: "ride_it_out:swap:walk"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "swap", value: "walk", label: "A walk, even round the room", version: "ro-v1"}, o.propsJson = "{\"check\": true, \"hit\": true, \"hurt\": true, \"leave\": true, \"other\": true, \"send\": true, \"use\": true}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "swap", value: "walk", label: "A walk, even round the room", version: "ro-v2"}, o.propsJson = "{\"check\": true, \"hit\": true, \"hurt\": true, \"leave\": true, \"other\": true, \"send\": true, \"use\": true}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:swap:walk"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "swap", order: 14};
 MERGE (o:SkillOption {id: "ride_it_out:swap:wash"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "swap", value: "wash", label: "Cool water on my hands", version: "ro-v1"}, o.propsJson = "{\"check\": true, \"hit\": true, \"hurt\": true, \"leave\": true, \"other\": true, \"send\": true, \"use\": true}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "swap", value: "wash", label: "Cool water on my hands", version: "ro-v2"}, o.propsJson = "{\"check\": true, \"hit\": true, \"hurt\": true, \"leave\": true, \"other\": true, \"send\": true, \"use\": true}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:swap:wash"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "swap", order: 15};
 MERGE (o:SkillOption {id: "ride_it_out:swap:call"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "swap", value: "call", label: "Call or text someone safe", version: "ro-v1"}, o.propsJson = "{\"check\": true, \"hit\": true, \"hurt\": true, \"leave\": true, \"other\": true, \"use\": true}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "swap", value: "call", label: "Call or text someone safe", version: "ro-v2"}, o.propsJson = "{\"check\": true, \"hit\": true, \"hurt\": true, \"leave\": true, \"other\": true, \"use\": true}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:swap:call"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "swap", order: 16};
 MERGE (o:SkillOption {id: "ride_it_out:swap:cold"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "swap", value: "cold", label: "Hold something cool", version: "ro-v1"}, o.propsJson = "{\"hit\": true}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "swap", value: "cold", label: "Hold something cool", version: "ro-v2"}, o.propsJson = "{\"hit\": true}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:swap:cold"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "swap", order: 17};
 MERGE (o:SkillOption {id: "ride_it_out:swap:squeeze"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "swap", value: "squeeze", label: "Squeeze a pillow or a ball", version: "ro-v1"}, o.propsJson = "{\"hit\": true}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "swap", value: "squeeze", label: "Squeeze a pillow or a ball", version: "ro-v2"}, o.propsJson = "{\"hit\": true}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:swap:squeeze"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "swap", order: 18};
 MERGE (o:SkillOption {id: "ride_it_out:swap:phone"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "swap", value: "phone", label: "Put the phone in another room", version: "ro-v1"}, o.propsJson = "{\"check\": true, \"send\": true}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "swap", value: "phone", label: "Put the phone in another room", version: "ro-v2"}, o.propsJson = "{\"check\": true, \"send\": true}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:swap:phone"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "swap", order: 19};
 MERGE (o:SkillOption {id: "ride_it_out:swap:hands"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "swap", value: "hands", label: "Give my hands a job", version: "ro-v1"}, o.propsJson = "{\"check\": true, \"other\": true, \"send\": true, \"use\": true}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "swap", value: "hands", label: "Give my hands a job", version: "ro-v2"}, o.propsJson = "{\"check\": true, \"other\": true, \"send\": true, \"use\": true}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:swap:hands"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "swap", order: 20};
 MERGE (o:SkillOption {id: "ride_it_out:swap:just_wait"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "swap", value: "just_wait", label: "Five minutes, nothing else", version: "ro-v1"}, o.propsJson = "{\"check\": true, \"hit\": true, \"hurt\": true, \"leave\": true, \"other\": true, \"send\": true, \"use\": true}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "swap", value: "just_wait", label: "Five minutes, nothing else", version: "ro-v2"}, o.propsJson = "{\"check\": true, \"hit\": true, \"hurt\": true, \"leave\": true, \"other\": true, \"send\": true, \"use\": true}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:swap:just_wait"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "swap", order: 21};
 MERGE (o:SkillOption {id: "ride_it_out:after_round:passed"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "after_round", value: "passed", label: "Gone or fading", version: "ro-v1"}, o.propsJson = "{\"again\": false}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "after_round", value: "passed", label: "Gone or fading", version: "ro-v2"}, o.propsJson = "{\"again\": false}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:after_round:passed"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "after_round", order: 22};
 MERGE (o:SkillOption {id: "ride_it_out:after_round:again"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "after_round", value: "again", label: "Five more minutes", version: "ro-v1"}, o.propsJson = "{\"again\": true}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "after_round", value: "again", label: "Five more minutes", version: "ro-v2"}, o.propsJson = "{\"again\": true}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:after_round:again"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "after_round", order: 23};
 MERGE (o:SkillOption {id: "ride_it_out:after_round:still"})
-SET o:SkillOption, o += {skillId: "ride_it_out", list: "after_round", value: "still", label: "Still here", version: "ro-v1"}, o.propsJson = "{\"again\": false}";
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "after_round", value: "still", label: "Still here", version: "ro-v2"}, o.propsJson = "{\"again\": false}";
 MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:after_round:still"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "after_round", order: 24};
+MERGE (o:SkillOption {id: "ride_it_out:remind:morning"})
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "remind", value: "morning", label: "In the morning", version: "ro-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:remind:morning"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "remind", order: 25};
+MERGE (o:SkillOption {id: "ride_it_out:morning:gone"})
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "morning", value: "gone", label: "Gone", version: "ro-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:morning:gone"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "morning", order: 26};
+MERGE (o:SkillOption {id: "ride_it_out:morning:quieter"})
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "morning", value: "quieter", label: "Quieter", version: "ro-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:morning:quieter"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "morning", order: 27};
+MERGE (o:SkillOption {id: "ride_it_out:morning:same"})
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "morning", value: "same", label: "About the same", version: "ro-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:morning:same"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "morning", order: 28};
+MERGE (o:SkillOption {id: "ride_it_out:morning:strong"})
+SET o:SkillOption, o += {skillId: "ride_it_out", list: "morning", value: "strong", label: "Back, and strong", version: "ro-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "ride_it_out"}), (o:SkillOption {id: "ride_it_out:morning:strong"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "morning", order: 29};
 
 // --- let_it_be (lb-v1) ---
 MERGE (s:Skill {id: "let_it_be"})
