@@ -69,7 +69,8 @@ export function shownToolIds(result: { tools?: ReadonlyArray<CardInput> } | null
 
 /**
  * A result card's frame for a skill that reads one (`?frame=`; the skill `accepts` it), by the check-in's pattern:
- * Find your people shows the low-energy patterns (freeze, low reward) the smallest steps only (PRD IE-09).
+ * Find your people shows the low-energy patterns (freeze, low reward) the smallest steps only (PRD IE-09). A value
+ * holding `=` is the whole query (One thing's `enterAt=outside&frame=ruminate`); any other value is `frame=<value>`.
  */
 export const CARD_FRAMES: Readonly<Record<string, Readonly<Record<string, string>>>> = {
   'finding-connection': { reward_drive_low: 'low', conservation_freeze: 'low' },

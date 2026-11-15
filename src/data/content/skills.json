@@ -50347,7 +50347,8 @@
         "emotionFields": [],
         "copy": {
           "flooded_title": "Your body's loud right now.",
-          "flooded_hint": "This works better once your body settles. You can start with your body, or try it anyway.",
+          "flooded_hint_outside": "Looking or listening for a minute can still help. Or start with your body.",
+          "flooded_hint_thing": "One thing works better once your body settles. Start with your body, or pick one anyway.",
           "body_first": "My body first",
           "outside_title": "First, a minute outside your head.",
           "outside_hint": "Eyes open. Pick one.",
@@ -50366,8 +50367,9 @@
           "bowl_skip": "Move on",
           "mode_title": "Is your mind trying to fix a feeling like a task?",
           "mode_hint": "Going over it, working it out, trying to make it stop.",
-          "mode_yes_title": "That's doing mind. Feelings don't get solved like tasks.",
-          "mode_yes_line": "Both minds are useful. Right now, a minute of being mind might help: one thing, done fully.",
+          "mode_yes_title": "That sounds like doing mind. Feelings don't get solved like tasks.",
+          "mode_maybe_title": "That might be doing mind. Feelings don't get solved like tasks.",
+          "mode_yes_line": "Both minds are useful. A minute of being mind, doing one thing fully, can give your head a rest.",
           "mode_no_title": "Then one thing, done fully, can still give your head a rest.",
           "one_thing_go": "One thing",
           "not_now": "Not now",
@@ -50376,7 +50378,7 @@
           "thing_own": "Something else",
           "length_title": "For how long?",
           "how_title": "With the phone, or without it?",
-          "how_hint": "Without it is the goal. With it, the screen stays quiet and you tap each time you come back.",
+          "how_hint": "Without it is where this is heading. With it, the screen stays quiet and you tap each time you come back.",
           "do_task": "When your mind wanders, tap, and come back to it.",
           "away_hint": "Put the phone down. Come back when you're done.",
           "back": "I'm back",
@@ -50384,25 +50386,28 @@
           "ins_drink": "The weight of the cup. The sound as it pours.",
           "ins_teeth": "The taste. The feel of each tooth.",
           "ins_walk": "Your feet meeting the ground, one step and the next.",
-          "ins_eat": "Three bites. The taste, the texture, the swallow.",
+          "ins_eat": "A few bites. The taste and the texture.",
           "ins_shower": "Where the water lands. How warm it is.",
           "ins_song": "One sound in the song. Then the next one.",
-          "ins_washup": "The warm water. One thing at a time.",
-          "ins_own": "{thing}. All of your attention on it.",
+          "ins_washup": "The warm water. One dish, then the next.",
+          "ins_own": "All of your attention on {thing}.",
           "with_title": "How much were you with it?",
           "with_line": "In and out is the practice. Each time you came back, that was it.",
           "loop_title": "The loop in your head now?",
           "louder_title": "It got louder. That happens.",
           "louder_line": "When your head is this loud, something for the body or a job for your mind can help first.",
-          "end_title": "One thing, done fully. That's the skill.",
+          "end_title": "You gave one thing your attention. Coming back is the skill.",
           "end_quieter_line": "The loop quietened a bit. One thing at a time is a way out of it you can use anywhere.",
-          "again_q": "Same thing tomorrow? I'll ask how it went.",
+          "again_q": "Same thing tomorrow, without the app? I'll ask how it went.",
           "end_short_title": "A minute outside your head. That counts.",
           "end_quieter_short": "The loop quietened a bit. Looking or listening is a way out of it you can use anywhere.",
-          "again_title": "Did you get to do {thing} with your whole attention?",
-          "again_yes_line": "That's one-mindfulness off the phone. It goes wherever you do.",
+          "again_title": "Your one thing: {thing}. Did you get to it with your whole attention?",
+          "again_yes_line": "That's one thing, done without the phone. It goes wherever you do.",
           "again_sort_line": "Some of it counts. Coming back is the practice.",
           "again_not_line": "Not yet is fine. It'll be there next time.",
+          "skip_title": "Not this time.",
+          "skip_line": "It'll be here when you want it.",
+          "safety_open": "Talk to someone now",
           "next": "Next",
           "done": "Done"
         },
@@ -50457,6 +50462,13 @@
                         "flooded"
                       ]
                     }
+                  },
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
                   }
                 ]
               }
@@ -50469,7 +50481,7 @@
                     "flooded"
                   ]
                 },
-                "key": "flooded_hint"
+                "key": "flooded_hint_outside"
               },
               {
                 "when": {
@@ -50510,7 +50522,25 @@
               "done": "found_done",
               "next": "next"
             },
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
             "next": [
+              {
+                "to": "thing",
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "flooded"
+                  ]
+                }
+              },
               {
                 "to": "mode",
                 "when": null
@@ -50524,6 +50554,15 @@
             "embed": "pebbleBowl",
             "answerAs": "listen",
             "title": "listen_title",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
             "props": {
               "seconds": 60,
               "task": "listen_task",
@@ -50536,6 +50575,15 @@
               "skip": "bowl_skip"
             },
             "next": [
+              {
+                "to": "thing",
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "flooded"
+                  ]
+                }
+              },
               {
                 "to": "mode",
                 "when": null
@@ -50554,7 +50602,16 @@
                   "list": "mode"
                 },
                 "max": 1,
-                "required": true
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
               }
             ],
             "hint": "mode_hint",
@@ -50578,7 +50635,23 @@
           {
             "id": "mode_yes",
             "kind": "ask",
-            "title": "mode_yes_title",
+            "title": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.mode",
+                    "maybe"
+                  ]
+                },
+                "key": "mode_maybe_title"
+              },
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "mode_yes_title"
+              }
+            ],
             "fields": [
               {
                 "id": "go",
@@ -50586,7 +50659,16 @@
                   "list": "go"
                 },
                 "max": 1,
-                "required": true
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
               }
             ],
             "lines": [
@@ -50625,7 +50707,16 @@
                   "list": "go"
                 },
                 "max": 1,
-                "required": true
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
               }
             ],
             "next": [
@@ -50651,9 +50742,18 @@
             "title": [
               {
                 "when": {
-                  "eq": [
-                    "$ctx.band",
-                    "flooded"
+                  "all": [
+                    {
+                      "eq": [
+                        "$ctx.band",
+                        "flooded"
+                      ]
+                    },
+                    {
+                      "not": {
+                        "set": "$a.outside"
+                      }
+                    }
                   ]
                 },
                 "key": "flooded_title"
@@ -50702,6 +50802,13 @@
                         "flooded"
                       ]
                     }
+                  },
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
                   }
                 ],
                 "own": {
@@ -50713,12 +50820,21 @@
             "lines": [
               {
                 "when": {
-                  "eq": [
-                    "$ctx.band",
-                    "flooded"
+                  "all": [
+                    {
+                      "eq": [
+                        "$ctx.band",
+                        "flooded"
+                      ]
+                    },
+                    {
+                      "not": {
+                        "set": "$a.outside"
+                      }
+                    }
                   ]
                 },
-                "key": "flooded_hint"
+                "key": "flooded_hint_thing"
               },
               {
                 "when": {
@@ -50729,27 +50845,18 @@
             ],
             "next": [
               {
-                "to": "length",
-                "when": null
-              }
-            ],
-            "offers": []
-          },
-          {
-            "id": "length",
-            "kind": "ask",
-            "title": "length_title",
-            "fields": [
-              {
-                "id": "length",
-                "options": {
-                  "list": "length"
-                },
-                "max": 1,
-                "required": true
-              }
-            ],
-            "next": [
+                "to": "away",
+                "when": {
+                  "in": [
+                    "$a.thing",
+                    [
+                      "hands",
+                      "shower",
+                      "washup"
+                    ]
+                  ]
+                }
+              },
               {
                 "to": "how",
                 "when": null
@@ -50768,7 +50875,16 @@
                   "list": "how"
                 },
                 "max": 1,
-                "required": true
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
               }
             ],
             "hint": "how_hint",
@@ -50782,6 +50898,46 @@
                   ]
                 }
               },
+              {
+                "to": "do_song",
+                "when": {
+                  "eq": [
+                    "$a.thing",
+                    "song"
+                  ]
+                }
+              },
+              {
+                "to": "length",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "length",
+            "kind": "ask",
+            "title": "length_title",
+            "fields": [
+              {
+                "id": "length",
+                "options": {
+                  "list": "length"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
               {
                 "to": "do_minute",
                 "when": {
@@ -50864,15 +51020,6 @@
                 "when": {
                   "eq": [
                     "$a.thing",
-                    "eat"
-                  ]
-                },
-                "key": "ins_eat"
-              },
-              {
-                "when": {
-                  "eq": [
-                    "$a.thing",
                     "shower"
                   ]
                 },
@@ -50895,6 +51042,24 @@
                   ]
                 },
                 "key": "ins_washup"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$a.thing",
+                    "eat"
+                  ]
+                },
+                "key": "ins_eat"
+              }
+            ],
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
               }
             ],
             "props": {
@@ -50914,6 +51079,34 @@
               }
             },
             "next": [
+              {
+                "to": "loop",
+                "when": {
+                  "all": [
+                    {
+                      "eq": [
+                        "$a.do_minute",
+                        "skipped"
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$ctx.frame",
+                        "ruminate"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "skip_end",
+                "when": {
+                  "eq": [
+                    "$a.do_minute",
+                    "skipped"
+                  ]
+                }
+              },
               {
                 "to": "with",
                 "when": null
@@ -50973,15 +51166,6 @@
                 "when": {
                   "eq": [
                     "$a.thing",
-                    "eat"
-                  ]
-                },
-                "key": "ins_eat"
-              },
-              {
-                "when": {
-                  "eq": [
-                    "$a.thing",
                     "shower"
                   ]
                 },
@@ -51004,6 +51188,24 @@
                   ]
                 },
                 "key": "ins_washup"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$a.thing",
+                    "eat"
+                  ]
+                },
+                "key": "ins_eat"
+              }
+            ],
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
               }
             ],
             "props": {
@@ -51023,6 +51225,34 @@
               }
             },
             "next": [
+              {
+                "to": "loop",
+                "when": {
+                  "all": [
+                    {
+                      "eq": [
+                        "$a.do_song",
+                        "skipped"
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$ctx.frame",
+                        "ruminate"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "skip_end",
+                "when": {
+                  "eq": [
+                    "$a.do_song",
+                    "skipped"
+                  ]
+                }
+              },
               {
                 "to": "with",
                 "when": null
@@ -51082,15 +51312,6 @@
                 "when": {
                   "eq": [
                     "$a.thing",
-                    "eat"
-                  ]
-                },
-                "key": "ins_eat"
-              },
-              {
-                "when": {
-                  "eq": [
-                    "$a.thing",
                     "shower"
                   ]
                 },
@@ -51113,6 +51334,24 @@
                   ]
                 },
                 "key": "ins_washup"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$a.thing",
+                    "eat"
+                  ]
+                },
+                "key": "ins_eat"
+              }
+            ],
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
               }
             ],
             "props": {
@@ -51132,6 +51371,34 @@
               }
             },
             "next": [
+              {
+                "to": "loop",
+                "when": {
+                  "all": [
+                    {
+                      "eq": [
+                        "$a.do_done",
+                        "skipped"
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$ctx.frame",
+                        "ruminate"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "skip_end",
+                "when": {
+                  "eq": [
+                    "$a.do_done",
+                    "skipped"
+                  ]
+                }
+              },
               {
                 "to": "with",
                 "when": null
@@ -51189,15 +51456,6 @@
                 "when": {
                   "eq": [
                     "$a.thing",
-                    "eat"
-                  ]
-                },
-                "key": "ins_eat"
-              },
-              {
-                "when": {
-                  "eq": [
-                    "$a.thing",
                     "shower"
                   ]
                 },
@@ -51220,6 +51478,15 @@
                   ]
                 },
                 "key": "ins_washup"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$a.thing",
+                    "eat"
+                  ]
+                },
+                "key": "ins_eat"
               }
             ],
             "titleSlots": {
@@ -51235,7 +51502,16 @@
                   "list": "back"
                 },
                 "max": 1,
-                "required": true
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
               }
             ],
             "next": [
@@ -51257,7 +51533,16 @@
                   "list": "with"
                 },
                 "max": 1,
-                "required": true
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
               }
             ],
             "next": [
@@ -51289,6 +51574,15 @@
                 },
                 "max": 1,
                 "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
                 "askFresh": "thenVsNow"
               }
             ],
@@ -51305,7 +51599,7 @@
               {
                 "to": "end_loop",
                 "when": {
-                  "set": "$a.thing"
+                  "set": "$a.with"
                 }
               },
               {
@@ -51329,6 +51623,15 @@
               }
             ],
             "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
             "next": [],
             "offers": [
               {
@@ -51342,6 +51645,12 @@
                 "when": {
                   "all": []
                 }
+              },
+              {
+                "exit": "safety_open",
+                "when": {
+                  "all": []
+                }
               }
             ]
           },
@@ -51349,7 +51658,6 @@
             "id": "end",
             "kind": "handoff",
             "complete": true,
-            "noClose": true,
             "title": "end_title",
             "lines": [
               {
@@ -51360,6 +51668,16 @@
               }
             ],
             "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
             "fields": [
               {
                 "id": "when",
@@ -51394,9 +51712,24 @@
                   ]
                 },
                 "key": "end_quieter_line"
+              },
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "with_line"
               }
             ],
             "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
             "fields": [
               {
                 "id": "when",
@@ -51434,6 +51767,42 @@
               }
             ],
             "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "next": [],
+            "offers": []
+          },
+          {
+            "id": "skip_end",
+            "kind": "handoff",
+            "complete": true,
+            "title": "skip_title",
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "skip_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
             "next": [],
             "offers": []
           },
@@ -51448,11 +51817,23 @@
                   "list": "again"
                 },
                 "max": 1,
-                "required": true
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
               }
             ],
             "reopens": {
-              "after": "end"
+              "after": "end",
+              "again": [
+                "end_loop"
+              ]
             },
             "clears": [
               "again"
@@ -51474,7 +51855,6 @@
             "id": "again_end",
             "kind": "handoff",
             "complete": true,
-            "noClose": true,
             "lines": [
               {
                 "when": {
@@ -51502,6 +51882,16 @@
               }
             ],
             "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
             "next": [],
             "offers": []
           }
@@ -51527,13 +51917,22 @@
             "query": {},
             "carry": [],
             "done": false
+          },
+          {
+            "id": "safety_open",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": false,
+            "safety": true
           }
         ],
         "options": {
           "thing": [
             {
               "value": "hands",
-              "label": "Wash my hands"
+              "label": "Wash my hands",
+              "wet": true
             },
             {
               "value": "drink",
@@ -51549,13 +51948,9 @@
               "move": true
             },
             {
-              "value": "eat",
-              "label": "Eat a few bites",
-              "food": true
-            },
-            {
               "value": "shower",
-              "label": "Have a shower"
+              "label": "Have a shower",
+              "wet": true
             },
             {
               "value": "song",
@@ -51564,7 +51959,13 @@
             {
               "value": "washup",
               "label": "Wash up",
-              "move": true
+              "move": true,
+              "wet": true
+            },
+            {
+              "value": "eat",
+              "label": "Eat a few bites",
+              "food": true
             }
           ],
           "length": [

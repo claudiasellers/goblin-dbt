@@ -34,7 +34,9 @@ const links = (s, c = ctx()) => {
   return [...M.stepLinks(c, st, s), ...M.shownFields(c, st, s).flatMap((f) => M.fieldLinks(c, f, s))].map((l) => l.exit.id);
 };
 const RUM = ctx({ enterAt: "outside", frame: "ruminate" });
-const HANDS = [pick("thing", "hands"), next, pick("length", "minute"), next];
+// A dry activity with the phone, a minute: thing, how, length.
+const DRINK = [pick("thing", "drink"), next, pick("how", "phone"), next, pick("length", "minute"), next];
+const skipped = { type: "embedDone", output: { ids: ["skipped"], durationSec: 0, doneCount: 0 } };
 
 test("the skill: tool one-thing on dbt_one_mindfully, listed under Mindfulness with its intent, close kind regulation_down", () => {
   assert.equal(skill.toolId, "one-thing");
@@ -48,35 +50,44 @@ test("the skill: tool one-thing on dbt_one_mindfully, listed under Mindfulness w
   assert.match(readFileSync("schema/app-tool-ids.cypher", "utf8"), /\{c: "dbt_one_mindfully", t: "one-thing"\}/);
 });
 
-test("a plain visit: pick one thing, a length, with the phone → the pebble bowl titled with the thing's one instruction", () => {
+test("a plain visit: pick one thing, with the phone, a length → the pebble bowl titled with the thing's one instruction", () => {
   const s0 = M.pageStart(ctx());
   assert.equal(s0.stepId, "thing");
-  assert.deepEqual(ids(s0, "thing"), ["hands", "drink", "teeth", "walk", "eat", "shower", "song", "washup"]);
-  const how = run(HANDS);
-  assert.equal(how.stepId, "how");
-  const doing = run([pick("how", "phone"), next], ctx(), how);
+  assert.deepEqual(ids(s0, "thing"), ["hands", "drink", "teeth", "walk", "shower", "song", "washup", "eat"], "eating last");
+  assert.equal(run([pick("thing", "drink"), next]).stepId, "how");
+  assert.equal(run([pick("thing", "drink"), next, pick("how", "phone"), next]).stepId, "length");
+  const doing = run(DRINK);
   assert.equal(doing.stepId, "do_minute");
-  assert.equal(title(doing), skill.copy.ins_hands);
+  assert.equal(title(doing), skill.copy.ins_drink);
+  // One song is its own length; wet hands go straight to without the phone.
+  assert.equal(run([pick("thing", "song"), next, pick("how", "phone"), next]).stepId, "do_song");
+  for (const w of ["hands", "shower", "washup"]) assert.equal(run([pick("thing", w), next]).stepId, "away", w);
   assert.equal(M.stepOf(skill, "do_minute").props.seconds, 60);
   assert.deepEqual(["do_minute", "do_song", "do_done"].map((id) => M.stepOf(skill, id).props.seconds), [60, 210, 300]);
   assert.equal(run([bowl], ctx(), doing).stepId, "with");
 });
 
 test("without the phone: the instruction, put it down, then I'm back; own words carry into the instruction", () => {
-  const away = run([own("thing", "Fold the laundry"), next, pick("length", "done"), next, pick("how", "away"), next]);
+  const away = run([own("thing", "fold the laundry"), next, pick("how", "away"), next]);
   assert.equal(away.stepId, "away");
-  assert.equal(title(away), "Fold the laundry. All of your attention on it.");
+  assert.equal(title(away), "All of your attention on fold the laundry.");
   assert.equal(M.stepOf(skill, "away").hint, "away_hint");
   assert.equal(run([pick("away", "back"), next], ctx(), away).stepId, "with");
 });
 
 test("how much you were with it: every answer is the practice; a plain visit ends without the close card", () => {
   for (const w of ["with", "in_out", "elsewhere"]) {
-    const end = run([...HANDS, pick("how", "phone"), next, bowl, pick("with", w), next]);
+    const end = run([...DRINK, bowl, pick("with", w), next]);
     assert.equal(end.stepId, "end", w);
   }
   const end = M.stepOf(skill, "end");
   assert.ok(end.noClose, "the with-it answer is the close");
+  assert.equal(skill.copy.end_title, "You gave one thing your attention. Coming back is the skill.");
+  // *Move on* before the bowl started: no praise, nothing asked.
+  const skip = run([...DRINK, skipped]);
+  assert.equal(skip.stepId, "skip_end");
+  assert.ok(M.stepOf(skill, "skip_end").noClose);
+  assert.ok(!M.stepOf(skill, "skip_end").followUp);
   assert.equal(skill.copy.with_line, "In and out is the practice. Each time you came back, that was it.");
 });
 
@@ -93,6 +104,7 @@ test("the rumination variant: a minute outside your head (Look or Listen), the d
   assert.equal(M.stepOf(skill, listen.stepId).embed, "pebbleBowl");
   assert.equal(run([bowl], RUM, listen).stepId, "mode");
   for (const m of ["yes", "maybe"]) assert.equal(run([pick("mode", m), next], RUM, mode).stepId, "mode_yes", m);
+  assert.equal(title(run([pick("mode", "maybe"), next], RUM, mode), RUM), skill.copy.mode_maybe_title, "maybe is never told it's doing mind");
   assert.equal(run([pick("mode", "no"), next], RUM, mode).stepId, "mode_no");
   const thing = run([pick("mode", "yes"), next, pick("go", "go"), next], RUM, mode);
   assert.equal(thing.stepId, "thing");
@@ -103,15 +115,19 @@ test("the loop, asked in the flow: louder → the body or a job for your mind; q
   assert.equal(loop.askFresh, "thenVsNow");
   assert.deepEqual(skill.options.loop.map((o) => o.label), ["Louder", "About the same", "Quieter", "Much quieter"]);
   const mode = run([pick("outside", "listen"), next, bowl], RUM);
-  const did = run([pick("mode", "yes"), next, pick("go", "go"), next, ...HANDS, pick("how", "phone"), next, bowl, pick("with", "in_out"), next], RUM, mode);
+  const did = run([pick("mode", "yes"), next, pick("go", "go"), next, ...DRINK, bowl, pick("with", "in_out"), next], RUM, mode);
   assert.equal(did.stepId, "loop");
   const louder = run([pick("loop", "worse"), next], RUM, did);
   assert.equal(louder.stepId, "louder");
-  assert.deepEqual(offers(louder, RUM), ["cool_down", "mind_job"]);
+  assert.deepEqual(offers(louder, RUM), ["cool_down", "mind_job", "safety_open"]);
   assert.equal(run([pick("loop", "better"), next], RUM, did).stepId, "end_loop");
   const short = run([pick("mode", "no"), next, pick("go_no", "not_now"), next], RUM, mode);
   assert.equal(short.stepId, "loop");
   assert.equal(run([pick("loop", "same"), next], RUM, short).stepId, "end_short");
+  // *Move on* before the bowl started on the rumination variant: the loop, then the short end.
+  const sk = run([pick("mode", "yes"), next, pick("go", "go"), next, ...DRINK, skipped], RUM, mode);
+  assert.equal(sk.stepId, "loop");
+  assert.equal(run([pick("loop", "same"), next], RUM, sk).stepId, "end_short");
   assert.ok(!M.stepOf(skill, "end_short").followUp, "no tomorrow card without a thing");
 });
 
@@ -119,11 +135,15 @@ test("a carried flooded reading: the heads-up as the title and the body first as
   const F = ctx({ band: "flooded" });
   const s0 = M.pageStart(F);
   assert.equal(title(s0, F), skill.copy.flooded_title);
-  assert.deepEqual(links(s0, F), ["cool_down"]);
-  assert.deepEqual(links(s0, ctx()), [], "no body link otherwise");
+  assert.deepEqual(links(s0, F), ["cool_down", "safety_open"]);
+  assert.deepEqual(links(s0, ctx()), ["safety_open"], "no body link otherwise");
   const FR = ctx({ band: "flooded", enterAt: "outside", frame: "ruminate" });
   assert.equal(title(M.pageStart(FR), FR), skill.copy.flooded_title);
-  assert.equal(run([pick("thing", "song"), next], F).stepId, "length");
+  // MF-09 is any band but flooded: after the minute outside, straight to the thing, the heads-up not said twice.
+  const t = run([pick("outside", "listen"), next, bowl], FR);
+  assert.equal(t.stepId, "thing");
+  assert.equal(title(t, FR), skill.copy.thing_title);
+  assert.equal(run([pick("thing", "song"), next], F).stepId, "how", "flooded can still go on: song asks phone or not first");
 });
 
 test("eating is never offered to someone who left food out of Running low; a blank entry lists movement first", () => {
@@ -140,11 +160,18 @@ test("same thing tomorrow: optional chips book one_thing_again, which reopens th
   const end = M.stepOf(skill, "end");
   assert.deepEqual(end.followUp, { type: "one_thing_again", whenFrom: "when" });
   assert.equal(end.fields[0].required, undefined, "optional");
-  const booked = run([...HANDS, pick("how", "phone"), next, bowl, pick("with", "with"), next, pick("when", "morning")]);
+  const booked = run([...DRINK, bowl, pick("with", "with"), next, pick("when", "morning")]);
   const r = M.resumeRun(ctx(), M.runRecord(ctx(), booked), "again");
   assert.ok(r, "a run that reached the end card reopens");
   assert.equal(r.stepId, "again");
-  assert.equal(title(r), "Did you get to do Wash my hands with your whole attention?");
+  assert.equal(title(r), "Your one thing: Make a drink. Did you get to it with your whole attention?");
+  // The rumination variant's end books the same card, and it reopens too.
+  const loopEnd = run([pick("outside", "listen"), next, bowl, pick("mode", "yes"), next, pick("go", "go"), next, ...DRINK, bowl,
+    pick("with", "in_out"), next, pick("loop", "better"), next, pick("when", "evening")], RUM);
+  assert.equal(loopEnd.stepId, "end_loop");
+  const r2 = M.resumeRun(RUM, M.runRecord(RUM, loopEnd), "again");
+  assert.ok(r2, "an end_loop run reopens");
+  assert.equal(r2.stepId, "again");
   const yes = run([pick("again", "yes"), next], ctx(), r);
   assert.equal(yes.stepId, "again_end");
   assert.ok(M.stepOf(skill, "again_end").noClose);
@@ -173,6 +200,15 @@ test("routing: the looping cell leads with One thing (Problem Solve beside it), 
   assert.match(src, /"rf_rumination_loop_default_one-thing"/);
   assert.equal(R.cardHref("one-thing", "rumination_loop"), "/tool/one-thing?enterAt=outside&frame=ruminate");
   assert.equal(R.cardHref("one-thing", "chronic_vigilance"), "/tool/one-thing");
+});
+
+test("Talk to someone now is on every screen", () => {
+  for (const st of skill.steps) {
+    const ls = [...(st.links ?? []), ...(st.fields ?? []).flatMap((f) => f.links ?? [])].map((l) => l.exit);
+    const off = (st.offers ?? []).map((o) => o.exit);
+    assert.ok(ls.includes("safety_open") || off.includes("safety_open"), st.id);
+  }
+  assert.ok(skill.exits.find((e) => e.id === "safety_open").safety);
 });
 
 test("no open-ended writing beyond the activity's few words; no breath instruction; no counts on screen", () => {

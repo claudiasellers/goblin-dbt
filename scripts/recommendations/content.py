@@ -328,7 +328,7 @@ TABLE = {
         "flooded": ("cool-down", "five-senses", "Flooded: bottom-up only."),
     },
     "rumination_loop": {
-        "default": ("one-thing", "problem-solve", "One thing leads (MF-05, opened on a minute outside your head and the doing-mind card: external absorption before working the problem, the PRD's ruling for a looping head, 15 Nov 2026); Problem Solve beside it (its barrier flow is the rumination guard) (Index §5.2 C)."),
+        "default": ("one-thing", "problem-solve", "One thing leads (MF-05, opened on a minute outside your head and the doing-mind card: external absorption before working the problem, 15 Nov 2026; the Index splits steady → MF-05 and stirred → Give your mind a job, but rf-v2 has no band split and the two redirect tools can't share a result); Problem Solve beside it (its barrier flow is the rumination guard) (Index §5.2 C)."),
         "backup": ("five-senses", "Orienting stays available when One thing and Problem Solve are both filtered."),
         "flooded": ("cool-down", "five-senses", "Flooded: bottom-up only."),
     },

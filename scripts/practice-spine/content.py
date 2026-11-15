@@ -928,7 +928,8 @@ NEW_SKILLS = [
      "Taking a verdict apart into what happened, what you feel and what mattered can loosen its grip without arguing with it.",
      ["linehan_skills_2015"], ["unpack-a-judgment"]),
     # One thing (MF-05, docs/design/one-thing.md): a completed visit is a one_thing rep (an off-phone one through the
-    # one_thing_again card). Preliminary: one-mindfulness at app dose has no trial of its own (the PRD's grade).
+    # one_thing_again card). Preliminary for one-mindfulness alone (no trial isolates it); the PRD's Preliminary–Moderate
+    # rests on module-level attention and rumination mediators.
     ("one_thing", "One-mindfully", "Preliminary", "mind", "dbt_one_mindfully",
      "Giving one ordinary thing all of your attention, and coming back each time you drift, gives a looping head something else to hold.",
      ["linehan_skills_2015"], ["one-thing"]),

@@ -61,6 +61,8 @@ export const FOLLOW_UP_SESSION_TOOL: Readonly<Record<string, string>> = {
   sleep_morning: 'sleep-reset',
   // Ride it out's morning card (DT-05 part 2): only from a Ride it out visit (it reopens that run).
   ride_morning: 'urge-surfing',
+  // One thing's *Same thing tomorrow?* (MF-05): only from a One thing visit (it reopens that run).
+  one_thing_again: 'one-thing',
 };
 
 /** The plan's ids, as the after card needs them. Own words are the visit's (its Today card may show them). */
