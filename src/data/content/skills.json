@@ -1,7 +1,7 @@
 {
   "source": {
-    "file": "graph-content-only-2026-11-14.json",
-    "exportedAt": "2026-11-14T23:05:09.546Z"
+    "file": "graph-content-only-2026-11-15.json",
+    "exportedAt": "2026-11-15T00:34:05.680Z"
   },
   "content": {
     "version": "skills-v1",
@@ -34644,8 +34644,8 @@
         },
         "derive": [
           {
-            "name": "cueChip",
             "from": "$a.cue",
+            "name": "cueChip",
             "table": "cueChip"
           }
         ],
@@ -36516,7 +36516,6 @@
           {
             "id": "cue",
             "kind": "ask",
-            "title": "cue_title",
             "crisis": [
               {
                 "variant": "other_person",
@@ -36558,6 +36557,16 @@
             "fields": [
               {
                 "id": "cue",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
                 "options": {
                   "list": "cue",
                   "where": {
@@ -36606,20 +36615,11 @@
                     ]
                   }
                 },
-                "max": 1,
-                "required": false,
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
+                "required": false
               }
             ],
             "hint": "cue_hint",
+            "title": "cue_title",
             "next": [
               {
                 "to": "remind",
@@ -36631,7 +36631,6 @@
           {
             "id": "remind",
             "kind": "ask",
-            "title": "remind_title",
             "crisis": [
               {
                 "variant": "other_person",
@@ -36673,12 +36672,6 @@
             "fields": [
               {
                 "id": "remind",
-                "options": {
-                  "list": "remind",
-                  "firstFrom": "$d.cueChip"
-                },
-                "max": 1,
-                "required": false,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -36687,13 +36680,17 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "firstFrom": "$d.cueChip",
+                  "list": "remind"
+                },
+                "required": false
               }
             ],
-            "hint": "remind_hint",
             "followUp": {
               "type": "turn_mind",
-              "whenFrom": "remind",
               "when": {
                 "in": [
                   "$a.remind",
@@ -36703,8 +36700,11 @@
                     "few_days"
                   ]
                 ]
-              }
+              },
+              "whenFrom": "remind"
             },
+            "hint": "remind_hint",
+            "title": "remind_title",
             "next": [
               {
                 "to": "end",
@@ -36716,50 +36716,7 @@
           {
             "id": "turn",
             "kind": "embed",
-            "embed": "turnFork",
             "answerAs": "turn",
-            "title": [
-              {
-                "when": {
-                  "any": [
-                    {
-                      "in": [
-                        "$a.still_again",
-                        [
-                          "yes",
-                          "sometimes",
-                          "unsure"
-                        ]
-                      ]
-                    },
-                    {
-                      "all": [
-                        {
-                          "not": {
-                            "set": "$a.still_again"
-                          }
-                        },
-                        {
-                          "in": [
-                            "$a.still",
-                            [
-                              "yes",
-                              "sometimes",
-                              "unsure"
-                            ]
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                },
-                "key": "turn_title_still"
-              },
-              {
-                "key": "turn_title"
-              }
-            ],
-            "hint": "turn_hint",
             "crisis": [
               {
                 "variant": "other_person",
@@ -36798,6 +36755,8 @@
                 }
               }
             ],
+            "embed": "turnFork",
+            "hint": "turn_hint",
             "links": [
               {
                 "exit": "safety_open",
@@ -36808,15 +36767,56 @@
               }
             ],
             "props": {
-              "turn": "turn_turn",
               "again": "turn_again",
-              "turnedLine": "turn_turned",
-              "fightLabel": "turn_fight",
-              "letLabel": "turn_let",
-              "hint": "turn_sr",
               "done": "turn_done",
-              "skip": "turn_skip"
+              "fightLabel": "turn_fight",
+              "hint": "turn_sr",
+              "letLabel": "turn_let",
+              "skip": "turn_skip",
+              "turn": "turn_turn",
+              "turnedLine": "turn_turned"
             },
+            "title": [
+              {
+                "key": "turn_title_still",
+                "when": {
+                  "any": [
+                    {
+                      "in": [
+                        "$a.still_again",
+                        [
+                          "yes",
+                          "sometimes",
+                          "unsure"
+                        ]
+                      ]
+                    },
+                    {
+                      "all": [
+                        {
+                          "not": {
+                            "set": "$a.still_again"
+                          }
+                        },
+                        {
+                          "in": [
+                            "$a.still",
+                            [
+                              "yes",
+                              "sometimes",
+                              "unsure"
+                            ]
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "key": "turn_title"
+              }
+            ],
             "next": [
               {
                 "to": "turn_card",
@@ -36834,8 +36834,6 @@
           {
             "id": "turn_card",
             "kind": "embed",
-            "embed": "boundaryLine",
-            "title": "turn_card_title",
             "crisis": [
               {
                 "variant": "other_person",
@@ -36874,6 +36872,7 @@
                 }
               }
             ],
+            "embed": "boundaryLine",
             "links": [
               {
                 "exit": "safety_open",
@@ -36884,13 +36883,14 @@
               }
             ],
             "props": {
-              "field": "statement",
-              "shape": "line",
-              "next": "card_next",
-              "copyLabel": "card_copy",
               "copiedLabel": "card_copied",
-              "selectedLabel": "card_selected"
+              "copyLabel": "card_copy",
+              "field": "statement",
+              "next": "card_next",
+              "selectedLabel": "card_selected",
+              "shape": "line"
             },
+            "title": "turn_card_title",
             "next": [
               {
                 "to": "turn_hands",
@@ -36902,8 +36902,6 @@
           {
             "id": "turn_hands",
             "kind": "embed",
-            "embed": "bodyCard",
-            "title": "turn_hands_title",
             "crisis": [
               {
                 "variant": "other_person",
@@ -36942,6 +36940,7 @@
                 }
               }
             ],
+            "embed": "bodyCard",
             "links": [
               {
                 "exit": "safety_open",
@@ -36952,17 +36951,18 @@
               }
             ],
             "props": {
+              "caution": "hands_caution",
+              "done": "hands_done",
               "kind": "willing",
+              "next": "next",
+              "running": "hands_running",
               "seconds": 10,
+              "start": "hands_start",
               "step1": "hands_step1",
               "step2": "hands_step2",
-              "step3": "hands_step3",
-              "caution": "hands_caution",
-              "start": "hands_start",
-              "running": "hands_running",
-              "done": "hands_done",
-              "next": "next"
+              "step3": "hands_step3"
             },
+            "title": "turn_hands_title",
             "next": [
               {
                 "to": "close",
@@ -36974,23 +36974,11 @@
           {
             "id": "turn_back",
             "kind": "ask",
-            "title": [
-              {
-                "when": {
-                  "in": [
-                    "$a.still",
-                    [
-                      "yes",
-                      "sometimes",
-                      "unsure"
-                    ]
-                  ]
-                },
-                "key": "back_title_still"
-              },
-              {
-                "key": "back_title"
-              }
+            "clears": [
+              "turn_back",
+              "still_again",
+              "remind_again",
+              "remind_later"
             ],
             "crisis": [
               {
@@ -37033,11 +37021,6 @@
             "fields": [
               {
                 "id": "turn_back",
-                "options": {
-                  "list": "turn_back"
-                },
-                "max": 1,
-                "required": true,
                 "links": [
                   {
                     "exit": "cool_down",
@@ -37056,7 +37039,12 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "list": "turn_back"
+                },
+                "required": true
               }
             ],
             "hint": "back_hint",
@@ -37067,11 +37055,23 @@
                 "remind_later"
               ]
             },
-            "clears": [
-              "turn_back",
-              "still_again",
-              "remind_again",
-              "remind_later"
+            "title": [
+              {
+                "key": "back_title_still",
+                "when": {
+                  "in": [
+                    "$a.still",
+                    [
+                      "yes",
+                      "sometimes",
+                      "unsure"
+                    ]
+                  ]
+                }
+              },
+              {
+                "key": "back_title"
+              }
             ],
             "next": [
               {
@@ -37135,7 +37135,6 @@
           {
             "id": "still_again",
             "kind": "ask",
-            "title": "still_again_title",
             "crisis": [
               {
                 "variant": "other_person",
@@ -37177,11 +37176,6 @@
             "fields": [
               {
                 "id": "still_again",
-                "options": {
-                  "list": "still"
-                },
-                "max": 1,
-                "required": true,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -37190,10 +37184,16 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "list": "still"
+                },
+                "required": true
               }
             ],
             "hint": "still_again_hint",
+            "title": "still_again_title",
             "next": [
               {
                 "to": "still_again_end",
@@ -37218,50 +37218,7 @@
           {
             "id": "turn_again",
             "kind": "embed",
-            "embed": "turnFork",
             "answerAs": "turn_again",
-            "title": [
-              {
-                "when": {
-                  "any": [
-                    {
-                      "in": [
-                        "$a.still_again",
-                        [
-                          "yes",
-                          "sometimes",
-                          "unsure"
-                        ]
-                      ]
-                    },
-                    {
-                      "all": [
-                        {
-                          "not": {
-                            "set": "$a.still_again"
-                          }
-                        },
-                        {
-                          "in": [
-                            "$a.still",
-                            [
-                              "yes",
-                              "sometimes",
-                              "unsure"
-                            ]
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                },
-                "key": "turn_title_still"
-              },
-              {
-                "key": "turn_title"
-              }
-            ],
-            "hint": "turn_hint",
             "crisis": [
               {
                 "variant": "other_person",
@@ -37300,6 +37257,8 @@
                 }
               }
             ],
+            "embed": "turnFork",
+            "hint": "turn_hint",
             "links": [
               {
                 "exit": "safety_open",
@@ -37310,15 +37269,56 @@
               }
             ],
             "props": {
-              "turn": "turn_turn",
               "again": "turn_again",
-              "turnedLine": "turn_turned",
-              "fightLabel": "turn_fight",
-              "letLabel": "turn_let",
-              "hint": "turn_sr",
               "done": "turn_done",
-              "skip": "turn_skip"
+              "fightLabel": "turn_fight",
+              "hint": "turn_sr",
+              "letLabel": "turn_let",
+              "skip": "turn_skip",
+              "turn": "turn_turn",
+              "turnedLine": "turn_turned"
             },
+            "title": [
+              {
+                "key": "turn_title_still",
+                "when": {
+                  "any": [
+                    {
+                      "in": [
+                        "$a.still_again",
+                        [
+                          "yes",
+                          "sometimes",
+                          "unsure"
+                        ]
+                      ]
+                    },
+                    {
+                      "all": [
+                        {
+                          "not": {
+                            "set": "$a.still_again"
+                          }
+                        },
+                        {
+                          "in": [
+                            "$a.still",
+                            [
+                              "yes",
+                              "sometimes",
+                              "unsure"
+                            ]
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "key": "turn_title"
+              }
+            ],
             "next": [
               {
                 "to": "turn_card_again",
@@ -37336,8 +37336,6 @@
           {
             "id": "turn_card_again",
             "kind": "embed",
-            "embed": "boundaryLine",
-            "title": "turn_card_title",
             "crisis": [
               {
                 "variant": "other_person",
@@ -37376,6 +37374,7 @@
                 }
               }
             ],
+            "embed": "boundaryLine",
             "links": [
               {
                 "exit": "safety_open",
@@ -37386,13 +37385,14 @@
               }
             ],
             "props": {
-              "field": "statement",
-              "shape": "line",
-              "next": "card_next",
-              "copyLabel": "card_copy",
               "copiedLabel": "card_copied",
-              "selectedLabel": "card_selected"
+              "copyLabel": "card_copy",
+              "field": "statement",
+              "next": "card_next",
+              "selectedLabel": "card_selected",
+              "shape": "line"
             },
+            "title": "turn_card_title",
             "next": [
               {
                 "to": "turn_hands_again",
@@ -37404,8 +37404,6 @@
           {
             "id": "turn_hands_again",
             "kind": "embed",
-            "embed": "bodyCard",
-            "title": "turn_hands_title",
             "crisis": [
               {
                 "variant": "other_person",
@@ -37444,6 +37442,7 @@
                 }
               }
             ],
+            "embed": "bodyCard",
             "links": [
               {
                 "exit": "safety_open",
@@ -37454,17 +37453,18 @@
               }
             ],
             "props": {
+              "caution": "hands_caution",
+              "done": "hands_done",
               "kind": "willing",
+              "next": "next",
+              "running": "hands_running",
               "seconds": 10,
+              "start": "hands_start",
               "step1": "hands_step1",
               "step2": "hands_step2",
-              "step3": "hands_step3",
-              "caution": "hands_caution",
-              "start": "hands_start",
-              "running": "hands_running",
-              "done": "hands_done",
-              "next": "next"
+              "step3": "hands_step3"
             },
+            "title": "turn_hands_title",
             "next": [
               {
                 "to": "remind_again",
@@ -37476,7 +37476,6 @@
           {
             "id": "remind_again",
             "kind": "ask",
-            "title": "remind_again_title",
             "crisis": [
               {
                 "variant": "other_person",
@@ -37518,11 +37517,6 @@
             "fields": [
               {
                 "id": "remind_again",
-                "options": {
-                  "list": "remind"
-                },
-                "max": 1,
-                "required": false,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -37531,13 +37525,16 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "list": "remind"
+                },
+                "required": false
               }
             ],
-            "hint": "remind_hint",
             "followUp": {
               "type": "turn_mind",
-              "whenFrom": "remind_again",
               "when": {
                 "in": [
                   "$a.remind_again",
@@ -37547,8 +37544,11 @@
                     "few_days"
                   ]
                 ]
-              }
+              },
+              "whenFrom": "remind_again"
             },
+            "hint": "remind_hint",
+            "title": "remind_again_title",
             "next": [
               {
                 "to": "turn_end",
@@ -37560,7 +37560,6 @@
           {
             "id": "remind_later",
             "kind": "ask",
-            "title": "remind_again_title",
             "crisis": [
               {
                 "variant": "other_person",
@@ -37602,11 +37601,6 @@
             "fields": [
               {
                 "id": "remind_later",
-                "options": {
-                  "list": "remind"
-                },
-                "max": 1,
-                "required": false,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -37615,13 +37609,16 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "list": "remind"
+                },
+                "required": false
               }
             ],
-            "hint": "remind_hint",
             "followUp": {
               "type": "turn_mind",
-              "whenFrom": "remind_later",
               "when": {
                 "in": [
                   "$a.remind_later",
@@ -37631,8 +37628,11 @@
                     "few_days"
                   ]
                 ]
-              }
+              },
+              "whenFrom": "remind_later"
             },
+            "hint": "remind_hint",
+            "title": "remind_again_title",
             "next": [
               {
                 "to": "later_end",
@@ -37864,24 +37864,24 @@
                 }
               }
             ],
+            "done": "done",
             "lines": [
               {
+                "key": "turn_end_skipped",
                 "when": {
                   "has": [
                     "$a.turn_again.ids",
                     "skipped"
                   ]
-                },
-                "key": "turn_end_skipped"
+                }
               },
               {
+                "key": "turn_end_line",
                 "when": {
                   "all": []
-                },
-                "key": "turn_end_line"
+                }
               }
             ],
-            "done": "done",
             "links": [
               {
                 "exit": "safety_open",
@@ -37898,7 +37898,6 @@
             "id": "later_end",
             "kind": "handoff",
             "complete": true,
-            "noClose": true,
             "crisis": [
               {
                 "variant": "other_person",
@@ -37937,21 +37936,21 @@
                 }
               }
             ],
+            "done": "done",
             "lines": [
               {
+                "key": "later_line_set",
                 "when": {
                   "set": "$a.remind_later"
-                },
-                "key": "later_line_set"
+                }
               },
               {
+                "key": "later_line",
                 "when": {
                   "all": []
-                },
-                "key": "later_line"
+                }
               }
             ],
-            "done": "done",
             "links": [
               {
                 "exit": "safety_open",
@@ -37961,6 +37960,7 @@
                 }
               }
             ],
+            "noClose": true,
             "next": [],
             "offers": []
           },
@@ -37968,7 +37968,6 @@
             "id": "still_again_end",
             "kind": "handoff",
             "complete": true,
-            "noClose": true,
             "crisis": [
               {
                 "variant": "other_person",
@@ -38007,15 +38006,15 @@
                 }
               }
             ],
+            "done": "done",
             "lines": [
               {
+                "key": "still_again_line",
                 "when": {
                   "all": []
-                },
-                "key": "still_again_line"
+                }
               }
             ],
-            "done": "done",
             "links": [
               {
                 "exit": "safety_open",
@@ -38025,6 +38024,7 @@
                 }
               }
             ],
+            "noClose": true,
             "next": [],
             "offers": [
               {
@@ -38045,7 +38045,6 @@
             "id": "rest_end",
             "kind": "handoff",
             "complete": true,
-            "noClose": true,
             "crisis": [
               {
                 "variant": "other_person",
@@ -38084,15 +38083,15 @@
                 }
               }
             ],
+            "done": "done",
             "lines": [
               {
+                "key": "rest_line",
                 "when": {
                   "all": []
-                },
-                "key": "rest_line"
+                }
               }
             ],
-            "done": "done",
             "links": [
               {
                 "exit": "safety_open",
@@ -38102,6 +38101,7 @@
                 }
               }
             ],
+            "noClose": true,
             "next": [],
             "offers": []
           },
@@ -38793,8 +38793,8 @@
           "thenVsNowFrom": "close"
         },
         "entries": {
-          "willingness": "what",
-          "turn": "what"
+          "turn": "what",
+          "willingness": "what"
         }
       },
       {
@@ -39227,16 +39227,9 @@
           {
             "id": "to_mine",
             "kind": "ask",
-            "title": "task_mine_title",
-            "hint": "task_mine_hint",
             "fields": [
               {
                 "id": "to_mine",
-                "options": {
-                  "profile": "thingsILike"
-                },
-                "max": 1,
-                "required": false,
                 "links": [
                   {
                     "exit": "safety_open",
@@ -39245,9 +39238,16 @@
                       "all": []
                     }
                   }
-                ]
+                ],
+                "max": 1,
+                "options": {
+                  "profile": "thingsILike"
+                },
+                "required": false
               }
             ],
+            "hint": "task_mine_hint",
+            "title": "task_mine_title",
             "next": [
               {
                 "to": "to_like",
@@ -39267,19 +39267,8 @@
           {
             "id": "mine_do",
             "kind": "embed",
-            "embed": "doseTimer",
             "answerAs": "mine_do",
-            "title": "mine_title",
-            "props": {
-              "seconds": 180,
-              "step1": "mine_step1",
-              "step2": "mine_step2",
-              "step3": "mine_step3",
-              "start": "mine_start",
-              "running": "mine_running",
-              "done": "mine_done",
-              "next": "next"
-            },
+            "embed": "doseTimer",
             "links": [
               {
                 "exit": "safety_open",
@@ -39289,6 +39278,17 @@
                 }
               }
             ],
+            "props": {
+              "done": "mine_done",
+              "next": "next",
+              "running": "mine_running",
+              "seconds": 180,
+              "start": "mine_start",
+              "step1": "mine_step1",
+              "step2": "mine_step2",
+              "step3": "mine_step3"
+            },
+            "title": "mine_title",
             "next": [
               {
                 "to": "back",
@@ -40935,6 +40935,7 @@
             "hint": "repark_hint",
             "title": [
               {
+                "key": "repark_title_again",
                 "when": {
                   "any": [
                     {
@@ -40950,8 +40951,7 @@
                       ]
                     }
                   ]
-                },
-                "key": "repark_title_again"
+                }
               },
               {
                 "key": "repark_title"
