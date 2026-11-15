@@ -72,7 +72,11 @@ payload = {
 }
 out = os.path.join(root, "tests/fixtures/parts-content.json")
 os.makedirs(os.path.dirname(out), exist_ok=True)
-with open(out, "w") as f:
+# Written whole, then moved into place: the freshness test runs this while other test files read the fixture, and
+# an in-place rewrite let a reader see it empty (the merge lane, 15 Nov).
+tmp = f"{out}.{os.getpid()}.tmp"
+with open(tmp, "w") as f:
     json.dump(payload, f, ensure_ascii=False, indent=1)
     f.write("\n")
+os.replace(tmp, out)
 print(out)

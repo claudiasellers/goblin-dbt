@@ -89,6 +89,8 @@ test("how much you were with it: every answer is the practice; a plain visit end
   assert.ok(M.stepOf(skill, "skip_end").noClose);
   assert.ok(!M.stepOf(skill, "skip_end").followUp);
   assert.equal(M.stepOf(skill, "skip_end").complete, false, "Move on before it started is no practice: not complete, no rep");
+  // The player leaves a `complete: false` hand-off as left early, so the server writes no rep unless something was practised.
+  assert.match(readFileSync("src/components/skillPlayer/SkillPlayer.tsx", "utf8"), /status: ending\.complete === false \? 'exited_early' : 'completed'/);
   assert.equal(skill.copy.with_line, "In and out is the practice. Each time you came back, that was it.");
 });
 
