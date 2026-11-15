@@ -138,13 +138,13 @@ function parseRef(data: unknown): { id: string; label: ItemLabel } {
   return { id: str(d.id, { max: 100 }), label: oneOf(d.label, Object.keys(ITEM_LABELS) as ItemLabel[]) };
 }
 
-async function itemWrite(uid: string, data: unknown, set: string): Promise<ProfileWriteResponse> {
+async function itemWrite(uid: string, data: unknown, set: string, then = ''): Promise<ProfileWriteResponse> {
   const ref = parseOrInvalid(() => parseRef(data), 'Invalid profile item');
   const rel = ITEM_LABELS[ref.label];
   const res = await writeTx((tx) => tx.run(
     `MATCH (u:User {id: $uid})-[:${rel}]->(p:${ref.label} {key: $key})
      OPTIONAL MATCH (k:ProfileKind {id: p.kind})
-     SET ${set}, p.updatedAt = datetime(), u.profileVersion = coalesce(u.profileVersion, 0) + 1
+     SET ${set}, p.updatedAt = datetime(), u.profileVersion = coalesce(u.profileVersion, 0) + 1${then}
      RETURN u.profileVersion AS version`,
     { uid, key: userKey(uid, ref.id) },
   ));
@@ -164,8 +164,20 @@ export const confirmProfileItem = callable<unknown, ProfileWriteResponse>(
 /** "Not any more": set aside (kept and restorable, never deleted silently; excluded from slices). */
 export const setAsideProfileItem = callable<unknown, ProfileWriteResponse>(
   { auth: 'required', label: 'setAsideProfileItem', errorMessage: 'Could not save that' },
-  async ({ uid, data }) => itemWrite(uid as string, data, `p.status = 'set_aside', p.lastReviewedAt = datetime()`),
+  async ({ uid, data }) => itemWrite(uid as string, data, `p.status = 'set_aside', p.lastReviewedAt = datetime()`, PRACTICE_PREFS_ASIDE),
 );
+
+/**
+ * Setting *My practice* aside also dismisses the waiting daily card (MF-02): Me says no daily card comes until the
+ * setup is done again, and Today doesn't read the preferences.
+ */
+export const PRACTICE_PREFS_ASIDE = `
+     WITH u, p
+     OPTIONAL MATCH (u)-[:HAS_FOLLOW_UP]->(f:FollowUp {type: 'practice_daily', status: 'scheduled'})
+       WHERE p.kind = 'practice_prefs'
+     WITH u, collect(f) AS waiting
+     FOREACH (f IN waiting | SET f.status = 'dismissed', f.resolvedAt = datetime(), f.updatedAt = datetime())
+     WITH u`;
 
 export const restoreProfileItem = callable<unknown, ProfileWriteResponse>(
   { auth: 'required', label: 'restoreProfileItem', errorMessage: 'Could not save that' },

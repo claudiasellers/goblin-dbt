@@ -10,7 +10,7 @@ import { callable } from '../shared/callable';
 import { readTx } from '../shared/neo4j';
 import { BANDS, type Band } from '../capacity/types';
 import { readFollowUpTypes, type FollowUpTypeContent } from './registry';
-import { fillDeepLink, followUpState, orderToday, type TodayItem } from './todayOrder';
+import { fillDeepLink, followUpState, orderToday, ROLLING_TYPES, type TodayItem } from './todayOrder';
 import { NOT_WHAT_HELPS } from './tools';
 import { COPE_AHEAD_AFTER, planIdsFromExt } from './copeAheadAfter';
 
@@ -78,7 +78,7 @@ async function followUpItems(tx: ManagedTransaction, uid: string, types: Map<str
       sourceSessionId: r.get('sourceSessionId') as string | null, followUpId: r.get('id') as string | null };
     const deepLink = t.resolveMode === 'deeplink' ? fillDeepLink(t.deepLinkTemplate, vars) : null;
     const state = followUpState(dueAt, t.staleAfterHours, now.getTime());
-    if (state) {
+    if (state && !(state === 'stale' && ROLLING_TYPES.has(t.id))) {
       items.push({
         id: r.get('id') as string, kind: 'follow_up', type: t.id, tier: t.tier, state, dueAt,
         resolveMode: t.resolveMode, deepLink,

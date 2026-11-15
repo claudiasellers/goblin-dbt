@@ -58,6 +58,11 @@ export const TODAY_VISIBLE = 3;
 export const UPCOMING_HOURS = 2;
 /** A stale follow-up stays in Today this long after it went stale. */
 export const STALE_KEEP_HOURS = 24 * 7;
+/**
+ * Rolling cards (each visit books the next): never shown stale, so a missed day leaves nothing behind. The Practice
+ * home's daily card (MF-02); the home dismisses them on its next read.
+ */
+export const ROLLING_TYPES: ReadonlySet<string> = new Set(['practice_daily']);
 
 const TIER_ORDER: Record<Tier, number> = { safety: 0, practice: 1, quality: 2, skills: 3 };
 const STATE_ORDER: Record<TodayState, number> = { due: 0, stale: 1, upcoming: 2 };

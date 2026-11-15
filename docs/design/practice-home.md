@@ -32,7 +32,8 @@ It **rolls** instead of recurring: every visit to the home books the next card w
 waiting (`shouldBookDaily`), and opening a card resolves it (`resolveFollowUp` status `done`) before the home reads, so
 the read sees none waiting and books the next. *Waiting* means scheduled and not yet stale, so a missed day never blocks
 the next card and produces nothing else: no *you missed*, no reset. The read lists booked cards past their 12 h
-(`staleDailyIds`) and the home dismisses them, so nothing piles up on Today. A cue books nothing (the cue is the
+(`staleDailyIds`) and the home dismisses them, and Today never shows a `practice_daily` card stale (`ROLLING_TYPES`
+in `functions/src/spine/todayOrder.ts`), so a missed day leaves nothing on Today even without a visit here. A cue books nothing (the cue is the
 reminder).
 
 ## What's saved
@@ -40,11 +41,12 @@ reminder).
 - `practice_prefs`: a `ProfileFact` kind (About me → *My practice*, area `about_me`, one per person, a re-save
   replaces it): `time` **or** `cue` (never both; the validator refuses), `cueOwn` only with *My own* (own words,
   encrypted, ≤ 60), `breath` (defaults to `no`). Read through the `practicePrefs` slice, by `PROFILE_NEEDS.practice` and
-  `PROFILE_NEEDS['wise-mind']` (the breath). Me can set it aside (no daily card until the setup is done again).
+  `PROFILE_NEEDS['wise-mind']` (the breath). Me can set it aside (no daily card until the setup is done again: the same write dismisses a waiting card).
 - Reps: the shared `SkillPractice` log. Catches are logged `self_report`. The read counts a visit once (Notice what's here
   logs `observe` and `describe` from one session), so the ring is visits, the skill cards are per skill.
 - `getPracticeHome` (new callable, `functions/src/practice/`): the MF skills by `mfOrder`, the caller's own reps of them,
-  the booked daily cards (waiting or stale) and the last Notice what's here close, in one read transaction; `compute.ts`
+  the booked daily cards (waiting or stale) and the last Notice what's here close, in one read transaction (levels come
+  from all-time counts per skill, the week and recent tools from the latest 2,000 reps); `compute.ts`
   is pure. Aggregates only: nothing it reads
   pre-fills a flow.
 

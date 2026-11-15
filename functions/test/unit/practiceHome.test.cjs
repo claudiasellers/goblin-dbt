@@ -17,6 +17,11 @@ test('getPracticeHome: the caller\'s own reps, the MF sequence in order, a fresh
       { id: 'describe', label: 'Name', mfOrder: 2, tools: ['notice-and-name'] },
       { id: 'observe', label: 'Notice', mfOrder: 1, tools: ['notice-and-name', 'five-senses'] },
     ];
+    // Lifetime counts, apart from the bounded recent rows: levels never go down.
+    if (query.includes('AS offPhone') && query.includes('count(DISTINCT visit)')) return [
+      { skillId: 'observe', reps: 2400, offPhone: 30 }, { skillId: 'describe', reps: 1, offPhone: 0 },
+    ];
+    if (query.includes('AS n')) return [{ n: 31 }];
     if (query.includes('HAS_SKILL_PRACTICE')) return [
       { skillId: 'observe', sessionKey: 'u1:s1', practiceId: 'notice-and-name', at, offPhone: false, source: 'in_app' },
       { skillId: 'describe', sessionKey: 'u1:s1', practiceId: 'notice-and-name', at, offPhone: false, source: 'in_app' },
@@ -27,7 +32,10 @@ test('getPracticeHome: the caller\'s own reps, the MF sequence in order, a fresh
   });
   setDriver(f.driver);
   const r = await fns.getPracticeHome.run({ auth: { uid: 'u1' }, data: {} });
-  assert.deepEqual(r.skills.map((s) => [s.id, s.reps]), [['observe', 1], ['describe', 1]]);
+  assert.deepEqual(r.skills.map((s) => [s.id, s.reps, s.offPhone]), [['observe', 2400, 30], ['describe', 1, 0]], 'levels from all-time counts');
+  assert.equal(r.offPhoneReps, 31);
+  const recent = f.calls.find((c) => c.query.includes('LIMIT 2000'));
+  assert.ok(recent, 'the week and recent tools read a bounded set');
   assert.equal(r.weekReps, 1, 'one visit, one rep on the ring');
   assert.deepEqual(r.recentTools, ['notice-and-name']);
   assert.equal(r.dailyPending, true);

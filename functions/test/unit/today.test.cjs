@@ -74,6 +74,20 @@ const TYPE = (id, o = {}) => ({ t: { id, ownerModule: 'wmp', hierarchyTier: 'qua
   notifyPush: false, notifyInTab: true, notifyIcs: false, enabled: true, deepLinkTemplate: null,
   contentJson: JSON.stringify({ copy: { title: id }, choices: [{ id: 'done', label: 'Done', status: 'done' }], window: {}, notification: 'Ready.' }), ...o } });
 
+test('getToday: a rolling practice card never shows stale, a due one does (MF-02)', async () => {
+  const f = fakeDriver((q) => {
+    if (/MATCH \(t:FollowUpType\) WHERE/.test(q)) return [TYPE('practice_daily', { staleAfterHours: 12, hierarchyTier: 'practice' })];
+    if (/HAS_FOLLOW_UP/.test(q) && !/part_checkback/.test(q)) return [
+      { id: 'missed', type: 'practice_daily', dueAt: inH(-30), sourceToolId: null, sourceSessionId: null, notifyInTab: true, detailId: null },
+      { id: 'today', type: 'practice_daily', dueAt: inH(-1), sourceToolId: null, sourceSessionId: null, notifyInTab: true, detailId: null },
+    ];
+    return [];
+  });
+  setDriver(f.driver);
+  const out = await fns.getToday.run({ auth: auth(), data: {} });
+  assert.deepEqual([...out.items, ...out.more].filter((i) => i.kind === 'follow_up').map((i) => [i.id, i.state]), [['today', 'due']]);
+});
+
 test('getToday: derived states, one tool_outcome from the close question, OA reminder left to OA, flooded collapse', async () => {
   const f = fakeDriver((q) => {
     if (/MATCH \(t:FollowUpType\) WHERE/.test(q)) return [TYPE('recover_next_day'), TYPE('recover_log'), TYPE('tool_outcome', { hierarchyTier: 'skills' }),

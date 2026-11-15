@@ -7,7 +7,7 @@
 import { callable } from '../shared/callable';
 import { readTx } from '../shared/neo4j';
 import { practiceHome } from './compute';
-import type { DailyCardRow, PracticeHomeResponse, RepRow, SkillMetaRow } from './types';
+import type { DailyCardRow, LifetimeTotals, PracticeHomeResponse, RepRow, SkillMetaRow } from './types';
 
 const SKILLS_QUERY = `MATCH (k:PracticeSkill) WHERE k.mfOrder IS NOT NULL
   RETURN k.id AS id, coalesce(k.practiceLabel, k.displayLabel, k.name) AS label, k.mfOrder AS mfOrder,
@@ -19,6 +19,19 @@ const REPS_QUERY = `MATCH (:User {id: $uid})-[:HAS_SKILL_PRACTICE]->(sp:SkillPra
   RETURN k.id AS skillId, coalesce(ts.key, sp.key) AS sessionKey, coalesce(sp.practiceId, '') AS practiceId,
          toString(sp.at) AS at, coalesce(sp.offPhone, false) AS offPhone, coalesce(sp.source, '') AS source
   ORDER BY sp.at DESC LIMIT 2000`;
+
+// Lifetime counts per skill, apart from the bounded recent rows above, so levels never go down however many reps
+// there are. `selfVisits`: off-phone or caught visits, each counted once.
+const TOTALS_QUERY = `MATCH (:User {id: $uid})-[:HAS_SKILL_PRACTICE]->(sp:SkillPractice)-[:PRACTICED]->(k:PracticeSkill)
+  WHERE k.mfOrder IS NOT NULL
+  OPTIONAL MATCH (ts:ToolSession)-[:LOGGED_REP]->(sp)
+  WITH k, sp, coalesce(ts.key, sp.key) AS visit, (coalesce(sp.offPhone, false) OR sp.source = 'catch') AS self
+  RETURN k.id AS skillId, count(DISTINCT visit) AS reps, count(DISTINCT CASE WHEN self THEN visit END) AS offPhone`;
+
+const SELF_VISITS_QUERY = `MATCH (:User {id: $uid})-[:HAS_SKILL_PRACTICE]->(sp:SkillPractice)-[:PRACTICED]->(k:PracticeSkill)
+  WHERE k.mfOrder IS NOT NULL AND (coalesce(sp.offPhone, false) OR sp.source = 'catch')
+  OPTIONAL MATCH (ts:ToolSession)-[:LOGGED_REP]->(sp)
+  RETURN count(DISTINCT coalesce(ts.key, sp.key)) AS n`;
 
 // Waiting = scheduled and not yet stale (staleAfterHours 12): a missed day's card never blocks the next one, and the
 // home dismisses the stale ones.
@@ -41,6 +54,8 @@ export const getPracticeHome = callable<unknown, PracticeHomeResponse>(
     const reps = await tx.run(REPS_QUERY, { uid });
     const daily = await tx.run(DAILY_QUERY, { uid });
     const notice = await tx.run(NOTICE_QUERY, { uid });
+    const totals = await tx.run(TOTALS_QUERY, { uid });
+    const selfVisits = await tx.run(SELF_VISITS_QUERY, { uid });
     const meta: SkillMetaRow[] = skills.records.map((r) => ({
       id: r.get('id') as string, label: r.get('label') as string, order: num(r.get('mfOrder')),
       tools: (r.get('tools') as unknown[]).filter((t): t is string => typeof t === 'string'),
@@ -52,6 +67,11 @@ export const getPracticeHome = callable<unknown, PracticeHomeResponse>(
     }));
     const cards: DailyCardRow[] = daily.records.map((r) => ({ id: r.get('id') as string, waiting: r.get('waiting') === true }));
     const last = notice.records[0]?.get('last');
-    return practiceHome(meta, rows, cards, typeof last === 'string' ? last : null, Date.now());
+    const lifetime: LifetimeTotals = {
+      bySkill: Object.fromEntries(totals.records.map((r) => [r.get('skillId') as string,
+        { reps: num(r.get('reps')), offPhone: num(r.get('offPhone')) }])),
+      offPhoneVisits: num(selfVisits.records[0]?.get('n') ?? 0),
+    };
+    return practiceHome(meta, rows, cards, typeof last === 'string' ? last : null, Date.now(), lifetime);
   }),
 );
