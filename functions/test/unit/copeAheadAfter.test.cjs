@@ -73,6 +73,7 @@ test('a close\'s schedule: another tool\'s session skips cope_ahead_after (like 
     oa_try: 'opposite-action',
     break_return: 'give', repair_outcome: 'give',
     habit_renew: 'habit-plan',
+    clear_mind: 'habit-plan',
     turn_mind: 'let-it-be',
     held_practice: 'soothe',
     please_fix: 'please-skill',

@@ -65,6 +65,8 @@ export interface ToolSessionApi {
    * never one hydrated from a saved session.
    */
   setUrgeIds(ids: string[]): void;
+  /** The urge picked in this visit so far (what `setUrgeIds` holds): the close reads it for the lapse plan (DT-09). */
+  visitUrgeIds(): string[];
   /**
    * Wise mind's answer in this visit (a WiseMindAnswer id, or `own`), sent with whichever close happens.
    * Ask-fresh (layers.ts ASK_FRESH_FIELDS): only what was picked now, never read back or pre-filled.
@@ -105,6 +107,7 @@ export const NO_SESSION: ToolSessionApi = {
   setSkillIds: () => {},
   setEmotionIds: () => {},
   setUrgeIds: () => {},
+  visitUrgeIds: () => [],
   setWiseMindAnswer: () => {},
   setFitsFacts: () => {},
   setThenVsNow: () => {},

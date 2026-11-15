@@ -22,6 +22,7 @@ PROFILE_SLICES = {
     "name", "quietHours", "patterns", "ownLines", "savedLines", "people", "bodyFlags", "values", "goals",
     "copeAheadPlans", "boundaryLines", "practicePrefs", "fadeLevels", "ownWords", "thingsILike", "thingsILikePicks", "iCanRungs", "crisisKit",
     "safetyPlan", "country", "parts", "partDetail", "partAnchors", "den", "prosCons", "pleaseRows", "sleepAnchor",
+    "abstinencePlans",
 }
 # Slices a field may list as options (src/data/skillTypes.ts ProfileOptionSlice).
 PROFILE_OPTION_SLICES = {"parts", "ownLines", "savedLines", "people", "values", "goals", "copeAheadPlans", "boundaryLines", "thingsILike"}
