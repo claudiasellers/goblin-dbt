@@ -317,7 +317,9 @@ EXITS = [{**{k: v for k, v in e.items() if k != "planned"}, "toolId": ENTRY_ALIA
          if e["toolId"] in ENTRY_ALIASES else e for e in EXITS]
 # What works here (MF-08) is opened from two directions (*Decide if this fight is worth it*, *Play the hand you have*):
 # the problem type rides along as its frame, so it opens with that grievance validated and that direction's steps first.
-EXITS = [{**e, "query": {"frame": "$a.problem"}} if e["toolId"] == "effectiveness" else e for e in EXITS]
+# What works here gets the direction picked (anger-blocked-redirect, envy-unfair-effective): a piled-up problem's focus
+# carries the same way as a single one.
+EXITS = [{**e, "query": {"frame": "$a.solutions"}} if e["toolId"] == "effectiveness" else e for e in EXITS]
 EXITS += [{"id": "safety_open", "safety": True}, {"id": "done", "done": True}]
 
 

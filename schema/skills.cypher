@@ -3020,7 +3020,7 @@ MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:dialectics"}), (t:TherapyConcept {appToolId: "dialectics"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:effectiveness"})
-SET x += {skillId: "problem_solve", exit: "effectiveness", toolId: "effectiveness", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{\"frame\": \"$a.problem\"}", x.label = null;
+SET x += {skillId: "problem_solve", exit: "effectiveness", toolId: "effectiveness", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{\"frame\": \"$a.solutions\"}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:effectiveness"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:effectiveness"}), (t:TherapyConcept {appToolId: "effectiveness"})
@@ -27981,61 +27981,76 @@ SET r += {list: "back", order: 32};
 
 // --- effectively (eff-v1) ---
 MERGE (s:Skill {id: "effectively"})
-SET s += {toolId: "effectiveness", version: "eff-v1", contentVersion: "skills-v1", start: "goal", ownMax: 60, emotionFields: [], accepts: ["band", "frame"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"back_didnt\": \"It was worth trying. What works can change, and you can look again.\", \"back_helped\": \"That's what works, found and done.\", \"back_not_yet\": \"It'll keep. The move is still there.\", \"back_title\": \"How did it go? You planned: {move}\", \"body_first\": \"My body first\", \"done\": \"Done\", \"end_line\": \"Right, or what works? Asking it is the skill.\", \"end_right_line\": \"Sometimes being right is the point. You know which this one is.\", \"end_set_line\": \"The rest can wait. Setting it down for now isn't giving in.\", \"end_title\": \"What works here: {move}\", \"end_unsure_line\": \"Not knowing is fine. You have one move either way.\", \"flooded_hint\": \"Working out what works is easier once it settles. Start with your body, or go on anyway.\", \"flooded_title\": \"Your body's loud right now.\", \"goal_hint\": \"One for now.\", \"goal_own\": \"Something else\", \"goal_title\": \"What do you want out of this, most?\", \"move_hint\": \"From where things stand today.\", \"move_own\": \"My own move\", \"move_title\": \"Given how things actually are, one move that works.\", \"move_title_right\": \"Then one move that keeps your self-respect, from how things actually are.\", \"next\": \"Next\", \"piles_hint\": \"Both are real. They don't always fit together.\", \"piles_title\": \"Here's what you're after.\", \"pull_title\": \"Right now, which matters more?\", \"remind_q\": \"Want me to ask how it went?\", \"right_label\": \"Being right\", \"safety_open\": \"Talk to someone now\", \"set_hint\": \"For now. Nothing is given up for good.\", \"set_title\": \"What could you set down, for now?\", \"unsafe_line\": \"When someone might hurt you, what works is staying safe. Nothing here asks you to give ground to them.\", \"unsafe_title\": \"Your safety comes first.\", \"valid_fight\": \"Maybe they are in the wrong. That's real.\", \"valid_plain\": \"Being right and getting what matters can pull apart.\", \"valid_unfair\": \"It isn't fair. That's real.\", \"want_hint\": \"Both can matter.\", \"want_title\": \"What are you after here? Tap any.\", \"works_label\": \"Getting what matters\"}", s.tablesJson = "{\"grievanceOf\": {\"anger-blocked-goal\": \"fight\", \"envy-unfair-advantage\": \"unfair\", \"fight\": \"fight\", \"unfair\": \"unfair\"}}", s.deriveJson = "[{\"from\": \"$ctx.frame\", \"name\": \"grievance\", \"table\": \"grievanceOf\"}]";
+SET s += {toolId: "effectiveness", version: "eff-v1", contentVersion: "skills-v1", start: "goal", ownMax: 60, emotionFields: [], accepts: ["band", "frame"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"back_again_none\": \"It'll be here when you're ready.\", \"back_again_set\": \"The card will come back then.\", \"back_didnt\": \"It was worth trying. What works can change, and you can look again.\", \"back_helped\": \"It helped. Worth remembering next time.\", \"back_not_yet\": \"It'll keep. The move is still there.\", \"back_title\": \"How did it go? You planned: {move}\", \"body_first\": \"My body first\", \"done\": \"Done\", \"end_even_line\": \"Self-respect can be the point. Getting even tends to cost you more than it costs them.\", \"end_line\": \"Right, or what works? Asking it is the skill.\", \"end_right_line\": \"Sometimes being right is the point. You know which this one is.\", \"end_set_line\": \"The rest can wait. Setting it down for now isn't giving in.\", \"end_title\": \"What works here: {move}\", \"end_unsure_line\": \"Not knowing is fine. You have one move either way.\", \"flooded_hint\": \"Working out what works is easier once it settles.\", \"flooded_title\": \"Your body's loud right now.\", \"goal_hint\": \"One for now.\", \"goal_own\": \"Something else\", \"goal_title\": \"What do you most want out of this?\", \"move_own\": \"My own move\", \"move_title\": \"Pick one move that works from where things stand.\", \"move_title_right\": \"Then one move that keeps your self-respect, from where things stand.\", \"next\": \"Next\", \"piles_hint\": \"Both are real. They don't always fit together.\", \"piles_title\": \"Here's what you're after.\", \"pull_title\": \"Right now, which matters more?\", \"remind_again\": \"Ask me again?\", \"remind_q\": \"Want me to ask how it went?\", \"right_label\": \"Being right\", \"safety_open\": \"Talk to someone now\", \"set_hint\": \"Nothing is given up for good.\", \"set_title\": \"What could you set down, for now?\", \"unsafe_line\": \"When someone might hurt you, what works is staying safe. Nothing here asks you to give ground to them.\", \"unsafe_title\": \"Your safety comes first.\", \"valid_fight\": \"Maybe they are in the wrong. That's real.\", \"valid_plain\": \"Being right and getting what matters can pull apart.\", \"valid_unfair\": \"It isn't fair. That's real.\", \"want_hint\": \"Both can matter.\", \"want_title\": \"What are you after here? Tap any.\", \"works_label\": \"Getting what matters\"}", s.tablesJson = "{\"grievanceOf\": {\"anger-blocked-goal\": \"fight\", \"anger-blocked-redirect\": \"fight\", \"envy-unfair-advantage\": \"unfair\", \"envy-unfair-effective\": \"unfair\", \"fight\": \"fight\", \"unfair\": \"unfair\"}}", s.deriveJson = "[{\"from\": \"$ctx.frame\", \"name\": \"grievance\", \"table\": \"grievanceOf\"}]";
 MATCH (t:TherapyConcept {id: "dbt_effectively"}), (s:Skill {id: "effectively"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "effectively"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
 MATCH (:Skill {id: "effectively"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
 MERGE (n:SkillStep {id: "effectively:goal"})
-SET n += {skillId: "effectively", step: "goal", kind: "ask", version: "eff-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.goal\", \"unsafe\"]}}], \"fields\": [{\"id\": \"goal\", \"links\": [{\"exit\": \"cool_down\", \"label\": \"body_first\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"goal\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"goal_own\"}, \"required\": true}], \"hint\": \"goal_hint\", \"lines\": [{\"key\": \"flooded_hint\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"valid_fight\", \"when\": {\"eq\": [\"$d.grievance\", \"fight\"]}}, {\"key\": \"valid_unfair\", \"when\": {\"eq\": [\"$d.grievance\", \"unfair\"]}}, {\"key\": \"valid_plain\", \"when\": {\"all\": []}}], \"title\": [{\"key\": \"flooded_title\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"goal_title\", \"when\": {\"all\": []}}]}";
+SET n += {skillId: "effectively", step: "goal", kind: "ask", version: "eff-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.goal\", \"unsafe\"]}}], \"fields\": [{\"id\": \"goal\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"goal\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"goal_own\"}, \"required\": true}], \"hint\": \"goal_hint\", \"lines\": [{\"key\": \"valid_fight\", \"when\": {\"eq\": [\"$d.grievance\", \"fight\"]}}, {\"key\": \"valid_unfair\", \"when\": {\"eq\": [\"$d.grievance\", \"unfair\"]}}, {\"key\": \"valid_plain\", \"when\": {\"all\": []}}], \"title\": \"goal_title\"}";
 MATCH (s:Skill {id: "effectively"}), (n:SkillStep {id: "effectively:goal"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 0};
-MERGE (n:SkillStep {id: "effectively:unsafe"})
-SET n += {skillId: "effectively", step: "unsafe", kind: "handoff", version: "eff-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"all\": []}}], \"done\": \"done\", \"lines\": [{\"key\": \"unsafe_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"unsafe_title\"}";
-MATCH (s:Skill {id: "effectively"}), (n:SkillStep {id: "effectively:unsafe"})
+MERGE (n:SkillStep {id: "effectively:heads_up"})
+SET n += {skillId: "effectively", step: "heads_up", kind: "ask", version: "eff-v1"}, n.specJson = "{\"fields\": [{\"id\": \"heads_up\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"heads_up\"}, \"required\": true}], \"lines\": [{\"key\": \"flooded_hint\", \"when\": {\"all\": []}}], \"title\": \"flooded_title\"}";
+MATCH (s:Skill {id: "effectively"}), (n:SkillStep {id: "effectively:heads_up"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 1};
+MERGE (n:SkillStep {id: "effectively:body_first"})
+SET n += {skillId: "effectively", step: "body_first", kind: "handoff", version: "eff-v1"}, n.specJson = "{\"complete\": false, \"done\": \"done\", \"lines\": [{\"key\": \"flooded_hint\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"flooded_title\"}";
+MATCH (s:Skill {id: "effectively"}), (n:SkillStep {id: "effectively:body_first"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 2};
+MERGE (n:SkillStep {id: "effectively:unsafe"})
+SET n += {skillId: "effectively", step: "unsafe", kind: "handoff", version: "eff-v1"}, n.specJson = "{\"complete\": false, \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"all\": []}}], \"done\": \"done\", \"lines\": [{\"key\": \"unsafe_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"unsafe_title\"}";
+MATCH (s:Skill {id: "effectively"}), (n:SkillStep {id: "effectively:unsafe"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 3};
 MERGE (n:SkillStep {id: "effectively:want"})
 SET n += {skillId: "effectively", step: "want", kind: "ask", version: "eff-v1"}, n.specJson = "{\"fields\": [{\"id\": \"right\", \"label\": \"right_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 5, \"options\": {\"list\": \"right\"}, \"required\": false}, {\"id\": \"works\", \"label\": \"works_label\", \"max\": 5, \"options\": {\"list\": \"works\"}, \"required\": false}], \"hint\": \"want_hint\", \"title\": \"want_title\"}";
 MATCH (s:Skill {id: "effectively"}), (n:SkillStep {id: "effectively:want"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 2};
+SET r += {order: 4};
 MERGE (n:SkillStep {id: "effectively:piles"})
 SET n += {skillId: "effectively", step: "piles", kind: "embed", version: "eff-v1"}, n.specJson = "{\"answerAs\": \"piles_read\", \"embed\": \"twoColumns\", \"hint\": \"piles_hint\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"left\": \"right\", \"leftLabel\": \"right_label\", \"next\": \"next\", \"right\": \"works\", \"rightLabel\": \"works_label\"}, \"title\": \"piles_title\"}";
 MATCH (s:Skill {id: "effectively"}), (n:SkillStep {id: "effectively:piles"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 3};
+SET r += {order: 5};
 MERGE (n:SkillStep {id: "effectively:pull"})
 SET n += {skillId: "effectively", step: "pull", kind: "ask", version: "eff-v1"}, n.specJson = "{\"fields\": [{\"id\": \"pull\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"pull\"}, \"required\": true}], \"title\": \"pull_title\"}";
 MATCH (s:Skill {id: "effectively"}), (n:SkillStep {id: "effectively:pull"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 4};
+SET r += {order: 6};
 MERGE (n:SkillStep {id: "effectively:move"})
-SET n += {skillId: "effectively", step: "move", kind: "ask", version: "eff-v1"}, n.specJson = "{\"fields\": [{\"id\": \"move\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"move\", \"where\": {\"any\": [{\"eq\": [\"$opt.grievance\", \"$d.grievance\"]}, {\"eq\": [\"$opt.goal\", \"$a.goal\"]}, {\"all\": [{\"own\": \"goal\"}, {\"eq\": [\"$opt.goal\", \"any\"]}]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"move_own\"}, \"required\": true}], \"hint\": \"move_hint\", \"title\": [{\"key\": \"move_title_right\", \"when\": {\"eq\": [\"$a.pull\", \"right\"]}}, {\"key\": \"move_title\", \"when\": {\"all\": []}}]}";
+SET n += {skillId: "effectively", step: "move", kind: "ask", version: "eff-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.move\", \"unsafe\"]}}], \"fields\": [{\"id\": \"move\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"move\", \"where\": {\"any\": [{\"eq\": [\"$opt.value\", \"unsafe\"]}, {\"all\": [{\"not\": {\"eq\": [\"$a.pull\", \"right\"]}}, {\"eq\": [\"$opt.grievance\", \"$d.grievance\"]}]}, {\"eq\": [\"$opt.goal\", \"$a.goal\"]}, {\"all\": [{\"own\": \"goal\"}, {\"eq\": [\"$opt.goal\", \"any\"]}]}, {\"all\": [{\"eq\": [\"$a.pull\", \"right\"]}, {\"eq\": [\"$opt.goal\", \"respect\"]}]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"move_own\"}, \"required\": true}], \"title\": [{\"key\": \"move_title_right\", \"when\": {\"eq\": [\"$a.pull\", \"right\"]}}, {\"key\": \"move_title\", \"when\": {\"all\": []}}]}";
 MATCH (s:Skill {id: "effectively"}), (n:SkillStep {id: "effectively:move"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 5};
+SET r += {order: 7};
 MERGE (n:SkillStep {id: "effectively:set_down"})
 SET n += {skillId: "effectively", step: "set_down", kind: "ask", version: "eff-v1"}, n.specJson = "{\"fields\": [{\"id\": \"set_down\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 3, \"options\": {\"list\": \"set_down\"}, \"required\": false}], \"hint\": \"set_hint\", \"title\": \"set_title\"}";
 MATCH (s:Skill {id: "effectively"}), (n:SkillStep {id: "effectively:set_down"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 6};
+SET r += {order: 8};
 MERGE (n:SkillStep {id: "effectively:end"})
-SET n += {skillId: "effectively", step: "end", kind: "handoff", version: "eff-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"fields\": [{\"id\": \"remind\", \"label\": \"remind_q\", \"max\": 1, \"options\": {\"list\": \"remind\"}}], \"followUp\": {\"type\": \"effective_move\", \"whenFrom\": \"remind\"}, \"lines\": [{\"key\": \"end_right_line\", \"when\": {\"eq\": [\"$a.pull\", \"right\"]}}, {\"key\": \"end_set_line\", \"when\": {\"set\": \"$a.set_down\"}}, {\"key\": \"end_unsure_line\", \"when\": {\"eq\": [\"$a.pull\", \"unsure\"]}}, {\"key\": \"end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"end_title\", \"titleSlots\": {\"move\": {\"labelOf\": \"move\"}}}";
+SET n += {skillId: "effectively", step: "end", kind: "handoff", version: "eff-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"fields\": [{\"id\": \"remind\", \"label\": \"remind_q\", \"max\": 1, \"options\": {\"list\": \"remind\"}}], \"followUp\": {\"type\": \"effective_move\", \"whenFrom\": \"remind\"}, \"lines\": [{\"key\": \"end_even_line\", \"when\": {\"all\": [{\"eq\": [\"$a.pull\", \"right\"]}, {\"has\": [\"$a.right.ids\", \"pay\"]}]}}, {\"key\": \"end_right_line\", \"when\": {\"eq\": [\"$a.pull\", \"right\"]}}, {\"key\": \"end_set_line\", \"when\": {\"set\": \"$a.set_down\"}}, {\"key\": \"end_unsure_line\", \"when\": {\"eq\": [\"$a.pull\", \"unsure\"]}}, {\"key\": \"end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"end_title\", \"titleSlots\": {\"move\": {\"labelOf\": \"move\"}}}";
 MATCH (s:Skill {id: "effectively"}), (n:SkillStep {id: "effectively:end"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 7};
+SET r += {order: 9};
 MERGE (n:SkillStep {id: "effectively:back"})
-SET n += {skillId: "effectively", step: "back", kind: "ask", version: "eff-v1"}, n.specJson = "{\"clears\": [\"back\"], \"fields\": [{\"id\": \"back\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"back\"}, \"required\": true}], \"reopens\": {\"after\": \"end\"}, \"title\": \"back_title\", \"titleSlots\": {\"move\": {\"labelOf\": \"move\"}}}";
+SET n += {skillId: "effectively", step: "back", kind: "ask", version: "eff-v1"}, n.specJson = "{\"clears\": [\"back\", \"again\"], \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.back\", \"unsafe\"]}}], \"fields\": [{\"id\": \"back\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"back\"}, \"required\": true}], \"reopens\": {\"after\": \"end\"}, \"title\": \"back_title\", \"titleSlots\": {\"move\": {\"labelOf\": \"move\"}}}";
 MATCH (s:Skill {id: "effectively"}), (n:SkillStep {id: "effectively:back"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 8};
+SET r += {order: 10};
+MERGE (n:SkillStep {id: "effectively:again"})
+SET n += {skillId: "effectively", step: "again", kind: "ask", version: "eff-v1"}, n.specJson = "{\"fields\": [{\"id\": \"again\", \"label\": \"remind_again\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"remind\"}, \"required\": false}], \"followUp\": {\"type\": \"effective_move\", \"whenFrom\": \"again\"}, \"title\": \"back_not_yet\"}";
+MATCH (s:Skill {id: "effectively"}), (n:SkillStep {id: "effectively:again"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 11};
 MERGE (n:SkillStep {id: "effectively:back_end"})
-SET n += {skillId: "effectively", step: "back_end", kind: "handoff", version: "eff-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"back_helped\", \"when\": {\"eq\": [\"$a.back\", \"helped\"]}}, {\"key\": \"back_didnt\", \"when\": {\"eq\": [\"$a.back\", \"didnt\"]}}, {\"key\": \"back_not_yet\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true}";
+SET n += {skillId: "effectively", step: "back_end", kind: "handoff", version: "eff-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"back_helped\", \"when\": {\"eq\": [\"$a.back\", \"helped\"]}}, {\"key\": \"back_didnt\", \"when\": {\"eq\": [\"$a.back\", \"didnt\"]}}, {\"key\": \"back_again_set\", \"when\": {\"set\": \"$a.again\"}}, {\"key\": \"back_again_none\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true}";
 MATCH (s:Skill {id: "effectively"}), (n:SkillStep {id: "effectively:back_end"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 9};
+SET r += {order: 12};
 MERGE (x:SkillExit {id: "effectively:cool_down"})
 SET x += {skillId: "effectively", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "effectively"}), (x:SkillExit {id: "effectively:cool_down"})
@@ -28095,15 +28110,30 @@ MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "effectively:goal"}), (b:SkillStep {id: "effectively:unsafe"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.goal\", \"unsafe\"]}";
+MATCH (a:SkillStep {id: "effectively:goal"}), (b:SkillStep {id: "effectively:heads_up"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
 MATCH (a:SkillStep {id: "effectively:goal"}), (b:SkillStep {id: "effectively:want"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "null";
-MATCH (a:SkillStep {id: "effectively:goal"}), (x:SkillExit {id: "effectively:cool_down"})
-MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 0, field: "goal", label: "body_first"}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
+SET r += {order: 2}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "effectively:goal"}), (x:SkillExit {id: "effectively:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 1, field: "goal", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+SET r += {order: 0, field: "goal", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "effectively:heads_up"}), (b:SkillStep {id: "effectively:body_first"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.heads_up\", \"body\"]}";
+MATCH (a:SkillStep {id: "effectively:heads_up"}), (b:SkillStep {id: "effectively:want"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "effectively:heads_up"}), (x:SkillExit {id: "effectively:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "heads_up", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "effectively:body_first"}), (x:SkillExit {id: "effectively:cool_down"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "effectively:body_first"}), (x:SkillExit {id: "effectively:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "effectively:unsafe"}), (x:SkillExit {id: "effectively:safety_open"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
@@ -28134,12 +28164,15 @@ SET r += {order: 0}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "effectively:pull"}), (x:SkillExit {id: "effectively:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "pull", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "effectively:move"}), (b:SkillStep {id: "effectively:unsafe"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.move\", \"unsafe\"]}";
 MATCH (a:SkillStep {id: "effectively:move"}), (b:SkillStep {id: "effectively:end"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.pull\", \"right\"]}";
+SET r += {order: 1}, r.whenJson = "{\"all\": [{\"eq\": [\"$a.pull\", \"right\"]}, {\"not\": {\"all\": [{\"eq\": [\"$a.pull\", \"right\"]}, {\"has\": [\"$a.right.ids\", \"pay\"]}]}}]}";
 MATCH (a:SkillStep {id: "effectively:move"}), (b:SkillStep {id: "effectively:set_down"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "null";
+SET r += {order: 2}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "effectively:move"}), (x:SkillExit {id: "effectively:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "move", label: "safety_open"}, r.whenJson = "{\"all\": []}";
@@ -28157,7 +28190,7 @@ MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"in\": [\"$a.goal\", [\"connected\", \"repair\", \"boundary\"]]}}]";
 MATCH (a:SkillStep {id: "effectively:end"}), (x:SkillExit {id: "effectively:fast"})
 MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"in\": [\"$a.goal\", [\"respect\", \"boundary\"]]}}]";
+SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"any\": [{\"in\": [\"$a.goal\", [\"respect\", \"boundary\"]]}, {\"all\": [{\"eq\": [\"$a.pull\", \"right\"]}, {\"has\": [\"$a.right.ids\", \"pay\"]}]}]}}]";
 MATCH (a:SkillStep {id: "effectively:end"}), (x:SkillExit {id: "effectively:say_no"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 3}, r.rowsJson = "[{\"order\": 3, \"when\": {\"in\": [\"$a.goal\", [\"boundary\"]]}}]";
@@ -28170,12 +28203,24 @@ SET r += {order: 5}, r.rowsJson = "[{\"order\": 5, \"when\": {\"in\": [\"$a.goal
 MATCH (a:SkillStep {id: "effectively:end"}), (x:SkillExit {id: "effectively:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "effectively:back"}), (b:SkillStep {id: "effectively:unsafe"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.back\", \"unsafe\"]}";
+MATCH (a:SkillStep {id: "effectively:back"}), (b:SkillStep {id: "effectively:again"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.back\", \"not_yet\"]}";
 MATCH (a:SkillStep {id: "effectively:back"}), (b:SkillStep {id: "effectively:back_end"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "null";
+SET r += {order: 2}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "effectively:back"}), (x:SkillExit {id: "effectively:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "back", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "effectively:again"}), (b:SkillStep {id: "effectively:back_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "effectively:again"}), (x:SkillExit {id: "effectively:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "again", label: "safety_open"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "effectively:back_end"}), (x:SkillExit {id: "effectively:problem_solve"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"eq\": [\"$a.back\", \"didnt\"]}}]";
@@ -28208,244 +28253,264 @@ MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:goal:respe
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "goal", order: 4};
 MERGE (o:SkillOption {id: "effectively:goal:unsafe"})
-SET o:SkillOption, o += {skillId: "effectively", list: "goal", value: "unsafe", label: "I'm scared of what they'd do", version: "eff-v1"}, o.propsJson = "{\"danger\": \"other\"}";
+SET o:SkillOption, o += {skillId: "effectively", list: "goal", value: "unsafe", label: "Someone threatened me, scared me or hurt me", version: "eff-v1"}, o.propsJson = "{\"danger\": \"other\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:goal:unsafe"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "goal", order: 5};
+MERGE (o:SkillOption {id: "effectively:heads_up:body"})
+SET o:SkillOption, o += {skillId: "effectively", list: "heads_up", value: "body", label: "My body first", version: "eff-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:heads_up:body"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up", order: 6};
+MERGE (o:SkillOption {id: "effectively:heads_up:go"})
+SET o:SkillOption, o += {skillId: "effectively", list: "heads_up", value: "go", label: "Try it anyway", version: "eff-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:heads_up:go"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up", order: 7};
 MERGE (o:SkillOption {id: "effectively:right:admit"})
 SET o:SkillOption:EffectivenessStatement, o += {skillId: "effectively", list: "right", value: "admit", label: "They admit they were wrong", version: "eff-v1"}, o.propsJson = "{\"pile\": \"right\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:right:admit"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "right", order: 6};
+SET r += {list: "right", order: 8};
 MERGE (o:SkillOption {id: "effectively:right:feel"})
 SET o:SkillOption:EffectivenessStatement, o += {skillId: "effectively", list: "right", value: "feel", label: "They feel what I felt", version: "eff-v1"}, o.propsJson = "{\"pile\": \"right\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:right:feel"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "right", order: 7};
+SET r += {list: "right", order: 9};
 MERGE (o:SkillOption {id: "effectively:right:seen"})
 SET o:SkillOption:EffectivenessStatement, o += {skillId: "effectively", list: "right", value: "seen", label: "Everyone sees it was unfair", version: "eff-v1"}, o.propsJson = "{\"pile\": \"right\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:right:seen"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "right", order: 8};
+SET r += {list: "right", order: 10};
 MERGE (o:SkillOption {id: "effectively:right:win"})
 SET o:SkillOption:EffectivenessStatement, o += {skillId: "effectively", list: "right", value: "win", label: "I win this one", version: "eff-v1"}, o.propsJson = "{\"pile\": \"right\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:right:win"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "right", order: 9};
+SET r += {list: "right", order: 11};
 MERGE (o:SkillOption {id: "effectively:right:pay"})
 SET o:SkillOption:EffectivenessStatement, o += {skillId: "effectively", list: "right", value: "pay", label: "They pay for it", version: "eff-v1"}, o.propsJson = "{\"pile\": \"right\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:right:pay"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "right", order: 10};
+SET r += {list: "right", order: 12};
 MERGE (o:SkillOption {id: "effectively:works:sorted"})
 SET o:SkillOption:EffectivenessStatement, o += {skillId: "effectively", list: "works", value: "sorted", label: "It gets sorted out", version: "eff-v1"}, o.propsJson = "{\"pile\": \"effective\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:works:sorted"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "works", order: 11};
+SET r += {list: "works", order: 13};
 MERGE (o:SkillOption {id: "effectively:works:together"})
 SET o:SkillOption:EffectivenessStatement, o += {skillId: "effectively", list: "works", value: "together", label: "We can still work together", version: "eff-v1"}, o.propsJson = "{\"pile\": \"effective\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:works:together"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "works", order: 12};
+SET r += {list: "works", order: 14};
 MERGE (o:SkillOption {id: "effectively:works:need"})
 SET o:SkillOption:EffectivenessStatement, o += {skillId: "effectively", list: "works", value: "need", label: "I get what I need from this", version: "eff-v1"}, o.propsJson = "{\"pile\": \"effective\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:works:need"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "works", order: 13};
+SET r += {list: "works", order: 15};
 MERGE (o:SkillOption {id: "effectively:works:better"})
 SET o:SkillOption:EffectivenessStatement, o += {skillId: "effectively", list: "works", value: "better", label: "Things go better from here", version: "eff-v1"}, o.propsJson = "{\"pile\": \"effective\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:works:better"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "works", order: 14};
+SET r += {list: "works", order: 16};
 MERGE (o:SkillOption {id: "effectively:works:handled"})
 SET o:SkillOption:EffectivenessStatement, o += {skillId: "effectively", list: "works", value: "handled", label: "I can live with how I handled it", version: "eff-v1"}, o.propsJson = "{\"pile\": \"effective\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:works:handled"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "works", order: 15};
+SET r += {list: "works", order: 17};
 MERGE (o:SkillOption {id: "effectively:pull:works"})
-SET o:SkillOption, o += {skillId: "effectively", list: "pull", value: "works", label: "What works", version: "eff-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "effectively", list: "pull", value: "works", label: "Getting what matters", version: "eff-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:pull:works"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "pull", order: 16};
+SET r += {list: "pull", order: 18};
 MERGE (o:SkillOption {id: "effectively:pull:right"})
 SET o:SkillOption, o += {skillId: "effectively", list: "pull", value: "right", label: "Being right about this one", version: "eff-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:pull:right"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "pull", order: 17};
+SET r += {list: "pull", order: 19};
 MERGE (o:SkillOption {id: "effectively:pull:unsure"})
 SET o:SkillOption, o += {skillId: "effectively", list: "pull", value: "unsure", label: "I can't tell", version: "eff-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:pull:unsure"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "pull", order: 18};
+SET r += {list: "pull", order: 20};
 MERGE (o:SkillOption {id: "effectively:move:fight_ask"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "fight_ask", label: "Ask myself what's the best I'd really get by pushing", version: "eff-v1"}, o.propsJson = "{\"goal\": \"host\", \"grievance\": \"fight\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:fight_ask"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 19};
+SET r += {list: "move", order: 21};
 MATCH (o:SkillOption {id: "effectively:move:fight_ask"}), (c:SolutionDirection {id: "anger-blocked-redirect"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "effectively:move:fight_hold"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "fight_hold", label: "Put this fight on hold for a week", version: "eff-v1"}, o.propsJson = "{\"goal\": \"host\", \"grievance\": \"fight\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:fight_hold"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 20};
+SET r += {list: "move", order: 22};
 MATCH (o:SkillOption {id: "effectively:move:fight_hold"}), (c:SolutionDirection {id: "anger-blocked-redirect"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "effectively:move:fight_let"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "fight_let", label: "Put the energy where it can move something", version: "eff-v1"}, o.propsJson = "{\"goal\": \"host\", \"grievance\": \"fight\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:fight_let"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 21};
+SET r += {list: "move", order: 23};
 MATCH (o:SkillOption {id: "effectively:move:fight_let"}), (c:SolutionDirection {id: "anger-blocked-redirect"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "effectively:move:unfair_have"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "unfair_have", label: "Name what I do have: time, skills, people", version: "eff-v1"}, o.propsJson = "{\"goal\": \"host\", \"grievance\": \"unfair\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:unfair_have"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 22};
+SET r += {list: "move", order: 24};
 MATCH (o:SkillOption {id: "effectively:move:unfair_have"}), (c:SolutionDirection {id: "envy-unfair-effective"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "effectively:move:unfair_plan"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "unfair_plan", label: "Make a plan from where I actually start", version: "eff-v1"}, o.propsJson = "{\"goal\": \"host\", \"grievance\": \"unfair\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:unfair_plan"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 23};
+SET r += {list: "move", order: 25};
 MATCH (o:SkillOption {id: "effectively:move:unfair_plan"}), (c:SolutionDirection {id: "envy-unfair-effective"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "effectively:move:unfair_own"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "unfair_own", label: "Put my energy into my own path", version: "eff-v1"}, o.propsJson = "{\"goal\": \"host\", \"grievance\": \"unfair\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:unfair_own"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 24};
+SET r += {list: "move", order: 26};
 MATCH (o:SkillOption {id: "effectively:move:unfair_own"}), (c:SolutionDirection {id: "envy-unfair-effective"})
 MERGE (o)-[:PRESENTS]->(c);
 MERGE (o:SkillOption {id: "effectively:move:conn_one"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "conn_one", label: "Say the one thing that matters most, and leave the rest", version: "eff-v1"}, o.propsJson = "{\"goal\": \"connected\", \"grievance\": \"none\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:conn_one"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 25};
+SET r += {list: "move", order: 27};
 MERGE (o:SkillOption {id: "effectively:move:conn_break"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "conn_break", label: "Take a break, then come back to it", version: "eff-v1"}, o.propsJson = "{\"goal\": \"connected\", \"grievance\": \"none\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:conn_break"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 26};
+SET r += {list: "move", order: 28};
 MERGE (o:SkillOption {id: "effectively:move:conn_ask"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "conn_ask", label: "Ask what they need from this", version: "eff-v1"}, o.propsJson = "{\"goal\": \"connected\", \"grievance\": \"none\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:conn_ask"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 27};
+SET r += {list: "move", order: 29};
 MERGE (o:SkillOption {id: "effectively:move:bound_once"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "bound_once", label: "Say the limit once, plainly", version: "eff-v1"}, o.propsJson = "{\"goal\": \"boundary\", \"grievance\": \"none\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:bound_once"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 28};
+SET r += {list: "move", order: 30};
 MERGE (o:SkillOption {id: "effectively:move:bound_step"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "bound_step", label: "Step away from it for now", version: "eff-v1"}, o.propsJson = "{\"goal\": \"boundary\", \"grievance\": \"none\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:bound_step"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 29};
+SET r += {list: "move", order: 31};
 MERGE (o:SkillOption {id: "effectively:move:bound_plan"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "bound_plan", label: "Decide what I'll do if it's crossed", version: "eff-v1"}, o.propsJson = "{\"goal\": \"boundary\", \"grievance\": \"none\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:bound_plan"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 30};
+SET r += {list: "move", order: 32};
 MERGE (o:SkillOption {id: "effectively:move:prog_step"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "prog_step", label: "Find the one step that's still in my hands", version: "eff-v1"}, o.propsJson = "{\"goal\": \"progress\", \"grievance\": \"none\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:prog_step"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 31};
+SET r += {list: "move", order: 33};
 MERGE (o:SkillOption {id: "effectively:move:prog_who"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "prog_who", label: "Take it to someone who can change it", version: "eff-v1"}, o.propsJson = "{\"goal\": \"progress\", \"grievance\": \"none\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:prog_who"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 32};
+SET r += {list: "move", order: 34};
 MERGE (o:SkillOption {id: "effectively:move:prog_where"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "prog_where", label: "Work from where I am today", version: "eff-v1"}, o.propsJson = "{\"goal\": \"progress\", \"grievance\": \"none\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:prog_where"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 33};
+SET r += {list: "move", order: 35};
 MERGE (o:SkillOption {id: "effectively:move:rep_own"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "rep_own", label: "Own my part, without the rest", version: "eff-v1"}, o.propsJson = "{\"goal\": \"repair\", \"grievance\": \"none\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:rep_own"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 34};
+SET r += {list: "move", order: 36};
 MERGE (o:SkillOption {id: "effectively:move:rep_ask"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "rep_ask", label: "Ask what would help put it right", version: "eff-v1"}, o.propsJson = "{\"goal\": \"repair\", \"grievance\": \"none\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:rep_ask"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 35};
+SET r += {list: "move", order: 37};
 MERGE (o:SkillOption {id: "effectively:move:rep_show"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "rep_show", label: "Do one thing that shows I mean it", version: "eff-v1"}, o.propsJson = "{\"goal\": \"repair\", \"grievance\": \"none\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:rep_show"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 36};
+SET r += {list: "move", order: 38};
 MERGE (o:SkillOption {id: "effectively:move:resp_proud"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "resp_proud", label: "Say it once, in a way I'd be proud of", version: "eff-v1"}, o.propsJson = "{\"goal\": \"respect\", \"grievance\": \"none\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:resp_proud"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 37};
+SET r += {list: "move", order: 39};
 MERGE (o:SkillOption {id: "effectively:move:resp_leave"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "resp_leave", label: "Leave it there, without getting even", version: "eff-v1"}, o.propsJson = "{\"goal\": \"respect\", \"grievance\": \"none\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:resp_leave"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 38};
+SET r += {list: "move", order: 40};
 MERGE (o:SkillOption {id: "effectively:move:resp_hold"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "resp_hold", label: "Hold to what I think is right, calmly", version: "eff-v1"}, o.propsJson = "{\"goal\": \"respect\", \"grievance\": \"none\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:resp_hold"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 39};
+SET r += {list: "move", order: 41};
 MERGE (o:SkillOption {id: "effectively:move:any_step"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "any_step", label: "Find the one step that's still in my hands", version: "eff-v1"}, o.propsJson = "{\"goal\": \"any\", \"grievance\": \"none\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:any_step"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 40};
+SET r += {list: "move", order: 42};
 MERGE (o:SkillOption {id: "effectively:move:any_pause"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "any_pause", label: "Wait a day before I act on it", version: "eff-v1"}, o.propsJson = "{\"goal\": \"any\", \"grievance\": \"none\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:any_pause"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 41};
+SET r += {list: "move", order: 43};
 MERGE (o:SkillOption {id: "effectively:move:any_ask"})
 SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "any_ask", label: "Ask for the one thing I most need", version: "eff-v1"}, o.propsJson = "{\"goal\": \"any\", \"grievance\": \"none\"}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:any_ask"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "move", order: 42};
+SET r += {list: "move", order: 44};
+MERGE (o:SkillOption {id: "effectively:move:unsafe"})
+SET o:SkillOption, o += {skillId: "effectively", list: "move", value: "unsafe", label: "They might hurt me if I do anything", version: "eff-v1"}, o.propsJson = "{\"danger\": \"other\", \"goal\": \"none\", \"grievance\": \"none\"}";
+MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:move:unsafe"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 45};
 MERGE (o:SkillOption {id: "effectively:set_down:right"})
 SET o:SkillOption, o += {skillId: "effectively", list: "set_down", value: "right", label: "Being right", version: "eff-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:set_down:right"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "set_down", order: 43};
+SET r += {list: "set_down", order: 46};
 MERGE (o:SkillOption {id: "effectively:set_down:even"})
 SET o:SkillOption, o += {skillId: "effectively", list: "set_down", value: "even", label: "Getting even", version: "eff-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:set_down:even"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "set_down", order: 44};
+SET r += {list: "set_down", order: 47};
 MERGE (o:SkillOption {id: "effectively:set_down:start"})
 SET o:SkillOption, o += {skillId: "effectively", list: "set_down", value: "start", label: "How unfair the start was", version: "eff-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:set_down:start"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "set_down", order: 45};
+SET r += {list: "set_down", order: 48};
 MERGE (o:SkillOption {id: "effectively:remind:tomorrow"})
 SET o:SkillOption, o += {skillId: "effectively", list: "remind", value: "tomorrow", label: "Tomorrow", version: "eff-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:remind:tomorrow"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "remind", order: 46};
+SET r += {list: "remind", order: 49};
 MERGE (o:SkillOption {id: "effectively:remind:few_days"})
 SET o:SkillOption, o += {skillId: "effectively", list: "remind", value: "few_days", label: "In a few days", version: "eff-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:remind:few_days"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "remind", order: 47};
+SET r += {list: "remind", order: 50};
 MERGE (o:SkillOption {id: "effectively:back:helped"})
 SET o:SkillOption, o += {skillId: "effectively", list: "back", value: "helped", label: "I did it, and it helped", version: "eff-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:back:helped"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "back", order: 48};
+SET r += {list: "back", order: 51};
 MERGE (o:SkillOption {id: "effectively:back:didnt"})
 SET o:SkillOption, o += {skillId: "effectively", list: "back", value: "didnt", label: "I did it, and it didn't help", version: "eff-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:back:didnt"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "back", order: 49};
+SET r += {list: "back", order: 52};
 MERGE (o:SkillOption {id: "effectively:back:not_yet"})
 SET o:SkillOption, o += {skillId: "effectively", list: "back", value: "not_yet", label: "Not yet", version: "eff-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:back:not_yet"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "back", order: 50};
+SET r += {list: "back", order: 53};
+MERGE (o:SkillOption {id: "effectively:back:unsafe"})
+SET o:SkillOption, o += {skillId: "effectively", list: "back", value: "unsafe", label: "It went badly, and I don't feel safe", version: "eff-v1"}, o.propsJson = "{\"danger\": \"other\"}";
+MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:back:unsafe"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "back", order: 54};

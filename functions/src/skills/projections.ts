@@ -55,7 +55,7 @@ export const PROJECTIONS: Readonly<Record<string, Projection>> = {
  * Skills whose rep is the person's own report of something done off the phone (PR-S4, D-09): the close logs it as
  * `followup_offphone` (self-reported), as DEAR MAN's hand-built debrief did. Only when the run says it happened.
  */
-export const OFF_PHONE_SKILLS: Readonly<Record<string, { toolId: string; happenedField: string | readonly string[]; yes: string; unansweredKeepsOwn?: boolean }>> = {
+export const OFF_PHONE_SKILLS: Readonly<Record<string, { toolId: string; happenedField: string | readonly string[]; yes: string | readonly string[]; unansweredKeepsOwn?: boolean }>> = {
   dear_man_debrief: { toolId: 'dear-man', happenedField: 'happened', yes: 'yes' },
   // Say no's afterwards (the no_outcome card reopens the run at *Did you say no?*): said is the rep. The first visit,
   // which never asks it, keeps the close's own rep (`unansweredKeepsOwn`).
@@ -79,6 +79,9 @@ export const OFF_PHONE_SKILLS: Readonly<Record<string, { toolId: string; happene
   // One thing's *Same thing tomorrow?* (the one_thing_again card reopens the run at *Did you get to do it with your whole
   // attention?*): yes is the off-phone rep (PRD MF-05 fade); sort of or not yet log none. The first visit keeps its own.
   one_thing: { toolId: 'one-thing', happenedField: 'again', yes: 'yes', unansweredKeepsOwn: true },
+  // What works here's afterwards (the effective_move card reopens the run at *How did it go?*): the move done, whether
+  // it helped or not, is the rep; not yet logs none. The first visit keeps the close's own (`effectively`).
+  effectively: { toolId: 'effectiveness', happenedField: 'back', yes: ['helped', 'didnt'], unansweredKeepsOwn: true },
 };
 
 /** The rep a run's close logs: off the phone (it happened), none (it didn't), or the close's own (null). */
@@ -95,7 +98,8 @@ export function runRep(ext: string | null, toolId: string): { repSource: 'follow
   const a = answers.find((x) => x && typeof x.fieldId === 'string' && fields.includes(x.fieldId));
   if (!a && rule.unansweredKeepsOwn) return null;
   const ids = a && Array.isArray(a.optionIds) ? a.optionIds : [];
-  return ids.includes(rule.yes) ? { repSource: 'followup_offphone' } : { noRep: true };
+  const yes: readonly string[] = typeof rule.yes === 'string' ? [rule.yes] : rule.yes;
+  return ids.some((id) => typeof id === 'string' && yes.includes(id)) ? { repSource: 'followup_offphone' } : { noRep: true };
 }
 
 /** Run the tool's projection, if it has one and the close carried a run. */

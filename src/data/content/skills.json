@@ -16501,12 +16501,12 @@
         "emotionFields": [],
         "copy": {
           "flooded_title": "Your body's loud right now.",
-          "flooded_hint": "Working out what works is easier once it settles. Start with your body, or go on anyway.",
+          "flooded_hint": "Working out what works is easier once it settles.",
           "body_first": "My body first",
           "valid_fight": "Maybe they are in the wrong. That's real.",
           "valid_unfair": "It isn't fair. That's real.",
           "valid_plain": "Being right and getting what matters can pull apart.",
-          "goal_title": "What do you want out of this, most?",
+          "goal_title": "What do you most want out of this?",
           "goal_hint": "One for now.",
           "goal_own": "Something else",
           "unsafe_title": "Your safety comes first.",
@@ -16518,28 +16518,33 @@
           "piles_title": "Here's what you're after.",
           "piles_hint": "Both are real. They don't always fit together.",
           "pull_title": "Right now, which matters more?",
-          "move_title": "Given how things actually are, one move that works.",
-          "move_title_right": "Then one move that keeps your self-respect, from how things actually are.",
-          "move_hint": "From where things stand today.",
+          "move_title": "Pick one move that works from where things stand.",
+          "move_title_right": "Then one move that keeps your self-respect, from where things stand.",
           "move_own": "My own move",
           "set_title": "What could you set down, for now?",
-          "set_hint": "For now. Nothing is given up for good.",
+          "set_hint": "Nothing is given up for good.",
           "end_title": "What works here: {move}",
           "end_set_line": "The rest can wait. Setting it down for now isn't giving in.",
           "end_right_line": "Sometimes being right is the point. You know which this one is.",
+          "end_even_line": "Self-respect can be the point. Getting even tends to cost you more than it costs them.",
           "end_unsure_line": "Not knowing is fine. You have one move either way.",
           "end_line": "Right, or what works? Asking it is the skill.",
           "remind_q": "Want me to ask how it went?",
           "back_title": "How did it go? You planned: {move}",
-          "back_helped": "That's what works, found and done.",
+          "back_helped": "It helped. Worth remembering next time.",
           "back_didnt": "It was worth trying. What works can change, and you can look again.",
           "back_not_yet": "It'll keep. The move is still there.",
+          "back_again_set": "The card will come back then.",
+          "back_again_none": "It'll be here when you're ready.",
+          "remind_again": "Ask me again?",
           "safety_open": "Talk to someone now",
           "next": "Next",
           "done": "Done"
         },
         "tables": {
           "grievanceOf": {
+            "anger-blocked-redirect": "fight",
+            "envy-unfair-effective": "unfair",
             "anger-blocked-goal": "fight",
             "envy-unfair-advantage": "unfair",
             "fight": "fight",
@@ -16557,23 +16562,7 @@
           {
             "id": "goal",
             "kind": "ask",
-            "title": [
-              {
-                "when": {
-                  "eq": [
-                    "$ctx.band",
-                    "flooded"
-                  ]
-                },
-                "key": "flooded_title"
-              },
-              {
-                "when": {
-                  "all": []
-                },
-                "key": "goal_title"
-              }
-            ],
+            "title": "goal_title",
             "fields": [
               {
                 "id": "goal",
@@ -16587,16 +16576,6 @@
                   "countsAsPick": true
                 },
                 "links": [
-                  {
-                    "exit": "cool_down",
-                    "label": "body_first",
-                    "when": {
-                      "eq": [
-                        "$ctx.band",
-                        "flooded"
-                      ]
-                    }
-                  },
                   {
                     "exit": "safety_open",
                     "label": "safety_open",
@@ -16620,15 +16599,6 @@
             ],
             "hint": "goal_hint",
             "lines": [
-              {
-                "when": {
-                  "eq": [
-                    "$ctx.band",
-                    "flooded"
-                  ]
-                },
-                "key": "flooded_hint"
-              },
               {
                 "when": {
                   "eq": [
@@ -16665,6 +16635,15 @@
                 }
               },
               {
+                "to": "heads_up",
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "flooded"
+                  ]
+                }
+              },
+              {
                 "to": "want",
                 "when": null
               }
@@ -16672,9 +16651,91 @@
             "offers": []
           },
           {
+            "id": "heads_up",
+            "kind": "ask",
+            "title": "flooded_title",
+            "fields": [
+              {
+                "id": "heads_up",
+                "options": {
+                  "list": "heads_up"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "flooded_hint"
+              }
+            ],
+            "next": [
+              {
+                "to": "body_first",
+                "when": {
+                  "eq": [
+                    "$a.heads_up",
+                    "body"
+                  ]
+                }
+              },
+              {
+                "to": "want",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "body_first",
+            "kind": "handoff",
+            "complete": false,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "flooded_hint"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
+            "title": "flooded_title",
+            "next": [],
+            "offers": [
+              {
+                "exit": "cool_down",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
+          },
+          {
             "id": "unsafe",
             "kind": "handoff",
-            "complete": true,
+            "complete": false,
             "lines": [
               {
                 "when": {
@@ -16865,8 +16926,26 @@
                     "any": [
                       {
                         "eq": [
-                          "$opt.grievance",
-                          "$d.grievance"
+                          "$opt.value",
+                          "unsafe"
+                        ]
+                      },
+                      {
+                        "all": [
+                          {
+                            "not": {
+                              "eq": [
+                                "$a.pull",
+                                "right"
+                              ]
+                            }
+                          },
+                          {
+                            "eq": [
+                              "$opt.grievance",
+                              "$d.grievance"
+                            ]
+                          }
                         ]
                       },
                       {
@@ -16884,6 +16963,22 @@
                             "eq": [
                               "$opt.goal",
                               "any"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "all": [
+                          {
+                            "eq": [
+                              "$a.pull",
+                              "right"
+                            ]
+                          },
+                          {
+                            "eq": [
+                              "$opt.goal",
+                              "respect"
                             ]
                           }
                         ]
@@ -16908,14 +17003,55 @@
                 ]
               }
             ],
-            "hint": "move_hint",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.move",
+                    "unsafe"
+                  ]
+                }
+              }
+            ],
             "next": [
+              {
+                "to": "unsafe",
+                "when": {
+                  "eq": [
+                    "$a.move",
+                    "unsafe"
+                  ]
+                }
+              },
               {
                 "to": "end",
                 "when": {
-                  "eq": [
-                    "$a.pull",
-                    "right"
+                  "all": [
+                    {
+                      "eq": [
+                        "$a.pull",
+                        "right"
+                      ]
+                    },
+                    {
+                      "not": {
+                        "all": [
+                          {
+                            "eq": [
+                              "$a.pull",
+                              "right"
+                            ]
+                          },
+                          {
+                            "has": [
+                              "$a.right.ids",
+                              "pay"
+                            ]
+                          }
+                        ]
+                      }
+                    }
                   ]
                 }
               },
@@ -16963,6 +17099,25 @@
             "kind": "handoff",
             "complete": true,
             "lines": [
+              {
+                "when": {
+                  "all": [
+                    {
+                      "eq": [
+                        "$a.pull",
+                        "right"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$a.right.ids",
+                        "pay"
+                      ]
+                    }
+                  ]
+                },
+                "key": "end_even_line"
+              },
               {
                 "when": {
                   "eq": [
@@ -17055,12 +17210,32 @@
               {
                 "exit": "fast",
                 "when": {
-                  "in": [
-                    "$a.goal",
-                    [
-                      "respect",
-                      "boundary"
-                    ]
+                  "any": [
+                    {
+                      "in": [
+                        "$a.goal",
+                        [
+                          "respect",
+                          "boundary"
+                        ]
+                      ]
+                    },
+                    {
+                      "all": [
+                        {
+                          "eq": [
+                            "$a.pull",
+                            "right"
+                          ]
+                        },
+                        {
+                          "has": [
+                            "$a.right.ids",
+                            "pay"
+                          ]
+                        }
+                      ]
+                    }
                   ]
                 }
               },
@@ -17133,12 +17308,78 @@
               "after": "end"
             },
             "clears": [
-              "back"
+              "back",
+              "again"
             ],
             "titleSlots": {
               "move": {
                 "labelOf": "move"
               }
+            },
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.back",
+                    "unsafe"
+                  ]
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "unsafe",
+                "when": {
+                  "eq": [
+                    "$a.back",
+                    "unsafe"
+                  ]
+                }
+              },
+              {
+                "to": "again",
+                "when": {
+                  "eq": [
+                    "$a.back",
+                    "not_yet"
+                  ]
+                }
+              },
+              {
+                "to": "back_end",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "again",
+            "kind": "ask",
+            "title": "back_not_yet",
+            "fields": [
+              {
+                "id": "again",
+                "options": {
+                  "list": "remind"
+                },
+                "max": 1,
+                "required": false,
+                "label": "remind_again",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "followUp": {
+              "type": "effective_move",
+              "whenFrom": "again"
             },
             "next": [
               {
@@ -17173,9 +17414,15 @@
               },
               {
                 "when": {
+                  "set": "$a.again"
+                },
+                "key": "back_again_set"
+              },
+              {
+                "when": {
                   "all": []
                 },
-                "key": "back_not_yet"
+                "key": "back_again_none"
               }
             ],
             "done": "done",
@@ -17302,8 +17549,18 @@
             },
             {
               "value": "unsafe",
-              "label": "I'm scared of what they'd do",
+              "label": "Someone threatened me, scared me or hurt me",
               "danger": "other"
+            }
+          ],
+          "heads_up": [
+            {
+              "value": "body",
+              "label": "My body first"
+            },
+            {
+              "value": "go",
+              "label": "Try it anyway"
             }
           ],
           "right": [
@@ -17363,7 +17620,7 @@
           "pull": [
             {
               "value": "works",
-              "label": "What works"
+              "label": "Getting what matters"
             },
             {
               "value": "right",
@@ -17518,6 +17775,13 @@
               "label": "Ask for the one thing I most need",
               "goal": "any",
               "grievance": "none"
+            },
+            {
+              "value": "unsafe",
+              "label": "They might hurt me if I do anything",
+              "goal": "none",
+              "grievance": "none",
+              "danger": "other"
             }
           ],
           "set_down": [
@@ -17556,6 +17820,11 @@
             {
               "value": "not_yet",
               "label": "Not yet"
+            },
+            {
+              "value": "unsafe",
+              "label": "It went badly, and I don't feel safe",
+              "danger": "other"
             }
           ]
         }
@@ -64181,7 +64450,7 @@
             "id": "effectiveness",
             "toolId": "effectiveness",
             "query": {
-              "frame": "$a.problem"
+              "frame": "$a.solutions"
             },
             "carry": [
               "feel"
