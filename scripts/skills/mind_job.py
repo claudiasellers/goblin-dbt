@@ -28,6 +28,7 @@ reopen times, the Stage rooms) and where it departs from the PRD.
 Safety (plan C6): *Talk to someone now* on every screen; nothing passive for a loop (every task is eyes open and
 outward, the plan one included); no comparisons with other people; the lid always books a reopen.
 """
+import os
 
 ID = "mind_job"
 TOOL_ID = "mind-job"
@@ -51,6 +52,16 @@ COPY = {
     "task_find_title": "Something to find. Pick one.",
     "task_like_title": "Something you like. Pick one.",
     "task_good_title": "Something good. Pick one.",
+    # Level 3 (DT-06 part 2): one of the person's own things I like (ER-04), for a few minutes, then the return.
+    "task_mine_title": "One of your things. Pick one.",
+    "task_mine_hint": "From your things I like. One you can do now, eyes open, that doesn't hurt you. None right now? Go on without one.",
+    "mine_title": "Give it a few minutes.",
+    "mine_step1": "Start it now, where you are.",
+    "mine_step2": "Let your attention stay with it.",
+    "mine_step3": "Then come back and check.",
+    "mine_start": "Start",
+    "mine_running": "With it",
+    "mine_done": "That's it.",
     "do_title": "Eyes open.",
     "here": "You're here, and it's",
     "found": "Found one",
@@ -114,6 +125,8 @@ COPY = {
     "reopen_fork_title": "Can anything be done about it?",
     "repark_title": "When will you open it?",
     "repark_hint": "It's okay to wait. If it keeps coming back, someone can look at it with you.",
+    # The re-park heads-up (DT-06 part 2): put back before, so said once, plainly; never a lock or a count.
+    "repark_title_again": "It's been put back before. That's okay. When will you open it?",
     "reopen_change": "Then let's look at what can be done.",
     "reopen_facts": "Checking the facts can show how big it is now.",
     # ER-08 (ER-B5): what the lid put away while flooded comes back here when steady (PRD ER-08, containment).
@@ -142,6 +155,34 @@ def FLOODED_ONLY(flag):
 
 
 CALM_TASKS = {"blue", "sound"}
+# Per-feeling ceilings (PRD DT-06): after shame, grief or rejection, warmer *good* tasks can sting (something that
+# reminds you of a kind moment), so a carried word in this set keeps the ladder at find and like. Never shown or said.
+# Shame is every grid word whose DBT parent is shame in the graph (parentOf: rejected and excluded sit there too);
+# grief and rejection's sadness words are named, since most of sadness (bored-ish, flat, disappointed) shouldn't cap.
+CEILING_SADNESS = ["abandoned", "despair", "grief", "hurt", "isolated", "let_down", "lonely"]
+
+
+def _ceiling_words():
+    import json
+    import subprocess
+    import sys
+    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    square = set(json.loads(subprocess.check_output([sys.executable, os.path.join(root, "scripts/emotions/build.py"), "--json"]))["square"])
+    saved = list(sys.path)
+    try:
+        from graph_tables import tables  # puts scripts/recommendations on the path; restore it after
+    finally:
+        sys.path[:] = saved
+    parent_of, _ = tables()
+    shame = {w for w, p in parent_of.items() if p == "shame" and w in square}
+    assert all(w in square and parent_of.get(w) == "sadness" for w in CEILING_SADNESS), "ceiling sadness words drifted"
+    return sorted(shame | set(CEILING_SADNESS))
+
+
+CEILING_WORDS = _ceiling_words()
+CEILING = {"any": [{"has": ["$carried", w]} for w in CEILING_WORDS]}
+HAS_THINGS = {"set": "$p.thingsILike"}
+PARKED_BEFORE = {"any": [{"eq": ["$prev.reopen", "not_yet"]}, {"eq": ["$prev.re_heads", "later"]}]}
 CALM_HOW = {"too_much", "enough"}
 SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
 
@@ -158,7 +199,13 @@ WARMTH = [
     ("find", "Something to find"),
     ("like", "Something I like"),
     ("good", "Something good"),
+    ("mine", "One of my things I like"),  # level 3: only with a kept thing I like (ER-04)
 ]
+# Which warmths show: good and mine never under a ceiling, mine only with kept things.
+WARMTH_WHERE = {"all": [
+    {"any": [{"not": {"in": ["$opt.value", ["good", "mine"]]}}, {"not": CEILING}]},
+    {"any": [{"not": {"eq": ["$opt.value", "mine"]}}, HAS_THINGS]},
+]}
 # AttentionTask: (value, label, level, variant, count, task copy, found copy). Level 0 neutral, 1 pleasant-neutral,
 # 2 positive (with a few seconds of staying with it). Every one is eyes open and outward (C6.3: nothing passive for a
 # loop).
@@ -275,7 +322,10 @@ def how_step(level):
     else:
         nxt.append({"when": {"eq": [a(f), "too_much"]}, "to": f"to_{cooler(level)}"})
     nxt.append({"when": {"all": [{"eq": [a(f), "more"]}, FLOODED]}, "to": "to_find"})
-    nxt.append({"when": {"all": [{"eq": [a(f), "more"]}, {"not": FLOODED}]}, "to": f"to_{warmer(level)}"})
+    # Warmer, unless the next level is past a ceiling (like → good after shame, grief or rejection: stay at like).
+    capped = level == "like"
+    nxt.append({"when": {"all": [{"eq": [a(f), "more"]}, {"not": FLOODED}, *([{"not": CEILING}] if capped else [])]},
+                "to": f"to_{warmer(level)}"})
     # The conditions are exclusive, so one jump per target: a jump to the default target is dropped (the default
     # catches it) and two jumps to the same target are joined with any.
     default = f"to_{level}"
@@ -310,7 +360,19 @@ STEPS = [
     ask("heads_up", "heads_up_title", "heads_up_hint", "heads_up", "heads_up",
         [{"when": {"eq": [a("heads_up"), "body"]}, "to": "settle"}, {"to": "to_find"}]),
     ask("warmth", "warmth_title", "warmth_hint", "warmth", "warmth",
-        [{"when": {"eq": [a("warmth"), lv]}, "to": f"to_{lv}"} for lv in LEVELS]),
+        # Explicit for every rung but the coolest: an option added later falls to find, never warmer.
+        [*[{"when": {"eq": [a("warmth"), lv]}, "to": f"to_{lv}"} for lv in LEVELS if lv != "find"],
+         {"when": {"eq": [a("warmth"), "mine"]}, "to": "to_mine"}, {"to": "to_find"}],
+        where=WARMTH_WHERE),
+    # Level 3: one of their own things I like, a few minutes with it, then the return.
+    {"id": "to_mine", "kind": "ask", "title": "task_mine_title", "hint": "task_mine_hint",
+     "fields": [{"id": "to_mine", "options": {"profile": "thingsILike"}, "max": 1, "required": False, "links": [SAFETY_LINK]}],
+     # None of them doable right now: the ladder's like rung instead (never stuck on level 3).
+     "next": [{"when": {"not": {"set": a("to_mine")}}, "to": "to_like"}, {"to": "mine_do"}]},
+    {"id": "mine_do", "kind": "embed", "embed": "doseTimer", "answerAs": "mine_do", "title": "mine_title",
+     "props": {"seconds": 180, "step1": "mine_step1", "step2": "mine_step2", "step3": "mine_step3", "start": "mine_start",
+               "running": "mine_running", "done": "mine_done", "next": "next"},
+     "links": [SAFETY_LINK], "next": [{"to": "back"}]},
     *[task_pick(lv) for lv in LEVELS],
     *[do_step(v, lv, variant, count, task, found) for v, _, lv, variant, count, task, found in TASKS],
     # Level 2: a few seconds of staying with it (savouring, briefly).
@@ -358,7 +420,9 @@ STEPS = [
         [{"when": {"eq": [a("re_heads"), "body"]}, "to": "settle"}, {"to": "repark"}]),
     ask("opened", "opened_title", "opened_hint", "opened", "label", [{"to": "can_do"}], required=False),
     ask("can_do", "reopen_fork_title", None, "can_do", "reopen_fork", [{"to": "lid_off"}]),
-    ask("repark", "repark_title", "repark_hint", "repark", "lid_when", [{"to": "lid_end"}],
+    # Put back last round too (`$prev`: a booking field's answer isn't kept, so the last round's way to the shelf is read).
+    ask("repark", [{"when": PARKED_BEFORE, "key": "repark_title_again"}, {"key": "repark_title"}],
+        "repark_hint", "repark", "lid_when", [{"to": "lid_end"}],
         extra={"followUp": {"type": "lid_reopen", "whenFrom": "repark"}}),
     handoff("lid_off",
             [{"when": {"eq": [a("reopen"), "gone"]}, "key": "reopen_skip"},

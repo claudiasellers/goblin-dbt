@@ -85,7 +85,7 @@ test("the tasks: eyes open and outward at every warmth (the plan one included), 
     assert.ok(st.links.some((l) => l.exit === "safety_open"), `${st.id}: a quiet way to someone`);
   }
   const text = Object.values(skill.copy).join(" ");
-  assert.doesNotMatch(text, /level \d|\bother people\b|\beveryone else\b|close your eyes|\bthink of\b/i);
+  assert.doesNotMatch(text, /level \d|\bother people\b|\beveryone else\b|close your eyes|\bthink of\b|\bpicture\b|\bimagine\b/i);
 });
 
 test("a carried flooded reading: the body first, or the coolest tasks only; more never goes warmer", () => {

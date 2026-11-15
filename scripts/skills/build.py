@@ -80,6 +80,9 @@ def check_cond(c, fields, derived, where, accepts=None):
     def ref(r):
         if r == "$each":  # R16: the pick a per-pick step is for (null on any other step)
             return
+        if r == "$carried":  # the grid words a link carried in (conditions only)
+            assert op == "has", (where, "$carried is a list: read it with has", c)
+            return
         if isinstance(r, str) and r.startswith("$"):
             assert REF.match(r), (where, r)
             kind, name = r[1:].split(".")[:2]

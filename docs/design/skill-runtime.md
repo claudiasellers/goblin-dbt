@@ -112,7 +112,8 @@ links and conditional copy. No `eval`, nothing Turing-complete; the build checks
 
 Refs: `$a.<field>` (first pick), `$a.<field>.ids` (all picks), `$a.<field>.own`, `$d.<name>` (derived),
 `$opt.<prop>` (the option under test), `$ctx.<key>` (context in: one id, no suffix; only keys the skill
-`accepts`). Derived values are lookups through tables: `{name: 'parent', from:
+`accepts`), `$carried` (DT part 2: the grid words a link or hand-off carried in, read only with `has`; never a pick
+or recorded; Give your mind a job's ceilings). Derived values are lookups through tables: `{name: 'parent', from:
 '$a.feel', table: 'parentOf'}`, `{name: 'set', from: '$d.parent', table: 'storySetOf', default:
 'general'}`, `{name: 'fitsParent', from: '$d.parent', table: 'fitsWhen', keep: 'key'}`. A derive on
 `feelingOf` may take one `field` of the row (`{name: 'ladder', from: '$d.guide', table: 'feelingOf', field:

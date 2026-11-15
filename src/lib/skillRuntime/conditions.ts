@@ -7,7 +7,8 @@
  * the skill passed in: an urge, a person, a frame, a carried band; only keys the skill `accepts`), `$p.<slice>`
  * (a profile slice the skill's tool declares in PROFILE_NEEDS: present when the person has kept something there;
  * `.ids` its items' ids), `$each` (R16: the pick a per-pick step is for, such as Do the Opposite's feeling; null on
- * any other step). Anything else is a literal.
+ * any other step), `$carried` (the grid words a link or hand-off carried in: read by conditions only, never a pick;
+ * Give your mind a job's ceilings). Anything else is a literal.
  * `{set: '$a.<field>'}` is true for a pick or own words; every other operator reads the first pick.
  */
 import type { Cond, OptionDef } from '../../data/skillTypes';
@@ -27,6 +28,8 @@ export interface Scope {
   ctx?: Readonly<Record<string, string>>;
   /** Profile slices (`$p.*`): only what the tool's PROFILE_NEEDS reads; null while loading or signed out. */
   profile?: Readonly<Record<string, unknown>> | null;
+  /** `$carried`: the grid words a link or hand-off carried in (ids only; never selected, never recorded). */
+  carried?: readonly string[];
 }
 
 /** A profile item's id (most items have `id`; a kept witness line has `lineId`). */
@@ -35,6 +38,9 @@ export function profileItemId(item: unknown): string | null {
   const o = item as { id?: unknown; lineId?: unknown };
   return typeof o.id === 'string' ? o.id : typeof o.lineId === 'string' ? o.lineId : null;
 }
+
+/** The carried words ref: `{has: ['$carried', '<word id>']}`. */
+export const CARRIED = '$carried';
 
 /** The answers key a per-pick step's view puts its pick under (R16, machine.ts `answersOf`). */
 export const EACH = '$each';
@@ -50,6 +56,7 @@ const REF = /^\$(a|prev|d|opt|ctx|p)\.([A-Za-z_][A-Za-z0-9_]*)(?:\.(ids|own))?$/
 export function resolve(v: unknown, scope: Scope): unknown {
   if (typeof v !== 'string' || !v.startsWith('$')) return v;
   if (v === EACH) return scope.answers[EACH]?.ids[0] ?? null;
+  if (v === CARRIED) return [...(scope.carried ?? [])];
   const m = REF.exec(v);
   if (!m) return null;
   const [, kind, name, part] = m;

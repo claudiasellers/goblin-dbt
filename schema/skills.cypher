@@ -10735,7 +10735,7 @@ SET r += {list: "turn_back", order: 68};
 
 // --- mind_job (mj-v1) ---
 MERGE (s:Skill {id: "mind_job"})
-SET s += {toolId: "mind-job", version: "mj-v1", contentVersion: "skills-v1", start: "what", ownMax: 36, emotionFields: [], accepts: ["band", "enterAt"]}, s.inlineJson = "null", s.runtimeJson = "{\"entries\": {\"lid\": \"lid_pick\"}, \"resumeAt\": [\"back\"]}", s.copyJson = "{\"back_title\": \"Back. Is it louder, the same, quieter?\", \"break_hint\": \"Something that takes your hands or your attention.\", \"break_line\": \"Take your time. When you're back, there'll be a check-in.\", \"break_own\": \"Something else that doesn't hurt you\", \"break_title\": \"What could you do for a while?\", \"break_when_hint\": \"You'll get a check-in then.\", \"break_when_title\": \"When do you want to come back to it?\", \"do_title\": \"Eyes open.\", \"done\": \"Done\", \"end_cant\": \"Then the fight with it can ease. Let it be is for that.\", \"end_change\": \"Then let's look at what can be done.\", \"end_gone\": \"It's gone for now. You gave your mind a job and came back to check. That's the skill.\", \"end_later\": \"Then put it away for later, with a time to come back.\", \"find_done\": \"That's it.\", \"fork_title\": \"Can anything be done about it right now?\", \"found\": \"Found one\", \"found_one\": \"Got it\", \"found_sound\": \"Heard it\", \"heads_up_hint\": \"You can settle your body first, or try a short find task.\", \"heads_up_title\": \"Your body's loud right now.\", \"here\": \"You're here, and it's\", \"how_hint\": \"Too much goes cooler. More goes warmer.\", \"how_title\": \"How was that?\", \"let_it_be_offer\": \"Make room for what happened\", \"lid_done\": \"It's shut, and on the shelf.\", \"lid_hold\": \"Hold the lid shut\", \"lid_hold_hint\": \"Press and hold until the lid is shut. If it keeps going after a tap, tap again to stop.\", \"lid_holding\": \"Holding\", \"lid_label_hint\": \"Skipping is fine.\", \"lid_label_own\": \"In my words\", \"lid_label_title\": \"Want to give it a label?\", \"lid_line\": \"It's on the shelf. It'll keep until you open it.\", \"lid_pick_hint\": \"It stays on the shelf until you open it.\", \"lid_pick_title\": \"Put it in something. Pick one.\", \"lid_put\": \"Put it in\", \"lid_skip\": \"Leave it open for now\", \"lid_title\": \"Put it in, then hold the lid shut.\", \"lid_when_hint\": \"It'll keep until then.\", \"lid_when_title\": \"When will you open it again?\", \"louder_line\": \"It got louder. That happens. Let's look after your body first.\", \"next\": \"Next\", \"opened_hint\": \"Pick the closest.\", \"opened_title\": \"Take the lid off. What's in there?\", \"re_heads_hint\": \"It can stay shut until you're steadier.\", \"re_heads_title\": \"Your body's loud right now.\", \"reopen_cant\": \"Then the fight with it can ease. You can let the situation be, or let the feeling rise and fall.\", \"reopen_change\": \"Then let's look at what can be done.\", \"reopen_facts\": \"Checking the facts can show how big it is now.\", \"reopen_fork_title\": \"Can anything be done about it?\", \"reopen_gone\": \"Then it can go. You opened it, and that's enough.\", \"reopen_hint\": \"You can put it back.\", \"reopen_skip\": \"Then it can go. You came back to check, and that's enough.\", \"reopen_title\": \"It's still on the shelf. Open it for a few minutes?\", \"repark_hint\": \"It's okay to wait. If it keeps coming back, someone can look at it with you.\", \"repark_title\": \"When will you open it?\", \"safety_open\": \"Talk to someone now\", \"settle_line\": \"Body first. Your mind's job is here when you're ready.\", \"stay_done\": \"That's it.\", \"stay_running\": \"Staying with it\", \"stay_start\": \"Start\", \"stay_step1\": \"Let your eyes rest on it, or keep it in mind.\", \"stay_step2\": \"Notice one thing you like about it.\", \"stay_title\": \"Stay with it for a few seconds.\", \"t_ahead\": \"Find something that's part of a plan you're looking forward to, even a small one.\", \"t_blue\": \"Find five blue things around you. Tap for each one.\", \"t_edges\": \"Find four things with straight edges.\", \"t_hum\": \"Listen for a sound you don't mind.\", \"t_liked\": \"Find something that reminds you of a kind moment.\", \"t_look\": \"Find one thing you like the look of.\", \"t_made\": \"Find something you chose or made.\", \"t_round\": \"Find three round things.\", \"t_soft\": \"Find something soft. Touch it if you can.\", \"t_sound\": \"Listen for the farthest sound you can hear.\", \"task_find_title\": \"Something to find. Pick one.\", \"task_good_title\": \"Something good. Pick one.\", \"task_like_title\": \"Something you like. Pick one.\", \"too_much_line\": \"That was a lot. Let's look after your body first.\", \"warmth_hint\": \"Some days the warmer ones are harder. Any is fine.\", \"warmth_title\": \"What kind of job?\", \"wave_offer\": \"Let the feeling rise and fall\", \"what_hint\": \"Each one comes back to it, so nothing's pushed away for good.\", \"what_title\": \"What would help right now?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "mind-job", version: "mj-v1", contentVersion: "skills-v1", start: "what", ownMax: 36, emotionFields: [], accepts: ["band", "enterAt"]}, s.inlineJson = "null", s.runtimeJson = "{\"entries\": {\"lid\": \"lid_pick\"}, \"resumeAt\": [\"back\"]}", s.copyJson = "{\"back_title\": \"Back. Is it louder, the same, quieter?\", \"break_hint\": \"Something that takes your hands or your attention.\", \"break_line\": \"Take your time. When you're back, there'll be a check-in.\", \"break_own\": \"Something else that doesn't hurt you\", \"break_title\": \"What could you do for a while?\", \"break_when_hint\": \"You'll get a check-in then.\", \"break_when_title\": \"When do you want to come back to it?\", \"do_title\": \"Eyes open.\", \"done\": \"Done\", \"end_cant\": \"Then the fight with it can ease. Let it be is for that.\", \"end_change\": \"Then let's look at what can be done.\", \"end_gone\": \"It's gone for now. You gave your mind a job and came back to check. That's the skill.\", \"end_later\": \"Then put it away for later, with a time to come back.\", \"find_done\": \"That's it.\", \"fork_title\": \"Can anything be done about it right now?\", \"found\": \"Found one\", \"found_one\": \"Got it\", \"found_sound\": \"Heard it\", \"heads_up_hint\": \"You can settle your body first, or try a short find task.\", \"heads_up_title\": \"Your body's loud right now.\", \"here\": \"You're here, and it's\", \"how_hint\": \"Too much goes cooler. More goes warmer.\", \"how_title\": \"How was that?\", \"let_it_be_offer\": \"Make room for what happened\", \"lid_done\": \"It's shut, and on the shelf.\", \"lid_hold\": \"Hold the lid shut\", \"lid_hold_hint\": \"Press and hold until the lid is shut. If it keeps going after a tap, tap again to stop.\", \"lid_holding\": \"Holding\", \"lid_label_hint\": \"Skipping is fine.\", \"lid_label_own\": \"In my words\", \"lid_label_title\": \"Want to give it a label?\", \"lid_line\": \"It's on the shelf. It'll keep until you open it.\", \"lid_pick_hint\": \"It stays on the shelf until you open it.\", \"lid_pick_title\": \"Put it in something. Pick one.\", \"lid_put\": \"Put it in\", \"lid_skip\": \"Leave it open for now\", \"lid_title\": \"Put it in, then hold the lid shut.\", \"lid_when_hint\": \"It'll keep until then.\", \"lid_when_title\": \"When will you open it again?\", \"louder_line\": \"It got louder. That happens. Let's look after your body first.\", \"mine_done\": \"That's it.\", \"mine_running\": \"With it\", \"mine_start\": \"Start\", \"mine_step1\": \"Start it now, where you are.\", \"mine_step2\": \"Let your attention stay with it.\", \"mine_step3\": \"Then come back and check.\", \"mine_title\": \"Give it a few minutes.\", \"next\": \"Next\", \"opened_hint\": \"Pick the closest.\", \"opened_title\": \"Take the lid off. What's in there?\", \"re_heads_hint\": \"It can stay shut until you're steadier.\", \"re_heads_title\": \"Your body's loud right now.\", \"reopen_cant\": \"Then the fight with it can ease. You can let the situation be, or let the feeling rise and fall.\", \"reopen_change\": \"Then let's look at what can be done.\", \"reopen_facts\": \"Checking the facts can show how big it is now.\", \"reopen_fork_title\": \"Can anything be done about it?\", \"reopen_gone\": \"Then it can go. You opened it, and that's enough.\", \"reopen_hint\": \"You can put it back.\", \"reopen_skip\": \"Then it can go. You came back to check, and that's enough.\", \"reopen_title\": \"It's still on the shelf. Open it for a few minutes?\", \"repark_hint\": \"It's okay to wait. If it keeps coming back, someone can look at it with you.\", \"repark_title\": \"When will you open it?\", \"repark_title_again\": \"It's been put back before. That's okay. When will you open it?\", \"safety_open\": \"Talk to someone now\", \"settle_line\": \"Body first. Your mind's job is here when you're ready.\", \"stay_done\": \"That's it.\", \"stay_running\": \"Staying with it\", \"stay_start\": \"Start\", \"stay_step1\": \"Let your eyes rest on it, or keep it in mind.\", \"stay_step2\": \"Notice one thing you like about it.\", \"stay_title\": \"Stay with it for a few seconds.\", \"t_ahead\": \"Find something that's part of a plan you're looking forward to, even a small one.\", \"t_blue\": \"Find five blue things around you. Tap for each one.\", \"t_edges\": \"Find four things with straight edges.\", \"t_hum\": \"Listen for a sound you don't mind.\", \"t_liked\": \"Find something that reminds you of a kind moment.\", \"t_look\": \"Find one thing you like the look of.\", \"t_made\": \"Find something you chose or made.\", \"t_round\": \"Find three round things.\", \"t_soft\": \"Find something soft. Touch it if you can.\", \"t_sound\": \"Listen for the farthest sound you can hear.\", \"task_find_title\": \"Something to find. Pick one.\", \"task_good_title\": \"Something good. Pick one.\", \"task_like_title\": \"Something you like. Pick one.\", \"task_mine_hint\": \"From your things I like. One you can do now, eyes open, that doesn't hurt you. None right now? Go on without one.\", \"task_mine_title\": \"One of your things. Pick one.\", \"too_much_line\": \"That was a lot. Let's look after your body first.\", \"warmth_hint\": \"Some days the warmer ones are harder. Any is fine.\", \"warmth_title\": \"What kind of job?\", \"wave_offer\": \"Let the feeling rise and fall\", \"what_hint\": \"Each one comes back to it, so nothing's pushed away for good.\", \"what_title\": \"What would help right now?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "dbt_accepts"}), (s:Skill {id: "mind_job"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "mind_job"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
@@ -10751,195 +10751,205 @@ MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:heads_up"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 1};
 MERGE (n:SkillStep {id: "mind_job:warmth"})
-SET n += {skillId: "mind_job", step: "warmth", kind: "ask", version: "mj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"warmth\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"warmth\"}, \"required\": true}], \"hint\": \"warmth_hint\", \"title\": \"warmth_title\"}";
+SET n += {skillId: "mind_job", step: "warmth", kind: "ask", version: "mj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"warmth\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"warmth\", \"where\": {\"all\": [{\"any\": [{\"not\": {\"in\": [\"$opt.value\", [\"good\", \"mine\"]]}}, {\"not\": {\"any\": [{\"has\": [\"$carried\", \"abandoned\"]}, {\"has\": [\"$carried\", \"ashamed\"]}, {\"has\": [\"$carried\", \"despair\"]}, {\"has\": [\"$carried\", \"embarrassed\"]}, {\"has\": [\"$carried\", \"excluded\"]}, {\"has\": [\"$carried\", \"exposed\"]}, {\"has\": [\"$carried\", \"grief\"]}, {\"has\": [\"$carried\", \"humiliated\"]}, {\"has\": [\"$carried\", \"hurt\"]}, {\"has\": [\"$carried\", \"inadequate\"]}, {\"has\": [\"$carried\", \"inferior\"]}, {\"has\": [\"$carried\", \"insecure\"]}, {\"has\": [\"$carried\", \"insignificant\"]}, {\"has\": [\"$carried\", \"isolated\"]}, {\"has\": [\"$carried\", \"let_down\"]}, {\"has\": [\"$carried\", \"lonely\"]}, {\"has\": [\"$carried\", \"rejected\"]}, {\"has\": [\"$carried\", \"ridiculed\"]}, {\"has\": [\"$carried\", \"weak\"]}, {\"has\": [\"$carried\", \"worthless\"]}]}}]}, {\"any\": [{\"not\": {\"eq\": [\"$opt.value\", \"mine\"]}}, {\"set\": \"$p.thingsILike\"}]}]}}, \"required\": true}], \"hint\": \"warmth_hint\", \"title\": \"warmth_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:warmth"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 2};
+MERGE (n:SkillStep {id: "mind_job:to_mine"})
+SET n += {skillId: "mind_job", step: "to_mine", kind: "ask", version: "mj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"to_mine\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"profile\": \"thingsILike\"}, \"required\": false}], \"hint\": \"task_mine_hint\", \"title\": \"task_mine_title\"}";
+MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:to_mine"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 3};
+MERGE (n:SkillStep {id: "mind_job:mine_do"})
+SET n += {skillId: "mind_job", step: "mine_do", kind: "embed", version: "mj-v1"}, n.specJson = "{\"answerAs\": \"mine_do\", \"embed\": \"doseTimer\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"done\": \"mine_done\", \"next\": \"next\", \"running\": \"mine_running\", \"seconds\": 180, \"start\": \"mine_start\", \"step1\": \"mine_step1\", \"step2\": \"mine_step2\", \"step3\": \"mine_step3\"}, \"title\": \"mine_title\"}";
+MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:mine_do"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 4};
 MERGE (n:SkillStep {id: "mind_job:to_find"})
 SET n += {skillId: "mind_job", step: "to_find", kind: "ask", version: "mj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"to_find\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"task_find\", \"where\": {\"any\": [{\"not\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"eq\": [\"$opt.calm\", true]}]}}, \"required\": true}], \"title\": \"task_find_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:to_find"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 3};
+SET r += {order: 5};
 MERGE (n:SkillStep {id: "mind_job:to_like"})
 SET n += {skillId: "mind_job", step: "to_like", kind: "ask", version: "mj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"to_like\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"task_like\"}, \"required\": true}], \"title\": \"task_like_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:to_like"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 4};
+SET r += {order: 6};
 MERGE (n:SkillStep {id: "mind_job:to_good"})
 SET n += {skillId: "mind_job", step: "to_good", kind: "ask", version: "mj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"to_good\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"task_good\"}, \"required\": true}], \"title\": \"task_good_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:to_good"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 5};
+SET r += {order: 7};
 MERGE (n:SkillStep {id: "mind_job:do_blue"})
 SET n += {skillId: "mind_job", step: "do_blue", kind: "embed", version: "mj-v1"}, n.specJson = "{\"answerAs\": \"do_blue\", \"embed\": \"orientFind\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"count\": 5, \"done\": \"find_done\", \"foundLabel\": \"found\", \"here\": \"here\", \"next\": \"next\", \"task\": \"t_blue\", \"variant\": \"find\"}, \"title\": \"do_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:do_blue"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 6};
+SET r += {order: 8};
 MERGE (n:SkillStep {id: "mind_job:do_sound"})
 SET n += {skillId: "mind_job", step: "do_sound", kind: "embed", version: "mj-v1"}, n.specJson = "{\"answerAs\": \"do_sound\", \"embed\": \"orientFind\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"count\": 1, \"done\": \"find_done\", \"foundLabel\": \"found_sound\", \"here\": \"here\", \"next\": \"next\", \"task\": \"t_sound\", \"variant\": \"listen\"}, \"title\": \"do_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:do_sound"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 7};
+SET r += {order: 9};
 MERGE (n:SkillStep {id: "mind_job:do_round"})
 SET n += {skillId: "mind_job", step: "do_round", kind: "embed", version: "mj-v1"}, n.specJson = "{\"answerAs\": \"do_round\", \"embed\": \"orientFind\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"count\": 3, \"done\": \"find_done\", \"foundLabel\": \"found\", \"here\": \"here\", \"next\": \"next\", \"task\": \"t_round\", \"variant\": \"find\"}, \"title\": \"do_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:do_round"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 8};
+SET r += {order: 10};
 MERGE (n:SkillStep {id: "mind_job:do_edges"})
 SET n += {skillId: "mind_job", step: "do_edges", kind: "embed", version: "mj-v1"}, n.specJson = "{\"answerAs\": \"do_edges\", \"embed\": \"orientFind\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"count\": 4, \"done\": \"find_done\", \"foundLabel\": \"found\", \"here\": \"here\", \"next\": \"next\", \"task\": \"t_edges\", \"variant\": \"find\"}, \"title\": \"do_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:do_edges"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 9};
+SET r += {order: 11};
 MERGE (n:SkillStep {id: "mind_job:do_look"})
 SET n += {skillId: "mind_job", step: "do_look", kind: "embed", version: "mj-v1"}, n.specJson = "{\"answerAs\": \"do_look\", \"embed\": \"orientFind\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"count\": 1, \"done\": \"find_done\", \"foundLabel\": \"found\", \"here\": \"here\", \"next\": \"next\", \"task\": \"t_look\", \"variant\": \"find\"}, \"title\": \"do_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:do_look"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 10};
+SET r += {order: 12};
 MERGE (n:SkillStep {id: "mind_job:do_soft"})
 SET n += {skillId: "mind_job", step: "do_soft", kind: "embed", version: "mj-v1"}, n.specJson = "{\"answerAs\": \"do_soft\", \"embed\": \"orientFind\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"count\": 1, \"done\": \"find_done\", \"foundLabel\": \"found\", \"here\": \"here\", \"next\": \"next\", \"task\": \"t_soft\", \"variant\": \"find\"}, \"title\": \"do_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:do_soft"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 11};
+SET r += {order: 13};
 MERGE (n:SkillStep {id: "mind_job:do_hum"})
 SET n += {skillId: "mind_job", step: "do_hum", kind: "embed", version: "mj-v1"}, n.specJson = "{\"answerAs\": \"do_hum\", \"embed\": \"orientFind\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"count\": 1, \"done\": \"find_done\", \"foundLabel\": \"found_sound\", \"here\": \"here\", \"next\": \"next\", \"task\": \"t_hum\", \"variant\": \"listen\"}, \"title\": \"do_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:do_hum"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 12};
+SET r += {order: 14};
 MERGE (n:SkillStep {id: "mind_job:do_made"})
 SET n += {skillId: "mind_job", step: "do_made", kind: "embed", version: "mj-v1"}, n.specJson = "{\"answerAs\": \"do_made\", \"embed\": \"orientFind\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"count\": 1, \"done\": \"find_done\", \"foundLabel\": \"found\", \"here\": \"here\", \"next\": \"next\", \"task\": \"t_made\", \"variant\": \"find\"}, \"title\": \"do_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:do_made"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 13};
+SET r += {order: 15};
 MERGE (n:SkillStep {id: "mind_job:do_liked"})
 SET n += {skillId: "mind_job", step: "do_liked", kind: "embed", version: "mj-v1"}, n.specJson = "{\"answerAs\": \"do_liked\", \"embed\": \"orientFind\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"count\": 1, \"done\": \"find_done\", \"foundLabel\": \"found\", \"here\": \"here\", \"next\": \"next\", \"task\": \"t_liked\", \"variant\": \"find\"}, \"title\": \"do_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:do_liked"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 14};
+SET r += {order: 16};
 MERGE (n:SkillStep {id: "mind_job:do_ahead"})
 SET n += {skillId: "mind_job", step: "do_ahead", kind: "embed", version: "mj-v1"}, n.specJson = "{\"answerAs\": \"do_ahead\", \"embed\": \"orientFind\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"count\": 1, \"done\": \"find_done\", \"foundLabel\": \"found_one\", \"here\": \"here\", \"next\": \"next\", \"task\": \"t_ahead\", \"variant\": \"find\"}, \"title\": \"do_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:do_ahead"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 15};
+SET r += {order: 17};
 MERGE (n:SkillStep {id: "mind_job:stay"})
 SET n += {skillId: "mind_job", step: "stay", kind: "embed", version: "mj-v1"}, n.specJson = "{\"answerAs\": \"stay\", \"embed\": \"bodyCard\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"done\": \"stay_done\", \"kind\": \"still\", \"next\": \"next\", \"running\": \"stay_running\", \"seconds\": 10, \"start\": \"stay_start\", \"step1\": \"stay_step1\", \"step2\": \"stay_step2\"}, \"title\": \"stay_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:stay"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 16};
+SET r += {order: 18};
 MERGE (n:SkillStep {id: "mind_job:how_find"})
 SET n += {skillId: "mind_job", step: "how_find", kind: "ask", version: "mj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"how_find\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"how\", \"where\": {\"any\": [{\"not\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"eq\": [\"$opt.calm\", true]}]}}, \"required\": true}], \"hint\": \"how_hint\", \"title\": \"how_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:how_find"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 17};
+SET r += {order: 19};
 MERGE (n:SkillStep {id: "mind_job:how_like"})
 SET n += {skillId: "mind_job", step: "how_like", kind: "ask", version: "mj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"how_like\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"how\"}, \"required\": true}], \"hint\": \"how_hint\", \"title\": \"how_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:how_like"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 18};
+SET r += {order: 20};
 MERGE (n:SkillStep {id: "mind_job:how_good"})
 SET n += {skillId: "mind_job", step: "how_good", kind: "ask", version: "mj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"how_good\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"how\"}, \"required\": true}], \"hint\": \"how_hint\", \"title\": \"how_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:how_good"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 19};
+SET r += {order: 21};
 MERGE (n:SkillStep {id: "mind_job:back"})
 SET n += {skillId: "mind_job", step: "back", kind: "ask", version: "mj-v1"}, n.specJson = "{\"fields\": [{\"askFresh\": \"thenVsNow\", \"id\": \"back\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"tvn\"}, \"required\": true}], \"title\": \"back_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:back"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 20};
+SET r += {order: 22};
 MERGE (n:SkillStep {id: "mind_job:fork"})
 SET n += {skillId: "mind_job", step: "fork", kind: "ask", version: "mj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"fork\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"fork\"}, \"required\": true}], \"title\": \"fork_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:fork"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 21};
+SET r += {order: 23};
 MERGE (n:SkillStep {id: "mind_job:end"})
 SET n += {skillId: "mind_job", step: "end", kind: "handoff", version: "mj-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"end_change\", \"when\": {\"eq\": [\"$a.fork\", \"change\"]}}, {\"key\": \"end_cant\", \"when\": {\"eq\": [\"$a.fork\", \"cant\"]}}, {\"key\": \"end_gone\", \"when\": {\"eq\": [\"$a.fork\", \"gone\"]}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}]}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:end"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 22};
+SET r += {order: 24};
 MERGE (n:SkillStep {id: "mind_job:louder"})
 SET n += {skillId: "mind_job", step: "louder", kind: "handoff", version: "mj-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"louder_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:louder"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 23};
+SET r += {order: 25};
 MERGE (n:SkillStep {id: "mind_job:too_much"})
 SET n += {skillId: "mind_job", step: "too_much", kind: "handoff", version: "mj-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"too_much_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:too_much"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 24};
+SET r += {order: 26};
 MERGE (n:SkillStep {id: "mind_job:settle"})
 SET n += {skillId: "mind_job", step: "settle", kind: "handoff", version: "mj-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"settle_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:settle"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 25};
+SET r += {order: 27};
 MERGE (n:SkillStep {id: "mind_job:break"})
 SET n += {skillId: "mind_job", step: "break", kind: "ask", version: "mj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"break\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"break\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"break_own\"}, \"required\": true}], \"hint\": \"break_hint\", \"title\": \"break_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:break"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 26};
+SET r += {order: 28};
 MERGE (n:SkillStep {id: "mind_job:break_at"})
 SET n += {skillId: "mind_job", step: "break_at", kind: "ask", version: "mj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"break_at\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"break_when\"}, \"required\": true}], \"followUp\": {\"type\": \"mind_job_back\", \"whenFrom\": \"break_at\"}, \"hint\": \"break_when_hint\", \"title\": \"break_when_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:break_at"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 27};
+SET r += {order: 29};
 MERGE (n:SkillStep {id: "mind_job:break_ok"})
 SET n += {skillId: "mind_job", step: "break_ok", kind: "handoff", version: "mj-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"break_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:break_ok"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 28};
+SET r += {order: 30};
 MERGE (n:SkillStep {id: "mind_job:lid_pick"})
 SET n += {skillId: "mind_job", step: "lid_pick", kind: "ask", version: "mj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"lid_pick\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"lid_pick\"}, \"required\": true}], \"hint\": \"lid_pick_hint\", \"title\": \"lid_pick_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:lid_pick"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 29};
+SET r += {order: 31};
 MERGE (n:SkillStep {id: "mind_job:lid_shut"})
 SET n += {skillId: "mind_job", step: "lid_shut", kind: "embed", version: "mj-v1"}, n.specJson = "{\"answerAs\": \"lid_shut\", \"embed\": \"lidShelf\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"containerField\": \"lid_pick\", \"done\": \"lid_done\", \"hint\": \"lid_hold_hint\", \"hold\": \"lid_hold\", \"holdSec\": 3, \"holding\": \"lid_holding\", \"next\": \"next\", \"put\": \"lid_put\", \"skip\": \"lid_skip\"}, \"title\": \"lid_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:lid_shut"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 30};
+SET r += {order: 32};
 MERGE (n:SkillStep {id: "mind_job:lid_name"})
 SET n += {skillId: "mind_job", step: "lid_name", kind: "ask", version: "mj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"lid_name\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"label\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"lid_label_own\"}, \"required\": false}], \"hint\": \"lid_label_hint\", \"title\": \"lid_label_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:lid_name"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 31};
+SET r += {order: 33};
 MERGE (n:SkillStep {id: "mind_job:lid_when"})
 SET n += {skillId: "mind_job", step: "lid_when", kind: "ask", version: "mj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"lid_when\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"lid_when\"}, \"required\": true}], \"followUp\": {\"type\": \"lid_reopen\", \"whenFrom\": \"lid_when\"}, \"hint\": \"lid_when_hint\", \"title\": \"lid_when_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:lid_when"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 32};
+SET r += {order: 34};
 MERGE (n:SkillStep {id: "mind_job:lid_end"})
 SET n += {skillId: "mind_job", step: "lid_end", kind: "handoff", version: "mj-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"lid_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:lid_end"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 33};
+SET r += {order: 35};
 MERGE (n:SkillStep {id: "mind_job:reopen"})
 SET n += {skillId: "mind_job", step: "reopen", kind: "ask", version: "mj-v1"}, n.specJson = "{\"clears\": [\"reopen\", \"re_heads\", \"opened\", \"can_do\", \"repark\"], \"fields\": [{\"id\": \"reopen\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"reopen\"}, \"required\": true}], \"hint\": \"reopen_hint\", \"reopens\": {\"after\": \"lid_when\", \"again\": [\"repark\"]}, \"title\": \"reopen_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:reopen"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 34};
+SET r += {order: 36};
 MERGE (n:SkillStep {id: "mind_job:re_heads"})
 SET n += {skillId: "mind_job", step: "re_heads", kind: "ask", version: "mj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"re_heads\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"re_heads\"}, \"required\": true}], \"hint\": \"re_heads_hint\", \"title\": \"re_heads_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:re_heads"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 35};
+SET r += {order: 37};
 MERGE (n:SkillStep {id: "mind_job:opened"})
 SET n += {skillId: "mind_job", step: "opened", kind: "ask", version: "mj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"opened\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"label\"}, \"required\": false}], \"hint\": \"opened_hint\", \"title\": \"opened_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:opened"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 36};
+SET r += {order: 38};
 MERGE (n:SkillStep {id: "mind_job:can_do"})
 SET n += {skillId: "mind_job", step: "can_do", kind: "ask", version: "mj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"can_do\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"reopen_fork\"}, \"required\": true}], \"title\": \"reopen_fork_title\"}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:can_do"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 37};
+SET r += {order: 39};
 MERGE (n:SkillStep {id: "mind_job:repark"})
-SET n += {skillId: "mind_job", step: "repark", kind: "ask", version: "mj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"repark\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"lid_when\"}, \"required\": true}], \"followUp\": {\"type\": \"lid_reopen\", \"whenFrom\": \"repark\"}, \"hint\": \"repark_hint\", \"title\": \"repark_title\"}";
+SET n += {skillId: "mind_job", step: "repark", kind: "ask", version: "mj-v1"}, n.specJson = "{\"fields\": [{\"id\": \"repark\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"lid_when\"}, \"required\": true}], \"followUp\": {\"type\": \"lid_reopen\", \"whenFrom\": \"repark\"}, \"hint\": \"repark_hint\", \"title\": [{\"key\": \"repark_title_again\", \"when\": {\"any\": [{\"eq\": [\"$prev.reopen\", \"not_yet\"]}, {\"eq\": [\"$prev.re_heads\", \"later\"]}]}}, {\"key\": \"repark_title\"}]}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:repark"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 38};
+SET r += {order: 40};
 MERGE (n:SkillStep {id: "mind_job:lid_off"})
 SET n += {skillId: "mind_job", step: "lid_off", kind: "handoff", version: "mj-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"reopen_skip\", \"when\": {\"eq\": [\"$a.reopen\", \"gone\"]}}, {\"key\": \"reopen_change\", \"when\": {\"eq\": [\"$a.can_do\", \"change\"]}}, {\"key\": \"reopen_facts\", \"when\": {\"eq\": [\"$a.can_do\", \"facts\"]}}, {\"key\": \"reopen_cant\", \"when\": {\"eq\": [\"$a.can_do\", \"cant\"]}}, {\"key\": \"reopen_gone\", \"when\": {\"eq\": [\"$a.can_do\", \"gone\"]}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true}";
 MATCH (s:Skill {id: "mind_job"}), (n:SkillStep {id: "mind_job:lid_off"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 39};
+SET r += {order: 41};
 MERGE (x:SkillExit {id: "mind_job:problem_solve"})
 SET x += {skillId: "mind_job", exit: "problem_solve", toolId: "problem-solve", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "mind_job"}), (x:SkillExit {id: "mind_job:problem_solve"})
@@ -11008,18 +11018,36 @@ SET r += {order: 1}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "mind_job:heads_up"}), (x:SkillExit {id: "mind_job:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "heads_up", label: "safety_open"}, r.whenJson = "{\"all\": []}";
-MATCH (a:SkillStep {id: "mind_job:warmth"}), (b:SkillStep {id: "mind_job:to_find"})
-MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.warmth\", \"find\"]}";
 MATCH (a:SkillStep {id: "mind_job:warmth"}), (b:SkillStep {id: "mind_job:to_like"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.warmth\", \"like\"]}";
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.warmth\", \"like\"]}";
 MATCH (a:SkillStep {id: "mind_job:warmth"}), (b:SkillStep {id: "mind_job:to_good"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 2}, r.whenJson = "{\"eq\": [\"$a.warmth\", \"good\"]}";
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.warmth\", \"good\"]}";
+MATCH (a:SkillStep {id: "mind_job:warmth"}), (b:SkillStep {id: "mind_job:to_mine"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "{\"eq\": [\"$a.warmth\", \"mine\"]}";
+MATCH (a:SkillStep {id: "mind_job:warmth"}), (b:SkillStep {id: "mind_job:to_find"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 3}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "mind_job:warmth"}), (x:SkillExit {id: "mind_job:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "warmth", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "mind_job:to_mine"}), (b:SkillStep {id: "mind_job:to_like"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"not\": {\"set\": \"$a.to_mine\"}}";
+MATCH (a:SkillStep {id: "mind_job:to_mine"}), (b:SkillStep {id: "mind_job:mine_do"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "mind_job:to_mine"}), (x:SkillExit {id: "mind_job:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "to_mine", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "mind_job:mine_do"}), (b:SkillStep {id: "mind_job:back"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "mind_job:mine_do"}), (x:SkillExit {id: "mind_job:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "mind_job:to_find"}), (b:SkillStep {id: "mind_job:do_blue"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.to_find\", \"blue\"]}";
@@ -11148,7 +11176,7 @@ MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 1}, r.whenJson = "{\"any\": [{\"eq\": [\"$a.how_like\", \"too_much\"]}, {\"all\": [{\"eq\": [\"$a.how_like\", \"more\"]}, {\"eq\": [\"$ctx.band\", \"flooded\"]}]}]}";
 MATCH (a:SkillStep {id: "mind_job:how_like"}), (b:SkillStep {id: "mind_job:to_good"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 2}, r.whenJson = "{\"all\": [{\"eq\": [\"$a.how_like\", \"more\"]}, {\"not\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}]}";
+SET r += {order: 2}, r.whenJson = "{\"all\": [{\"eq\": [\"$a.how_like\", \"more\"]}, {\"not\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"not\": {\"any\": [{\"has\": [\"$carried\", \"abandoned\"]}, {\"has\": [\"$carried\", \"ashamed\"]}, {\"has\": [\"$carried\", \"despair\"]}, {\"has\": [\"$carried\", \"embarrassed\"]}, {\"has\": [\"$carried\", \"excluded\"]}, {\"has\": [\"$carried\", \"exposed\"]}, {\"has\": [\"$carried\", \"grief\"]}, {\"has\": [\"$carried\", \"humiliated\"]}, {\"has\": [\"$carried\", \"hurt\"]}, {\"has\": [\"$carried\", \"inadequate\"]}, {\"has\": [\"$carried\", \"inferior\"]}, {\"has\": [\"$carried\", \"insecure\"]}, {\"has\": [\"$carried\", \"insignificant\"]}, {\"has\": [\"$carried\", \"isolated\"]}, {\"has\": [\"$carried\", \"let_down\"]}, {\"has\": [\"$carried\", \"lonely\"]}, {\"has\": [\"$carried\", \"rejected\"]}, {\"has\": [\"$carried\", \"ridiculed\"]}, {\"has\": [\"$carried\", \"weak\"]}, {\"has\": [\"$carried\", \"worthless\"]}]}}]}";
 MATCH (a:SkillStep {id: "mind_job:how_like"}), (b:SkillStep {id: "mind_job:to_like"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 3}, r.whenJson = "null";
@@ -11357,261 +11385,266 @@ SET o:SkillOption, o += {skillId: "mind_job", list: "warmth", value: "good", lab
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:warmth:good"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "warmth", order: 7};
+MERGE (o:SkillOption {id: "mind_job:warmth:mine"})
+SET o:SkillOption, o += {skillId: "mind_job", list: "warmth", value: "mine", label: "One of my things I like", version: "mj-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:warmth:mine"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "warmth", order: 8};
 MERGE (o:SkillOption {id: "mind_job:task_find:blue"})
 SET o:SkillOption:AttentionTask, o += {skillId: "mind_job", list: "task_find", value: "blue", label: "Five blue things", version: "mj-v1"}, o.propsJson = "{\"calm\": true, \"level\": \"find\"}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:task_find:blue"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "task_find", order: 8};
+SET r += {list: "task_find", order: 9};
 MERGE (o:SkillOption {id: "mind_job:task_find:sound"})
 SET o:SkillOption:AttentionTask, o += {skillId: "mind_job", list: "task_find", value: "sound", label: "The farthest sound", version: "mj-v1"}, o.propsJson = "{\"calm\": true, \"level\": \"find\"}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:task_find:sound"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "task_find", order: 9};
+SET r += {list: "task_find", order: 10};
 MERGE (o:SkillOption {id: "mind_job:task_find:round"})
 SET o:SkillOption:AttentionTask, o += {skillId: "mind_job", list: "task_find", value: "round", label: "Three round things", version: "mj-v1"}, o.propsJson = "{\"level\": \"find\"}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:task_find:round"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "task_find", order: 10};
+SET r += {list: "task_find", order: 11};
 MERGE (o:SkillOption {id: "mind_job:task_find:edges"})
 SET o:SkillOption:AttentionTask, o += {skillId: "mind_job", list: "task_find", value: "edges", label: "Four things with straight edges", version: "mj-v1"}, o.propsJson = "{\"level\": \"find\"}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:task_find:edges"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "task_find", order: 11};
+SET r += {list: "task_find", order: 12};
 MERGE (o:SkillOption {id: "mind_job:task_like:look"})
 SET o:SkillOption:AttentionTask, o += {skillId: "mind_job", list: "task_like", value: "look", label: "One thing I like the look of", version: "mj-v1"}, o.propsJson = "{\"level\": \"like\"}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:task_like:look"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "task_like", order: 12};
+SET r += {list: "task_like", order: 13};
 MERGE (o:SkillOption {id: "mind_job:task_like:soft"})
 SET o:SkillOption:AttentionTask, o += {skillId: "mind_job", list: "task_like", value: "soft", label: "Something soft", version: "mj-v1"}, o.propsJson = "{\"level\": \"like\"}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:task_like:soft"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "task_like", order: 13};
+SET r += {list: "task_like", order: 14};
 MERGE (o:SkillOption {id: "mind_job:task_like:hum"})
 SET o:SkillOption:AttentionTask, o += {skillId: "mind_job", list: "task_like", value: "hum", label: "A sound I don't mind", version: "mj-v1"}, o.propsJson = "{\"level\": \"like\"}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:task_like:hum"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "task_like", order: 14};
+SET r += {list: "task_like", order: 15};
 MERGE (o:SkillOption {id: "mind_job:task_good:made"})
 SET o:SkillOption:AttentionTask, o += {skillId: "mind_job", list: "task_good", value: "made", label: "Something I chose or made", version: "mj-v1"}, o.propsJson = "{\"level\": \"good\"}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:task_good:made"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "task_good", order: 15};
+SET r += {list: "task_good", order: 16};
 MERGE (o:SkillOption {id: "mind_job:task_good:liked"})
 SET o:SkillOption:AttentionTask, o += {skillId: "mind_job", list: "task_good", value: "liked", label: "Something that reminds me of a kind moment", version: "mj-v1"}, o.propsJson = "{\"level\": \"good\"}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:task_good:liked"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "task_good", order: 16};
+SET r += {list: "task_good", order: 17};
 MERGE (o:SkillOption {id: "mind_job:task_good:ahead"})
 SET o:SkillOption:AttentionTask, o += {skillId: "mind_job", list: "task_good", value: "ahead", label: "Something for a plan I'm looking forward to", version: "mj-v1"}, o.propsJson = "{\"level\": \"good\"}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:task_good:ahead"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "task_good", order: 17};
+SET r += {list: "task_good", order: 18};
 MERGE (o:SkillOption {id: "mind_job:how:too_much"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "how", value: "too_much", label: "Too much", version: "mj-v1"}, o.propsJson = "{\"calm\": true}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:how:too_much"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "how", order: 18};
+SET r += {list: "how", order: 19};
 MERGE (o:SkillOption {id: "mind_job:how:right"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "how", value: "right", label: "About right", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:how:right"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "how", order: 19};
+SET r += {list: "how", order: 20};
 MERGE (o:SkillOption {id: "mind_job:how:more"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "how", value: "more", label: "Could do more", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:how:more"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "how", order: 20};
+SET r += {list: "how", order: 21};
 MERGE (o:SkillOption {id: "mind_job:how:enough"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "how", value: "enough", label: "That's enough for now", version: "mj-v1"}, o.propsJson = "{\"calm\": true}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:how:enough"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "how", order: 21};
+SET r += {list: "how", order: 22};
 MERGE (o:SkillOption {id: "mind_job:tvn:worse"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "tvn", value: "worse", label: "Louder", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:tvn:worse"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "tvn", order: 22};
+SET r += {list: "tvn", order: 23};
 MERGE (o:SkillOption {id: "mind_job:tvn:same"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "tvn", value: "same", label: "About the same", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:tvn:same"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "tvn", order: 23};
+SET r += {list: "tvn", order: 24};
 MERGE (o:SkillOption {id: "mind_job:tvn:better"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "tvn", value: "better", label: "Quieter", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:tvn:better"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "tvn", order: 24};
+SET r += {list: "tvn", order: 25};
 MERGE (o:SkillOption {id: "mind_job:tvn:much_better"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "tvn", value: "much_better", label: "Much quieter", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:tvn:much_better"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "tvn", order: 25};
+SET r += {list: "tvn", order: 26};
 MERGE (o:SkillOption {id: "mind_job:fork:change"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "fork", value: "change", label: "Yes, something can be done", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:fork:change"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "fork", order: 26};
+SET r += {list: "fork", order: 27};
 MERGE (o:SkillOption {id: "mind_job:fork:cant"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "fork", value: "cant", label: "No, it can't be changed", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:fork:cant"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "fork", order: 27};
+SET r += {list: "fork", order: 28};
 MERGE (o:SkillOption {id: "mind_job:fork:later"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "fork", value: "later", label: "Not now. Put it away for later", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:fork:later"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "fork", order: 28};
+SET r += {list: "fork", order: 29};
 MERGE (o:SkillOption {id: "mind_job:fork:gone"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "fork", value: "gone", label: "It's gone for now", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:fork:gone"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "fork", order: 29};
+SET r += {list: "fork", order: 30};
 MERGE (o:SkillOption {id: "mind_job:break:move"})
 SET o:SkillOption:AcceptsOption, o += {skillId: "mind_job", list: "break", value: "move", label: "Move my body", version: "mj-v1"}, o.propsJson = "{\"family\": \"Activities\"}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:break:move"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "break", order: 30};
+SET r += {list: "break", order: 31};
 MERGE (o:SkillOption {id: "mind_job:break:hands"})
 SET o:SkillOption:AcceptsOption, o += {skillId: "mind_job", list: "break", value: "hands", label: "Something with my hands", version: "mj-v1"}, o.propsJson = "{\"family\": \"Activities\"}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:break:hands"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "break", order: 31};
+SET r += {list: "break", order: 32};
 MERGE (o:SkillOption {id: "mind_job:break:kind"})
 SET o:SkillOption:AcceptsOption, o += {skillId: "mind_job", list: "break", value: "kind", label: "One small kind thing for someone", version: "mj-v1"}, o.propsJson = "{\"family\": \"Contributing\"}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:break:kind"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "break", order: 32};
+SET r += {list: "break", order: 33};
 MERGE (o:SkillOption {id: "mind_job:break:feeling"})
 SET o:SkillOption:AcceptsOption, o += {skillId: "mind_job", list: "break", value: "feeling", label: "A different feeling on purpose: a song I love", version: "mj-v1"}, o.propsJson = "{\"family\": \"Emotions\"}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:break:feeling"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "break", order: 33};
+SET r += {list: "break", order: 34};
 MERGE (o:SkillOption {id: "mind_job:break:cold"})
 SET o:SkillOption:AcceptsOption, o += {skillId: "mind_job", list: "break", value: "cold", label: "Something cold in my hand", version: "mj-v1"}, o.propsJson = "{\"family\": \"Sensations\"}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:break:cold"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "break", order: 34};
+SET r += {list: "break", order: 35};
 MERGE (o:SkillOption {id: "mind_job:break_when:m5"})
 SET o:SkillOption:ReturnOption, o += {skillId: "mind_job", list: "break_when", value: "m5", label: "5 minutes", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:break_when:m5"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "break_when", order: 35};
+SET r += {list: "break_when", order: 36};
 MERGE (o:SkillOption {id: "mind_job:break_when:m15"})
 SET o:SkillOption:ReturnOption, o += {skillId: "mind_job", list: "break_when", value: "m15", label: "15 minutes", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:break_when:m15"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "break_when", order: 36};
+SET r += {list: "break_when", order: 37};
 MERGE (o:SkillOption {id: "mind_job:break_when:m30"})
 SET o:SkillOption:ReturnOption, o += {skillId: "mind_job", list: "break_when", value: "m30", label: "30 minutes", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:break_when:m30"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "break_when", order: 37};
+SET r += {list: "break_when", order: 38};
 MERGE (o:SkillOption {id: "mind_job:break_when:m60"})
 SET o:SkillOption:ReturnOption, o += {skillId: "mind_job", list: "break_when", value: "m60", label: "When I'm done (about an hour)", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:break_when:m60"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "break_when", order: 38};
+SET r += {list: "break_when", order: 39};
 MERGE (o:SkillOption {id: "mind_job:lid_pick:jar"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "lid_pick", value: "jar", label: "A jar", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:lid_pick:jar"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "lid_pick", order: 39};
+SET r += {list: "lid_pick", order: 40};
 MERGE (o:SkillOption {id: "mind_job:lid_pick:tin"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "lid_pick", value: "tin", label: "A tin", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:lid_pick:tin"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "lid_pick", order: 40};
+SET r += {list: "lid_pick", order: 41};
 MERGE (o:SkillOption {id: "mind_job:lid_pick:box"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "lid_pick", value: "box", label: "A box", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:lid_pick:box"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "lid_pick", order: 41};
+SET r += {list: "lid_pick", order: 42};
 MERGE (o:SkillOption {id: "mind_job:label:worry"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "label", value: "worry", label: "A worry", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:label:worry"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "label", order: 42};
+SET r += {list: "label", order: 43};
 MERGE (o:SkillOption {id: "mind_job:label:said"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "label", value: "said", label: "Something someone said", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:label:said"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "label", order: 43};
+SET r += {list: "label", order: 44};
 MERGE (o:SkillOption {id: "mind_job:label:did"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "label", value: "did", label: "Something I did", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:label:did"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "label", order: 44};
+SET r += {list: "label", order: 45};
 MERGE (o:SkillOption {id: "mind_job:label:feeling"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "label", value: "feeling", label: "A feeling", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:label:feeling"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "label", order: 45};
+SET r += {list: "label", order: 46};
 MERGE (o:SkillOption {id: "mind_job:label:unnamed"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "label", value: "unnamed", label: "Nothing to name yet", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:label:unnamed"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "label", order: 46};
+SET r += {list: "label", order: 47};
 MERGE (o:SkillOption {id: "mind_job:lid_when:tonight"})
 SET o:SkillOption:ParkReopenOption, o += {skillId: "mind_job", list: "lid_when", value: "tonight", label: "Tonight", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:lid_when:tonight"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "lid_when", order: 47};
+SET r += {list: "lid_when", order: 48};
 MERGE (o:SkillOption {id: "mind_job:lid_when:tomorrow"})
 SET o:SkillOption:ParkReopenOption, o += {skillId: "mind_job", list: "lid_when", value: "tomorrow", label: "Tomorrow", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:lid_when:tomorrow"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "lid_when", order: 48};
+SET r += {list: "lid_when", order: 49};
 MERGE (o:SkillOption {id: "mind_job:lid_when:few_days"})
 SET o:SkillOption:ParkReopenOption, o += {skillId: "mind_job", list: "lid_when", value: "few_days", label: "In a few days", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:lid_when:few_days"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "lid_when", order: 49};
+SET r += {list: "lid_when", order: 50};
 MERGE (o:SkillOption {id: "mind_job:reopen:open"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "reopen", value: "open", label: "Open it", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:reopen:open"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "reopen", order: 50};
+SET r += {list: "reopen", order: 51};
 MERGE (o:SkillOption {id: "mind_job:reopen:not_yet"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "reopen", value: "not_yet", label: "Not yet", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:reopen:not_yet"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "reopen", order: 51};
+SET r += {list: "reopen", order: 52};
 MERGE (o:SkillOption {id: "mind_job:reopen:gone"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "reopen", value: "gone", label: "It's gone", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:reopen:gone"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "reopen", order: 52};
+SET r += {list: "reopen", order: 53};
 MERGE (o:SkillOption {id: "mind_job:re_heads:body"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "re_heads", value: "body", label: "My body first", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:re_heads:body"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "re_heads", order: 53};
+SET r += {list: "re_heads", order: 54};
 MERGE (o:SkillOption {id: "mind_job:re_heads:later"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "re_heads", value: "later", label: "Put it back for now", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:re_heads:later"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "re_heads", order: 54};
+SET r += {list: "re_heads", order: 55};
 MERGE (o:SkillOption {id: "mind_job:reopen_fork:change"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "reopen_fork", value: "change", label: "Yes, something can be done", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:reopen_fork:change"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "reopen_fork", order: 55};
+SET r += {list: "reopen_fork", order: 56};
 MERGE (o:SkillOption {id: "mind_job:reopen_fork:facts"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "reopen_fork", value: "facts", label: "It might not be as big as it felt", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:reopen_fork:facts"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "reopen_fork", order: 56};
+SET r += {list: "reopen_fork", order: 57};
 MERGE (o:SkillOption {id: "mind_job:reopen_fork:cant"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "reopen_fork", value: "cant", label: "No, it can't be changed", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:reopen_fork:cant"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "reopen_fork", order: 57};
+SET r += {list: "reopen_fork", order: 58};
 MERGE (o:SkillOption {id: "mind_job:reopen_fork:gone"})
 SET o:SkillOption, o += {skillId: "mind_job", list: "reopen_fork", value: "gone", label: "It's gone now", version: "mj-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "mind_job"}), (o:SkillOption {id: "mind_job:reopen_fork:gone"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "reopen_fork", order: 58};
+SET r += {list: "reopen_fork", order: 59};
 
 // --- say_no (say-no-v1) ---
 MERGE (s:Skill {id: "say_no"})
