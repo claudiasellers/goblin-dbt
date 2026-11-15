@@ -586,5 +586,7 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     /** The tap that lets the stone go. */
     start: { type: 'copy' },
     next: { type: 'copy' },
+    /** The quiet way on before the stone rests (named apart from `next` for screen readers). */
+    skip: { type: 'copy' },
   },
 };

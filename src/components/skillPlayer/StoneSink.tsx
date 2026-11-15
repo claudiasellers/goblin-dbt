@@ -11,7 +11,8 @@ import type { EmbedProps } from './embeds';
  * still frames. The way on is always there (a quiet link before the stone rests, never a lock). Reports `done` when
  * it rested, `partly` when the person moved on while it sank, `skipped` when they never let it go, with the seconds.
  *
- * Props (copy props arrive as text): `line1`–`line3`, `seconds`, `start` (the tap that lets it go), `next`.
+ * Props (copy props arrive as text): `line1`–`line3`, `seconds`, `start` (the tap that lets it go), `next` (the way on
+ * once it rested), `skip` (the quiet way on before that; a different name from `next` for screen readers).
  */
 export function StoneSink({ props, onShown, onDone }: EmbedProps) {
   const text = (k: string) => (typeof props[k] === 'string' ? (props[k] as string) : '');
@@ -19,9 +20,12 @@ export function StoneSink({ props, onShown, onDone }: EmbedProps) {
   const [startedAt, setStartedAt] = useState<number | null>(null);
   const [rested, setRested] = useState(false);
   const nextRef = useRef<HTMLButtonElement>(null);
+  const skipRef = useRef<HTMLButtonElement>(null);
   const shown = useRef(false);
   useEffect(() => { if (!shown.current) { shown.current = true; onShown(); } }, [onShown]);
   useEffect(() => { if (rested) nextRef.current?.focus({ preventScroll: true }); }, [rested]);
+  // Letting it go unmounts the button: focus moves to the quiet way on, never to <body>.
+  useEffect(() => { if (startedAt !== null && !rested) skipRef.current?.focus({ preventScroll: true }); }, [startedAt, rested]);
   const [practice] = useState<WiseMindPracticeItem>(() => ({
     id: 'check_stone', name: '', sub: '', kind: 'drift', lines: [text('line1'), text('line2'), text('line3')],
     breaths: null, seconds, order: 0,
@@ -38,7 +42,7 @@ export function StoneSink({ props, onShown, onDone }: EmbedProps) {
         <p className="font-serif text-xl text-center text-[var(--color-text-primary)] text-balance">{text('line1')}</p>
         <button type="button" className={primaryButton} onClick={() => setStartedAt(Date.now())}>{text('start')}</button>
         <div className="flex justify-center">
-          <button type="button" className={linkButton} onClick={finish}>{text('next')}</button>
+          <button type="button" className={linkButton} onClick={finish}>{text('skip') || text('next')}</button>
         </div>
       </section>
     );
@@ -50,7 +54,7 @@ export function StoneSink({ props, onShown, onDone }: EmbedProps) {
         ? <button ref={nextRef} type="button" className={primaryButton} onClick={finish}>{text('next')}</button>
         : (
           <div className="flex justify-center">
-            <button type="button" className={linkButton} onClick={finish}>{text('next')}</button>
+            <button ref={skipRef} type="button" className={linkButton} onClick={finish}>{text('skip') || text('next')}</button>
           </div>
         )}
     </section>

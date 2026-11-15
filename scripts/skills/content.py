@@ -519,6 +519,7 @@ EMBED_PROPS = {
         "seconds": {"type": "int", "min": 10, "max": 120},
         "start": {"type": "copy"},
         "next": {"type": "copy"},
+        "skip": {"type": "copy"},
     },
 }
 # Shared tables the graph supplies to every skill (never written here).

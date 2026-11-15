@@ -334,7 +334,7 @@ FOLLOW_UP_TYPES = [
         "window": {"kind": "chip", "chips": {"tomorrow": {"kind": "at_local", "days": 1, "time": "09:30"}}},
         "staleAfterHours": 72, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
         "enabled": True,
-        "copy": {"title": "Looking back", "body": "Yesterday you checked with wise mind. Looking back, how was it?"},
+        "copy": {"title": "Looking back", "body": "You checked with wise mind. Looking back, how was it?"},
         "choices": [{"id": "dismiss", "label": "Not this time", "status": "dismissed"}],
         "notification": "A look back is ready when you are.",
     },

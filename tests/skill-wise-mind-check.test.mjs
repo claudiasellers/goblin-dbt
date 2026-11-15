@@ -35,7 +35,7 @@ const links = (s, c = ctx()) => {
 const SEND = [pick("decision", "send"), next];
 const cues = (...cs) => [...cs.map((x) => pick("cues", x)), next];
 
-test("the skill: the wise-mind tool's check, on the player at ?frame=check (Help me decide) and a reopened run", () => {
+test("the skill: the wise-mind tool's check, on the player at ?frame=check (Check a decision before I act) and a reopened run", () => {
   assert.equal(skill.toolId, "wise-mind");
   assert.match(readFileSync("schema/skills.cypher", "utf8"), /MATCH \(t:TherapyConcept \{id: "dbt_wise_mind"\}\), \(s:Skill \{id: "wise_mind_check"\}\)/);
   assert.match(readFileSync("src/lib/skillRuntime/playerTools.ts", "utf8"), /'wise-mind': \['wise_mind_check'\],/);
@@ -44,13 +44,13 @@ test("the skill: the wise-mind tool's check, on the player at ?frame=check (Help
   assert.equal(W.isWiseMindCheck(""), false, "the practice stays the tool's default");
   assert.equal(W.isWiseMindCheck("?first=q1"), false);
   const tools = readFileSync("src/data/tools.ts", "utf8");
-  assert.match(tools, /label: 'Help me decide before I act', toolId: 'wise-mind', query: 'frame=check'/);
+  assert.match(tools, /label: 'Check a decision before I act', toolId: 'wise-mind', query: 'frame=check'/);
   assert.match(tools, /key: 'check', name: 'Check a decision with wise mind',[^}]*query: 'frame=check'/);
   assert.match(readFileSync("src/pages/ToolPage.tsx", "utf8"), /isWiseMindCheck\(search\)/);
 });
 
 test("the decision, or own words; Hurting myself is never a wise mind check (the crisis route, no close)", () => {
-  assert.deepEqual(ids(M.initialRun(skill), "decision"), ["send", "say", "leave", "quit", "buy_use", "hurt"]);
+  assert.deepEqual(ids(M.initialRun(skill), "decision"), ["send", "say", "leave", "quit", "buy_use", "get_away", "hurt"]);
   assert.equal(run([own("decision", "move cities"), next]).stepId, "cues");
   const hurt = run([pick("decision", "hurt"), next]);
   assert.equal(hurt.stepId, "hurt");
@@ -58,6 +58,7 @@ test("the decision, or own words; Hurting myself is never a wise mind check (the
   assert.ok(step("hurt").crisis.some((c) => c.variant === "crisis"));
   assert.ok(step("decision").crisis.some((c) => c.variant === "crisis"));
   assert.deepEqual(M.offersFor(ctx(), step("hurt"), hurt), ["safety_open"]);
+  assert.ok(step("hurt").safetyFirst, "someone to talk to opens straight away");
   for (const id of ["decision", "cues", "answer", "look"]) assert.ok(step(id).fields[0].links.some((l) => l.exit === "safety_open"), id);
 });
 
@@ -73,14 +74,31 @@ test("which mind: emotion-mind cues read as emotion mind first, then reasonable,
   assert.equal(step("settle").embed, "stoneSink");
 });
 
+test("danger from someone is never read as a mind: the decision or the cue → the other_person resources, no check", () => {
+  const away = run([pick("decision", "get_away"), next]);
+  assert.equal(away.stepId, "away");
+  assert.equal(step("away").complete, false);
+  assert.equal(step("away").noClose, true);
+  assert.ok(step("away").crisis.some((c) => c.variant === "other_person"));
+  assert.ok(step("decision").crisis.some((c) => c.variant === "other_person"));
+  assert.deepEqual(M.offersFor(ctx(), step("away"), away), ["safety_open", "ending_careful"]);
+  assert.deepEqual(skill.exits.find((e) => e.id === "ending_careful").query, { frame: "careful" });
+  assert.ok(ids(run(SEND), "cues").includes("danger"));
+  assert.ok(step("cues").crisis.some((c) => c.variant === "other_person"));
+  assert.equal(run([...SEND, ...cues("now", "danger")]).stepId, "away", "the danger chip wins over any mind cue");
+});
+
 test("a carried flooded reading: a heads-up and My body first, never a lock; not inside a host (its draft)", () => {
   const fl = ctx({ band: "flooded" });
   const s = run(SEND, fl);
-  assert.equal(title(s, fl), "Wise mind is hard to reach this loud.");
+  assert.equal(title(s, fl), "Which mind is steering right now? Tap any.", "the question stays");
+  assert.equal(M.handoffLine(fl, step("cues"), s), "Wise mind is hard to reach this loud. Body first, then ask. Or ask anyway.");
   assert.ok(links(s, fl).includes("cool_down"));
   assert.ok(!links(run(SEND), ctx()).includes("cool_down"));
   const hosted = ctx({ band: "flooded", frame: "hosted", situationId: "send" });
-  assert.ok(!links(M.inlineStart(hosted, "cues"), hosted).includes("cool_down"));
+  const h0 = M.inlineStart(hosted, "cues");
+  assert.ok(!links(h0, hosted).includes("cool_down"));
+  assert.match(M.handoffLine(hosted, step("cues"), h0), /go back to where you were/);
   assert.equal(run(cues("now"), fl, s).stepId, "settle", "it can still go on");
 });
 
@@ -105,11 +123,14 @@ test("on its own, waiting is offered: a minute and a half, twenty minutes, sleep
   assert.equal(step("hold").props.seconds, 90);
   const after = run([{ type: "embedDone", output: { ids: ["held"], durationSec: 90 } }], ctx(), short);
   assert.equal(after.stepId, "after_wait");
-  const look = run([pick("after", "yes"), next], ctx(), after);
+  const again = run([pick("after", "yes"), next], ctx(), after);
+  assert.equal(again.stepId, "yes_after", "a yes after the wait is looked at once more");
+  const look = run([pick("yes_after", "calm"), next], ctx(), again);
   assert.equal(title(look), "A calm yes. That's yours to act on.", "after the wait, the second answer stands");
+  assert.equal(title(run([pick("yes_after", "urgent"), next], ctx(), again)), "An urgent yes is worth a wait.");
   assert.equal(run([pick("wait_pick", "long"), next], ctx(), urgent).stepId, "lock");
   assert.equal(step("lock").props.minutes, 20);
-  assert.equal(title(run([pick("wait_pick", "anyway"), next], ctx(), urgent)), "You're going ahead. You checked first, and that counts.");
+  assert.equal(title(run([pick("wait_pick", "anyway"), next], ctx(), urgent)), "You're going ahead. That's yours to decide.");
   assert.equal(title(run([pick("wait_pick", "sleep"), next], ctx(), nothing)), "Sleeping on it is a wise answer too.");
   // A quiet no isn't asked to wait.
   assert.equal(title(run([pick("answer", "no"), next], ctx(), toAnswer)), "A quiet no. That's worth listening to.");
@@ -125,7 +146,8 @@ test("the look-back: optional, tomorrow; the card reopens the check at what you 
   assert.equal(step("end").noClose, true, "the answer is the outcome");
   const r = M.resumeRun(ctx(), M.runRecord(ctx(), end), "lookback");
   assert.equal(r.stepId, "lookback");
-  assert.equal(title(r), "Yesterday you checked with wise mind about this: Send a message");
+  assert.equal(title(r), "You checked with wise mind about this: Send a message", "no 'yesterday': the card can be opened later");
+  assert.deepEqual(ids(r, "lookback"), ["waited", "went", "not", "undecided"]);
   assert.equal(run([pick("did", "waited"), pick("came", "yes"), next], ctx(), r).stepId, "sign");
   assert.equal(run([pick("did", "went"), pick("came", "no"), next], ctx(), r).stepId, "back_end");
   const signed = run([pick("did", "waited"), pick("came", "sort_of"), next, own("sign", "my shoulders drop"), next], ctx(), r);
@@ -167,9 +189,19 @@ test("One message's cooling screen runs it inline: wait → hold it, a quiet no 
   assert.equal(wise.props.enterAt, "cues");
   const to = Object.fromEntries(wise.next.map((n) => [n.to, n.when ?? null]));
   assert.match(JSON.stringify(wise.next[0].when), /unsafe/, "unsafe first");
-  assert.equal(wise.next[0].to, "later");
+  assert.equal(wise.next[0].to, "wise_unsafe", "danger never books a reminder");
+  assert.match(JSON.stringify(to.quiet_no), /no_go/);
   assert.match(JSON.stringify(to.wait), /"wait"/);
   assert.equal(to.message, null);
+  const unsafe = one.steps.find((s) => s.id === "wise_unsafe");
+  assert.equal(unsafe.complete, false);
+  assert.ok(unsafe.crisis.some((c) => c.variant === "other_person"));
+  assert.ok(!unsafe.followUp, "no reminder");
+  const quiet = one.steps.find((s) => s.id === "quiet_no");
+  assert.deepEqual(one.options.quiet_no.map((o) => o.value), ["keep", "show"]);
+  assert.deepEqual(quiet.next.map((n) => n.to), ["later", "resend"]);
+  const cool = one.options.cool.map((o) => o.value);
+  assert.ok(cool.indexOf("wise") < cool.indexOf("send"), "the check sits before I'm good to send it");
   assert.ok(one.options.cool.some((o) => o.value === "wise" && o.label === "Check it with wise mind first"));
 });
 
@@ -177,4 +209,34 @@ test("reps and close: a completed check logs a wise_mind rep (the tool's Practic
   const ps = readFileSync("scripts/practice-spine/content.py", "utf8");
   assert.match(ps, /\("wise_mind", "Wise mind", "Preliminary", "mind", "dbt_wise_mind",[\s\S]*?\["wise-mind"\]\)/);
   for (const id of ["end", "back_end", "hurt"]) assert.equal(step(id).noClose, true, id);
+});
+
+test("a yes on a carried flooded reading is offered a wait even when it feels calm, never locked", () => {
+  const fl = ctx({ band: "flooded" });
+  const toAnswer = run([...SEND, ...cues("calm"), sank], fl);
+  const yes = run([pick("answer", "yes"), next], fl, toAnswer);
+  assert.equal(yes.stepId, "yes_check", "a flooded body's yes is checked");
+  const wait = run([pick("yes_check", "calm"), next], fl, yes);
+  assert.equal(wait.stepId, "wait_pick");
+  assert.equal(title(wait, fl), "A yes. With your body this loud, a short wait is worth it. How long?");
+  assert.ok(ids(wait, "wait_pick", fl).includes("anyway"), "going ahead stays a choice");
+  assert.equal(title(run([pick("wait_pick", "anyway"), next], fl, wait), fl), "You're going ahead. That's yours to decide.");
+  // Inside a host the flooded yes is a wait, which the host owns.
+  const hosted = ctx({ band: "flooded", frame: "hosted", situationId: "send" });
+  const done = run([...cues("calm"), sank, pick("answer", "yes"), next, pick("yes_check", "calm"), next, next], hosted, M.inlineStart(hosted, "cues"));
+  assert.deepEqual(M.inlineResult(hosted, done).ids, ["finished", "wait"]);
+});
+
+test("inline: danger from someone stops the check with the unsafe flag, which the host reads first", () => {
+  const hosted = ctx({ situationId: "send", frame: "hosted" });
+  const away = run([...cues("danger")], hosted, M.inlineStart(hosted, "cues"));
+  assert.equal(away.stepId, "away");
+  const r = M.inlineResult(hosted, away);
+  assert.equal(r.ids[0], "stopped");
+  assert.ok(r.ids.includes("unsafe"));
+  assert.deepEqual(skill.inline.ends, { hurt: "stopped", away: "stopped" });
+});
+
+test("the look-back logs no rep: it's neither a check nor a practice (OFF_PHONE_SKILLS with no yes)", () => {
+  assert.match(readFileSync("functions/src/skills/projections.ts", "utf8"), /wise_mind_check: \{ toolId: 'wise-mind', happenedField: 'did', yes: \[\], unansweredKeepsOwn: true \}/);
 });

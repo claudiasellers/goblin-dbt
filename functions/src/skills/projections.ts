@@ -82,6 +82,10 @@ export const OFF_PHONE_SKILLS: Readonly<Record<string, { toolId: string; happene
   // What works here's afterwards (the effective_move card reopens the run at *How did it go?*): the move done, whether
   // it helped or not, is the rep; not yet logs none. The first visit keeps the close's own (`effectively`).
   effectively: { toolId: 'effectiveness', happenedField: 'back', yes: ['helped', 'didnt'], unansweredKeepsOwn: true },
+  // The wise mind check's look-back (the wise_mind_lookback card reopens the run at *What did you do in the end?*):
+  // neither a check nor a practice, so it logs no rep whatever the answer (PRD MF-04: a rep per check and practice).
+  // The check itself keeps the close's own (`wise_mind`).
+  wise_mind_check: { toolId: 'wise-mind', happenedField: 'did', yes: [], unansweredKeepsOwn: true },
 };
 
 /** The rep a run's close logs: off the phone (it happened), none (it didn't), or the close's own (null). */
