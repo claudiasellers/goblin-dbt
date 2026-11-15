@@ -10,14 +10,17 @@ Steps:
             someone · a chore with music · something of my own (no words asked). A blank frame (Notice what's here's
             blank branch, Doing mind's drifting) says the beat is a bit faster. Not offered (PRD capacity branching) to
             a carried flooded reading (DT first) or a carried anger word (arousal-raising activity doesn't bring anger
-            down: Kjærvik & Bushman 2024): the title says so, *Not now* is the one chip, and *My body first* (First,
-            the body) and *Something slower: listen for a minute* (Notice what's here) are links. Never a pick that
-            turns things up for those two.
+            down: Kjærvik & Bushman 2024): the title says so (*This one turns things up.*), *Bring it down first* is
+            the one chip, and the next card (`gate_end`, no rep) offers *My body first* (First, the body) and
+            *Something slower: listen for a minute* (Notice what's here). Never a pick that turns things up for those
+            two. No entry carries the check-in's words yet, so *I'm wound up or angry right now* is a seventh chip
+            that goes to the same card.
   play      the `beatPulse` embed for the three on-phone picks: a pulse at a steady tempo, a big tap target to tap along
             (optional, never counted on screen), sound off until the person turns it on (MF rule 8), the one
             instruction: *Throw yourself in. When you catch yourself watching yourself, drop back in.* A minute at an
             easy tempo; a carried stirred reading gets a moderate one (`play_calm`); a blank frame gets short rounds
-            at a quicker one with a settle between (`play_blank`, `settle`, `play_blank2`: the somatic dose cap).
+            at a quicker one with a settle between (`play_blank`, `settle`, `play_blank2`: the somatic dose cap; *Move on*
+            before the second round counts the first).
   away      the off-phone picks: the same instruction, *Put the phone down. Come back when you're done.*, *I'm back*.
   with      *How much were you in it?* in it · half in · watching myself, all answered plainly (*Watching yourself is
             the thing you practise dropping.*).
@@ -37,12 +40,13 @@ OWN_MAX = 40
 
 COPY = {
     "pick_title": "Pick something to throw yourself into.",
-    "pick_hint": "Move in whatever way your body can. Sitting is fine.",
-    "pick_blank_line": "The beat runs a little quicker today, in short rounds.",
-    "anger_title": "This one turns things up, and anger doesn't need more fuel today.",
-    "anger_line": "Bring it down first. Join in will be here on a calmer day.",
+    "pick_line": "Move in whatever way your body can. Sitting is fine.",
+    "pick_blank_line": "The beat runs a little quicker today, in short rounds. Sitting is fine.",
+    "anger_title": "This one turns things up.",
+    "anger_line": "Today's a day to bring things down first.",
     "flooded_title": "Your body's loud right now.",
     "flooded_line": "This one turns things up. Settle your body first, or try something slower.",
+    "wound_title": "Then bring it down first.",
     "body_first": "My body first",
     "listen_instead": "Something slower: listen for a minute",
     "gate_end_title": "Not now is fine.",
@@ -57,7 +61,7 @@ COPY = {
     "beat_sound": "Sound",
     "beat_done": "That's the round.",
     "beat_skip": "Move on",
-    "settle_title": "Let it settle for a few breaths.",
+    "settle_title": "Let it settle for a moment.",
     "settle_q": "Another round?",
     "away_title": "Throw yourself in.",
     "away_line": "When you catch yourself watching yourself, drop back in.",
@@ -67,7 +71,7 @@ COPY = {
     "with_half": "Half in counts. Dropping back in is the practice.",
     "with_watching": "Watching yourself is the thing you practise dropping. Noticing it is the start.",
     "end_title": "You joined in.",
-    "social_q": "Next time, with someone? I'll ask how it went.",
+    "social_q": "Join in at something with someone soon? I'll ask how it went.",
     "social_title": "Did you get to join in at something with someone?",
     "social_yes_line": "That's participating, off the phone and with people. It goes wherever you do.",
     "social_sort_line": "Some of it counts. Dropping back in is the practice.",
@@ -144,12 +148,13 @@ def handoff(step_id, title, lines, offers, *, complete=True, extra=None):
     return s
 
 
-def beat(step_id, bpm, seconds, nxt):
+def beat(step_id, bpm, seconds, nxt, *, skip_to="skip_end"):
     return {"id": step_id, "kind": "embed", "embed": "beatPulse", "answerAs": step_id, "title": TASK, "links": LINKS,
             "props": {"bpm": bpm, "seconds": seconds, "task": "play_task", "start": "beat_start", "tap": "beat_tap",
                       "running": "beat_running", "sound": "beat_sound",
                       "done": "beat_done", "next": "next", "skip": "beat_skip"},
-            "next": [{"when": EQ(step_id, "skipped"), "to": "skip_end"}, *nxt]}
+            # skip_to=None: a skip goes the same way as a finished round (one NEXT edge per target).
+            "next": [*([{"when": EQ(step_id, "skipped"), "to": skip_to}] if skip_to else []), *nxt]}
 
 
 # Which beat: a blank frame's short quick rounds, a stirred reading's moderate tempo, or the easy minute.
@@ -158,17 +163,19 @@ TO_BEAT = [{"when": BLANK, "to": "play_blank"}, {"when": STIRRED, "to": "play_ca
 STEPS = [
     ask("pick", [{"when": ANGER, "key": "anger_title"}, {"when": FLOODED, "key": "flooded_title"},
                  {"when": ALWAYS, "key": "pick_title"}],
-        "pick_hint", "thing", "thing",
-        [{"when": EQ("thing", "not_now"), "to": "gate_end"},
+        None, "thing", "thing",
+        [{"when": {"in": [a("thing"), ["not_now", "wound_up"]]}, "to": "gate_end"},
          *[{"when": {"all": [{"in": [a("thing"), BEAT]}, *([t["when"]] if "when" in t else [])]}, "to": t["to"]} for t in TO_BEAT],
          {"to": "away"}],
-        # Not offered flooded or angry: *Not now* is the one chip, the body and a slower practice are links.
+        # Not offered flooded or angry: *Bring it down first* is the one chip, and the body and a slower practice are
+        # the next card's offers (left from a card that logs no rep). Otherwise the six picks, and *I'm wound up or
+        # angry right now* last: no entry carries the check-in's words yet, so the person can say so here.
         where={"any": [{"all": [{"eq": ["$opt.gate", True]}, GATED]}, {"all": [{"eq": ["$opt.gate", False]}, {"not": GATED}]}]},
-        links=[{"exit": "cool_down", "label": "body_first", "when": GATED},
-               {"exit": "listen", "label": "listen_instead", "when": GATED}],
         lines=[{"when": ANGER, "key": "anger_line"}, {"when": FLOODED, "key": "flooded_line"},
-               {"when": BLANK, "key": "pick_blank_line"}]),
-    handoff("gate_end", "gate_end_title", [{"when": ALWAYS, "key": "gate_end_line"}], [], complete=False),
+               {"when": BLANK, "key": "pick_blank_line"}, {"when": ALWAYS, "key": "pick_line"}]),
+    handoff("gate_end", [{"when": EQ("thing", "wound_up"), "key": "wound_title"}, {"when": ALWAYS, "key": "gate_end_title"}],
+            [{"when": ALWAYS, "key": "gate_end_line"}],
+            [{"exit": "cool_down", "when": ALWAYS}, {"exit": "listen", "when": ALWAYS}], complete=False),
 ]
 STEPS += [
     beat("play", 100, 60, [{"to": "with"}]),
@@ -177,7 +184,8 @@ STEPS += [
     beat("play_blank", 112, 25, [{"to": "settle"}]),
     ask("settle", "settle_title", None, "settle", "settle",
         [{"when": EQ("settle", "again"), "to": "play_blank2"}, {"to": "with"}], label="settle_q"),
-    beat("play_blank2", 112, 25, [{"to": "with"}]),
+    # A first round was done: *Move on* here is *That's enough*, never *Not this time*.
+    beat("play_blank2", 112, 25, [{"to": "with"}], skip_to=None),
     {"id": "away", "kind": "ask", "title": "away_title", "hint": "away_hint",
      "lines": [{"when": ALWAYS, "key": "away_line"}],
      "fields": [{"id": "away", "options": {"list": "back"}, "max": 1, "required": True, "links": LINKS}],
@@ -207,7 +215,8 @@ EXITS = [
 
 def options():
     out = [("thing", v, label, {"gate": False, "beat": b}, "ParticipateActivity") for v, label, b in THINGS]
-    out += [("thing", "not_now", "Not now", {"gate": True}, None)]
+    out += [("thing", "wound_up", "I'm wound up or angry right now", {"gate": False, "beat": False}, None)]
+    out += [("thing", "not_now", "Bring it down first", {"gate": True}, None)]
     out += [("settle", v, label, {}, None) for v, label in SETTLE]
     out += [("with", v, label, {}, None) for v, label in WITH]
     out += [("when", v, label, {}, None) for v, label in WHEN]

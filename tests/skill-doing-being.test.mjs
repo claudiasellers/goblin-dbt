@@ -76,6 +76,8 @@ test("the mode card: yes or maybe → doing mind named, a minute of listening or
   const done = M.runNext(card, listen, { type: "embedDone", output: { ids: ["done"], durationSec: 60, doneCount: 4 } });
   assert.equal(done.stepId, "listen_end");
   assert.equal(step("listen_end").complete, true);
+  const skipped = M.runNext(card, listen, { type: "embedDone", output: { ids: ["skipped"], durationSec: 0, doneCount: 0 } });
+  assert.equal(skipped.stepId, "not_now", "Move on before it started is no minute, no praise");
   assert.equal(run([pick("switch", "not_now"), next], card, yes).stepId, "not_now");
   const no = run([pick("mode", "no"), next], card);
   assert.equal(no.stepId, "mode_no");
@@ -100,7 +102,7 @@ test("a carried flooded reading: a heads-up first from the library, a line and t
   assert.deepEqual(links(w, ctx({ enterAt: "week" })), ["safety_open"]);
 });
 
-test("the weekly shape: mostly doing → a being break as a cue; drifting → one small doing (movement first when blank); mixed → balanced", () => {
+test("the weekly shape: mostly doing → a being break as a cue; drifting → Join in, then one small doing; mixed → balanced", () => {
   const wk = ctx({ enterAt: "week" });
   const s0 = M.pageStart(wk);
   assert.deepEqual(ids(s0, "week", wk), ["doing", "being", "mixed", "drifting"]);
@@ -110,14 +112,12 @@ test("the weekly shape: mostly doing → a being break as a cue; drifting → on
   assert.doesNotMatch(JSON.stringify(skill.options.cue), /eat|lunch|food/i, "no eating moment");
   const end = run([pick("cue", "drink"), next], wk, cue);
   assert.equal(end.stepId, "cue_end");
-  assert.match(title(end, wk), /Your being break: When I make a drink\./i);
+  assert.match(title(end, wk), /^When I make a drink: your being break\.$/);
   const ownEnd = run([own("cue", "after the school run"), next], wk, cue);
   assert.match(title(ownEnd, wk), /after the school run/);
   const drift = run([pick("week", "drifting"), next], wk);
   assert.equal(drift.stepId, "drift");
-  assert.deepEqual(offers(drift, wk), ["build_mastery"]);
-  const blank = ctx({ enterAt: "week", frame: "blank" });
-  assert.deepEqual(offers(run([pick("week", "drifting"), next], blank), blank), ["join_in", "build_mastery"], "blank: movement first, never a being practice");
+  assert.deepEqual(offers(drift, wk), ["join_in", "build_mastery"], "movement first, never a being practice");
   assert.equal(run([pick("week", "mixed"), next], wk).stepId, "mixed_end");
   assert.equal(run([pick("week", "being"), next], wk).stepId, "being_end");
   assert.deepEqual(skill.exits.find((x) => x.id === "join_in").query, { frame: "blank" });
@@ -131,7 +131,7 @@ test("the being break: optional chips book being_break, which reopens the run at
   const r = M.resumeRun(wk, M.runRecord(wk, booked), "back");
   assert.ok(r, "a run that reached the cue card reopens");
   assert.equal(r.stepId, "back");
-  assert.match(title(r, wk), /Your being break: When I wash my hands\. Did you get to take one\?/);
+  assert.match(title(r, wk), /When I wash my hands: your being break\. Did you get to take one\?/);
   assert.equal(run([pick("back", "yes"), next], wk, r).stepId, "back_end");
   const ps = execFileSync("python3", ["-c", [
     "import json,sys; sys.path.insert(0,'scripts/practice-spine'); import content as c",
@@ -151,6 +151,20 @@ test("hosts: Problem Solve's thinking-constantly links the card, the Practice ho
   const sub = ps.steps.find((s) => s.id === "sub_reply");
   const l = sub.fields[0].links.find((x) => x.exit === "doing_being");
   assert.deepEqual(l.when, { eq: ["$a.sub", "tried-thinking-constantly"] });
-  assert.deepEqual(ps.exits.find((x) => x.id === "doing_being").query, { enterAt: "mode" });
+  assert.deepEqual(ps.exits.find((x) => x.id === "doing_being").query, { enterAt: "mode", frame: "problem_solve" });
+  // From Problem Solve, every end of the card offers the way back; never from the library.
+  const fromPs = ctx({ enterAt: "mode", frame: "problem_solve" });
+  const yes = run([pick("mode", "yes"), next], fromPs);
+  const ends = {
+    mode_no: run([pick("mode", "no"), next], fromPs),
+    not_now: run([pick("switch", "not_now"), next], fromPs, yes),
+    listen_end: M.runNext(fromPs, run([pick("switch", "listen"), next], fromPs, yes), { type: "embedDone", output: { ids: ["done"], durationSec: 60, doneCount: 4 } }),
+  };
+  for (const [id, s] of Object.entries(ends)) {
+    assert.equal(s.stepId, id);
+    assert.ok(offers(s, fromPs).includes("problem_solve"), id);
+    assert.ok(!offers(s, ctx({ enterAt: "mode" })).includes("problem_solve"), `${id}: not from the library`);
+  }
+  assert.equal(skill.exits.find((x) => x.id === "problem_solve").toolId, "problem-solve");
   assert.match(readFileSync("src/pages/Practice.tsx", "utf8"), /to="\/tool\/doing-being\?enterAt=week"/);
 });

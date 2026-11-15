@@ -9,12 +9,14 @@ import type { EmbedProps } from './embeds';
  * The beat (MF-10 Join in; docs/design/join-in.md): a steady pulse to move, hum or tap along to for one round. The
  * circle swells on each beat and is the tap target; tapping along is optional and never counted on screen (the taps
  * are a measure in the report). Sound is off until the person turns it on (MF rule 8), and a soft tick follows the
- * beat while it's on; every step works muted. Reduced motion: the circle brightens on the beat instead of swelling,
- * at the same timing.
+ * beat while it's on; every step works muted. The circle swells on every beat and settles back within it. Reduced
+ * motion: it brightens on the beat instead of swelling, at the same timing.
  *
  * Nothing locks: the quiet way on is there from the start (`skip`), and the button once the round is up. While
  * something covers the step (safety.open, P2) the beat stops there and the round ends as it was (no tick under a
- * dialog, no focus taken). The end makes a short buzz for anyone moving with their eyes off the screen. The rules are
+ * dialog, no focus taken), and the end line is left out for a round cut short. The end makes a short buzz for anyone
+ * moving with their eyes off the screen, and focus goes to the end line, not to Next, so a key still tapping along
+ * doesn't press Next. The rules are
  * src/lib/beatPulse.ts (pure).
  */
 
@@ -29,7 +31,7 @@ export function BeatPulse({ props, onShown, onDone, covered }: EmbedProps) {
   const [ended, setEnded] = useState(false);
   const [ranMs, setRanMs] = useState(0);
   const [sound, setSound] = useState(false);
-  const [pulse, setPulse] = useState(0);
+  const [on, setOn] = useState(false);
   const taps = useRef(0);
   const coveredRef = useRef(!!covered);
   coveredRef.current = !!covered;
@@ -43,14 +45,17 @@ export function BeatPulse({ props, onShown, onDone, covered }: EmbedProps) {
   soundRef.current = sound;
   const cues = timer.cues;
 
-  // The beat itself: one pulse per interval while the round runs.
+  // The beat itself: a swell on every beat, settling back within it, while the round runs.
   useEffect(() => {
     if (!running) return;
+    let off: number | undefined;
     const id = window.setInterval(() => {
-      setPulse((n) => n + 1);
+      setOn(true);
+      window.clearTimeout(off);
+      off = window.setTimeout(() => setOn(false), Math.round(interval * 0.35));
       if (soundRef.current) cues.tick();
     }, interval);
-    return () => window.clearInterval(id);
+    return () => { window.clearInterval(id); window.clearTimeout(off); setOn(false); };
   }, [running, interval, cues]);
 
   // Covered while running: the beat stops there and the round ends as it was.
@@ -63,9 +68,11 @@ export function BeatPulse({ props, onShown, onDone, covered }: EmbedProps) {
   }, [covered, running, timer]);
 
   const tapRef = useRef<HTMLButtonElement>(null);
-  const nextRef = useRef<HTMLButtonElement>(null);
+  const endRef = useRef<HTMLParagraphElement>(null);
   useEffect(() => { if (started && !ended) tapRef.current?.focus({ preventScroll: true }); }, [started, ended]);
-  useEffect(() => { if (ended && !covered) nextRef.current?.focus({ preventScroll: true }); }, [ended, covered]);
+  // The end line takes focus (announced), not Next: a key still tapping along in time would press Next.
+  useEffect(() => { if (ended && !covered) endRef.current?.focus({ preventScroll: true }); }, [ended, covered]);
+  const full = ended && ranMs >= ms;
 
   const start = () => { setStarted(true); timer.start(); };
   const toggleSound = () => {
@@ -80,7 +87,6 @@ export function BeatPulse({ props, onShown, onDone, covered }: EmbedProps) {
     onDone?.(beatOutput(started, fraction, ran, taps.current));
   };
   const quiet = text(props, 'skip') || text(props, 'next');
-  const on = pulse % 2 === 1;
 
   return (
     <section className="space-y-5" data-testid="beat-pulse" data-state={ended ? 'done' : running ? 'running' : 'idle'}>
@@ -103,7 +109,7 @@ export function BeatPulse({ props, onShown, onDone, covered }: EmbedProps) {
               <span aria-hidden="true" className="max-w-[8rem] text-center text-balance">{text(props, 'tap')}</span>
             </button>
           )}
-          {ended && <p role="status" className="text-center text-[var(--color-text-secondary)]">{text(props, 'done')}</p>}
+          {ended && <p ref={endRef} tabIndex={-1} role="status" className="text-center text-[var(--color-text-secondary)] focus:outline-none">{full ? text(props, 'done') : ''}</p>}
         </div>
         <button type="button" aria-pressed={sound} onClick={toggleSound} data-beat-sound=""
           className={`min-h-11 px-4 rounded-full border text-sm ${sound ? 'border-[var(--color-accent)] bg-[var(--color-accent-fill)] text-[var(--color-on-accent)]' : 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-accent)]'}`}>
@@ -113,7 +119,7 @@ export function BeatPulse({ props, onShown, onDone, covered }: EmbedProps) {
 
       {started && !ended && <p className="text-center text-sm text-[var(--color-text-secondary)]">{text(props, 'running')}</p>}
       {ended
-        ? <button ref={nextRef} type="button" className={primaryButton} onClick={report}>{text(props, 'next')}</button>
+        ? <button type="button" className={primaryButton} onClick={report}>{text(props, 'next')}</button>
         : <div className="flex justify-center"><button type="button" className={linkButton} onClick={report}>{quiet}</button></div>}
     </section>
   );

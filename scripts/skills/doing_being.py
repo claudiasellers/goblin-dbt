@@ -18,14 +18,17 @@ Steps:
             *Is your mind trying to fix a feeling like a task?* yes · maybe · no.
   switch    yes or maybe: *That sounds like doing mind* / *That might be doing mind*. *Feelings don't get solved like
             tasks. One minute of being mind?* A minute of listening (the `pebbleBowl`, eyes open) · not now; One thing
-            as the swap, a link (the PRD's one pick, one swap). No: *Then there's nothing to switch.* and the way back.
+            as the swap, a link (the PRD's one pick, one swap). No: *Then there's nothing to switch.* Opened from Problem
+            Solve (`frame=problem_solve`), every end of the card offers *Back to Problem Solve*. *Move on* before the
+            minute starts is *Not now*, never praised as being mind.
   week      the weekly shape (`?enterAt=week`: the Practice home's *How did this week feel?*): mostly doing · mostly
             being · mixed · drifting.
   cue       mostly doing: one being break a day, at a moment you already have (sit down for a break, make a drink, wash
             your hands, get in the car or on the bus, get into bed, or a few words); *Ask me tomorrow?* books
             `being_break`, which reopens the run at *Did you get to take one?* (yes is an off-phone rep).
-  drift     drifting: *One small doing could help.* Build mastery (one thing you can finish), and Join in when the
-            frame is blank, first (PRD: the blank drifting branch leads with movement, never a being practice).
+  drift     drifting: *One small doing could help.* Join in first (a drifting week is the blank signal the runtime has:
+            PRD, the blank drifting branch leads with movement, never a being practice), then Build mastery (one thing
+            you can finish).
   being_end mostly being: rest counts; one small doing if something's been waiting (Build mastery, optional).
   mixed_end mixed: *Sounds balanced.* Nothing else.
 
@@ -44,8 +47,7 @@ OWN_MAX = 40  # a few words for the cue
 
 COPY = {
     "about_title": "Doing mind, being mind.",
-    "about_line1": "Doing mind works things out, plans and fixes. Being mind notices and lets things be.",
-    "about_line2": "Both are needed. Wise mind uses each one when it fits.",
+    "about_line": "Doing mind works things out, plans and fixes. Being mind notices and lets things be. Both are needed, and wise mind uses each one when it fits.",
     "about_q": "Which would help now?",
     "heads_up_title": "Your body's loud right now.",
     "heads_up_line": "This works better once your body settles. Start there, or go on anyway.",
@@ -64,7 +66,7 @@ COPY = {
     "listen_task": "Listen. Each time you notice a new sound, or catch yourself back in the problem, tap.",
     "bowl_start": "Start",
     "came_back": "A sound",
-    "bowl_running": "Eyes open. No sound to find? Your breath counts.",
+    "bowl_running": "Eyes open. Quiet is a sound too.",
     "bowl_dropped": "A pebble in the bowl",
     "bowl_done": "That's a minute.",
     "bowl_skip": "Move on",
@@ -74,23 +76,23 @@ COPY = {
     "not_now_line": "Noticing it was doing mind is already a step outside it.",
     "mode_no_title": "Then there's nothing to switch.",
     "mode_no_line": "Carry on. The question will be here when you want it.",
+    "back_ps": "Back to Problem Solve",
     # The weekly shape (PRD MF-09 step 3).
     "week_title": "This week felt…",
-    "week_hint": "A rough guess is fine.",
+    "week_hint": "Doing: working things out, getting things done. Being: noticing, resting. Drifting: not much of either. A rough guess is fine.",
     "cue_title": "One being break a day, then?",
     "cue_line": "A minute of one thing, done fully, at a moment you already have.",
     "cue_q": "When could it go?",
     "cue_own": "My own moment",
-    "cue_end_title": "Your being break: {cue}.",
+    "cue_end_title": "{cue}: your being break.",
     "cue_end_line": "One ordinary thing, with all of your attention, for about a minute. Nothing to fix.",
     "remind_q": "Ask me tomorrow how it went?",
-    "back_title": "Your being break: {cue}. Did you get to take one?",
+    "back_title": "{cue}: your being break. Did you get to take one?",
     "back_yes_line": "That's being mind, without the phone. It goes wherever you do.",
     "back_sort_line": "Some of it counts. Coming back is the practice.",
     "back_not_line": "Not yet is fine. The moment comes round again.",
     "drift_title": "One small doing could help.",
-    "drift_line": "Something you can finish today, however small. Done beats done well.",
-    "drift_blank_line": "When everything feels flat, moving first can make doing easier.",
+    "drift_line": "When things feel flat, moving first can make doing easier. Then something you can finish today, however small.",
     "being_end_title": "Rest counts.",
     "being_end_line": "If something's been waiting, one small doing could balance the week.",
     "mixed_end_title": "Sounds balanced.",
@@ -114,7 +116,10 @@ def EQ(field, v):
 
 ALWAYS = {"all": []}
 FLOODED = {"eq": ["$ctx.band", "flooded"]}
-BLANK = {"eq": ["$ctx.frame", "blank"]}
+# Opened from Problem Solve's *thinking about it constantly* (`frame=problem_solve`): every end of the card offers the
+# way back (PRD: *No* goes back to the host with nothing added).
+FROM_PS = {"eq": ["$ctx.frame", "problem_solve"]}
+BACK_PS = [{"exit": "problem_solve", "when": FROM_PS}]
 SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
 LINKS = [SAFETY_LINK]
 
@@ -165,11 +170,6 @@ def handoff(step_id, title, lines, offers, *, complete=True, extra=None):
     return s
 
 
-# A carried flooded reading meets the heads-up once, whichever way it came in.
-def gate(to):
-    return [{"when": {"all": [FLOODED, {"not": {"set": a("heads_up")}}]}, "to": "heads_up"}, {"to": to}]
-
-
 AFTER_HEADS_UP = [{"when": EQ("heads_up", "body"), "to": "body_first"}, {"when": EQ("about", "week"), "to": "week"},
                   {"to": "mode"}]
 # Opened straight at the card or the week (a host, the intent, the Practice home): a carried flooded reading gets the
@@ -182,7 +182,7 @@ STEPS = [
     ask("about", "about_title", None, [field("about", "about", label="about_q")],
         [{"when": {"all": [FLOODED, {"not": {"set": a("heads_up")}}]}, "to": "heads_up"},
          {"when": EQ("about", "week"), "to": "week"}, {"to": "mode"}],
-        lines=[{"when": ALWAYS, "key": "about_line1"}, {"when": ALWAYS, "key": "about_line2"}]),
+        lines=[{"when": ALWAYS, "key": "about_line"}]),
     # A carried flooded reading (PRD: any band but flooded): the body first, or go on. Never a lock.
     ask("heads_up", "heads_up_title", None, [field("heads_up", "heads_up")], AFTER_HEADS_UP,
         lines=[{"when": ALWAYS, "key": "heads_up_line"}]),
@@ -200,10 +200,11 @@ STEPS = [
     {"id": "listen", "kind": "embed", "embed": "pebbleBowl", "answerAs": "listen", "title": "listen_title", "links": LINKS,
      "props": {"seconds": 60, "task": "listen_task", "start": "bowl_start", "tapLabel": "came_back", "running": "bowl_running",
                "dropped": "bowl_dropped", "done": "bowl_done", "next": "next", "skip": "bowl_skip"},
-     "next": [{"to": "listen_end"}]},
-    handoff("listen_end", "listen_end_title", [{"when": ALWAYS, "key": "listen_end_line"}], []),
-    handoff("not_now", "not_now_title", [{"when": ALWAYS, "key": "not_now_line"}], []),
-    handoff("mode_no", "mode_no_title", [{"when": ALWAYS, "key": "mode_no_line"}], []),
+     # *Move on* before the minute started: not praised as being mind; *Not now* is the honest card.
+     "next": [{"when": EQ("listen", "skipped"), "to": "not_now"}, {"to": "listen_end"}]},
+    handoff("listen_end", "listen_end_title", [{"when": ALWAYS, "key": "listen_end_line"}], BACK_PS),
+    handoff("not_now", "not_now_title", [{"when": ALWAYS, "key": "not_now_line"}], BACK_PS),
+    handoff("mode_no", "mode_no_title", [{"when": ALWAYS, "key": "mode_no_line"}], BACK_PS),
     # The weekly shape (PRD step 3).
     ask("week", "week_title", "week_hint", [field("week", "week", links=[BODY_LINK])],
         [{"when": EQ("week", "doing"), "to": "cue"}, {"when": EQ("week", "being"), "to": "being_end"},
@@ -221,10 +222,10 @@ STEPS = [
     handoff("back_end", None, [{"when": EQ("back", "yes"), "key": "back_yes_line"},
                                {"when": EQ("back", "sort_of"), "key": "back_sort_line"},
                                {"when": ALWAYS, "key": "back_not_line"}], []),
-    # Drifting (PRD): one small doing, handed to Build mastery; a blank frame leads with movement (Join in), never a
+    # Drifting (PRD): movement first (Join in, its short rounds), then one small doing (Build mastery), never a
     # being practice.
-    handoff("drift", "drift_title", [{"when": BLANK, "key": "drift_blank_line"}, {"when": ALWAYS, "key": "drift_line"}],
-            [{"exit": "join_in", "when": BLANK}, {"exit": "build_mastery", "when": ALWAYS}]),
+    handoff("drift", "drift_title", [{"when": ALWAYS, "key": "drift_line"}],
+            [{"exit": "join_in", "when": ALWAYS}, {"exit": "build_mastery", "when": ALWAYS}]),
     handoff("being_end", "being_end_title", [{"when": ALWAYS, "key": "being_end_line"}],
             [{"exit": "build_mastery", "when": ALWAYS}]),
     handoff("mixed_end", "mixed_end_title", [{"when": ALWAYS, "key": "mixed_end_line"}], []),
@@ -234,7 +235,8 @@ EXITS = [
     {"id": "cool_down", "toolId": "cool-down", "label": "body_first"},           # DT-01 First, the body (flooded)
     {"id": "one_thing", "toolId": "one-thing", "label": "one_thing"},            # MF-05, the swap
     {"id": "build_mastery", "toolId": "build-mastery", "label": "build_mastery"},  # ER-11, one small doing
-    {"id": "join_in", "toolId": "join-in", "query": {"frame": "blank"}, "label": "join_in"},  # MF-10, blank drifting
+    {"id": "join_in", "toolId": "join-in", "query": {"frame": "blank"}, "label": "join_in"},  # MF-10, drifting leads with it
+    {"id": "problem_solve", "toolId": "problem-solve", "label": "back_ps"},     # ER-12, the host, back again
     {"id": "safety_open", "toolId": None, "safety": True},                       # safety.open (R6): on every screen
     {"id": "done", "done": True},
 ]
@@ -254,7 +256,7 @@ def options():
 
 SKILL = {
     "id": ID, "toolId": TOOL_ID, "concept": CONCEPT, "version": VERSION, "start": "about", "ownMax": OWN_MAX,
-    # band: a carried flooded reading (C6.2); frame: blank (the drifting branch leads with movement); enterAt: `mode`
+    # band: a carried flooded reading (C6.2); frame: `problem_solve` (the card's ends offer the way back); enterAt: `mode`
     # (the card on its own: Problem Solve, the intent) or `week` (the Practice home's weekly shape).
     "accepts": ["band", "frame", "enterAt"],
     "entries": {"mode": "mode", "week": "week"},

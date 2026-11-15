@@ -27,7 +27,7 @@ const links = (s, c = ctx()) => {
   const st = step(s.stepId);
   return [...M.stepLinks(c, st, s), ...M.shownFields(c, st, s).flatMap((f) => M.fieldLinks(c, f, s))].map((l) => l.exit.id);
 };
-const PICKS = ["song", "hum", "tap", "game", "chore", "own"];
+const PICKS = ["song", "hum", "tap", "game", "chore", "own", "wound_up"];
 
 test("the skill: the join-in tool on dbt_participate, listed under Mindfulness with its intent; a participate rep at order 7", () => {
   assert.equal(skill.toolId, "join-in");
@@ -48,7 +48,7 @@ test("the skill: the join-in tool on dbt_participate, listed under Mindfulness w
   }
 });
 
-test("pick: the PRD's six in order; the beat for move, hum and tap; the phone down for a game, a chore or my own", () => {
+test("pick: the PRD's six in order, then I'm wound up or angry; the beat for move, hum and tap; the phone down for a game, a chore or my own", () => {
   const s0 = M.pageStart(ctx());
   assert.equal(s0.stepId, "pick");
   assert.deepEqual(ids(s0, "thing"), PICKS);
@@ -61,18 +61,25 @@ test("pick: the PRD's six in order; the beat for move, hum and tap; the phone do
   assert.equal(skill.steps.find((s) => s.id === "pick").fields[0].own, undefined, "no open-ended writing");
 });
 
-test("not offered flooded or angry: Not now is the one chip, the body and a slower practice are links", () => {
+test("not offered flooded or angry: Bring it down first is the one chip; the next card offers the body and a slower practice, no rep", () => {
   const fl = ctx({ band: "flooded" });
   const s0 = M.pageStart(fl);
   assert.deepEqual(ids(s0, "thing", fl), ["not_now"]);
-  assert.deepEqual(links(s0, fl), ["cool_down", "listen", "safety_open"]);
+  assert.deepEqual(links(s0, fl), ["safety_open"]);
   assert.match(title(s0, fl), /Your body's loud/);
   const angry = ctx({}, ["furious"]);
   assert.deepEqual(ids(s0, "thing", angry), ["not_now"]);
-  assert.match(title(s0, angry), /anger doesn't need more fuel/);
+  assert.match(title(s0, angry), /This one turns things up/);
   const end = run([pick("thing", "not_now"), next], angry);
   assert.equal(end.stepId, "gate_end");
   assert.equal(step("gate_end").complete, false, "no rep");
+  assert.equal(step("gate_end").noClose, true);
+  assert.deepEqual(step("gate_end").offers.map((o) => o.exit), ["cool_down", "listen"]);
+  assert.match(title(end, angry), /Not now is fine/);
+  // No entry carries the check-in's words yet: the person can say it on the pick.
+  const wound = run([pick("thing", "wound_up"), next]);
+  assert.equal(wound.stepId, "gate_end");
+  assert.match(title(wound), /Then bring it down first/);
   // A carried word that isn't anger, or a calm reading, keeps every pick.
   assert.deepEqual(ids(s0, "thing", ctx({}, ["sad"])), PICKS);
   assert.deepEqual(skill.exits.find((x) => x.id === "listen").query, { frame: "listen" });
@@ -92,6 +99,9 @@ test("tempo: stirred gets the moderate minute; blank gets short quicker rounds w
   assert.equal(settle.stepId, "settle");
   assert.equal(run([pick("settle", "again"), next], bl, settle).stepId, "play_blank2");
   assert.equal(run([pick("settle", "enough"), next], bl, settle).stepId, "with");
+  // Move on in the second round still reaches the close: the first round happened.
+  const r2 = run([pick("settle", "again"), next], bl, settle);
+  assert.equal(M.runNext(bl, r2, beat("skipped")).stepId, "with");
 });
 
 test("close: in it, half in, watching myself, each answered plainly; Move on before it started is no rep", () => {
@@ -132,7 +142,7 @@ test("the beat's pure rules: tempo and length clamped, outcomes, taps a measure;
   assert.deepEqual(B.beatOutput(true, 0.4, 24000, 7), { ids: ["partly"], durationSec: 24, doneCount: 7 });
   assert.deepEqual(B.beatOutput(true, 1, 60000, 0).ids, ["done"]);
   const tsx = readFileSync("src/components/skillPlayer/BeatPulse.tsx", "utf8");
-  assert.match(tsx, /useState\(false\);\n\s+const \[pulse/, "sound starts off (MF rule 8)");
+  assert.match(tsx, /const \[sound, setSound\] = useState\(false\);/, "sound starts off (MF rule 8)");
   assert.match(tsx, /aria-pressed=\{sound\}/);
   assert.match(tsx, /if \(covered && running\)/, "a dialog over the step stops the beat");
   assert.doesNotMatch(tsx, /\{taps\.current\}|doneCount\}/, "taps are never shown");

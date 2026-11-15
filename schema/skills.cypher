@@ -3122,7 +3122,7 @@ MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:willingness"}), (t:TherapyConcept {appToolId: "let-it-be"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:doing_being"})
-SET x += {skillId: "problem_solve", exit: "doing_being", toolId: "doing-being", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"enterAt\": \"mode\"}", x.label = null;
+SET x += {skillId: "problem_solve", exit: "doing_being", toolId: "doing-being", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"enterAt\": \"mode\", \"frame\": \"problem_solve\"}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:doing_being"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:doing_being"}), (t:TherapyConcept {appToolId: "doing-being"})
@@ -30145,13 +30145,13 @@ SET r += {list: "step_down", order: 23};
 
 // --- doing_being (db-v1) ---
 MERGE (s:Skill {id: "doing_being"})
-SET s += {toolId: "doing-being", version: "db-v1", contentVersion: "skills-v1", start: "about", ownMax: 40, emotionFields: [], accepts: ["band", "frame", "enterAt"]}, s.inlineJson = "null", s.runtimeJson = "{\"entries\": {\"mode\": \"mode\", \"week\": \"week\"}}", s.copyJson = "{\"about_line1\": \"Doing mind works things out, plans and fixes. Being mind notices and lets things be.\", \"about_line2\": \"Both are needed. Wise mind uses each one when it fits.\", \"about_q\": \"Which would help now?\", \"about_title\": \"Doing mind, being mind.\", \"back_not_line\": \"Not yet is fine. The moment comes round again.\", \"back_sort_line\": \"Some of it counts. Coming back is the practice.\", \"back_title\": \"Your being break: {cue}. Did you get to take one?\", \"back_yes_line\": \"That's being mind, without the phone. It goes wherever you do.\", \"being_end_line\": \"If something's been waiting, one small doing could balance the week.\", \"being_end_title\": \"Rest counts.\", \"body_first\": \"My body first\", \"body_first_line\": \"This will keep for a calmer minute.\", \"body_first_title\": \"Settle your body first.\", \"bowl_done\": \"That's a minute.\", \"bowl_dropped\": \"A pebble in the bowl\", \"bowl_running\": \"Eyes open. No sound to find? Your breath counts.\", \"bowl_skip\": \"Move on\", \"bowl_start\": \"Start\", \"build_mastery\": \"One small thing to finish\", \"came_back\": \"A sound\", \"cue_end_line\": \"One ordinary thing, with all of your attention, for about a minute. Nothing to fix.\", \"cue_end_title\": \"Your being break: {cue}.\", \"cue_line\": \"A minute of one thing, done fully, at a moment you already have.\", \"cue_own\": \"My own moment\", \"cue_q\": \"When could it go?\", \"cue_title\": \"One being break a day, then?\", \"done\": \"Done\", \"drift_blank_line\": \"When everything feels flat, moving first can make doing easier.\", \"drift_line\": \"Something you can finish today, however small. Done beats done well.\", \"drift_title\": \"One small doing could help.\", \"heads_up_line\": \"This works better once your body settles. Start there, or go on anyway.\", \"heads_up_title\": \"Your body's loud right now.\", \"join_in\": \"Move to something first\", \"listen_end_line\": \"Doing mind will still be there when you need it.\", \"listen_end_title\": \"That was being mind.\", \"listen_task\": \"Listen. Each time you notice a new sound, or catch yourself back in the problem, tap.\", \"listen_title\": \"A minute of being mind.\", \"mixed_end_line\": \"Some doing, some being. That's the mix wise mind uses.\", \"mixed_end_title\": \"Sounds balanced.\", \"mode_hint\": \"Going over it, working it out, trying to make it stop.\", \"mode_no_line\": \"Carry on. The question will be here when you want it.\", \"mode_no_title\": \"Then there's nothing to switch.\", \"mode_title\": \"Is your mind trying to fix a feeling like a task?\", \"next\": \"Next\", \"not_now_line\": \"Noticing it was doing mind is already a step outside it.\", \"not_now_title\": \"Not now is fine.\", \"one_thing\": \"One thing, done fully\", \"one_thing_link\": \"One thing, done fully, instead\", \"remind_q\": \"Ask me tomorrow how it went?\", \"safety_open\": \"Talk to someone now\", \"switch_line\": \"Doing mind is useful. A minute of being mind can give it a rest.\", \"switch_maybe_title\": \"That might be doing mind. Feelings don't get solved like tasks.\", \"switch_q\": \"One minute of being mind?\", \"switch_yes_title\": \"That sounds like doing mind. Feelings don't get solved like tasks.\", \"week_hint\": \"A rough guess is fine.\", \"week_title\": \"This week felt…\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "doing-being", version: "db-v1", contentVersion: "skills-v1", start: "about", ownMax: 40, emotionFields: [], accepts: ["band", "frame", "enterAt"]}, s.inlineJson = "null", s.runtimeJson = "{\"entries\": {\"mode\": \"mode\", \"week\": \"week\"}}", s.copyJson = "{\"about_line\": \"Doing mind works things out, plans and fixes. Being mind notices and lets things be. Both are needed, and wise mind uses each one when it fits.\", \"about_q\": \"Which would help now?\", \"about_title\": \"Doing mind, being mind.\", \"back_not_line\": \"Not yet is fine. The moment comes round again.\", \"back_ps\": \"Back to Problem Solve\", \"back_sort_line\": \"Some of it counts. Coming back is the practice.\", \"back_title\": \"{cue}: your being break. Did you get to take one?\", \"back_yes_line\": \"That's being mind, without the phone. It goes wherever you do.\", \"being_end_line\": \"If something's been waiting, one small doing could balance the week.\", \"being_end_title\": \"Rest counts.\", \"body_first\": \"My body first\", \"body_first_line\": \"This will keep for a calmer minute.\", \"body_first_title\": \"Settle your body first.\", \"bowl_done\": \"That's a minute.\", \"bowl_dropped\": \"A pebble in the bowl\", \"bowl_running\": \"Eyes open. Quiet is a sound too.\", \"bowl_skip\": \"Move on\", \"bowl_start\": \"Start\", \"build_mastery\": \"One small thing to finish\", \"came_back\": \"A sound\", \"cue_end_line\": \"One ordinary thing, with all of your attention, for about a minute. Nothing to fix.\", \"cue_end_title\": \"{cue}: your being break.\", \"cue_line\": \"A minute of one thing, done fully, at a moment you already have.\", \"cue_own\": \"My own moment\", \"cue_q\": \"When could it go?\", \"cue_title\": \"One being break a day, then?\", \"done\": \"Done\", \"drift_line\": \"When things feel flat, moving first can make doing easier. Then something you can finish today, however small.\", \"drift_title\": \"One small doing could help.\", \"heads_up_line\": \"This works better once your body settles. Start there, or go on anyway.\", \"heads_up_title\": \"Your body's loud right now.\", \"join_in\": \"Move to something first\", \"listen_end_line\": \"Doing mind will still be there when you need it.\", \"listen_end_title\": \"That was being mind.\", \"listen_task\": \"Listen. Each time you notice a new sound, or catch yourself back in the problem, tap.\", \"listen_title\": \"A minute of being mind.\", \"mixed_end_line\": \"Some doing, some being. That's the mix wise mind uses.\", \"mixed_end_title\": \"Sounds balanced.\", \"mode_hint\": \"Going over it, working it out, trying to make it stop.\", \"mode_no_line\": \"Carry on. The question will be here when you want it.\", \"mode_no_title\": \"Then there's nothing to switch.\", \"mode_title\": \"Is your mind trying to fix a feeling like a task?\", \"next\": \"Next\", \"not_now_line\": \"Noticing it was doing mind is already a step outside it.\", \"not_now_title\": \"Not now is fine.\", \"one_thing\": \"One thing, done fully\", \"one_thing_link\": \"One thing, done fully, instead\", \"remind_q\": \"Ask me tomorrow how it went?\", \"safety_open\": \"Talk to someone now\", \"switch_line\": \"Doing mind is useful. A minute of being mind can give it a rest.\", \"switch_maybe_title\": \"That might be doing mind. Feelings don't get solved like tasks.\", \"switch_q\": \"One minute of being mind?\", \"switch_yes_title\": \"That sounds like doing mind. Feelings don't get solved like tasks.\", \"week_hint\": \"Doing: working things out, getting things done. Being: noticing, resting. Drifting: not much of either. A rough guess is fine.\", \"week_title\": \"This week felt…\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "dbt_skillful_means"}), (s:Skill {id: "doing_being"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "doing_being"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
 MATCH (:Skill {id: "doing_being"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
 MERGE (n:SkillStep {id: "doing_being:about"})
-SET n += {skillId: "doing_being", step: "about", kind: "ask", version: "db-v1"}, n.specJson = "{\"fields\": [{\"id\": \"about\", \"label\": \"about_q\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"about\"}, \"required\": true}], \"lines\": [{\"key\": \"about_line1\", \"when\": {\"all\": []}}, {\"key\": \"about_line2\", \"when\": {\"all\": []}}], \"title\": \"about_title\"}";
+SET n += {skillId: "doing_being", step: "about", kind: "ask", version: "db-v1"}, n.specJson = "{\"fields\": [{\"id\": \"about\", \"label\": \"about_q\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"about\"}, \"required\": true}], \"lines\": [{\"key\": \"about_line\", \"when\": {\"all\": []}}], \"title\": \"about_title\"}";
 MATCH (s:Skill {id: "doing_being"}), (n:SkillStep {id: "doing_being:about"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 0};
@@ -30221,7 +30221,7 @@ MATCH (s:Skill {id: "doing_being"}), (n:SkillStep {id: "doing_being:back_end"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 13};
 MERGE (n:SkillStep {id: "doing_being:drift"})
-SET n += {skillId: "doing_being", step: "drift", kind: "handoff", version: "db-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"drift_blank_line\", \"when\": {\"eq\": [\"$ctx.frame\", \"blank\"]}}, {\"key\": \"drift_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"drift_title\"}";
+SET n += {skillId: "doing_being", step: "drift", kind: "handoff", version: "db-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"drift_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"drift_title\"}";
 MATCH (s:Skill {id: "doing_being"}), (n:SkillStep {id: "doing_being:drift"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 14};
@@ -30258,6 +30258,12 @@ SET x += {skillId: "doing_being", exit: "join_in", toolId: "join-in", done: fals
 MATCH (s:Skill {id: "doing_being"}), (x:SkillExit {id: "doing_being:join_in"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "doing_being:join_in"}), (t:TherapyConcept {appToolId: "join-in"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "doing_being:problem_solve"})
+SET x += {skillId: "doing_being", exit: "problem_solve", toolId: "problem-solve", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = "back_ps";
+MATCH (s:Skill {id: "doing_being"}), (x:SkillExit {id: "doing_being:problem_solve"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "doing_being:problem_solve"}), (t:TherapyConcept {appToolId: "problem-solve"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "doing_being:safety_open"})
 SET x += {skillId: "doing_being", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
@@ -30321,18 +30327,30 @@ SET r += {order: 0, field: "switch", label: "one_thing_link"}, r.whenJson = "{\"
 MATCH (a:SkillStep {id: "doing_being:switch"}), (x:SkillExit {id: "doing_being:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 1, field: "switch", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "doing_being:listen"}), (b:SkillStep {id: "doing_being:not_now"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.listen\", \"skipped\"]}";
 MATCH (a:SkillStep {id: "doing_being:listen"}), (b:SkillStep {id: "doing_being:listen_end"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "null";
+SET r += {order: 1}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "doing_being:listen"}), (x:SkillExit {id: "doing_being:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "doing_being:listen_end"}), (x:SkillExit {id: "doing_being:problem_solve"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"eq\": [\"$ctx.frame\", \"problem_solve\"]}}]";
 MATCH (a:SkillStep {id: "doing_being:listen_end"}), (x:SkillExit {id: "doing_being:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "doing_being:not_now"}), (x:SkillExit {id: "doing_being:problem_solve"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"eq\": [\"$ctx.frame\", \"problem_solve\"]}}]";
 MATCH (a:SkillStep {id: "doing_being:not_now"}), (x:SkillExit {id: "doing_being:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "doing_being:mode_no"}), (x:SkillExit {id: "doing_being:problem_solve"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"eq\": [\"$ctx.frame\", \"problem_solve\"]}}]";
 MATCH (a:SkillStep {id: "doing_being:mode_no"}), (x:SkillExit {id: "doing_being:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
@@ -30374,7 +30392,7 @@ MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "doing_being:drift"}), (x:SkillExit {id: "doing_being:join_in"})
 MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"eq\": [\"$ctx.frame\", \"blank\"]}}]";
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
 MATCH (a:SkillStep {id: "doing_being:drift"}), (x:SkillExit {id: "doing_being:build_mastery"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
@@ -30508,18 +30526,18 @@ SET r += {list: "back", order: 22};
 
 // --- join_in (ji-v1) ---
 MERGE (s:Skill {id: "join_in"})
-SET s += {toolId: "join-in", version: "ji-v1", contentVersion: "skills-v1", start: "pick", ownMax: 40, emotionFields: [], accepts: ["band", "frame"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"anger_line\": \"Bring it down first. Join in will be here on a calmer day.\", \"anger_title\": \"This one turns things up, and anger doesn't need more fuel today.\", \"away_hint\": \"Put the phone down. Come back when you're done.\", \"away_line\": \"When you catch yourself watching yourself, drop back in.\", \"away_title\": \"Throw yourself in.\", \"beat_done\": \"That's the round.\", \"beat_running\": \"Watching yourself? Drop back in.\", \"beat_skip\": \"Move on\", \"beat_sound\": \"Sound\", \"beat_start\": \"Start\", \"beat_tap\": \"Tap along\", \"body_first\": \"My body first\", \"done\": \"Done\", \"end_title\": \"You joined in.\", \"flooded_line\": \"This one turns things up. Settle your body first, or try something slower.\", \"flooded_title\": \"Your body's loud right now.\", \"gate_end_line\": \"Join in will be here on a calmer day.\", \"gate_end_title\": \"Not now is fine.\", \"listen_instead\": \"Something slower: listen for a minute\", \"next\": \"Next\", \"pick_blank_line\": \"The beat runs a little quicker today, in short rounds.\", \"pick_hint\": \"Move in whatever way your body can. Sitting is fine.\", \"pick_title\": \"Pick something to throw yourself into.\", \"play_task\": \"Throw yourself in. When you catch yourself watching yourself, drop back in.\", \"play_task_hum\": \"Hum or sing along to the beat. Any tune, any words.\", \"play_task_song\": \"Move to the beat, or to a song of your own.\", \"play_task_tap\": \"Tap along, on the circle, a table or your knees.\", \"safety_open\": \"Talk to someone now\", \"settle_q\": \"Another round?\", \"settle_title\": \"Let it settle for a few breaths.\", \"skip_line\": \"It'll be here when you want it.\", \"skip_title\": \"Not this time.\", \"social_not_line\": \"Not yet is fine. It'll be there next time.\", \"social_q\": \"Next time, with someone? I'll ask how it went.\", \"social_sort_line\": \"Some of it counts. Dropping back in is the practice.\", \"social_title\": \"Did you get to join in at something with someone?\", \"social_yes_line\": \"That's participating, off the phone and with people. It goes wherever you do.\", \"with_half\": \"Half in counts. Dropping back in is the practice.\", \"with_in\": \"That's participating. No watching needed.\", \"with_title\": \"How much were you in it?\", \"with_watching\": \"Watching yourself is the thing you practise dropping. Noticing it is the start.\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "join-in", version: "ji-v1", contentVersion: "skills-v1", start: "pick", ownMax: 40, emotionFields: [], accepts: ["band", "frame"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"anger_line\": \"Today's a day to bring things down first.\", \"anger_title\": \"This one turns things up.\", \"away_hint\": \"Put the phone down. Come back when you're done.\", \"away_line\": \"When you catch yourself watching yourself, drop back in.\", \"away_title\": \"Throw yourself in.\", \"beat_done\": \"That's the round.\", \"beat_running\": \"Watching yourself? Drop back in.\", \"beat_skip\": \"Move on\", \"beat_sound\": \"Sound\", \"beat_start\": \"Start\", \"beat_tap\": \"Tap along\", \"body_first\": \"My body first\", \"done\": \"Done\", \"end_title\": \"You joined in.\", \"flooded_line\": \"This one turns things up. Settle your body first, or try something slower.\", \"flooded_title\": \"Your body's loud right now.\", \"gate_end_line\": \"Join in will be here on a calmer day.\", \"gate_end_title\": \"Not now is fine.\", \"listen_instead\": \"Something slower: listen for a minute\", \"next\": \"Next\", \"pick_blank_line\": \"The beat runs a little quicker today, in short rounds. Sitting is fine.\", \"pick_line\": \"Move in whatever way your body can. Sitting is fine.\", \"pick_title\": \"Pick something to throw yourself into.\", \"play_task\": \"Throw yourself in. When you catch yourself watching yourself, drop back in.\", \"play_task_hum\": \"Hum or sing along to the beat. Any tune, any words.\", \"play_task_song\": \"Move to the beat, or to a song of your own.\", \"play_task_tap\": \"Tap along, on the circle, a table or your knees.\", \"safety_open\": \"Talk to someone now\", \"settle_q\": \"Another round?\", \"settle_title\": \"Let it settle for a moment.\", \"skip_line\": \"It'll be here when you want it.\", \"skip_title\": \"Not this time.\", \"social_not_line\": \"Not yet is fine. It'll be there next time.\", \"social_q\": \"Join in at something with someone soon? I'll ask how it went.\", \"social_sort_line\": \"Some of it counts. Dropping back in is the practice.\", \"social_title\": \"Did you get to join in at something with someone?\", \"social_yes_line\": \"That's participating, off the phone and with people. It goes wherever you do.\", \"with_half\": \"Half in counts. Dropping back in is the practice.\", \"with_in\": \"That's participating. No watching needed.\", \"with_title\": \"How much were you in it?\", \"with_watching\": \"Watching yourself is the thing you practise dropping. Noticing it is the start.\", \"wound_title\": \"Then bring it down first.\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "dbt_participate"}), (s:Skill {id: "join_in"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "join_in"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
 MATCH (:Skill {id: "join_in"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
 MERGE (n:SkillStep {id: "join_in:pick"})
-SET n += {skillId: "join_in", step: "pick", kind: "ask", version: "ji-v1"}, n.specJson = "{\"fields\": [{\"id\": \"thing\", \"links\": [{\"exit\": \"cool_down\", \"label\": \"body_first\", \"when\": {\"any\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"any\": [{\"has\": [\"$carried\", \"angry\"]}, {\"has\": [\"$carried\", \"mad\"]}, {\"has\": [\"$carried\", \"aggressive\"]}, {\"has\": [\"$carried\", \"furious\"]}, {\"has\": [\"$carried\", \"provoked\"]}, {\"has\": [\"$carried\", \"hostile\"]}, {\"has\": [\"$carried\", \"infuriated\"]}, {\"has\": [\"$carried\", \"indignant\"]}, {\"has\": [\"$carried\", \"bitter\"]}, {\"has\": [\"$carried\", \"resentful\"]}, {\"has\": [\"$carried\", \"frustrated\"]}, {\"has\": [\"$carried\", \"annoyed\"]}]}]}}, {\"exit\": \"listen\", \"label\": \"listen_instead\", \"when\": {\"any\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"any\": [{\"has\": [\"$carried\", \"angry\"]}, {\"has\": [\"$carried\", \"mad\"]}, {\"has\": [\"$carried\", \"aggressive\"]}, {\"has\": [\"$carried\", \"furious\"]}, {\"has\": [\"$carried\", \"provoked\"]}, {\"has\": [\"$carried\", \"hostile\"]}, {\"has\": [\"$carried\", \"infuriated\"]}, {\"has\": [\"$carried\", \"indignant\"]}, {\"has\": [\"$carried\", \"bitter\"]}, {\"has\": [\"$carried\", \"resentful\"]}, {\"has\": [\"$carried\", \"frustrated\"]}, {\"has\": [\"$carried\", \"annoyed\"]}]}]}}, {\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"thing\", \"where\": {\"any\": [{\"all\": [{\"eq\": [\"$opt.gate\", true]}, {\"any\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"any\": [{\"has\": [\"$carried\", \"angry\"]}, {\"has\": [\"$carried\", \"mad\"]}, {\"has\": [\"$carried\", \"aggressive\"]}, {\"has\": [\"$carried\", \"furious\"]}, {\"has\": [\"$carried\", \"provoked\"]}, {\"has\": [\"$carried\", \"hostile\"]}, {\"has\": [\"$carried\", \"infuriated\"]}, {\"has\": [\"$carried\", \"indignant\"]}, {\"has\": [\"$carried\", \"bitter\"]}, {\"has\": [\"$carried\", \"resentful\"]}, {\"has\": [\"$carried\", \"frustrated\"]}, {\"has\": [\"$carried\", \"annoyed\"]}]}]}]}, {\"all\": [{\"eq\": [\"$opt.gate\", false]}, {\"not\": {\"any\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"any\": [{\"has\": [\"$carried\", \"angry\"]}, {\"has\": [\"$carried\", \"mad\"]}, {\"has\": [\"$carried\", \"aggressive\"]}, {\"has\": [\"$carried\", \"furious\"]}, {\"has\": [\"$carried\", \"provoked\"]}, {\"has\": [\"$carried\", \"hostile\"]}, {\"has\": [\"$carried\", \"infuriated\"]}, {\"has\": [\"$carried\", \"indignant\"]}, {\"has\": [\"$carried\", \"bitter\"]}, {\"has\": [\"$carried\", \"resentful\"]}, {\"has\": [\"$carried\", \"frustrated\"]}, {\"has\": [\"$carried\", \"annoyed\"]}]}]}}]}]}}, \"required\": true}], \"hint\": \"pick_hint\", \"lines\": [{\"key\": \"anger_line\", \"when\": {\"any\": [{\"has\": [\"$carried\", \"angry\"]}, {\"has\": [\"$carried\", \"mad\"]}, {\"has\": [\"$carried\", \"aggressive\"]}, {\"has\": [\"$carried\", \"furious\"]}, {\"has\": [\"$carried\", \"provoked\"]}, {\"has\": [\"$carried\", \"hostile\"]}, {\"has\": [\"$carried\", \"infuriated\"]}, {\"has\": [\"$carried\", \"indignant\"]}, {\"has\": [\"$carried\", \"bitter\"]}, {\"has\": [\"$carried\", \"resentful\"]}, {\"has\": [\"$carried\", \"frustrated\"]}, {\"has\": [\"$carried\", \"annoyed\"]}]}}, {\"key\": \"flooded_line\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"pick_blank_line\", \"when\": {\"eq\": [\"$ctx.frame\", \"blank\"]}}], \"title\": [{\"key\": \"anger_title\", \"when\": {\"any\": [{\"has\": [\"$carried\", \"angry\"]}, {\"has\": [\"$carried\", \"mad\"]}, {\"has\": [\"$carried\", \"aggressive\"]}, {\"has\": [\"$carried\", \"furious\"]}, {\"has\": [\"$carried\", \"provoked\"]}, {\"has\": [\"$carried\", \"hostile\"]}, {\"has\": [\"$carried\", \"infuriated\"]}, {\"has\": [\"$carried\", \"indignant\"]}, {\"has\": [\"$carried\", \"bitter\"]}, {\"has\": [\"$carried\", \"resentful\"]}, {\"has\": [\"$carried\", \"frustrated\"]}, {\"has\": [\"$carried\", \"annoyed\"]}]}}, {\"key\": \"flooded_title\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"pick_title\", \"when\": {\"all\": []}}]}";
+SET n += {skillId: "join_in", step: "pick", kind: "ask", version: "ji-v1"}, n.specJson = "{\"fields\": [{\"id\": \"thing\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"thing\", \"where\": {\"any\": [{\"all\": [{\"eq\": [\"$opt.gate\", true]}, {\"any\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"any\": [{\"has\": [\"$carried\", \"angry\"]}, {\"has\": [\"$carried\", \"mad\"]}, {\"has\": [\"$carried\", \"aggressive\"]}, {\"has\": [\"$carried\", \"furious\"]}, {\"has\": [\"$carried\", \"provoked\"]}, {\"has\": [\"$carried\", \"hostile\"]}, {\"has\": [\"$carried\", \"infuriated\"]}, {\"has\": [\"$carried\", \"indignant\"]}, {\"has\": [\"$carried\", \"bitter\"]}, {\"has\": [\"$carried\", \"resentful\"]}, {\"has\": [\"$carried\", \"frustrated\"]}, {\"has\": [\"$carried\", \"annoyed\"]}]}]}]}, {\"all\": [{\"eq\": [\"$opt.gate\", false]}, {\"not\": {\"any\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"any\": [{\"has\": [\"$carried\", \"angry\"]}, {\"has\": [\"$carried\", \"mad\"]}, {\"has\": [\"$carried\", \"aggressive\"]}, {\"has\": [\"$carried\", \"furious\"]}, {\"has\": [\"$carried\", \"provoked\"]}, {\"has\": [\"$carried\", \"hostile\"]}, {\"has\": [\"$carried\", \"infuriated\"]}, {\"has\": [\"$carried\", \"indignant\"]}, {\"has\": [\"$carried\", \"bitter\"]}, {\"has\": [\"$carried\", \"resentful\"]}, {\"has\": [\"$carried\", \"frustrated\"]}, {\"has\": [\"$carried\", \"annoyed\"]}]}]}}]}]}}, \"required\": true}], \"lines\": [{\"key\": \"anger_line\", \"when\": {\"any\": [{\"has\": [\"$carried\", \"angry\"]}, {\"has\": [\"$carried\", \"mad\"]}, {\"has\": [\"$carried\", \"aggressive\"]}, {\"has\": [\"$carried\", \"furious\"]}, {\"has\": [\"$carried\", \"provoked\"]}, {\"has\": [\"$carried\", \"hostile\"]}, {\"has\": [\"$carried\", \"infuriated\"]}, {\"has\": [\"$carried\", \"indignant\"]}, {\"has\": [\"$carried\", \"bitter\"]}, {\"has\": [\"$carried\", \"resentful\"]}, {\"has\": [\"$carried\", \"frustrated\"]}, {\"has\": [\"$carried\", \"annoyed\"]}]}}, {\"key\": \"flooded_line\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"pick_blank_line\", \"when\": {\"eq\": [\"$ctx.frame\", \"blank\"]}}, {\"key\": \"pick_line\", \"when\": {\"all\": []}}], \"title\": [{\"key\": \"anger_title\", \"when\": {\"any\": [{\"has\": [\"$carried\", \"angry\"]}, {\"has\": [\"$carried\", \"mad\"]}, {\"has\": [\"$carried\", \"aggressive\"]}, {\"has\": [\"$carried\", \"furious\"]}, {\"has\": [\"$carried\", \"provoked\"]}, {\"has\": [\"$carried\", \"hostile\"]}, {\"has\": [\"$carried\", \"infuriated\"]}, {\"has\": [\"$carried\", \"indignant\"]}, {\"has\": [\"$carried\", \"bitter\"]}, {\"has\": [\"$carried\", \"resentful\"]}, {\"has\": [\"$carried\", \"frustrated\"]}, {\"has\": [\"$carried\", \"annoyed\"]}]}}, {\"key\": \"flooded_title\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"pick_title\", \"when\": {\"all\": []}}]}";
 MATCH (s:Skill {id: "join_in"}), (n:SkillStep {id: "join_in:pick"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 0};
 MERGE (n:SkillStep {id: "join_in:gate_end"})
-SET n += {skillId: "join_in", step: "gate_end", kind: "handoff", version: "ji-v1"}, n.specJson = "{\"complete\": false, \"done\": \"done\", \"lines\": [{\"key\": \"gate_end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"gate_end_title\"}";
+SET n += {skillId: "join_in", step: "gate_end", kind: "handoff", version: "ji-v1"}, n.specJson = "{\"complete\": false, \"done\": \"done\", \"lines\": [{\"key\": \"gate_end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": [{\"key\": \"wound_title\", \"when\": {\"eq\": [\"$a.thing\", \"wound_up\"]}}, {\"key\": \"gate_end_title\", \"when\": {\"all\": []}}]}";
 MATCH (s:Skill {id: "join_in"}), (n:SkillStep {id: "join_in:gate_end"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 1};
@@ -30600,7 +30618,7 @@ MATCH (s:Skill {id: "join_in"}), (x:SkillExit {id: "join_in:done"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "join_in:pick"}), (b:SkillStep {id: "join_in:gate_end"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.thing\", \"not_now\"]}";
+SET r += {order: 0}, r.whenJson = "{\"in\": [\"$a.thing\", [\"not_now\", \"wound_up\"]]}";
 MATCH (a:SkillStep {id: "join_in:pick"}), (b:SkillStep {id: "join_in:play_blank"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 1}, r.whenJson = "{\"all\": [{\"in\": [\"$a.thing\", [\"song\", \"hum\", \"tap\"]]}, {\"eq\": [\"$ctx.frame\", \"blank\"]}]}";
@@ -30613,15 +30631,15 @@ SET r += {order: 3}, r.whenJson = "{\"all\": [{\"in\": [\"$a.thing\", [\"song\",
 MATCH (a:SkillStep {id: "join_in:pick"}), (b:SkillStep {id: "join_in:away"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 4}, r.whenJson = "null";
-MATCH (a:SkillStep {id: "join_in:pick"}), (x:SkillExit {id: "join_in:cool_down"})
-MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 0, field: "thing", label: "body_first"}, r.whenJson = "{\"any\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"any\": [{\"has\": [\"$carried\", \"angry\"]}, {\"has\": [\"$carried\", \"mad\"]}, {\"has\": [\"$carried\", \"aggressive\"]}, {\"has\": [\"$carried\", \"furious\"]}, {\"has\": [\"$carried\", \"provoked\"]}, {\"has\": [\"$carried\", \"hostile\"]}, {\"has\": [\"$carried\", \"infuriated\"]}, {\"has\": [\"$carried\", \"indignant\"]}, {\"has\": [\"$carried\", \"bitter\"]}, {\"has\": [\"$carried\", \"resentful\"]}, {\"has\": [\"$carried\", \"frustrated\"]}, {\"has\": [\"$carried\", \"annoyed\"]}]}]}";
-MATCH (a:SkillStep {id: "join_in:pick"}), (x:SkillExit {id: "join_in:listen"})
-MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 1, field: "thing", label: "listen_instead"}, r.whenJson = "{\"any\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"any\": [{\"has\": [\"$carried\", \"angry\"]}, {\"has\": [\"$carried\", \"mad\"]}, {\"has\": [\"$carried\", \"aggressive\"]}, {\"has\": [\"$carried\", \"furious\"]}, {\"has\": [\"$carried\", \"provoked\"]}, {\"has\": [\"$carried\", \"hostile\"]}, {\"has\": [\"$carried\", \"infuriated\"]}, {\"has\": [\"$carried\", \"indignant\"]}, {\"has\": [\"$carried\", \"bitter\"]}, {\"has\": [\"$carried\", \"resentful\"]}, {\"has\": [\"$carried\", \"frustrated\"]}, {\"has\": [\"$carried\", \"annoyed\"]}]}]}";
 MATCH (a:SkillStep {id: "join_in:pick"}), (x:SkillExit {id: "join_in:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 2, field: "thing", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+SET r += {order: 0, field: "thing", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "join_in:gate_end"}), (x:SkillExit {id: "join_in:cool_down"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "join_in:gate_end"}), (x:SkillExit {id: "join_in:listen"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
 MATCH (a:SkillStep {id: "join_in:gate_end"}), (x:SkillExit {id: "join_in:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
@@ -30661,12 +30679,9 @@ SET r += {order: 1}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "join_in:settle"}), (x:SkillExit {id: "join_in:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "settle", label: "safety_open"}, r.whenJson = "{\"all\": []}";
-MATCH (a:SkillStep {id: "join_in:play_blank2"}), (b:SkillStep {id: "join_in:skip_end"})
-MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.play_blank2\", \"skipped\"]}";
 MATCH (a:SkillStep {id: "join_in:play_blank2"}), (b:SkillStep {id: "join_in:with"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "null";
+SET r += {order: 0}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "join_in:play_blank2"}), (x:SkillExit {id: "join_in:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
@@ -30727,63 +30742,68 @@ SET o:SkillOption:ParticipateActivity, o += {skillId: "join_in", list: "thing", 
 MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:thing:own"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "thing", order: 5};
-MERGE (o:SkillOption {id: "join_in:thing:not_now"})
-SET o:SkillOption, o += {skillId: "join_in", list: "thing", value: "not_now", label: "Not now", version: "ji-v1"}, o.propsJson = "{\"gate\": true}";
-MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:thing:not_now"})
+MERGE (o:SkillOption {id: "join_in:thing:wound_up"})
+SET o:SkillOption, o += {skillId: "join_in", list: "thing", value: "wound_up", label: "I'm wound up or angry right now", version: "ji-v1"}, o.propsJson = "{\"beat\": false, \"gate\": false}";
+MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:thing:wound_up"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "thing", order: 6};
+MERGE (o:SkillOption {id: "join_in:thing:not_now"})
+SET o:SkillOption, o += {skillId: "join_in", list: "thing", value: "not_now", label: "Bring it down first", version: "ji-v1"}, o.propsJson = "{\"gate\": true}";
+MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:thing:not_now"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "thing", order: 7};
 MERGE (o:SkillOption {id: "join_in:settle:again"})
 SET o:SkillOption, o += {skillId: "join_in", list: "settle", value: "again", label: "Another round", version: "ji-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:settle:again"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "settle", order: 7};
+SET r += {list: "settle", order: 8};
 MERGE (o:SkillOption {id: "join_in:settle:enough"})
 SET o:SkillOption, o += {skillId: "join_in", list: "settle", value: "enough", label: "That's enough", version: "ji-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:settle:enough"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "settle", order: 8};
+SET r += {list: "settle", order: 9};
 MERGE (o:SkillOption {id: "join_in:with:in"})
 SET o:SkillOption, o += {skillId: "join_in", list: "with", value: "in", label: "In it", version: "ji-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:with:in"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "with", order: 9};
+SET r += {list: "with", order: 10};
 MERGE (o:SkillOption {id: "join_in:with:half"})
 SET o:SkillOption, o += {skillId: "join_in", list: "with", value: "half", label: "Half in", version: "ji-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:with:half"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "with", order: 10};
+SET r += {list: "with", order: 11};
 MERGE (o:SkillOption {id: "join_in:with:watching"})
 SET o:SkillOption, o += {skillId: "join_in", list: "with", value: "watching", label: "Watching myself", version: "ji-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:with:watching"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "with", order: 11};
+SET r += {list: "with", order: 12};
 MERGE (o:SkillOption {id: "join_in:when:tomorrow"})
 SET o:SkillOption, o += {skillId: "join_in", list: "when", value: "tomorrow", label: "Tomorrow", version: "ji-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:when:tomorrow"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "when", order: 12};
+SET r += {list: "when", order: 13};
 MERGE (o:SkillOption {id: "join_in:when:few_days"})
 SET o:SkillOption, o += {skillId: "join_in", list: "when", value: "few_days", label: "In a few days", version: "ji-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:when:few_days"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "when", order: 13};
+SET r += {list: "when", order: 14};
 MERGE (o:SkillOption {id: "join_in:social:yes"})
 SET o:SkillOption, o += {skillId: "join_in", list: "social", value: "yes", label: "Yes", version: "ji-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:social:yes"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "social", order: 14};
+SET r += {list: "social", order: 15};
 MERGE (o:SkillOption {id: "join_in:social:sort_of"})
 SET o:SkillOption, o += {skillId: "join_in", list: "social", value: "sort_of", label: "Sort of", version: "ji-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:social:sort_of"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "social", order: 15};
+SET r += {list: "social", order: 16};
 MERGE (o:SkillOption {id: "join_in:social:not_yet"})
 SET o:SkillOption, o += {skillId: "join_in", list: "social", value: "not_yet", label: "Not yet", version: "ji-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:social:not_yet"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "social", order: 16};
+SET r += {list: "social", order: 17};
 MERGE (o:SkillOption {id: "join_in:back:back"})
 SET o:SkillOption, o += {skillId: "join_in", list: "back", value: "back", label: "I'm back", version: "ji-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:back:back"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "back", order: 17};
+SET r += {list: "back", order: 18};

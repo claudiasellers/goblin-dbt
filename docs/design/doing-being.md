@@ -19,16 +19,16 @@ it, and the weekly shape.
 
 | Step | What the person sees | PRD MF-09 |
 |---|---|---|
-| `about` | The library entry: *Doing mind, being mind.* *Doing mind works things out, plans and fixes. Being mind notices and lets things be.* *Both are needed. Wise mind uses each one when it fits.* Which would help now? Is my mind stuck trying to fix something? · How did this week feel? | The one-screen explainer (MF H9 paraphrased) |
+| `about` | The library entry: *Doing mind, being mind.* *Doing mind works things out, plans and fixes. Being mind notices and lets things be. Both are needed, and wise mind uses each one when it fits.* Which would help now? Is my mind stuck trying to fix something? · How did this week feel? | The one-screen explainer (MF H9 paraphrased) |
 | `heads_up` | A carried flooded reading, from the library: *Your body's loud right now.* My body first (First, the body) · Go on anyway. Opened straight at the card or the week, the same line sits on that screen with *My body first* as a link | Any band but flooded; never a lock |
 | `mode` | *Is your mind trying to fix a feeling like a task?* (*Going over it, working it out, trying to make it stop.*) Yes · Maybe · No | Step 1, the mode card (One thing's words) |
 | `switch` | Yes: *That sounds like doing mind. Feelings don't get solved like tasks.* (maybe: *That might be…*) *Doing mind is useful. A minute of being mind can give it a rest.* One minute of being mind? A minute of listening · Not now; *One thing, done fully, instead* as a link | Step 2: one pick, one swap |
-| `listen` | The `pebbleBowl` for 60 s, eyes open: a pebble for each new sound or each time you catch yourself back in the problem | MF-01 Listen |
-| `listen_end` / `not_now` / `mode_no` | *That was being mind. Doing mind will still be there when you need it.* · *Not now is fine. Noticing it was doing mind is already a step outside it.* · No: *Then there's nothing to switch. Carry on.* | No: back to the host with nothing added |
-| `week` | `?enterAt=week` (the Practice home's *How did this week feel?*): *This week felt…* Mostly doing · Mostly being · Mixed · Drifting | Step 3, the weekly shape |
-| `cue` / `cue_end` | Mostly doing: *One being break a day, then?* at a moment you already have (when I sit down for a break, make a drink, wash my hands, get in the car or on the bus, get into bed, or my own moment), then *Your being break: {cue}.* with *Ask me tomorrow how it went?* (morning or evening) | One being break a day as a One thing cue |
-| `back` | The `being_break` card reopens the run: *Your being break: {cue}. Did you get to take one?* Yes · Sort of · Not yet; yes is an off-phone rep | Follow-up: an off-phone rep |
-| `drift` | Drifting: *One small doing could help.* *Something you can finish today, however small. Done beats done well.* One small thing to finish (Build mastery); a blank frame leads with *Move to something first* (Join in, `frame=blank`) | Drifting → ER activation; blank → MF-10, never a being practice |
+| `listen` | The `pebbleBowl` for 60 s, eyes open (*Quiet is a sound too.*, never the breath: PRD rule 7): a pebble for each new sound or each time you catch yourself back in the problem. *Move on* before it starts → *Not now*, never praised as being mind | MF-01 Listen |
+| `listen_end` / `not_now` / `mode_no` | *That was being mind. Doing mind will still be there when you need it.* · *Not now is fine. Noticing it was doing mind is already a step outside it.* · No: *Then there's nothing to switch. Carry on.* Opened from Problem Solve (`frame=problem_solve`), each offers *Back to Problem Solve* | No: back to the host with nothing added |
+| `week` | `?enterAt=week` (the Practice home's *How did this week feel?*): *This week felt…* (*Doing: working things out, getting things done. Being: noticing, resting. Drifting: not much of either. A rough guess is fine.*) Mostly doing · Mostly being · Mixed · Drifting | Step 3, the weekly shape |
+| `cue` / `cue_end` | Mostly doing: *One being break a day, then?* at a moment you already have (when I sit down for a break, make a drink, wash my hands, get in the car or on the bus, get into bed, or my own moment), then *{cue}: your being break.* with *Ask me tomorrow how it went?* (morning or evening) | One being break a day as a One thing cue |
+| `back` | The `being_break` card reopens the run: *{cue}: your being break. Did you get to take one?* Yes · Sort of · Not yet; yes is an off-phone rep | Follow-up: an off-phone rep |
+| `drift` | Drifting: *One small doing could help.* *When things feel flat, moving first can make doing easier. Then something you can finish today, however small.* *Move to something first* (Join in, `frame=blank`: its short rounds), then One small thing to finish (Build mastery) | Drifting → ER activation; blank → MF-10, never a being practice |
 | `being_end` / `mixed_end` | Mostly being: *Rest counts.* and one small doing as an offer. Mixed: *Sounds balanced.* | Mixed → nothing else |
 
 *Talk to someone now* (`safety.open`) is on every screen. Close kind `none`: every answer is plain. A completed visit
@@ -37,9 +37,8 @@ Preliminary, `defaultFor ['doing-being']`), not in the Practice home's MF sequen
 means). Answering *no* or *not now* completes it too: the PRD's rep records the answer and whether the switch was taken.
 
 **Hosts.** Problem Solve's *I've been thinking about it constantly* links the card (*Is my mind trying to fix a
-feeling?*, `enterAt=mode`): the rumination guard, rebuilt without a loop counter. One thing's rumination variant keeps
-its own copy of the card in its run. The Practice home's week ring has *How did this week feel? Doing, being or
-drifting* (`enterAt=week`), a line to tap when the person chooses, never asked.
+feeling?*, `enterAt=mode&frame=problem_solve`, every end offering the way back): the rumination guard, rebuilt without a loop counter. One thing's rumination variant keeps
+its own copy of the card in its run. The Practice home's week ring has *How did this week feel?* (`enterAt=week`), a line to tap when the person chooses, never asked.
 
 ## Where it departs from the PRD
 
@@ -47,6 +46,10 @@ drifting* (`enterAt=week`), a line to tap when the person chooses, never asked.
   so the question is always asked (it is one tap). Part 2, with the Practice home's fade levels.
 - **The minute is here, One thing is the swap.** The PRD's *MF-01 Listen or MF-05* is a minute of listening on the
   pebble bowl in this run (so the switch is recorded with the answer), with One thing a link away.
+- **Problem Solve opens the card as a link, not inline.** Its *Back to Problem Solve* starts Problem Solve again
+  rather than resuming the run (as its other redirects do); running the card inline (R8) is part 2.
+- **Every drifting week leads with movement.** The PRD's blank drifting branch needs a blank signal no host sends
+  yet, so a drifting week is that signal: Join in first, in its short blank rounds, then Build mastery.
 - **Mostly being** has no branch in the PRD; it gets *Rest counts.* and one small doing as an offer, never a push.
 - **The weekly shape lives on the Practice home** (the PRD's open question: CORE's weekly review doesn't exist yet), as
   a line, not a weekly prompt.

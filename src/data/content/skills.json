@@ -16683,13 +16683,13 @@
         "ownMax": 40,
         "emotionFields": [],
         "copy": {
-          "about_line1": "Doing mind works things out, plans and fixes. Being mind notices and lets things be.",
-          "about_line2": "Both are needed. Wise mind uses each one when it fits.",
+          "about_line": "Doing mind works things out, plans and fixes. Being mind notices and lets things be. Both are needed, and wise mind uses each one when it fits.",
           "about_q": "Which would help now?",
           "about_title": "Doing mind, being mind.",
           "back_not_line": "Not yet is fine. The moment comes round again.",
+          "back_ps": "Back to Problem Solve",
           "back_sort_line": "Some of it counts. Coming back is the practice.",
-          "back_title": "Your being break: {cue}. Did you get to take one?",
+          "back_title": "{cue}: your being break. Did you get to take one?",
           "back_yes_line": "That's being mind, without the phone. It goes wherever you do.",
           "being_end_line": "If something's been waiting, one small doing could balance the week.",
           "being_end_title": "Rest counts.",
@@ -16698,20 +16698,19 @@
           "body_first_title": "Settle your body first.",
           "bowl_done": "That's a minute.",
           "bowl_dropped": "A pebble in the bowl",
-          "bowl_running": "Eyes open. No sound to find? Your breath counts.",
+          "bowl_running": "Eyes open. Quiet is a sound too.",
           "bowl_skip": "Move on",
           "bowl_start": "Start",
           "build_mastery": "One small thing to finish",
           "came_back": "A sound",
           "cue_end_line": "One ordinary thing, with all of your attention, for about a minute. Nothing to fix.",
-          "cue_end_title": "Your being break: {cue}.",
+          "cue_end_title": "{cue}: your being break.",
           "cue_line": "A minute of one thing, done fully, at a moment you already have.",
           "cue_own": "My own moment",
           "cue_q": "When could it go?",
           "cue_title": "One being break a day, then?",
           "done": "Done",
-          "drift_blank_line": "When everything feels flat, moving first can make doing easier.",
-          "drift_line": "Something you can finish today, however small. Done beats done well.",
+          "drift_line": "When things feel flat, moving first can make doing easier. Then something you can finish today, however small.",
           "drift_title": "One small doing could help.",
           "heads_up_line": "This works better once your body settles. Start there, or go on anyway.",
           "heads_up_title": "Your body's loud right now.",
@@ -16737,7 +16736,7 @@
           "switch_maybe_title": "That might be doing mind. Feelings don't get solved like tasks.",
           "switch_q": "One minute of being mind?",
           "switch_yes_title": "That sounds like doing mind. Feelings don't get solved like tasks.",
-          "week_hint": "A rough guess is fine.",
+          "week_hint": "Doing: working things out, getting things done. Being: noticing, resting. Drifting: not much of either. A rough guess is fine.",
           "week_title": "This week felt…"
         },
         "tables": {},
@@ -16806,13 +16805,7 @@
                 "when": {
                   "all": []
                 },
-                "key": "about_line1"
-              },
-              {
-                "when": {
-                  "all": []
-                },
-                "key": "about_line2"
+                "key": "about_line"
               }
             ]
           },
@@ -17065,6 +17058,15 @@
             "title": "listen_title",
             "next": [
               {
+                "to": "not_now",
+                "when": {
+                  "eq": [
+                    "$a.listen",
+                    "skipped"
+                  ]
+                }
+              },
+              {
                 "to": "listen_end",
                 "when": null
               }
@@ -17098,7 +17100,17 @@
             "kind": "handoff",
             "title": "listen_end_title",
             "next": [],
-            "offers": [],
+            "offers": [
+              {
+                "exit": "problem_solve",
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "problem_solve"
+                  ]
+                }
+              }
+            ],
             "complete": true,
             "lines": [
               {
@@ -17125,7 +17137,17 @@
             "kind": "handoff",
             "title": "not_now_title",
             "next": [],
-            "offers": [],
+            "offers": [
+              {
+                "exit": "problem_solve",
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "problem_solve"
+                  ]
+                }
+              }
+            ],
             "complete": true,
             "lines": [
               {
@@ -17152,7 +17174,17 @@
             "kind": "handoff",
             "title": "mode_no_title",
             "next": [],
-            "offers": [],
+            "offers": [
+              {
+                "exit": "problem_solve",
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "problem_solve"
+                  ]
+                }
+              }
+            ],
             "complete": true,
             "lines": [
               {
@@ -17457,10 +17489,7 @@
               {
                 "exit": "join_in",
                 "when": {
-                  "eq": [
-                    "$ctx.frame",
-                    "blank"
-                  ]
+                  "all": []
                 }
               },
               {
@@ -17472,15 +17501,6 @@
             ],
             "complete": true,
             "lines": [
-              {
-                "when": {
-                  "eq": [
-                    "$ctx.frame",
-                    "blank"
-                  ]
-                },
-                "key": "drift_blank_line"
-              },
               {
                 "when": {
                   "all": []
@@ -17603,6 +17623,14 @@
             "carry": [],
             "done": false,
             "label": "one_thing"
+          },
+          {
+            "id": "problem_solve",
+            "toolId": "problem-solve",
+            "query": {},
+            "carry": [],
+            "done": false,
+            "label": "back_ps"
           },
           {
             "id": "safety_open",
@@ -40418,8 +40446,8 @@
         "ownMax": 40,
         "emotionFields": [],
         "copy": {
-          "anger_line": "Bring it down first. Join in will be here on a calmer day.",
-          "anger_title": "This one turns things up, and anger doesn't need more fuel today.",
+          "anger_line": "Today's a day to bring things down first.",
+          "anger_title": "This one turns things up.",
           "away_hint": "Put the phone down. Come back when you're done.",
           "away_line": "When you catch yourself watching yourself, drop back in.",
           "away_title": "Throw yourself in.",
@@ -40438,8 +40466,8 @@
           "gate_end_title": "Not now is fine.",
           "listen_instead": "Something slower: listen for a minute",
           "next": "Next",
-          "pick_blank_line": "The beat runs a little quicker today, in short rounds.",
-          "pick_hint": "Move in whatever way your body can. Sitting is fine.",
+          "pick_blank_line": "The beat runs a little quicker today, in short rounds. Sitting is fine.",
+          "pick_line": "Move in whatever way your body can. Sitting is fine.",
           "pick_title": "Pick something to throw yourself into.",
           "play_task": "Throw yourself in. When you catch yourself watching yourself, drop back in.",
           "play_task_hum": "Hum or sing along to the beat. Any tune, any words.",
@@ -40447,18 +40475,19 @@
           "play_task_tap": "Tap along, on the circle, a table or your knees.",
           "safety_open": "Talk to someone now",
           "settle_q": "Another round?",
-          "settle_title": "Let it settle for a few breaths.",
+          "settle_title": "Let it settle for a moment.",
           "skip_line": "It'll be here when you want it.",
           "skip_title": "Not this time.",
           "social_not_line": "Not yet is fine. It'll be there next time.",
-          "social_q": "Next time, with someone? I'll ask how it went.",
+          "social_q": "Join in at something with someone soon? I'll ask how it went.",
           "social_sort_line": "Some of it counts. Dropping back in is the practice.",
           "social_title": "Did you get to join in at something with someone?",
           "social_yes_line": "That's participating, off the phone and with people. It goes wherever you do.",
           "with_half": "Half in counts. Dropping back in is the practice.",
           "with_in": "That's participating. No watching needed.",
           "with_title": "How much were you in it?",
-          "with_watching": "Watching yourself is the thing you practise dropping. Noticing it is the start."
+          "with_watching": "Watching yourself is the thing you practise dropping. Noticing it is the start.",
+          "wound_title": "Then bring it down first."
         },
         "tables": {},
         "derive": [],
@@ -40470,186 +40499,6 @@
               {
                 "id": "thing",
                 "links": [
-                  {
-                    "exit": "cool_down",
-                    "label": "body_first",
-                    "when": {
-                      "any": [
-                        {
-                          "eq": [
-                            "$ctx.band",
-                            "flooded"
-                          ]
-                        },
-                        {
-                          "any": [
-                            {
-                              "has": [
-                                "$carried",
-                                "angry"
-                              ]
-                            },
-                            {
-                              "has": [
-                                "$carried",
-                                "mad"
-                              ]
-                            },
-                            {
-                              "has": [
-                                "$carried",
-                                "aggressive"
-                              ]
-                            },
-                            {
-                              "has": [
-                                "$carried",
-                                "furious"
-                              ]
-                            },
-                            {
-                              "has": [
-                                "$carried",
-                                "provoked"
-                              ]
-                            },
-                            {
-                              "has": [
-                                "$carried",
-                                "hostile"
-                              ]
-                            },
-                            {
-                              "has": [
-                                "$carried",
-                                "infuriated"
-                              ]
-                            },
-                            {
-                              "has": [
-                                "$carried",
-                                "indignant"
-                              ]
-                            },
-                            {
-                              "has": [
-                                "$carried",
-                                "bitter"
-                              ]
-                            },
-                            {
-                              "has": [
-                                "$carried",
-                                "resentful"
-                              ]
-                            },
-                            {
-                              "has": [
-                                "$carried",
-                                "frustrated"
-                              ]
-                            },
-                            {
-                              "has": [
-                                "$carried",
-                                "annoyed"
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  },
-                  {
-                    "exit": "listen",
-                    "label": "listen_instead",
-                    "when": {
-                      "any": [
-                        {
-                          "eq": [
-                            "$ctx.band",
-                            "flooded"
-                          ]
-                        },
-                        {
-                          "any": [
-                            {
-                              "has": [
-                                "$carried",
-                                "angry"
-                              ]
-                            },
-                            {
-                              "has": [
-                                "$carried",
-                                "mad"
-                              ]
-                            },
-                            {
-                              "has": [
-                                "$carried",
-                                "aggressive"
-                              ]
-                            },
-                            {
-                              "has": [
-                                "$carried",
-                                "furious"
-                              ]
-                            },
-                            {
-                              "has": [
-                                "$carried",
-                                "provoked"
-                              ]
-                            },
-                            {
-                              "has": [
-                                "$carried",
-                                "hostile"
-                              ]
-                            },
-                            {
-                              "has": [
-                                "$carried",
-                                "infuriated"
-                              ]
-                            },
-                            {
-                              "has": [
-                                "$carried",
-                                "indignant"
-                              ]
-                            },
-                            {
-                              "has": [
-                                "$carried",
-                                "bitter"
-                              ]
-                            },
-                            {
-                              "has": [
-                                "$carried",
-                                "resentful"
-                              ]
-                            },
-                            {
-                              "has": [
-                                "$carried",
-                                "frustrated"
-                              ]
-                            },
-                            {
-                              "has": [
-                                "$carried",
-                                "annoyed"
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  },
                   {
                     "exit": "safety_open",
                     "label": "safety_open",
@@ -40963,9 +40812,12 @@
               {
                 "to": "gate_end",
                 "when": {
-                  "eq": [
+                  "in": [
                     "$a.thing",
-                    "not_now"
+                    [
+                      "not_now",
+                      "wound_up"
+                    ]
                   ]
                 }
               },
@@ -41038,7 +40890,6 @@
               }
             ],
             "offers": [],
-            "hint": "pick_hint",
             "lines": [
               {
                 "when": {
@@ -41136,15 +40987,50 @@
                   ]
                 },
                 "key": "pick_blank_line"
+              },
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "pick_line"
               }
             ]
           },
           {
             "id": "gate_end",
             "kind": "handoff",
-            "title": "gate_end_title",
+            "title": [
+              {
+                "key": "wound_title",
+                "when": {
+                  "eq": [
+                    "$a.thing",
+                    "wound_up"
+                  ]
+                }
+              },
+              {
+                "key": "gate_end_title",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
             "next": [],
-            "offers": [],
+            "offers": [
+              {
+                "exit": "cool_down",
+                "when": {
+                  "all": []
+                }
+              },
+              {
+                "exit": "listen",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
             "complete": false,
             "lines": [
               {
@@ -41444,15 +41330,6 @@
               }
             ],
             "next": [
-              {
-                "to": "skip_end",
-                "when": {
-                  "eq": [
-                    "$a.play_blank2",
-                    "skipped"
-                  ]
-                }
-              },
               {
                 "to": "with",
                 "when": null
@@ -41796,8 +41673,14 @@
               "beat": false
             },
             {
+              "value": "wound_up",
+              "label": "I'm wound up or angry right now",
+              "gate": false,
+              "beat": false
+            },
+            {
               "value": "not_now",
-              "label": "Not now",
+              "label": "Bring it down first",
               "gate": true
             }
           ],
@@ -70716,7 +70599,8 @@
             "id": "doing_being",
             "toolId": "doing-being",
             "query": {
-              "enterAt": "mode"
+              "enterAt": "mode",
+              "frame": "problem_solve"
             },
             "carry": [],
             "done": false

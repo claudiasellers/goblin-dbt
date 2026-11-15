@@ -323,7 +323,7 @@ EXITS = [{**{k: v for k, v in e.items() if k != "planned"}, "toolId": ENTRY_ALIA
 EXITS = [{**e, "query": {"frame": "$a.solutions"}} if e["toolId"] == "effectiveness" else e for e in EXITS]
 # The rumination guard (MF-09, MF-B9): *I've been thinking about it constantly* links Doing mind, being mind's card, in
 # case the thinking is doing mind aimed at a feeling.
-EXITS += [{"id": "doing_being", "toolId": "doing-being", "query": {"enterAt": "mode"}}]
+EXITS += [{"id": "doing_being", "toolId": "doing-being", "query": {"enterAt": "mode", "frame": "problem_solve"}}]
 EXITS += [{"id": "safety_open", "safety": True}, {"id": "done", "done": True}]
 
 
