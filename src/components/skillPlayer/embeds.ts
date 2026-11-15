@@ -601,11 +601,14 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     line: { type: 'copy' },
     seconds: { type: 'int', min: 10, max: 60 },
     start: { type: 'copy' },
-    running: { type: 'copy' },
     hint: { type: 'copy' },
     done: { type: 'copy' },
     next: { type: 'copy' },
     /** The quiet way on before the last wish (named apart from `next` for screen readers). */
     skip: { type: 'copy' },
+    /** 1: only the chip picks become wishes (own words written for another tier are left out). */
+    chipsOnly: { type: 'int', min: 0, max: 1, optional: true },
+    /** The wish offered when nothing usable was picked. */
+    fallback: { type: 'copy', optional: true },
   },
 };

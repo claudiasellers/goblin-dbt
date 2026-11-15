@@ -544,7 +544,7 @@ export const tools: Tool[] = [
     description: 'Pick someone, start with someone easy, and offer them two or three kind wishes, one at a time. The wishes don\'t need to feel true. Offering them is the practice.',
     whenToUse: 'On a calmer day, when you\'re hard on yourself or sore after being turned away.',
     module: 'mindfulness',
-    dbtBasis: 'DBT Mindfulness: loving kindness',
+    dbtBasis: 'DBT Mindfulness: loving kindness (Mindfulness Handout 8, Worksheet 6)',
     emoji: '🕊️',
     bare: true,
   },

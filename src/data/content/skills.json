@@ -39359,18 +39359,18 @@
         "ownMax": 40,
         "emotionFields": [],
         "copy": {
+          "backdraft_deserve": "You don't have to deserve it. Offering is the practice, not believing it.",
           "backdraft_line": "It's called backdraft, and it isn't failure.",
           "backdraft_title": "That's common. Warmth can wake old hurts.",
           "body_first": "My body first",
-          "body_first_line": "Kind wishes will keep for a calmer minute.",
-          "body_first_title": "Settle your body first.",
           "came_hint": "Any of these is fine.",
           "came_title": "What came up?",
-          "check_hint": "Kind wishes are never owed to someone who hurts you.",
-          "check_title": "Has this person hurt you, or could they?",
+          "check_hint": "Someone annoying or hard to be around is fine to pick. Kind wishes are never owed to someone who hurts or scares you.",
+          "check_title": "Has this person ever threatened you, scared you or hurt you, or could they?",
           "done": "Done",
-          "end_easy": "Next time, someone easy again is a good place to start.",
-          "end_line": "Next time, try your own words, or someone one step further out.",
+          "end_easy": "Next time, someone easy is a good place to begin.",
+          "end_line": "Next time, try your own words, or someone a little less easy.",
+          "end_own": "Next time, try them in your own words.",
           "end_stopped": "You stopped when it got heavy. That's looking after yourself.",
           "end_title": "You offered kind wishes. That's the practice.",
           "ending_careful": "Leaving someone who might hurt me",
@@ -39388,29 +39388,37 @@
           "line_me": "May I {wish}.",
           "line_you": "May you {wish}.",
           "next": "Next",
-          "not_them_line": "Send the wishes somewhere else today. Support is here if you want it.",
+          "not_them_line": "Send the wishes somewhere else today, or stop here. Support is here if you want it.",
           "not_them_title": "Then not this one. Your safety comes first.",
           "offer_again_title": "Picture someone easy, and offer them the same wishes.",
           "offer_done": "All offered.",
+          "offer_easy_title": "Picture someone easy, and offer them one at a time.",
+          "offer_fallback": "Be at ease",
           "offer_hint": "The wishes don't need to feel true. Offering them is the practice.",
           "offer_ring_hint": "Tap to offer this wish. The ring fills slowly. Tap again to stop.",
-          "offer_running": "Offering",
           "offer_self_title": "Offer them to yourself, one at a time.",
           "offer_skip": "Move on",
           "offer_start": "Offer it",
           "offer_title": "Offer them one at a time.",
           "safety_open": "Talk to someone now",
-          "twice_line": "That happens. It's worth talking through with someone you trust. Next time, start with someone easy.",
+          "skip_line": "The wishes will keep for another day.",
+          "skip_title": "Not this time.",
+          "stop_safe_line": "Support is here if you want it.",
+          "stop_safe_title": "Stopping here is a real answer.",
+          "twice_line": "That happens. It's worth talking through with someone you trust. Next time, a hand on your heart first, then someone easy.",
           "twice_title": "Warmth keeps stirring things up today.",
-          "who_flooded": "Someone easy, for today.",
           "who_hint": "Someone easy is a good place to start.",
-          "who_stirred": "With things stirred up, someone easy or someone neutral works best today.",
+          "who_stirred": "With things stirred up, wishes for yourself or someone difficult can wait for a steadier day.",
           "who_title": "Who will you send kind wishes to?",
-          "wish_own": "My own words",
-          "wishes_all": "Pick two or three wishes for everyone around you.",
+          "wish_own": "My own wish",
+          "wishes_all": "Pick up to three wishes for everyone around you.",
+          "wishes_all_line": "Leave out anyone who hurts or scares you. Kind wishes are never owed to them.",
+          "wishes_easy": "Pick up to three wishes for someone easy.",
           "wishes_hint": "Pick the ones that sound kind. They don't need to feel true.",
-          "wishes_other": "Pick two or three wishes for them.",
-          "wishes_self": "Pick two or three wishes for yourself."
+          "wishes_other": "Pick up to three wishes for them.",
+          "wishes_own_me": "Your own words finish the line \"May I…\"",
+          "wishes_own_you": "Your own words finish the line \"May you…\"",
+          "wishes_self": "Pick up to three wishes for yourself."
         },
         "tables": {},
         "derive": [],
@@ -39422,6 +39430,26 @@
               {
                 "id": "who",
                 "links": [
+                  {
+                    "exit": "cool_down",
+                    "label": "body_first",
+                    "when": {
+                      "eq": [
+                        "$ctx.band",
+                        "flooded"
+                      ]
+                    }
+                  },
+                  {
+                    "exit": "held_hand",
+                    "label": "hand_offer",
+                    "when": {
+                      "eq": [
+                        "$ctx.band",
+                        "flooded"
+                      ]
+                    }
+                  },
                   {
                     "exit": "safety_open",
                     "label": "safety_open",
@@ -39445,26 +39473,24 @@
                 "required": true
               }
             ],
-            "title": "who_title",
-            "next": [
+            "title": [
               {
-                "to": "heads_up",
+                "key": "heads_up_title",
                 "when": {
-                  "all": [
-                    {
-                      "eq": [
-                        "$ctx.band",
-                        "flooded"
-                      ]
-                    },
-                    {
-                      "not": {
-                        "set": "$a.heads_up"
-                      }
-                    }
+                  "eq": [
+                    "$ctx.band",
+                    "flooded"
                   ]
                 }
               },
+              {
+                "key": "who_title",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "next": [
               {
                 "to": "check",
                 "when": {
@@ -39489,7 +39515,7 @@
                     "flooded"
                   ]
                 },
-                "key": "who_flooded"
+                "key": "heads_up_line"
               },
               {
                 "when": {
@@ -39501,94 +39527,6 @@
                 "key": "who_stirred"
               }
             ]
-          },
-          {
-            "id": "heads_up",
-            "kind": "ask",
-            "fields": [
-              {
-                "id": "heads_up",
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ],
-                "max": 1,
-                "options": {
-                  "list": "heads_up"
-                },
-                "required": true
-              }
-            ],
-            "title": "heads_up_title",
-            "next": [
-              {
-                "to": "body_first",
-                "when": {
-                  "eq": [
-                    "$a.heads_up",
-                    "body"
-                  ]
-                }
-              },
-              {
-                "to": "wishes",
-                "when": null
-              }
-            ],
-            "offers": [],
-            "lines": [
-              {
-                "when": {
-                  "all": []
-                },
-                "key": "heads_up_line"
-              }
-            ]
-          },
-          {
-            "id": "body_first",
-            "kind": "handoff",
-            "title": "body_first_title",
-            "next": [],
-            "offers": [
-              {
-                "exit": "cool_down",
-                "when": {
-                  "all": []
-                }
-              },
-              {
-                "exit": "held_hand",
-                "when": {
-                  "all": []
-                }
-              }
-            ],
-            "complete": false,
-            "lines": [
-              {
-                "when": {
-                  "all": []
-                },
-                "key": "body_first_line"
-              }
-            ],
-            "done": "done",
-            "links": [
-              {
-                "exit": "safety_open",
-                "label": "safety_open",
-                "when": {
-                  "all": []
-                }
-              }
-            ],
-            "noClose": true
           },
           {
             "id": "check",
@@ -39676,6 +39614,15 @@
             "title": "not_them_title",
             "next": [
               {
+                "to": "stop_safe",
+                "when": {
+                  "eq": [
+                    "$a.instead",
+                    "stop"
+                  ]
+                }
+              },
+              {
                 "to": "wishes",
                 "when": null
               }
@@ -39689,6 +39636,54 @@
                 "key": "not_them_line"
               }
             ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
+          },
+          {
+            "id": "stop_safe",
+            "kind": "handoff",
+            "title": "stop_safe_title",
+            "next": [],
+            "offers": [
+              {
+                "exit": "ending_careful",
+                "when": {
+                  "all": []
+                }
+              },
+              {
+                "exit": "held_hand",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "complete": false,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "stop_safe_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
             "crisis": [
               {
                 "variant": "other_person",
@@ -39726,20 +39721,91 @@
             ],
             "title": [
               {
+                "key": "wishes_easy",
+                "when": {
+                  "all": [
+                    {
+                      "all": [
+                        {
+                          "eq": [
+                            "$a.who",
+                            "difficult"
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.check",
+                            [
+                              "yes",
+                              "unsure"
+                            ]
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$a.instead",
+                        "easy"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
                 "key": "wishes_self",
                 "when": {
                   "any": [
                     {
-                      "eq": [
-                        "$a.instead",
-                        "self"
+                      "all": [
+                        {
+                          "all": [
+                            {
+                              "eq": [
+                                "$a.who",
+                                "difficult"
+                              ]
+                            },
+                            {
+                              "in": [
+                                "$a.check",
+                                [
+                                  "yes",
+                                  "unsure"
+                                ]
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "eq": [
+                            "$a.instead",
+                            "self"
+                          ]
+                        }
                       ]
                     },
                     {
                       "all": [
                         {
                           "not": {
-                            "set": "$a.instead"
+                            "all": [
+                              {
+                                "eq": [
+                                  "$a.who",
+                                  "difficult"
+                                ]
+                              },
+                              {
+                                "in": [
+                                  "$a.check",
+                                  [
+                                    "yes",
+                                    "unsure"
+                                  ]
+                                ]
+                              }
+                            ]
                           }
                         },
                         {
@@ -39758,16 +39824,55 @@
                 "when": {
                   "any": [
                     {
-                      "eq": [
-                        "$a.instead",
-                        "everyone"
+                      "all": [
+                        {
+                          "all": [
+                            {
+                              "eq": [
+                                "$a.who",
+                                "difficult"
+                              ]
+                            },
+                            {
+                              "in": [
+                                "$a.check",
+                                [
+                                  "yes",
+                                  "unsure"
+                                ]
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "eq": [
+                            "$a.instead",
+                            "everyone"
+                          ]
+                        }
                       ]
                     },
                     {
                       "all": [
                         {
                           "not": {
-                            "set": "$a.instead"
+                            "all": [
+                              {
+                                "eq": [
+                                  "$a.who",
+                                  "difficult"
+                                ]
+                              },
+                              {
+                                "in": [
+                                  "$a.check",
+                                  [
+                                    "yes",
+                                    "unsure"
+                                  ]
+                                ]
+                              }
+                            ]
                           }
                         },
                         {
@@ -39794,16 +39899,55 @@
                 "when": {
                   "any": [
                     {
-                      "eq": [
-                        "$a.instead",
-                        "self"
+                      "all": [
+                        {
+                          "all": [
+                            {
+                              "eq": [
+                                "$a.who",
+                                "difficult"
+                              ]
+                            },
+                            {
+                              "in": [
+                                "$a.check",
+                                [
+                                  "yes",
+                                  "unsure"
+                                ]
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "eq": [
+                            "$a.instead",
+                            "self"
+                          ]
+                        }
                       ]
                     },
                     {
                       "all": [
                         {
                           "not": {
-                            "set": "$a.instead"
+                            "all": [
+                              {
+                                "eq": [
+                                  "$a.who",
+                                  "difficult"
+                                ]
+                              },
+                              {
+                                "in": [
+                                  "$a.check",
+                                  [
+                                    "yes",
+                                    "unsure"
+                                  ]
+                                ]
+                              }
+                            ]
                           }
                         },
                         {
@@ -39822,16 +39966,55 @@
                 "when": {
                   "any": [
                     {
-                      "eq": [
-                        "$a.instead",
-                        "everyone"
+                      "all": [
+                        {
+                          "all": [
+                            {
+                              "eq": [
+                                "$a.who",
+                                "difficult"
+                              ]
+                            },
+                            {
+                              "in": [
+                                "$a.check",
+                                [
+                                  "yes",
+                                  "unsure"
+                                ]
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "eq": [
+                            "$a.instead",
+                            "everyone"
+                          ]
+                        }
                       ]
                     },
                     {
                       "all": [
                         {
                           "not": {
-                            "set": "$a.instead"
+                            "all": [
+                              {
+                                "eq": [
+                                  "$a.who",
+                                  "difficult"
+                                ]
+                              },
+                              {
+                                "in": [
+                                  "$a.check",
+                                  [
+                                    "yes",
+                                    "unsure"
+                                  ]
+                                ]
+                              }
+                            ]
                           }
                         },
                         {
@@ -39851,13 +40034,203 @@
               }
             ],
             "offers": [],
-            "hint": "wishes_hint"
+            "hint": "wishes_hint",
+            "lines": [
+              {
+                "when": {
+                  "any": [
+                    {
+                      "all": [
+                        {
+                          "all": [
+                            {
+                              "eq": [
+                                "$a.who",
+                                "difficult"
+                              ]
+                            },
+                            {
+                              "in": [
+                                "$a.check",
+                                [
+                                  "yes",
+                                  "unsure"
+                                ]
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "eq": [
+                            "$a.instead",
+                            "everyone"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "all": [
+                        {
+                          "not": {
+                            "all": [
+                              {
+                                "eq": [
+                                  "$a.who",
+                                  "difficult"
+                                ]
+                              },
+                              {
+                                "in": [
+                                  "$a.check",
+                                  [
+                                    "yes",
+                                    "unsure"
+                                  ]
+                                ]
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "eq": [
+                            "$a.who",
+                            "everyone"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "key": "wishes_all_line"
+              },
+              {
+                "when": {
+                  "any": [
+                    {
+                      "all": [
+                        {
+                          "all": [
+                            {
+                              "eq": [
+                                "$a.who",
+                                "difficult"
+                              ]
+                            },
+                            {
+                              "in": [
+                                "$a.check",
+                                [
+                                  "yes",
+                                  "unsure"
+                                ]
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "eq": [
+                            "$a.instead",
+                            "self"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "all": [
+                        {
+                          "not": {
+                            "all": [
+                              {
+                                "eq": [
+                                  "$a.who",
+                                  "difficult"
+                                ]
+                              },
+                              {
+                                "in": [
+                                  "$a.check",
+                                  [
+                                    "yes",
+                                    "unsure"
+                                  ]
+                                ]
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "eq": [
+                            "$a.who",
+                            "self"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "key": "wishes_own_me"
+              },
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "wishes_own_you"
+              }
+            ]
           },
           {
             "id": "offer_other",
             "kind": "embed",
-            "title": "offer_title",
+            "title": [
+              {
+                "key": "offer_easy_title",
+                "when": {
+                  "all": [
+                    {
+                      "all": [
+                        {
+                          "eq": [
+                            "$a.who",
+                            "difficult"
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.check",
+                            [
+                              "yes",
+                              "unsure"
+                            ]
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$a.instead",
+                        "easy"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "key": "offer_title",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
             "next": [
+              {
+                "to": "skip_end",
+                "when": {
+                  "eq": [
+                    "$a.offered",
+                    "skipped"
+                  ]
+                }
+              },
               {
                 "to": "came",
                 "when": null
@@ -39870,9 +40243,8 @@
             "props": {
               "wishes": "wishes",
               "line": "line_you",
-              "seconds": 20,
+              "seconds": 30,
               "start": "offer_start",
-              "running": "offer_running",
               "hint": "offer_ring_hint",
               "done": "offer_done",
               "next": "next",
@@ -39894,6 +40266,15 @@
             "title": "offer_self_title",
             "next": [
               {
+                "to": "skip_end",
+                "when": {
+                  "eq": [
+                    "$a.offered_self",
+                    "skipped"
+                  ]
+                }
+              },
+              {
                 "to": "came",
                 "when": null
               }
@@ -39905,9 +40286,8 @@
             "props": {
               "wishes": "wishes",
               "line": "line_me",
-              "seconds": 20,
+              "seconds": 30,
               "start": "offer_start",
-              "running": "offer_running",
               "hint": "offer_ring_hint",
               "done": "offer_done",
               "next": "next",
@@ -39929,6 +40309,15 @@
             "title": "offer_title",
             "next": [
               {
+                "to": "skip_end",
+                "when": {
+                  "eq": [
+                    "$a.offered_all",
+                    "skipped"
+                  ]
+                }
+              },
+              {
                 "to": "came",
                 "when": null
               }
@@ -39940,9 +40329,8 @@
             "props": {
               "wishes": "wishes",
               "line": "line_all",
-              "seconds": 20,
+              "seconds": 30,
               "start": "offer_start",
-              "running": "offer_running",
               "hint": "offer_ring_hint",
               "done": "offer_done",
               "next": "next",
@@ -39975,7 +40363,83 @@
                 ],
                 "max": 1,
                 "options": {
-                  "list": "came"
+                  "list": "came",
+                  "where": {
+                    "any": [
+                      {
+                        "not": {
+                          "eq": [
+                            "$opt.value",
+                            "undeserved"
+                          ]
+                        }
+                      },
+                      {
+                        "any": [
+                          {
+                            "all": [
+                              {
+                                "all": [
+                                  {
+                                    "eq": [
+                                      "$a.who",
+                                      "difficult"
+                                    ]
+                                  },
+                                  {
+                                    "in": [
+                                      "$a.check",
+                                      [
+                                        "yes",
+                                        "unsure"
+                                      ]
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "eq": [
+                                  "$a.instead",
+                                  "self"
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "all": [
+                              {
+                                "not": {
+                                  "all": [
+                                    {
+                                      "eq": [
+                                        "$a.who",
+                                        "difficult"
+                                      ]
+                                    },
+                                    {
+                                      "in": [
+                                        "$a.check",
+                                        [
+                                          "yes",
+                                          "unsure"
+                                        ]
+                                      ]
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "eq": [
+                                  "$a.who",
+                                  "self"
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
                 },
                 "required": true
               }
@@ -39989,7 +40453,8 @@
                     "$a.came",
                     [
                       "sad",
-                      "stirred"
+                      "stirred",
+                      "undeserved"
                     ]
                   ]
                 }
@@ -40034,16 +40499,55 @@
                         "not": {
                           "any": [
                             {
-                              "eq": [
-                                "$a.instead",
-                                "easy"
+                              "all": [
+                                {
+                                  "all": [
+                                    {
+                                      "eq": [
+                                        "$a.who",
+                                        "difficult"
+                                      ]
+                                    },
+                                    {
+                                      "in": [
+                                        "$a.check",
+                                        [
+                                          "yes",
+                                          "unsure"
+                                        ]
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "eq": [
+                                    "$a.instead",
+                                    "easy"
+                                  ]
+                                }
                               ]
                             },
                             {
                               "all": [
                                 {
                                   "not": {
-                                    "set": "$a.instead"
+                                    "all": [
+                                      {
+                                        "eq": [
+                                          "$a.who",
+                                          "difficult"
+                                        ]
+                                      },
+                                      {
+                                        "in": [
+                                          "$a.check",
+                                          [
+                                            "yes",
+                                            "unsure"
+                                          ]
+                                        ]
+                                      }
+                                    ]
                                   }
                                 },
                                 {
@@ -40092,6 +40596,15 @@
             "lines": [
               {
                 "when": {
+                  "eq": [
+                    "$a.came",
+                    "undeserved"
+                  ]
+                },
+                "key": "backdraft_deserve"
+              },
+              {
+                "when": {
                   "all": []
                 },
                 "key": "backdraft_line"
@@ -40138,6 +40651,15 @@
             "title": "offer_again_title",
             "next": [
               {
+                "to": "end",
+                "when": {
+                  "eq": [
+                    "$a.offered_again",
+                    "skipped"
+                  ]
+                }
+              },
+              {
                 "to": "came_again",
                 "when": null
               }
@@ -40149,13 +40671,14 @@
             "props": {
               "wishes": "wishes",
               "line": "line_you",
-              "seconds": 20,
+              "seconds": 30,
               "start": "offer_start",
-              "running": "offer_running",
               "hint": "offer_ring_hint",
               "done": "offer_done",
               "next": "next",
-              "skip": "offer_skip"
+              "skip": "offer_skip",
+              "chipsOnly": 1,
+              "fallback": "offer_fallback"
             },
             "links": [
               {
@@ -40184,7 +40707,15 @@
                 ],
                 "max": 1,
                 "options": {
-                  "list": "came"
+                  "list": "came",
+                  "where": {
+                    "not": {
+                      "eq": [
+                        "$opt.value",
+                        "undeserved"
+                      ]
+                    }
+                  }
                 },
                 "required": true
               }
@@ -40194,12 +40725,23 @@
               {
                 "to": "twice",
                 "when": {
-                  "in": [
-                    "$a.came_again",
-                    [
-                      "sad",
-                      "stirred"
-                    ]
+                  "all": [
+                    {
+                      "eq": [
+                        "$a.step_down",
+                        "easier"
+                      ]
+                    },
+                    {
+                      "in": [
+                        "$a.came_again",
+                        [
+                          "sad",
+                          "stirred",
+                          "undeserved"
+                        ]
+                      ]
+                    }
                   ]
                 }
               },
@@ -40258,9 +40800,23 @@
               {
                 "key": "end_stopped",
                 "when": {
-                  "eq": [
-                    "$a.step_down",
-                    "stop"
+                  "all": [
+                    {
+                      "in": [
+                        "$a.came",
+                        [
+                          "sad",
+                          "stirred",
+                          "undeserved"
+                        ]
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$a.step_down",
+                        "stop"
+                      ]
+                    }
                   ]
                 }
               },
@@ -40283,17 +40839,29 @@
                         "$a.came",
                         [
                           "sad",
-                          "stirred"
+                          "stirred",
+                          "undeserved"
                         ]
                       ]
                     },
                     {
-                      "in": [
-                        "$a.came_again",
-                        [
-                          "sad",
-                          "stirred"
-                        ]
+                      "all": [
+                        {
+                          "eq": [
+                            "$a.step_down",
+                            "easier"
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.came_again",
+                            [
+                              "sad",
+                              "stirred",
+                              "undeserved"
+                            ]
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -40302,9 +40870,171 @@
               },
               {
                 "when": {
+                  "any": [
+                    {
+                      "any": [
+                        {
+                          "all": [
+                            {
+                              "all": [
+                                {
+                                  "eq": [
+                                    "$a.who",
+                                    "difficult"
+                                  ]
+                                },
+                                {
+                                  "in": [
+                                    "$a.check",
+                                    [
+                                      "yes",
+                                      "unsure"
+                                    ]
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "eq": [
+                                "$a.instead",
+                                "everyone"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "all": [
+                            {
+                              "not": {
+                                "all": [
+                                  {
+                                    "eq": [
+                                      "$a.who",
+                                      "difficult"
+                                    ]
+                                  },
+                                  {
+                                    "in": [
+                                      "$a.check",
+                                      [
+                                        "yes",
+                                        "unsure"
+                                      ]
+                                    ]
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "eq": [
+                                "$a.who",
+                                "everyone"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "all": [
+                            {
+                              "all": [
+                                {
+                                  "eq": [
+                                    "$a.who",
+                                    "difficult"
+                                  ]
+                                },
+                                {
+                                  "in": [
+                                    "$a.check",
+                                    [
+                                      "yes",
+                                      "unsure"
+                                    ]
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "eq": [
+                                "$a.instead",
+                                "difficult"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "all": [
+                            {
+                              "not": {
+                                "all": [
+                                  {
+                                    "eq": [
+                                      "$a.who",
+                                      "difficult"
+                                    ]
+                                  },
+                                  {
+                                    "in": [
+                                      "$a.check",
+                                      [
+                                        "yes",
+                                        "unsure"
+                                      ]
+                                    ]
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "eq": [
+                                "$a.who",
+                                "difficult"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "key": "end_own"
+              },
+              {
+                "when": {
                   "all": []
                 },
                 "key": "end_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true
+          },
+          {
+            "id": "skip_end",
+            "kind": "handoff",
+            "title": "skip_title",
+            "next": [],
+            "offers": [],
+            "complete": false,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "skip_line"
               }
             ],
             "done": "done",
@@ -40366,16 +41096,6 @@
           }
         ],
         "options": {
-          "heads_up": [
-            {
-              "value": "body",
-              "label": "My body first"
-            },
-            {
-              "value": "go",
-              "label": "Someone easy, anyway"
-            }
-          ],
           "who": [
             {
               "value": "easy",
@@ -40409,6 +41129,7 @@
               "value": "everyone",
               "label": "Everyone around me right now",
               "hideIn": [
+                "stirred",
                 "flooded"
               ]
             }
@@ -40416,7 +41137,7 @@
           "check": [
             {
               "value": "no",
-              "label": "No"
+              "label": "No, they're hard to be around"
             },
             {
               "value": "yes",
@@ -40429,12 +41150,16 @@
           ],
           "instead": [
             {
-              "value": "self",
-              "label": "Send them to me instead"
+              "value": "easy",
+              "label": "To someone easy instead"
             },
             {
-              "value": "easy",
-              "label": "Someone easy instead"
+              "value": "self",
+              "label": "To me instead"
+            },
+            {
+              "value": "stop",
+              "label": "Not today"
             }
           ],
           "wishes": [
@@ -40456,7 +41181,7 @@
             },
             {
               "value": "free",
-              "label": "Be free from this pain"
+              "label": "Be free from pain"
             }
           ],
           "came": [
@@ -40478,6 +41203,11 @@
             {
               "value": "stirred",
               "label": "Stirred up or angry",
+              "backdraft": true
+            },
+            {
+              "value": "undeserved",
+              "label": "It felt like I don't deserve it",
               "backdraft": true
             }
           ],

@@ -49,36 +49,38 @@ test("the skill: the kind-wishes tool on the new dbt_loving_kindness, listed und
   for (const id of ["end", "twice"]) assert.equal(step(id).noClose, true, id);
 });
 
-test("who: the PRD's tiers in order; stirred lists easy, neutral and everyone; Talk to someone now on every screen", () => {
+test("who: the PRD's tiers in order; stirred lists easy and neutral; Talk to someone now on every screen", () => {
   const s0 = M.initialRun(skill);
   assert.deepEqual(ids(s0, "who"), ["easy", "neutral", "self", "difficult", "everyone"]);
   const st = ctx({ band: "stirred" });
-  assert.deepEqual(ids(s0, "who", st), ["easy", "neutral", "everyone"]);
-  assert.match(M.handoffLine(st, step("who"), s0), /someone easy or someone neutral/);
-  for (const st2 of skill.steps.filter((x) => x.kind !== "handoff" || x.id !== "body_first")) {
+  assert.deepEqual(ids(s0, "who", st), ["easy", "neutral"], "everyone can include someone difficult: steady only");
+  assert.match(M.handoffLine(st, step("who"), s0), /wishes for yourself or someone difficult can wait/);
+  assert.ok(!M.handoffLine(ctx(), step("who"), s0));
+  for (const st2 of skill.steps) {
     const hasSafety = (st2.links ?? []).some((l) => l.exit === "safety_open") || (st2.fields ?? []).some((f) => (f.links ?? []).some((l) => l.exit === "safety_open"))
       || (st2.offers ?? []).some((o) => o.exit === "safety_open");
     assert.ok(hasSafety, st2.id);
   }
 });
 
-test("a carried flooded reading: a heads-up, the body first or someone easy anyway; never a lock", () => {
+test("a carried flooded reading: the heads-up before anyone is picked, someone easy only, the body and the hand as links; never a lock", () => {
   const fl = ctx({ band: "flooded" });
   const s0 = M.initialRun(skill);
+  assert.equal(s0.stepId, "who");
+  assert.equal(title(s0, fl), "Kind wishes work best on a calmer day.");
+  assert.match(M.handoffLine(fl, step("who"), s0), /Settle it first, or offer them to someone easy/);
   assert.deepEqual(ids(s0, "who", fl), ["easy"]);
-  const heads = run(to("easy"), fl);
-  assert.equal(heads.stepId, "heads_up");
-  assert.equal(title(heads, fl), "Kind wishes work best on a calmer day.");
-  const body = run([pick("heads_up", "body"), next], fl, heads);
-  assert.equal(body.stepId, "body_first");
-  assert.deepEqual(M.offersFor(fl, step("body_first"), body), ["cool_down", "held_hand"]);
-  assert.equal(step("body_first").complete, false);
-  assert.equal(run([pick("heads_up", "go"), next], fl, heads).stepId, "wishes");
+  assert.deepEqual(links(s0, fl), ["cool_down", "held_hand", "safety_open"]);
+  assert.deepEqual(links(s0), ["safety_open"], "no body links on a calm day");
+  assert.equal(run(to("easy"), fl).stepId, "wishes");
+  assert.equal(skill.exits.find((e) => e.id === "cool_down").label, "body_first");
 });
 
 test("someone difficult: asked whether they hurt you; yes or not sure → never warmth toward them (other_person, Ending careful)", () => {
   const check = run(to("difficult"));
   assert.equal(check.stepId, "check");
+  assert.equal(title(check), "Has this person ever threatened you, scared you or hurt you, or could they?");
+  assert.deepEqual(ids(check, "check"), ["no", "yes", "unsure"]);
   assert.equal(run([pick("check", "no"), next], ctx(), check).stepId, "wishes");
   for (const v of ["yes", "unsure"]) {
     const not = run([pick("check", v), next], ctx(), check);
@@ -88,10 +90,24 @@ test("someone difficult: asked whether they hurt you; yes or not sure → never 
     assert.ok(links(not).includes("safety_open"));
   }
   const self = run([pick("check", "yes"), next, pick("instead", "self"), next], ctx(), check);
-  assert.equal(title(self), "Pick two or three wishes for yourself.");
+  assert.equal(title(self), "Pick up to three wishes for yourself.");
   assert.equal(run(WISH, ctx(), self).stepId, "offer_self");
-  const easy = run([pick("check", "unsure"), next, pick("instead", "easy"), next, ...WISH], ctx(), check);
+  const easyW = run([pick("check", "unsure"), next, pick("instead", "easy"), next], ctx(), check);
+  assert.equal(title(easyW), "Pick up to three wishes for someone easy.");
+  const easy = run(WISH, ctx(), easyW);
   assert.equal(easy.stepId, "offer_other");
+  assert.match(title(easy), /Picture someone easy/);
+  // Not today: a real answer, no rep, the resources still there.
+  const stop = run([pick("check", "yes"), next, pick("instead", "stop"), next], ctx(), check);
+  assert.equal(stop.stepId, "stop_safe");
+  assert.equal(step("stop_safe").complete, false);
+  assert.ok(step("stop_safe").crisis.some((c) => c.variant === "other_person"));
+  assert.deepEqual(M.offersFor(ctx(), step("stop_safe"), stop), ["ending_careful", "held_hand"]);
+  // An answer left behind by Back never steers: back to the check, *No*, and the wishes are for them, not for me.
+  const viaBack = run([pick("check", "yes"), next, pick("instead", "self"), next, { type: "back" }, { type: "back" }, pick("check", "no"), next], ctx(), check);
+  assert.equal(viaBack.stepId, "wishes");
+  assert.equal(title(viaBack), "Pick up to three wishes for them.");
+  assert.equal(run(WISH, ctx(), viaBack).stepId, "offer_other");
   assert.deepEqual(skill.exits.find((e) => e.id === "ending_careful").query, { frame: "careful" });
 });
 
@@ -101,6 +117,12 @@ test("the wishes and the offer: up to three or own words; May you / May I / May 
   assert.equal(run([...to("self"), ...WISH]).stepId, "offer_self");
   assert.equal(run([...to("everyone"), ...WISH]).stepId, "offer_all");
   assert.equal(run([...to("neutral"), own("wishes", "sleep well"), next]).stepId, "offer_other", "own words alone are enough");
+  // Own words finish the tier's line, and the screen says so.
+  const w = (who) => run(to(who));
+  assert.match(M.handoffLine(ctx(), step("wishes"), w("easy")), /finish the line "May you…"/);
+  assert.match(M.handoffLine(ctx(), step("wishes"), w("self")), /finish the line "May I…"/);
+  assert.match(M.handoffLine(ctx(), step("wishes"), w("everyone")), /Leave out anyone who hurts or scares you/);
+  assert.equal(skill.copy.wish_own, "My own wish");
   const lineOf = (id) => skill.copy[step(id).props.line];
   assert.equal(lineOf("offer_other"), "May you {wish}.");
   assert.equal(lineOf("offer_self"), "May I {wish}.");
@@ -113,7 +135,18 @@ test("the wishes and the offer: up to three or own words; May you / May I / May 
   // The offer's lines.
   assert.deepEqual(K.wishLines(["Be safe", "Rest", "sleep well"], "May you {wish}."), ["May you be safe.", "May you rest.", "May you sleep well."]);
   assert.deepEqual(K.wishLines(["Be at ease"], "May I {wish}."), ["May I be at ease."]);
-  assert.deepEqual(K.wishLines(["may you find peace", "May they be well!", "  "], "May you {wish}."), ["may you find peace.", "May they be well!"]);
+  assert.deepEqual(K.wishLines(["may you find peace", "May they be well!", "  "], "May you {wish}."), ["May you find peace.", "May they be well!"]);
+  // Own words that already say who: shown as typed, capitalised, never garbled into the template.
+  assert.deepEqual(K.wishLines(["I am enough", "i'm okay", "you deserve rest", "everyone gets home safe."], "May I {wish}."),
+    ["I am enough.", "I'm okay.", "You deserve rest.", "Everyone gets home safe."]);
+  assert.deepEqual(K.wishLines(["Happiness", "Feel loved"], "May you {wish}."), ["May you happiness.", "May you feel loved."]);
+  // The step back to someone easier: chip picks only (own words come last), the fallback when there are none.
+  assert.deepEqual(K.offerWishes(["Be safe", "forgive myself"], 1, true, "Be at ease"), ["Be safe"]);
+  assert.deepEqual(K.offerWishes(["forgive myself"], 0, true, "Be at ease"), ["Be at ease"]);
+  assert.deepEqual(K.offerWishes(["Be safe", "forgive myself"], 1, false, "Be at ease"), ["Be safe", "forgive myself"]);
+  assert.deepEqual(K.offerWishes([], 0, false, ""), []);
+  assert.deepEqual([step("offer_again").props.chipsOnly, skill.copy[step("offer_again").props.fallback]], [1, "Be at ease"]);
+  assert.equal(step("offer_other").props.chipsOnly, undefined);
   assert.deepEqual(K.wishLines(undefined, "May you {wish}."), []);
   assert.deepEqual([K.offerResult(3, 3), K.offerResult(3, 1), K.offerResult(3, 0), K.offerResult(0, 0)], ["offered", "partly", "skipped", "skipped"]);
 });
@@ -121,7 +154,11 @@ test("the wishes and the offer: up to three or own words; May you / May I / May 
 test("what came up: warmth or nothing much ends; sadness or stirred is backdraft, named, with the hand, someone easier or stop", () => {
   const came = run([...to("self"), ...WISH, offered]);
   assert.equal(came.stepId, "came");
-  assert.deepEqual(ids(came, "came"), ["warmth", "nothing", "sad", "stirred"]);
+  assert.deepEqual(ids(came, "came"), ["warmth", "nothing", "sad", "stirred", "undeserved"]);
+  assert.deepEqual(ids(run([...to("easy"), ...WISH, offered]), "came"), ["warmth", "nothing", "sad", "stirred"], "I don't deserve it: the self tier only");
+  const deserve = run([pick("came", "undeserved"), next], ctx(), came);
+  assert.equal(deserve.stepId, "backdraft");
+  assert.match(M.handoffLine(ctx(), step("backdraft"), deserve), /You don't have to deserve it/);
   const end = run([pick("came", "nothing"), next], ctx(), came);
   assert.equal(end.stepId, "end");
   assert.equal(title(end), "You offered kind wishes. That's the practice.", "reps, never feelings");
@@ -136,9 +173,28 @@ test("what came up: warmth or nothing much ends; sadness or stirred is backdraft
   assert.equal(run([{ type: "embedDone", output: { ids: ["done"], durationSec: 30 } }], ctx(), hand).stepId, "end");
   const stop = run([pick("step_down", "stop"), next], ctx(), back);
   assert.equal(title(stop), "You stopped when it got heavy. That's looking after yourself.");
+  assert.match(M.handoffLine(ctx(), step("end"), stop), /someone easy is a good place to begin/);
+  // The next step only where there is one.
+  const fine = (who) => run([...to(who), ...WISH, offered, pick("came", "warmth"), next]);
+  assert.match(M.handoffLine(ctx(), step("end"), fine("easy")), /someone a little less easy/);
+  assert.equal(M.handoffLine(ctx(), step("end"), fine("everyone")), "Next time, try them in your own words.");
+  assert.equal(M.handoffLine(ctx(), step("end"), run([...to("difficult"), pick("check", "no"), next, ...WISH, offered, pick("came", "warmth"), next])), "Next time, try them in your own words.");
   // From someone easy, there's no easier step.
   const easyBack = run([...to("easy"), ...WISH, offered, pick("came", "stirred"), next]);
   assert.deepEqual(ids(easyBack, "step_down"), ["hand", "stop"]);
+});
+
+test("a skipped offer is no practice: straight to Not this time, no rep and nothing asked", () => {
+  const skipped = { type: "embedDone", output: { ids: ["skipped"], durationSec: 2, doneCount: 0 } };
+  for (const who of ["easy", "self", "everyone"]) {
+    const s = run([...to(who), ...WISH, skipped]);
+    assert.equal(s.stepId, "skip_end", who);
+  }
+  assert.equal(step("skip_end").complete, false);
+  assert.equal(title(run([...to("easy"), ...WISH, skipped])), "Not this time.");
+  // After a first offer, a skip of the step back still ends on the first offer's rep, without asking again.
+  const again = run([...to("self"), ...WISH, offered, pick("came", "sad"), next, pick("step_down", "easier"), next]);
+  assert.equal(run([skipped], ctx(), again).stepId, "end");
 });
 
 test("two backdraft closes in a row: easy next time and talking it through, with the hand and someone to talk to", () => {
@@ -150,7 +206,7 @@ test("two backdraft closes in a row: easy next time and talking it through, with
   assert.equal(came2.stepId, "came_again");
   const ok = run([pick("came_again", "warmth"), next], ctx(), came2);
   assert.equal(ok.stepId, "end");
-  assert.match(M.handoffLine(ctx(), step("end"), ok), /someone easy again/);
+  assert.match(M.handoffLine(ctx(), step("end"), ok), /someone easy is a good place to begin/);
   const twice = run([pick("came_again", "sad"), next], ctx(), came2);
   assert.equal(twice.stepId, "twice");
   assert.match(M.handoffLine(ctx(), step("twice"), twice), /talking through with someone you trust/);

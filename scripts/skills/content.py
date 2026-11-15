@@ -532,11 +532,12 @@ EMBED_PROPS = {
         "line": {"type": "copy"},
         "seconds": {"type": "int", "min": 10, "max": 60},
         "start": {"type": "copy"},
-        "running": {"type": "copy"},
         "hint": {"type": "copy"},
         "done": {"type": "copy"},
         "next": {"type": "copy"},
         "skip": {"type": "copy"},
+        "chipsOnly": {"type": "int", "min": 0, "max": 1, "optional": True},
+        "fallback": {"type": "copy", "optional": True},
     },
 }
 # Shared tables the graph supplies to every skill (never written here).
