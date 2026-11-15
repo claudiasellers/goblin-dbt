@@ -45,31 +45,48 @@ export function bowlFloor(x: number): number {
   return BOWL.rimY + 2 * (BOWL.ctrlY - BOWL.rimY) * u * (1 - u);
 }
 
-// Rows from the bottom up: each sits on the one below, and each row is spread across the width the bowl has there.
-const ROWS = [3, 5, 7, 9]; // 24 in all (BOWL_SHOWN)
-const R = 11;
+// Rows from the bottom up: each row holds as many pebbles as the bowl is wide there (at least 2r - 2 apart), filled from
+// the middle outward, alternating sides, so a part-filled row never leaves a pebble hanging on one wall.
+const R = 10;
+const STEP = 2 * R - 2;
+const RISE = 2 * R - 4;
+
+function halfWidthAt(y: number): number {
+  const depth = bowlFloor((BOWL.left + BOWL.right) / 2) - BOWL.rimY;
+  return ((BOWL.right - BOWL.left) / 2) * Math.sqrt(Math.max(0, 1 - (y - BOWL.rimY) / depth));
+}
+
+const SPOTS: ReadonlyArray<{ x: number; y: number; r: number }> = (() => {
+  const mid = (BOWL.left + BOWL.right) / 2;
+  const out: Array<{ x: number; y: number; r: number }> = [];
+  for (let row = 0; out.length < BOWL_SHOWN && row < 12; row++) {
+    const y = bowlFloor(mid) - R - 2 - row * RISE;
+    if (y - R < BOWL.rimY + 4) break;
+    const half = Math.max(0, halfWidthAt(y + R * 0.5) - R - 1);
+    const fits = Math.max(1, Math.floor((2 * half) / STEP) + 1);
+    // Centre-out offsets: 0, +1, -1, +2, -2… (odd counts), or ±0.5, ±1.5… (even counts).
+    const offsets = Array.from({ length: fits }, (_, k) => (fits % 2 ? Math.ceil(k / 2) * (k % 2 ? 1 : -1) : (Math.floor(k / 2) + 0.5) * (k % 2 ? -1 : 1)));
+    for (const o of offsets) {
+      if (out.length >= BOWL_SHOWN) break;
+      const n = out.length;
+      const r = R - ((n * 13) % 3) * 0.75;
+      const x = mid + o * STEP + (((n * 37) % 5) - 2) * 0.5;
+      // Seated: it drops onto the wall, or onto the pebbles under it, whichever it meets first; never floating.
+      const floor = Math.min(bowlFloor(x - r * 0.7), bowlFloor(x), bowlFloor(x + r * 0.7));
+      let py = floor - r - 1;
+      while (py > BOWL.rimY + r && out.some((p) => Math.hypot(p.x - x, p.y - py) < p.r + r - 3)) py -= 1;
+      out.push({ x, y: py, r });
+    }
+  }
+  return out;
+})();
 
 /**
  * Where pebble `i` rests in the bowl, in the SVG's units ({x, y} the centre, r the radius). Deterministic (the same
  * pebble always lands in the same place, so a re-render never shuffles them): rows fill from the bottom of the curve
- * up, each row as wide as the bowl is there, with a small fixed jitter so it reads as a heap, not a grid. Every pebble
+ * up, each from the middle out, with a small fixed variation in size so it reads as a heap, not a grid. Every pebble
  * sits inside the curve (tests/skill-notice-and-name.test.mjs).
  */
 export function pebbleSpot(i: number): { x: number; y: number; r: number } {
-  const n = Math.max(0, Math.min(BOWL_SHOWN - 1, Math.floor(i)));
-  let row = 0;
-  let k = n;
-  while (row < ROWS.length - 1 && k >= ROWS[row]) { k -= ROWS[row]; row += 1; }
-  const perRow = ROWS[row];
-  const mid = (BOWL.left + BOWL.right) / 2;
-  const bottom = bowlFloor(mid) - 4;
-  const r = R - ((n * 13) % 3);
-  const y = bottom - R - row * (2 * R - 3) + ((n * 17) % 3) - 1;
-  // The bowl's half-width a little under this row's centre, less a pebble, is where this row may spread.
-  const depth = (bowlFloor(mid) - BOWL.rimY);
-  const below = Math.min(bowlFloor(mid), y + R);
-  const half = Math.max(0, ((BOWL.right - BOWL.left) / 2) * Math.sqrt(Math.max(0, 1 - (below - BOWL.rimY) / depth)) - R);
-  const step = perRow > 1 ? (2 * half) / (perRow - 1) : 0;
-  const jitter = (((n * 37) % 7) - 3) * 0.6;
-  return { x: mid - half + k * step + jitter, y, r };
+  return SPOTS[Math.max(0, Math.min(SPOTS.length - 1, Math.floor(i)))];
 }

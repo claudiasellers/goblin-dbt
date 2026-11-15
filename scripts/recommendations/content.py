@@ -304,7 +304,7 @@ TABLE = {
         "flooded": ("cool-down", "five-senses", "Flooded: bottom-up only."),
     },
     "chronic_vigilance": {
-        "default": ("notice-and-name", "problem-solve", "Outward attention (Notice what's here, opened on Listen: a non-threat framing for a watchful state, MF-01 and the Index ruling, 15 Nov 2026) and Problem Solve for a solvable worry; the anxiety words lead with Do the Opposite (word rules below)."),
+        "default": ("notice-and-name", "problem-solve", "Outward attention (Notice what's here, Listen listed first: a non-threat framing for a watchful state, MF-01 and the Index ruling, 15 Nov 2026) and Problem Solve for a solvable worry; the anxiety words lead with Do the Opposite (word rules below)."),
         "backup": ("five-senses", "Orienting stays available when Notice what's here is filtered."),
         "flooded": ("cool-down", "five-senses", "Flooded: DT-01 body first."),
     },

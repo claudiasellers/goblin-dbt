@@ -20,55 +20,85 @@ rules: eyes open, outside in, short, external anchors, a stop that lands, catego
 
 | Step | What the person sees | PRD MF-01 |
 |---|---|---|
-| `way` | *Pick a way to notice.* (*Eyes open, a minute or so. Your mind will wander. Coming back is the practice.*) Look · Listen · Touch · Feet on the floor · Inside the body. A host's `frame` lists one first, never picks it: `listen` (a watchful result's card), `far` (Look first, and no Inside), `blank` (Feet first). A carried flooded reading: *Your body's loud right now.*, Look or Listen only, and *My body first* (First, the body) as a link | Steps 1–2; the gate table (Inside steady only, never far away; flooded → Look or Listen after a heads-up) |
+| `way` | *Pick a way to notice.* (*Eyes open, a minute or so. Your mind will wander. Coming back is the practice.*) Look · Listen · Touch · Feet on the floor · Inside the body. A host's `frame` lists one first, never picks it: `listen` (a watchful result's card: Listen first and no Inside), `far` (Look first, no Inside), `blank` (Feet first). A carried flooded reading: *Your body's loud right now.*, Look or Listen only, and *My body first* (First, the body) as a link | Steps 1–2; the gate table |
 | `look_what` → `look` | *Find three things that are…* blue · round · soft · old, then `orientFind`: today's date and time on screen, a tap for each find | Look (neutral finds) |
-| `listen` | `pebbleBowl`, a minute: *Each time a new sound arrives, tap.* | Listen |
-| `touch` | `pebbleBowl`, 45 s: *Is it warm or cool? Smooth or rough? When your mind wanders, tap, and come back to it.* | Touch |
+| `listen` | `pebbleBowl`, a minute: *Let sounds come to you. Near or far, loud or soft. No need to find them. When your mind wanders, tap, and come back to listening.* | Listen, as receiving, not detecting (a watchful state shouldn't rehearse scanning) |
+| `touch` | `pebbleBowl`, 45 s: *Notice if it's warm or cool, smooth or rough. When your mind wanders, tap, and come back to it.* | Touch |
 | `contact` | `squeezeRelease`, three rounds: *press your feet down into the floor*, then *let go, and notice the difference* | Contact (the press and release) |
-| `inside_where` → `inside` | *Start where you touch the chair or the floor. Then a little further in.* One of the body map's places (`BodyRegion`) or *Nothing stands out*; then `pebbleBowl`, 30 s on that place | Inside (outside-in scan, contact points first) |
-| `name` | *What was it like?* Up to two quality words for that way of noticing, offered as guesses (Inside: the check-in's sensation words, the same `SensationType` nodes), *My own word* (40 characters) or *No words today*, a full answer. Skipped on a carried flooded reading | Step 4, words as hypotheses |
+| `inside_where` → `inside` | *Where is something most noticeable right now?* (*Start where you touch the chair or the floor, then a little further in. … If you start to feel far away, the room is one tap away.*) The body map's places outside in (feet, legs, hands, lower back, …; never the chest, throat or whole body) or *Nothing stands out*; then `pebbleBowl`, 30 s, *{Place}. Stay with it for a little while.* with *Eyes open* first | Inside (outside-in, contact points first; heartbeat never a channel) |
+| `room_stop` → `room_end` | The bowl's quiet *Back to the room* while noticing (Listen, Touch, Inside): three things you can see, then *Back in the room.* *Stopping when it's too much is part of it too.* Five senses and *If it comes with thoughts of hurting yourself* (safety.open). No word step, no close | Rule 3, a stop that lands |
+| `name` | *What was it like?* One quality word for that way of noticing, offered as a guess (Inside: the check-in's sensation words, the same `SensationType` nodes), *My own word* (40 characters) or *No words today*, a full answer. Skipped on a carried flooded reading and after a bowl never started | Step 4; one word at most (stirred) |
 | `else` | *What else showed up while you did this?* A thought · A feeling · A body sensation · An urge · Nothing much. Optional | Step 4, describe as Linehan frames it |
 | `close` | *Compared to when you started, you feel…* Further away · About the same · A bit more here · More here (`askFresh: 'thenVsNow'`, the orienting close) | Step 5 |
-| `room` → `far` | Further away: *Back to the room.* (`orientFind`, three things you can see), then *Feeling further away can happen when you notice. It isn't a failure. Looking and listening, eyes open, tend to suit better for now.* and *If feeling far away comes with thoughts of hurting yourself, or happens a lot, talk to someone.* Talk to someone now on both screens | Rule 5, *far away* runs Back to the room |
-| `end` | *Wandering is the practice. Each time you came back, that was the skill.* A feeling that showed up → Find the feeling; a thought → Thoughts passing through (neither on a carried flooded reading). Optional chips: *Try one without the app?* Tomorrow morning · Tomorrow evening books `offphone_rep` | Step 6, the off-phone rep |
-| `offphone` → `offphone_end` | The card reopens the run (R9 `reopens`, only a run that reached `end`): *Did you get to notice something without the app?* Yes · Sort of · Not yet, each with its line, no close | Fade level 3's next-day report |
+| `room` → `far` | Further away: *Back to the room.* (three things you can see), then *Feeling further away can happen when attention turns in.* *Sometimes the mind steps back when things are a lot. Next time, looking or listening, eyes open, may suit you better. If it happens a lot, a doctor or therapist can help with it.* Five senses, and *If it comes with thoughts of hurting yourself* (safety.open) | Rule 5 |
+| `end` | Title by the way: *Wandering is the practice. Each time you came back, that was the skill.* (the bowl) or *You noticed what was here. That counts.* (Look, the feet). A feeling that showed up → Find the feeling; a thought → Thoughts passing through, never on a watchful or far-away entry (rumination alongside contraindicates it: `schema/pattern-co-occurrence.cypher`, `thoughts-passing.md`); an urge → *If the urge is to hurt yourself*. Optional chips: *Try one without the app?* Tomorrow morning · Tomorrow evening books `offphone_rep` | Step 6, the off-phone rep |
+| `end_flooded` | A carried flooded reading: *You noticed something while your body was loud. That counts.* No offers and no off-phone rep (a flooded entry runs at level 0) | Flooded |
+| `offphone` → `offphone_end` | The card reopens the run (R9 `reopens`, only a run that reached `end`): *Did you get to notice something without the app?* Yes · Sort of · Not yet, each with a plain line, no close | Fade level 3's next-day report |
 
 ## The pebble bowl
 
-`pebbleBowl` is the PRD's *came back* target: a big round button that drops a pebble into a soft SVG bowl, with the
-time as a faint line along the rim. Returns are marks, never a number (PRD §4 rule 6): the count is the embed's
-`doneCount` measure and appears nowhere on screen, and the screen reader hears *A pebble in the bowl.*, not how many.
-Nothing locks: the way on is a quiet link from the start and the button once the time is up. No chime (rule 8, sound off
-by default). Reduced motion: pebbles appear in place. The bowl shows 24 pebbles at most; later taps still count.
-Outputs: `done` (the whole time), `partly`, `skipped` (never started), `durationSec`, `doneCount`.
+`pebbleBowl` (MF-owned, C3b) is the PRD's *came back* target: a big round button (accent-tinted, accent ring) that drops
+a pebble into a soft SVG bowl, with the time as a line along the rim. A pebble is always a return, never a new sound
+(rule 6). The count is the embed's `doneCount` measure and appears nowhere on screen; the screen reader hears *A pebble
+in the bowl.*, not how many. The heap itself is a visible amount (up to 24 pebbles; past that each tap gives the bowl a
+small settle): the PRD leaves *show the pebbles at all, or keep returns invisible?* open, and this PR settles it as
+"show them, never count them" for Claudia to confirm. Nothing locks: *Move on* is a quiet link from the start, the
+button once the time is up, and *Back to the room* (`room`) while running. No chime (rule 8). While something covers
+the step the end makes no buzz and takes no focus; focus moves to the tap target on Start and to Next at the end.
+Reduced motion: pebbles appear in place. Outputs: `done`, `partly`, `skipped`, `room`, `durationSec`, `doneCount`.
 
 ## Reps, routing, links
 
-- **Reps.** A completed visit logs an `observe` and a `describe` rep (new `PracticeSkill`s, `defaultFor:
-  ['notice-and-name']`; `observe` also lists `five-senses`, PRD §2.2 note 2: Five senses is an observe practice filed
-  under DT). The off-phone *Yes* is an off-phone rep (`OFF_PHONE_SKILLS.notice_and_name` in
-  `functions/src/skills/projections.ts`, `followup_offphone`); *Sort of* and *Not yet* log none.
-- **Routing.** A watchful result (`chronic_vigilance`, any band but flooded) leads with it, opened on Listen
-  (`CARD_FRAMES`), Problem Solve beside it, Five senses the backup row (PRD MF-01 entry points: Listen in a non-threat
-  framing for a watchful state, which had no MF card). Tags: acceptance, orient, orient. The anxiety and worry words still
-  lead with their own rows. Flooded stays body first.
-- **Exits:** First, the body (`cool_down`), Find the feeling, Thoughts passing through, `safety.open`.
+- **Reps.** A completed visit logs an `observe` and a `describe` rep (new `PracticeSkill`s, Moderate as the PRD grades
+  MF-01, `defaultFor: ['notice-and-name']`). A carried flooded visit skips the word step and still logs `describe`
+  (the runtime sets reps per tool, not per path); accepted for part 1. Five senses counting as observe (PRD §2.2 note
+  2) is left to MF-B3 with the DT lane, so its Reflect counts don't change here. The off-phone *Yes* is an off-phone
+  rep (`OFF_PHONE_SKILLS.notice_and_name`, `followup_offphone`); *Sort of* and *Not yet* log none.
+- **Routing.** A watchful result (`chronic_vigilance`, any band but flooded) leads with it, Listen listed first
+  (`CARD_FRAMES`), Problem Solve beside it, Five senses the backup row (PRD MF-01 entry points; the Arch Map's "steady,
+  no named trigger" is every unflooded watchful result under D1). The anxiety and worry words still lead with their own
+  rows. Flooded stays body first. Tags: acceptance, orient, orient. DT lane: Five senses moves from this pattern's
+  first card to its backup.
+- **Exits:** First, the body (`cool_down`), Find the feeling, Thoughts passing through, Five senses, `safety.open`.
+- **Ways in still to come** (`module-edges.json`, state MF-B3): First, the body's quieter close (frame `far`), Held,
+  and the MF-01 card inside Hold to wait and Ride it out. Until then no host sends `far` or `blank`; the frames are
+  ready for them.
 
 ## Where it departs from the PRD
 
 - **No capacity probe** (D1): the band is a carried reading only. Flooded comes from `band.current()` or a host.
+- **Inside on the standard path.** The PRD offers Inside at `steady` only, and with D1 the no-band path is *stirred*.
+  Hiding it everywhere would remove the only inward channel from a skill people open in calm, so it stays on the
+  standard path with three guards instead: never flooded, far away or watchful; places outside in with no chest, throat
+  or whole body; and *Back to the room* one tap away while noticing, said on the screen before it. The PRD's rule that
+  turns Inside off for people whose check-ins are mostly alarm needs the log (MF-B3).
+- **Five ways, not three curated cards.** All five are listed (Inside hidden as above), one listed first by the frame.
+  Choosing three by history needs the Practice profile (MF-B3).
+- **Eight word offers per way** instead of three hypotheses with *Yes · Close · Not that*: one pick, contrasting pairs
+  side by side; the per-word verdict is part of the fade ladder (MF-B3).
+- **What else showed up from the first rep.** The PRD holds it until fade level 1; here it is optional from the start
+  (no fade levels yet).
 - **The close.** The PRD's *here · partly here · far away* plus then-vs-now becomes the orienting then-vs-now asked in
-  the flow (*Further away … More here*), the close every MF tool uses. *Further away* runs Back to the room as the PRD's
-  *far away* does. The two-strike rule (two far-away closes in a row → external only for two weeks) needs the log and
-  waits for MF-02.
-- **The off-phone rep** is offered on every end card, not only at fade level 3, because there are no fade levels yet.
-- **Words.** The PRD's *Yes · Close · Not that* per offered word is a pick of up to two; contrasting pairs sit side by
-  side. `DescribeWord`, `ObserveChannel`, `LookPrompt` and `MentalEventType` are the options' clinical labels, not graph
-  nodes yet; Inside's words present the existing `SensationType` nodes.
+  the flow, the close every MF tool uses. *Further away* runs Back to the room as the PRD's *far away* does. The
+  two-strike rule (two far-away closes in a row → external only for two weeks) needs the log (MF-B3).
+- **No pebble echo** (*You came back [pebbles]*) on the end card: the title names returns without a number. No *set up
+  a daily practice* offer until the Practice home exists (MF-B3).
+- **The off-phone rep** is offered on every unflooded end card, not only at fade level 3.
+- **Find the feeling** is an end-card exit, not an embedded word step returning an emotion id (Arch Map row 12): the
+  embed is ER's to build.
+- **Blank's fast press.** `blank` lists Feet first; the PRD's faster cadence for it waits on `squeezeRelease` taking a
+  cadence prop (DT-owned).
+- **Words as graph nodes.** `DescribeWord`, `ObserveChannel`, `LookPrompt` and `MentalEventType` are the options'
+  clinical labels, not nodes yet; Inside's words present the existing `SensationType` nodes.
 
 ## Part 2 (deferred)
 
-Fade levels 0–3 and the my-words shelf (MF-02's `PracticeProfile`), the Practice home's daily card, the graduation to
-pleasant finds (never before three neutral reps, never flooded or on low-mood patterns), Listen's sound dots (Tune's
-audio engine), the Inside silhouette (Shape), the Breath channel (opt-in), `attention-shift` and `sensory-anchor` as
-presets, the positive-state and steady practice line, the embedded card for other tools, the dissociation calm-time row.
+| Item | Why it waits | Batch |
+|---|---|---|
+| Fade levels 0–3, the my-words shelf, choosing three ways by history, the two-strike rule, the alarm-history Inside rule | Need `PracticeProfile` and the log | MF-B3 (MF-02) |
+| The daily card, the positive-state and steady practice line, *set up a daily practice* | The Practice home hosts them | MF-B3 |
+| `attention-shift` and `sensory-anchor` as presets (and sensory-anchor's ending) | Graph-served guided activities | MF-B3 |
+| The embedded MF-01 card for Hold to wait, Ride it out, DEAR MAN Describe and chain links | The card is a hosted variant of this skill | MF-B3 |
+| Pleasant finds (never before three neutral reps, never flooded or on low-mood patterns) | Needs rep history; ends at ER-04's things I like | MF-B7 (MF-07) |
+| The dissociation calm-time row | Needs the two-strike rule first | MF-B3 |
+| Listen's sound dots (Tune's audio engine), the Inside silhouette (Shape), the Breath channel (opt-in) | Room work and the opt-in setting | after MF-B9 |

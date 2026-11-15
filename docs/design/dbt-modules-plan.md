@@ -273,7 +273,8 @@ lands with F2 because two lanes need it in their first batch.
 | `doseTimer` | Hands-free dose with lead-in (cold, move burst, warmth) | `CoolDown.tsx` clock and audio, `ColdReset`; **built** in DT-01 part 1 (`BodyEmbeds.tsx` over `src/lib/bodyModes.ts`) | DT | DT-B2 | DT-01, DT-07 |
 | `breathPacer` | Exhale-weighted pacer, dizzy/tingly stop rule | `BreathOrb`, capacity `sigh`; **built** in DT-01 part 1 (`BodyEmbeds.tsx` over `src/lib/bodyModes.ts`) | DT | DT-B2 | DT-01, DT-07, P2 |
 | `squeezeRelease` | Squeeze on the in-breath, drop on the out-breath ×3 | FTF Shape blob; **built** in DT-01 part 1 (`BodyEmbeds.tsx` over `src/lib/bodyModes.ts`) | DT | DT-B2 | DT-01 |
-| `orientFind` | Eyes-open find-N with date, time and where you are on screen | `Orient`, capacity `orient`, `FiveSenses.tsx`; **built** in DT-01 part 1 (`BodyEmbeds.tsx` over `src/lib/bodyModes.ts`) | DT | DT-B2 | DT-01, DT-06, MF-01 later |
+| `orientFind` | Eyes-open find-N with date, time and where you are on screen | `Orient`, capacity `orient`, `FiveSenses.tsx`; **built** in DT-01 part 1 (`BodyEmbeds.tsx` over `src/lib/bodyModes.ts`) | DT | DT-B2 | DT-01, DT-06, MF-01 (used unchanged) |
+| `pebbleBowl` | A timed noticing with a big *came back* target that drops a pebble into a bowl; the time as a line on the rim, never a count on screen; a quiet *Back to the room* (`room`) | new | MF | MF-B1 (**built**: `PebbleBowl.tsx` over `src/lib/pebbleBowl.ts`) | MF-01; later MF practices (MF-05, MF-07) |
 | `rebellionCard` | The rebellion on the square paper (wraps `PaperCard` unchanged, no keep), *against* the squeeze, *for* the function, then *When?* | `RebellionCard.tsx` | DT | DT-B1 | DT-11 (DT-03's kit menu card may reuse it) |
 | `waitLock` | Timestamp lock with a come-back, draft stays visible, never locks the send | `WaitLock.tsx`; **built** as an embed in DT-02 (`WaitLockEmbed.tsx`: plain wait, `clock={false}`, *I'm back* always there; `waited` · `back_early` + `durationSec`) | DT | DT-B1 | DT-02, IE composer |
 | `urgeWave` | The urge as a moving object animated by taps; axis-free trace at the close. Shares a motion engine with `waveRoom` | FTF Shape urge loop | DT (engine too) | DT-B3 (**built**: `urgeWave` + `waveTrace`, `UrgeWave.tsx` over `src/lib/urgeWave.ts`; 2D, the shared engine waits on ER-08) | DT-05, ER-08 visual |
@@ -401,7 +402,7 @@ Every lane holds to these. The clinical gate (§6, Gate 3) checks each one.
 | `layers.ts`, constraints, `ASK_FRESH_FIELDS`, endpoints fixture, auth matrix | Shared, append-only | |
 | Profile kinds | The kind's owner (`user-profile.md` §4.2) | |
 | Recover changes the modules need (`personId`, drop `boundaryLocked` and `tooHot` (**done**, IE-B4 second PR), embed IE-05 / DT-04 inline) | IE lane (IE-B2 / IE-B4) | WMP isn't a lane; the IE lane does these in the PR that needs them |
-| MF pieces needed first (`wise_mind_check`, MF-01 card fallback) | First consumer (IE / DT) | Handed to MF when it starts |
+| MF pieces needed first (`wise_mind_check`, MF-01 card fallback) | First consumer (IE / DT) | Handed to MF when it starts (the MF lane started 15 Nov: `wise_mind_check` stays One message's ask step until MF-B6's embed; the MF-01 card is part 2, MF-B3) |
 | CORE pieces needed first (Help-me-now fork, `safety.open` interim) | DT (fork, inside DT-01), Foundation (interim screen) | CORE-07 takes the fork over later |
 
 ### C8. Moving an existing tool

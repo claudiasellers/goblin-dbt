@@ -11,27 +11,31 @@ Steps:
   way       *Pick a way to notice.* Look · Listen · Touch · Feet on the floor · Inside the body (the Inside tier is
             hidden on a carried flooded reading and in the `far` frame: PRD gate table, never inward then). One is
             listed first by the frame a host passes (`listen` for watchful results, `far` after feeling far away,
-            `blank` for shut-down states: Feet first, the fast press). A carried flooded reading gets the heads-up as
+            `blank` for shut-down states: Feet first). A carried flooded reading gets the heads-up as
             the title and Look or Listen only, with *My body first* (First, the body) as a quiet link.
   look_what *Find three things that are…* blue · round · soft · old (neutral finds; the PRD's graduation to pleasant
             finds is part 2).
   look      `orientFind`: three finds, today's date and the time on screen (the DISSOC rule, kept for everyone).
-  listen    `pebbleBowl` (a minute): a pebble each time a new sound arrives.
+  listen    `pebbleBowl` (a minute): let sounds come; a pebble each time the mind wanders and comes back.
   touch     `pebbleBowl` (45 s): hold something, warm or cool, smooth or rough; a pebble each time you come back.
   contact   `squeezeRelease`: press your feet down, then let go, three rounds (no breath words).
-  inside_where  *Start where you touch the chair or the floor. Then a little further in.* the body's places (the
-            same `BodyRegion` nodes the check-in marks), or *Nothing stands out* (a full answer).
+  inside_where  *Where is something most noticeable right now?* (start where you touch the chair or the floor, then a
+            little further in) the body's places outside in (the same `BodyRegion` nodes the check-in marks; never the
+            chest, throat or whole body), or *Nothing stands out* (a full answer). Also hidden on the `listen` frame.
   inside    `pebbleBowl` (30 s) on that place.
-  name      *What was it like?* up to two quality words for that way of noticing, offered as guesses (Inside: the
+  name      *What was it like?* a quality word for that way of noticing, offered as guesses (Inside: the
             check-in's sensation words, the same `SensationType` nodes), *My own word*, or *No words today* (a full
-            answer). Skipped on a carried flooded reading (PRD: no words, or one).
+            answer). One at most (PRD: stirred). Skipped on a carried flooded reading (PRD: no words, or one).
   else      *What else showed up while you did this?* a thought · a feeling · a body sensation · an urge · nothing
             much. Optional (PRD: describe as Linehan frames it, a thought labelled as a thought).
   close     the close, asked in the flow (`askFresh: 'thenVsNow'`, orienting): *Further away · About the same · A bit
             more here · More here*. Further away → back to the room (`orientFind`), then a plain line about what
-            feeling far away can mean, eyes-open ways next time, and someone to talk to.
+            feeling far away can mean, eyes-open ways next time, a doctor if it happens a lot, and someone to talk to.
+  room_stop *Back to the room* during the noticing itself (the bowl's quiet link, PRD rule 3: a stop that lands), then
+            `room_end`. No word step, no close.
   end       *Wandering is the practice.* A feeling that showed up → Find the feeling; a thought → Thoughts passing
-            through. Optional: *Try one without the app?* (the `offphone_rep` card, tomorrow), which reopens the run
+            through (not on a watchful or far-away entry: rumination alongside contraindicates it); an urge → *If the
+            urge is to hurt yourself* (safety.open). A carried flooded reading ends at `end_flooded` (no rep offer). Optional: *Try one without the app?* (the `offphone_rep` card, tomorrow), which reopens the run
             at *Did you notice something without the app?* (`offphone`): yes is an off-phone rep (runRep).
 
 Every completed visit logs an observe and a describe rep (PracticeSkill `observe`, `describe`, defaultFor
@@ -69,19 +73,20 @@ COPY = {
     "found": "Found one",
     "found_done": "That's three.",
     # Listen, Touch, Inside (the pebble bowl).
-    "listen_title": "Listen.",
-    "listen_task": "Each time a new sound arrives, tap. Near or far, loud or soft.",
-    "listen_tap": "A new sound",
+    "listen_title": "Let sounds come to you.",
+    "listen_task": "Near or far, loud or soft. No need to find them. When your mind wanders, tap, and come back to listening.",
     "touch_title": "Hold something near you.",
-    "touch_task": "Is it warm or cool? Smooth or rough? When your mind wanders, tap, and come back to it.",
-    "inside_title": "Stay with your {place} for a little while.",
+    "touch_task": "Notice if it's warm or cool, smooth or rough. When your mind wanders, tap, and come back to it.",
+    "inside_title": "{place}. Stay with it for a little while.",
     "inside_title_none": "Stay with where you touch the chair or the floor.",
-    "inside_task": "Notice what's there, without changing it. When your mind wanders, tap, and come back.",
+    "inside_task": "Eyes open. Let your gaze rest low if you like. Notice what's there, without changing it. When your mind wanders, tap, and come back.",
     "came_back": "Came back",
     "bowl_start": "Start",
     "bowl_running": "A pebble for each time.",
     "bowl_dropped": "A pebble in the bowl.",
     "bowl_done": "That's the time.",
+    "bowl_skip": "Move on",
+    "back_to_room": "Back to the room",
     # Feet on the floor.
     "contact_title": "Feet on the floor.",
     "contact_step1": "Hold the circle and press your feet down into the floor.",
@@ -91,11 +96,11 @@ COPY = {
     "contact_drop": "Let go",
     "contact_done": "That's three.",
     # Inside.
-    "inside_where_title": "Start where you touch the chair or the floor. Then a little further in.",
-    "inside_where_hint": "Where is something most noticeable right now? Roughly is fine.",
+    "inside_where_title": "Where is something most noticeable right now?",
+    "inside_where_hint": "Start where you touch the chair or the floor, then a little further in. Roughly is fine. If you start to feel far away, the room is one tap away.",
     # Name it.
     "name_title": "What was it like?",
-    "name_hint": "Pick up to two. A guess is fine, and so is no words.",
+    "name_hint": "Pick one. A guess is fine, and so is no words.",
     "name_own": "My own word",
     # What else showed up.
     "else_title": "What else showed up while you did this?",
@@ -105,18 +110,24 @@ COPY = {
     # Further away: back to the room, then a plain line (PRD runtime rules 3 and 5).
     "room_title": "Back to the room.",
     "room_task": "Find three things you can see.",
-    "far_line": "Feeling further away can happen when you notice. It isn't a failure. Looking and listening, eyes open, tend to suit better for now.",
-    "far_heavy_line": "If feeling far away comes with thoughts of hurting yourself, or happens a lot, talk to someone.",
+    "far_title": "Feeling further away can happen when attention turns in.",
+    "far_line": "Sometimes the mind steps back when things are a lot. Next time, looking or listening, eyes open, may suit you better. If it happens a lot, a doctor or therapist can help with it.",
+    "far_safety": "If it comes with thoughts of hurting yourself",
+    # Back to the room during the noticing (room_stop → room_end).
+    "room_end_title": "Back in the room.",
+    "room_end_line": "Stopping when it's too much is part of it too. Looking or listening, eyes open, may suit you better next time.",
     # The end.
-    "end_line": "Wandering is the practice. Each time you came back, that was the skill.",
-    "end_flooded_line": "You noticed something while your body was loud. That counts.",
+    "end_return_title": "Wandering is the practice. Each time you came back, that was the skill.",
+    "end_found_title": "You noticed what was here. That counts.",
+    "end_flooded_title": "You noticed something while your body was loud. That counts.",
     "end_feeling_line": "A feeling showed up. If you want a word for it, Find the feeling can help.",
     "end_thought_line": "A thought showed up. Watching it as a thought is its own practice.",
-    "offphone_q": "Try one without the app? Next time you're waiting for the kettle or a bus, notice three sounds. I'll ask how it went.",
+    "safety_urge": "If the urge is to hurt yourself",
+    "offphone_q": "Try one without the app? Next time you're waiting, notice three sounds. I'll ask how it went.",
     # The off-phone check (reopened from the offphone_rep card).
     "offphone_title": "Did you get to notice something without the app?",
-    "offphone_yes_line": "That's the practice moving off the phone, which is where it's meant to live.",
-    "offphone_sort_line": "A few seconds of noticing is still noticing. Next time, try for three sounds.",
+    "offphone_yes_line": "That's the practice moving off the phone.",
+    "offphone_sort_line": "A few seconds of noticing is still noticing.",
     "offphone_not_line": "Not yet is fine. It'll be there next time you're waiting.",
     "safety_open": "Talk to someone now",
     "next": "Next",
@@ -132,6 +143,7 @@ ALWAYS = {"all": []}
 FLOODED = {"eq": ["$ctx.band", "flooded"]}
 NOT_FLOODED = {"not": FLOODED}
 FAR = {"eq": ["$ctx.frame", "far"]}
+WATCHFUL = {"eq": ["$ctx.frame", "listen"]}  # the frame a watchful result's card passes (chronic_vigilance)
 SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
 
 # Ways to notice (ObserveChannel): outside in. `inward` ones are never offered flooded or far away; `calm` ones are the
@@ -145,8 +157,12 @@ WAYS = [
 ]
 # Neutral finds (LookPrompt, graduation stage neutral; PRD: qualities, never "scan the room" or "check for exits").
 LOOK_FOR = [("blue", "blue"), ("round", "round"), ("soft", "soft"), ("old", "old")]
-# The places, as Let it be a wave asks them (BodyRegion), and a full answer for nothing in particular.
-INSIDE_WHERE = [(rid, BM.REGION_NAMES[rid][0]) for rid in BM.REGIONS] + [("none", "Nothing stands out")]
+# The places outside in, from where the body touches the chair or the floor (BodyRegion, the check-in's own ids). Never
+# the chest (the heart: PRD MF-01, heartbeat is never a channel), the throat (a common trauma trigger) or the whole body
+# (a scan); a full answer for nothing in particular.
+INSIDE_ORDER = ["feet", "legs", "hands", "lower_back", "arms", "shoulders", "upper_back", "stomach", "head", "face", "jaw", "neck"]
+assert set(INSIDE_ORDER) <= set(BM.REGIONS)
+INSIDE_WHERE = [(rid, BM.REGION_NAMES[rid][0]) for rid in INSIDE_ORDER] + [("none", "Nothing stands out")]
 # Quality words per way of noticing (DescribeWord), offered as guesses; contrasting pairs sit side by side.
 WORDS = {
     "look": [("bright", "Bright"), ("dull", "Dull"), ("still", "Still"), ("moving", "Moving"), ("near", "Near"), ("far", "Far"),
@@ -185,10 +201,13 @@ def ask(step_id, title, hint, field, lst, nxt, *, required=True, own=None, links
 
 
 def bowl(step_id, title, task, tap, seconds, *, title_slots=None):
+    # The bowl's quiet *Back to the room* (PRD rule 3: a stop that lands, during the noticing) reports `room`; a bowl
+    # never started (`skipped`) goes past the word step, as a carried flooded reading does.
     s = {"id": step_id, "kind": "embed", "embed": "pebbleBowl", "answerAs": step_id, "title": title,
          "props": {"seconds": seconds, "task": task, "start": "bowl_start", "tapLabel": tap, "running": "bowl_running",
-                   "dropped": "bowl_dropped", "done": "bowl_done", "next": "next"},
-         "next": [{"when": FLOODED, "to": "close"}, {"to": "name"}]}
+                   "dropped": "bowl_dropped", "done": "bowl_done", "next": "next", "skip": "bowl_skip", "room": "back_to_room"},
+         "next": [{"when": {"eq": [a(step_id), "room"]}, "to": "room_stop"},
+                  {"when": {"any": [FLOODED, {"eq": [a(step_id), "skipped"]}]}, "to": "close"}, {"to": "name"}]}
     if title_slots:
         s["titleSlots"] = title_slots
     return s
@@ -201,7 +220,7 @@ STEPS = [
          for v, _, _ in WAYS],
         links=[{"exit": "cool_down", "label": "body_first", "when": FLOODED}],
         extra={"options": {"list": "way", "firstFrom": "$d.firstWay",
-                           "where": {"all": [{"not": {"all": [{"eq": ["$opt.inward", True]}, {"any": [FLOODED, FAR]}]}},
+                           "where": {"all": [{"not": {"all": [{"eq": ["$opt.inward", True]}, {"any": [FLOODED, FAR, WATCHFUL]}]}},
                                              {"not": {"all": [FLOODED, {"not": {"eq": ["$opt.calm", True]}}]}}]}}},
         step_extra={"lines": [{"when": FLOODED, "key": "way_hint_flooded"}, {"when": NOT_FLOODED, "key": "way_hint"}]}),
     ask("look_what", "look_what_title", "look_what_hint", "what", "look_for", [{"to": "look"}]),
@@ -210,7 +229,7 @@ STEPS = [
      "props": {"variant": "find", "count": 3, "here": "here", "task": "look_task", "foundLabel": "found",
                "done": "found_done", "next": "next"},
      "next": [{"when": FLOODED, "to": "close"}, {"to": "name"}]},
-    bowl("listen", "listen_title", "listen_task", "listen_tap", 60),
+    bowl("listen", "listen_title", "listen_task", "came_back", 60),
     bowl("touch", "touch_title", "touch_task", "came_back", 45),
     {"id": "contact", "kind": "embed", "embed": "squeezeRelease", "answerAs": "contact", "title": "contact_title",
      "props": {"rounds": 3, "squeezeSec": 5, "step1": "contact_step1", "step2": "contact_step2", "start": "contact_start",
@@ -219,29 +238,46 @@ STEPS = [
     ask("inside_where", "inside_where_title", "inside_where_hint", "place", "inside_where", [{"to": "inside"}]),
     bowl("inside", [{"when": {"eq": [a("place"), "none"]}, "key": "inside_title_none"}, {"when": ALWAYS, "key": "inside_title"}],
          "inside_task", "came_back", 30, title_slots={"place": {"labelOf": "place"}}),
-    ask("name", "name_title", "name_hint", "name", "words", [{"to": "else"}], own="name_own", max_=2,
+    ask("name", "name_title", "name_hint", "name", "words", [{"to": "else"}], own="name_own", max_=1,
         extra={"options": {"list": "words", "where": {"any": [{"eq": ["$opt.channel", a("way")]}, {"eq": ["$opt.channel", "any"]}]}}}),
     ask("else", "else_title", "else_hint", "else", "else", [{"to": "close"}], required=False, max_=5),
     ask("close", "close_title", None, "close", "tvn",
-        [{"when": {"eq": [a("close"), "worse"]}, "to": "room"}, {"to": "end"}], extra={"askFresh": "thenVsNow"}),
+        [{"when": {"eq": [a("close"), "worse"]}, "to": "room"}, {"when": FLOODED, "to": "end_flooded"}, {"to": "end"}],
+        extra={"askFresh": "thenVsNow"}),
     {"id": "room", "kind": "embed", "embed": "orientFind", "answerAs": "room", "title": "room_title",
      "props": {"variant": "find", "count": 3, "here": "here", "task": "room_task", "foundLabel": "found",
                "done": "found_done", "next": "next"},
      "links": [SAFETY_LINK], "next": [{"to": "far"}]},
-    {"id": "far", "kind": "handoff", "complete": True,
-     "lines": [{"when": ALWAYS, "key": "far_line"}, {"when": ALWAYS, "key": "far_heavy_line"}],
-     "offers": [], "done": "done", "links": [SAFETY_LINK]},
+    {"id": "far", "kind": "handoff", "complete": True, "title": "far_title",
+     "lines": [{"when": ALWAYS, "key": "far_line"}],
+     "offers": [{"exit": "five_senses", "when": ALWAYS}], "done": "done",
+     "links": [{"exit": "safety_open", "label": "far_safety", "when": ALWAYS}]},
+    # Back to the room during the noticing: three things you can see, then a plain line. No word step, no close.
+    {"id": "room_stop", "kind": "embed", "embed": "orientFind", "answerAs": "room_stop", "title": "room_title",
+     "props": {"variant": "find", "count": 3, "here": "here", "task": "room_task", "foundLabel": "found",
+               "done": "found_done", "next": "next"},
+     "links": [SAFETY_LINK], "next": [{"to": "room_end"}]},
+    {"id": "room_end", "kind": "handoff", "complete": True, "noClose": True, "title": "room_end_title",
+     "lines": [{"when": ALWAYS, "key": "room_end_line"}],
+     "offers": [{"exit": "five_senses", "when": ALWAYS}], "done": "done",
+     "links": [{"exit": "safety_open", "label": "far_safety", "when": ALWAYS}]},
     {"id": "end", "kind": "handoff", "complete": True,
-     "lines": [{"when": FLOODED, "key": "end_flooded_line"},
-               {"when": {"has": [a("else.ids"), "feeling"]}, "key": "end_feeling_line"},
-               {"when": {"has": [a("else.ids"), "thought"]}, "key": "end_thought_line"},
-               {"when": ALWAYS, "key": "end_line"}],
-     "offers": [{"exit": "find_the_feeling", "when": {"all": [NOT_FLOODED, {"has": [a("else.ids"), "feeling"]}]}},
-                {"exit": "thoughts_passing", "when": {"all": [NOT_FLOODED, {"has": [a("else.ids"), "thought"]}]}}],
+     # The title says what this way of noticing was: returns (the bowl) or finds (look, the feet).
+     "title": [{"when": {"in": [a("way"), ["look", "contact"]]}, "key": "end_found_title"}, {"when": ALWAYS, "key": "end_return_title"}],
+     "lines": [{"when": {"has": [a("else.ids"), "feeling"]}, "key": "end_feeling_line"},
+               {"when": {"has": [a("else.ids"), "thought"]}, "key": "end_thought_line"}],
+     # Thoughts passing through is contraindicated with rumination alongside a watchful or far-away state
+     # (schema/pattern-co-occurrence.cypher; docs/design/thoughts-passing.md): never offered on those entries.
+     "offers": [{"exit": "find_the_feeling", "when": {"has": [a("else.ids"), "feeling"]}},
+                {"exit": "thoughts_passing", "when": {"all": [{"has": [a("else.ids"), "thought"]}, {"not": {"any": [WATCHFUL, FAR]}}]}}],
+     "links": [{"exit": "safety_open", "label": "safety_urge", "when": {"has": [a("else.ids"), "urge"]}}],
      "done": "done",
      # The reminder chips (R5 on a hand-off): optional; leaving with one picked schedules offphone_rep.
      "fields": [{"id": "when", "label": "offphone_q", "max": 1, "options": {"list": "when"}}],
      "followUp": {"type": "offphone_rep", "whenFrom": "when"}},
+    # A carried flooded reading: no word step was asked, and no off-phone rep (PRD: a flooded entry runs at level 0).
+    {"id": "end_flooded", "kind": "handoff", "complete": True, "title": "end_flooded_title", "lines": [],
+     "offers": [], "done": "done"},
     # Reopened from the offphone_rep card (R9): only a run that reached the end card.
     ask("offphone", "offphone_title", None, "offphone", "offphone", [{"to": "offphone_end"}],
         step_extra={"reopens": {"after": "end"}, "clears": ["offphone"]}),
@@ -256,6 +292,7 @@ EXITS = [
     {"id": "cool_down", "toolId": "cool-down"},                          # DT-01 First, the body (a carried flooded reading)
     {"id": "find_the_feeling", "toolId": "find-the-feeling"},            # ER: a feeling showed up, a word for it
     {"id": "thoughts_passing", "toolId": "thoughts-passing"},            # DT-08: a thought showed up
+    {"id": "five_senses", "toolId": "five-senses"},                      # eyes-open orienting after feeling far away
     {"id": "safety_open", "toolId": None, "safety": True},               # safety.open (R6)
     {"id": "done", "done": True},
 ]

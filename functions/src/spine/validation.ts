@@ -143,6 +143,8 @@ export const FOLLOW_UP_WINDOWS = ['hour', 'afternoon', 'evening', 'tomorrow', 't
   'm5', 'm15', 'm30', 'm60', 'few_days',
   // Good things' week plan (ER-04 level 2): the day after tomorrow.
   'day_after',
+  // Notice what's here (MF-01): the off-phone rep, tomorrow morning (`evening` above is tomorrow evening there).
+  'morning',
   // Sleep reset (ER-13): the wake time the person set, for the next morning's check (`sleep_morning`): the mornings by
   // half hours, then shift and night times by the hour (part 2); `n…` is the renewal, a day on.
   'w0600', 'w0630', 'w0700', 'w0730', 'w0800', 'w0830', 'w0900', 'w0930',

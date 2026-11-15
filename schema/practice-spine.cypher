@@ -161,14 +161,14 @@ UNWIND ["linehan_skills_2015"] AS srcId
 MATCH (k:PracticeSkill {id: "cope_ahead"}), (s:ClinicalSource {id: srcId})
 MERGE (k)-[:SUPPORTED_BY]->(s);
 MERGE (k:PracticeSkill {id: "observe"})
-SET k.name = "Observe", k.displayLabel = "Observe", k.evidenceGrade = "Preliminary", k.evidenceBasis = "Limited trials", k.family = "mind", k.why = "Giving attention one small job, and coming back each time it wanders, is how noticing gets easier when it matters.", k.defaultFor = ["notice-and-name", "five-senses"], k.reviewStatus = "draft";
+SET k.name = "Observe", k.displayLabel = "Observe", k.evidenceGrade = "Moderate", k.evidenceBasis = null, k.family = "mind", k.why = "Giving attention one small job, and coming back each time it wanders, can make noticing easier when it matters.", k.defaultFor = ["notice-and-name"], k.reviewStatus = "draft";
 MATCH (k:PracticeSkill {id: "observe"}), (c:TherapyConcept {id: "dbt_observe"})
 MERGE (k)-[:PRACTICES]->(c);
 UNWIND ["linehan_skills_2015"] AS srcId
 MATCH (k:PracticeSkill {id: "observe"}), (s:ClinicalSource {id: srcId})
 MERGE (k)-[:SUPPORTED_BY]->(s);
 MERGE (k:PracticeSkill {id: "describe"})
-SET k.name = "Describe", k.displayLabel = "Describe", k.evidenceGrade = "Preliminary", k.evidenceBasis = "Limited trials", k.family = "mind", k.why = "Putting a plain word on what you noticed, a guess is fine, separates what happened from the story about it.", k.defaultFor = ["notice-and-name"], k.reviewStatus = "draft";
+SET k.name = "Describe", k.displayLabel = "Describe", k.evidenceGrade = "Moderate", k.evidenceBasis = null, k.family = "mind", k.why = "Putting a plain word on what you noticed, a guess is fine, can help separate what happened from the story about it.", k.defaultFor = ["notice-and-name"], k.reviewStatus = "draft";
 MATCH (k:PracticeSkill {id: "describe"}), (c:TherapyConcept {id: "dbt_describe"})
 MERGE (k)-[:PRACTICES]->(c);
 UNWIND ["linehan_skills_2015"] AS srcId

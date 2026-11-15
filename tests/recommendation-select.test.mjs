@@ -126,7 +126,7 @@ test("#10 Social threat: Recover + Do the Opposite (unhiding) in any band but fl
   assert.deepEqual(pickIds(await cell("social_threat_shame", "stirred")), ["recovering-from-invalidation", "opposite-action"]);
 });
 
-test("#11 On guard always has a card: 5-4-3-2-1 + Problem Solve; Ride it out for worry (12 Nov 2026)", async () => {
+test("#11 On guard always has a card: Notice what's here (MF-01, 15 Nov 2026) + Problem Solve; Ride it out for worry (12 Nov 2026)", async () => {
   assert.deepEqual(pickIds(await cell("chronic_vigilance", "steady", { words: ["stressed"] })), ["notice-and-name", "problem-solve"]);
   assert.deepEqual(pickIds(await cell("chronic_vigilance", "stirred", { words: ["stressed"] })), ["notice-and-name", "problem-solve"]);
   assert.deepEqual(pickIds(await cell("chronic_vigilance", "flooded")), ["cool-down", "five-senses"]);

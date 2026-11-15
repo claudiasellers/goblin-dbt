@@ -128,7 +128,7 @@ EMBEDS = {
     "feelingCard": {"ids": ["read"]},
     # MF-01's bowl (MF-owned; src/components/skillPlayer/PebbleBowl.tsx): one noticing task for a set time, a pebble
     # per return. done / partly / skipped, the seconds, and the pebbles (a measure, never shown as a number).
-    "pebbleBowl": {"ids": ["done", "partly", "skipped"], "measures": ["durationSec", "doneCount"]},
+    "pebbleBowl": {"ids": ["done", "partly", "skipped", "room"], "measures": ["durationSec", "doneCount"]},
 }
 # What each embed takes from the skill (embeds.ts EMBED_PROPS; the contract test keeps the two equal). build.py
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
@@ -469,6 +469,8 @@ EMBED_PROPS = {
         "dropped": {"type": "copy"},
         "done": {"type": "copy"},
         "next": {"type": "copy"},
+        "skip": {"type": "copy", "optional": True},
+        "room": {"type": "copy", "optional": True},
     },
 }
 # Shared tables the graph supplies to every skill (never written here).

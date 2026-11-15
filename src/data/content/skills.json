@@ -43814,19 +43814,20 @@
           "look_task": "Tap each one as you find it.",
           "found": "Found one",
           "found_done": "That's three.",
-          "listen_title": "Listen.",
-          "listen_task": "Each time a new sound arrives, tap. Near or far, loud or soft.",
-          "listen_tap": "A new sound",
+          "listen_title": "Let sounds come to you.",
+          "listen_task": "Near or far, loud or soft. No need to find them. When your mind wanders, tap, and come back to listening.",
           "touch_title": "Hold something near you.",
-          "touch_task": "Is it warm or cool? Smooth or rough? When your mind wanders, tap, and come back to it.",
-          "inside_title": "Stay with your {place} for a little while.",
+          "touch_task": "Notice if it's warm or cool, smooth or rough. When your mind wanders, tap, and come back to it.",
+          "inside_title": "{place}. Stay with it for a little while.",
           "inside_title_none": "Stay with where you touch the chair or the floor.",
-          "inside_task": "Notice what's there, without changing it. When your mind wanders, tap, and come back.",
+          "inside_task": "Eyes open. Let your gaze rest low if you like. Notice what's there, without changing it. When your mind wanders, tap, and come back.",
           "came_back": "Came back",
           "bowl_start": "Start",
           "bowl_running": "A pebble for each time.",
           "bowl_dropped": "A pebble in the bowl.",
           "bowl_done": "That's the time.",
+          "bowl_skip": "Move on",
+          "back_to_room": "Back to the room",
           "contact_title": "Feet on the floor.",
           "contact_step1": "Hold the circle and press your feet down into the floor.",
           "contact_step2": "Let go, and notice the difference.",
@@ -43834,26 +43835,31 @@
           "contact_press": "Pressing",
           "contact_drop": "Let go",
           "contact_done": "That's three.",
-          "inside_where_title": "Start where you touch the chair or the floor. Then a little further in.",
-          "inside_where_hint": "Where is something most noticeable right now? Roughly is fine.",
+          "inside_where_title": "Where is something most noticeable right now?",
+          "inside_where_hint": "Start where you touch the chair or the floor, then a little further in. Roughly is fine. If you start to feel far away, the room is one tap away.",
           "name_title": "What was it like?",
-          "name_hint": "Pick up to two. A guess is fine, and so is no words.",
+          "name_hint": "Pick one. A guess is fine, and so is no words.",
           "name_own": "My own word",
           "else_title": "What else showed up while you did this?",
           "else_hint": "Tap any. Noticing them is part of it.",
           "close_title": "Compared to when you started, you feel…",
           "room_title": "Back to the room.",
           "room_task": "Find three things you can see.",
-          "far_line": "Feeling further away can happen when you notice. It isn't a failure. Looking and listening, eyes open, tend to suit better for now.",
-          "far_heavy_line": "If feeling far away comes with thoughts of hurting yourself, or happens a lot, talk to someone.",
-          "end_line": "Wandering is the practice. Each time you came back, that was the skill.",
-          "end_flooded_line": "You noticed something while your body was loud. That counts.",
+          "far_title": "Feeling further away can happen when attention turns in.",
+          "far_line": "Sometimes the mind steps back when things are a lot. Next time, looking or listening, eyes open, may suit you better. If it happens a lot, a doctor or therapist can help with it.",
+          "far_safety": "If it comes with thoughts of hurting yourself",
+          "room_end_title": "Back in the room.",
+          "room_end_line": "Stopping when it's too much is part of it too. Looking or listening, eyes open, may suit you better next time.",
+          "end_return_title": "Wandering is the practice. Each time you came back, that was the skill.",
+          "end_found_title": "You noticed what was here. That counts.",
+          "end_flooded_title": "You noticed something while your body was loud. That counts.",
           "end_feeling_line": "A feeling showed up. If you want a word for it, Find the feeling can help.",
           "end_thought_line": "A thought showed up. Watching it as a thought is its own practice.",
-          "offphone_q": "Try one without the app? Next time you're waiting for the kettle or a bus, notice three sounds. I'll ask how it went.",
+          "safety_urge": "If the urge is to hurt yourself",
+          "offphone_q": "Try one without the app? Next time you're waiting, notice three sounds. I'll ask how it went.",
           "offphone_title": "Did you get to notice something without the app?",
-          "offphone_yes_line": "That's the practice moving off the phone, which is where it's meant to live.",
-          "offphone_sort_line": "Sort of counts. Noticing for a few seconds is still noticing.",
+          "offphone_yes_line": "That's the practice moving off the phone.",
+          "offphone_sort_line": "A few seconds of noticing is still noticing.",
           "offphone_not_line": "Not yet is fine. It'll be there next time you're waiting.",
           "safety_open": "Talk to someone now",
           "next": "Next",
@@ -43923,6 +43929,12 @@
                                   "eq": [
                                     "$ctx.frame",
                                     "far"
+                                  ]
+                                },
+                                {
+                                  "eq": [
+                                    "$ctx.frame",
+                                    "listen"
                                   ]
                                 }
                               ]
@@ -44110,19 +44122,40 @@
               "seconds": 60,
               "task": "listen_task",
               "start": "bowl_start",
-              "tapLabel": "listen_tap",
+              "tapLabel": "came_back",
               "running": "bowl_running",
               "dropped": "bowl_dropped",
               "done": "bowl_done",
-              "next": "next"
+              "next": "next",
+              "skip": "bowl_skip",
+              "room": "back_to_room"
             },
             "next": [
               {
-                "to": "close",
+                "to": "room_stop",
                 "when": {
                   "eq": [
-                    "$ctx.band",
-                    "flooded"
+                    "$a.listen",
+                    "room"
+                  ]
+                }
+              },
+              {
+                "to": "close",
+                "when": {
+                  "any": [
+                    {
+                      "eq": [
+                        "$ctx.band",
+                        "flooded"
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$a.listen",
+                        "skipped"
+                      ]
+                    }
                   ]
                 }
               },
@@ -44147,15 +44180,36 @@
               "running": "bowl_running",
               "dropped": "bowl_dropped",
               "done": "bowl_done",
-              "next": "next"
+              "next": "next",
+              "skip": "bowl_skip",
+              "room": "back_to_room"
             },
             "next": [
               {
-                "to": "close",
+                "to": "room_stop",
                 "when": {
                   "eq": [
-                    "$ctx.band",
-                    "flooded"
+                    "$a.touch",
+                    "room"
+                  ]
+                }
+              },
+              {
+                "to": "close",
+                "when": {
+                  "any": [
+                    {
+                      "eq": [
+                        "$ctx.band",
+                        "flooded"
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$a.touch",
+                        "skipped"
+                      ]
+                    }
                   ]
                 }
               },
@@ -44253,7 +44307,9 @@
               "running": "bowl_running",
               "dropped": "bowl_dropped",
               "done": "bowl_done",
-              "next": "next"
+              "next": "next",
+              "skip": "bowl_skip",
+              "room": "back_to_room"
             },
             "titleSlots": {
               "place": {
@@ -44262,11 +44318,30 @@
             },
             "next": [
               {
-                "to": "close",
+                "to": "room_stop",
                 "when": {
                   "eq": [
-                    "$ctx.band",
-                    "flooded"
+                    "$a.inside",
+                    "room"
+                  ]
+                }
+              },
+              {
+                "to": "close",
+                "when": {
+                  "any": [
+                    {
+                      "eq": [
+                        "$ctx.band",
+                        "flooded"
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$a.inside",
+                        "skipped"
+                      ]
+                    }
                   ]
                 }
               },
@@ -44303,7 +44378,7 @@
                     ]
                   }
                 },
-                "max": 2,
+                "max": 1,
                 "required": true,
                 "own": {
                   "hint": "name_own",
@@ -44369,6 +44444,15 @@
                 }
               },
               {
+                "to": "end_flooded",
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "flooded"
+                  ]
+                }
+              },
+              {
                 "to": "end",
                 "when": null
               }
@@ -44411,21 +44495,50 @@
             "id": "far",
             "kind": "handoff",
             "complete": true,
+            "title": "far_title",
             "lines": [
               {
                 "when": {
                   "all": []
                 },
                 "key": "far_line"
-              },
-              {
-                "when": {
-                  "all": []
-                },
-                "key": "far_heavy_line"
               }
             ],
             "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "far_safety",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "next": [],
+            "offers": [
+              {
+                "exit": "five_senses",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
+          },
+          {
+            "id": "room_stop",
+            "kind": "embed",
+            "embed": "orientFind",
+            "answerAs": "room_stop",
+            "title": "room_title",
+            "props": {
+              "variant": "find",
+              "count": 3,
+              "here": "here",
+              "task": "room_task",
+              "foundLabel": "found",
+              "done": "found_done",
+              "next": "next"
+            },
             "links": [
               {
                 "exit": "safety_open",
@@ -44435,23 +44548,73 @@
                 }
               }
             ],
-            "next": [],
+            "next": [
+              {
+                "to": "room_end",
+                "when": null
+              }
+            ],
             "offers": []
+          },
+          {
+            "id": "room_end",
+            "kind": "handoff",
+            "complete": true,
+            "noClose": true,
+            "title": "room_end_title",
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "room_end_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "far_safety",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "next": [],
+            "offers": [
+              {
+                "exit": "five_senses",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
           },
           {
             "id": "end",
             "kind": "handoff",
             "complete": true,
-            "lines": [
+            "title": [
               {
                 "when": {
-                  "eq": [
-                    "$ctx.band",
-                    "flooded"
+                  "in": [
+                    "$a.way",
+                    [
+                      "look",
+                      "contact"
+                    ]
                   ]
                 },
-                "key": "end_flooded_line"
+                "key": "end_found_title"
               },
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "end_return_title"
+              }
+            ],
+            "lines": [
               {
                 "when": {
                   "has": [
@@ -44469,12 +44632,18 @@
                   ]
                 },
                 "key": "end_thought_line"
-              },
+              }
+            ],
+            "links": [
               {
+                "exit": "safety_open",
+                "label": "safety_urge",
                 "when": {
-                  "all": []
-                },
-                "key": "end_line"
+                  "has": [
+                    "$a.else.ids",
+                    "urge"
+                  ]
+                }
               }
             ],
             "done": "done",
@@ -44497,21 +44666,9 @@
               {
                 "exit": "find_the_feeling",
                 "when": {
-                  "all": [
-                    {
-                      "not": {
-                        "eq": [
-                          "$ctx.band",
-                          "flooded"
-                        ]
-                      }
-                    },
-                    {
-                      "has": [
-                        "$a.else.ids",
-                        "feeling"
-                      ]
-                    }
+                  "has": [
+                    "$a.else.ids",
+                    "feeling"
                   ]
                 }
               },
@@ -44520,23 +44677,43 @@
                 "when": {
                   "all": [
                     {
-                      "not": {
-                        "eq": [
-                          "$ctx.band",
-                          "flooded"
-                        ]
-                      }
-                    },
-                    {
                       "has": [
                         "$a.else.ids",
                         "thought"
                       ]
+                    },
+                    {
+                      "not": {
+                        "any": [
+                          {
+                            "eq": [
+                              "$ctx.frame",
+                              "listen"
+                            ]
+                          },
+                          {
+                            "eq": [
+                              "$ctx.frame",
+                              "far"
+                            ]
+                          }
+                        ]
+                      }
                     }
                   ]
                 }
               }
             ]
+          },
+          {
+            "id": "end_flooded",
+            "kind": "handoff",
+            "complete": true,
+            "title": "end_flooded_title",
+            "lines": [],
+            "done": "done",
+            "next": [],
+            "offers": []
           },
           {
             "id": "offphone",
@@ -44625,6 +44802,13 @@
             "done": false
           },
           {
+            "id": "five_senses",
+            "toolId": "five-senses",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
             "id": "safety_open",
             "toolId": null,
             "query": {},
@@ -44686,6 +44870,38 @@
           ],
           "inside_where": [
             {
+              "value": "feet",
+              "label": "Feet"
+            },
+            {
+              "value": "legs",
+              "label": "Legs"
+            },
+            {
+              "value": "hands",
+              "label": "Hands"
+            },
+            {
+              "value": "lower_back",
+              "label": "Lower back"
+            },
+            {
+              "value": "arms",
+              "label": "Arms"
+            },
+            {
+              "value": "shoulders",
+              "label": "Shoulders"
+            },
+            {
+              "value": "upper_back",
+              "label": "Upper back"
+            },
+            {
+              "value": "stomach",
+              "label": "Stomach"
+            },
+            {
               "value": "head",
               "label": "Head"
             },
@@ -44698,52 +44914,8 @@
               "label": "Jaw"
             },
             {
-              "value": "throat",
-              "label": "Throat"
-            },
-            {
               "value": "neck",
               "label": "Neck"
-            },
-            {
-              "value": "shoulders",
-              "label": "Shoulders"
-            },
-            {
-              "value": "chest",
-              "label": "Chest"
-            },
-            {
-              "value": "upper_back",
-              "label": "Upper back"
-            },
-            {
-              "value": "stomach",
-              "label": "Stomach"
-            },
-            {
-              "value": "lower_back",
-              "label": "Lower back"
-            },
-            {
-              "value": "arms",
-              "label": "Arms"
-            },
-            {
-              "value": "hands",
-              "label": "Hands"
-            },
-            {
-              "value": "legs",
-              "label": "Legs"
-            },
-            {
-              "value": "feet",
-              "label": "Feet"
-            },
-            {
-              "value": "body",
-              "label": "Whole body"
             },
             {
               "value": "none",

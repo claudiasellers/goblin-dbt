@@ -146,7 +146,8 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   kitDeck: { ids: ['body', 'hands', 'soothe', 'words', 'place', 'reasons', 'pros_cons', 'starter'], measures: ['durationSec', 'doneCount'] },
   inlineSkill: { ids: ['finished', 'left', 'stopped', 'body', 'unsafe'] },
   // MF-01's bowl: the time noticed, and how many pebbles dropped (returns: a measure, never shown).
-  pebbleBowl: { ids: ['done', 'partly', 'skipped'], measures: ['durationSec', 'doneCount'] },
+  // `room`: the person took the quiet *Back to the room* during the noticing (PRD MF rule 3).
+  pebbleBowl: { ids: ['done', 'partly', 'skipped', 'room'], measures: ['durationSec', 'doneCount'] },
 };
 
 /**
@@ -523,5 +524,9 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     dropped: { type: 'copy' },
     done: { type: 'copy' },
     next: { type: 'copy' },
+    /** The quiet way on before the time is up (else `next`). */
+    skip: { type: 'copy', optional: true },
+    /** The quiet *Back to the room* while noticing; reports `room`. */
+    room: { type: 'copy', optional: true },
   },
 };

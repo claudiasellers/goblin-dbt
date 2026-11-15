@@ -1213,6 +1213,48 @@
         "notification": "A plan you made is ready."
       },
       {
+        "id": "offphone_rep",
+        "ownerModule": "mf",
+        "tier": "practice",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/notice-and-name?run={sourceSessionId}&at=offphone&followUp={followUpId}",
+        "staleAfterHours": 48,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "A minute of noticing, without the app. Did you get to try it?",
+          "title": "Your noticing practice"
+        },
+        "choices": [
+          {
+            "id": "dismiss",
+            "label": "Not this time",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "chips": {
+            "evening": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "19:00"
+            },
+            "morning": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "09:00"
+            }
+          },
+          "kind": "chip"
+        },
+        "notification": "Your noticing practice is ready to check."
+      },
+      {
         "id": "part_checkback",
         "ownerModule": "mf",
         "tier": "quality",

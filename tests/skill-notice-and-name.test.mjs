@@ -13,7 +13,7 @@ const B = await importTs("src/lib/pebbleBowl.ts");
 const content = JSON.parse(readFileSync("tests/fixtures/skills-content.json", "utf8"));
 const skill = content.skills.find((s) => s.id === "notice_and_name");
 const embedOutputs = {
-  pebbleBowl: { ids: ["done", "partly", "skipped"], measures: ["durationSec", "doneCount"] },
+  pebbleBowl: { ids: ["done", "partly", "skipped", "room"], measures: ["durationSec", "doneCount"] },
   squeezeRelease: { ids: ["done", "partly", "skipped"], measures: ["durationSec", "doneCount"] },
   orientFind: { ids: ["done", "partly", "skipped"], measures: ["doneCount"] },
 };
@@ -22,6 +22,8 @@ const pick = (fieldId, value) => ({ type: "pick", fieldId, value });
 const own = (fieldId, text) => ({ type: "own", fieldId, text });
 const next = { type: "next" };
 const bowl = { type: "embedDone", output: { ids: ["done"], durationSec: 60, doneCount: 4 } };
+const toRoom = { type: "embedDone", output: { ids: ["room"], durationSec: 12, doneCount: 1 } };
+const unstarted = { type: "embedDone", output: { ids: ["skipped"], durationSec: 0, doneCount: 0 } };
 const found = { type: "embedDone", output: { ids: ["done"], doneCount: 3 } };
 const pressed = { type: "embedDone", output: { ids: ["done"], durationSec: 30, doneCount: 3 } };
 const run = (events, c = ctx(), from = M.initialRun(skill)) => events.reduce((s, e) => M.runNext(c, s, e), from);
@@ -30,6 +32,7 @@ const ids = (s, step, c = ctx()) => {
   const f = M.shownFields(c, M.stepOf(skill, step), s)[0];
   return M.optionGroups(c, f, s.answers).flatMap((g) => g.options.map((o) => o.value));
 };
+const line = (s, c = ctx()) => M.handoffLine(c, M.stepOf(skill, s.stepId), s);
 const title = (s, c = ctx()) => M.copyText(c, M.stepOf(skill, s.stepId).title, s, M.titleSlots(c, M.stepOf(skill, s.stepId), s));
 const links = (s, c = ctx()) => {
   const st = M.stepOf(skill, s.stepId);
@@ -64,24 +67,29 @@ test("Mindfulness is listed first on Tools (PRD Q11: DBT teaches it first)", () 
 
 test("pick a way: outside in, a host's frame lists one first (never picks it)", () => {
   assert.deepEqual(ids(M.initialRun(skill), "way"), ["look", "listen", "touch", "contact", "inside"]);
-  assert.deepEqual(ids(M.initialRun(skill), "way", ctx({ frame: "listen" })), ["listen", "look", "touch", "contact", "inside"]);
+  assert.deepEqual(ids(M.initialRun(skill), "way", ctx({ frame: "listen" })), ["listen", "look", "touch", "contact"]);
   assert.deepEqual(ids(M.initialRun(skill), "way", ctx({ frame: "blank" })), ["contact", "look", "listen", "touch", "inside"]);
   assert.equal(M.initialRun(skill).answers.way, undefined, "nothing preselected");
   for (const [w, to] of [["look", "look_what"], ["listen", "listen"], ["touch", "touch"], ["contact", "contact"], ["inside", "inside_where"]])
     assert.equal(run([pick("way", w), next]).stepId, to, w);
 });
 
-test("never inward when flooded or far away; a carried flooded reading gets Look or Listen and the body first", () => {
+test("never inward when flooded, far away or watchful; a carried flooded reading gets Look or Listen and the body first", () => {
   const far = ctx({ frame: "far" });
   assert.deepEqual(ids(M.initialRun(skill), "way", far), ["look", "listen", "touch", "contact"]);
+  assert.deepEqual(ids(M.initialRun(skill), "way", ctx({ frame: "listen" })), ["listen", "look", "touch", "contact"], "a watchful result's card: no Inside");
   const start = M.initialRun(skill);
   assert.deepEqual(ids(start, "way", FLOODED), ["look", "listen"]);
   assert.equal(title(start, FLOODED), "Your body's loud right now.");
   assert.deepEqual(links(start, FLOODED), ["cool_down"]);
   assert.deepEqual(links(start), [], "the body-first link is for a carried flooded reading only");
   assert.equal(skill.exits.find((x) => x.id === "cool_down").toolId, "cool-down");
-  // Flooded: no word step (PRD: no words, or one). Straight to the close.
+  // Flooded: no word step (PRD: no words, or one). Straight to the close, then an end with no off-phone offer.
   assert.equal(run(LISTEN, FLOODED).stepId, "close");
+  const end = run([...LISTEN, pick("close", "better"), next], FLOODED);
+  assert.equal(end.stepId, "end_flooded");
+  assert.equal(M.stepOf(skill, "end_flooded").fields, undefined);
+  assert.equal(title(end, FLOODED), "You noticed something while your body was loud. That counts.");
 });
 
 test("look: a quality to find, three finds with today's date on screen", () => {
@@ -101,6 +109,9 @@ test("listen, touch and inside run the pebble bowl; feet on the floor is a press
     assert.equal(st.props.seconds, secs, step);
   }
   assert.equal(skill.copy.bowl_dropped, "A pebble in the bowl.", "the screen reader hears a pebble, never a count");
+  for (const step of ["listen", "touch", "inside"])
+    assert.equal(M.stepOf(skill, step).props.tapLabel, "came_back", `${step}: a pebble is a return, never a new sound (rule 6)`);
+  assert.doesNotMatch(skill.copy.listen_task, /each time a new sound/i, "listening, not detecting");
   const c = M.stepOf(skill, "contact");
   assert.equal(c.embed, "squeezeRelease");
   assert.equal(run([pick("way", "contact"), next, pressed]).stepId, "name");
@@ -108,17 +119,21 @@ test("listen, touch and inside run the pebble bowl; feet on the floor is a press
     assert.doesNotMatch(skill.copy[k], /breath|close your eyes|danger|exit/i, k);
 });
 
-test("inside: start at the contact points, then one place (the body map's places) or nothing standing out", () => {
+test("inside: the body map's places outside in from the contact points, never the chest, throat or whole body", () => {
   const where = run([pick("way", "inside"), next]);
   const places = ids(where, "inside_where");
-  assert.ok(places.includes("chest") && places.includes("none"));
-  const chest = run([pick("place", "chest"), next], ctx(), where);
-  assert.equal(chest.stepId, "inside");
-  assert.match(title(chest), /^Stay with your .+ for a little while\.$/);
+  assert.deepEqual(places.slice(0, 3), ["feet", "legs", "hands"]);
+  for (const no of ["chest", "throat", "body"]) assert.ok(!places.includes(no), no);
+  assert.equal(places.at(-1), "none");
+  assert.match(skill.copy.inside_where_hint, /one tap away/);
+  assert.match(skill.copy.inside_task, /^Eyes open\./);
+  const feet = run([pick("place", "feet"), next], ctx(), where);
+  assert.equal(feet.stepId, "inside");
+  assert.match(title(feet), /^Feet\. Stay with it for a little while\.$/);
   assert.equal(title(run([pick("place", "none"), next], ctx(), where)), "Stay with where you touch the chair or the floor.");
 });
 
-test("name it: guesses for the way they noticed, up to two, their own word or no words (a full answer)", () => {
+test("name it: guesses for the way they noticed, one at most, their own word or no words (a full answer)", () => {
   const s = run(LISTEN);
   assert.equal(s.stepId, "name");
   const words = ids(s, "name");
@@ -127,7 +142,7 @@ test("name it: guesses for the way they noticed, up to two, their own word or no
   const inside = run([pick("way", "inside"), next, pick("place", "belly"), next, bowl]);
   assert.ok(ids(inside, "name").includes("inside_tension"), "inside: the check-in's sensation words");
   assert.match(readFileSync("schema/skills.cypher", "utf8"), /SensationType \{id: "tension"\}/);
-  assert.equal(M.stepOf(skill, "name").fields[0].max, 2);
+  assert.equal(M.stepOf(skill, "name").fields[0].max, 1);
   assert.equal(run([pick("name", "no_words"), next], ctx(), s).stepId, "else");
   assert.equal(run([own("name", "fizzy"), next], ctx(), s).stepId, "else");
 });
@@ -139,10 +154,29 @@ test("what else showed up is optional, and the end card points on to what showed
   const end = run([pick("else", "feeling"), pick("else", "thought"), next, pick("close", "same"), next], ctx(), s);
   assert.equal(end.stepId, "end");
   assert.deepEqual(offers(end), ["find_the_feeling", "thoughts_passing"]);
-  assert.match(M.handoffLine(ctx(), M.stepOf(skill, "end"), end), /A feeling showed up/);
+  assert.match(line(end), /A feeling showed up/);
   const plain = run([...TO_CLOSE, pick("close", "much_better"), next]);
   assert.deepEqual(offers(plain), []);
-  assert.equal(M.handoffLine(ctx(), M.stepOf(skill, "end"), plain), "Wandering is the practice. Each time you came back, that was the skill.");
+  assert.equal(title(plain), "Wandering is the practice. Each time you came back, that was the skill.");
+  const looked = run([pick("way", "look"), next, pick("what", "round"), next, found, pick("name", "look_still"), next, next, pick("close", "same"), next]);
+  assert.equal(title(looked), "You noticed what was here. That counts.", "no return taps on Look: no praise for returns");
+});
+
+test("never Thoughts passing through on a watchful or far-away entry (rumination alongside contraindicates it)", () => {
+  for (const frame of ["listen", "far"]) {
+    const c = ctx({ frame });
+    const end = run([pick("way", "look"), next, pick("what", "old"), next, found, pick("name", "no_words"), next, pick("else", "thought"), next, pick("close", "same"), next], c);
+    assert.equal(end.stepId, "end", frame);
+    assert.deepEqual(offers(end, c), [], frame);
+    assert.match(line(end, c), /A thought showed up/, "the line still validates");
+  }
+});
+
+test("an urge that showed up puts *If the urge is to hurt yourself* on the end card", () => {
+  const end = run([...LISTEN, pick("name", "listen_near"), next, pick("else", "urge"), next, pick("close", "same"), next]);
+  assert.deepEqual(links(end), ["safety_open"]);
+  assert.equal(skill.copy.safety_urge, "If the urge is to hurt yourself");
+  assert.deepEqual(links(run([...TO_CLOSE, pick("close", "same"), next])), []);
 });
 
 test("further away: back to the room, then a plain line, someone to talk to on both screens, no blame", () => {
@@ -153,7 +187,23 @@ test("further away: back to the room, then a plain line, someone to talk to on b
   const far = run([found], ctx(), room);
   assert.equal(far.stepId, "far");
   assert.deepEqual(links(far), ["safety_open"]);
-  assert.match(skill.copy.far_line, /isn't a failure/);
+  assert.equal(title(far), "Feeling further away can happen when attention turns in.");
+  assert.match(line(far), /a doctor or therapist can help/);
+  assert.equal(skill.copy.far_safety, "If it comes with thoughts of hurting yourself");
+  assert.deepEqual(offers(far), ["five_senses"]);
+});
+
+test("Back to the room while noticing: a stop that lands (PRD rule 3), no word step, no close", () => {
+  for (const [way, pre] of [["listen", []], ["touch", []], ["inside", [pick("place", "hands"), next]]]) {
+    assert.equal(M.stepOf(skill, way).props.room, "back_to_room", way);
+    const stop = run([pick("way", way), next, ...pre, toRoom]);
+    assert.equal(stop.stepId, "room_stop", way);
+    assert.deepEqual(links(stop), ["safety_open"]);
+    const end = run([found], ctx(), stop);
+    assert.equal(end.stepId, "room_end");
+    assert.ok(M.stepOf(skill, "room_end").noClose);
+  }
+  assert.equal(run([pick("way", "touch"), next, unstarted]).stepId, "close", "a bowl never started skips the words");
   assert.ok(skill.exits.find((x) => x.id === "safety_open").safety);
 });
 
@@ -170,16 +220,17 @@ test("the off-phone rep: optional chips book offphone_rep, which reopens the run
   assert.ok(M.stepOf(skill, "offphone_end").noClose);
   assert.equal(M.resumeRun(ctx(), M.runRecord(ctx(), run(LISTEN)), "offphone"), null, "a run that never reached the end doesn't reopen");
   const spine = JSON.parse(readFileSync("src/data/content/spine.json", "utf8")).content.followUpTypes.find((t) => t.id === "offphone_rep");
-  if (spine) assert.equal(spine.deepLinkTemplate, "/tool/notice-and-name?run={sourceSessionId}&at=offphone&followUp={followUpId}");
+  assert.ok(spine, "spine.json ships the type");
+  assert.equal(spine.deepLinkTemplate, "/tool/notice-and-name?run={sourceSessionId}&at=offphone&followUp={followUpId}");
   const ps = readFileSync("schema/practice-spine.cypher", "utf8");
   assert.match(ps, /FollowUpType \{id: "offphone_rep"\}/);
   assert.match(readFileSync("functions/src/skills/projections.ts", "utf8"),
     /notice_and_name: \{ toolId: 'notice-and-name', happenedField: 'offphone', yes: 'yes', unansweredKeepsOwn: true \}/);
 });
 
-test("reps: a completed visit is an observe and a describe rep; Five senses counts as observe too", () => {
+test("reps: a completed visit is an observe and a describe rep (Moderate, the PRD's grade)", () => {
   const ps = readFileSync("schema/practice-spine.cypher", "utf8");
-  assert.match(ps, /PracticeSkill \{id: "observe"\}\)\nSET k\.name = "Observe",[\s\S]*?k\.defaultFor = \["notice-and-name", "five-senses"\]/);
+  assert.match(ps, /PracticeSkill \{id: "observe"\}\)\nSET k\.name = "Observe",[^\n]*k\.evidenceGrade = "Moderate"[\s\S]*?k\.defaultFor = \["notice-and-name"\]/);
   assert.match(ps, /PracticeSkill \{id: "describe"\}\)\nSET k\.name = "Describe",[\s\S]*?k\.defaultFor = \["notice-and-name"\]/);
   assert.match(ps, /PracticeSkill \{id: "observe"\}\), \(c:TherapyConcept \{id: "dbt_observe"\}\)/);
 });

@@ -785,12 +785,12 @@ NEW_SKILLS = [
      "Deciding what you'll do at the hardest moment, and rehearsing it once in your mind, makes the plan easier to reach when it comes.",
      ["linehan_skills_2015"], ["cope-ahead"]),
     # Notice what's here (MF-01, docs/design/notice-and-name.md): a completed visit is an observe and a describe rep.
-    # Five senses is an observe practice filed under DT (PRD MF §2.2 note 2): its runs count as observe reps too.
-    ("observe", "Observe", "Preliminary", "mind", "dbt_observe",
-     "Giving attention one small job, and coming back each time it wanders, is how noticing gets easier when it matters.",
-     ["linehan_skills_2015"], ["notice-and-name", "five-senses"]),
-    ("describe", "Describe", "Preliminary", "mind", "dbt_describe",
-     "Putting a plain word on what you noticed, a guess is fine, separates what happened from the story about it.",
+    # (Five senses stays orient only: counting it as observe too is the PRD's §2.2 note 2, left to MF-B3 with the DT lane.)
+    ("observe", "Observe", "Moderate", "mind", "dbt_observe",
+     "Giving attention one small job, and coming back each time it wanders, can make noticing easier when it matters.",
+     ["linehan_skills_2015"], ["notice-and-name"]),
+    ("describe", "Describe", "Moderate", "mind", "dbt_describe",
+     "Putting a plain word on what you noticed, a guess is fine, can help separate what happened from the story about it.",
      ["linehan_skills_2015"], ["notice-and-name"]),
 ]
 
