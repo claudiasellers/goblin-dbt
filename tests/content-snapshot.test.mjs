@@ -439,7 +439,7 @@ test("Wise mind: no content in the graph yet keeps the committed file (warns, wr
   const { mkdtempSync, readdirSync, rmSync } = await import("node:fs");
   const { tmpdir } = await import("node:os");
   const { join } = await import("node:path");
-  assert.deepEqual(KEPT_WHEN_MISSING, ["wise-mind.json", "cope-ahead.json", "skills.json", "safety.json"]);
+  assert.deepEqual(KEPT_WHEN_MISSING, ["wise-mind.json", "cope-ahead.json", "skills.json", "safety.json", "micro-steps.json"]);
   const empty = indexGraph({ scope: "content-only", nodes: [], relationships: [] });
   assert.equal(buildWiseMind(empty), null, "missing: nothing to build");
   const wrong = indexGraph({ scope: "content-only", nodes: [node("wise_mind_flow", ["WiseMindFlow"], { version: "wise-mind-v0", contentJson: "{}" })], relationships: [] });
@@ -449,12 +449,13 @@ test("Wise mind: no content in the graph yet keeps the committed file (warns, wr
     const said = { warn: [], log: [] };
     writeSnapshots({ "spine.json": { a: 1 } }, { file: "x.json", exportedAt: "2026-10-17T00:00:00Z" },
       { outDir: dir, log: { warn: (m) => said.warn.push(m), log: (m) => said.log.push(m) } });
-    assert.deepEqual(readdirSync(dir), ["spine.json"], "wise-mind.json, cope-ahead.json, skills.json and safety.json not written");
-    assert.equal(said.warn.length, 4);
+    assert.deepEqual(readdirSync(dir), ["spine.json"], "wise-mind.json, cope-ahead.json, skills.json, safety.json and micro-steps.json not written");
+    assert.equal(said.warn.length, 5);
     assert.match(said.warn[0], /wise-mind\.json: no content for it in this graph yet; kept the committed file/);
     assert.match(said.warn[1], /cope-ahead\.json: no content for it in this graph yet; kept the committed file/);
     assert.match(said.warn[2], /skills\.json: no content for it in this graph yet; kept the committed file/);
     assert.match(said.warn[3], /safety\.json: no content for it in this graph yet; kept the committed file/);
+    assert.match(said.warn[4], /micro-steps\.json: no content for it in this graph yet; kept the committed file/);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 

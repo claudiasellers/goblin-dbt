@@ -82,6 +82,7 @@ export const LOAD_ORDER = [
   'emotion-guide.cypher',                          // Know this feeling (ER-10): FeelingGuide per DBT family + happiness; GUIDES its EmotionRegulationContent, FELT_LIKE a BodyMap, happiness words IN_GUIDE (needs regulation content, OA data, body-map)
   'skills.cypher',                                 // The skill runtime (docs/design/skill-runtime.md): Skill / SkillStep / SkillExit / SkillOption, NEXT / OFFERS / LINKS; Check the Facts (needs app-tool-ids, EmotionRegulationContent)
   'safety-route.cypher',                          // The safety route (CORE-01): SafetyScreenFlow, Country / CrisisLine, ASKS_SAFETY, Emotion.safetyScreen, the SafetyFlag rewrite, SafetyPolicy (needs knowledge-graph, emotion-wheel-sync)
+  'micro-steps.cypher',                            // Micro-steps (DT-01 part 2): Intervention ROUTES_TO from ActivationPattern / CrisisState (needs knowledge-graph)
   'recommended-for.cypher',                        // Check-in routing: RECOMMENDED_FOR pattern × band, concept tags, RoutingPolicy (needs urge_surfing, dbt_find_the_feeling)
 ];
 

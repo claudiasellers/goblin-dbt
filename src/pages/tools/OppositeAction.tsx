@@ -9,7 +9,7 @@ import {
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { getEmotionById, getEmotionByName } from "../../data/emotions";
 import { getToolById } from "../../data/tools";
-import { getMicroStepsForPattern, type MicroStep } from "../../data/microSteps";
+import { getMicroStepsForPattern, type MicroStep } from "../../lib/microSteps";
 import { ToolLoading } from "../../components/tools/ToolLoading";
 import { OppositeActionStart } from "../../components/tools/oppositeAction/OppositeActionStart";
 import { getOppositeActionPickerContent } from "../../services/oppositeActionPicker";

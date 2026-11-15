@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import { importTs } from "./lib/importTs.mjs";
 
 const help = await importTs("src/lib/spine/helpNow.ts");
-const micro = await importTs("src/data/microSteps.ts");
+const micro = await importTs("src/lib/microSteps.ts");
 const tools = await importTs("functions/src/spine/tools.ts");
 
 test("uses the universally safe fallback set and two links that split direction", () => {

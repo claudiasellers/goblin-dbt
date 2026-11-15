@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { getMicroStep, type MicroStep } from '../../data/microSteps';
+import { getMicroStep, type MicroStep } from '../../lib/microSteps';
 import type { StateResult } from '../../services/neo4j';
 import { CrisisBanner } from '../safety/CrisisBanner';
 import { bailoutSections, resultSections, type ResultSection } from '../../lib/crisisBanner';
