@@ -28104,7 +28104,7 @@ MATCH (s:Skill {id: "effectively"}), (n:SkillStep {id: "effectively:end"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 9};
 MERGE (n:SkillStep {id: "effectively:back"})
-SET n += {skillId: "effectively", step: "back", kind: "ask", version: "eff-v1"}, n.specJson = "{\"clears\": [\"back\", \"again\"], \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.back\", \"unsafe\"]}}], \"fields\": [{\"id\": \"back\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"back\"}, \"required\": true}], \"reopens\": {\"after\": \"end\"}, \"title\": \"back_title\", \"titleSlots\": {\"move\": {\"labelOf\": \"move\"}}}";
+SET n += {skillId: "effectively", step: "back", kind: "ask", version: "eff-v1"}, n.specJson = "{\"clears\": [\"back\", \"again\"], \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.back\", \"unsafe\"]}}], \"fields\": [{\"id\": \"back\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"back\"}, \"required\": true}], \"reopens\": {\"after\": \"end\", \"again\": [\"again\"]}, \"title\": \"back_title\", \"titleSlots\": {\"move\": {\"labelOf\": \"move\"}}}";
 MATCH (s:Skill {id: "effectively"}), (n:SkillStep {id: "effectively:back"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 10};
@@ -29005,3 +29005,744 @@ SET o:SkillOption, o += {skillId: "wise_mind_check", list: "sign", value: "unhur
 MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:sign:unhurried"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "sign", order: 36};
+
+// --- moment_apart (ma-v1) ---
+MERGE (s:Skill {id: "moment_apart"})
+SET s += {toolId: "moment-apart", version: "ma-v1", contentVersion: "skills-v1", start: "which", ownMax: 40, emotionFields: ["feel"], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"aware_hint\": \"Noticing later counts. Noticing during gets easier with practice.\", \"aware_title\": \"Were you aware of it while it was happening?\", \"back_room\": \"Back to the room\", \"body_first\": \"My body first\", \"body_first_line\": \"This moment will keep. First, the body.\", \"body_first_title\": \"Settle your body first.\", \"body_hint\": \"Guesses are fine. Up to two places and three words, or skip.\", \"body_title\": \"What did your body do then?\", \"danger_line\": \"When someone threatened or hurt you, your safety comes first, not a replay. Support is here, and so is the room.\", \"done\": \"Done\", \"end_aware_later\": \"Next time, see if you notice one while it's happening.\", \"end_aware_partly\": \"And you caught some of it while it happened.\", \"end_aware_yes\": \"And you noticed it while it happened.\", \"end_good\": \"You took a good moment apart. It's easier to find the next one.\", \"end_good_kept\": \"Kept. Good things are worth finding again.\", \"end_hard\": \"That was hard. You took it apart instead of carrying it whole.\", \"end_mid\": \"You took one moment apart. That's the skill.\", \"ending_careful\": \"Leaving someone who might hurt me\", \"feel_hint\": \"A guess is fine. Up to two.\", \"feel_more\": \"Something else\", \"feel_title\": \"What were you feeling?\", \"ftf_label\": \"Find the word for the feeling\", \"go_on\": \"Go on anyway\", \"good_instead\": \"Take apart a good one instead\", \"heads_up_hard_line\": \"Going back into a hard moment can stir things more. A good one might fit better today.\", \"heads_up_hard_title\": \"You're already stirred up.\", \"heads_up_line\": \"This one works better once it has settled.\", \"heads_up_title\": \"Your body's loud right now.\", \"hurt_line\": \"That matters more than this practice. Someone to talk to comes first.\", \"hurt_title\": \"Thank you for saying it.\", \"keep_hint\": \"Pick the closest, or name it in a few words so you'll know it again.\", \"keep_own\": \"Name it\", \"keep_primary\": \"Next\", \"keep_title\": \"What was the good bit?\", \"keepit_label\": \"Keep it in Things I like?\", \"more_label\": \"Plan more of this\", \"next\": \"Next\", \"recover_line\": \"That needs more care than taking apart. Recover is made for it.\", \"recover_offer\": \"Open Recover\", \"recover_title\": \"Someone put you down or brushed you off.\", \"safety_open\": \"Talk to someone now\", \"savour_done\": \"You stayed with it.\", \"savour_hint\": \"Bring it back to mind. Notice one thing you liked about it. Let it be as big as it was.\", \"savour_label\": \"Start\", \"savour_running\": \"Staying with it\", \"savour_title\": \"Stay with the good bit for a few seconds. Notice one thing you liked about it.\", \"stop_line\": \"Something frightening deserves care, not a replay. You can talk to someone, or come back to the room first.\", \"stop_title\": \"Let's not go back into that one.\", \"thoughts_hint\": \"Not the words, only what kind. Up to two.\", \"thoughts_title\": \"What went through your mind?\", \"unpack_label\": \"Look at the thought about me\", \"unsure_label\": \"Or\", \"what_hint\": \"Pick the closest.\", \"what_own\": \"Something else\", \"what_title\": \"What was going on?\", \"where_label\": \"Where\", \"which_hint\": \"One moment from today or lately. Small is fine.\", \"which_title\": \"Which moment do you want to take apart?\", \"words_label\": \"What it felt like\"}", s.tablesJson = "{\"feelOf\": {\"good\": [\"happy\", \"content\", \"calm\", \"thankful\", \"proud\", \"loving\", \"relaxed\", \"excited\", \"hopeful\", \"peaceful\"], \"hard\": [\"sad\", \"anxious\", \"angry\", \"hurt\", \"frustrated\", \"embarrassed\", \"lonely\", \"disappointed\", \"guilty\", \"ashamed\"], \"mid\": [\"calm\", \"tired\", \"bored\", \"interested\", \"content\", \"anxious\", \"frustrated\", \"confused\", \"thoughtful\"]}}", s.deriveJson = "[{\"from\": \"$a.valence\", \"name\": \"feelFirst\", \"table\": \"feelOf\"}]";
+MATCH (t:TherapyConcept {id: "dbt_mindful_events"}), (s:Skill {id: "moment_apart"})
+MERGE (t)-[:HAS_SKILL]->(s);
+MATCH (:SkillStep {skillId: "moment_apart"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
+MATCH (:Skill {id: "moment_apart"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
+MERGE (n:SkillStep {id: "moment_apart:which"})
+SET n += {skillId: "moment_apart", step: "which", kind: "ask", version: "ma-v1"}, n.specJson = "{\"fields\": [{\"id\": \"valence\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"valence\"}, \"required\": true}], \"hint\": \"which_hint\", \"title\": \"which_title\"}";
+MATCH (s:Skill {id: "moment_apart"}), (n:SkillStep {id: "moment_apart:which"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 0};
+MERGE (n:SkillStep {id: "moment_apart:heads_up"})
+SET n += {skillId: "moment_apart", step: "heads_up", kind: "ask", version: "ma-v1"}, n.specJson = "{\"fields\": [{\"id\": \"heads_up\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"heads_up\"}, \"required\": true}], \"lines\": [{\"key\": \"heads_up_line\", \"when\": {\"all\": []}}], \"title\": \"heads_up_title\"}";
+MATCH (s:Skill {id: "moment_apart"}), (n:SkillStep {id: "moment_apart:heads_up"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 1};
+MERGE (n:SkillStep {id: "moment_apart:heads_up_hard"})
+SET n += {skillId: "moment_apart", step: "heads_up_hard", kind: "ask", version: "ma-v1"}, n.specJson = "{\"clears\": [\"heads_up_hard\"], \"fields\": [{\"id\": \"heads_up_hard\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"heads_up_hard\"}, \"required\": true}], \"lines\": [{\"key\": \"heads_up_hard_line\", \"when\": {\"all\": []}}], \"title\": \"heads_up_hard_title\"}";
+MATCH (s:Skill {id: "moment_apart"}), (n:SkillStep {id: "moment_apart:heads_up_hard"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 2};
+MERGE (n:SkillStep {id: "moment_apart:body_first"})
+SET n += {skillId: "moment_apart", step: "body_first", kind: "handoff", version: "ma-v1"}, n.specJson = "{\"complete\": false, \"done\": \"done\", \"lines\": [{\"key\": \"body_first_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"body_first_title\"}";
+MATCH (s:Skill {id: "moment_apart"}), (n:SkillStep {id: "moment_apart:body_first"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 3};
+MERGE (n:SkillStep {id: "moment_apart:what"})
+SET n += {skillId: "moment_apart", step: "what", kind: "ask", version: "ma-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.what\", \"self_harm\"]}, {\"has\": [\"$a.thoughts.ids\", \"self_harm_thought\"]}]}}, {\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.what\", \"threatened\"]}}], \"fields\": [{\"id\": \"what\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"what\", \"where\": {\"has\": [\"$opt.v\", \"$a.valence\"]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"what_own\"}, \"required\": true}], \"hint\": \"what_hint\", \"title\": \"what_title\"}";
+MATCH (s:Skill {id: "moment_apart"}), (n:SkillStep {id: "moment_apart:what"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 4};
+MERGE (n:SkillStep {id: "moment_apart:hurt"})
+SET n += {skillId: "moment_apart", step: "hurt", kind: "handoff", version: "ma-v1"}, n.specJson = "{\"complete\": false, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"all\": []}}], \"done\": \"done\", \"lines\": [{\"key\": \"hurt_line\", \"when\": {\"all\": []}}], \"links\": [], \"noClose\": true, \"safetyFirst\": {\"all\": []}, \"title\": \"hurt_title\"}";
+MATCH (s:Skill {id: "moment_apart"}), (n:SkillStep {id: "moment_apart:hurt"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 5};
+MERGE (n:SkillStep {id: "moment_apart:stop"})
+SET n += {skillId: "moment_apart", step: "stop", kind: "handoff", version: "ma-v1"}, n.specJson = "{\"complete\": false, \"done\": \"done\", \"lines\": [{\"key\": \"stop_line\", \"when\": {\"all\": []}}], \"links\": [], \"noClose\": true, \"title\": \"stop_title\"}";
+MATCH (s:Skill {id: "moment_apart"}), (n:SkillStep {id: "moment_apart:stop"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 6};
+MERGE (n:SkillStep {id: "moment_apart:danger"})
+SET n += {skillId: "moment_apart", step: "danger", kind: "handoff", version: "ma-v1"}, n.specJson = "{\"complete\": false, \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"all\": []}}], \"done\": \"done\", \"lines\": [{\"key\": \"danger_line\", \"when\": {\"all\": []}}], \"links\": [], \"noClose\": true, \"title\": \"stop_title\"}";
+MATCH (s:Skill {id: "moment_apart"}), (n:SkillStep {id: "moment_apart:danger"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 7};
+MERGE (n:SkillStep {id: "moment_apart:recover"})
+SET n += {skillId: "moment_apart", step: "recover", kind: "handoff", version: "ma-v1"}, n.specJson = "{\"complete\": false, \"done\": \"done\", \"lines\": [{\"key\": \"recover_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"recover_title\"}";
+MATCH (s:Skill {id: "moment_apart"}), (n:SkillStep {id: "moment_apart:recover"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 8};
+MERGE (n:SkillStep {id: "moment_apart:body"})
+SET n += {skillId: "moment_apart", step: "body", kind: "ask", version: "ma-v1"}, n.specJson = "{\"fields\": [{\"id\": \"where\", \"label\": \"where_label\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"back_room\", \"when\": {\"not\": {\"eq\": [\"$a.valence\", \"good\"]}}}, {\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 2, \"options\": {\"list\": \"where\"}, \"required\": false}, {\"id\": \"words\", \"label\": \"words_label\", \"max\": 3, \"options\": {\"list\": \"words\", \"where\": {\"has\": [\"$opt.v\", \"$a.valence\"]}}, \"required\": false}], \"hint\": \"body_hint\", \"title\": \"body_title\"}";
+MATCH (s:Skill {id: "moment_apart"}), (n:SkillStep {id: "moment_apart:body"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 9};
+MERGE (n:SkillStep {id: "moment_apart:thoughts"})
+SET n += {skillId: "moment_apart", step: "thoughts", kind: "ask", version: "ma-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"has\": [\"$a.thoughts.ids\", \"self_harm_thought\"]}}], \"fields\": [{\"id\": \"thoughts\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"back_room\", \"when\": {\"not\": {\"eq\": [\"$a.valence\", \"good\"]}}}, {\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 2, \"options\": {\"list\": \"thoughts\", \"where\": {\"has\": [\"$opt.v\", \"$a.valence\"]}}, \"required\": false}], \"hint\": \"thoughts_hint\", \"title\": \"thoughts_title\"}";
+MATCH (s:Skill {id: "moment_apart"}), (n:SkillStep {id: "moment_apart:thoughts"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 10};
+MERGE (n:SkillStep {id: "moment_apart:feel"})
+SET n += {skillId: "moment_apart", step: "feel", kind: "ask", version: "ma-v1"}, n.specJson = "{\"fields\": [{\"emotion\": true, \"id\": \"feel\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"back_room\", \"when\": {\"not\": {\"eq\": [\"$a.valence\", \"good\"]}}}, {\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 2, \"options\": {\"carriedFirst\": true, \"emotions\": [\"calm\", \"tired\", \"bored\", \"interested\", \"content\", \"anxious\", \"frustrated\", \"confused\", \"thoughtful\"], \"emotionsFrom\": \"$d.feelFirst\", \"moreKey\": \"feel_more\"}, \"required\": false}, {\"id\": \"unsure\", \"label\": \"unsure_label\", \"max\": 1, \"options\": {\"list\": \"unsure\"}, \"required\": false}], \"hint\": \"feel_hint\", \"title\": \"feel_title\"}";
+MATCH (s:Skill {id: "moment_apart"}), (n:SkillStep {id: "moment_apart:feel"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 11};
+MERGE (n:SkillStep {id: "moment_apart:aware"})
+SET n += {skillId: "moment_apart", step: "aware", kind: "ask", version: "ma-v1"}, n.specJson = "{\"fields\": [{\"id\": \"aware\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"back_room\", \"when\": {\"not\": {\"eq\": [\"$a.valence\", \"good\"]}}}, {\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"aware\"}, \"required\": true}], \"hint\": \"aware_hint\", \"title\": \"aware_title\"}";
+MATCH (s:Skill {id: "moment_apart"}), (n:SkillStep {id: "moment_apart:aware"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 12};
+MERGE (n:SkillStep {id: "moment_apart:savour"})
+SET n += {skillId: "moment_apart", step: "savour", kind: "embed", version: "ma-v1"}, n.specJson = "{\"answerAs\": \"savoured\", \"embed\": \"holdRing\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"doneLabel\": \"savour_done\", \"hint\": \"savour_hint\", \"label\": \"savour_label\", \"next\": \"next\", \"runningLabel\": \"savour_running\", \"seconds\": 10, \"variant\": \"timed\"}, \"title\": \"savour_title\"}";
+MATCH (s:Skill {id: "moment_apart"}), (n:SkillStep {id: "moment_apart:savour"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 13};
+MERGE (n:SkillStep {id: "moment_apart:keep"})
+SET n += {skillId: "moment_apart", step: "keep", kind: "ask", version: "ma-v1"}, n.specJson = "{\"fields\": [{\"id\": \"kind\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"kind\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"keep_own\"}, \"required\": true}, {\"id\": \"keepit\", \"label\": \"keepit_label\", \"max\": 1, \"options\": {\"list\": \"keepit\"}, \"required\": true}], \"hint\": \"keep_hint\", \"keep\": {\"from\": [\"kind\"], \"kind\": \"thing_i_like\", \"many\": true, \"when\": {\"eq\": [\"$a.keepit\", \"keep\"]}}, \"primary\": \"keep_primary\", \"title\": \"keep_title\"}";
+MATCH (s:Skill {id: "moment_apart"}), (n:SkillStep {id: "moment_apart:keep"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 14};
+MERGE (n:SkillStep {id: "moment_apart:end"})
+SET n += {skillId: "moment_apart", step: "end", kind: "handoff", version: "ma-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"end_aware_yes\", \"when\": {\"eq\": [\"$a.aware\", \"yes\"]}}, {\"key\": \"end_aware_partly\", \"when\": {\"eq\": [\"$a.aware\", \"partly\"]}}, {\"key\": \"end_aware_later\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": [{\"key\": \"end_good_kept\", \"when\": {\"all\": [{\"eq\": [\"$a.valence\", \"good\"]}, {\"eq\": [\"$a.keepit\", \"keep\"]}]}}, {\"key\": \"end_good\", \"when\": {\"eq\": [\"$a.valence\", \"good\"]}}, {\"key\": \"end_hard\", \"when\": {\"eq\": [\"$a.valence\", \"hard\"]}}, {\"key\": \"end_mid\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "moment_apart"}), (n:SkillStep {id: "moment_apart:end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 15};
+MERGE (x:SkillExit {id: "moment_apart:cool_down"})
+SET x += {skillId: "moment_apart", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "moment_apart"}), (x:SkillExit {id: "moment_apart:cool_down"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "moment_apart:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "moment_apart:recover"})
+SET x += {skillId: "moment_apart", exit: "recover", toolId: "recovering-from-invalidation", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = "recover_offer";
+MATCH (s:Skill {id: "moment_apart"}), (x:SkillExit {id: "moment_apart:recover"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "moment_apart:recover"}), (t:TherapyConcept {appToolId: "recovering-from-invalidation"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "moment_apart:five_senses"})
+SET x += {skillId: "moment_apart", exit: "five_senses", toolId: "five-senses", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = "back_room";
+MATCH (s:Skill {id: "moment_apart"}), (x:SkillExit {id: "moment_apart:five_senses"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "moment_apart:five_senses"}), (t:TherapyConcept {appToolId: "five-senses"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "moment_apart:good_things"})
+SET x += {skillId: "moment_apart", exit: "good_things", toolId: "good-things", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = "more_label";
+MATCH (s:Skill {id: "moment_apart"}), (x:SkillExit {id: "moment_apart:good_things"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "moment_apart:good_things"}), (t:TherapyConcept {appToolId: "good-things"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "moment_apart:find_the_feeling"})
+SET x += {skillId: "moment_apart", exit: "find_the_feeling", toolId: "find-the-feeling", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = "ftf_label";
+MATCH (s:Skill {id: "moment_apart"}), (x:SkillExit {id: "moment_apart:find_the_feeling"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "moment_apart:find_the_feeling"}), (t:TherapyConcept {appToolId: "find-the-feeling"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "moment_apart:unpack"})
+SET x += {skillId: "moment_apart", exit: "unpack", toolId: "unpack-a-judgment", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = "unpack_label";
+MATCH (s:Skill {id: "moment_apart"}), (x:SkillExit {id: "moment_apart:unpack"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "moment_apart:unpack"}), (t:TherapyConcept {appToolId: "unpack-a-judgment"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "moment_apart:ending_careful"})
+SET x += {skillId: "moment_apart", exit: "ending_careful", toolId: "ending-relationships", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"careful\"}", x.label = "ending_careful";
+MATCH (s:Skill {id: "moment_apart"}), (x:SkillExit {id: "moment_apart:ending_careful"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "moment_apart:ending_careful"}), (t:TherapyConcept {appToolId: "ending-relationships"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "moment_apart:safety_open"})
+SET x += {skillId: "moment_apart", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "moment_apart"}), (x:SkillExit {id: "moment_apart:safety_open"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MERGE (x:SkillExit {id: "moment_apart:done"})
+SET x += {skillId: "moment_apart", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "moment_apart"}), (x:SkillExit {id: "moment_apart:done"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (a:SkillStep {id: "moment_apart:which"}), (b:SkillStep {id: "moment_apart:heads_up"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
+MATCH (a:SkillStep {id: "moment_apart:which"}), (b:SkillStep {id: "moment_apart:heads_up_hard"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"all\": [{\"eq\": [\"$ctx.band\", \"stirred\"]}, {\"eq\": [\"$a.valence\", \"hard\"]}]}";
+MATCH (a:SkillStep {id: "moment_apart:which"}), (b:SkillStep {id: "moment_apart:what"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "moment_apart:which"}), (x:SkillExit {id: "moment_apart:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "valence", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "moment_apart:heads_up"}), (b:SkillStep {id: "moment_apart:body_first"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.heads_up\", \"body\"]}";
+MATCH (a:SkillStep {id: "moment_apart:heads_up"}), (b:SkillStep {id: "moment_apart:heads_up_hard"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.valence\", \"hard\"]}";
+MATCH (a:SkillStep {id: "moment_apart:heads_up"}), (b:SkillStep {id: "moment_apart:what"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "moment_apart:heads_up"}), (x:SkillExit {id: "moment_apart:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "heads_up", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "moment_apart:heads_up_hard"}), (b:SkillStep {id: "moment_apart:body_first"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.heads_up_hard\", \"body\"]}";
+MATCH (a:SkillStep {id: "moment_apart:heads_up_hard"}), (b:SkillStep {id: "moment_apart:which"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.heads_up_hard\", \"good\"]}";
+MATCH (a:SkillStep {id: "moment_apart:heads_up_hard"}), (b:SkillStep {id: "moment_apart:what"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "moment_apart:heads_up_hard"}), (x:SkillExit {id: "moment_apart:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "heads_up_hard", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "moment_apart:body_first"}), (x:SkillExit {id: "moment_apart:cool_down"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "moment_apart:body_first"}), (x:SkillExit {id: "moment_apart:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "moment_apart:what"}), (b:SkillStep {id: "moment_apart:hurt"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"any\": [{\"eq\": [\"$a.what\", \"self_harm\"]}, {\"has\": [\"$a.thoughts.ids\", \"self_harm_thought\"]}]}";
+MATCH (a:SkillStep {id: "moment_apart:what"}), (b:SkillStep {id: "moment_apart:danger"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.what\", \"threatened\"]}";
+MATCH (a:SkillStep {id: "moment_apart:what"}), (b:SkillStep {id: "moment_apart:stop"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "{\"eq\": [\"$a.what\", \"frightening\"]}";
+MATCH (a:SkillStep {id: "moment_apart:what"}), (b:SkillStep {id: "moment_apart:recover"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 3}, r.whenJson = "{\"eq\": [\"$a.what\", \"hurt_by\"]}";
+MATCH (a:SkillStep {id: "moment_apart:what"}), (b:SkillStep {id: "moment_apart:body"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 4}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "moment_apart:what"}), (x:SkillExit {id: "moment_apart:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "what", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "moment_apart:hurt"}), (x:SkillExit {id: "moment_apart:safety_open"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "moment_apart:stop"}), (x:SkillExit {id: "moment_apart:safety_open"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "moment_apart:stop"}), (x:SkillExit {id: "moment_apart:five_senses"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "moment_apart:danger"}), (x:SkillExit {id: "moment_apart:safety_open"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "moment_apart:danger"}), (x:SkillExit {id: "moment_apart:ending_careful"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "moment_apart:danger"}), (x:SkillExit {id: "moment_apart:five_senses"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "moment_apart:recover"}), (x:SkillExit {id: "moment_apart:recover"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "moment_apart:recover"}), (x:SkillExit {id: "moment_apart:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "moment_apart:body"}), (b:SkillStep {id: "moment_apart:thoughts"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "moment_apart:body"}), (x:SkillExit {id: "moment_apart:five_senses"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "where", label: "back_room"}, r.whenJson = "{\"not\": {\"eq\": [\"$a.valence\", \"good\"]}}";
+MATCH (a:SkillStep {id: "moment_apart:body"}), (x:SkillExit {id: "moment_apart:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 1, field: "where", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "moment_apart:thoughts"}), (b:SkillStep {id: "moment_apart:hurt"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"has\": [\"$a.thoughts.ids\", \"self_harm_thought\"]}";
+MATCH (a:SkillStep {id: "moment_apart:thoughts"}), (b:SkillStep {id: "moment_apart:feel"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "moment_apart:thoughts"}), (x:SkillExit {id: "moment_apart:five_senses"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "thoughts", label: "back_room"}, r.whenJson = "{\"not\": {\"eq\": [\"$a.valence\", \"good\"]}}";
+MATCH (a:SkillStep {id: "moment_apart:thoughts"}), (x:SkillExit {id: "moment_apart:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 1, field: "thoughts", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "moment_apart:feel"}), (b:SkillStep {id: "moment_apart:aware"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "moment_apart:feel"}), (x:SkillExit {id: "moment_apart:five_senses"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "feel", label: "back_room"}, r.whenJson = "{\"not\": {\"eq\": [\"$a.valence\", \"good\"]}}";
+MATCH (a:SkillStep {id: "moment_apart:feel"}), (x:SkillExit {id: "moment_apart:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 1, field: "feel", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "moment_apart:aware"}), (b:SkillStep {id: "moment_apart:savour"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.valence\", \"good\"]}";
+MATCH (a:SkillStep {id: "moment_apart:aware"}), (b:SkillStep {id: "moment_apart:end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "moment_apart:aware"}), (x:SkillExit {id: "moment_apart:five_senses"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "aware", label: "back_room"}, r.whenJson = "{\"not\": {\"eq\": [\"$a.valence\", \"good\"]}}";
+MATCH (a:SkillStep {id: "moment_apart:aware"}), (x:SkillExit {id: "moment_apart:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 1, field: "aware", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "moment_apart:savour"}), (b:SkillStep {id: "moment_apart:end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.savoured\", \"skipped\"]}";
+MATCH (a:SkillStep {id: "moment_apart:savour"}), (b:SkillStep {id: "moment_apart:keep"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "moment_apart:savour"}), (x:SkillExit {id: "moment_apart:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "moment_apart:keep"}), (b:SkillStep {id: "moment_apart:end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "moment_apart:keep"}), (x:SkillExit {id: "moment_apart:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "kind", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "moment_apart:end"}), (x:SkillExit {id: "moment_apart:good_things"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"eq\": [\"$a.valence\", \"good\"]}}]";
+MATCH (a:SkillStep {id: "moment_apart:end"}), (x:SkillExit {id: "moment_apart:find_the_feeling"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"any\": [{\"has\": [\"$a.unsure.ids\", \"unsure\"]}, {\"not\": {\"set\": \"$a.feel.ids\"}}]}}]";
+MATCH (a:SkillStep {id: "moment_apart:end"}), (x:SkillExit {id: "moment_apart:unpack"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"all\": [{\"eq\": [\"$a.valence\", \"hard\"]}, {\"has\": [\"$a.thoughts.ids\", \"me\"]}]}}]";
+MATCH (a:SkillStep {id: "moment_apart:end"}), (x:SkillExit {id: "moment_apart:five_senses"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 3}, r.rowsJson = "[{\"order\": 3, \"when\": {\"eq\": [\"$a.valence\", \"hard\"]}}]";
+MATCH (a:SkillStep {id: "moment_apart:end"}), (x:SkillExit {id: "moment_apart:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MERGE (o:SkillOption {id: "moment_apart:valence:good"})
+SET o:SkillOption:MomentValence, o += {skillId: "moment_apart", list: "valence", value: "good", label: "Something good, even small", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:valence:good"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "valence", order: 0};
+MERGE (o:SkillOption {id: "moment_apart:valence:hard"})
+SET o:SkillOption:MomentValence, o += {skillId: "moment_apart", list: "valence", value: "hard", label: "Something hard", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:valence:hard"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "valence", order: 1};
+MERGE (o:SkillOption {id: "moment_apart:valence:mid"})
+SET o:SkillOption:MomentValence, o += {skillId: "moment_apart", list: "valence", value: "mid", label: "Something in between", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:valence:mid"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "valence", order: 2};
+MERGE (o:SkillOption {id: "moment_apart:heads_up:body"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "heads_up", value: "body", label: "My body first", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:heads_up:body"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up", order: 3};
+MERGE (o:SkillOption {id: "moment_apart:heads_up:go"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "heads_up", value: "go", label: "Go on anyway", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:heads_up:go"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up", order: 4};
+MERGE (o:SkillOption {id: "moment_apart:heads_up_hard:good"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "heads_up_hard", value: "good", label: "Take apart a good one instead", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:heads_up_hard:good"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up_hard", order: 5};
+MERGE (o:SkillOption {id: "moment_apart:heads_up_hard:body"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "heads_up_hard", value: "body", label: "My body first", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:heads_up_hard:body"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up_hard", order: 6};
+MERGE (o:SkillOption {id: "moment_apart:heads_up_hard:go"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "heads_up_hard", value: "go", label: "Go on anyway", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:heads_up_hard:go"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up_hard", order: 7};
+MERGE (o:SkillOption {id: "moment_apart:what:someone"})
+SET o:SkillOption:MomentPrompt, o += {skillId: "moment_apart", list: "what", value: "someone", label: "With someone", version: "ma-v1"}, o.propsJson = "{\"v\": [\"good\", \"hard\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:what:someone"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 8};
+MERGE (o:SkillOption {id: "moment_apart:what:alone"})
+SET o:SkillOption:MomentPrompt, o += {skillId: "moment_apart", list: "what", value: "alone", label: "On my own", version: "ma-v1"}, o.propsJson = "{\"v\": [\"good\", \"hard\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:what:alone"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 9};
+MERGE (o:SkillOption {id: "moment_apart:what:work"})
+SET o:SkillOption:MomentPrompt, o += {skillId: "moment_apart", list: "what", value: "work", label: "At work or study", version: "ma-v1"}, o.propsJson = "{\"v\": [\"good\", \"hard\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:what:work"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 10};
+MERGE (o:SkillOption {id: "moment_apart:what:outside"})
+SET o:SkillOption:MomentPrompt, o += {skillId: "moment_apart", list: "what", value: "outside", label: "Outside", version: "ma-v1"}, o.propsJson = "{\"v\": [\"good\", \"hard\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:what:outside"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 11};
+MERGE (o:SkillOption {id: "moment_apart:what:online"})
+SET o:SkillOption:MomentPrompt, o += {skillId: "moment_apart", list: "what", value: "online", label: "Online", version: "ma-v1"}, o.propsJson = "{\"v\": [\"good\", \"hard\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:what:online"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 12};
+MERGE (o:SkillOption {id: "moment_apart:what:hurt_by"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "what", value: "hurt_by", label: "Someone put me down, brushed me off or left me out", version: "ma-v1"}, o.propsJson = "{\"v\": [\"hard\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:what:hurt_by"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 13};
+MERGE (o:SkillOption {id: "moment_apart:what:threatened"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "what", value: "threatened", label: "Someone threatened me, scared me or hurt me", version: "ma-v1"}, o.propsJson = "{\"danger\": \"other\", \"v\": [\"hard\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:what:threatened"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 14};
+MERGE (o:SkillOption {id: "moment_apart:what:frightening"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "what", value: "frightening", label: "Something frightening happened", version: "ma-v1"}, o.propsJson = "{\"v\": [\"hard\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:what:frightening"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 15};
+MERGE (o:SkillOption {id: "moment_apart:what:self_harm"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "what", value: "self_harm", label: "I hurt myself, or thought about it", version: "ma-v1"}, o.propsJson = "{\"danger\": \"self\", \"v\": [\"hard\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:what:self_harm"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 16};
+MERGE (o:SkillOption {id: "moment_apart:where:chest"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "where", value: "chest", label: "Chest", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:where:chest"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "where", order: 17};
+MATCH (o:SkillOption {id: "moment_apart:where:chest"}), (c:BodyRegion {id: "chest"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:where:stomach"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "where", value: "stomach", label: "Stomach", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:where:stomach"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "where", order: 18};
+MATCH (o:SkillOption {id: "moment_apart:where:stomach"}), (c:BodyRegion {id: "stomach"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:where:throat"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "where", value: "throat", label: "Throat", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:where:throat"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "where", order: 19};
+MATCH (o:SkillOption {id: "moment_apart:where:throat"}), (c:BodyRegion {id: "throat"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:where:shoulders"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "where", value: "shoulders", label: "Shoulders", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:where:shoulders"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "where", order: 20};
+MATCH (o:SkillOption {id: "moment_apart:where:shoulders"}), (c:BodyRegion {id: "shoulders"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:where:face"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "where", value: "face", label: "Face", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:where:face"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "where", order: 21};
+MATCH (o:SkillOption {id: "moment_apart:where:face"}), (c:BodyRegion {id: "face"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:where:jaw"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "where", value: "jaw", label: "Jaw", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:where:jaw"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "where", order: 22};
+MATCH (o:SkillOption {id: "moment_apart:where:jaw"}), (c:BodyRegion {id: "jaw"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:where:head"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "where", value: "head", label: "Head", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:where:head"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "where", order: 23};
+MATCH (o:SkillOption {id: "moment_apart:where:head"}), (c:BodyRegion {id: "head"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:where:hands"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "where", value: "hands", label: "Hands", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:where:hands"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "where", order: 24};
+MATCH (o:SkillOption {id: "moment_apart:where:hands"}), (c:BodyRegion {id: "hands"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:where:arms"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "where", value: "arms", label: "Arms", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:where:arms"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "where", order: 25};
+MATCH (o:SkillOption {id: "moment_apart:where:arms"}), (c:BodyRegion {id: "arms"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:where:legs"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "where", value: "legs", label: "Legs", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:where:legs"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "where", order: 26};
+MATCH (o:SkillOption {id: "moment_apart:where:legs"}), (c:BodyRegion {id: "legs"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:where:body"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "where", value: "body", label: "Whole body", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:where:body"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "where", order: 27};
+MATCH (o:SkillOption {id: "moment_apart:where:body"}), (c:BodyRegion {id: "body"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:where:nowhere"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "where", value: "nowhere", label: "Nothing stands out", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:where:nowhere"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "where", order: 28};
+MERGE (o:SkillOption {id: "moment_apart:words:warmth"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "warmth", label: "Warm", version: "ma-v1"}, o.propsJson = "{\"v\": [\"good\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:warmth"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 29};
+MATCH (o:SkillOption {id: "moment_apart:words:warmth"}), (c:SensationType {id: "warmth"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:lightness"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "lightness", label: "Light", version: "ma-v1"}, o.propsJson = "{\"v\": [\"good\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:lightness"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 30};
+MATCH (o:SkillOption {id: "moment_apart:words:lightness"}), (c:SensationType {id: "lightness"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:expansion"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "expansion", label: "Open", version: "ma-v1"}, o.propsJson = "{\"v\": [\"good\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:expansion"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 31};
+MATCH (o:SkillOption {id: "moment_apart:words:expansion"}), (c:SensationType {id: "expansion"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:settled"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "settled", label: "Settled", version: "ma-v1"}, o.propsJson = "{\"v\": [\"good\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:settled"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 32};
+MATCH (o:SkillOption {id: "moment_apart:words:settled"}), (c:SensationType {id: "settled"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:loose"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "loose", label: "Loose", version: "ma-v1"}, o.propsJson = "{\"v\": [\"good\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:loose"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 33};
+MATCH (o:SkillOption {id: "moment_apart:words:loose"}), (c:SensationType {id: "loose"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:soft"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "soft", label: "Soft", version: "ma-v1"}, o.propsJson = "{\"v\": [\"good\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:soft"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 34};
+MATCH (o:SkillOption {id: "moment_apart:words:soft"}), (c:SensationType {id: "soft"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:energised"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "energised", label: "Energised", version: "ma-v1"}, o.propsJson = "{\"v\": [\"good\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:energised"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 35};
+MATCH (o:SkillOption {id: "moment_apart:words:energised"}), (c:SensationType {id: "energised"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:smiling"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "smiling", label: "Smiling", version: "ma-v1"}, o.propsJson = "{\"v\": [\"good\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:smiling"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 36};
+MATCH (o:SkillOption {id: "moment_apart:words:smiling"}), (c:SensationType {id: "smiling"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:fizzy"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "fizzy", label: "Fizzy", version: "ma-v1"}, o.propsJson = "{\"v\": [\"good\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:fizzy"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 37};
+MATCH (o:SkillOption {id: "moment_apart:words:fizzy"}), (c:SensationType {id: "fizzy"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:easy_breathing"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "easy_breathing", label: "Breathing easy", version: "ma-v1"}, o.propsJson = "{\"v\": [\"good\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:easy_breathing"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 38};
+MATCH (o:SkillOption {id: "moment_apart:words:easy_breathing"}), (c:SensationType {id: "easy_breathing"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:tingly"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "tingly", label: "Tingly", version: "ma-v1"}, o.propsJson = "{\"v\": [\"good\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:tingly"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 39};
+MATCH (o:SkillOption {id: "moment_apart:words:tingly"}), (c:SensationType {id: "tingly"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:tension"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "tension", label: "Tight", version: "ma-v1"}, o.propsJson = "{\"v\": [\"hard\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:tension"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 40};
+MATCH (o:SkillOption {id: "moment_apart:words:tension"}), (c:SensationType {id: "tension"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:pressure"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "pressure", label: "Pressure", version: "ma-v1"}, o.propsJson = "{\"v\": [\"hard\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:pressure"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 41};
+MATCH (o:SkillOption {id: "moment_apart:words:pressure"}), (c:SensationType {id: "pressure"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:heaviness"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "heaviness", label: "Heavy", version: "ma-v1"}, o.propsJson = "{\"v\": [\"hard\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:heaviness"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 42};
+MATCH (o:SkillOption {id: "moment_apart:words:heaviness"}), (c:SensationType {id: "heaviness"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:knotted"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "knotted", label: "Knotted", version: "ma-v1"}, o.propsJson = "{\"v\": [\"hard\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:knotted"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 43};
+MATCH (o:SkillOption {id: "moment_apart:words:knotted"}), (c:SensationType {id: "knotted"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:churning"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "churning", label: "Churning", version: "ma-v1"}, o.propsJson = "{\"v\": [\"hard\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:churning"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 44};
+MATCH (o:SkillOption {id: "moment_apart:words:churning"}), (c:SensationType {id: "churning"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:racing_heart"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "racing_heart", label: "Racing", version: "ma-v1"}, o.propsJson = "{\"v\": [\"hard\", \"good\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:racing_heart"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 45};
+MATCH (o:SkillOption {id: "moment_apart:words:racing_heart"}), (c:SensationType {id: "racing_heart"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:heat"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "heat", label: "Hot", version: "ma-v1"}, o.propsJson = "{\"v\": [\"hard\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:heat"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 46};
+MATCH (o:SkillOption {id: "moment_apart:words:heat"}), (c:SensationType {id: "heat"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:constriction"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "constriction", label: "Closing up", version: "ma-v1"}, o.propsJson = "{\"v\": [\"hard\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:constriction"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 47};
+MATCH (o:SkillOption {id: "moment_apart:words:constriction"}), (c:SensationType {id: "constriction"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:shaking"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "shaking", label: "Shaky", version: "ma-v1"}, o.propsJson = "{\"v\": [\"hard\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:shaking"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 48};
+MATCH (o:SkillOption {id: "moment_apart:words:shaking"}), (c:SensationType {id: "shaking"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:sinking"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "sinking", label: "Sinking", version: "ma-v1"}, o.propsJson = "{\"v\": [\"hard\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:sinking"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 49};
+MATCH (o:SkillOption {id: "moment_apart:words:sinking"}), (c:SensationType {id: "sinking"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:lump"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "lump", label: "A lump", version: "ma-v1"}, o.propsJson = "{\"v\": [\"hard\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:lump"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 50};
+MATCH (o:SkillOption {id: "moment_apart:words:lump"}), (c:SensationType {id: "lump"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:numbness_sensation"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "numbness_sensation", label: "Numb", version: "ma-v1"}, o.propsJson = "{\"v\": [\"hard\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:numbness_sensation"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 51};
+MATCH (o:SkillOption {id: "moment_apart:words:numbness_sensation"}), (c:SensationType {id: "numbness_sensation"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:drained"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "drained", label: "Drained", version: "ma-v1"}, o.propsJson = "{\"v\": [\"hard\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:drained"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 52};
+MATCH (o:SkillOption {id: "moment_apart:words:drained"}), (c:SensationType {id: "drained"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:butterflies"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "butterflies", label: "Fluttery", version: "ma-v1"}, o.propsJson = "{\"v\": [\"good\", \"hard\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:butterflies"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 53};
+MATCH (o:SkillOption {id: "moment_apart:words:butterflies"}), (c:SensationType {id: "butterflies"})
+MERGE (o)-[:PRESENTS]->(c);
+MERGE (o:SkillOption {id: "moment_apart:words:no_words"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "words", value: "no_words", label: "No words for it", version: "ma-v1"}, o.propsJson = "{\"v\": [\"good\", \"hard\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:words:no_words"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "words", order: 54};
+MERGE (o:SkillOption {id: "moment_apart:thoughts:me"})
+SET o:SkillOption:MomentPrompt, o += {skillId: "moment_apart", list: "thoughts", value: "me", label: "About me", version: "ma-v1"}, o.propsJson = "{\"v\": [\"good\", \"hard\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:thoughts:me"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "thoughts", order: 55};
+MERGE (o:SkillOption {id: "moment_apart:thoughts:them"})
+SET o:SkillOption:MomentPrompt, o += {skillId: "moment_apart", list: "thoughts", value: "them", label: "About someone else", version: "ma-v1"}, o.propsJson = "{\"v\": [\"good\", \"hard\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:thoughts:them"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "thoughts", order: 56};
+MERGE (o:SkillOption {id: "moment_apart:thoughts:next"})
+SET o:SkillOption:MomentPrompt, o += {skillId: "moment_apart", list: "thoughts", value: "next", label: "About what happens next", version: "ma-v1"}, o.propsJson = "{\"v\": [\"good\", \"hard\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:thoughts:next"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "thoughts", order: 57};
+MERGE (o:SkillOption {id: "moment_apart:thoughts:meant"})
+SET o:SkillOption:MomentPrompt, o += {skillId: "moment_apart", list: "thoughts", value: "meant", label: "About what it meant", version: "ma-v1"}, o.propsJson = "{\"v\": [\"good\", \"hard\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:thoughts:meant"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "thoughts", order: 58};
+MERGE (o:SkillOption {id: "moment_apart:thoughts:none"})
+SET o:SkillOption:MomentPrompt, o += {skillId: "moment_apart", list: "thoughts", value: "none", label: "No thoughts I noticed", version: "ma-v1"}, o.propsJson = "{\"v\": [\"good\", \"hard\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:thoughts:none"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "thoughts", order: 59};
+MERGE (o:SkillOption {id: "moment_apart:thoughts:self_harm_thought"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "thoughts", value: "self_harm_thought", label: "Thoughts of hurting myself or not being here", version: "ma-v1"}, o.propsJson = "{\"danger\": \"self\", \"v\": [\"hard\", \"mid\"]}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:thoughts:self_harm_thought"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "thoughts", order: 60};
+MERGE (o:SkillOption {id: "moment_apart:unsure:unsure"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "unsure", value: "unsure", label: "I can't tell", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:unsure:unsure"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "unsure", order: 61};
+MERGE (o:SkillOption {id: "moment_apart:aware:yes"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "aware", value: "yes", label: "Yes", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:aware:yes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "aware", order: 62};
+MERGE (o:SkillOption {id: "moment_apart:aware:partly"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "aware", value: "partly", label: "Partly", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:aware:partly"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "aware", order: 63};
+MERGE (o:SkillOption {id: "moment_apart:aware:later"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "aware", value: "later", label: "Only now", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:aware:later"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "aware", order: 64};
+MERGE (o:SkillOption {id: "moment_apart:kind:moment"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "kind", value: "moment", label: "A moment, or how I felt", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:kind:moment"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "kind", order: 65};
+MERGE (o:SkillOption {id: "moment_apart:kind:person"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "kind", value: "person", label: "A person", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:kind:person"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "kind", order: 66};
+MERGE (o:SkillOption {id: "moment_apart:kind:view"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "kind", value: "view", label: "A view", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:kind:view"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "kind", order: 67};
+MERGE (o:SkillOption {id: "moment_apart:kind:sound"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "kind", value: "sound", label: "A sound", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:kind:sound"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "kind", order: 68};
+MERGE (o:SkillOption {id: "moment_apart:kind:taste"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "kind", value: "taste", label: "A taste or smell", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:kind:taste"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "kind", order: 69};
+MERGE (o:SkillOption {id: "moment_apart:kind:texture"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "kind", value: "texture", label: "Something soft or comfortable", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:kind:texture"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "kind", order: 70};
+MERGE (o:SkillOption {id: "moment_apart:kind:colour"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "kind", value: "colour", label: "A colour", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:kind:colour"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "kind", order: 71};
+MERGE (o:SkillOption {id: "moment_apart:kind:pet"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "kind", value: "pet", label: "An animal", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:kind:pet"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "kind", order: 72};
+MERGE (o:SkillOption {id: "moment_apart:keepit:keep"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "keepit", value: "keep", label: "Keep it", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:keepit:keep"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "keepit", order: 73};
+MERGE (o:SkillOption {id: "moment_apart:keepit:not_now"})
+SET o:SkillOption, o += {skillId: "moment_apart", list: "keepit", value: "not_now", label: "Not this time", version: "ma-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:keepit:not_now"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "keepit", order: 74};

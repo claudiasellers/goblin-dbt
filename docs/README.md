@@ -127,7 +127,7 @@ Waves follow the index: 1 safety floor and platform, 2 validation and the transf
 | 56 | MF-06 | Kind wishes (loving-kindness) | spec only | |
 | 57 | DT-09 | When it's a habit (addiction skills) | spec only | |
 | 58 | IE-09 | Find your people | built (part 1) | One small step towards people with a guess before and a check after ([design/find-your-people.md](design/find-your-people.md)) |
-| 59 | MF-07 | Take a moment apart | spec only | |
+| 59 | MF-07 | Take a moment apart | built (part 1) | *Take a moment apart* on the skill runtime (MF-B7, 15 Nov): one moment taken apart into body, thoughts and feeling, *were you aware of it?*, a good one savoured and kept in Things I like; hurt by someone → Recover, frightening → stop and support; intent *Work out what a moment was made of*. [`moment-apart.md`](design/moment-apart.md) |
 | 60 | WMP-08 | Validate them | spec only | |
 | 61 | CORE-12 | Outcomes, fade and graduation | spec only | Reflect shows what helped; no outcomes or fade |
 | 62 | DT-08 | Thoughts passing through | spec only | |

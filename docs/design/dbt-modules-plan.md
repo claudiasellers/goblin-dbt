@@ -576,7 +576,7 @@ batch, no capacity probe (D1), the orienting close asked in the flow, reps throu
 | MF-B4 | **MF-05** One thing (**built 15 Nov**, [`one-thing.md`](one-thing.md): intent *Get out of my head*, leads `rumination_loop` beside Problem Solve, the rumination variant (a minute outside, MF-09's mode card, the loop in the flow), with or without the phone, `one_thing_again` for the off-phone rep, `mfOrder` 4 on the Practice home; fade and the hosted card are part 2) with MF-09's mode card | MF-B1 | |
 | MF-B5 | **MF-08** What works here (**built 15 Nov**, [`what-works.md`](what-works.md): tool `effectiveness`, intent *Being right is getting in the way*, Problem Solve's two `effectiveness` directions built with the problem type as the frame, `effective_move` reopening the run, `mfOrder` 6; fade and Do the Opposite's offer are part 2) | MF-B1 | |
 | MF-B6 | **Built** (15 Nov, [`wise-mind-check.md`](wise-mind-check.md)). **MF-04** Wise mind check (`wise_mind_check` on the `wise-mind` tool at `?frame=check`, inline in One message; the `stoneSink` embed) and the 24-hour look-back (`wise_mind_lookback`) | MF-B1 | Wise mind's practice already ships |
-| MF-B7 | **MF-07** Take a moment apart | MF-B1 | |
+| MF-B7 | **MF-07** Take a moment apart (**built 15 Nov**, [`moment-apart.md`](moment-apart.md): tool `moment-apart` on the new concept `dbt_mindful_events`, intent *Work out what a moment was made of*, a good moment kept in ER-04's Things I like, Recover and the support resources for hurt and frightening moments, a `describe` rep; fade, the silhouette and the anhedonia history rule are part 2) | MF-B1 | |
 | MF-B8 | **MF-06** Kind wishes (tiers, backdraft) | MF-B1 | |
 | MF-B9 | **MF-09** Doing mind, being mind; **MF-10** Join in | MF-B4 | |
 

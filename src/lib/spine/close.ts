@@ -52,6 +52,8 @@ export const TOOL_CLOSE_KIND: Record<string, { module: SpineModule; closeKind: C
   'unpack-a-judgment': { module: 'mf', closeKind: 'none' },
   'one-thing': { module: 'mf', closeKind: 'regulation_down' },
   'effectiveness': { module: 'mf', closeKind: 'none' },
+  // Take a moment apart (MF-07, docs/design/moment-apart.md): no close (the description is the outcome).
+  'moment-apart': { module: 'mf', closeKind: 'none' },
   'help-now': { module: 'core', closeKind: 'none' },
   'micro-step': { module: 'core', closeKind: 'none' },
   'guided-activity': { module: 'core', closeKind: 'none' },

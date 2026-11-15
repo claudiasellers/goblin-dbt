@@ -1362,6 +1362,17 @@ SET sleep_hygiene += {
   skill_type: "reducing_vulnerability"
 };
 
+// Mindfulness Worksheets 8-9 (PRD MF-07): one pleasant or unpleasant event taken apart into body, thoughts and feeling,
+// and whether you noticed it while it happened; Take a moment apart (docs/design/moment-apart.md).
+MERGE (mindful_events:TherapyConcept {id: "dbt_mindful_events"})
+SET mindful_events += {
+  name: "Mindfulness of Pleasant and Unpleasant Events",
+  description: "Taking one moment apart into what the body felt, what you thought and what you felt, and noticing whether you were aware of it as it happened",
+  modality: "DBT",
+  module: "Mindfulness",
+  skill_type: "what_skill"
+};
+
 MERGE (check_the_facts:TherapyConcept {id: "dbt_check_facts"})
 SET check_the_facts += {
   name: "Check the Facts",

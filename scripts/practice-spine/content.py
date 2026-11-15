@@ -913,7 +913,7 @@ SKILL_FIELDS = {
 # the skill (PRD: five-senses → observe, Find the feeling → describe), added to `defaultFor` so their reps count here.
 MF_SEQUENCE = [
     ("observe", 1, "Notice", ["five-senses"]),
-    ("describe", 2, "Name", ["find-the-feeling"]),
+    ("describe", 2, "Name", ["find-the-feeling", "moment-apart"]),
     ("nonjudge", 3, "Without judging", []),
     ("one_thing", 4, "One thing", []),
     ("wise_mind", 5, "Wise mind", []),

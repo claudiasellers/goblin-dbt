@@ -413,11 +413,14 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
     const tvn = r?.thenVsNow as ThenVsNow | null | undefined;
     // With no change check answered, the outcome is dismissed too: the sub-run is never asked about later, so a
     // safety or too-much hand-off doesn't come back as Today's "Did it help?" (the noClose rule, for the sub-session).
-    void toolSession.close({ status: finished ? 'completed' : 'exited_early', ...(tvn ? { thenVsNow: tvn } : {}) })
+    // A hand-off that isn't the practice (`complete: false`: a danger or safety stop) closes the sub-session as left
+    // early, as a standalone visit does, so it logs a rep only when something was practised on the way.
+    const done = finished && !(step.kind === 'handoff' && step.complete === false);
+    void toolSession.close({ status: done ? 'completed' : 'exited_early', ...(tvn ? { thenVsNow: tvn } : {}) })
       .then((r) => (r && !tvn ? answerToolOutcome(toolSession.id, { dismissed: true }) : null))
       .catch(() => { /* signed out, or offline: nothing to dismiss */ });
     inline.onReturn?.({ answers: r?.answers ?? {}, finished, ids: r?.ids ?? [finished ? 'finished' : 'left'] });
-  }, [inline, ctx, st, toolSession]);
+  }, [inline, ctx, st, step, toolSession]);
   useEffect(() => { if (inline && step.kind === 'handoff') giveBack(true); }, [inline, step.kind, giveBack]);
 
   let body: ReactNode;
