@@ -339,6 +339,35 @@ FOLLOW_UP_TYPES = [
         "notification": "A look back is ready when you are.",
     },
     {
+        # Doing mind, being mind (MF-09, docs/design/doing-being.md): a week that felt mostly doing gets one being break
+        # a day at a moment the person already has; *Ask me tomorrow how it went?* books this card, which reopens that
+        # visit at `back` (R9 `reopens`: *Your being break: {cue}. Did you get to take one?*); a yes is an off-phone rep
+        # (runRep). Opening it is the resolution. Content-free.
+        "id": "being_break", "ownerModule": "mf", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/doing-being?run={sourceSessionId}&at=back&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"morning": {"kind": "at_local", "days": 1, "time": "09:00"},
+                                             "evening": {"kind": "at_local", "days": 1, "time": "19:00"}}},
+        "staleAfterHours": 48, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Your being break", "body": "A minute of being mind, at a moment you already have. Did you get to take one?"},
+        "choices": [{"id": "dismiss", "label": "Not this time", "status": "dismissed"}],
+        "notification": "Your being break is ready to check.",
+    },
+    {
+        # Join in (MF-10, docs/design/join-in.md): *Next time, with someone?* on the end card, tomorrow or in a few days.
+        # The card reopens that visit at `social` (R9 `reopens`: *Did you get to join in at something with someone?*);
+        # a yes is an off-phone rep (runRep; the PRD's off-phone social rep). Opening it is the resolution. Content-free.
+        "id": "join_in_social", "ownerModule": "mf", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/join-in?run={sourceSessionId}&at=social&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
+                                             "few_days": {"kind": "at_local", "days": 3, "time": "18:00"}}},
+        "staleAfterHours": 72, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Joining in", "body": "Joining in at something, with someone. Did you get to?"},
+        "choices": [{"id": "dismiss", "label": "Not this time", "status": "dismissed"}],
+        "notification": "Joining in is ready to check.",
+    },
+    {
         # The Practice home's daily minute (MF-02, MF-B3, docs/design/practice-home.md): set once in Practice's setup
         # (*morning · midday · evening*; a cue of the person's own books nothing: the cue is the reminder). No rrule yet,
         # so it rolls: opening the card resolves it, and every visit to Practice books the next one when none is
@@ -909,7 +938,7 @@ SKILL_FIELDS = {
 # The Practice home (MF-02, MF-B3, docs/design/practice-home.md): the MF sequence (PRD MF-02 workflow 2: observe →
 # describe → nonjudgment → one-mindfully → wise mind → effectively → participate, then cycling) as `mfOrder`, and the
 # library's plain name per skill (`practiceLabel`). Only skills with a built tool are listed; One thing (MF-05) joined
-# with MF-B4, What works (MF-08) with MF-B5 and Kind wishes (MF-06) with MF-B8; Join in (MF-10) joins the sequence with its batch. `alsoFor`: other tools that practise
+# with MF-B4, What works (MF-08) with MF-B5, Kind wishes (MF-06) with MF-B8 and Join in (MF-10) with MF-B9. `alsoFor`: other tools that practise
 # the skill (PRD: five-senses → observe, Find the feeling → describe), added to `defaultFor` so their reps count here.
 MF_SEQUENCE = [
     ("observe", 1, "Notice", ["five-senses"]),
@@ -918,9 +947,11 @@ MF_SEQUENCE = [
     ("one_thing", 4, "One thing", []),
     ("wise_mind", 5, "Wise mind", []),
     ("effectively", 6, "What works", []),
+    # Join in (MF-10): participate, after effectively in the PRD's sequence.
+    ("participate", 7, "Join in", []),
     # Kind wishes (MF-06): last in the order, so the daily pick reaches it once the others have reps (PRD: MF-02
     # rotation after the first weeks; Arch Map: the easy tier in week 3).
-    ("kind_wishes", 7, "Kind wishes", []),
+    ("kind_wishes", 8, "Kind wishes", []),
 ]
 
 # The tool the home opens for a skill when its first `defaultFor` is shared with an earlier skill: Notice what's here
@@ -977,6 +1008,17 @@ NEW_SKILLS = [
     ("kind_wishes", "Loving kindness", "Preliminary", "mind", "dbt_loving_kindness",
      "Offering kind wishes on purpose, whether or not they feel true, practises warmth toward others and toward yourself.",
      ["linehan_skills_2015"], ["kind-wishes"]),
+    # Doing mind, being mind (MF-09, docs/design/doing-being.md): a completed visit is a skillful_means rep (the mode
+    # card answered, the switch taken or not, or the week's shape). Not in the Practice home's MF sequence (the PRD's
+    # sequence has no skillful means: the card lives in its hosts and the weekly shape). Preliminary at app dose (PRD).
+    ("skillful_means", "Doing mind, being mind", "Preliminary", "mind", "dbt_skillful_means",
+     "Noticing when your mind is trying to fix a feeling like a task gives the loop an outside, and a minute of being mind a way in.",
+     ["linehan_skills_2015"], ["doing-being"]),
+    # Join in (MF-10, docs/design/join-in.md): a completed visit is a participate rep (an off-phone one through the
+    # join_in_social card). Preliminary: participate has no trial of its own (the PRD's grade for the practice).
+    ("participate", "Participate", "Preliminary", "mind", "dbt_participate",
+     "Throwing yourself into something, and dropping back in each time you catch yourself watching, builds doing things without narrating them.",
+     ["linehan_skills_2015"], ["join-in"]),
 ]
 
 SOURCES = [

@@ -65,6 +65,8 @@ export const PRACTICE_COPY = {
   weekLabel: 'Practice this week',
   weekNone: 'Reps count whenever they happen.',
   weekSome: 'Reps count whenever they happen. Levels never go down.',
+  // MF-09's weekly shape (docs/design/doing-being.md): a line the person taps when they choose, never asked.
+  weekShape: 'How did this week feel? Doing, being or drifting',
   /** The ring in words for a screen reader: never a number. */
   weekRing: (fraction: number) => (fraction <= 0 ? 'Nothing yet this week' : fraction >= 1 ? 'A full week' : 'Some practice this week'),
   skillsTitle: 'Your skills',

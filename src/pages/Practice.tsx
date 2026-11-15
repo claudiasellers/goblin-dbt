@@ -290,6 +290,7 @@ function WeekRing({ weekReps }: { weekReps: number }) {
         <ProgressRing value={fraction} size={72} stroke={8} label={C.weekLabel} valueText={C.weekRing(fraction)} />
         <p className="m-0 text-sm text-[var(--color-text-secondary)]">{weekReps > 0 ? C.weekSome : C.weekNone}</p>
       </div>
+      <Link to="/tool/doing-being?enterAt=week" className={`${quiet} inline-flex items-center px-1`} data-testid="practice-week-shape">{C.weekShape}</Link>
     </section>
   );
 }

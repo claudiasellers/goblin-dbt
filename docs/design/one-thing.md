@@ -66,8 +66,8 @@ PRD: it can raise distress in high ruminators). Nothing on screen counts.
 - **Profile.** `PROFILE_NEEDS['one-thing'] = ['pleaseRows']`: *Eat a few bites* is never listed for someone who left
   food out of Running low in Me.
 - **Exits.** First, the body (flooded, or the loop got louder) and Give your mind a job (louder). Recorded in
-  `tests/fixtures/module-edges.json`, with the two hosts that wait: Problem Solve's rumination guard (MF-B9, with MF-09)
-  and *one thing in the moment* inside DEAR MAN and IMPROVE (part 2).
+  `tests/fixtures/module-edges.json`, with the host that waits: *one thing in the moment* inside DEAR MAN and IMPROVE (part 2).
+  Problem Solve's rumination guard came with MF-B9 as a link to Doing mind, being mind's card, which offers One thing.
 
 ## Where it departs from the PRD
 
@@ -79,8 +79,8 @@ PRD: it can raise distress in high ruminators). Nothing on screen counts.
   `offphone_rep` (MF-01's card asks about noticing, not the activity).
 - **The rumination variant's external task** is one minute, not two: MF-01's Look (five finds) or Listen (60 s), the
   same embeds and lengths as Notice what's here.
-- **The mode card has no rep of its own.** It is one card inside this path (MF-09 at app dose); MF-09's own skill and
-  its reps come with MF-B9.
+- **The mode card has no rep of its own.** It is one card inside this path (MF-09 at app dose); MF-09's own skill
+  (`doing-being`, MF-B9, [`doing-being.md`](doing-being.md)) has its own `skillful_means` rep.
 - **`attention-shift`** (the looping result's guided activity) stays as it is; becoming an MF-01 preset is part 2.
 - **A plain visit has no close card.** *How much were you with it?* is the close (all answers equal); the rumination
   variant asks the loop's then-vs-now in the flow, so the close kind is `regulation_down`.
@@ -97,6 +97,5 @@ PRD: it can raise distress in high ruminators). Nothing on screen counts.
 |---|---|---|
 | Fade: phone → no phone, one instruction → none, app-picked → the person's own cue, next-day ask → nothing | Needs the fade levels on the Practice home | MF part 2 |
 | *One thing in the moment* embedded in DT's IMPROVE and as the M in DEAR MAN | A hosted variant of this skill | MF part 2 |
-| Problem Solve's rumination guard (re-entering *define* on a looping result offers One thing) | With MF-09's own skill | MF-B9 |
 | `attention-shift` as an MF-01 preset | The guided activity's rewrite | MF part 2 |
 | `OneThingActivity` nodes with per-level instructions | Fade | MF part 2 |

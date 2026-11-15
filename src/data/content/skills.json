@@ -16671,6 +16671,1064 @@
         }
       },
       {
+        "id": "doing_being",
+        "toolId": "doing-being",
+        "version": "db-v1",
+        "start": "about",
+        "accepts": [
+          "band",
+          "frame",
+          "enterAt"
+        ],
+        "ownMax": 40,
+        "emotionFields": [],
+        "copy": {
+          "about_line1": "Doing mind works things out, plans and fixes. Being mind notices and lets things be.",
+          "about_line2": "Both are needed. Wise mind uses each one when it fits.",
+          "about_q": "Which would help now?",
+          "about_title": "Doing mind, being mind.",
+          "back_not_line": "Not yet is fine. The moment comes round again.",
+          "back_sort_line": "Some of it counts. Coming back is the practice.",
+          "back_title": "Your being break: {cue}. Did you get to take one?",
+          "back_yes_line": "That's being mind, without the phone. It goes wherever you do.",
+          "being_end_line": "If something's been waiting, one small doing could balance the week.",
+          "being_end_title": "Rest counts.",
+          "body_first": "My body first",
+          "body_first_line": "This will keep for a calmer minute.",
+          "body_first_title": "Settle your body first.",
+          "bowl_done": "That's a minute.",
+          "bowl_dropped": "A pebble in the bowl",
+          "bowl_running": "Eyes open. No sound to find? Your breath counts.",
+          "bowl_skip": "Move on",
+          "bowl_start": "Start",
+          "build_mastery": "One small thing to finish",
+          "came_back": "A sound",
+          "cue_end_line": "One ordinary thing, with all of your attention, for about a minute. Nothing to fix.",
+          "cue_end_title": "Your being break: {cue}.",
+          "cue_line": "A minute of one thing, done fully, at a moment you already have.",
+          "cue_own": "My own moment",
+          "cue_q": "When could it go?",
+          "cue_title": "One being break a day, then?",
+          "done": "Done",
+          "drift_blank_line": "When everything feels flat, moving first can make doing easier.",
+          "drift_line": "Something you can finish today, however small. Done beats done well.",
+          "drift_title": "One small doing could help.",
+          "heads_up_line": "This works better once your body settles. Start there, or go on anyway.",
+          "heads_up_title": "Your body's loud right now.",
+          "join_in": "Move to something first",
+          "listen_end_line": "Doing mind will still be there when you need it.",
+          "listen_end_title": "That was being mind.",
+          "listen_task": "Listen. Each time you notice a new sound, or catch yourself back in the problem, tap.",
+          "listen_title": "A minute of being mind.",
+          "mixed_end_line": "Some doing, some being. That's the mix wise mind uses.",
+          "mixed_end_title": "Sounds balanced.",
+          "mode_hint": "Going over it, working it out, trying to make it stop.",
+          "mode_no_line": "Carry on. The question will be here when you want it.",
+          "mode_no_title": "Then there's nothing to switch.",
+          "mode_title": "Is your mind trying to fix a feeling like a task?",
+          "next": "Next",
+          "not_now_line": "Noticing it was doing mind is already a step outside it.",
+          "not_now_title": "Not now is fine.",
+          "one_thing": "One thing, done fully",
+          "one_thing_link": "One thing, done fully, instead",
+          "remind_q": "Ask me tomorrow how it went?",
+          "safety_open": "Talk to someone now",
+          "switch_line": "Doing mind is useful. A minute of being mind can give it a rest.",
+          "switch_maybe_title": "That might be doing mind. Feelings don't get solved like tasks.",
+          "switch_q": "One minute of being mind?",
+          "switch_yes_title": "That sounds like doing mind. Feelings don't get solved like tasks.",
+          "week_hint": "A rough guess is fine.",
+          "week_title": "This week felt…"
+        },
+        "tables": {},
+        "derive": [],
+        "steps": [
+          {
+            "id": "about",
+            "kind": "ask",
+            "fields": [
+              {
+                "id": "about",
+                "label": "about_q",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "about"
+                },
+                "required": true
+              }
+            ],
+            "title": "about_title",
+            "next": [
+              {
+                "to": "heads_up",
+                "when": {
+                  "all": [
+                    {
+                      "eq": [
+                        "$ctx.band",
+                        "flooded"
+                      ]
+                    },
+                    {
+                      "not": {
+                        "set": "$a.heads_up"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "week",
+                "when": {
+                  "eq": [
+                    "$a.about",
+                    "week"
+                  ]
+                }
+              },
+              {
+                "to": "mode",
+                "when": null
+              }
+            ],
+            "offers": [],
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "about_line1"
+              },
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "about_line2"
+              }
+            ]
+          },
+          {
+            "id": "heads_up",
+            "kind": "ask",
+            "fields": [
+              {
+                "id": "heads_up",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "heads_up"
+                },
+                "required": true
+              }
+            ],
+            "title": "heads_up_title",
+            "next": [
+              {
+                "to": "body_first",
+                "when": {
+                  "eq": [
+                    "$a.heads_up",
+                    "body"
+                  ]
+                }
+              },
+              {
+                "to": "week",
+                "when": {
+                  "eq": [
+                    "$a.about",
+                    "week"
+                  ]
+                }
+              },
+              {
+                "to": "mode",
+                "when": null
+              }
+            ],
+            "offers": [],
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "heads_up_line"
+              }
+            ]
+          },
+          {
+            "id": "body_first",
+            "kind": "handoff",
+            "title": "body_first_title",
+            "next": [],
+            "offers": [
+              {
+                "exit": "cool_down",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "complete": false,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "body_first_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true
+          },
+          {
+            "id": "mode",
+            "kind": "ask",
+            "fields": [
+              {
+                "id": "mode",
+                "links": [
+                  {
+                    "exit": "cool_down",
+                    "label": "body_first",
+                    "when": {
+                      "all": [
+                        {
+                          "eq": [
+                            "$ctx.band",
+                            "flooded"
+                          ]
+                        },
+                        {
+                          "not": {
+                            "set": "$a.heads_up"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "mode"
+                },
+                "required": true
+              }
+            ],
+            "title": "mode_title",
+            "next": [
+              {
+                "to": "mode_no",
+                "when": {
+                  "eq": [
+                    "$a.mode",
+                    "no"
+                  ]
+                }
+              },
+              {
+                "to": "switch",
+                "when": null
+              }
+            ],
+            "offers": [],
+            "hint": "mode_hint",
+            "lines": [
+              {
+                "when": {
+                  "all": [
+                    {
+                      "eq": [
+                        "$ctx.band",
+                        "flooded"
+                      ]
+                    },
+                    {
+                      "not": {
+                        "set": "$a.heads_up"
+                      }
+                    }
+                  ]
+                },
+                "key": "heads_up_line"
+              }
+            ]
+          },
+          {
+            "id": "switch",
+            "kind": "ask",
+            "fields": [
+              {
+                "id": "switch",
+                "label": "switch_q",
+                "links": [
+                  {
+                    "exit": "one_thing",
+                    "label": "one_thing_link",
+                    "when": {
+                      "all": []
+                    }
+                  },
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "switch"
+                },
+                "required": true
+              }
+            ],
+            "title": [
+              {
+                "key": "switch_maybe_title",
+                "when": {
+                  "eq": [
+                    "$a.mode",
+                    "maybe"
+                  ]
+                }
+              },
+              {
+                "key": "switch_yes_title",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "not_now",
+                "when": {
+                  "eq": [
+                    "$a.switch",
+                    "not_now"
+                  ]
+                }
+              },
+              {
+                "to": "listen",
+                "when": null
+              }
+            ],
+            "offers": [],
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "switch_line"
+              }
+            ]
+          },
+          {
+            "id": "listen",
+            "kind": "embed",
+            "title": "listen_title",
+            "next": [
+              {
+                "to": "listen_end",
+                "when": null
+              }
+            ],
+            "offers": [],
+            "embed": "pebbleBowl",
+            "answerAs": "listen",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "props": {
+              "seconds": 60,
+              "task": "listen_task",
+              "start": "bowl_start",
+              "tapLabel": "came_back",
+              "running": "bowl_running",
+              "dropped": "bowl_dropped",
+              "done": "bowl_done",
+              "next": "next",
+              "skip": "bowl_skip"
+            }
+          },
+          {
+            "id": "listen_end",
+            "kind": "handoff",
+            "title": "listen_end_title",
+            "next": [],
+            "offers": [],
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "listen_end_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true
+          },
+          {
+            "id": "not_now",
+            "kind": "handoff",
+            "title": "not_now_title",
+            "next": [],
+            "offers": [],
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "not_now_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true
+          },
+          {
+            "id": "mode_no",
+            "kind": "handoff",
+            "title": "mode_no_title",
+            "next": [],
+            "offers": [],
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "mode_no_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true
+          },
+          {
+            "id": "week",
+            "kind": "ask",
+            "fields": [
+              {
+                "id": "week",
+                "links": [
+                  {
+                    "exit": "cool_down",
+                    "label": "body_first",
+                    "when": {
+                      "all": [
+                        {
+                          "eq": [
+                            "$ctx.band",
+                            "flooded"
+                          ]
+                        },
+                        {
+                          "not": {
+                            "set": "$a.heads_up"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "week"
+                },
+                "required": true
+              }
+            ],
+            "title": "week_title",
+            "next": [
+              {
+                "to": "cue",
+                "when": {
+                  "eq": [
+                    "$a.week",
+                    "doing"
+                  ]
+                }
+              },
+              {
+                "to": "being_end",
+                "when": {
+                  "eq": [
+                    "$a.week",
+                    "being"
+                  ]
+                }
+              },
+              {
+                "to": "drift",
+                "when": {
+                  "eq": [
+                    "$a.week",
+                    "drifting"
+                  ]
+                }
+              },
+              {
+                "to": "mixed_end",
+                "when": null
+              }
+            ],
+            "offers": [],
+            "hint": "week_hint",
+            "lines": [
+              {
+                "when": {
+                  "all": [
+                    {
+                      "eq": [
+                        "$ctx.band",
+                        "flooded"
+                      ]
+                    },
+                    {
+                      "not": {
+                        "set": "$a.heads_up"
+                      }
+                    }
+                  ]
+                },
+                "key": "heads_up_line"
+              }
+            ]
+          },
+          {
+            "id": "cue",
+            "kind": "ask",
+            "fields": [
+              {
+                "id": "cue",
+                "label": "cue_q",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "cue"
+                },
+                "own": {
+                  "hint": "cue_own",
+                  "countsAsPick": true
+                },
+                "required": true
+              }
+            ],
+            "title": "cue_title",
+            "next": [
+              {
+                "to": "cue_end",
+                "when": null
+              }
+            ],
+            "offers": [],
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "cue_line"
+              }
+            ]
+          },
+          {
+            "id": "cue_end",
+            "kind": "handoff",
+            "fields": [
+              {
+                "id": "remind",
+                "label": "remind_q",
+                "max": 1,
+                "options": {
+                  "list": "when"
+                }
+              }
+            ],
+            "title": "cue_end_title",
+            "next": [],
+            "offers": [],
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "cue_end_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
+            "titleSlots": {
+              "cue": {
+                "labelOf": "cue"
+              }
+            },
+            "followUp": {
+              "type": "being_break",
+              "whenFrom": "remind"
+            }
+          },
+          {
+            "id": "back",
+            "kind": "ask",
+            "clears": [
+              "back"
+            ],
+            "fields": [
+              {
+                "id": "back",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "back"
+                },
+                "required": true
+              }
+            ],
+            "reopens": {
+              "after": "cue_end"
+            },
+            "title": "back_title",
+            "next": [
+              {
+                "to": "back_end",
+                "when": null
+              }
+            ],
+            "offers": [],
+            "titleSlots": {
+              "cue": {
+                "labelOf": "cue"
+              }
+            }
+          },
+          {
+            "id": "back_end",
+            "kind": "handoff",
+            "next": [],
+            "offers": [],
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.back",
+                    "yes"
+                  ]
+                },
+                "key": "back_yes_line"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$a.back",
+                    "sort_of"
+                  ]
+                },
+                "key": "back_sort_line"
+              },
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "back_not_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true
+          },
+          {
+            "id": "drift",
+            "kind": "handoff",
+            "title": "drift_title",
+            "next": [],
+            "offers": [
+              {
+                "exit": "join_in",
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "blank"
+                  ]
+                }
+              },
+              {
+                "exit": "build_mastery",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "blank"
+                  ]
+                },
+                "key": "drift_blank_line"
+              },
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "drift_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true
+          },
+          {
+            "id": "being_end",
+            "kind": "handoff",
+            "title": "being_end_title",
+            "next": [],
+            "offers": [
+              {
+                "exit": "build_mastery",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "being_end_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true
+          },
+          {
+            "id": "mixed_end",
+            "kind": "handoff",
+            "title": "mixed_end_title",
+            "next": [],
+            "offers": [],
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "mixed_end_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true
+          }
+        ],
+        "exits": [
+          {
+            "id": "build_mastery",
+            "toolId": "build-mastery",
+            "query": {},
+            "carry": [],
+            "done": false,
+            "label": "build_mastery"
+          },
+          {
+            "id": "cool_down",
+            "toolId": "cool-down",
+            "query": {},
+            "carry": [],
+            "done": false,
+            "label": "body_first"
+          },
+          {
+            "id": "done",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": true
+          },
+          {
+            "id": "join_in",
+            "toolId": "join-in",
+            "query": {
+              "frame": "blank"
+            },
+            "carry": [],
+            "done": false,
+            "label": "join_in"
+          },
+          {
+            "id": "one_thing",
+            "toolId": "one-thing",
+            "query": {},
+            "carry": [],
+            "done": false,
+            "label": "one_thing"
+          },
+          {
+            "id": "safety_open",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": false,
+            "safety": true
+          }
+        ],
+        "options": {
+          "heads_up": [
+            {
+              "value": "body",
+              "label": "My body first"
+            },
+            {
+              "value": "go",
+              "label": "Go on anyway"
+            }
+          ],
+          "about": [
+            {
+              "value": "mode",
+              "label": "Is my mind stuck trying to fix something?"
+            },
+            {
+              "value": "week",
+              "label": "How did this week feel?"
+            }
+          ],
+          "mode": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "maybe",
+              "label": "Maybe"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "switch": [
+            {
+              "value": "listen",
+              "label": "A minute of listening"
+            },
+            {
+              "value": "not_now",
+              "label": "Not now"
+            }
+          ],
+          "week": [
+            {
+              "value": "doing",
+              "label": "Mostly doing"
+            },
+            {
+              "value": "being",
+              "label": "Mostly being"
+            },
+            {
+              "value": "mixed",
+              "label": "Mixed"
+            },
+            {
+              "value": "drifting",
+              "label": "Drifting"
+            }
+          ],
+          "cue": [
+            {
+              "value": "break",
+              "label": "When I sit down for a break"
+            },
+            {
+              "value": "drink",
+              "label": "When I make a drink"
+            },
+            {
+              "value": "hands",
+              "label": "When I wash my hands"
+            },
+            {
+              "value": "travel",
+              "label": "When I get in the car or on the bus"
+            },
+            {
+              "value": "bed",
+              "label": "When I get into bed"
+            }
+          ],
+          "when": [
+            {
+              "value": "morning",
+              "label": "Tomorrow morning"
+            },
+            {
+              "value": "evening",
+              "label": "Tomorrow evening"
+            }
+          ],
+          "back": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "sort_of",
+              "label": "Sort of"
+            },
+            {
+              "value": "not_yet",
+              "label": "Not yet"
+            }
+          ]
+        },
+        "entries": {
+          "mode": "mode",
+          "week": "week"
+        }
+      },
+      {
         "id": "effectively",
         "toolId": "effectiveness",
         "version": "eff-v1",
@@ -39349,6 +40407,1457 @@
         }
       },
       {
+        "id": "join_in",
+        "toolId": "join-in",
+        "version": "ji-v1",
+        "start": "pick",
+        "accepts": [
+          "band",
+          "frame"
+        ],
+        "ownMax": 40,
+        "emotionFields": [],
+        "copy": {
+          "anger_line": "Bring it down first. Join in will be here on a calmer day.",
+          "anger_title": "This one turns things up, and anger doesn't need more fuel today.",
+          "away_hint": "Put the phone down. Come back when you're done.",
+          "away_line": "When you catch yourself watching yourself, drop back in.",
+          "away_title": "Throw yourself in.",
+          "beat_done": "That's the round.",
+          "beat_running": "Watching yourself? Drop back in.",
+          "beat_skip": "Move on",
+          "beat_sound": "Sound",
+          "beat_start": "Start",
+          "beat_tap": "Tap along",
+          "body_first": "My body first",
+          "done": "Done",
+          "end_title": "You joined in.",
+          "flooded_line": "This one turns things up. Settle your body first, or try something slower.",
+          "flooded_title": "Your body's loud right now.",
+          "gate_end_line": "Join in will be here on a calmer day.",
+          "gate_end_title": "Not now is fine.",
+          "listen_instead": "Something slower: listen for a minute",
+          "next": "Next",
+          "pick_blank_line": "The beat runs a little quicker today, in short rounds.",
+          "pick_hint": "Move in whatever way your body can. Sitting is fine.",
+          "pick_title": "Pick something to throw yourself into.",
+          "play_task": "Throw yourself in. When you catch yourself watching yourself, drop back in.",
+          "play_task_hum": "Hum or sing along to the beat. Any tune, any words.",
+          "play_task_song": "Move to the beat, or to a song of your own.",
+          "play_task_tap": "Tap along, on the circle, a table or your knees.",
+          "safety_open": "Talk to someone now",
+          "settle_q": "Another round?",
+          "settle_title": "Let it settle for a few breaths.",
+          "skip_line": "It'll be here when you want it.",
+          "skip_title": "Not this time.",
+          "social_not_line": "Not yet is fine. It'll be there next time.",
+          "social_q": "Next time, with someone? I'll ask how it went.",
+          "social_sort_line": "Some of it counts. Dropping back in is the practice.",
+          "social_title": "Did you get to join in at something with someone?",
+          "social_yes_line": "That's participating, off the phone and with people. It goes wherever you do.",
+          "with_half": "Half in counts. Dropping back in is the practice.",
+          "with_in": "That's participating. No watching needed.",
+          "with_title": "How much were you in it?",
+          "with_watching": "Watching yourself is the thing you practise dropping. Noticing it is the start."
+        },
+        "tables": {},
+        "derive": [],
+        "steps": [
+          {
+            "id": "pick",
+            "kind": "ask",
+            "fields": [
+              {
+                "id": "thing",
+                "links": [
+                  {
+                    "exit": "cool_down",
+                    "label": "body_first",
+                    "when": {
+                      "any": [
+                        {
+                          "eq": [
+                            "$ctx.band",
+                            "flooded"
+                          ]
+                        },
+                        {
+                          "any": [
+                            {
+                              "has": [
+                                "$carried",
+                                "angry"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$carried",
+                                "mad"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$carried",
+                                "aggressive"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$carried",
+                                "furious"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$carried",
+                                "provoked"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$carried",
+                                "hostile"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$carried",
+                                "infuriated"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$carried",
+                                "indignant"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$carried",
+                                "bitter"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$carried",
+                                "resentful"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$carried",
+                                "frustrated"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$carried",
+                                "annoyed"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "exit": "listen",
+                    "label": "listen_instead",
+                    "when": {
+                      "any": [
+                        {
+                          "eq": [
+                            "$ctx.band",
+                            "flooded"
+                          ]
+                        },
+                        {
+                          "any": [
+                            {
+                              "has": [
+                                "$carried",
+                                "angry"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$carried",
+                                "mad"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$carried",
+                                "aggressive"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$carried",
+                                "furious"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$carried",
+                                "provoked"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$carried",
+                                "hostile"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$carried",
+                                "infuriated"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$carried",
+                                "indignant"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$carried",
+                                "bitter"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$carried",
+                                "resentful"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$carried",
+                                "frustrated"
+                              ]
+                            },
+                            {
+                              "has": [
+                                "$carried",
+                                "annoyed"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "thing",
+                  "where": {
+                    "any": [
+                      {
+                        "all": [
+                          {
+                            "eq": [
+                              "$opt.gate",
+                              true
+                            ]
+                          },
+                          {
+                            "any": [
+                              {
+                                "eq": [
+                                  "$ctx.band",
+                                  "flooded"
+                                ]
+                              },
+                              {
+                                "any": [
+                                  {
+                                    "has": [
+                                      "$carried",
+                                      "angry"
+                                    ]
+                                  },
+                                  {
+                                    "has": [
+                                      "$carried",
+                                      "mad"
+                                    ]
+                                  },
+                                  {
+                                    "has": [
+                                      "$carried",
+                                      "aggressive"
+                                    ]
+                                  },
+                                  {
+                                    "has": [
+                                      "$carried",
+                                      "furious"
+                                    ]
+                                  },
+                                  {
+                                    "has": [
+                                      "$carried",
+                                      "provoked"
+                                    ]
+                                  },
+                                  {
+                                    "has": [
+                                      "$carried",
+                                      "hostile"
+                                    ]
+                                  },
+                                  {
+                                    "has": [
+                                      "$carried",
+                                      "infuriated"
+                                    ]
+                                  },
+                                  {
+                                    "has": [
+                                      "$carried",
+                                      "indignant"
+                                    ]
+                                  },
+                                  {
+                                    "has": [
+                                      "$carried",
+                                      "bitter"
+                                    ]
+                                  },
+                                  {
+                                    "has": [
+                                      "$carried",
+                                      "resentful"
+                                    ]
+                                  },
+                                  {
+                                    "has": [
+                                      "$carried",
+                                      "frustrated"
+                                    ]
+                                  },
+                                  {
+                                    "has": [
+                                      "$carried",
+                                      "annoyed"
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "all": [
+                          {
+                            "eq": [
+                              "$opt.gate",
+                              false
+                            ]
+                          },
+                          {
+                            "not": {
+                              "any": [
+                                {
+                                  "eq": [
+                                    "$ctx.band",
+                                    "flooded"
+                                  ]
+                                },
+                                {
+                                  "any": [
+                                    {
+                                      "has": [
+                                        "$carried",
+                                        "angry"
+                                      ]
+                                    },
+                                    {
+                                      "has": [
+                                        "$carried",
+                                        "mad"
+                                      ]
+                                    },
+                                    {
+                                      "has": [
+                                        "$carried",
+                                        "aggressive"
+                                      ]
+                                    },
+                                    {
+                                      "has": [
+                                        "$carried",
+                                        "furious"
+                                      ]
+                                    },
+                                    {
+                                      "has": [
+                                        "$carried",
+                                        "provoked"
+                                      ]
+                                    },
+                                    {
+                                      "has": [
+                                        "$carried",
+                                        "hostile"
+                                      ]
+                                    },
+                                    {
+                                      "has": [
+                                        "$carried",
+                                        "infuriated"
+                                      ]
+                                    },
+                                    {
+                                      "has": [
+                                        "$carried",
+                                        "indignant"
+                                      ]
+                                    },
+                                    {
+                                      "has": [
+                                        "$carried",
+                                        "bitter"
+                                      ]
+                                    },
+                                    {
+                                      "has": [
+                                        "$carried",
+                                        "resentful"
+                                      ]
+                                    },
+                                    {
+                                      "has": [
+                                        "$carried",
+                                        "frustrated"
+                                      ]
+                                    },
+                                    {
+                                      "has": [
+                                        "$carried",
+                                        "annoyed"
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": true
+              }
+            ],
+            "title": [
+              {
+                "key": "anger_title",
+                "when": {
+                  "any": [
+                    {
+                      "has": [
+                        "$carried",
+                        "angry"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "mad"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "aggressive"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "furious"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "provoked"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "hostile"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "infuriated"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "indignant"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "bitter"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "resentful"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "frustrated"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "annoyed"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "key": "flooded_title",
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "flooded"
+                  ]
+                }
+              },
+              {
+                "key": "pick_title",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "gate_end",
+                "when": {
+                  "eq": [
+                    "$a.thing",
+                    "not_now"
+                  ]
+                }
+              },
+              {
+                "to": "play_blank",
+                "when": {
+                  "all": [
+                    {
+                      "in": [
+                        "$a.thing",
+                        [
+                          "song",
+                          "hum",
+                          "tap"
+                        ]
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$ctx.frame",
+                        "blank"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "play_calm",
+                "when": {
+                  "all": [
+                    {
+                      "in": [
+                        "$a.thing",
+                        [
+                          "song",
+                          "hum",
+                          "tap"
+                        ]
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$ctx.band",
+                        "stirred"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "play",
+                "when": {
+                  "all": [
+                    {
+                      "in": [
+                        "$a.thing",
+                        [
+                          "song",
+                          "hum",
+                          "tap"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "away",
+                "when": null
+              }
+            ],
+            "offers": [],
+            "hint": "pick_hint",
+            "lines": [
+              {
+                "when": {
+                  "any": [
+                    {
+                      "has": [
+                        "$carried",
+                        "angry"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "mad"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "aggressive"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "furious"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "provoked"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "hostile"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "infuriated"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "indignant"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "bitter"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "resentful"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "frustrated"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$carried",
+                        "annoyed"
+                      ]
+                    }
+                  ]
+                },
+                "key": "anger_line"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "flooded"
+                  ]
+                },
+                "key": "flooded_line"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "blank"
+                  ]
+                },
+                "key": "pick_blank_line"
+              }
+            ]
+          },
+          {
+            "id": "gate_end",
+            "kind": "handoff",
+            "title": "gate_end_title",
+            "next": [],
+            "offers": [],
+            "complete": false,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "gate_end_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true
+          },
+          {
+            "id": "play",
+            "kind": "embed",
+            "title": [
+              {
+                "key": "play_task_song",
+                "when": {
+                  "eq": [
+                    "$a.thing",
+                    "song"
+                  ]
+                }
+              },
+              {
+                "key": "play_task_hum",
+                "when": {
+                  "eq": [
+                    "$a.thing",
+                    "hum"
+                  ]
+                }
+              },
+              {
+                "key": "play_task_tap",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "skip_end",
+                "when": {
+                  "eq": [
+                    "$a.play",
+                    "skipped"
+                  ]
+                }
+              },
+              {
+                "to": "with",
+                "when": null
+              }
+            ],
+            "offers": [],
+            "embed": "beatPulse",
+            "answerAs": "play",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "props": {
+              "bpm": 100,
+              "seconds": 60,
+              "task": "play_task",
+              "start": "beat_start",
+              "tap": "beat_tap",
+              "running": "beat_running",
+              "sound": "beat_sound",
+              "done": "beat_done",
+              "next": "next",
+              "skip": "beat_skip"
+            }
+          },
+          {
+            "id": "play_calm",
+            "kind": "embed",
+            "title": [
+              {
+                "key": "play_task_song",
+                "when": {
+                  "eq": [
+                    "$a.thing",
+                    "song"
+                  ]
+                }
+              },
+              {
+                "key": "play_task_hum",
+                "when": {
+                  "eq": [
+                    "$a.thing",
+                    "hum"
+                  ]
+                }
+              },
+              {
+                "key": "play_task_tap",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "skip_end",
+                "when": {
+                  "eq": [
+                    "$a.play_calm",
+                    "skipped"
+                  ]
+                }
+              },
+              {
+                "to": "with",
+                "when": null
+              }
+            ],
+            "offers": [],
+            "embed": "beatPulse",
+            "answerAs": "play_calm",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "props": {
+              "bpm": 84,
+              "seconds": 60,
+              "task": "play_task",
+              "start": "beat_start",
+              "tap": "beat_tap",
+              "running": "beat_running",
+              "sound": "beat_sound",
+              "done": "beat_done",
+              "next": "next",
+              "skip": "beat_skip"
+            }
+          },
+          {
+            "id": "play_blank",
+            "kind": "embed",
+            "title": [
+              {
+                "key": "play_task_song",
+                "when": {
+                  "eq": [
+                    "$a.thing",
+                    "song"
+                  ]
+                }
+              },
+              {
+                "key": "play_task_hum",
+                "when": {
+                  "eq": [
+                    "$a.thing",
+                    "hum"
+                  ]
+                }
+              },
+              {
+                "key": "play_task_tap",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "skip_end",
+                "when": {
+                  "eq": [
+                    "$a.play_blank",
+                    "skipped"
+                  ]
+                }
+              },
+              {
+                "to": "settle",
+                "when": null
+              }
+            ],
+            "offers": [],
+            "embed": "beatPulse",
+            "answerAs": "play_blank",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "props": {
+              "bpm": 112,
+              "seconds": 25,
+              "task": "play_task",
+              "start": "beat_start",
+              "tap": "beat_tap",
+              "running": "beat_running",
+              "sound": "beat_sound",
+              "done": "beat_done",
+              "next": "next",
+              "skip": "beat_skip"
+            }
+          },
+          {
+            "id": "settle",
+            "kind": "ask",
+            "fields": [
+              {
+                "id": "settle",
+                "label": "settle_q",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "settle"
+                },
+                "required": true
+              }
+            ],
+            "title": "settle_title",
+            "next": [
+              {
+                "to": "play_blank2",
+                "when": {
+                  "eq": [
+                    "$a.settle",
+                    "again"
+                  ]
+                }
+              },
+              {
+                "to": "with",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "play_blank2",
+            "kind": "embed",
+            "title": [
+              {
+                "key": "play_task_song",
+                "when": {
+                  "eq": [
+                    "$a.thing",
+                    "song"
+                  ]
+                }
+              },
+              {
+                "key": "play_task_hum",
+                "when": {
+                  "eq": [
+                    "$a.thing",
+                    "hum"
+                  ]
+                }
+              },
+              {
+                "key": "play_task_tap",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "skip_end",
+                "when": {
+                  "eq": [
+                    "$a.play_blank2",
+                    "skipped"
+                  ]
+                }
+              },
+              {
+                "to": "with",
+                "when": null
+              }
+            ],
+            "offers": [],
+            "embed": "beatPulse",
+            "answerAs": "play_blank2",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "props": {
+              "bpm": 112,
+              "seconds": 25,
+              "task": "play_task",
+              "start": "beat_start",
+              "tap": "beat_tap",
+              "running": "beat_running",
+              "sound": "beat_sound",
+              "done": "beat_done",
+              "next": "next",
+              "skip": "beat_skip"
+            }
+          },
+          {
+            "id": "away",
+            "kind": "ask",
+            "fields": [
+              {
+                "id": "away",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "back"
+                },
+                "required": true
+              }
+            ],
+            "title": "away_title",
+            "next": [
+              {
+                "to": "with",
+                "when": null
+              }
+            ],
+            "offers": [],
+            "hint": "away_hint",
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "away_line"
+              }
+            ]
+          },
+          {
+            "id": "with",
+            "kind": "ask",
+            "fields": [
+              {
+                "id": "with",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "with"
+                },
+                "required": true
+              }
+            ],
+            "title": "with_title",
+            "next": [
+              {
+                "to": "end",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "end",
+            "kind": "handoff",
+            "fields": [
+              {
+                "id": "when",
+                "label": "social_q",
+                "max": 1,
+                "options": {
+                  "list": "when"
+                }
+              }
+            ],
+            "title": "end_title",
+            "next": [],
+            "offers": [],
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.with",
+                    "in"
+                  ]
+                },
+                "key": "with_in"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$a.with",
+                    "half"
+                  ]
+                },
+                "key": "with_half"
+              },
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "with_watching"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
+            "followUp": {
+              "type": "join_in_social",
+              "whenFrom": "when"
+            }
+          },
+          {
+            "id": "social",
+            "kind": "ask",
+            "fields": [
+              {
+                "id": "social",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "social"
+                },
+                "required": true
+              }
+            ],
+            "title": "social_title",
+            "next": [
+              {
+                "to": "social_end",
+                "when": null
+              }
+            ],
+            "offers": [],
+            "reopens": {
+              "after": "end"
+            },
+            "clears": [
+              "social"
+            ]
+          },
+          {
+            "id": "social_end",
+            "kind": "handoff",
+            "next": [],
+            "offers": [],
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.social",
+                    "yes"
+                  ]
+                },
+                "key": "social_yes_line"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$a.social",
+                    "sort_of"
+                  ]
+                },
+                "key": "social_sort_line"
+              },
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "social_not_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true
+          },
+          {
+            "id": "skip_end",
+            "kind": "handoff",
+            "title": "skip_title",
+            "next": [],
+            "offers": [],
+            "complete": false,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "skip_line"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true
+          }
+        ],
+        "exits": [
+          {
+            "id": "cool_down",
+            "toolId": "cool-down",
+            "query": {},
+            "carry": [],
+            "done": false,
+            "label": "body_first"
+          },
+          {
+            "id": "done",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": true
+          },
+          {
+            "id": "listen",
+            "toolId": "notice-and-name",
+            "query": {
+              "frame": "listen"
+            },
+            "carry": [],
+            "done": false,
+            "label": "listen_instead"
+          },
+          {
+            "id": "safety_open",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": false,
+            "safety": true
+          }
+        ],
+        "options": {
+          "thing": [
+            {
+              "value": "song",
+              "label": "Move to a song",
+              "gate": false,
+              "beat": true
+            },
+            {
+              "value": "hum",
+              "label": "Sing or hum along",
+              "gate": false,
+              "beat": true
+            },
+            {
+              "value": "tap",
+              "label": "Tap a rhythm",
+              "gate": false,
+              "beat": true
+            },
+            {
+              "value": "game",
+              "label": "A game with someone",
+              "gate": false,
+              "beat": false
+            },
+            {
+              "value": "chore",
+              "label": "A chore with music",
+              "gate": false,
+              "beat": false
+            },
+            {
+              "value": "own",
+              "label": "Something of my own",
+              "gate": false,
+              "beat": false
+            },
+            {
+              "value": "not_now",
+              "label": "Not now",
+              "gate": true
+            }
+          ],
+          "settle": [
+            {
+              "value": "again",
+              "label": "Another round"
+            },
+            {
+              "value": "enough",
+              "label": "That's enough"
+            }
+          ],
+          "with": [
+            {
+              "value": "in",
+              "label": "In it"
+            },
+            {
+              "value": "half",
+              "label": "Half in"
+            },
+            {
+              "value": "watching",
+              "label": "Watching myself"
+            }
+          ],
+          "when": [
+            {
+              "value": "tomorrow",
+              "label": "Tomorrow"
+            },
+            {
+              "value": "few_days",
+              "label": "In a few days"
+            }
+          ],
+          "social": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "sort_of",
+              "label": "Sort of"
+            },
+            {
+              "value": "not_yet",
+              "label": "Not yet"
+            }
+          ],
+          "back": [
+            {
+              "value": "back",
+              "label": "I'm back"
+            }
+          ]
+        }
+      },
+      {
         "id": "kind_wishes",
         "toolId": "kind-wishes",
         "version": "kw-v1",
@@ -52202,6 +54711,7 @@
           "inside_title_none": "Stay with where you touch the chair or the floor.",
           "inside_where_hint": "Start where you touch the chair or the floor, then a little further in. Roughly is fine. If you start to feel far away, the room is one tap away.",
           "inside_where_title": "Where is something most noticeable right now?",
+          "join_in": "Another way: something with movement",
           "listen_task": "Near or far, loud or soft. No need to find them. When your mind wanders, tap, and come back to listening.",
           "listen_title": "Let sounds come to you.",
           "look_task": "Tap each one as you find it.",
@@ -52259,6 +54769,28 @@
                       "eq": [
                         "$ctx.band",
                         "flooded"
+                      ]
+                    }
+                  },
+                  {
+                    "exit": "join_in",
+                    "label": "join_in",
+                    "when": {
+                      "all": [
+                        {
+                          "eq": [
+                            "$ctx.frame",
+                            "blank"
+                          ]
+                        },
+                        {
+                          "not": {
+                            "eq": [
+                              "$ctx.band",
+                              "flooded"
+                            ]
+                          }
+                        }
                       ]
                     }
                   }
@@ -53170,6 +55702,15 @@
             "id": "five_senses",
             "toolId": "five-senses",
             "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "join_in",
+            "toolId": "join-in",
+            "query": {
+              "frame": "blank"
+            },
             "carry": [],
             "done": false
           },
@@ -64440,6 +66981,7 @@
           "l_cope_ahead": "Rehearse it with Cope Ahead",
           "l_dear_man": "Work out what to say with DEAR MAN",
           "l_dialectics": "Find the middle path",
+          "l_doing_being": "Is my mind trying to fix a feeling?",
           "l_fast": "Keep your self-respect",
           "l_finding_connection": "Take one small step towards people",
           "l_give": "Keep it warm",
@@ -65576,6 +68118,16 @@
                         [
                           "person-no-right-to-speak"
                         ]
+                      ]
+                    }
+                  },
+                  {
+                    "exit": "doing_being",
+                    "label": "l_doing_being",
+                    "when": {
+                      "eq": [
+                        "$a.sub",
+                        "tried-thinking-constantly"
                       ]
                     }
                   },
@@ -68159,6 +70711,15 @@
             "carry": [],
             "done": false,
             "planned": true
+          },
+          {
+            "id": "doing_being",
+            "toolId": "doing-being",
+            "query": {
+              "enterAt": "mode"
+            },
+            "carry": [],
+            "done": false
           },
           {
             "id": "done",

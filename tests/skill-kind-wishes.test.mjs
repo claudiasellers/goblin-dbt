@@ -45,7 +45,7 @@ test("the skill: the kind-wishes tool on the new dbt_loving_kindness, listed und
   assert.match(tools, /toolId: 'kind-wishes'/);
   const ps = readFileSync("scripts/practice-spine/content.py", "utf8");
   assert.match(ps, /\("kind_wishes", "Loving kindness", "Preliminary", "mind", "dbt_loving_kindness",[\s\S]*?\["kind-wishes"\]\)/);
-  assert.match(ps, /\("kind_wishes", 7, "Kind wishes", \[\]\)/, "the Practice home's sequence, last");
+  assert.match(ps, /\("kind_wishes", 8, "Kind wishes", \[\]\)/, "the Practice home's sequence, last (8 since Join in, MF-B9)");
   for (const id of ["end", "twice"]) assert.equal(step(id).noClose, true, id);
 });
 

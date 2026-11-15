@@ -2,7 +2,7 @@
 
 **Status:** built 15 Nov 2026 on the skill runtime (MF-B8; [the modules plan](dbt-modules-plan.md) §5.3a). Tool
 `kind-wishes` on the new concept `dbt_loving_kindness` (DBT Mindfulness, loving kindness), listed under Mindfulness
-with the intent *Practise being kind, to someone or to me*, and on the Practice home as *Kind wishes* (`mfOrder` 7).
+with the intent *Practise being kind, to someone or to me*, and on the Practice home as *Kind wishes* (`mfOrder` 8 since Join in took 7 with MF-B9).
 Source: `scripts/skills/kind_wishes.py`. Tests: `tests/skill-kind-wishes.test.mjs`. New embed: `wishOffer`
 (`src/components/skillPlayer/WishOffer.tsx` over `src/lib/kindWishes.ts`). Rolling back is removing `'kind-wishes'`
 from `src/lib/skillRuntime/playerTools.ts`, its entry and intent in `src/data/tools.ts`, and its `MF_SEQUENCE` row.

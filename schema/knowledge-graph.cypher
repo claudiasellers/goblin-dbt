@@ -1384,6 +1384,19 @@ SET loving_kindness += {
   skill_type: "how_skill"
 };
 
+// Skillful means (PRD MF-09, DBT Mindfulness Handout 9, read with MBCT's doing and being modes): noticing when your mind
+// is trying to fix a feeling like a task, and balancing doing and being across a week; Doing mind, being mind
+// (docs/design/doing-being.md).
+MERGE (skillful_means:TherapyConcept {id: "dbt_skillful_means"})
+SET skillful_means += {
+  name: "Doing Mind and Being Mind",
+  description: "Both modes are needed: doing mind works things out, being mind notices and lets things be, and wise mind uses each when it fits",
+  modality: "DBT",
+  module: "Mindfulness",
+  skill_type: "how_skill",
+  evidence_grade: "Preliminary"
+};
+
 MERGE (check_the_facts:TherapyConcept {id: "dbt_check_facts"})
 SET check_the_facts += {
   name: "Check the Facts",

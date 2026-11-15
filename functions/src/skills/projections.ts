@@ -86,6 +86,12 @@ export const OFF_PHONE_SKILLS: Readonly<Record<string, { toolId: string; happene
   // neither a check nor a practice, so it logs no rep whatever the answer (PRD MF-04: a rep per check and practice).
   // The check itself keeps the close's own (`wise_mind`).
   wise_mind_check: { toolId: 'wise-mind', happenedField: 'did', yes: [], unansweredKeepsOwn: true },
+  // Doing mind, being mind's being break (the being_break card reopens the run at *Did you get to take one?*): yes is the
+  // off-phone rep; sort of or not yet log none. The first visit keeps the close's own (`skillful_means`).
+  doing_being: { toolId: 'doing-being', happenedField: 'back', yes: 'yes', unansweredKeepsOwn: true },
+  // Join in's *Next time, with someone?* (the join_in_social card reopens the run at *Did you get to join in at
+  // something with someone?*): yes is the off-phone social rep (PRD MF-10); sort of or not yet log none.
+  join_in: { toolId: 'join-in', happenedField: 'social', yes: 'yes', unansweredKeepsOwn: true },
 };
 
 /** The rep a run's close logs: off the phone (it happened), none (it didn't), or the close's own (null). */

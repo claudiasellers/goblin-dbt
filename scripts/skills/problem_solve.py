@@ -56,6 +56,7 @@ COPY = {
     "own_hint": "Say it your way",
     "piling": "It's not one thing. Everything feels like too much",
     "safety_open": "Talk to someone now",
+    "l_doing_being": "Is my mind trying to fix a feeling?",
     "triage_title": "When everything piles up, one thing is a foothold. Which would shift most if it moved even a little?",
     "barrier_title": "What's in the way of doing something about it?",
     "barrier_hint": "There's no wrong answer. It helps find the next step.",
@@ -320,6 +321,9 @@ EXITS = [{**{k: v for k, v in e.items() if k != "planned"}, "toolId": ENTRY_ALIA
 # What works here gets the direction picked (anger-blocked-redirect, envy-unfair-effective): a piled-up problem's focus
 # carries the same way as a single one.
 EXITS = [{**e, "query": {"frame": "$a.solutions"}} if e["toolId"] == "effectiveness" else e for e in EXITS]
+# The rumination guard (MF-09, MF-B9): *I've been thinking about it constantly* links Doing mind, being mind's card, in
+# case the thinking is doing mind aimed at a feeling.
+EXITS += [{"id": "doing_being", "toolId": "doing-being", "query": {"enterAt": "mode"}}]
 EXITS += [{"id": "safety_open", "safety": True}, {"id": "done", "done": True}]
 
 
@@ -445,7 +449,8 @@ STEPS = [
                  + [{"key": "go_q"}],
         "fields": [{"id": "go", "label": "go_q", "options": {"list": "go", "where": {"has": ["$d.subGo", "$opt.value"]}},
                     "max": 1, "required": True,
-                    "links": sub_links() + [{"exit": "safety_open", "label": "safety_open", "when": eq(a("sub"), "tried-exhausted")}]}],
+                    "links": sub_links() + [{"exit": "doing_being", "label": "l_doing_being", "when": eq(a("sub"), "tried-thinking-constantly")},
+                                            {"exit": "safety_open", "label": "safety_open", "when": eq(a("sub"), "tried-exhausted")}]}],
         "next": [{"when": eq(a("go"), "rest"), "to": "rest"}, {"when": eq(a("go"), "ambiv"), "to": "ambivalence"},
                  {"when": eq(a("go"), "ruler"), "to": "confidence"}, {"to": "solutions"}],
     },

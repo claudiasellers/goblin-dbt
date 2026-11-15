@@ -56,6 +56,10 @@ export const TOOL_CLOSE_KIND: Record<string, { module: SpineModule; closeKind: C
   'moment-apart': { module: 'mf', closeKind: 'none' },
   // Kind wishes (MF-06, docs/design/kind-wishes.md): *What came up?* is asked in the flow; no close after it.
   'kind-wishes': { module: 'mf', closeKind: 'none' },
+  // Doing mind, being mind (MF-09, docs/design/doing-being.md): every answer is plain; no close after it.
+  'doing-being': { module: 'mf', closeKind: 'none' },
+  // Join in (MF-10, docs/design/join-in.md): *How much were you in it?* is asked in the flow; no close after it.
+  'join-in': { module: 'mf', closeKind: 'none' },
   'help-now': { module: 'core', closeKind: 'none' },
   'micro-step': { module: 'core', closeKind: 'none' },
   'guided-activity': { module: 'core', closeKind: 'none' },

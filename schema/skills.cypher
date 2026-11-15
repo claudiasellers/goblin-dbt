@@ -2836,7 +2836,7 @@ SET r += {list: "remind", order: 28};
 
 // --- problem_solve (ps-v1) ---
 MERGE (s:Skill {id: "problem_solve"})
-SET s += {toolId: "problem-solve", version: "ps-v1", contentVersion: "skills-v1", start: "feel", ownMax: 140, emotionFields: ["feel"], accepts: ["band", "frame"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"accept_line\": \"Most of this is facts or other people's choices. That's painful, and it isn't a failure. Here the skill is to carry it, not solve it.\", \"ack_anger\": \"Your anger says something that mattered got crossed. Let's work out what to do about it.\", \"ack_disgust\": \"Something is crossing a line for you. Let's see what you can do about it.\", \"ack_envy\": \"Envy points at something you want. That's useful to know, and you can use it.\", \"ack_fear\": \"Your fear is pointing at something that matters to you. Let's see what you can do about it.\", \"ack_guilt\": \"Something you did doesn't sit right with your values. The move now is repair, not punishing yourself.\", \"ack_jealousy\": \"Something in this relationship feels under threat. Let's look at what you can do, starting from what you need.\", \"ack_love\": \"The love is real, and something is in the way. Let's look at what's in the way.\", \"ack_repair\": \"You want to put something right. Owning it and repairing it is the opposite of hiding.\", \"ack_routed\": \"Something is asking a lot of you right now. Let's see what you can do about it.\", \"ack_sadness\": \"You've lost something, or something didn't go the way you needed. Let's see which parts you can do something about.\", \"ambiv_title\": \"What does staying the same protect you from?\", \"barrier_hint\": \"There's no wrong answer. It helps find the next step.\", \"barrier_title\": \"What's in the way of doing something about it?\", \"co_high\": \"So the how is there. Let's name the step.\", \"co_low\": \"That's honest. Someone else could help with this, and a smaller piece might be in reach.\", \"co_medium\": \"Small is real. Let's find the smallest version that still counts.\", \"co_none\": \"Then the step may need to be smaller still, or something may need to change first. Not easy. Possible.\", \"commit_line\": \"Any size is a real step. If it doesn't work, or the problem shifts, come back: problem-solving goes round more than once.\", \"commit_line_rehearse\": \"A bigger step can help to rehearse before you take it.\", \"commit_line_safety\": \"If it gets more dangerous, call now. You don't have to wait for a plan.\", \"commit_title\": \"Your next step: {step}\", \"commit_title_own\": \"Your next step: {mine}\", \"conf_title\": \"How sure are you that you could do the smallest version of this?\", \"decompose_title\": \"Some parts of this are facts. Some are up to other people. Some are in your hands.\", \"done\": \"Done\", \"feel_more\": \"Something else\", \"feel_title\": \"What's the feeling that's pointing at a problem?\", \"fo_ambiv-admitting-need-help\": \"Asking for help or owning a mistake can feel like it makes you smaller. It's also a way of looking after what matters.\", \"fo_ambiv-change-might-not-help\": \"If you change things and it still hurts, that would be hard. That fear is real. Staying put to avoid finding out is a choice too.\", \"fo_ambiv-hard-conversation\": \"Hard conversations carry real risk. The question is whether not having it costs more than having it.\", \"fo_ambiv-losing-something\": \"Change usually costs something. There may be a way to change and keep the part that matters.\", \"go_ambiv\": \"Look at what it protects me from\", \"go_keep\": \"Keep problem-solving\", \"go_options\": \"Show me some options\", \"go_q\": \"What would help now?\", \"go_rest\": \"Stop here for now\", \"go_ruler\": \"See how sure I feel\", \"l_build_mastery\": \"Build a small win\", \"l_cope_ahead\": \"Rehearse it with Cope Ahead\", \"l_dear_man\": \"Work out what to say with DEAR MAN\", \"l_dialectics\": \"Find the middle path\", \"l_fast\": \"Keep your self-respect\", \"l_finding_connection\": \"Take one small step towards people\", \"l_give\": \"Keep it warm\", \"l_missing_links\": \"Find what got in the way\", \"l_others\": \"This part is about them. Work out what to say with DEAR MAN\", \"l_please_skill\": \"Look after the basics first\", \"l_self_validate\": \"Validate yourself\", \"mine_q\": \"Which of these are in your hands?\", \"mysize_q\": \"How big is it?\", \"next\": \"Next\", \"not_fit_facts\": \"When something isn't clear yet, it helps to get the facts straight before solving anything.\", \"not_fit_other\": \"Problem Solve works from a feeling that's pointing at a problem you can work on. This one might want something else first.\", \"not_fit_shame\": \"When a feeling says something is wrong with you, there's nothing there to solve. Lots of people feel this. Doing the opposite of hiding often helps more. If there's one thing you did that you want to put right, you can come back for that.\", \"not_now_line\": \"That makes sense. When a feeling is this loud, planning is harder. It may help to bring it down a little first, then come back to this.\", \"o_body_scan\": \"Notice my body, from the outside in\", \"o_turning_the_mind\": \"Turn my mind toward letting it be\", \"o_willingness\": \"Do what the moment needs anyway\", \"others_title\": \"Which parts are up to someone else?\", \"own_direction\": \"My own idea\", \"own_hint\": \"Say it your way\", \"own_step_hint\": \"Write it your way, or start from one of these.\", \"own_step_title\": \"What's the step you already know you want to take?\", \"piling\": \"It's not one thing. Everything feels like too much\", \"problem_q\": \"Which of these sounds closest?\", \"re_cant-afraid-aftermath\": \"The fear of what comes after is real, and you can prepare for it. Rehearsing the hard part first can make the real thing less overwhelming.\", \"re_cant-ambivalent\": \"That's honest. Both sides are real: the part that wants change and the part that doesn't. Let's look at what staying the same protects you from.\", \"re_cant-keep-putting-off\": \"Putting it off usually protects you from something, like discomfort, failing or conflict. Let's find the smallest version of the step and see how sure you feel about that.\", \"re_cant-no-energy\": \"That's not a flaw in you. When you're running low, even obvious steps feel impossible. Refill a little first, then come back.\", \"re_person-dont-know-what-to-say\": \"DEAR MAN is for exactly that. It gives you a shape for what to say, so you don't start from nothing.\", \"re_person-no-right-to-speak\": \"That feeling is worth a look. You have needs, and saying them isn't selfish. This may be more about your self-respect than the problem itself.\", \"re_person-scared-reaction\": \"Their reaction is worth taking seriously. You can prepare what to say and rehearse how you'll handle the hard part.\", \"re_person-tried-they-dont-listen\": \"When something hasn't landed, it may be the approach and not the message. Changing how you say it can change whether it gets through. Or this may be where your influence over them ends.\", \"re_tried-different-approaches\": \"That tells you something. Either it needs a different kind of strategy, or this wall won't move and the wise move is to put your energy somewhere else.\", \"re_tried-exhausted\": \"Trying hard without results wears you out. You're not failing, you're running low. The most useful thing now is to refill, not push harder.\", \"re_tried-talked-to-them\": \"Maybe it's the approach that needs to change, not the goal. Saying your piece and saying it so it gets through are different things.\", \"re_tried-thinking-constantly\": \"That's your mind working on it, and it counts. Thinking and doing are different skills. You've done the thinking. Let's try the smallest piece of doing.\", \"ready_title\": \"Can you think about this fairly clearly right now, or is the feeling too loud?\", \"rest_line\": \"Stopping here is a real choice. You can come back to this when you have more in the tank.\", \"review_done_line\": \"You took the step and saw what it did. That's the whole loop: a problem, a step, and seeing how it went.\", \"review_help_title\": \"You took the step. Did it help with the problem?\", \"review_later_line\": \"It can wait.\", \"review_later_q\": \"Want me to ask again?\", \"review_next_didnt\": \"That happens, and it's useful to know. What would help next time?\", \"review_next_didnt_safety\": \"That happens. If you're not safe now, call. Or pick another way.\", \"review_next_nohelp\": \"You did it, and it didn't help. That's worth knowing. What would help now?\", \"review_next_nohelp_safety\": \"It didn't help enough. If you're not safe now, call. Or pick another way.\", \"review_next_part\": \"Part of it is still a step. What would help with the rest?\", \"review_title\": \"How did it go? You planned: {step}\", \"review_title_own\": \"How did it go? You planned: {mine}\", \"safety_open\": \"Talk to someone now\", \"size_title\": \"{direction}. Pick what feels doable.\", \"solutions_title\": \"Which direction feels right?\", \"solutions_title_mine\": \"Here's what's in your hands. Which direction feels right?\", \"solutions_title_small\": \"Let's start small. Which direction feels right?\", \"sub_title\": \"Can you say a bit more?\", \"sub_title_tried\": \"You've been trying. That counts, even though it hasn't landed the way you needed. Can you say a bit more?\", \"triage_title\": \"When everything piles up, one thing is a foothold. Which would shift most if it moved even a little?\", \"when_q\": \"Want me to ask how it went?\"}", s.tablesJson = "{\"psFit\": {\"abandoned\": \"fit\", \"accepted\": \"other\", \"aggressive\": \"fit\", \"amazed\": \"other\", \"angry\": \"fit\", \"annoyed\": \"fit\", \"anxious\": \"fit\", \"apathetic\": \"other\", \"appalled\": \"fit\", \"appreciative\": \"other\", \"aroused\": \"other\", \"ashamed\": \"shame\", \"astonished\": \"other\", \"at_ease\": \"other\", \"awe\": \"other\", \"awful\": \"fit\", \"bad\": \"other\", \"balanced\": \"other\", \"betrayed\": \"fit\", \"bitter\": \"fit\", \"bored\": \"other\", \"busy\": \"fit\", \"calm\": \"other\", \"cheeky\": \"other\", \"chill\": \"other\", \"comfortable\": \"other\", \"confident\": \"other\", \"confused\": \"facts\", \"content\": \"other\", \"courageous\": \"other\", \"cozy\": \"other\", \"creative\": \"other\", \"critical\": \"fit\", \"curious\": \"other\", \"depressed\": \"fit\", \"despair\": \"fit\", \"detestable\": \"fit\", \"disappointed\": \"fit\", \"disapproving\": \"fit\", \"disgusted\": \"fit\", \"disillusioned\": \"fit\", \"dismayed\": \"fit\", \"dismissive\": \"fit\", \"disrespected\": \"fit\", \"distant\": \"fit\", \"eager\": \"other\", \"embarrassed\": \"shame\", \"empty\": \"fit\", \"energetic\": \"other\", \"excited\": \"other\", \"excluded\": \"shame\", \"exposed\": \"shame\", \"fearful\": \"other\", \"fragile\": \"fit\", \"frightened\": \"fit\", \"frustrated\": \"fit\", \"furious\": \"fit\", \"good\": \"other\", \"grief\": \"fit\", \"grounded\": \"other\", \"guilty\": \"fit\", \"happy\": \"other\", \"helpless\": \"fit\", \"hesitant\": \"fit\", \"hopeful\": \"other\", \"horrified\": \"fit\", \"hostile\": \"fit\", \"humble\": \"other\", \"humiliated\": \"shame\", \"hurt\": \"fit\", \"inadequate\": \"shame\", \"indifferent\": \"other\", \"indignant\": \"fit\", \"inferior\": \"shame\", \"infuriated\": \"fit\", \"inquisitive\": \"other\", \"insecure\": \"shame\", \"insignificant\": \"shame\", \"inspired\": \"other\", \"interested\": \"other\", \"intimate\": \"other\", \"isolated\": \"fit\", \"jealous\": \"fit\", \"joyful\": \"other\", \"judgmental\": \"fit\", \"let_down\": \"fit\", \"lonely\": \"fit\", \"loving\": \"other\", \"mad\": \"fit\", \"mellow\": \"other\", \"nauseated\": \"fit\", \"nervous\": \"fit\", \"numb\": \"other\", \"optimistic\": \"other\", \"out_of_control\": \"fit\", \"overwhelmed\": \"fit\", \"peaceful\": \"other\", \"perplexed\": \"facts\", \"persecuted\": \"other\", \"playful\": \"other\", \"powerful\": \"other\", \"powerless\": \"fit\", \"pressured\": \"fit\", \"proud\": \"other\", \"provoked\": \"fit\", \"rejected\": \"shame\", \"relaxed\": \"other\", \"remorseful\": \"fit\", \"repelled\": \"fit\", \"resentful\": \"fit\", \"respected\": \"other\", \"restful\": \"other\", \"revolted\": \"fit\", \"ridiculed\": \"shame\", \"rushed\": \"fit\", \"sad\": \"fit\", \"satisfied\": \"other\", \"scared\": \"fit\", \"secure\": \"other\", \"sensitive\": \"other\", \"serene\": \"other\", \"shocked\": \"fit\", \"skeptical\": \"facts\", \"sleepy\": \"other\", \"startled\": \"other\", \"stressed\": \"fit\", \"successful\": \"other\", \"surprised\": \"other\", \"sympathetic\": \"other\", \"tender\": \"other\", \"thankful\": \"other\", \"thoughtful\": \"other\", \"threatened\": \"fit\", \"tired\": \"other\", \"trusting\": \"other\", \"unfocused\": \"other\", \"valued\": \"other\", \"victimized\": \"fit\", \"violated\": \"fit\", \"vulnerable\": \"fit\", \"weak\": \"shame\", \"withdrawn\": \"fit\", \"worried\": \"fit\", \"worthless\": \"shame\"}, \"psParent\": {\"abandoned\": \"sadness\", \"aggressive\": \"anger\", \"angry\": \"anger\", \"annoyed\": \"anger\", \"anxious\": \"fear\", \"appalled\": \"disgust\", \"awful\": \"sadness\", \"betrayed\": \"anger\", \"bitter\": \"anger\", \"busy\": \"fear\", \"critical\": \"anger\", \"depressed\": \"sadness\", \"despair\": \"sadness\", \"detestable\": \"disgust\", \"disappointed\": \"sadness\", \"disapproving\": \"disgust\", \"disgusted\": \"disgust\", \"disillusioned\": \"sadness\", \"dismayed\": \"sadness\", \"dismissive\": \"disgust\", \"disrespected\": \"anger\", \"distant\": \"sadness\", \"empty\": \"sadness\", \"fragile\": \"fear\", \"frightened\": \"fear\", \"frustrated\": \"anger\", \"furious\": \"anger\", \"grief\": \"sadness\", \"guilty\": \"guilt\", \"helpless\": \"sadness\", \"hesitant\": \"fear\", \"horrified\": \"fear\", \"hostile\": \"anger\", \"hurt\": \"sadness\", \"indignant\": \"anger\", \"infuriated\": \"anger\", \"isolated\": \"sadness\", \"jealous\": \"jealousy\", \"judgmental\": \"anger\", \"let_down\": \"sadness\", \"lonely\": \"sadness\", \"mad\": \"anger\", \"nauseated\": \"disgust\", \"nervous\": \"fear\", \"out_of_control\": \"fear\", \"overwhelmed\": \"fear\", \"powerless\": \"sadness\", \"pressured\": \"fear\", \"provoked\": \"anger\", \"remorseful\": \"guilt\", \"repelled\": \"disgust\", \"resentful\": \"anger\", \"revolted\": \"disgust\", \"rushed\": \"fear\", \"sad\": \"sadness\", \"scared\": \"fear\", \"shocked\": \"fear\", \"stressed\": \"fear\", \"threatened\": \"fear\", \"victimized\": \"anger\", \"violated\": \"anger\", \"vulnerable\": \"fear\", \"withdrawn\": \"sadness\", \"worried\": \"fear\"}, \"startSmall\": {\"tried-thinking-constantly\": \"yes\"}, \"subGo\": {\"cant-afraid-aftermath\": [\"keep\"], \"cant-ambivalent\": [\"ambiv\"], \"cant-keep-putting-off\": [\"ruler\"], \"cant-no-energy\": [\"rest\", \"keep\"], \"person-dont-know-what-to-say\": [\"keep\"], \"person-no-right-to-speak\": [\"keep\"], \"person-scared-reaction\": [\"keep\"], \"person-tried-they-dont-listen\": [\"keep\"], \"tried-different-approaches\": [\"options\"], \"tried-exhausted\": [\"rest\", \"keep\"], \"tried-talked-to-them\": [\"keep\"], \"tried-thinking-constantly\": [\"options\"]}}", s.deriveJson = "[{\"from\": \"$a.feel\", \"name\": \"parent\", \"table\": \"psParent\"}, {\"default\": \"other\", \"from\": \"$a.feel\", \"name\": \"fit\", \"table\": \"psFit\"}, {\"from\": \"$a.sub\", \"name\": \"subGo\", \"table\": \"subGo\"}, {\"from\": \"$a.sub\", \"name\": \"startSmall\", \"table\": \"startSmall\"}, {\"from\": \"$a.feel\", \"name\": \"dbtParent\", \"table\": \"parentOf\"}]";
+SET s += {toolId: "problem-solve", version: "ps-v1", contentVersion: "skills-v1", start: "feel", ownMax: 140, emotionFields: ["feel"], accepts: ["band", "frame"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"accept_line\": \"Most of this is facts or other people's choices. That's painful, and it isn't a failure. Here the skill is to carry it, not solve it.\", \"ack_anger\": \"Your anger says something that mattered got crossed. Let's work out what to do about it.\", \"ack_disgust\": \"Something is crossing a line for you. Let's see what you can do about it.\", \"ack_envy\": \"Envy points at something you want. That's useful to know, and you can use it.\", \"ack_fear\": \"Your fear is pointing at something that matters to you. Let's see what you can do about it.\", \"ack_guilt\": \"Something you did doesn't sit right with your values. The move now is repair, not punishing yourself.\", \"ack_jealousy\": \"Something in this relationship feels under threat. Let's look at what you can do, starting from what you need.\", \"ack_love\": \"The love is real, and something is in the way. Let's look at what's in the way.\", \"ack_repair\": \"You want to put something right. Owning it and repairing it is the opposite of hiding.\", \"ack_routed\": \"Something is asking a lot of you right now. Let's see what you can do about it.\", \"ack_sadness\": \"You've lost something, or something didn't go the way you needed. Let's see which parts you can do something about.\", \"ambiv_title\": \"What does staying the same protect you from?\", \"barrier_hint\": \"There's no wrong answer. It helps find the next step.\", \"barrier_title\": \"What's in the way of doing something about it?\", \"co_high\": \"So the how is there. Let's name the step.\", \"co_low\": \"That's honest. Someone else could help with this, and a smaller piece might be in reach.\", \"co_medium\": \"Small is real. Let's find the smallest version that still counts.\", \"co_none\": \"Then the step may need to be smaller still, or something may need to change first. Not easy. Possible.\", \"commit_line\": \"Any size is a real step. If it doesn't work, or the problem shifts, come back: problem-solving goes round more than once.\", \"commit_line_rehearse\": \"A bigger step can help to rehearse before you take it.\", \"commit_line_safety\": \"If it gets more dangerous, call now. You don't have to wait for a plan.\", \"commit_title\": \"Your next step: {step}\", \"commit_title_own\": \"Your next step: {mine}\", \"conf_title\": \"How sure are you that you could do the smallest version of this?\", \"decompose_title\": \"Some parts of this are facts. Some are up to other people. Some are in your hands.\", \"done\": \"Done\", \"feel_more\": \"Something else\", \"feel_title\": \"What's the feeling that's pointing at a problem?\", \"fo_ambiv-admitting-need-help\": \"Asking for help or owning a mistake can feel like it makes you smaller. It's also a way of looking after what matters.\", \"fo_ambiv-change-might-not-help\": \"If you change things and it still hurts, that would be hard. That fear is real. Staying put to avoid finding out is a choice too.\", \"fo_ambiv-hard-conversation\": \"Hard conversations carry real risk. The question is whether not having it costs more than having it.\", \"fo_ambiv-losing-something\": \"Change usually costs something. There may be a way to change and keep the part that matters.\", \"go_ambiv\": \"Look at what it protects me from\", \"go_keep\": \"Keep problem-solving\", \"go_options\": \"Show me some options\", \"go_q\": \"What would help now?\", \"go_rest\": \"Stop here for now\", \"go_ruler\": \"See how sure I feel\", \"l_build_mastery\": \"Build a small win\", \"l_cope_ahead\": \"Rehearse it with Cope Ahead\", \"l_dear_man\": \"Work out what to say with DEAR MAN\", \"l_dialectics\": \"Find the middle path\", \"l_doing_being\": \"Is my mind trying to fix a feeling?\", \"l_fast\": \"Keep your self-respect\", \"l_finding_connection\": \"Take one small step towards people\", \"l_give\": \"Keep it warm\", \"l_missing_links\": \"Find what got in the way\", \"l_others\": \"This part is about them. Work out what to say with DEAR MAN\", \"l_please_skill\": \"Look after the basics first\", \"l_self_validate\": \"Validate yourself\", \"mine_q\": \"Which of these are in your hands?\", \"mysize_q\": \"How big is it?\", \"next\": \"Next\", \"not_fit_facts\": \"When something isn't clear yet, it helps to get the facts straight before solving anything.\", \"not_fit_other\": \"Problem Solve works from a feeling that's pointing at a problem you can work on. This one might want something else first.\", \"not_fit_shame\": \"When a feeling says something is wrong with you, there's nothing there to solve. Lots of people feel this. Doing the opposite of hiding often helps more. If there's one thing you did that you want to put right, you can come back for that.\", \"not_now_line\": \"That makes sense. When a feeling is this loud, planning is harder. It may help to bring it down a little first, then come back to this.\", \"o_body_scan\": \"Notice my body, from the outside in\", \"o_turning_the_mind\": \"Turn my mind toward letting it be\", \"o_willingness\": \"Do what the moment needs anyway\", \"others_title\": \"Which parts are up to someone else?\", \"own_direction\": \"My own idea\", \"own_hint\": \"Say it your way\", \"own_step_hint\": \"Write it your way, or start from one of these.\", \"own_step_title\": \"What's the step you already know you want to take?\", \"piling\": \"It's not one thing. Everything feels like too much\", \"problem_q\": \"Which of these sounds closest?\", \"re_cant-afraid-aftermath\": \"The fear of what comes after is real, and you can prepare for it. Rehearsing the hard part first can make the real thing less overwhelming.\", \"re_cant-ambivalent\": \"That's honest. Both sides are real: the part that wants change and the part that doesn't. Let's look at what staying the same protects you from.\", \"re_cant-keep-putting-off\": \"Putting it off usually protects you from something, like discomfort, failing or conflict. Let's find the smallest version of the step and see how sure you feel about that.\", \"re_cant-no-energy\": \"That's not a flaw in you. When you're running low, even obvious steps feel impossible. Refill a little first, then come back.\", \"re_person-dont-know-what-to-say\": \"DEAR MAN is for exactly that. It gives you a shape for what to say, so you don't start from nothing.\", \"re_person-no-right-to-speak\": \"That feeling is worth a look. You have needs, and saying them isn't selfish. This may be more about your self-respect than the problem itself.\", \"re_person-scared-reaction\": \"Their reaction is worth taking seriously. You can prepare what to say and rehearse how you'll handle the hard part.\", \"re_person-tried-they-dont-listen\": \"When something hasn't landed, it may be the approach and not the message. Changing how you say it can change whether it gets through. Or this may be where your influence over them ends.\", \"re_tried-different-approaches\": \"That tells you something. Either it needs a different kind of strategy, or this wall won't move and the wise move is to put your energy somewhere else.\", \"re_tried-exhausted\": \"Trying hard without results wears you out. You're not failing, you're running low. The most useful thing now is to refill, not push harder.\", \"re_tried-talked-to-them\": \"Maybe it's the approach that needs to change, not the goal. Saying your piece and saying it so it gets through are different things.\", \"re_tried-thinking-constantly\": \"That's your mind working on it, and it counts. Thinking and doing are different skills. You've done the thinking. Let's try the smallest piece of doing.\", \"ready_title\": \"Can you think about this fairly clearly right now, or is the feeling too loud?\", \"rest_line\": \"Stopping here is a real choice. You can come back to this when you have more in the tank.\", \"review_done_line\": \"You took the step and saw what it did. That's the whole loop: a problem, a step, and seeing how it went.\", \"review_help_title\": \"You took the step. Did it help with the problem?\", \"review_later_line\": \"It can wait.\", \"review_later_q\": \"Want me to ask again?\", \"review_next_didnt\": \"That happens, and it's useful to know. What would help next time?\", \"review_next_didnt_safety\": \"That happens. If you're not safe now, call. Or pick another way.\", \"review_next_nohelp\": \"You did it, and it didn't help. That's worth knowing. What would help now?\", \"review_next_nohelp_safety\": \"It didn't help enough. If you're not safe now, call. Or pick another way.\", \"review_next_part\": \"Part of it is still a step. What would help with the rest?\", \"review_title\": \"How did it go? You planned: {step}\", \"review_title_own\": \"How did it go? You planned: {mine}\", \"safety_open\": \"Talk to someone now\", \"size_title\": \"{direction}. Pick what feels doable.\", \"solutions_title\": \"Which direction feels right?\", \"solutions_title_mine\": \"Here's what's in your hands. Which direction feels right?\", \"solutions_title_small\": \"Let's start small. Which direction feels right?\", \"sub_title\": \"Can you say a bit more?\", \"sub_title_tried\": \"You've been trying. That counts, even though it hasn't landed the way you needed. Can you say a bit more?\", \"triage_title\": \"When everything piles up, one thing is a foothold. Which would shift most if it moved even a little?\", \"when_q\": \"Want me to ask how it went?\"}", s.tablesJson = "{\"psFit\": {\"abandoned\": \"fit\", \"accepted\": \"other\", \"aggressive\": \"fit\", \"amazed\": \"other\", \"angry\": \"fit\", \"annoyed\": \"fit\", \"anxious\": \"fit\", \"apathetic\": \"other\", \"appalled\": \"fit\", \"appreciative\": \"other\", \"aroused\": \"other\", \"ashamed\": \"shame\", \"astonished\": \"other\", \"at_ease\": \"other\", \"awe\": \"other\", \"awful\": \"fit\", \"bad\": \"other\", \"balanced\": \"other\", \"betrayed\": \"fit\", \"bitter\": \"fit\", \"bored\": \"other\", \"busy\": \"fit\", \"calm\": \"other\", \"cheeky\": \"other\", \"chill\": \"other\", \"comfortable\": \"other\", \"confident\": \"other\", \"confused\": \"facts\", \"content\": \"other\", \"courageous\": \"other\", \"cozy\": \"other\", \"creative\": \"other\", \"critical\": \"fit\", \"curious\": \"other\", \"depressed\": \"fit\", \"despair\": \"fit\", \"detestable\": \"fit\", \"disappointed\": \"fit\", \"disapproving\": \"fit\", \"disgusted\": \"fit\", \"disillusioned\": \"fit\", \"dismayed\": \"fit\", \"dismissive\": \"fit\", \"disrespected\": \"fit\", \"distant\": \"fit\", \"eager\": \"other\", \"embarrassed\": \"shame\", \"empty\": \"fit\", \"energetic\": \"other\", \"excited\": \"other\", \"excluded\": \"shame\", \"exposed\": \"shame\", \"fearful\": \"other\", \"fragile\": \"fit\", \"frightened\": \"fit\", \"frustrated\": \"fit\", \"furious\": \"fit\", \"good\": \"other\", \"grief\": \"fit\", \"grounded\": \"other\", \"guilty\": \"fit\", \"happy\": \"other\", \"helpless\": \"fit\", \"hesitant\": \"fit\", \"hopeful\": \"other\", \"horrified\": \"fit\", \"hostile\": \"fit\", \"humble\": \"other\", \"humiliated\": \"shame\", \"hurt\": \"fit\", \"inadequate\": \"shame\", \"indifferent\": \"other\", \"indignant\": \"fit\", \"inferior\": \"shame\", \"infuriated\": \"fit\", \"inquisitive\": \"other\", \"insecure\": \"shame\", \"insignificant\": \"shame\", \"inspired\": \"other\", \"interested\": \"other\", \"intimate\": \"other\", \"isolated\": \"fit\", \"jealous\": \"fit\", \"joyful\": \"other\", \"judgmental\": \"fit\", \"let_down\": \"fit\", \"lonely\": \"fit\", \"loving\": \"other\", \"mad\": \"fit\", \"mellow\": \"other\", \"nauseated\": \"fit\", \"nervous\": \"fit\", \"numb\": \"other\", \"optimistic\": \"other\", \"out_of_control\": \"fit\", \"overwhelmed\": \"fit\", \"peaceful\": \"other\", \"perplexed\": \"facts\", \"persecuted\": \"other\", \"playful\": \"other\", \"powerful\": \"other\", \"powerless\": \"fit\", \"pressured\": \"fit\", \"proud\": \"other\", \"provoked\": \"fit\", \"rejected\": \"shame\", \"relaxed\": \"other\", \"remorseful\": \"fit\", \"repelled\": \"fit\", \"resentful\": \"fit\", \"respected\": \"other\", \"restful\": \"other\", \"revolted\": \"fit\", \"ridiculed\": \"shame\", \"rushed\": \"fit\", \"sad\": \"fit\", \"satisfied\": \"other\", \"scared\": \"fit\", \"secure\": \"other\", \"sensitive\": \"other\", \"serene\": \"other\", \"shocked\": \"fit\", \"skeptical\": \"facts\", \"sleepy\": \"other\", \"startled\": \"other\", \"stressed\": \"fit\", \"successful\": \"other\", \"surprised\": \"other\", \"sympathetic\": \"other\", \"tender\": \"other\", \"thankful\": \"other\", \"thoughtful\": \"other\", \"threatened\": \"fit\", \"tired\": \"other\", \"trusting\": \"other\", \"unfocused\": \"other\", \"valued\": \"other\", \"victimized\": \"fit\", \"violated\": \"fit\", \"vulnerable\": \"fit\", \"weak\": \"shame\", \"withdrawn\": \"fit\", \"worried\": \"fit\", \"worthless\": \"shame\"}, \"psParent\": {\"abandoned\": \"sadness\", \"aggressive\": \"anger\", \"angry\": \"anger\", \"annoyed\": \"anger\", \"anxious\": \"fear\", \"appalled\": \"disgust\", \"awful\": \"sadness\", \"betrayed\": \"anger\", \"bitter\": \"anger\", \"busy\": \"fear\", \"critical\": \"anger\", \"depressed\": \"sadness\", \"despair\": \"sadness\", \"detestable\": \"disgust\", \"disappointed\": \"sadness\", \"disapproving\": \"disgust\", \"disgusted\": \"disgust\", \"disillusioned\": \"sadness\", \"dismayed\": \"sadness\", \"dismissive\": \"disgust\", \"disrespected\": \"anger\", \"distant\": \"sadness\", \"empty\": \"sadness\", \"fragile\": \"fear\", \"frightened\": \"fear\", \"frustrated\": \"anger\", \"furious\": \"anger\", \"grief\": \"sadness\", \"guilty\": \"guilt\", \"helpless\": \"sadness\", \"hesitant\": \"fear\", \"horrified\": \"fear\", \"hostile\": \"anger\", \"hurt\": \"sadness\", \"indignant\": \"anger\", \"infuriated\": \"anger\", \"isolated\": \"sadness\", \"jealous\": \"jealousy\", \"judgmental\": \"anger\", \"let_down\": \"sadness\", \"lonely\": \"sadness\", \"mad\": \"anger\", \"nauseated\": \"disgust\", \"nervous\": \"fear\", \"out_of_control\": \"fear\", \"overwhelmed\": \"fear\", \"powerless\": \"sadness\", \"pressured\": \"fear\", \"provoked\": \"anger\", \"remorseful\": \"guilt\", \"repelled\": \"disgust\", \"resentful\": \"anger\", \"revolted\": \"disgust\", \"rushed\": \"fear\", \"sad\": \"sadness\", \"scared\": \"fear\", \"shocked\": \"fear\", \"stressed\": \"fear\", \"threatened\": \"fear\", \"victimized\": \"anger\", \"violated\": \"anger\", \"vulnerable\": \"fear\", \"withdrawn\": \"sadness\", \"worried\": \"fear\"}, \"startSmall\": {\"tried-thinking-constantly\": \"yes\"}, \"subGo\": {\"cant-afraid-aftermath\": [\"keep\"], \"cant-ambivalent\": [\"ambiv\"], \"cant-keep-putting-off\": [\"ruler\"], \"cant-no-energy\": [\"rest\", \"keep\"], \"person-dont-know-what-to-say\": [\"keep\"], \"person-no-right-to-speak\": [\"keep\"], \"person-scared-reaction\": [\"keep\"], \"person-tried-they-dont-listen\": [\"keep\"], \"tried-different-approaches\": [\"options\"], \"tried-exhausted\": [\"rest\", \"keep\"], \"tried-talked-to-them\": [\"keep\"], \"tried-thinking-constantly\": [\"options\"]}}", s.deriveJson = "[{\"from\": \"$a.feel\", \"name\": \"parent\", \"table\": \"psParent\"}, {\"default\": \"other\", \"from\": \"$a.feel\", \"name\": \"fit\", \"table\": \"psFit\"}, {\"from\": \"$a.sub\", \"name\": \"subGo\", \"table\": \"subGo\"}, {\"from\": \"$a.sub\", \"name\": \"startSmall\", \"table\": \"startSmall\"}, {\"from\": \"$a.feel\", \"name\": \"dbtParent\", \"table\": \"parentOf\"}]";
 MATCH (t:TherapyConcept {id: "dbt_problem_solving"}), (s:Skill {id: "problem_solve"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "problem_solve"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
@@ -2872,7 +2872,7 @@ MATCH (s:Skill {id: "problem_solve"}), (n:SkillStep {id: "problem_solve:sub"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 5};
 MERGE (n:SkillStep {id: "problem_solve:sub_reply"})
-SET n += {skillId: "problem_solve", step: "sub_reply", kind: "ask", version: "ps-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"any\": [{\"eq\": [\"$a.problem\", \"fear-safety-threat\"]}, {\"eq\": [\"$a.focus\", \"fear-safety-threat\"]}]}}], \"fields\": [{\"id\": \"go\", \"label\": \"go_q\", \"links\": [{\"exit\": \"build_mastery\", \"label\": \"l_build_mastery\", \"when\": {\"in\": [\"$a.sub\", [\"tried-exhausted\"]]}}, {\"exit\": \"cope_ahead\", \"label\": \"l_cope_ahead\", \"when\": {\"in\": [\"$a.sub\", [\"cant-afraid-aftermath\", \"person-scared-reaction\"]]}}, {\"exit\": \"dear_man\", \"label\": \"l_dear_man\", \"when\": {\"in\": [\"$a.sub\", [\"person-dont-know-what-to-say\", \"person-scared-reaction\", \"tried-talked-to-them\"]]}}, {\"exit\": \"dialectics\", \"label\": \"l_dialectics\", \"when\": {\"in\": [\"$a.sub\", [\"person-tried-they-dont-listen\"]]}}, {\"exit\": \"fast\", \"label\": \"l_fast\", \"when\": {\"in\": [\"$a.sub\", [\"person-no-right-to-speak\"]]}}, {\"exit\": \"give\", \"label\": \"l_give\", \"when\": {\"in\": [\"$a.sub\", [\"person-tried-they-dont-listen\", \"tried-talked-to-them\"]]}}, {\"exit\": \"please_skill\", \"label\": \"l_please_skill\", \"when\": {\"in\": [\"$a.sub\", [\"cant-no-energy\", \"tried-exhausted\"]]}}, {\"exit\": \"self_validate\", \"label\": \"l_self_validate\", \"when\": {\"in\": [\"$a.sub\", [\"person-no-right-to-speak\"]]}}, {\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"eq\": [\"$a.sub\", \"tried-exhausted\"]}}], \"max\": 1, \"options\": {\"list\": \"go\", \"where\": {\"has\": [\"$d.subGo\", \"$opt.value\"]}}, \"required\": true}], \"title\": [{\"key\": \"re_cant-afraid-aftermath\", \"when\": {\"eq\": [\"$a.sub\", \"cant-afraid-aftermath\"]}}, {\"key\": \"re_cant-no-energy\", \"when\": {\"eq\": [\"$a.sub\", \"cant-no-energy\"]}}, {\"key\": \"re_cant-ambivalent\", \"when\": {\"eq\": [\"$a.sub\", \"cant-ambivalent\"]}}, {\"key\": \"re_cant-keep-putting-off\", \"when\": {\"eq\": [\"$a.sub\", \"cant-keep-putting-off\"]}}, {\"key\": \"re_person-dont-know-what-to-say\", \"when\": {\"eq\": [\"$a.sub\", \"person-dont-know-what-to-say\"]}}, {\"key\": \"re_person-scared-reaction\", \"when\": {\"eq\": [\"$a.sub\", \"person-scared-reaction\"]}}, {\"key\": \"re_person-tried-they-dont-listen\", \"when\": {\"eq\": [\"$a.sub\", \"person-tried-they-dont-listen\"]}}, {\"key\": \"re_person-no-right-to-speak\", \"when\": {\"eq\": [\"$a.sub\", \"person-no-right-to-speak\"]}}, {\"key\": \"re_tried-talked-to-them\", \"when\": {\"eq\": [\"$a.sub\", \"tried-talked-to-them\"]}}, {\"key\": \"re_tried-thinking-constantly\", \"when\": {\"eq\": [\"$a.sub\", \"tried-thinking-constantly\"]}}, {\"key\": \"re_tried-different-approaches\", \"when\": {\"eq\": [\"$a.sub\", \"tried-different-approaches\"]}}, {\"key\": \"re_tried-exhausted\", \"when\": {\"eq\": [\"$a.sub\", \"tried-exhausted\"]}}, {\"key\": \"go_q\"}]}";
+SET n += {skillId: "problem_solve", step: "sub_reply", kind: "ask", version: "ps-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"any\": [{\"eq\": [\"$a.problem\", \"fear-safety-threat\"]}, {\"eq\": [\"$a.focus\", \"fear-safety-threat\"]}]}}], \"fields\": [{\"id\": \"go\", \"label\": \"go_q\", \"links\": [{\"exit\": \"build_mastery\", \"label\": \"l_build_mastery\", \"when\": {\"in\": [\"$a.sub\", [\"tried-exhausted\"]]}}, {\"exit\": \"cope_ahead\", \"label\": \"l_cope_ahead\", \"when\": {\"in\": [\"$a.sub\", [\"cant-afraid-aftermath\", \"person-scared-reaction\"]]}}, {\"exit\": \"dear_man\", \"label\": \"l_dear_man\", \"when\": {\"in\": [\"$a.sub\", [\"person-dont-know-what-to-say\", \"person-scared-reaction\", \"tried-talked-to-them\"]]}}, {\"exit\": \"dialectics\", \"label\": \"l_dialectics\", \"when\": {\"in\": [\"$a.sub\", [\"person-tried-they-dont-listen\"]]}}, {\"exit\": \"fast\", \"label\": \"l_fast\", \"when\": {\"in\": [\"$a.sub\", [\"person-no-right-to-speak\"]]}}, {\"exit\": \"give\", \"label\": \"l_give\", \"when\": {\"in\": [\"$a.sub\", [\"person-tried-they-dont-listen\", \"tried-talked-to-them\"]]}}, {\"exit\": \"please_skill\", \"label\": \"l_please_skill\", \"when\": {\"in\": [\"$a.sub\", [\"cant-no-energy\", \"tried-exhausted\"]]}}, {\"exit\": \"self_validate\", \"label\": \"l_self_validate\", \"when\": {\"in\": [\"$a.sub\", [\"person-no-right-to-speak\"]]}}, {\"exit\": \"doing_being\", \"label\": \"l_doing_being\", \"when\": {\"eq\": [\"$a.sub\", \"tried-thinking-constantly\"]}}, {\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"eq\": [\"$a.sub\", \"tried-exhausted\"]}}], \"max\": 1, \"options\": {\"list\": \"go\", \"where\": {\"has\": [\"$d.subGo\", \"$opt.value\"]}}, \"required\": true}], \"title\": [{\"key\": \"re_cant-afraid-aftermath\", \"when\": {\"eq\": [\"$a.sub\", \"cant-afraid-aftermath\"]}}, {\"key\": \"re_cant-no-energy\", \"when\": {\"eq\": [\"$a.sub\", \"cant-no-energy\"]}}, {\"key\": \"re_cant-ambivalent\", \"when\": {\"eq\": [\"$a.sub\", \"cant-ambivalent\"]}}, {\"key\": \"re_cant-keep-putting-off\", \"when\": {\"eq\": [\"$a.sub\", \"cant-keep-putting-off\"]}}, {\"key\": \"re_person-dont-know-what-to-say\", \"when\": {\"eq\": [\"$a.sub\", \"person-dont-know-what-to-say\"]}}, {\"key\": \"re_person-scared-reaction\", \"when\": {\"eq\": [\"$a.sub\", \"person-scared-reaction\"]}}, {\"key\": \"re_person-tried-they-dont-listen\", \"when\": {\"eq\": [\"$a.sub\", \"person-tried-they-dont-listen\"]}}, {\"key\": \"re_person-no-right-to-speak\", \"when\": {\"eq\": [\"$a.sub\", \"person-no-right-to-speak\"]}}, {\"key\": \"re_tried-talked-to-them\", \"when\": {\"eq\": [\"$a.sub\", \"tried-talked-to-them\"]}}, {\"key\": \"re_tried-thinking-constantly\", \"when\": {\"eq\": [\"$a.sub\", \"tried-thinking-constantly\"]}}, {\"key\": \"re_tried-different-approaches\", \"when\": {\"eq\": [\"$a.sub\", \"tried-different-approaches\"]}}, {\"key\": \"re_tried-exhausted\", \"when\": {\"eq\": [\"$a.sub\", \"tried-exhausted\"]}}, {\"key\": \"go_q\"}]}";
 MATCH (s:Skill {id: "problem_solve"}), (n:SkillStep {id: "problem_solve:sub_reply"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 6};
@@ -3121,6 +3121,12 @@ MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:willingn
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "problem_solve:willingness"}), (t:TherapyConcept {appToolId: "let-it-be"})
 MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "problem_solve:doing_being"})
+SET x += {skillId: "problem_solve", exit: "doing_being", toolId: "doing-being", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"enterAt\": \"mode\"}", x.label = null;
+MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:doing_being"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "problem_solve:doing_being"}), (t:TherapyConcept {appToolId: "doing-being"})
+MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "problem_solve:safety_open"})
 SET x += {skillId: "problem_solve", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "problem_solve"}), (x:SkillExit {id: "problem_solve:safety_open"})
@@ -3213,9 +3219,12 @@ SET r += {order: 6, field: "go", label: "l_please_skill"}, r.whenJson = "{\"in\"
 MATCH (a:SkillStep {id: "problem_solve:sub_reply"}), (x:SkillExit {id: "problem_solve:self_validate"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 7, field: "go", label: "l_self_validate"}, r.whenJson = "{\"in\": [\"$a.sub\", [\"person-no-right-to-speak\"]]}";
+MATCH (a:SkillStep {id: "problem_solve:sub_reply"}), (x:SkillExit {id: "problem_solve:doing_being"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 8, field: "go", label: "l_doing_being"}, r.whenJson = "{\"eq\": [\"$a.sub\", \"tried-thinking-constantly\"]}";
 MATCH (a:SkillStep {id: "problem_solve:sub_reply"}), (x:SkillExit {id: "problem_solve:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
-SET r += {order: 8, field: "go", label: "safety_open"}, r.whenJson = "{\"eq\": [\"$a.sub\", \"tried-exhausted\"]}";
+SET r += {order: 9, field: "go", label: "safety_open"}, r.whenJson = "{\"eq\": [\"$a.sub\", \"tried-exhausted\"]}";
 MATCH (a:SkillStep {id: "problem_solve:ambivalence"}), (b:SkillStep {id: "problem_solve:ambiv_reply"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
@@ -26059,13 +26068,13 @@ SET r += {list: "wake", order: 62};
 
 // --- notice_and_name (nn-v1) ---
 MERGE (s:Skill {id: "notice_and_name"})
-SET s += {toolId: "notice-and-name", version: "nn-v1", contentVersion: "skills-v1", start: "way", ownMax: 40, emotionFields: [], accepts: ["band", "frame"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"back_to_room\": \"Back to the room\", \"body_first\": \"My body first\", \"bowl_done\": \"That's the time.\", \"bowl_dropped\": \"A pebble in the bowl.\", \"bowl_running\": \"A pebble for each time.\", \"bowl_skip\": \"Move on\", \"bowl_start\": \"Start\", \"came_back\": \"Came back\", \"close_title\": \"Compared to when you started, you feel…\", \"contact_done\": \"That's three.\", \"contact_drop\": \"Let go\", \"contact_press\": \"Pressing\", \"contact_start\": \"Hold to press\", \"contact_step1\": \"Hold the circle and press your feet down into the floor.\", \"contact_step2\": \"Let go, and notice the difference.\", \"contact_title\": \"Feet on the floor.\", \"done\": \"Done\", \"else_hint\": \"Tap any. Noticing them is part of it.\", \"else_title\": \"What else showed up while you did this?\", \"end_feeling_line\": \"A feeling showed up. If you want a word for it, Find the feeling can help.\", \"end_flooded_title\": \"You noticed something while your body was loud. That counts.\", \"end_found_title\": \"You noticed what was here. That counts.\", \"end_return_title\": \"Wandering is the practice. Each time you came back, that was the skill.\", \"end_thought_line\": \"A thought showed up. Watching it as a thought is its own practice.\", \"far_line\": \"Sometimes the mind steps back when things are a lot. Next time, looking or listening, eyes open, may suit you better. If it happens a lot, a doctor or therapist can help with it.\", \"far_safety\": \"If it comes with thoughts of hurting yourself\", \"far_title\": \"Feeling further away can happen when attention turns in.\", \"found\": \"Found one\", \"found_done\": \"That's three.\", \"here\": \"You're here, and it's\", \"inside_task\": \"Eyes open. Let your gaze rest low if you like. Notice what's there, without changing it. When your mind wanders, tap, and come back.\", \"inside_title\": \"{place}. Stay with it for a little while.\", \"inside_title_none\": \"Stay with where you touch the chair or the floor.\", \"inside_where_hint\": \"Start where you touch the chair or the floor, then a little further in. Roughly is fine. If you start to feel far away, the room is one tap away.\", \"inside_where_title\": \"Where is something most noticeable right now?\", \"listen_task\": \"Near or far, loud or soft. No need to find them. When your mind wanders, tap, and come back to listening.\", \"listen_title\": \"Let sounds come to you.\", \"look_task\": \"Tap each one as you find it.\", \"look_title\": \"Find three things that are {what}.\", \"look_what_hint\": \"Pick one. Any shade, any size.\", \"look_what_title\": \"Find three things that are…\", \"name_hint\": \"Pick one. A guess is fine, and so is no words.\", \"name_own\": \"My own word\", \"name_title\": \"What was it like?\", \"next\": \"Next\", \"offphone_not_line\": \"Not yet is fine. It'll be there next time you're waiting.\", \"offphone_q\": \"Try one without the app? Next time you're waiting, notice three sounds. I'll ask how it went.\", \"offphone_sort_line\": \"A few seconds of noticing is still noticing.\", \"offphone_title\": \"Did you get to notice something without the app?\", \"offphone_yes_line\": \"That's the practice moving off the phone.\", \"room_end_line\": \"Stopping when it's too much is part of it too. Looking or listening, eyes open, may suit you better next time.\", \"room_end_title\": \"Back in the room.\", \"room_task\": \"Find three things you can see.\", \"room_title\": \"Back to the room.\", \"safety_open\": \"Talk to someone now\", \"safety_urge\": \"If the urge is to hurt yourself\", \"touch_task\": \"Notice if it's warm or cool, smooth or rough. When your mind wanders, tap, and come back to it.\", \"touch_title\": \"Hold something near you.\", \"way_hint\": \"Eyes open, a minute or so. Your mind will wander. Coming back is the practice.\", \"way_hint_flooded\": \"Noticing works better once your body settles. You can look or listen for a minute, or start with your body.\", \"way_title\": \"Pick a way to notice.\", \"way_title_flooded\": \"Your body's loud right now.\"}", s.tablesJson = "{\"firstWayOf\": {\"blank\": \"contact\", \"far\": \"look\", \"listen\": \"listen\"}}", s.deriveJson = "[{\"from\": \"$ctx.frame\", \"name\": \"firstWay\", \"table\": \"firstWayOf\"}]";
+SET s += {toolId: "notice-and-name", version: "nn-v1", contentVersion: "skills-v1", start: "way", ownMax: 40, emotionFields: [], accepts: ["band", "frame"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"back_to_room\": \"Back to the room\", \"body_first\": \"My body first\", \"bowl_done\": \"That's the time.\", \"bowl_dropped\": \"A pebble in the bowl.\", \"bowl_running\": \"A pebble for each time.\", \"bowl_skip\": \"Move on\", \"bowl_start\": \"Start\", \"came_back\": \"Came back\", \"close_title\": \"Compared to when you started, you feel…\", \"contact_done\": \"That's three.\", \"contact_drop\": \"Let go\", \"contact_press\": \"Pressing\", \"contact_start\": \"Hold to press\", \"contact_step1\": \"Hold the circle and press your feet down into the floor.\", \"contact_step2\": \"Let go, and notice the difference.\", \"contact_title\": \"Feet on the floor.\", \"done\": \"Done\", \"else_hint\": \"Tap any. Noticing them is part of it.\", \"else_title\": \"What else showed up while you did this?\", \"end_feeling_line\": \"A feeling showed up. If you want a word for it, Find the feeling can help.\", \"end_flooded_title\": \"You noticed something while your body was loud. That counts.\", \"end_found_title\": \"You noticed what was here. That counts.\", \"end_return_title\": \"Wandering is the practice. Each time you came back, that was the skill.\", \"end_thought_line\": \"A thought showed up. Watching it as a thought is its own practice.\", \"far_line\": \"Sometimes the mind steps back when things are a lot. Next time, looking or listening, eyes open, may suit you better. If it happens a lot, a doctor or therapist can help with it.\", \"far_safety\": \"If it comes with thoughts of hurting yourself\", \"far_title\": \"Feeling further away can happen when attention turns in.\", \"found\": \"Found one\", \"found_done\": \"That's three.\", \"here\": \"You're here, and it's\", \"inside_task\": \"Eyes open. Let your gaze rest low if you like. Notice what's there, without changing it. When your mind wanders, tap, and come back.\", \"inside_title\": \"{place}. Stay with it for a little while.\", \"inside_title_none\": \"Stay with where you touch the chair or the floor.\", \"inside_where_hint\": \"Start where you touch the chair or the floor, then a little further in. Roughly is fine. If you start to feel far away, the room is one tap away.\", \"inside_where_title\": \"Where is something most noticeable right now?\", \"join_in\": \"Another way: something with movement\", \"listen_task\": \"Near or far, loud or soft. No need to find them. When your mind wanders, tap, and come back to listening.\", \"listen_title\": \"Let sounds come to you.\", \"look_task\": \"Tap each one as you find it.\", \"look_title\": \"Find three things that are {what}.\", \"look_what_hint\": \"Pick one. Any shade, any size.\", \"look_what_title\": \"Find three things that are…\", \"name_hint\": \"Pick one. A guess is fine, and so is no words.\", \"name_own\": \"My own word\", \"name_title\": \"What was it like?\", \"next\": \"Next\", \"offphone_not_line\": \"Not yet is fine. It'll be there next time you're waiting.\", \"offphone_q\": \"Try one without the app? Next time you're waiting, notice three sounds. I'll ask how it went.\", \"offphone_sort_line\": \"A few seconds of noticing is still noticing.\", \"offphone_title\": \"Did you get to notice something without the app?\", \"offphone_yes_line\": \"That's the practice moving off the phone.\", \"room_end_line\": \"Stopping when it's too much is part of it too. Looking or listening, eyes open, may suit you better next time.\", \"room_end_title\": \"Back in the room.\", \"room_task\": \"Find three things you can see.\", \"room_title\": \"Back to the room.\", \"safety_open\": \"Talk to someone now\", \"safety_urge\": \"If the urge is to hurt yourself\", \"touch_task\": \"Notice if it's warm or cool, smooth or rough. When your mind wanders, tap, and come back to it.\", \"touch_title\": \"Hold something near you.\", \"way_hint\": \"Eyes open, a minute or so. Your mind will wander. Coming back is the practice.\", \"way_hint_flooded\": \"Noticing works better once your body settles. You can look or listen for a minute, or start with your body.\", \"way_title\": \"Pick a way to notice.\", \"way_title_flooded\": \"Your body's loud right now.\"}", s.tablesJson = "{\"firstWayOf\": {\"blank\": \"contact\", \"far\": \"look\", \"listen\": \"listen\"}}", s.deriveJson = "[{\"from\": \"$ctx.frame\", \"name\": \"firstWay\", \"table\": \"firstWayOf\"}]";
 MATCH (t:TherapyConcept {id: "dbt_observe"}), (s:Skill {id: "notice_and_name"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "notice_and_name"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
 MATCH (:Skill {id: "notice_and_name"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
 MERGE (n:SkillStep {id: "notice_and_name:way"})
-SET n += {skillId: "notice_and_name", step: "way", kind: "ask", version: "nn-v1"}, n.specJson = "{\"fields\": [{\"id\": \"way\", \"links\": [{\"exit\": \"cool_down\", \"label\": \"body_first\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}], \"max\": 1, \"options\": {\"firstFrom\": \"$d.firstWay\", \"list\": \"way\", \"where\": {\"all\": [{\"not\": {\"all\": [{\"eq\": [\"$opt.inward\", true]}, {\"any\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"eq\": [\"$ctx.frame\", \"far\"]}, {\"eq\": [\"$ctx.frame\", \"listen\"]}]}]}}, {\"not\": {\"all\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"not\": {\"eq\": [\"$opt.calm\", true]}}]}}]}}, \"required\": true}], \"lines\": [{\"key\": \"way_hint_flooded\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"way_hint\", \"when\": {\"not\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}}], \"title\": [{\"key\": \"way_title_flooded\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"way_title\", \"when\": {\"all\": []}}]}";
+SET n += {skillId: "notice_and_name", step: "way", kind: "ask", version: "nn-v1"}, n.specJson = "{\"fields\": [{\"id\": \"way\", \"links\": [{\"exit\": \"cool_down\", \"label\": \"body_first\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"exit\": \"join_in\", \"label\": \"join_in\", \"when\": {\"all\": [{\"eq\": [\"$ctx.frame\", \"blank\"]}, {\"not\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}]}}], \"max\": 1, \"options\": {\"firstFrom\": \"$d.firstWay\", \"list\": \"way\", \"where\": {\"all\": [{\"not\": {\"all\": [{\"eq\": [\"$opt.inward\", true]}, {\"any\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"eq\": [\"$ctx.frame\", \"far\"]}, {\"eq\": [\"$ctx.frame\", \"listen\"]}]}]}}, {\"not\": {\"all\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"not\": {\"eq\": [\"$opt.calm\", true]}}]}}]}}, \"required\": true}], \"lines\": [{\"key\": \"way_hint_flooded\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"way_hint\", \"when\": {\"not\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}}], \"title\": [{\"key\": \"way_title_flooded\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"way_title\", \"when\": {\"all\": []}}]}";
 MATCH (s:Skill {id: "notice_and_name"}), (n:SkillStep {id: "notice_and_name:way"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 0};
@@ -26183,6 +26192,12 @@ MATCH (s:Skill {id: "notice_and_name"}), (x:SkillExit {id: "notice_and_name:five
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "notice_and_name:five_senses"}), (t:TherapyConcept {appToolId: "five-senses"})
 MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "notice_and_name:join_in"})
+SET x += {skillId: "notice_and_name", exit: "join_in", toolId: "join-in", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"blank\"}", x.label = null;
+MATCH (s:Skill {id: "notice_and_name"}), (x:SkillExit {id: "notice_and_name:join_in"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "notice_and_name:join_in"}), (t:TherapyConcept {appToolId: "join-in"})
+MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "notice_and_name:safety_open"})
 SET x += {skillId: "notice_and_name", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "notice_and_name"}), (x:SkillExit {id: "notice_and_name:safety_open"})
@@ -26209,6 +26224,9 @@ SET r += {order: 4}, r.whenJson = "{\"eq\": [\"$a.way\", \"inside\"]}";
 MATCH (a:SkillStep {id: "notice_and_name:way"}), (x:SkillExit {id: "notice_and_name:cool_down"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "way", label: "body_first"}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
+MATCH (a:SkillStep {id: "notice_and_name:way"}), (x:SkillExit {id: "notice_and_name:join_in"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 1, field: "way", label: "join_in"}, r.whenJson = "{\"all\": [{\"eq\": [\"$ctx.frame\", \"blank\"]}, {\"not\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}]}";
 MATCH (a:SkillStep {id: "notice_and_name:look_what"}), (b:SkillStep {id: "notice_and_name:look"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
@@ -30124,3 +30142,648 @@ SET o:SkillOption, o += {skillId: "kind_wishes", list: "step_down", value: "stop
 MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:step_down:stop"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "step_down", order: 23};
+
+// --- doing_being (db-v1) ---
+MERGE (s:Skill {id: "doing_being"})
+SET s += {toolId: "doing-being", version: "db-v1", contentVersion: "skills-v1", start: "about", ownMax: 40, emotionFields: [], accepts: ["band", "frame", "enterAt"]}, s.inlineJson = "null", s.runtimeJson = "{\"entries\": {\"mode\": \"mode\", \"week\": \"week\"}}", s.copyJson = "{\"about_line1\": \"Doing mind works things out, plans and fixes. Being mind notices and lets things be.\", \"about_line2\": \"Both are needed. Wise mind uses each one when it fits.\", \"about_q\": \"Which would help now?\", \"about_title\": \"Doing mind, being mind.\", \"back_not_line\": \"Not yet is fine. The moment comes round again.\", \"back_sort_line\": \"Some of it counts. Coming back is the practice.\", \"back_title\": \"Your being break: {cue}. Did you get to take one?\", \"back_yes_line\": \"That's being mind, without the phone. It goes wherever you do.\", \"being_end_line\": \"If something's been waiting, one small doing could balance the week.\", \"being_end_title\": \"Rest counts.\", \"body_first\": \"My body first\", \"body_first_line\": \"This will keep for a calmer minute.\", \"body_first_title\": \"Settle your body first.\", \"bowl_done\": \"That's a minute.\", \"bowl_dropped\": \"A pebble in the bowl\", \"bowl_running\": \"Eyes open. No sound to find? Your breath counts.\", \"bowl_skip\": \"Move on\", \"bowl_start\": \"Start\", \"build_mastery\": \"One small thing to finish\", \"came_back\": \"A sound\", \"cue_end_line\": \"One ordinary thing, with all of your attention, for about a minute. Nothing to fix.\", \"cue_end_title\": \"Your being break: {cue}.\", \"cue_line\": \"A minute of one thing, done fully, at a moment you already have.\", \"cue_own\": \"My own moment\", \"cue_q\": \"When could it go?\", \"cue_title\": \"One being break a day, then?\", \"done\": \"Done\", \"drift_blank_line\": \"When everything feels flat, moving first can make doing easier.\", \"drift_line\": \"Something you can finish today, however small. Done beats done well.\", \"drift_title\": \"One small doing could help.\", \"heads_up_line\": \"This works better once your body settles. Start there, or go on anyway.\", \"heads_up_title\": \"Your body's loud right now.\", \"join_in\": \"Move to something first\", \"listen_end_line\": \"Doing mind will still be there when you need it.\", \"listen_end_title\": \"That was being mind.\", \"listen_task\": \"Listen. Each time you notice a new sound, or catch yourself back in the problem, tap.\", \"listen_title\": \"A minute of being mind.\", \"mixed_end_line\": \"Some doing, some being. That's the mix wise mind uses.\", \"mixed_end_title\": \"Sounds balanced.\", \"mode_hint\": \"Going over it, working it out, trying to make it stop.\", \"mode_no_line\": \"Carry on. The question will be here when you want it.\", \"mode_no_title\": \"Then there's nothing to switch.\", \"mode_title\": \"Is your mind trying to fix a feeling like a task?\", \"next\": \"Next\", \"not_now_line\": \"Noticing it was doing mind is already a step outside it.\", \"not_now_title\": \"Not now is fine.\", \"one_thing\": \"One thing, done fully\", \"one_thing_link\": \"One thing, done fully, instead\", \"remind_q\": \"Ask me tomorrow how it went?\", \"safety_open\": \"Talk to someone now\", \"switch_line\": \"Doing mind is useful. A minute of being mind can give it a rest.\", \"switch_maybe_title\": \"That might be doing mind. Feelings don't get solved like tasks.\", \"switch_q\": \"One minute of being mind?\", \"switch_yes_title\": \"That sounds like doing mind. Feelings don't get solved like tasks.\", \"week_hint\": \"A rough guess is fine.\", \"week_title\": \"This week felt…\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+MATCH (t:TherapyConcept {id: "dbt_skillful_means"}), (s:Skill {id: "doing_being"})
+MERGE (t)-[:HAS_SKILL]->(s);
+MATCH (:SkillStep {skillId: "doing_being"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
+MATCH (:Skill {id: "doing_being"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
+MERGE (n:SkillStep {id: "doing_being:about"})
+SET n += {skillId: "doing_being", step: "about", kind: "ask", version: "db-v1"}, n.specJson = "{\"fields\": [{\"id\": \"about\", \"label\": \"about_q\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"about\"}, \"required\": true}], \"lines\": [{\"key\": \"about_line1\", \"when\": {\"all\": []}}, {\"key\": \"about_line2\", \"when\": {\"all\": []}}], \"title\": \"about_title\"}";
+MATCH (s:Skill {id: "doing_being"}), (n:SkillStep {id: "doing_being:about"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 0};
+MERGE (n:SkillStep {id: "doing_being:heads_up"})
+SET n += {skillId: "doing_being", step: "heads_up", kind: "ask", version: "db-v1"}, n.specJson = "{\"fields\": [{\"id\": \"heads_up\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"heads_up\"}, \"required\": true}], \"lines\": [{\"key\": \"heads_up_line\", \"when\": {\"all\": []}}], \"title\": \"heads_up_title\"}";
+MATCH (s:Skill {id: "doing_being"}), (n:SkillStep {id: "doing_being:heads_up"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 1};
+MERGE (n:SkillStep {id: "doing_being:body_first"})
+SET n += {skillId: "doing_being", step: "body_first", kind: "handoff", version: "db-v1"}, n.specJson = "{\"complete\": false, \"done\": \"done\", \"lines\": [{\"key\": \"body_first_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"body_first_title\"}";
+MATCH (s:Skill {id: "doing_being"}), (n:SkillStep {id: "doing_being:body_first"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 2};
+MERGE (n:SkillStep {id: "doing_being:mode"})
+SET n += {skillId: "doing_being", step: "mode", kind: "ask", version: "db-v1"}, n.specJson = "{\"fields\": [{\"id\": \"mode\", \"links\": [{\"exit\": \"cool_down\", \"label\": \"body_first\", \"when\": {\"all\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"not\": {\"set\": \"$a.heads_up\"}}]}}, {\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"mode\"}, \"required\": true}], \"hint\": \"mode_hint\", \"lines\": [{\"key\": \"heads_up_line\", \"when\": {\"all\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"not\": {\"set\": \"$a.heads_up\"}}]}}], \"title\": \"mode_title\"}";
+MATCH (s:Skill {id: "doing_being"}), (n:SkillStep {id: "doing_being:mode"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 3};
+MERGE (n:SkillStep {id: "doing_being:switch"})
+SET n += {skillId: "doing_being", step: "switch", kind: "ask", version: "db-v1"}, n.specJson = "{\"fields\": [{\"id\": \"switch\", \"label\": \"switch_q\", \"links\": [{\"exit\": \"one_thing\", \"label\": \"one_thing_link\", \"when\": {\"all\": []}}, {\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"switch\"}, \"required\": true}], \"lines\": [{\"key\": \"switch_line\", \"when\": {\"all\": []}}], \"title\": [{\"key\": \"switch_maybe_title\", \"when\": {\"eq\": [\"$a.mode\", \"maybe\"]}}, {\"key\": \"switch_yes_title\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "doing_being"}), (n:SkillStep {id: "doing_being:switch"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 4};
+MERGE (n:SkillStep {id: "doing_being:listen"})
+SET n += {skillId: "doing_being", step: "listen", kind: "embed", version: "db-v1"}, n.specJson = "{\"answerAs\": \"listen\", \"embed\": \"pebbleBowl\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"done\": \"bowl_done\", \"dropped\": \"bowl_dropped\", \"next\": \"next\", \"running\": \"bowl_running\", \"seconds\": 60, \"skip\": \"bowl_skip\", \"start\": \"bowl_start\", \"tapLabel\": \"came_back\", \"task\": \"listen_task\"}, \"title\": \"listen_title\"}";
+MATCH (s:Skill {id: "doing_being"}), (n:SkillStep {id: "doing_being:listen"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 5};
+MERGE (n:SkillStep {id: "doing_being:listen_end"})
+SET n += {skillId: "doing_being", step: "listen_end", kind: "handoff", version: "db-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"listen_end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"listen_end_title\"}";
+MATCH (s:Skill {id: "doing_being"}), (n:SkillStep {id: "doing_being:listen_end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 6};
+MERGE (n:SkillStep {id: "doing_being:not_now"})
+SET n += {skillId: "doing_being", step: "not_now", kind: "handoff", version: "db-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"not_now_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"not_now_title\"}";
+MATCH (s:Skill {id: "doing_being"}), (n:SkillStep {id: "doing_being:not_now"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 7};
+MERGE (n:SkillStep {id: "doing_being:mode_no"})
+SET n += {skillId: "doing_being", step: "mode_no", kind: "handoff", version: "db-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"mode_no_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"mode_no_title\"}";
+MATCH (s:Skill {id: "doing_being"}), (n:SkillStep {id: "doing_being:mode_no"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 8};
+MERGE (n:SkillStep {id: "doing_being:week"})
+SET n += {skillId: "doing_being", step: "week", kind: "ask", version: "db-v1"}, n.specJson = "{\"fields\": [{\"id\": \"week\", \"links\": [{\"exit\": \"cool_down\", \"label\": \"body_first\", \"when\": {\"all\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"not\": {\"set\": \"$a.heads_up\"}}]}}, {\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"week\"}, \"required\": true}], \"hint\": \"week_hint\", \"lines\": [{\"key\": \"heads_up_line\", \"when\": {\"all\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"not\": {\"set\": \"$a.heads_up\"}}]}}], \"title\": \"week_title\"}";
+MATCH (s:Skill {id: "doing_being"}), (n:SkillStep {id: "doing_being:week"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 9};
+MERGE (n:SkillStep {id: "doing_being:cue"})
+SET n += {skillId: "doing_being", step: "cue", kind: "ask", version: "db-v1"}, n.specJson = "{\"fields\": [{\"id\": \"cue\", \"label\": \"cue_q\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"cue\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"cue_own\"}, \"required\": true}], \"lines\": [{\"key\": \"cue_line\", \"when\": {\"all\": []}}], \"title\": \"cue_title\"}";
+MATCH (s:Skill {id: "doing_being"}), (n:SkillStep {id: "doing_being:cue"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 10};
+MERGE (n:SkillStep {id: "doing_being:cue_end"})
+SET n += {skillId: "doing_being", step: "cue_end", kind: "handoff", version: "db-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"fields\": [{\"id\": \"remind\", \"label\": \"remind_q\", \"max\": 1, \"options\": {\"list\": \"when\"}}], \"followUp\": {\"type\": \"being_break\", \"whenFrom\": \"remind\"}, \"lines\": [{\"key\": \"cue_end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"cue_end_title\", \"titleSlots\": {\"cue\": {\"labelOf\": \"cue\"}}}";
+MATCH (s:Skill {id: "doing_being"}), (n:SkillStep {id: "doing_being:cue_end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 11};
+MERGE (n:SkillStep {id: "doing_being:back"})
+SET n += {skillId: "doing_being", step: "back", kind: "ask", version: "db-v1"}, n.specJson = "{\"clears\": [\"back\"], \"fields\": [{\"id\": \"back\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"back\"}, \"required\": true}], \"reopens\": {\"after\": \"cue_end\"}, \"title\": \"back_title\", \"titleSlots\": {\"cue\": {\"labelOf\": \"cue\"}}}";
+MATCH (s:Skill {id: "doing_being"}), (n:SkillStep {id: "doing_being:back"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 12};
+MERGE (n:SkillStep {id: "doing_being:back_end"})
+SET n += {skillId: "doing_being", step: "back_end", kind: "handoff", version: "db-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"back_yes_line\", \"when\": {\"eq\": [\"$a.back\", \"yes\"]}}, {\"key\": \"back_sort_line\", \"when\": {\"eq\": [\"$a.back\", \"sort_of\"]}}, {\"key\": \"back_not_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true}";
+MATCH (s:Skill {id: "doing_being"}), (n:SkillStep {id: "doing_being:back_end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 13};
+MERGE (n:SkillStep {id: "doing_being:drift"})
+SET n += {skillId: "doing_being", step: "drift", kind: "handoff", version: "db-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"drift_blank_line\", \"when\": {\"eq\": [\"$ctx.frame\", \"blank\"]}}, {\"key\": \"drift_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"drift_title\"}";
+MATCH (s:Skill {id: "doing_being"}), (n:SkillStep {id: "doing_being:drift"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 14};
+MERGE (n:SkillStep {id: "doing_being:being_end"})
+SET n += {skillId: "doing_being", step: "being_end", kind: "handoff", version: "db-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"being_end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"being_end_title\"}";
+MATCH (s:Skill {id: "doing_being"}), (n:SkillStep {id: "doing_being:being_end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 15};
+MERGE (n:SkillStep {id: "doing_being:mixed_end"})
+SET n += {skillId: "doing_being", step: "mixed_end", kind: "handoff", version: "db-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"mixed_end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"mixed_end_title\"}";
+MATCH (s:Skill {id: "doing_being"}), (n:SkillStep {id: "doing_being:mixed_end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 16};
+MERGE (x:SkillExit {id: "doing_being:cool_down"})
+SET x += {skillId: "doing_being", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = "body_first";
+MATCH (s:Skill {id: "doing_being"}), (x:SkillExit {id: "doing_being:cool_down"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "doing_being:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "doing_being:one_thing"})
+SET x += {skillId: "doing_being", exit: "one_thing", toolId: "one-thing", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = "one_thing";
+MATCH (s:Skill {id: "doing_being"}), (x:SkillExit {id: "doing_being:one_thing"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "doing_being:one_thing"}), (t:TherapyConcept {appToolId: "one-thing"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "doing_being:build_mastery"})
+SET x += {skillId: "doing_being", exit: "build_mastery", toolId: "build-mastery", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = "build_mastery";
+MATCH (s:Skill {id: "doing_being"}), (x:SkillExit {id: "doing_being:build_mastery"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "doing_being:build_mastery"}), (t:TherapyConcept {appToolId: "build-mastery"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "doing_being:join_in"})
+SET x += {skillId: "doing_being", exit: "join_in", toolId: "join-in", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"blank\"}", x.label = "join_in";
+MATCH (s:Skill {id: "doing_being"}), (x:SkillExit {id: "doing_being:join_in"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "doing_being:join_in"}), (t:TherapyConcept {appToolId: "join-in"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "doing_being:safety_open"})
+SET x += {skillId: "doing_being", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "doing_being"}), (x:SkillExit {id: "doing_being:safety_open"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MERGE (x:SkillExit {id: "doing_being:done"})
+SET x += {skillId: "doing_being", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "doing_being"}), (x:SkillExit {id: "doing_being:done"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (a:SkillStep {id: "doing_being:about"}), (b:SkillStep {id: "doing_being:heads_up"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"all\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"not\": {\"set\": \"$a.heads_up\"}}]}";
+MATCH (a:SkillStep {id: "doing_being:about"}), (b:SkillStep {id: "doing_being:week"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.about\", \"week\"]}";
+MATCH (a:SkillStep {id: "doing_being:about"}), (b:SkillStep {id: "doing_being:mode"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "doing_being:about"}), (x:SkillExit {id: "doing_being:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "about", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "doing_being:heads_up"}), (b:SkillStep {id: "doing_being:body_first"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.heads_up\", \"body\"]}";
+MATCH (a:SkillStep {id: "doing_being:heads_up"}), (b:SkillStep {id: "doing_being:week"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.about\", \"week\"]}";
+MATCH (a:SkillStep {id: "doing_being:heads_up"}), (b:SkillStep {id: "doing_being:mode"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "doing_being:heads_up"}), (x:SkillExit {id: "doing_being:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "heads_up", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "doing_being:body_first"}), (x:SkillExit {id: "doing_being:cool_down"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "doing_being:body_first"}), (x:SkillExit {id: "doing_being:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "doing_being:mode"}), (b:SkillStep {id: "doing_being:mode_no"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.mode\", \"no\"]}";
+MATCH (a:SkillStep {id: "doing_being:mode"}), (b:SkillStep {id: "doing_being:switch"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "doing_being:mode"}), (x:SkillExit {id: "doing_being:cool_down"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "mode", label: "body_first"}, r.whenJson = "{\"all\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"not\": {\"set\": \"$a.heads_up\"}}]}";
+MATCH (a:SkillStep {id: "doing_being:mode"}), (x:SkillExit {id: "doing_being:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 1, field: "mode", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "doing_being:switch"}), (b:SkillStep {id: "doing_being:not_now"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.switch\", \"not_now\"]}";
+MATCH (a:SkillStep {id: "doing_being:switch"}), (b:SkillStep {id: "doing_being:listen"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "doing_being:switch"}), (x:SkillExit {id: "doing_being:one_thing"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "switch", label: "one_thing_link"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "doing_being:switch"}), (x:SkillExit {id: "doing_being:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 1, field: "switch", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "doing_being:listen"}), (b:SkillStep {id: "doing_being:listen_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "doing_being:listen"}), (x:SkillExit {id: "doing_being:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "doing_being:listen_end"}), (x:SkillExit {id: "doing_being:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "doing_being:not_now"}), (x:SkillExit {id: "doing_being:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "doing_being:mode_no"}), (x:SkillExit {id: "doing_being:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "doing_being:week"}), (b:SkillStep {id: "doing_being:cue"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.week\", \"doing\"]}";
+MATCH (a:SkillStep {id: "doing_being:week"}), (b:SkillStep {id: "doing_being:being_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.week\", \"being\"]}";
+MATCH (a:SkillStep {id: "doing_being:week"}), (b:SkillStep {id: "doing_being:drift"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "{\"eq\": [\"$a.week\", \"drifting\"]}";
+MATCH (a:SkillStep {id: "doing_being:week"}), (b:SkillStep {id: "doing_being:mixed_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 3}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "doing_being:week"}), (x:SkillExit {id: "doing_being:cool_down"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "week", label: "body_first"}, r.whenJson = "{\"all\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"not\": {\"set\": \"$a.heads_up\"}}]}";
+MATCH (a:SkillStep {id: "doing_being:week"}), (x:SkillExit {id: "doing_being:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 1, field: "week", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "doing_being:cue"}), (b:SkillStep {id: "doing_being:cue_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "doing_being:cue"}), (x:SkillExit {id: "doing_being:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "cue", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "doing_being:cue_end"}), (x:SkillExit {id: "doing_being:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "doing_being:back"}), (b:SkillStep {id: "doing_being:back_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "doing_being:back"}), (x:SkillExit {id: "doing_being:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "back", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "doing_being:back_end"}), (x:SkillExit {id: "doing_being:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "doing_being:drift"}), (x:SkillExit {id: "doing_being:join_in"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"eq\": [\"$ctx.frame\", \"blank\"]}}]";
+MATCH (a:SkillStep {id: "doing_being:drift"}), (x:SkillExit {id: "doing_being:build_mastery"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "doing_being:drift"}), (x:SkillExit {id: "doing_being:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "doing_being:being_end"}), (x:SkillExit {id: "doing_being:build_mastery"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "doing_being:being_end"}), (x:SkillExit {id: "doing_being:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "doing_being:mixed_end"}), (x:SkillExit {id: "doing_being:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MERGE (o:SkillOption {id: "doing_being:about:mode"})
+SET o:SkillOption, o += {skillId: "doing_being", list: "about", value: "mode", label: "Is my mind stuck trying to fix something?", version: "db-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "doing_being"}), (o:SkillOption {id: "doing_being:about:mode"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "about", order: 0};
+MERGE (o:SkillOption {id: "doing_being:about:week"})
+SET o:SkillOption, o += {skillId: "doing_being", list: "about", value: "week", label: "How did this week feel?", version: "db-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "doing_being"}), (o:SkillOption {id: "doing_being:about:week"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "about", order: 1};
+MERGE (o:SkillOption {id: "doing_being:heads_up:body"})
+SET o:SkillOption, o += {skillId: "doing_being", list: "heads_up", value: "body", label: "My body first", version: "db-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "doing_being"}), (o:SkillOption {id: "doing_being:heads_up:body"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up", order: 2};
+MERGE (o:SkillOption {id: "doing_being:heads_up:go"})
+SET o:SkillOption, o += {skillId: "doing_being", list: "heads_up", value: "go", label: "Go on anyway", version: "db-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "doing_being"}), (o:SkillOption {id: "doing_being:heads_up:go"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up", order: 3};
+MERGE (o:SkillOption {id: "doing_being:mode:yes"})
+SET o:SkillOption:ModeCardAnswer, o += {skillId: "doing_being", list: "mode", value: "yes", label: "Yes", version: "db-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "doing_being"}), (o:SkillOption {id: "doing_being:mode:yes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "mode", order: 4};
+MERGE (o:SkillOption {id: "doing_being:mode:maybe"})
+SET o:SkillOption:ModeCardAnswer, o += {skillId: "doing_being", list: "mode", value: "maybe", label: "Maybe", version: "db-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "doing_being"}), (o:SkillOption {id: "doing_being:mode:maybe"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "mode", order: 5};
+MERGE (o:SkillOption {id: "doing_being:mode:no"})
+SET o:SkillOption:ModeCardAnswer, o += {skillId: "doing_being", list: "mode", value: "no", label: "No", version: "db-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "doing_being"}), (o:SkillOption {id: "doing_being:mode:no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "mode", order: 6};
+MERGE (o:SkillOption {id: "doing_being:switch:listen"})
+SET o:SkillOption, o += {skillId: "doing_being", list: "switch", value: "listen", label: "A minute of listening", version: "db-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "doing_being"}), (o:SkillOption {id: "doing_being:switch:listen"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "switch", order: 7};
+MERGE (o:SkillOption {id: "doing_being:switch:not_now"})
+SET o:SkillOption, o += {skillId: "doing_being", list: "switch", value: "not_now", label: "Not now", version: "db-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "doing_being"}), (o:SkillOption {id: "doing_being:switch:not_now"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "switch", order: 8};
+MERGE (o:SkillOption {id: "doing_being:week:doing"})
+SET o:SkillOption:WeekShape, o += {skillId: "doing_being", list: "week", value: "doing", label: "Mostly doing", version: "db-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "doing_being"}), (o:SkillOption {id: "doing_being:week:doing"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "week", order: 9};
+MERGE (o:SkillOption {id: "doing_being:week:being"})
+SET o:SkillOption:WeekShape, o += {skillId: "doing_being", list: "week", value: "being", label: "Mostly being", version: "db-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "doing_being"}), (o:SkillOption {id: "doing_being:week:being"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "week", order: 10};
+MERGE (o:SkillOption {id: "doing_being:week:mixed"})
+SET o:SkillOption:WeekShape, o += {skillId: "doing_being", list: "week", value: "mixed", label: "Mixed", version: "db-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "doing_being"}), (o:SkillOption {id: "doing_being:week:mixed"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "week", order: 11};
+MERGE (o:SkillOption {id: "doing_being:week:drifting"})
+SET o:SkillOption:WeekShape, o += {skillId: "doing_being", list: "week", value: "drifting", label: "Drifting", version: "db-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "doing_being"}), (o:SkillOption {id: "doing_being:week:drifting"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "week", order: 12};
+MERGE (o:SkillOption {id: "doing_being:cue:break"})
+SET o:SkillOption, o += {skillId: "doing_being", list: "cue", value: "break", label: "When I sit down for a break", version: "db-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "doing_being"}), (o:SkillOption {id: "doing_being:cue:break"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "cue", order: 13};
+MERGE (o:SkillOption {id: "doing_being:cue:drink"})
+SET o:SkillOption, o += {skillId: "doing_being", list: "cue", value: "drink", label: "When I make a drink", version: "db-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "doing_being"}), (o:SkillOption {id: "doing_being:cue:drink"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "cue", order: 14};
+MERGE (o:SkillOption {id: "doing_being:cue:hands"})
+SET o:SkillOption, o += {skillId: "doing_being", list: "cue", value: "hands", label: "When I wash my hands", version: "db-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "doing_being"}), (o:SkillOption {id: "doing_being:cue:hands"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "cue", order: 15};
+MERGE (o:SkillOption {id: "doing_being:cue:travel"})
+SET o:SkillOption, o += {skillId: "doing_being", list: "cue", value: "travel", label: "When I get in the car or on the bus", version: "db-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "doing_being"}), (o:SkillOption {id: "doing_being:cue:travel"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "cue", order: 16};
+MERGE (o:SkillOption {id: "doing_being:cue:bed"})
+SET o:SkillOption, o += {skillId: "doing_being", list: "cue", value: "bed", label: "When I get into bed", version: "db-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "doing_being"}), (o:SkillOption {id: "doing_being:cue:bed"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "cue", order: 17};
+MERGE (o:SkillOption {id: "doing_being:when:morning"})
+SET o:SkillOption, o += {skillId: "doing_being", list: "when", value: "morning", label: "Tomorrow morning", version: "db-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "doing_being"}), (o:SkillOption {id: "doing_being:when:morning"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "when", order: 18};
+MERGE (o:SkillOption {id: "doing_being:when:evening"})
+SET o:SkillOption, o += {skillId: "doing_being", list: "when", value: "evening", label: "Tomorrow evening", version: "db-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "doing_being"}), (o:SkillOption {id: "doing_being:when:evening"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "when", order: 19};
+MERGE (o:SkillOption {id: "doing_being:back:yes"})
+SET o:SkillOption, o += {skillId: "doing_being", list: "back", value: "yes", label: "Yes", version: "db-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "doing_being"}), (o:SkillOption {id: "doing_being:back:yes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "back", order: 20};
+MERGE (o:SkillOption {id: "doing_being:back:sort_of"})
+SET o:SkillOption, o += {skillId: "doing_being", list: "back", value: "sort_of", label: "Sort of", version: "db-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "doing_being"}), (o:SkillOption {id: "doing_being:back:sort_of"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "back", order: 21};
+MERGE (o:SkillOption {id: "doing_being:back:not_yet"})
+SET o:SkillOption, o += {skillId: "doing_being", list: "back", value: "not_yet", label: "Not yet", version: "db-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "doing_being"}), (o:SkillOption {id: "doing_being:back:not_yet"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "back", order: 22};
+
+// --- join_in (ji-v1) ---
+MERGE (s:Skill {id: "join_in"})
+SET s += {toolId: "join-in", version: "ji-v1", contentVersion: "skills-v1", start: "pick", ownMax: 40, emotionFields: [], accepts: ["band", "frame"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"anger_line\": \"Bring it down first. Join in will be here on a calmer day.\", \"anger_title\": \"This one turns things up, and anger doesn't need more fuel today.\", \"away_hint\": \"Put the phone down. Come back when you're done.\", \"away_line\": \"When you catch yourself watching yourself, drop back in.\", \"away_title\": \"Throw yourself in.\", \"beat_done\": \"That's the round.\", \"beat_running\": \"Watching yourself? Drop back in.\", \"beat_skip\": \"Move on\", \"beat_sound\": \"Sound\", \"beat_start\": \"Start\", \"beat_tap\": \"Tap along\", \"body_first\": \"My body first\", \"done\": \"Done\", \"end_title\": \"You joined in.\", \"flooded_line\": \"This one turns things up. Settle your body first, or try something slower.\", \"flooded_title\": \"Your body's loud right now.\", \"gate_end_line\": \"Join in will be here on a calmer day.\", \"gate_end_title\": \"Not now is fine.\", \"listen_instead\": \"Something slower: listen for a minute\", \"next\": \"Next\", \"pick_blank_line\": \"The beat runs a little quicker today, in short rounds.\", \"pick_hint\": \"Move in whatever way your body can. Sitting is fine.\", \"pick_title\": \"Pick something to throw yourself into.\", \"play_task\": \"Throw yourself in. When you catch yourself watching yourself, drop back in.\", \"play_task_hum\": \"Hum or sing along to the beat. Any tune, any words.\", \"play_task_song\": \"Move to the beat, or to a song of your own.\", \"play_task_tap\": \"Tap along, on the circle, a table or your knees.\", \"safety_open\": \"Talk to someone now\", \"settle_q\": \"Another round?\", \"settle_title\": \"Let it settle for a few breaths.\", \"skip_line\": \"It'll be here when you want it.\", \"skip_title\": \"Not this time.\", \"social_not_line\": \"Not yet is fine. It'll be there next time.\", \"social_q\": \"Next time, with someone? I'll ask how it went.\", \"social_sort_line\": \"Some of it counts. Dropping back in is the practice.\", \"social_title\": \"Did you get to join in at something with someone?\", \"social_yes_line\": \"That's participating, off the phone and with people. It goes wherever you do.\", \"with_half\": \"Half in counts. Dropping back in is the practice.\", \"with_in\": \"That's participating. No watching needed.\", \"with_title\": \"How much were you in it?\", \"with_watching\": \"Watching yourself is the thing you practise dropping. Noticing it is the start.\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+MATCH (t:TherapyConcept {id: "dbt_participate"}), (s:Skill {id: "join_in"})
+MERGE (t)-[:HAS_SKILL]->(s);
+MATCH (:SkillStep {skillId: "join_in"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
+MATCH (:Skill {id: "join_in"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
+MERGE (n:SkillStep {id: "join_in:pick"})
+SET n += {skillId: "join_in", step: "pick", kind: "ask", version: "ji-v1"}, n.specJson = "{\"fields\": [{\"id\": \"thing\", \"links\": [{\"exit\": \"cool_down\", \"label\": \"body_first\", \"when\": {\"any\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"any\": [{\"has\": [\"$carried\", \"angry\"]}, {\"has\": [\"$carried\", \"mad\"]}, {\"has\": [\"$carried\", \"aggressive\"]}, {\"has\": [\"$carried\", \"furious\"]}, {\"has\": [\"$carried\", \"provoked\"]}, {\"has\": [\"$carried\", \"hostile\"]}, {\"has\": [\"$carried\", \"infuriated\"]}, {\"has\": [\"$carried\", \"indignant\"]}, {\"has\": [\"$carried\", \"bitter\"]}, {\"has\": [\"$carried\", \"resentful\"]}, {\"has\": [\"$carried\", \"frustrated\"]}, {\"has\": [\"$carried\", \"annoyed\"]}]}]}}, {\"exit\": \"listen\", \"label\": \"listen_instead\", \"when\": {\"any\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"any\": [{\"has\": [\"$carried\", \"angry\"]}, {\"has\": [\"$carried\", \"mad\"]}, {\"has\": [\"$carried\", \"aggressive\"]}, {\"has\": [\"$carried\", \"furious\"]}, {\"has\": [\"$carried\", \"provoked\"]}, {\"has\": [\"$carried\", \"hostile\"]}, {\"has\": [\"$carried\", \"infuriated\"]}, {\"has\": [\"$carried\", \"indignant\"]}, {\"has\": [\"$carried\", \"bitter\"]}, {\"has\": [\"$carried\", \"resentful\"]}, {\"has\": [\"$carried\", \"frustrated\"]}, {\"has\": [\"$carried\", \"annoyed\"]}]}]}}, {\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"thing\", \"where\": {\"any\": [{\"all\": [{\"eq\": [\"$opt.gate\", true]}, {\"any\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"any\": [{\"has\": [\"$carried\", \"angry\"]}, {\"has\": [\"$carried\", \"mad\"]}, {\"has\": [\"$carried\", \"aggressive\"]}, {\"has\": [\"$carried\", \"furious\"]}, {\"has\": [\"$carried\", \"provoked\"]}, {\"has\": [\"$carried\", \"hostile\"]}, {\"has\": [\"$carried\", \"infuriated\"]}, {\"has\": [\"$carried\", \"indignant\"]}, {\"has\": [\"$carried\", \"bitter\"]}, {\"has\": [\"$carried\", \"resentful\"]}, {\"has\": [\"$carried\", \"frustrated\"]}, {\"has\": [\"$carried\", \"annoyed\"]}]}]}]}, {\"all\": [{\"eq\": [\"$opt.gate\", false]}, {\"not\": {\"any\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"any\": [{\"has\": [\"$carried\", \"angry\"]}, {\"has\": [\"$carried\", \"mad\"]}, {\"has\": [\"$carried\", \"aggressive\"]}, {\"has\": [\"$carried\", \"furious\"]}, {\"has\": [\"$carried\", \"provoked\"]}, {\"has\": [\"$carried\", \"hostile\"]}, {\"has\": [\"$carried\", \"infuriated\"]}, {\"has\": [\"$carried\", \"indignant\"]}, {\"has\": [\"$carried\", \"bitter\"]}, {\"has\": [\"$carried\", \"resentful\"]}, {\"has\": [\"$carried\", \"frustrated\"]}, {\"has\": [\"$carried\", \"annoyed\"]}]}]}}]}]}}, \"required\": true}], \"hint\": \"pick_hint\", \"lines\": [{\"key\": \"anger_line\", \"when\": {\"any\": [{\"has\": [\"$carried\", \"angry\"]}, {\"has\": [\"$carried\", \"mad\"]}, {\"has\": [\"$carried\", \"aggressive\"]}, {\"has\": [\"$carried\", \"furious\"]}, {\"has\": [\"$carried\", \"provoked\"]}, {\"has\": [\"$carried\", \"hostile\"]}, {\"has\": [\"$carried\", \"infuriated\"]}, {\"has\": [\"$carried\", \"indignant\"]}, {\"has\": [\"$carried\", \"bitter\"]}, {\"has\": [\"$carried\", \"resentful\"]}, {\"has\": [\"$carried\", \"frustrated\"]}, {\"has\": [\"$carried\", \"annoyed\"]}]}}, {\"key\": \"flooded_line\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"pick_blank_line\", \"when\": {\"eq\": [\"$ctx.frame\", \"blank\"]}}], \"title\": [{\"key\": \"anger_title\", \"when\": {\"any\": [{\"has\": [\"$carried\", \"angry\"]}, {\"has\": [\"$carried\", \"mad\"]}, {\"has\": [\"$carried\", \"aggressive\"]}, {\"has\": [\"$carried\", \"furious\"]}, {\"has\": [\"$carried\", \"provoked\"]}, {\"has\": [\"$carried\", \"hostile\"]}, {\"has\": [\"$carried\", \"infuriated\"]}, {\"has\": [\"$carried\", \"indignant\"]}, {\"has\": [\"$carried\", \"bitter\"]}, {\"has\": [\"$carried\", \"resentful\"]}, {\"has\": [\"$carried\", \"frustrated\"]}, {\"has\": [\"$carried\", \"annoyed\"]}]}}, {\"key\": \"flooded_title\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"pick_title\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "join_in"}), (n:SkillStep {id: "join_in:pick"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 0};
+MERGE (n:SkillStep {id: "join_in:gate_end"})
+SET n += {skillId: "join_in", step: "gate_end", kind: "handoff", version: "ji-v1"}, n.specJson = "{\"complete\": false, \"done\": \"done\", \"lines\": [{\"key\": \"gate_end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"gate_end_title\"}";
+MATCH (s:Skill {id: "join_in"}), (n:SkillStep {id: "join_in:gate_end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 1};
+MERGE (n:SkillStep {id: "join_in:play"})
+SET n += {skillId: "join_in", step: "play", kind: "embed", version: "ji-v1"}, n.specJson = "{\"answerAs\": \"play\", \"embed\": \"beatPulse\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"bpm\": 100, \"done\": \"beat_done\", \"next\": \"next\", \"running\": \"beat_running\", \"seconds\": 60, \"skip\": \"beat_skip\", \"sound\": \"beat_sound\", \"start\": \"beat_start\", \"tap\": \"beat_tap\", \"task\": \"play_task\"}, \"title\": [{\"key\": \"play_task_song\", \"when\": {\"eq\": [\"$a.thing\", \"song\"]}}, {\"key\": \"play_task_hum\", \"when\": {\"eq\": [\"$a.thing\", \"hum\"]}}, {\"key\": \"play_task_tap\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "join_in"}), (n:SkillStep {id: "join_in:play"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 2};
+MERGE (n:SkillStep {id: "join_in:play_calm"})
+SET n += {skillId: "join_in", step: "play_calm", kind: "embed", version: "ji-v1"}, n.specJson = "{\"answerAs\": \"play_calm\", \"embed\": \"beatPulse\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"bpm\": 84, \"done\": \"beat_done\", \"next\": \"next\", \"running\": \"beat_running\", \"seconds\": 60, \"skip\": \"beat_skip\", \"sound\": \"beat_sound\", \"start\": \"beat_start\", \"tap\": \"beat_tap\", \"task\": \"play_task\"}, \"title\": [{\"key\": \"play_task_song\", \"when\": {\"eq\": [\"$a.thing\", \"song\"]}}, {\"key\": \"play_task_hum\", \"when\": {\"eq\": [\"$a.thing\", \"hum\"]}}, {\"key\": \"play_task_tap\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "join_in"}), (n:SkillStep {id: "join_in:play_calm"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 3};
+MERGE (n:SkillStep {id: "join_in:play_blank"})
+SET n += {skillId: "join_in", step: "play_blank", kind: "embed", version: "ji-v1"}, n.specJson = "{\"answerAs\": \"play_blank\", \"embed\": \"beatPulse\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"bpm\": 112, \"done\": \"beat_done\", \"next\": \"next\", \"running\": \"beat_running\", \"seconds\": 25, \"skip\": \"beat_skip\", \"sound\": \"beat_sound\", \"start\": \"beat_start\", \"tap\": \"beat_tap\", \"task\": \"play_task\"}, \"title\": [{\"key\": \"play_task_song\", \"when\": {\"eq\": [\"$a.thing\", \"song\"]}}, {\"key\": \"play_task_hum\", \"when\": {\"eq\": [\"$a.thing\", \"hum\"]}}, {\"key\": \"play_task_tap\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "join_in"}), (n:SkillStep {id: "join_in:play_blank"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 4};
+MERGE (n:SkillStep {id: "join_in:settle"})
+SET n += {skillId: "join_in", step: "settle", kind: "ask", version: "ji-v1"}, n.specJson = "{\"fields\": [{\"id\": \"settle\", \"label\": \"settle_q\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"settle\"}, \"required\": true}], \"title\": \"settle_title\"}";
+MATCH (s:Skill {id: "join_in"}), (n:SkillStep {id: "join_in:settle"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 5};
+MERGE (n:SkillStep {id: "join_in:play_blank2"})
+SET n += {skillId: "join_in", step: "play_blank2", kind: "embed", version: "ji-v1"}, n.specJson = "{\"answerAs\": \"play_blank2\", \"embed\": \"beatPulse\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"bpm\": 112, \"done\": \"beat_done\", \"next\": \"next\", \"running\": \"beat_running\", \"seconds\": 25, \"skip\": \"beat_skip\", \"sound\": \"beat_sound\", \"start\": \"beat_start\", \"tap\": \"beat_tap\", \"task\": \"play_task\"}, \"title\": [{\"key\": \"play_task_song\", \"when\": {\"eq\": [\"$a.thing\", \"song\"]}}, {\"key\": \"play_task_hum\", \"when\": {\"eq\": [\"$a.thing\", \"hum\"]}}, {\"key\": \"play_task_tap\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "join_in"}), (n:SkillStep {id: "join_in:play_blank2"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 6};
+MERGE (n:SkillStep {id: "join_in:away"})
+SET n += {skillId: "join_in", step: "away", kind: "ask", version: "ji-v1"}, n.specJson = "{\"fields\": [{\"id\": \"away\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"back\"}, \"required\": true}], \"hint\": \"away_hint\", \"lines\": [{\"key\": \"away_line\", \"when\": {\"all\": []}}], \"title\": \"away_title\"}";
+MATCH (s:Skill {id: "join_in"}), (n:SkillStep {id: "join_in:away"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 7};
+MERGE (n:SkillStep {id: "join_in:with"})
+SET n += {skillId: "join_in", step: "with", kind: "ask", version: "ji-v1"}, n.specJson = "{\"fields\": [{\"id\": \"with\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"with\"}, \"required\": true}], \"title\": \"with_title\"}";
+MATCH (s:Skill {id: "join_in"}), (n:SkillStep {id: "join_in:with"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 8};
+MERGE (n:SkillStep {id: "join_in:end"})
+SET n += {skillId: "join_in", step: "end", kind: "handoff", version: "ji-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"fields\": [{\"id\": \"when\", \"label\": \"social_q\", \"max\": 1, \"options\": {\"list\": \"when\"}}], \"followUp\": {\"type\": \"join_in_social\", \"whenFrom\": \"when\"}, \"lines\": [{\"key\": \"with_in\", \"when\": {\"eq\": [\"$a.with\", \"in\"]}}, {\"key\": \"with_half\", \"when\": {\"eq\": [\"$a.with\", \"half\"]}}, {\"key\": \"with_watching\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"end_title\"}";
+MATCH (s:Skill {id: "join_in"}), (n:SkillStep {id: "join_in:end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 9};
+MERGE (n:SkillStep {id: "join_in:social"})
+SET n += {skillId: "join_in", step: "social", kind: "ask", version: "ji-v1"}, n.specJson = "{\"clears\": [\"social\"], \"fields\": [{\"id\": \"social\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"social\"}, \"required\": true}], \"reopens\": {\"after\": \"end\"}, \"title\": \"social_title\"}";
+MATCH (s:Skill {id: "join_in"}), (n:SkillStep {id: "join_in:social"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 10};
+MERGE (n:SkillStep {id: "join_in:social_end"})
+SET n += {skillId: "join_in", step: "social_end", kind: "handoff", version: "ji-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"social_yes_line\", \"when\": {\"eq\": [\"$a.social\", \"yes\"]}}, {\"key\": \"social_sort_line\", \"when\": {\"eq\": [\"$a.social\", \"sort_of\"]}}, {\"key\": \"social_not_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true}";
+MATCH (s:Skill {id: "join_in"}), (n:SkillStep {id: "join_in:social_end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 11};
+MERGE (n:SkillStep {id: "join_in:skip_end"})
+SET n += {skillId: "join_in", step: "skip_end", kind: "handoff", version: "ji-v1"}, n.specJson = "{\"complete\": false, \"done\": \"done\", \"lines\": [{\"key\": \"skip_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"skip_title\"}";
+MATCH (s:Skill {id: "join_in"}), (n:SkillStep {id: "join_in:skip_end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 12};
+MERGE (x:SkillExit {id: "join_in:cool_down"})
+SET x += {skillId: "join_in", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = "body_first";
+MATCH (s:Skill {id: "join_in"}), (x:SkillExit {id: "join_in:cool_down"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "join_in:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "join_in:listen"})
+SET x += {skillId: "join_in", exit: "listen", toolId: "notice-and-name", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"listen\"}", x.label = "listen_instead";
+MATCH (s:Skill {id: "join_in"}), (x:SkillExit {id: "join_in:listen"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "join_in:listen"}), (t:TherapyConcept {appToolId: "notice-and-name"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "join_in:safety_open"})
+SET x += {skillId: "join_in", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "join_in"}), (x:SkillExit {id: "join_in:safety_open"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MERGE (x:SkillExit {id: "join_in:done"})
+SET x += {skillId: "join_in", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "join_in"}), (x:SkillExit {id: "join_in:done"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (a:SkillStep {id: "join_in:pick"}), (b:SkillStep {id: "join_in:gate_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.thing\", \"not_now\"]}";
+MATCH (a:SkillStep {id: "join_in:pick"}), (b:SkillStep {id: "join_in:play_blank"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"all\": [{\"in\": [\"$a.thing\", [\"song\", \"hum\", \"tap\"]]}, {\"eq\": [\"$ctx.frame\", \"blank\"]}]}";
+MATCH (a:SkillStep {id: "join_in:pick"}), (b:SkillStep {id: "join_in:play_calm"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "{\"all\": [{\"in\": [\"$a.thing\", [\"song\", \"hum\", \"tap\"]]}, {\"eq\": [\"$ctx.band\", \"stirred\"]}]}";
+MATCH (a:SkillStep {id: "join_in:pick"}), (b:SkillStep {id: "join_in:play"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 3}, r.whenJson = "{\"all\": [{\"in\": [\"$a.thing\", [\"song\", \"hum\", \"tap\"]]}]}";
+MATCH (a:SkillStep {id: "join_in:pick"}), (b:SkillStep {id: "join_in:away"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 4}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "join_in:pick"}), (x:SkillExit {id: "join_in:cool_down"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "thing", label: "body_first"}, r.whenJson = "{\"any\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"any\": [{\"has\": [\"$carried\", \"angry\"]}, {\"has\": [\"$carried\", \"mad\"]}, {\"has\": [\"$carried\", \"aggressive\"]}, {\"has\": [\"$carried\", \"furious\"]}, {\"has\": [\"$carried\", \"provoked\"]}, {\"has\": [\"$carried\", \"hostile\"]}, {\"has\": [\"$carried\", \"infuriated\"]}, {\"has\": [\"$carried\", \"indignant\"]}, {\"has\": [\"$carried\", \"bitter\"]}, {\"has\": [\"$carried\", \"resentful\"]}, {\"has\": [\"$carried\", \"frustrated\"]}, {\"has\": [\"$carried\", \"annoyed\"]}]}]}";
+MATCH (a:SkillStep {id: "join_in:pick"}), (x:SkillExit {id: "join_in:listen"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 1, field: "thing", label: "listen_instead"}, r.whenJson = "{\"any\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"any\": [{\"has\": [\"$carried\", \"angry\"]}, {\"has\": [\"$carried\", \"mad\"]}, {\"has\": [\"$carried\", \"aggressive\"]}, {\"has\": [\"$carried\", \"furious\"]}, {\"has\": [\"$carried\", \"provoked\"]}, {\"has\": [\"$carried\", \"hostile\"]}, {\"has\": [\"$carried\", \"infuriated\"]}, {\"has\": [\"$carried\", \"indignant\"]}, {\"has\": [\"$carried\", \"bitter\"]}, {\"has\": [\"$carried\", \"resentful\"]}, {\"has\": [\"$carried\", \"frustrated\"]}, {\"has\": [\"$carried\", \"annoyed\"]}]}]}";
+MATCH (a:SkillStep {id: "join_in:pick"}), (x:SkillExit {id: "join_in:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 2, field: "thing", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "join_in:gate_end"}), (x:SkillExit {id: "join_in:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "join_in:play"}), (b:SkillStep {id: "join_in:skip_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.play\", \"skipped\"]}";
+MATCH (a:SkillStep {id: "join_in:play"}), (b:SkillStep {id: "join_in:with"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "join_in:play"}), (x:SkillExit {id: "join_in:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "join_in:play_calm"}), (b:SkillStep {id: "join_in:skip_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.play_calm\", \"skipped\"]}";
+MATCH (a:SkillStep {id: "join_in:play_calm"}), (b:SkillStep {id: "join_in:with"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "join_in:play_calm"}), (x:SkillExit {id: "join_in:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "join_in:play_blank"}), (b:SkillStep {id: "join_in:skip_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.play_blank\", \"skipped\"]}";
+MATCH (a:SkillStep {id: "join_in:play_blank"}), (b:SkillStep {id: "join_in:settle"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "join_in:play_blank"}), (x:SkillExit {id: "join_in:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "join_in:settle"}), (b:SkillStep {id: "join_in:play_blank2"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.settle\", \"again\"]}";
+MATCH (a:SkillStep {id: "join_in:settle"}), (b:SkillStep {id: "join_in:with"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "join_in:settle"}), (x:SkillExit {id: "join_in:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "settle", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "join_in:play_blank2"}), (b:SkillStep {id: "join_in:skip_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.play_blank2\", \"skipped\"]}";
+MATCH (a:SkillStep {id: "join_in:play_blank2"}), (b:SkillStep {id: "join_in:with"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "join_in:play_blank2"}), (x:SkillExit {id: "join_in:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "join_in:away"}), (b:SkillStep {id: "join_in:with"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "join_in:away"}), (x:SkillExit {id: "join_in:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "away", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "join_in:with"}), (b:SkillStep {id: "join_in:end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "join_in:with"}), (x:SkillExit {id: "join_in:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "with", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "join_in:end"}), (x:SkillExit {id: "join_in:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "join_in:social"}), (b:SkillStep {id: "join_in:social_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "join_in:social"}), (x:SkillExit {id: "join_in:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "social", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "join_in:social_end"}), (x:SkillExit {id: "join_in:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "join_in:skip_end"}), (x:SkillExit {id: "join_in:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MERGE (o:SkillOption {id: "join_in:thing:song"})
+SET o:SkillOption:ParticipateActivity, o += {skillId: "join_in", list: "thing", value: "song", label: "Move to a song", version: "ji-v1"}, o.propsJson = "{\"beat\": true, \"gate\": false}";
+MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:thing:song"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "thing", order: 0};
+MERGE (o:SkillOption {id: "join_in:thing:hum"})
+SET o:SkillOption:ParticipateActivity, o += {skillId: "join_in", list: "thing", value: "hum", label: "Sing or hum along", version: "ji-v1"}, o.propsJson = "{\"beat\": true, \"gate\": false}";
+MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:thing:hum"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "thing", order: 1};
+MERGE (o:SkillOption {id: "join_in:thing:tap"})
+SET o:SkillOption:ParticipateActivity, o += {skillId: "join_in", list: "thing", value: "tap", label: "Tap a rhythm", version: "ji-v1"}, o.propsJson = "{\"beat\": true, \"gate\": false}";
+MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:thing:tap"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "thing", order: 2};
+MERGE (o:SkillOption {id: "join_in:thing:game"})
+SET o:SkillOption:ParticipateActivity, o += {skillId: "join_in", list: "thing", value: "game", label: "A game with someone", version: "ji-v1"}, o.propsJson = "{\"beat\": false, \"gate\": false}";
+MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:thing:game"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "thing", order: 3};
+MERGE (o:SkillOption {id: "join_in:thing:chore"})
+SET o:SkillOption:ParticipateActivity, o += {skillId: "join_in", list: "thing", value: "chore", label: "A chore with music", version: "ji-v1"}, o.propsJson = "{\"beat\": false, \"gate\": false}";
+MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:thing:chore"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "thing", order: 4};
+MERGE (o:SkillOption {id: "join_in:thing:own"})
+SET o:SkillOption:ParticipateActivity, o += {skillId: "join_in", list: "thing", value: "own", label: "Something of my own", version: "ji-v1"}, o.propsJson = "{\"beat\": false, \"gate\": false}";
+MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:thing:own"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "thing", order: 5};
+MERGE (o:SkillOption {id: "join_in:thing:not_now"})
+SET o:SkillOption, o += {skillId: "join_in", list: "thing", value: "not_now", label: "Not now", version: "ji-v1"}, o.propsJson = "{\"gate\": true}";
+MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:thing:not_now"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "thing", order: 6};
+MERGE (o:SkillOption {id: "join_in:settle:again"})
+SET o:SkillOption, o += {skillId: "join_in", list: "settle", value: "again", label: "Another round", version: "ji-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:settle:again"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "settle", order: 7};
+MERGE (o:SkillOption {id: "join_in:settle:enough"})
+SET o:SkillOption, o += {skillId: "join_in", list: "settle", value: "enough", label: "That's enough", version: "ji-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:settle:enough"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "settle", order: 8};
+MERGE (o:SkillOption {id: "join_in:with:in"})
+SET o:SkillOption, o += {skillId: "join_in", list: "with", value: "in", label: "In it", version: "ji-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:with:in"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "with", order: 9};
+MERGE (o:SkillOption {id: "join_in:with:half"})
+SET o:SkillOption, o += {skillId: "join_in", list: "with", value: "half", label: "Half in", version: "ji-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:with:half"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "with", order: 10};
+MERGE (o:SkillOption {id: "join_in:with:watching"})
+SET o:SkillOption, o += {skillId: "join_in", list: "with", value: "watching", label: "Watching myself", version: "ji-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:with:watching"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "with", order: 11};
+MERGE (o:SkillOption {id: "join_in:when:tomorrow"})
+SET o:SkillOption, o += {skillId: "join_in", list: "when", value: "tomorrow", label: "Tomorrow", version: "ji-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:when:tomorrow"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "when", order: 12};
+MERGE (o:SkillOption {id: "join_in:when:few_days"})
+SET o:SkillOption, o += {skillId: "join_in", list: "when", value: "few_days", label: "In a few days", version: "ji-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:when:few_days"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "when", order: 13};
+MERGE (o:SkillOption {id: "join_in:social:yes"})
+SET o:SkillOption, o += {skillId: "join_in", list: "social", value: "yes", label: "Yes", version: "ji-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:social:yes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "social", order: 14};
+MERGE (o:SkillOption {id: "join_in:social:sort_of"})
+SET o:SkillOption, o += {skillId: "join_in", list: "social", value: "sort_of", label: "Sort of", version: "ji-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:social:sort_of"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "social", order: 15};
+MERGE (o:SkillOption {id: "join_in:social:not_yet"})
+SET o:SkillOption, o += {skillId: "join_in", list: "social", value: "not_yet", label: "Not yet", version: "ji-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:social:not_yet"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "social", order: 16};
+MERGE (o:SkillOption {id: "join_in:back:back"})
+SET o:SkillOption, o += {skillId: "join_in", list: "back", value: "back", label: "I'm back", version: "ji-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "join_in"}), (o:SkillOption {id: "join_in:back:back"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "back", order: 17};

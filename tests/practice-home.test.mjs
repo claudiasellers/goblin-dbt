@@ -127,14 +127,14 @@ test("practice_prefs: a time or a cue (never both), own words only with `own`, b
   assert.deepEqual(copy.PRACTICE_BREATH.map((t) => t.id), [...kinds.PRACTICE_BREATH]);
 });
 
-test("graph: practice_daily is live with the three times; the MF sequence orders observe, describe, nonjudge, one thing, wise mind, effectively, kind wishes", () => {
+test("graph: practice_daily is live with the three times; the MF sequence orders observe, describe, nonjudge, one thing, wise mind, effectively, join in, kind wishes", () => {
   const spine = JSON.parse(execFileSync("python3", ["-c", [
     "import json,sys; sys.path.insert(0,'scripts/practice-spine'); import content as c",
     "d=[t for t in c.FOLLOW_UP_TYPES if t['id']=='practice_daily'][0]",
     "print(json.dumps({'daily': d, 'seq': c.MF_SEQUENCE, 'reserved': list(getattr(c,'RESERVED',[]))}, default=str))",
   ].join("\n")], { encoding: "utf8" }));
   assert.notEqual(spine.daily.enabled, false);
-  assert.deepEqual(spine.seq.map((s) => s[0]), ["observe", "describe", "nonjudge", "one_thing", "wise_mind", "effectively", "kind_wishes"]);
+  assert.deepEqual(spine.seq.map((s) => s[0]), ["observe", "describe", "nonjudge", "one_thing", "wise_mind", "effectively", "participate", "kind_wishes"]);
   assert.ok(!JSON.stringify(spine.reserved).includes("practice_daily"));
   const cypher = readFileSync("schema/practice-spine.cypher", "utf8");
   assert.match(cypher, /FollowUpType \{id: "practice_daily"\}/);
