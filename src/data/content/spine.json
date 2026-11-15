@@ -2798,6 +2798,43 @@
           "kind": "chip"
         },
         "notification": "Your small step is ready to check."
+      },
+      {
+        "id": "wise_mind_lookback",
+        "ownerModule": "mf",
+        "tier": "practice",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/wise-mind?run={sourceSessionId}&at=lookback&followUp={followUpId}",
+        "staleAfterHours": 72,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "title": "Looking back",
+          "body": "Yesterday you checked with wise mind. Looking back, how was it?"
+        },
+        "choices": [
+          {
+            "id": "dismiss",
+            "label": "Not this time",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "kind": "chip",
+          "chips": {
+            "tomorrow": {
+              "kind": "at_local",
+              "days": 1,
+              "time": "09:30"
+            }
+          }
+        },
+        "notification": "A look back is ready when you are."
       }
     ]
   }

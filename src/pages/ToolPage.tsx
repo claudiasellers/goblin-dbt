@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { useParams, Link, useLocation, Navigate } from 'react-router-dom';
 import { getToolById, toolIdFromUrl, TOOL_URL_SLUGS } from '../data/tools';
 import { ToolSessionProvider } from '../contexts/ToolSessionContext';
@@ -20,6 +20,7 @@ import { ProblemSolve } from './tools/ProblemSolve';
 import { InvalidationRecovery } from './tools/InvalidationRecovery';
 import { FindTheFeeling } from './tools/FindTheFeeling';
 import { legacyLink, playerSkillFor } from '../lib/skillRuntime/playerTools';
+import { isWiseMindCheck } from '../lib/wiseMindCheck';
 
 // Meet a part, loaded on demand: its gate below (parts on, copy signed off) stays eager, so
 // a parts-off person never fetches it. With parts on, the fetch starts with the gate's own.
@@ -35,9 +36,16 @@ const loadWiseMind = () => import('./tools/WiseMind');
 const LazyWiseMind = lazy(() => loadWiseMind().then((m) => ({ default: m.WiseMind })));
 /**
  * With parts on, a kept part and the step back's copy shipped, Wise mind runs its parts form (screen 2p,
- * src/hooks/useStepBackSlot.tsx); the page decides its form once, so it waits for that gate first.
+ * src/hooks/useStepBackSlot.tsx); the page decides its form once, so it waits for that gate first. The check
+ * (`isWiseMindCheck`) is the skill player, with no parts form.
  */
 function WiseMind() {
+  const { search } = useLocation();
+  const [check] = useState(() => isWiseMindCheck(search));
+  // The check (MF-04, docs/design/wise-mind-check.md) on the skill player: `?frame=check` or a reopened run.
+  return check ? <Suspense fallback={<ToolLoading />}><LazySkillPlayer skillId="wise_mind_check" /></Suspense> : <WiseMindPractice />;
+}
+function WiseMindPractice() {
   const { pending, slot } = useStepBackSlot();
   if (pending) return <ToolLoading />;
   return <Suspense fallback={<ToolLoading />}><LazyWiseMind stepBack={slot} /></Suspense>;

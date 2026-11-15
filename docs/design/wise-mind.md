@@ -165,6 +165,10 @@ now."* (chip) or their own words. Same store My words already reads for kept lin
 
 ## As built (17 Oct)
 
+**Since 15 Nov (MF-B6):** the tool has a second form, the check on the skill player (`?frame=check`, the Tools card
+*Check a decision with wise mind*, the intent *Help me decide before I act*, and the look-back card's reopened run),
+in [wise-mind-check.md](wise-mind-check.md). This page stays the default.
+
 - **Where:**
   - `src/pages/tools/WiseMind.tsx` (lazy), `src/components/tools/wiseMind/` (`TwoMinds`, `Practices`,
     `bits`), the pure flow in `src/lib/wiseMind.ts`.

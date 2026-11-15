@@ -324,6 +324,21 @@ FOLLOW_UP_TYPES = [
         "notification": "Your move is ready to check.",
     },
     {
+        # Wise mind's look-back (MF-04, MF-B6, docs/design/wise-mind-check.md): booked from a wise mind check's last
+        # screen (*Look back on it tomorrow?*), standalone or inside a host (One message). The card reopens that check
+        # at `lookback` (R9 `reopens`): what you did in the end, did it come from wise mind, and what tells you it's
+        # wise mind (PRD: the internalisation step). Opening it is the resolution; content-free; missed look-backs
+        # expire silently after 72 hours.
+        "id": "wise_mind_lookback", "ownerModule": "mf", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/wise-mind?run={sourceSessionId}&at=lookback&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"tomorrow": {"kind": "at_local", "days": 1, "time": "09:30"}}},
+        "staleAfterHours": 72, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Looking back", "body": "Yesterday you checked with wise mind. Looking back, how was it?"},
+        "choices": [{"id": "dismiss", "label": "Not this time", "status": "dismissed"}],
+        "notification": "A look back is ready when you are.",
+    },
+    {
         # The Practice home's daily minute (MF-02, MF-B3, docs/design/practice-home.md): set once in Practice's setup
         # (*morning · midday · evening*; a cue of the person's own books nothing: the cue is the reminder). No rrule yet,
         # so it rolls: opening the card resolves it, and every visit to Practice books the next one when none is

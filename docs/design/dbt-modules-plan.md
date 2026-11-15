@@ -316,7 +316,7 @@ have one source, one record and their own outcome:
 | `dt.parkIt` | DT-06 `mind_job` | `lid` | `{parked: bool, followUpId?}` | DT |
 | ER P3 check-facts mini-card | ER-02 `check_the_facts` | `story` | `{fits, alternativeIds}` | ER |
 | ER P8 `er.copeAhead` | ER-05 `cope_ahead` | `moment` | `{planKept: bool, itemId?}` | ER |
-| MF P2 wise-mind check | `wise_mind_check` (new, small) | start | `{answer}` | IE (first consumer, IE-B3: built in One message as an ask step, `source`); MF takes it over later |
+| MF P2 wise-mind check | `wise_mind_check` | `cues` (the decision seeded) | `go` · `wait` · `no_go` (`unsafe`) | MF (MF-B6, [`wise-mind-check.md`](wise-mind-check.md)); first host One message's cooling screen. One message's own `source` step stays |
 
 Until a primitive's skill ships, a host offers a normal exit to the tool instead (`planned` if the tool
 doesn't exist), and switches to inline when it does. That switch is the owner's PR, not the host's.
@@ -403,7 +403,7 @@ Every lane holds to these. The clinical gate (§6, Gate 3) checks each one.
 | `layers.ts`, constraints, `ASK_FRESH_FIELDS`, endpoints fixture, auth matrix | Shared, append-only | |
 | Profile kinds | The kind's owner (`user-profile.md` §4.2) | |
 | Recover changes the modules need (`personId`, drop `boundaryLocked` and `tooHot` (**done**, IE-B4 second PR), embed IE-05 / DT-04 inline) | IE lane (IE-B2 / IE-B4) | WMP isn't a lane; the IE lane does these in the PR that needs them |
-| MF pieces needed first (`wise_mind_check`, MF-01 card fallback) | First consumer (IE / DT) | Handed to MF when it starts (the MF lane started 15 Nov: `wise_mind_check` stays One message's ask step until MF-B6's embed; the MF-01 card is part 2, MF-B3) |
+| MF pieces needed first (`wise_mind_check`, MF-01 card fallback) | First consumer (IE / DT) | Handed to MF when it starts (MF-B6 built `wise_mind_check` as an inline skill, run from One message's cooling screen; the MF-01 card is part 2, MF-B3) |
 | CORE pieces needed first (Help-me-now fork, `safety.open` interim) | DT (fork, inside DT-01), Foundation (interim screen) | CORE-07 takes the fork over later |
 
 ### C8. Moving an existing tool
@@ -575,7 +575,7 @@ batch, no capacity probe (D1), the orienting close asked in the flow, reps throu
 | MF-B3 | **MF-02** Practice home (**built 15 Nov**, [`practice-home.md`](practice-home.md): `/practice`, the setup kept as `practice_prefs`, today's practice from the graph's MF sequence (`PracticeSkill.mfOrder`), the rolling `practice_daily` card, catch-one taps, the weekly ring and skill levels with no counts, the positive-state line, Tools → Mindfulness → *Practice*; fade and the stirred pick are part 2) | MF-B1 | Needs at least one practice to host |
 | MF-B4 | **MF-05** One thing (**built 15 Nov**, [`one-thing.md`](one-thing.md): intent *Get out of my head*, leads `rumination_loop` beside Problem Solve, the rumination variant (a minute outside, MF-09's mode card, the loop in the flow), with or without the phone, `one_thing_again` for the off-phone rep, `mfOrder` 4 on the Practice home; fade and the hosted card are part 2) with MF-09's mode card | MF-B1 | |
 | MF-B5 | **MF-08** What works here (**built 15 Nov**, [`what-works.md`](what-works.md): tool `effectiveness`, intent *Being right is getting in the way*, Problem Solve's two `effectiveness` directions built with the problem type as the frame, `effective_move` reopening the run, `mfOrder` 6; fade and Do the Opposite's offer are part 2) | MF-B1 | |
-| MF-B6 | **MF-04** Wise mind check (the embed) and the 24-hour look-back | MF-B1 | Wise mind's practice already ships |
+| MF-B6 | **Built** (15 Nov, [`wise-mind-check.md`](wise-mind-check.md)). **MF-04** Wise mind check (`wise_mind_check` on the `wise-mind` tool at `?frame=check`, inline in One message; the `stoneSink` embed) and the 24-hour look-back (`wise_mind_lookback`) | MF-B1 | Wise mind's practice already ships |
 | MF-B7 | **MF-07** Take a moment apart | MF-B1 | |
 | MF-B8 | **MF-06** Kind wishes (tiers, backdraft) | MF-B1 | |
 | MF-B9 | **MF-09** Doing mind, being mind; **MF-10** Join in | MF-B4 | |

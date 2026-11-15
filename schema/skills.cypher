@@ -12485,7 +12485,7 @@ SET r += {list: "proud", order: 63};
 
 // --- dear_man_one (dm-one-v1) ---
 MERGE (s:Skill {id: "dear_man_one"})
-SET s += {toolId: "dear-man", version: "dm-one-v1", contentVersion: "skills-v1", start: "source", ownMax: 100, emotionFields: [], accepts: ["personId", "frame", "band", "emotionId", "refused"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"about_title\": \"What's the message about?\", \"about_title_heads_up\": \"Keep it short, written, and about one thing. What's it about?\", \"again_label\": \"Want me to ask how it went?\", \"aloud_hint\": \"If a part sounds sharper than you mean, change it once you've pasted it.\", \"aloud_title\": \"Read it out loud once.\", \"ask_hint\": \"One small ask is often easier to say yes to.\", \"ask_title\": \"What's the one thing you're asking for?\", \"ask_title_heads_up\": \"What's the one practical thing you're asking for?\", \"back_hint\": \"Whatever you decide is fine.\", \"back_title\": \"Still want to send it?\", \"cool_down\": \"Settle my body first\", \"cool_hint\": \"Sending is up to you. Messages sent from a hot place tend to land harder than we mean.\", \"cool_title\": \"Your message is put together. Send it now, or give it a little time first?\", \"copied\": \"Copied\", \"copy\": \"Copy\", \"done\": \"Done\", \"drop_sorry\": \"Take the sorry out\", \"dropped_line\": \"You decided not to send it. That's a real choice too.\", \"fact_hint\": \"Pick the closest, or say it your way.\", \"fact_title\": \"What happened? Say it the way a camera would see it.\", \"felt_hint\": \"One word is enough.\", \"felt_title\": \"How did it feel?\", \"give_hint\": \"Optional.\", \"give_title\": \"A warm line can help it land. Want one?\", \"later_label\": \"When do you want the reminder?\", \"later_line\": \"Pick a time and a reminder brings it back. It won't say who it's for or what it says.\", \"let_go\": \"I've asked them to hear me before. Look at letting this one go\", \"message_title\": \"Here's your message.\", \"next\": \"Next\", \"open_messages\": \"Open messages\", \"own_line\": \"In my own words\", \"picker_personChanged\": \"Things changed with someone?\", \"picker_personChangedHint\": \"Pick who it is, and you'll be asked about them again.\", \"picker_personGoOn\": \"Go on\", \"picker_personKeepLine\": \"The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.\", \"picker_personNameHint\": \"A nickname is fine. No real names needed.\", \"picker_personNameLabel\": \"What do you call them?\", \"picker_personNew\": \"Someone new\", \"picker_personNoNameLine\": \"Without a name, nothing about them is kept.\", \"picker_personRoleLabel\": \"Who are they to you?\", \"picker_personSignedOutLine\": \"This stays on this screen only.\", \"picker_personWhoOne\": \"Who's the message for?\", \"picker_riskBadly\": \"It tends to go badly\", \"picker_riskHarm\": \"They might hurt or control me\", \"picker_riskQuestion\": \"Is it more that they might hurt or control you, or that it tends to go badly?\", \"picker_riskUnsaid\": \"I'd rather not say\", \"picker_safeNo\": \"No\", \"picker_safeQuestion\": \"Is it safe to bring hard things up with {who}?\", \"picker_safeUnsure\": \"Not sure\", \"picker_safeYes\": \"Yes, mostly\", \"picker_safetyRouteBack\": \"This is about someone else\", \"picker_safetyRouteBody\": \"The people below can help you think it through, any time, and you don't have to be sure.\", \"picker_safetyRouteEnding\": \"Thinking about ending the relationship\", \"picker_safetyRouteOneHeading\": \"A message to {who} can wait. Your safety comes first.\", \"predict_title\": \"How do you think they'll take it?\", \"resend_title\": \"Your message, ready when you are.\", \"selected\": \"Selected. Copy it from here.\", \"sent_line\": \"One message, said once. Give them room to answer.\", \"sent_line_badly\": \"You're sending it knowing it might not go well. That takes something.\", \"settle_line\": \"Settle your body first. Pick a time and a reminder brings the message back.\", \"sorry_line\": \"There's a sorry in there. Asking for something isn't a wrong. Keep it only if it's for something you did.\", \"source_hint\": \"Any answer is fine. It only changes what comes after the message.\", \"source_title\": \"Before you write it: where's this coming from?\", \"sure_label\": \"How sure are you?\", \"wait_back\": \"I'm back\", \"wait_done\": \"That's the wait. Read it once more and see if it still fits.\", \"wait_done_short\": \"Done\", \"wait_short\": \"Waiting\", \"wait_title\": \"Phone down. The message will keep.\", \"wait_waiting\": \"Put the phone face down and come back when you're ready. Your message is still here.\", \"why_title\": \"Why it matters (optional)\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "dear-man", version: "dm-one-v1", contentVersion: "skills-v1", start: "source", ownMax: 100, emotionFields: [], accepts: ["personId", "frame", "band", "emotionId", "refused"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"about_title\": \"What's the message about?\", \"about_title_heads_up\": \"Keep it short, written, and about one thing. What's it about?\", \"again_label\": \"Want me to ask how it went?\", \"aloud_hint\": \"If a part sounds sharper than you mean, change it once you've pasted it.\", \"aloud_title\": \"Read it out loud once.\", \"ask_hint\": \"One small ask is often easier to say yes to.\", \"ask_title\": \"What's the one thing you're asking for?\", \"ask_title_heads_up\": \"What's the one practical thing you're asking for?\", \"back_hint\": \"Whatever you decide is fine.\", \"back_title\": \"Still want to send it?\", \"cool_down\": \"Settle my body first\", \"cool_hint\": \"Sending is up to you. Messages sent from a hot place tend to land harder than we mean.\", \"cool_title\": \"Your message is put together. Send it now, or give it a little time first?\", \"copied\": \"Copied\", \"copy\": \"Copy\", \"done\": \"Done\", \"drop_sorry\": \"Take the sorry out\", \"dropped_line\": \"You decided not to send it. That's a real choice too.\", \"fact_hint\": \"Pick the closest, or say it your way.\", \"fact_title\": \"What happened? Say it the way a camera would see it.\", \"felt_hint\": \"One word is enough.\", \"felt_title\": \"How did it feel?\", \"give_hint\": \"Optional.\", \"give_title\": \"A warm line can help it land. Want one?\", \"later_label\": \"When do you want the reminder?\", \"later_line\": \"Pick a time and a reminder brings it back. It won't say who it's for or what it says.\", \"let_go\": \"I've asked them to hear me before. Look at letting this one go\", \"message_title\": \"Here's your message.\", \"next\": \"Next\", \"open_messages\": \"Open messages\", \"own_line\": \"In my own words\", \"picker_personChanged\": \"Things changed with someone?\", \"picker_personChangedHint\": \"Pick who it is, and you'll be asked about them again.\", \"picker_personGoOn\": \"Go on\", \"picker_personKeepLine\": \"The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.\", \"picker_personNameHint\": \"A nickname is fine. No real names needed.\", \"picker_personNameLabel\": \"What do you call them?\", \"picker_personNew\": \"Someone new\", \"picker_personNoNameLine\": \"Without a name, nothing about them is kept.\", \"picker_personRoleLabel\": \"Who are they to you?\", \"picker_personSignedOutLine\": \"This stays on this screen only.\", \"picker_personWhoOne\": \"Who's the message for?\", \"picker_riskBadly\": \"It tends to go badly\", \"picker_riskHarm\": \"They might hurt or control me\", \"picker_riskQuestion\": \"Is it more that they might hurt or control you, or that it tends to go badly?\", \"picker_riskUnsaid\": \"I'd rather not say\", \"picker_safeNo\": \"No\", \"picker_safeQuestion\": \"Is it safe to bring hard things up with {who}?\", \"picker_safeUnsure\": \"Not sure\", \"picker_safeYes\": \"Yes, mostly\", \"picker_safetyRouteBack\": \"This is about someone else\", \"picker_safetyRouteBody\": \"The people below can help you think it through, any time, and you don't have to be sure.\", \"picker_safetyRouteEnding\": \"Thinking about ending the relationship\", \"picker_safetyRouteOneHeading\": \"A message to {who} can wait. Your safety comes first.\", \"predict_title\": \"How do you think they'll take it?\", \"resend_title\": \"Your message, ready when you are.\", \"selected\": \"Selected. Copy it from here.\", \"sent_line\": \"One message, said once. Give them room to answer.\", \"sent_line_badly\": \"You're sending it knowing it might not go well. That takes something.\", \"settle_line\": \"Settle your body first. Pick a time and a reminder brings the message back.\", \"sorry_line\": \"There's a sorry in there. Asking for something isn't a wrong. Keep it only if it's for something you did.\", \"source_hint\": \"Any answer is fine. It only changes what comes after the message.\", \"source_title\": \"Before you write it: where's this coming from?\", \"sure_label\": \"How sure are you?\", \"wait_back\": \"I'm back\", \"wait_done\": \"That's the wait. Read it once more and see if it still fits.\", \"wait_done_short\": \"Done\", \"wait_short\": \"Waiting\", \"wait_title\": \"Phone down. The message will keep.\", \"wait_waiting\": \"Put the phone face down and come back when you're ready. Your message is still here.\", \"why_title\": \"Why it matters (optional)\", \"wise_title\": \"Before you send it: ask wise mind.\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "dbt_dear_man"}), (s:Skill {id: "dear_man_one"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "dear_man_one"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
@@ -12535,51 +12535,56 @@ SET n += {skillId: "dear_man_one", step: "cool", kind: "ask", version: "dm-one-v
 MATCH (s:Skill {id: "dear_man_one"}), (n:SkillStep {id: "dear_man_one:cool"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 8};
+MERGE (n:SkillStep {id: "dear_man_one:wise"})
+SET n += {skillId: "dear_man_one", step: "wise", kind: "embed", version: "dm-one-v1"}, n.specJson = "{\"answerAs\": \"wise\", \"embed\": \"inlineSkill\", \"props\": {\"ctx\": {\"band\": \"$ctx.band\", \"frame\": \"hosted\", \"situationId\": \"send\"}, \"enterAt\": \"cues\", \"outcomes\": [\"go\", \"wait\", \"no_go\"], \"skill\": \"wise_mind_check\"}, \"title\": \"wise_title\"}";
+MATCH (s:Skill {id: "dear_man_one"}), (n:SkillStep {id: "dear_man_one:wise"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 9};
 MERGE (n:SkillStep {id: "dear_man_one:aloud"})
 SET n += {skillId: "dear_man_one", step: "aloud", kind: "embed", version: "dm-one-v1"}, n.specJson = "{\"answerAs\": \"aloud_how\", \"embed\": \"messageComposer\", \"hint\": \"aloud_hint\", \"props\": {\"copiedLabel\": \"copied\", \"copyLabel\": \"copy\", \"dropSorry\": \"drop_sorry\", \"field\": \"ask\", \"next\": \"next\", \"openLabel\": \"open_messages\", \"parts\": [\"fact\", \"felt\", \"give\", \"ask\", \"why\"], \"selectedLabel\": \"selected\", \"sorryLine\": \"sorry_line\"}, \"title\": \"aloud_title\"}";
 MATCH (s:Skill {id: "dear_man_one"}), (n:SkillStep {id: "dear_man_one:aloud"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 9};
+SET r += {order: 10};
 MERGE (n:SkillStep {id: "dear_man_one:wait"})
 SET n += {skillId: "dear_man_one", step: "wait", kind: "embed", version: "dm-one-v1"}, n.specJson = "{\"answerAs\": \"wait\", \"embed\": \"waitLock\", \"props\": {\"done\": \"wait_done\", \"doneShort\": \"wait_done_short\", \"minutes\": 10, \"next\": \"wait_back\", \"waiting\": \"wait_waiting\", \"waitingShort\": \"wait_short\"}, \"title\": \"wait_title\"}";
 MATCH (s:Skill {id: "dear_man_one"}), (n:SkillStep {id: "dear_man_one:wait"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 10};
+SET r += {order: 11};
 MERGE (n:SkillStep {id: "dear_man_one:resend"})
 SET n += {skillId: "dear_man_one", step: "resend", kind: "embed", version: "dm-one-v1"}, n.specJson = "{\"answerAs\": \"resend_how\", \"embed\": \"messageComposer\", \"props\": {\"copiedLabel\": \"copied\", \"copyLabel\": \"copy\", \"dropSorry\": \"drop_sorry\", \"field\": \"ask\", \"next\": \"next\", \"openLabel\": \"open_messages\", \"parts\": [\"fact\", \"felt\", \"give\", \"ask\", \"why\"], \"selectedLabel\": \"selected\", \"sorryLine\": \"sorry_line\"}, \"title\": \"resend_title\"}";
 MATCH (s:Skill {id: "dear_man_one"}), (n:SkillStep {id: "dear_man_one:resend"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 11};
+SET r += {order: 12};
 MERGE (n:SkillStep {id: "dear_man_one:later"})
-SET n += {skillId: "dear_man_one", step: "later", kind: "handoff", version: "dm-one-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"fields\": [{\"id\": \"later_when\", \"label\": \"later_label\", \"max\": 1, \"options\": {\"list\": \"later\"}}], \"followUp\": {\"type\": \"ask_delayed\", \"whenFrom\": \"later_when\"}, \"lines\": [{\"key\": \"settle_line\", \"when\": {\"eq\": [\"$a.cool\", \"settle\"]}}, {\"key\": \"later_line\", \"when\": null}]}";
+SET n += {skillId: "dear_man_one", step: "later", kind: "handoff", version: "dm-one-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"has\": [\"$a.wise.ids\", \"unsafe\"]}}], \"done\": \"done\", \"fields\": [{\"id\": \"later_when\", \"label\": \"later_label\", \"max\": 1, \"options\": {\"list\": \"later\"}}], \"followUp\": {\"type\": \"ask_delayed\", \"whenFrom\": \"later_when\"}, \"lines\": [{\"key\": \"settle_line\", \"when\": {\"eq\": [\"$a.cool\", \"settle\"]}}, {\"key\": \"later_line\", \"when\": null}]}";
 MATCH (s:Skill {id: "dear_man_one"}), (n:SkillStep {id: "dear_man_one:later"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 12};
+SET r += {order: 13};
 MERGE (n:SkillStep {id: "dear_man_one:predict"})
 SET n += {skillId: "dear_man_one", step: "predict", kind: "ask", version: "dm-one-v1"}, n.specJson = "{\"fields\": [{\"id\": \"predict\", \"max\": 1, \"options\": {\"list\": \"predict\"}, \"required\": true}], \"title\": \"predict_title\"}";
 MATCH (s:Skill {id: "dear_man_one"}), (n:SkillStep {id: "dear_man_one:predict"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 13};
+SET r += {order: 14};
 MERGE (n:SkillStep {id: "dear_man_one:sure"})
 SET n += {skillId: "dear_man_one", step: "sure", kind: "ask", version: "dm-one-v1"}, n.specJson = "{\"fields\": [{\"id\": \"sure\", \"max\": 1, \"options\": {\"list\": \"sure\"}}], \"title\": \"sure_label\"}";
 MATCH (s:Skill {id: "dear_man_one"}), (n:SkillStep {id: "dear_man_one:sure"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 14};
+SET r += {order: 15};
 MERGE (n:SkillStep {id: "dear_man_one:sent"})
 SET n += {skillId: "dear_man_one", step: "sent", kind: "handoff", version: "dm-one-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"fields\": [{\"id\": \"again\", \"label\": \"again_label\", \"max\": 1, \"options\": {\"list\": \"again\"}}], \"followUp\": {\"type\": \"ask_outcome\", \"whenFrom\": \"again\"}, \"lines\": [{\"key\": \"sent_line_badly\", \"when\": {\"eq\": [\"$a.predict\", \"badly\"]}}, {\"key\": \"sent_line\", \"when\": null}]}";
 MATCH (s:Skill {id: "dear_man_one"}), (n:SkillStep {id: "dear_man_one:sent"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 15};
+SET r += {order: 16};
 MERGE (n:SkillStep {id: "dear_man_one:back"})
 SET n += {skillId: "dear_man_one", step: "back", kind: "ask", version: "dm-one-v1"}, n.specJson = "{\"clears\": [\"back\"], \"fields\": [{\"id\": \"back\", \"max\": 1, \"options\": {\"list\": \"back\"}, \"required\": true}], \"hint\": \"back_hint\", \"reopens\": {\"after\": \"later\"}, \"title\": \"back_title\"}";
 MATCH (s:Skill {id: "dear_man_one"}), (n:SkillStep {id: "dear_man_one:back"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 16};
+SET r += {order: 17};
 MERGE (n:SkillStep {id: "dear_man_one:dropped"})
 SET n += {skillId: "dear_man_one", step: "dropped", kind: "handoff", version: "dm-one-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"dropped_line\", \"when\": null}]}";
 MATCH (s:Skill {id: "dear_man_one"}), (n:SkillStep {id: "dear_man_one:dropped"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 17};
+SET r += {order: 18};
 MERGE (x:SkillExit {id: "dear_man_one:cool_down"})
 SET x += {skillId: "dear_man_one", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
 MATCH (s:Skill {id: "dear_man_one"}), (x:SkillExit {id: "dear_man_one:cool_down"})
@@ -12638,9 +12643,21 @@ SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.cool\", \"hold\"]}";
 MATCH (a:SkillStep {id: "dear_man_one:cool"}), (b:SkillStep {id: "dear_man_one:later"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 2}, r.whenJson = "{\"in\": [\"$a.cool\", [\"later\", \"settle\"]]}";
+MATCH (a:SkillStep {id: "dear_man_one:cool"}), (b:SkillStep {id: "dear_man_one:wise"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 3}, r.whenJson = "{\"eq\": [\"$a.cool\", \"wise\"]}";
 MATCH (a:SkillStep {id: "dear_man_one:cool"}), (b:SkillStep {id: "dear_man_one:message"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 3}, r.whenJson = "null";
+SET r += {order: 4}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "dear_man_one:wise"}), (b:SkillStep {id: "dear_man_one:later"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"any\": [{\"has\": [\"$a.wise.ids\", \"unsafe\"]}, {\"has\": [\"$a.wise.ids\", \"no_go\"]}]}";
+MATCH (a:SkillStep {id: "dear_man_one:wise"}), (b:SkillStep {id: "dear_man_one:wait"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"has\": [\"$a.wise.ids\", \"wait\"]}";
+MATCH (a:SkillStep {id: "dear_man_one:wise"}), (b:SkillStep {id: "dear_man_one:message"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "dear_man_one:aloud"}), (b:SkillStep {id: "dear_man_one:predict"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
@@ -12918,86 +12935,91 @@ SET o:SkillOption, o += {skillId: "dear_man_one", list: "cool", value: "send", l
 MATCH (s:Skill {id: "dear_man_one"}), (o:SkillOption {id: "dear_man_one:cool:send"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "cool", order: 49};
+MERGE (o:SkillOption {id: "dear_man_one:cool:wise"})
+SET o:SkillOption, o += {skillId: "dear_man_one", list: "cool", value: "wise", label: "Check it with wise mind first", version: "dm-one-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "dear_man_one"}), (o:SkillOption {id: "dear_man_one:cool:wise"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "cool", order: 50};
 MERGE (o:SkillOption {id: "dear_man_one:later:hour"})
 SET o:SkillOption, o += {skillId: "dear_man_one", list: "later", value: "hour", label: "In an hour", version: "dm-one-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "dear_man_one"}), (o:SkillOption {id: "dear_man_one:later:hour"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "later", order: 50};
+SET r += {list: "later", order: 51};
 MERGE (o:SkillOption {id: "dear_man_one:later:today"})
 SET o:SkillOption, o += {skillId: "dear_man_one", list: "later", value: "today", label: "This evening", version: "dm-one-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "dear_man_one"}), (o:SkillOption {id: "dear_man_one:later:today"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "later", order: 51};
+SET r += {list: "later", order: 52};
 MERGE (o:SkillOption {id: "dear_man_one:later:tomorrow"})
 SET o:SkillOption, o += {skillId: "dear_man_one", list: "later", value: "tomorrow", label: "Tomorrow", version: "dm-one-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "dear_man_one"}), (o:SkillOption {id: "dear_man_one:later:tomorrow"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "later", order: 52};
+SET r += {list: "later", order: 53};
 MERGE (o:SkillOption {id: "dear_man_one:predict:well"})
 SET o:SkillOption, o += {skillId: "dear_man_one", list: "predict", value: "well", label: "Well", version: "dm-one-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "dear_man_one"}), (o:SkillOption {id: "dear_man_one:predict:well"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "predict", order: 53};
+SET r += {list: "predict", order: 54};
 MERGE (o:SkillOption {id: "dear_man_one:predict:mixed"})
 SET o:SkillOption, o += {skillId: "dear_man_one", list: "predict", value: "mixed", label: "Mixed", version: "dm-one-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "dear_man_one"}), (o:SkillOption {id: "dear_man_one:predict:mixed"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "predict", order: 54};
+SET r += {list: "predict", order: 55};
 MERGE (o:SkillOption {id: "dear_man_one:predict:badly"})
 SET o:SkillOption, o += {skillId: "dear_man_one", list: "predict", value: "badly", label: "Badly", version: "dm-one-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "dear_man_one"}), (o:SkillOption {id: "dear_man_one:predict:badly"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "predict", order: 55};
+SET r += {list: "predict", order: 56};
 MERGE (o:SkillOption {id: "dear_man_one:predict:no_answer"})
 SET o:SkillOption, o += {skillId: "dear_man_one", list: "predict", value: "no_answer", label: "They won't answer", version: "dm-one-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "dear_man_one"}), (o:SkillOption {id: "dear_man_one:predict:no_answer"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "predict", order: 56};
+SET r += {list: "predict", order: 57};
 MERGE (o:SkillOption {id: "dear_man_one:sure:sure"})
 SET o:SkillOption, o += {skillId: "dear_man_one", list: "sure", value: "sure", label: "Sure", version: "dm-one-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "dear_man_one"}), (o:SkillOption {id: "dear_man_one:sure:sure"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "sure", order: 57};
+SET r += {list: "sure", order: 58};
 MERGE (o:SkillOption {id: "dear_man_one:sure:think_so"})
 SET o:SkillOption, o += {skillId: "dear_man_one", list: "sure", value: "think_so", label: "Think so", version: "dm-one-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "dear_man_one"}), (o:SkillOption {id: "dear_man_one:sure:think_so"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "sure", order: 58};
+SET r += {list: "sure", order: 59};
 MERGE (o:SkillOption {id: "dear_man_one:sure:not_sure"})
 SET o:SkillOption, o += {skillId: "dear_man_one", list: "sure", value: "not_sure", label: "Not sure", version: "dm-one-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "dear_man_one"}), (o:SkillOption {id: "dear_man_one:sure:not_sure"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "sure", order: 59};
+SET r += {list: "sure", order: 60};
 MERGE (o:SkillOption {id: "dear_man_one:again:today"})
 SET o:SkillOption, o += {skillId: "dear_man_one", list: "again", value: "today", label: "This evening", version: "dm-one-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "dear_man_one"}), (o:SkillOption {id: "dear_man_one:again:today"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "again", order: 60};
+SET r += {list: "again", order: 61};
 MERGE (o:SkillOption {id: "dear_man_one:again:tomorrow"})
 SET o:SkillOption, o += {skillId: "dear_man_one", list: "again", value: "tomorrow", label: "Tomorrow", version: "dm-one-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "dear_man_one"}), (o:SkillOption {id: "dear_man_one:again:tomorrow"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "again", order: 61};
+SET r += {list: "again", order: 62};
 MERGE (o:SkillOption {id: "dear_man_one:again:this_week"})
 SET o:SkillOption, o += {skillId: "dear_man_one", list: "again", value: "this_week", label: "In a few days", version: "dm-one-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "dear_man_one"}), (o:SkillOption {id: "dear_man_one:again:this_week"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "again", order: 62};
+SET r += {list: "again", order: 63};
 MERGE (o:SkillOption {id: "dear_man_one:back:send"})
 SET o:SkillOption, o += {skillId: "dear_man_one", list: "back", value: "send", label: "Yes, show me the message", version: "dm-one-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "dear_man_one"}), (o:SkillOption {id: "dear_man_one:back:send"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "back", order: 63};
+SET r += {list: "back", order: 64};
 MERGE (o:SkillOption {id: "dear_man_one:back:not_yet"})
 SET o:SkillOption, o += {skillId: "dear_man_one", list: "back", value: "not_yet", label: "Not yet", version: "dm-one-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "dear_man_one"}), (o:SkillOption {id: "dear_man_one:back:not_yet"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "back", order: 64};
+SET r += {list: "back", order: 65};
 MERGE (o:SkillOption {id: "dear_man_one:back:dropped"})
 SET o:SkillOption, o += {skillId: "dear_man_one", list: "back", value: "dropped", label: "I've changed my mind", version: "dm-one-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "dear_man_one"}), (o:SkillOption {id: "dear_man_one:back:dropped"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "back", order: 65};
+SET r += {list: "back", order: 66};
 
 // --- held (held-v1) ---
 MERGE (s:Skill {id: "held"})
@@ -28514,3 +28536,375 @@ SET o:SkillOption, o += {skillId: "effectively", list: "back", value: "unsafe", 
 MATCH (s:Skill {id: "effectively"}), (o:SkillOption {id: "effectively:back:unsafe"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "back", order: 54};
+
+// --- wise_mind_check (wmc-v1) ---
+MERGE (s:Skill {id: "wise_mind_check"})
+SET s += {toolId: "wise-mind", version: "wmc-v1", contentVersion: "skills-v1", start: "decision", ownMax: 60, emotionFields: [], accepts: ["band", "situationId", "frame"]}, s.inlineJson = "{\"ends\": {\"hurt\": \"stopped\"}, \"enterAt\": [\"cues\"], \"enterWhen\": {\"cues\": {\"set\": \"$a.decision\"}}, \"flags\": [{\"id\": \"unsafe\", \"when\": {\"eq\": [\"$a.decision\", \"hurt\"]}}, {\"id\": \"go\", \"when\": {\"all\": [{\"set\": \"$a.answer\"}, {\"any\": [{\"all\": [{\"any\": [{\"eq\": [\"$a.after\", \"yes\"]}, {\"all\": [{\"not\": {\"set\": \"$a.after\"}}, {\"eq\": [\"$a.answer\", \"yes\"]}]}]}, {\"not\": {\"all\": [{\"not\": {\"set\": \"$a.after\"}}, {\"eq\": [\"$a.answer\", \"yes\"]}, {\"in\": [\"$a.yes_check\", [\"urgent\", \"unsure\"]]}]}}]}, {\"eq\": [\"$a.wait_pick\", \"anyway\"]}]}]}}, {\"id\": \"wait\", \"when\": {\"all\": [{\"set\": \"$a.answer\"}, {\"all\": [{\"not\": {\"any\": [{\"all\": [{\"any\": [{\"eq\": [\"$a.after\", \"yes\"]}, {\"all\": [{\"not\": {\"set\": \"$a.after\"}}, {\"eq\": [\"$a.answer\", \"yes\"]}]}]}, {\"not\": {\"all\": [{\"not\": {\"set\": \"$a.after\"}}, {\"eq\": [\"$a.answer\", \"yes\"]}, {\"in\": [\"$a.yes_check\", [\"urgent\", \"unsure\"]]}]}}]}, {\"eq\": [\"$a.wait_pick\", \"anyway\"]}]}}, {\"not\": {\"all\": [{\"any\": [{\"eq\": [\"$a.after\", \"no\"]}, {\"all\": [{\"not\": {\"set\": \"$a.after\"}}, {\"eq\": [\"$a.answer\", \"no\"]}]}]}, {\"not\": {\"eq\": [\"$a.wait_pick\", \"anyway\"]}}]}}]}]}}, {\"id\": \"no_go\", \"when\": {\"all\": [{\"set\": \"$a.answer\"}, {\"all\": [{\"any\": [{\"eq\": [\"$a.after\", \"no\"]}, {\"all\": [{\"not\": {\"set\": \"$a.after\"}}, {\"eq\": [\"$a.answer\", \"no\"]}]}]}, {\"not\": {\"eq\": [\"$a.wait_pick\", \"anyway\"]}}]}]}}], \"outcomes\": [\"go\", \"wait\", \"no_go\"], \"returns\": [], \"seed\": {\"decision\": \"$ctx.situationId\"}}", s.runtimeJson = "{}", s.copyJson = "{\"after_hint\": \"It's fine if it's the same.\", \"after_title\": \"After the wait, what comes back now?\", \"answer_hint\": \"Nothing yet is an answer too.\", \"answer_title\": \"What came back?\", \"back_no\": \"Now you know a bit more about how emotion mind sounds. That counts too.\", \"back_sort_of\": \"Some of it was. That's how it gets clearer.\", \"back_unsure\": \"Can't tell is fine. Wise mind gets easier to hear with practice.\", \"back_yes\": \"That's what your wise mind feels like. Worth remembering.\", \"body_first\": \"My body first\", \"came_label\": \"Looking back, did that come from wise mind?\", \"cues_hint\": \"There's no wrong answer. It's only to notice.\", \"cues_title\": \"Which mind is steering right now? Tap any.\", \"decision_hint\": \"Wise mind is the part of you that knows what fits. It can take a minute to hear.\", \"decision_own\": \"Something else\", \"decision_title\": \"What are you deciding?\", \"did_label\": \"What did you do in the end?\", \"done\": \"Done\", \"end_line\": \"Next time, the stone and one question are enough.\", \"end_title\": \"Whatever you decide, you checked first.\", \"flooded_hint\": \"Body first, then ask. Or ask anyway.\", \"flooded_title\": \"Wise mind is hard to reach this loud.\", \"hold_done\": \"That's the wait.\", \"hold_hint\": \"A minute and a half. Let the question sit.\", \"hold_label\": \"Waiting\", \"hurt_line\": \"That's not a decision to make alone. Someone to talk to comes first.\", \"hurt_title\": \"Thank you for saying it.\", \"inline_back\": \"Back to the message\", \"lock_done\": \"Twenty minutes. That's the wait.\", \"lock_done_short\": \"Done\", \"lock_short\": \"Waiting\", \"lock_waiting\": \"Phone down. The question will keep.\", \"look_anyway\": \"You're going ahead. You checked first, and that counts.\", \"look_go\": \"A calm yes. That's yours to act on.\", \"look_hint\": \"It's how you learn what your wise mind feels like.\", \"look_label\": \"Look back on it tomorrow?\", \"look_no\": \"A quiet no. That's worth listening to.\", \"look_sleep\": \"Sleeping on it is a wise answer too.\", \"look_urgent\": \"An urgent yes is worth a wait.\", \"look_wait\": \"Then waiting is the wise answer for now.\", \"lookback_title\": \"Yesterday you checked with wise mind about this: {decision}\", \"next\": \"Next\", \"read_emotion\": \"Sounds like emotion mind is driving. It isn't wrong. It decides fast.\", \"read_reasonable\": \"Sounds like reasonable mind is driving. It's useful, and it can leave your feelings out.\", \"read_unsure\": \"Hard to tell which mind is driving. That's common.\", \"read_wise\": \"Sounds like it could be wise mind. Ask it and see.\", \"safety_open\": \"Talk to someone now\", \"settle_hint\": \"Ask your question as the stone goes down. Notice what comes back.\", \"sign_hint\": \"Your own sign. It's the check you can use without the app.\", \"sign_own\": \"My own word\", \"sign_title\": \"What tells you it's wise mind?\", \"stone_line1\": \"Let the question go, like a stone into clear water.\", \"stone_line2\": \"It drifts down, past the busy surface.\", \"stone_line3\": \"It rests on the sand. Quiet down here.\", \"stone_start\": \"Let it go\", \"wait_hint\": \"Waiting is never a lock. You can go ahead whenever you choose.\", \"wait_title\": \"Then give it some time. How long?\", \"yes_hint\": \"Emotion mind can sound like a yes. A wise yes can wait a minute.\", \"yes_title\": \"Is the yes calm, or urgent?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+MATCH (t:TherapyConcept {id: "dbt_wise_mind"}), (s:Skill {id: "wise_mind_check"})
+MERGE (t)-[:HAS_SKILL]->(s);
+MATCH (:SkillStep {skillId: "wise_mind_check"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
+MATCH (:Skill {id: "wise_mind_check"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
+MERGE (n:SkillStep {id: "wise_mind_check:decision"})
+SET n += {skillId: "wise_mind_check", step: "decision", kind: "ask", version: "wmc-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.decision\", \"hurt\"]}}], \"fields\": [{\"id\": \"decision\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"decision\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"decision_own\"}, \"required\": true}], \"hint\": \"decision_hint\", \"title\": \"decision_title\"}";
+MATCH (s:Skill {id: "wise_mind_check"}), (n:SkillStep {id: "wise_mind_check:decision"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 0};
+MERGE (n:SkillStep {id: "wise_mind_check:hurt"})
+SET n += {skillId: "wise_mind_check", step: "hurt", kind: "handoff", version: "wmc-v1"}, n.specJson = "{\"complete\": false, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"all\": []}}], \"done\": \"done\", \"lines\": [{\"key\": \"hurt_line\", \"when\": {\"all\": []}}], \"links\": [], \"noClose\": true, \"title\": \"hurt_title\"}";
+MATCH (s:Skill {id: "wise_mind_check"}), (n:SkillStep {id: "wise_mind_check:hurt"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 1};
+MERGE (n:SkillStep {id: "wise_mind_check:cues"})
+SET n += {skillId: "wise_mind_check", step: "cues", kind: "ask", version: "wmc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"cues\", \"links\": [{\"exit\": \"cool_down\", \"label\": \"body_first\", \"when\": {\"all\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"not\": {\"eq\": [\"$ctx.frame\", \"hosted\"]}}]}}, {\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 6, \"options\": {\"list\": \"cues\"}, \"required\": true}], \"hint\": \"cues_hint\", \"lines\": [{\"key\": \"flooded_hint\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}], \"title\": [{\"key\": \"flooded_title\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"cues_title\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "wise_mind_check"}), (n:SkillStep {id: "wise_mind_check:cues"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 2};
+MERGE (n:SkillStep {id: "wise_mind_check:settle"})
+SET n += {skillId: "wise_mind_check", step: "settle", kind: "embed", version: "wmc-v1"}, n.specJson = "{\"answerAs\": \"settled\", \"embed\": \"stoneSink\", \"hint\": \"settle_hint\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"line1\": \"stone_line1\", \"line2\": \"stone_line2\", \"line3\": \"stone_line3\", \"next\": \"next\", \"seconds\": 20, \"start\": \"stone_start\"}, \"title\": [{\"key\": \"read_emotion\", \"when\": {\"any\": [{\"has\": [\"$a.cues.ids\", \"now\"]}, {\"has\": [\"$a.cues.ids\", \"facts\"]}, {\"has\": [\"$a.cues.ids\", \"hot\"]}]}}, {\"key\": \"read_reasonable\", \"when\": {\"all\": [{\"not\": {\"any\": [{\"has\": [\"$a.cues.ids\", \"now\"]}, {\"has\": [\"$a.cues.ids\", \"facts\"]}, {\"has\": [\"$a.cues.ids\", \"hot\"]}]}}, {\"has\": [\"$a.cues.ids\", \"feelings\"]}]}}, {\"key\": \"read_wise\", \"when\": {\"all\": [{\"not\": {\"any\": [{\"has\": [\"$a.cues.ids\", \"now\"]}, {\"has\": [\"$a.cues.ids\", \"facts\"]}, {\"has\": [\"$a.cues.ids\", \"hot\"]}]}}, {\"not\": {\"has\": [\"$a.cues.ids\", \"feelings\"]}}, {\"has\": [\"$a.cues.ids\", \"calm\"]}, {\"not\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}]}}, {\"key\": \"read_unsure\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "wise_mind_check"}), (n:SkillStep {id: "wise_mind_check:settle"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 3};
+MERGE (n:SkillStep {id: "wise_mind_check:answer"})
+SET n += {skillId: "wise_mind_check", step: "answer", kind: "ask", version: "wmc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"answer\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"answer\"}, \"required\": true}], \"hint\": \"answer_hint\", \"title\": \"answer_title\"}";
+MATCH (s:Skill {id: "wise_mind_check"}), (n:SkillStep {id: "wise_mind_check:answer"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 4};
+MERGE (n:SkillStep {id: "wise_mind_check:yes_check"})
+SET n += {skillId: "wise_mind_check", step: "yes_check", kind: "ask", version: "wmc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"yes_check\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"yes_check\"}, \"required\": true}], \"hint\": \"yes_hint\", \"title\": \"yes_title\"}";
+MATCH (s:Skill {id: "wise_mind_check"}), (n:SkillStep {id: "wise_mind_check:yes_check"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 5};
+MERGE (n:SkillStep {id: "wise_mind_check:wait_pick"})
+SET n += {skillId: "wise_mind_check", step: "wait_pick", kind: "ask", version: "wmc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"wait_pick\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"wait_pick\"}, \"required\": true}], \"hint\": \"wait_hint\", \"title\": \"wait_title\"}";
+MATCH (s:Skill {id: "wise_mind_check"}), (n:SkillStep {id: "wise_mind_check:wait_pick"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 6};
+MERGE (n:SkillStep {id: "wise_mind_check:hold"})
+SET n += {skillId: "wise_mind_check", step: "hold", kind: "embed", version: "wmc-v1"}, n.specJson = "{\"answerAs\": \"held\", \"embed\": \"holdRing\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"doneLabel\": \"hold_done\", \"hint\": \"hold_hint\", \"label\": \"hold_label\", \"next\": \"next\", \"seconds\": 90, \"variant\": \"timed\"}}";
+MATCH (s:Skill {id: "wise_mind_check"}), (n:SkillStep {id: "wise_mind_check:hold"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 7};
+MERGE (n:SkillStep {id: "wise_mind_check:lock"})
+SET n += {skillId: "wise_mind_check", step: "lock", kind: "embed", version: "wmc-v1"}, n.specJson = "{\"answerAs\": \"locked\", \"embed\": \"waitLock\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"done\": \"lock_done\", \"doneShort\": \"lock_done_short\", \"minutes\": 20, \"next\": \"next\", \"waiting\": \"lock_waiting\", \"waitingShort\": \"lock_short\"}}";
+MATCH (s:Skill {id: "wise_mind_check"}), (n:SkillStep {id: "wise_mind_check:lock"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 8};
+MERGE (n:SkillStep {id: "wise_mind_check:after_wait"})
+SET n += {skillId: "wise_mind_check", step: "after_wait", kind: "ask", version: "wmc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"after\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"answer\"}, \"required\": true}], \"hint\": \"after_hint\", \"title\": \"after_title\"}";
+MATCH (s:Skill {id: "wise_mind_check"}), (n:SkillStep {id: "wise_mind_check:after_wait"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 9};
+MERGE (n:SkillStep {id: "wise_mind_check:look"})
+SET n += {skillId: "wise_mind_check", step: "look", kind: "ask", version: "wmc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"look\", \"label\": \"look_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"look\"}, \"required\": false}], \"followUp\": {\"type\": \"wise_mind_lookback\", \"whenFrom\": \"look\"}, \"hint\": \"look_hint\", \"title\": [{\"key\": \"look_anyway\", \"when\": {\"eq\": [\"$a.wait_pick\", \"anyway\"]}}, {\"key\": \"look_sleep\", \"when\": {\"eq\": [\"$a.wait_pick\", \"sleep\"]}}, {\"key\": \"look_urgent\", \"when\": {\"all\": [{\"not\": {\"set\": \"$a.after\"}}, {\"eq\": [\"$a.answer\", \"yes\"]}, {\"in\": [\"$a.yes_check\", [\"urgent\", \"unsure\"]]}]}}, {\"key\": \"look_go\", \"when\": {\"any\": [{\"all\": [{\"any\": [{\"eq\": [\"$a.after\", \"yes\"]}, {\"all\": [{\"not\": {\"set\": \"$a.after\"}}, {\"eq\": [\"$a.answer\", \"yes\"]}]}]}, {\"not\": {\"all\": [{\"not\": {\"set\": \"$a.after\"}}, {\"eq\": [\"$a.answer\", \"yes\"]}, {\"in\": [\"$a.yes_check\", [\"urgent\", \"unsure\"]]}]}}]}, {\"eq\": [\"$a.wait_pick\", \"anyway\"]}]}}, {\"key\": \"look_no\", \"when\": {\"all\": [{\"any\": [{\"eq\": [\"$a.after\", \"no\"]}, {\"all\": [{\"not\": {\"set\": \"$a.after\"}}, {\"eq\": [\"$a.answer\", \"no\"]}]}]}, {\"not\": {\"eq\": [\"$a.wait_pick\", \"anyway\"]}}]}}, {\"key\": \"look_wait\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "wise_mind_check"}), (n:SkillStep {id: "wise_mind_check:look"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 10};
+MERGE (n:SkillStep {id: "wise_mind_check:end"})
+SET n += {skillId: "wise_mind_check", step: "end", kind: "handoff", version: "wmc-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"end_title\"}";
+MATCH (s:Skill {id: "wise_mind_check"}), (n:SkillStep {id: "wise_mind_check:end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 11};
+MERGE (n:SkillStep {id: "wise_mind_check:lookback"})
+SET n += {skillId: "wise_mind_check", step: "lookback", kind: "ask", version: "wmc-v1"}, n.specJson = "{\"clears\": [\"did\", \"came\", \"sign\"], \"fields\": [{\"id\": \"did\", \"label\": \"did_label\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"did\"}, \"required\": true}, {\"id\": \"came\", \"label\": \"came_label\", \"max\": 1, \"options\": {\"list\": \"came\"}, \"required\": true}], \"reopens\": {\"after\": \"look\"}, \"title\": \"lookback_title\", \"titleSlots\": {\"decision\": {\"labelOf\": \"decision\"}}}";
+MATCH (s:Skill {id: "wise_mind_check"}), (n:SkillStep {id: "wise_mind_check:lookback"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 12};
+MERGE (n:SkillStep {id: "wise_mind_check:sign"})
+SET n += {skillId: "wise_mind_check", step: "sign", kind: "ask", version: "wmc-v1"}, n.specJson = "{\"fields\": [{\"id\": \"sign\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 2, \"options\": {\"list\": \"sign\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"sign_own\"}, \"required\": false}], \"hint\": \"sign_hint\", \"title\": \"sign_title\"}";
+MATCH (s:Skill {id: "wise_mind_check"}), (n:SkillStep {id: "wise_mind_check:sign"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 13};
+MERGE (n:SkillStep {id: "wise_mind_check:back_end"})
+SET n += {skillId: "wise_mind_check", step: "back_end", kind: "handoff", version: "wmc-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"back_yes\", \"when\": {\"eq\": [\"$a.came\", \"yes\"]}}, {\"key\": \"back_sort_of\", \"when\": {\"eq\": [\"$a.came\", \"sort_of\"]}}, {\"key\": \"back_no\", \"when\": {\"eq\": [\"$a.came\", \"no\"]}}, {\"key\": \"back_unsure\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true}";
+MATCH (s:Skill {id: "wise_mind_check"}), (n:SkillStep {id: "wise_mind_check:back_end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 14};
+MERGE (x:SkillExit {id: "wise_mind_check:cool_down"})
+SET x += {skillId: "wise_mind_check", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "wise_mind_check"}), (x:SkillExit {id: "wise_mind_check:cool_down"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "wise_mind_check:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "wise_mind_check:safety_open"})
+SET x += {skillId: "wise_mind_check", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "wise_mind_check"}), (x:SkillExit {id: "wise_mind_check:safety_open"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MERGE (x:SkillExit {id: "wise_mind_check:done"})
+SET x += {skillId: "wise_mind_check", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "wise_mind_check"}), (x:SkillExit {id: "wise_mind_check:done"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (a:SkillStep {id: "wise_mind_check:decision"}), (b:SkillStep {id: "wise_mind_check:hurt"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.decision\", \"hurt\"]}";
+MATCH (a:SkillStep {id: "wise_mind_check:decision"}), (b:SkillStep {id: "wise_mind_check:cues"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "wise_mind_check:decision"}), (x:SkillExit {id: "wise_mind_check:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "decision", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "wise_mind_check:hurt"}), (x:SkillExit {id: "wise_mind_check:safety_open"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "wise_mind_check:cues"}), (b:SkillStep {id: "wise_mind_check:settle"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "wise_mind_check:cues"}), (x:SkillExit {id: "wise_mind_check:cool_down"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "cues", label: "body_first"}, r.whenJson = "{\"all\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"not\": {\"eq\": [\"$ctx.frame\", \"hosted\"]}}]}";
+MATCH (a:SkillStep {id: "wise_mind_check:cues"}), (x:SkillExit {id: "wise_mind_check:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 1, field: "cues", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "wise_mind_check:settle"}), (b:SkillStep {id: "wise_mind_check:answer"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "wise_mind_check:settle"}), (x:SkillExit {id: "wise_mind_check:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "wise_mind_check:answer"}), (b:SkillStep {id: "wise_mind_check:yes_check"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"all\": [{\"eq\": [\"$a.answer\", \"yes\"]}, {\"any\": [{\"any\": [{\"has\": [\"$a.cues.ids\", \"now\"]}, {\"has\": [\"$a.cues.ids\", \"facts\"]}, {\"has\": [\"$a.cues.ids\", \"hot\"]}]}, {\"in\": [\"$ctx.band\", [\"stirred\", \"flooded\"]]}]}]}";
+MATCH (a:SkillStep {id: "wise_mind_check:answer"}), (b:SkillStep {id: "wise_mind_check:wait_pick"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"all\": [{\"not\": {\"eq\": [\"$ctx.frame\", \"hosted\"]}}, {\"any\": [{\"eq\": [\"$a.answer\", \"wait\"]}, {\"eq\": [\"$a.answer\", \"nothing\"]}, {\"all\": [{\"not\": {\"set\": \"$a.after\"}}, {\"eq\": [\"$a.answer\", \"yes\"]}, {\"in\": [\"$a.yes_check\", [\"urgent\", \"unsure\"]]}]}]}]}";
+MATCH (a:SkillStep {id: "wise_mind_check:answer"}), (b:SkillStep {id: "wise_mind_check:look"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "wise_mind_check:answer"}), (x:SkillExit {id: "wise_mind_check:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "answer", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "wise_mind_check:yes_check"}), (b:SkillStep {id: "wise_mind_check:wait_pick"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"all\": [{\"not\": {\"eq\": [\"$ctx.frame\", \"hosted\"]}}, {\"any\": [{\"eq\": [\"$a.answer\", \"wait\"]}, {\"eq\": [\"$a.answer\", \"nothing\"]}, {\"all\": [{\"not\": {\"set\": \"$a.after\"}}, {\"eq\": [\"$a.answer\", \"yes\"]}, {\"in\": [\"$a.yes_check\", [\"urgent\", \"unsure\"]]}]}]}]}";
+MATCH (a:SkillStep {id: "wise_mind_check:yes_check"}), (b:SkillStep {id: "wise_mind_check:look"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "wise_mind_check:yes_check"}), (x:SkillExit {id: "wise_mind_check:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "yes_check", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "wise_mind_check:wait_pick"}), (b:SkillStep {id: "wise_mind_check:hold"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.wait_pick\", \"short\"]}";
+MATCH (a:SkillStep {id: "wise_mind_check:wait_pick"}), (b:SkillStep {id: "wise_mind_check:lock"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.wait_pick\", \"long\"]}";
+MATCH (a:SkillStep {id: "wise_mind_check:wait_pick"}), (b:SkillStep {id: "wise_mind_check:look"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "wise_mind_check:wait_pick"}), (x:SkillExit {id: "wise_mind_check:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "wait_pick", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "wise_mind_check:hold"}), (b:SkillStep {id: "wise_mind_check:after_wait"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "wise_mind_check:hold"}), (x:SkillExit {id: "wise_mind_check:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "wise_mind_check:lock"}), (b:SkillStep {id: "wise_mind_check:after_wait"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "wise_mind_check:lock"}), (x:SkillExit {id: "wise_mind_check:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "wise_mind_check:after_wait"}), (b:SkillStep {id: "wise_mind_check:look"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "wise_mind_check:after_wait"}), (x:SkillExit {id: "wise_mind_check:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "after", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "wise_mind_check:look"}), (b:SkillStep {id: "wise_mind_check:end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "wise_mind_check:look"}), (x:SkillExit {id: "wise_mind_check:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "look", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "wise_mind_check:end"}), (x:SkillExit {id: "wise_mind_check:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "wise_mind_check:lookback"}), (b:SkillStep {id: "wise_mind_check:sign"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"in\": [\"$a.came\", [\"yes\", \"sort_of\"]]}";
+MATCH (a:SkillStep {id: "wise_mind_check:lookback"}), (b:SkillStep {id: "wise_mind_check:back_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "wise_mind_check:lookback"}), (x:SkillExit {id: "wise_mind_check:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "did", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "wise_mind_check:sign"}), (b:SkillStep {id: "wise_mind_check:back_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "wise_mind_check:sign"}), (x:SkillExit {id: "wise_mind_check:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "sign", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "wise_mind_check:back_end"}), (x:SkillExit {id: "wise_mind_check:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MERGE (o:SkillOption {id: "wise_mind_check:decision:send"})
+SET o:SkillOption:DecisionType, o += {skillId: "wise_mind_check", list: "decision", value: "send", label: "Send a message", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:decision:send"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "decision", order: 0};
+MERGE (o:SkillOption {id: "wise_mind_check:decision:say"})
+SET o:SkillOption:DecisionType, o += {skillId: "wise_mind_check", list: "decision", value: "say", label: "Say something to someone", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:decision:say"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "decision", order: 1};
+MERGE (o:SkillOption {id: "wise_mind_check:decision:leave"})
+SET o:SkillOption:DecisionType, o += {skillId: "wise_mind_check", list: "decision", value: "leave", label: "Leave", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:decision:leave"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "decision", order: 2};
+MERGE (o:SkillOption {id: "wise_mind_check:decision:quit"})
+SET o:SkillOption:DecisionType, o += {skillId: "wise_mind_check", list: "decision", value: "quit", label: "Quit something", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:decision:quit"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "decision", order: 3};
+MERGE (o:SkillOption {id: "wise_mind_check:decision:buy_use"})
+SET o:SkillOption:DecisionType, o += {skillId: "wise_mind_check", list: "decision", value: "buy_use", label: "Buy or use something", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:decision:buy_use"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "decision", order: 4};
+MERGE (o:SkillOption {id: "wise_mind_check:decision:hurt"})
+SET o:SkillOption, o += {skillId: "wise_mind_check", list: "decision", value: "hurt", label: "Hurting myself", version: "wmc-v1"}, o.propsJson = "{\"danger\": \"self\"}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:decision:hurt"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "decision", order: 5};
+MERGE (o:SkillOption {id: "wise_mind_check:cues:now"})
+SET o:SkillOption:MindCue, o += {skillId: "wise_mind_check", list: "cues", value: "now", label: "It has to happen now", version: "wmc-v1"}, o.propsJson = "{\"mind\": \"emotion\"}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:cues:now"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "cues", order: 6};
+MERGE (o:SkillOption {id: "wise_mind_check:cues:facts"})
+SET o:SkillOption:MindCue, o += {skillId: "wise_mind_check", list: "cues", value: "facts", label: "The facts don't matter right now", version: "wmc-v1"}, o.propsJson = "{\"mind\": \"emotion\"}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:cues:facts"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "cues", order: 7};
+MERGE (o:SkillOption {id: "wise_mind_check:cues:feelings"})
+SET o:SkillOption:MindCue, o += {skillId: "wise_mind_check", list: "cues", value: "feelings", label: "My feelings don't count here", version: "wmc-v1"}, o.propsJson = "{\"mind\": \"reasonable\"}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:cues:feelings"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "cues", order: 8};
+MERGE (o:SkillOption {id: "wise_mind_check:cues:hot"})
+SET o:SkillOption:MindCue, o += {skillId: "wise_mind_check", list: "cues", value: "hot", label: "I'm sure, and I'm hot", version: "wmc-v1"}, o.propsJson = "{\"mind\": \"emotion\"}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:cues:hot"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "cues", order: 9};
+MERGE (o:SkillOption {id: "wise_mind_check:cues:calm"})
+SET o:SkillOption:MindCue, o += {skillId: "wise_mind_check", list: "cues", value: "calm", label: "I'm calm, and it still feels right", version: "wmc-v1"}, o.propsJson = "{\"mind\": \"wise\"}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:cues:calm"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "cues", order: 10};
+MERGE (o:SkillOption {id: "wise_mind_check:cues:unsure"})
+SET o:SkillOption:MindCue, o += {skillId: "wise_mind_check", list: "cues", value: "unsure", label: "I can't tell", version: "wmc-v1"}, o.propsJson = "{\"mind\": \"unsure\"}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:cues:unsure"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "cues", order: 11};
+MERGE (o:SkillOption {id: "wise_mind_check:answer:yes"})
+SET o:SkillOption, o += {skillId: "wise_mind_check", list: "answer", value: "yes", label: "A quiet yes", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:answer:yes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "answer", order: 12};
+MERGE (o:SkillOption {id: "wise_mind_check:answer:no"})
+SET o:SkillOption, o += {skillId: "wise_mind_check", list: "answer", value: "no", label: "A quiet no", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:answer:no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "answer", order: 13};
+MERGE (o:SkillOption {id: "wise_mind_check:answer:wait"})
+SET o:SkillOption, o += {skillId: "wise_mind_check", list: "answer", value: "wait", label: "Wait", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:answer:wait"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "answer", order: 14};
+MERGE (o:SkillOption {id: "wise_mind_check:answer:nothing"})
+SET o:SkillOption, o += {skillId: "wise_mind_check", list: "answer", value: "nothing", label: "Nothing yet", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:answer:nothing"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "answer", order: 15};
+MERGE (o:SkillOption {id: "wise_mind_check:yes_check:calm"})
+SET o:SkillOption, o += {skillId: "wise_mind_check", list: "yes_check", value: "calm", label: "Calm", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:yes_check:calm"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "yes_check", order: 16};
+MERGE (o:SkillOption {id: "wise_mind_check:yes_check:urgent"})
+SET o:SkillOption, o += {skillId: "wise_mind_check", list: "yes_check", value: "urgent", label: "Urgent", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:yes_check:urgent"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "yes_check", order: 17};
+MERGE (o:SkillOption {id: "wise_mind_check:yes_check:unsure"})
+SET o:SkillOption, o += {skillId: "wise_mind_check", list: "yes_check", value: "unsure", label: "I can't tell", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:yes_check:unsure"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "yes_check", order: 18};
+MERGE (o:SkillOption {id: "wise_mind_check:wait_pick:short"})
+SET o:SkillOption, o += {skillId: "wise_mind_check", list: "wait_pick", value: "short", label: "A minute and a half", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:wait_pick:short"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wait_pick", order: 19};
+MERGE (o:SkillOption {id: "wise_mind_check:wait_pick:long"})
+SET o:SkillOption, o += {skillId: "wise_mind_check", list: "wait_pick", value: "long", label: "Twenty minutes", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:wait_pick:long"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wait_pick", order: 20};
+MERGE (o:SkillOption {id: "wise_mind_check:wait_pick:sleep"})
+SET o:SkillOption, o += {skillId: "wise_mind_check", list: "wait_pick", value: "sleep", label: "Sleep on it", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:wait_pick:sleep"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wait_pick", order: 21};
+MERGE (o:SkillOption {id: "wise_mind_check:wait_pick:anyway"})
+SET o:SkillOption, o += {skillId: "wise_mind_check", list: "wait_pick", value: "anyway", label: "Go ahead anyway", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:wait_pick:anyway"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wait_pick", order: 22};
+MERGE (o:SkillOption {id: "wise_mind_check:look:tomorrow"})
+SET o:SkillOption, o += {skillId: "wise_mind_check", list: "look", value: "tomorrow", label: "Tomorrow", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:look:tomorrow"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "look", order: 23};
+MERGE (o:SkillOption {id: "wise_mind_check:did:waited"})
+SET o:SkillOption, o += {skillId: "wise_mind_check", list: "did", value: "waited", label: "I waited", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:did:waited"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "did", order: 24};
+MERGE (o:SkillOption {id: "wise_mind_check:did:went"})
+SET o:SkillOption, o += {skillId: "wise_mind_check", list: "did", value: "went", label: "I went ahead", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:did:went"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "did", order: 25};
+MERGE (o:SkillOption {id: "wise_mind_check:did:undecided"})
+SET o:SkillOption, o += {skillId: "wise_mind_check", list: "did", value: "undecided", label: "I didn't decide", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:did:undecided"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "did", order: 26};
+MERGE (o:SkillOption {id: "wise_mind_check:came:yes"})
+SET o:SkillOption, o += {skillId: "wise_mind_check", list: "came", value: "yes", label: "Yes", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:came:yes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "came", order: 27};
+MERGE (o:SkillOption {id: "wise_mind_check:came:sort_of"})
+SET o:SkillOption, o += {skillId: "wise_mind_check", list: "came", value: "sort_of", label: "Sort of", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:came:sort_of"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "came", order: 28};
+MERGE (o:SkillOption {id: "wise_mind_check:came:no"})
+SET o:SkillOption, o += {skillId: "wise_mind_check", list: "came", value: "no", label: "No", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:came:no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "came", order: 29};
+MERGE (o:SkillOption {id: "wise_mind_check:came:unsure"})
+SET o:SkillOption, o += {skillId: "wise_mind_check", list: "came", value: "unsure", label: "I can't tell", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:came:unsure"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "came", order: 30};
+MERGE (o:SkillOption {id: "wise_mind_check:sign:quiet"})
+SET o:SkillOption, o += {skillId: "wise_mind_check", list: "sign", value: "quiet", label: "Quiet", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:sign:quiet"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "sign", order: 31};
+MERGE (o:SkillOption {id: "wise_mind_check:sign:still"})
+SET o:SkillOption, o += {skillId: "wise_mind_check", list: "sign", value: "still", label: "Still", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:sign:still"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "sign", order: 32};
+MERGE (o:SkillOption {id: "wise_mind_check:sign:unhurried"})
+SET o:SkillOption, o += {skillId: "wise_mind_check", list: "sign", value: "unhurried", label: "Sure, without rushing", version: "wmc-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "wise_mind_check"}), (o:SkillOption {id: "wise_mind_check:sign:unhurried"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "sign", order: 33};

@@ -95,6 +95,7 @@ COPY = {
     "done": "Done",
     "cool_title": "Your message is put together. Send it now, or give it a little time first?",
     "cool_hint": "Sending is up to you. Messages sent from a hot place tend to land harder than we mean.",
+    "wise_title": "Before you send it: ask wise mind.",
     "aloud_title": "Read it out loud once.",
     "aloud_hint": "If a part sounds sharper than you mean, change it once you've pasted it.",
     "wait_title": "Phone down. The message will keep.",
@@ -194,6 +195,9 @@ COOL = [
     ("later", "Save it and remind me"),
     ("settle", "Settle my body first. Keep the message"),
     ("send", "I'm good to send it"),
+    # MF-04's check, inline (MF-B6): the decision is this message; the check hands back its answer, and the waiting
+    # stays here (Hold it, Save it and remind me).
+    ("wise", "Check it with wise mind first"),
 ]
 # The ask_delayed card's window chips (scripts/practice-spine/content.py ask_delayed).
 LATER = [("hour", "In an hour"), ("today", "This evening"), ("tomorrow", "Tomorrow")]
@@ -267,7 +271,17 @@ STEPS = [
         # Settle my body first keeps the message (saved, with a reminder), so settling never costs the draft.
         "fields": [{"id": "cool", "options": {"list": "cool"}, "max": 1, "required": True}],
         "next": [{"when": is_("cool", "aloud"), "to": "aloud"}, {"when": is_("cool", "hold"), "to": "wait"},
-                 {"when": {"in": [a("cool"), ["later", "settle"]]}, "to": "later"}, {"to": "message"}],
+                 {"when": {"in": [a("cool"), ["later", "settle"]]}, "to": "later"}, {"when": is_("cool", "wise"), "to": "wise"},
+                 {"to": "message"}],
+    },
+    {
+        # MF-04's wise mind check, run inline (R8): which mind is steering, the stone, what comes back. Its answer picks
+        # the way on: wait → hold it here; a quiet no → save it and remind me (the draft kept); a yes → the card.
+        "id": "wise", "kind": "embed", "embed": "inlineSkill", "title": "wise_title", "answerAs": "wise",
+        "props": {"skill": "wise_mind_check", "enterAt": "cues", "ctx": {"situationId": "send", "frame": "hosted", "band": "$ctx.band"}},
+        "next": [{"when": {"any": [{"has": ["$a.wise.ids", "unsafe"]}, {"has": ["$a.wise.ids", "no_go"]}]}, "to": "later"},
+                 {"when": {"has": ["$a.wise.ids", "wait"]}, "to": "wait"},
+                 {"to": "message"}],
     },
     {
         "id": "aloud", "kind": "embed", "embed": "messageComposer", "title": "aloud_title", "hint": "aloud_hint",
@@ -291,6 +305,8 @@ STEPS = [
         "fields": [{"id": "later_when", "label": "later_label", "max": 1, "options": {"list": "later"}}],
         "followUp": {"type": "ask_delayed", "whenFrom": "later_when"},
         "offers": [{"exit": "cool_down", "when": is_("cool", "settle")}], "done": "done",
+        # The wise mind check's danger flag (it can't be raised from a seeded `send`, but a host branches on it first).
+        "crisis": [{"variant": "crisis", "when": {"has": ["$a.wise.ids", "unsafe"]}}],
     },
     {
         "id": "predict", "kind": "ask", "title": "predict_title",
