@@ -28104,7 +28104,7 @@ MATCH (s:Skill {id: "effectively"}), (n:SkillStep {id: "effectively:end"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 9};
 MERGE (n:SkillStep {id: "effectively:back"})
-SET n += {skillId: "effectively", step: "back", kind: "ask", version: "eff-v1"}, n.specJson = "{\"clears\": [\"back\", \"again\"], \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.back\", \"unsafe\"]}}], \"fields\": [{\"id\": \"back\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"back\"}, \"required\": true}], \"reopens\": {\"after\": \"end\"}, \"title\": \"back_title\", \"titleSlots\": {\"move\": {\"labelOf\": \"move\"}}}";
+SET n += {skillId: "effectively", step: "back", kind: "ask", version: "eff-v1"}, n.specJson = "{\"clears\": [\"back\", \"again\"], \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.back\", \"unsafe\"]}}], \"fields\": [{\"id\": \"back\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"back\"}, \"required\": true}], \"reopens\": {\"after\": \"end\", \"again\": [\"again\"]}, \"title\": \"back_title\", \"titleSlots\": {\"move\": {\"labelOf\": \"move\"}}}";
 MATCH (s:Skill {id: "effectively"}), (n:SkillStep {id: "effectively:back"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 10};

@@ -169,7 +169,13 @@ test("ask how it went: optional chips book effective_move, which reopens the run
   const ny = run([pick("back", "not_yet"), next], ctx(), r);
   assert.equal(ny.stepId, "again");
   assert.deepEqual(step("again").followUp, { type: "effective_move", whenFrom: "again" });
-  assert.equal(lines(run([pick("again", "few_days"), next], ctx(), ny))[0], "The card will come back then.");
+  const rebooked = run([pick("again", "few_days"), next], ctx(), ny);
+  assert.equal(lines(rebooked)[0], "The card will come back then.");
+  // The card booked again on Not yet reopens the same plan (reopens.again), not a fresh visit.
+  const r2 = M.resumeRun(ctx(), M.runRecord(ctx(), rebooked), "back");
+  assert.ok(r2, "the rebooked card reopens the run");
+  assert.equal(r2.stepId, "back");
+  assert.equal(M.resumeRun(ctx(), M.runRecord(ctx(), run([pick("back", "helped"), next], ctx(), r)), "back"), null, "a move already answered doesn't reopen");
   assert.equal(lines(run([next], ctx(), ny))[0], "It'll be here when you're ready.");
   assert.match(readFileSync("functions/src/skills/projections.ts", "utf8"), /effectively: \{ toolId: 'effectiveness', happenedField: 'back', yes: \['helped', 'didnt'\]/);
   assert.equal(M.resumeRun(ctx(), M.runRecord(ctx(), run([pick("goal", "connected"), next])), "back"), null, "a run that never reached the end doesn't reopen");

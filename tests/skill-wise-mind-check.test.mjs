@@ -240,3 +240,9 @@ test("inline: danger from someone stops the check with the unsafe flag, which th
 test("the look-back logs no rep: it's neither a check nor a practice (OFF_PHONE_SKILLS with no yes)", () => {
   assert.match(readFileSync("functions/src/skills/projections.ts", "utf8"), /wise_mind_check: \{ toolId: 'wise-mind', happenedField: 'did', yes: \[\], unansweredKeepsOwn: true \}/);
 });
+
+test("inline: a danger or safety stop closes the sub-session as left early, so it logs no wise_mind rep", () => {
+  for (const id of ["hurt", "away"]) assert.equal(skill.steps.find((s) => s.id === id).complete, false, id);
+  const tsx = readFileSync("src/components/skillPlayer/SkillPlayer.tsx", "utf8");
+  assert.match(tsx, /const done = finished && !\(step\.kind === 'handoff' && step\.complete === false\);\n\s+void toolSession\.close\(\{ status: done \? 'completed' : 'exited_early'/);
+});

@@ -17501,7 +17501,10 @@
               }
             ],
             "reopens": {
-              "after": "end"
+              "after": "end",
+              "again": [
+                "again"
+              ]
             },
             "title": "back_title",
             "titleSlots": {
