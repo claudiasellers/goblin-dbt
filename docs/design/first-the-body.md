@@ -74,8 +74,12 @@ All three are documented in [`skill-runtime.md`](skill-runtime.md).
 
 ## Deferred to DT-01 part 2
 
-- `CrisisState` and `Intervention` graph nodes with `ROUTES_TO`; moving `src/data/microSteps.ts` (clinical content in
-  the frontend) into them.
+- ~~`CrisisState` and `Intervention` graph nodes with `ROUTES_TO`; moving `src/data/microSteps.ts`~~ **Built 15 Nov 2026:**
+  the micro-steps are graph content (`scripts/micro-steps/content.py` → `schema/micro-steps.cypher`: `Intervention
+  {kind: 'micro_step'}`, `ROUTES_TO {order}` from each `ActivationPattern` and from the `CrisisState` `fallback`),
+  shipped as `src/data/content/micro-steps.json` and read by `src/lib/microSteps.ts`; the hand-written file is deleted.
+  Same 49 steps, same ids and order, same rotation. The body modes as `Intervention` nodes are still to come (the
+  skill's options carry them today).
 - **Built 14 Nov 2026:** the *someone* card offers Held at the hand (`?enterAt=hand&frame=hurt`: the banner stays, and
   *stirred up* ends with someone to talk to, never back to the body) after the people and the kit, never after the
   frozen or far-away path (no calming mode there); *Not right now* opens the lid (`?enterAt=lid`). Help me now does not

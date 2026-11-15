@@ -36,6 +36,9 @@
  *   safety.json            the safety route (CORE-01, schema/safety-route.cypher): SafetyScreenFlow's copy, each
  *                          SafetyFlag's userCopy (never the clinician action), countries and their CrisisLines by
  *                          order (never checkedAt / verifiedAt / source: the audit stays in the graph)
+ *   micro-steps.json       the micro-steps (DT-01 part 2, schema/micro-steps.cypher): each ActivationPattern's
+ *                          and CrisisState's Intervention {kind: 'micro_step'} rows by ROUTES_TO order (no Cloud
+ *                          Function serves them; the check-in result and Help me now read them synchronously)
  *   opposite-action-picker.json  getOppositeActionContent's word → DBT parent rows and each parent's
  *                          label, acknowledgment and urges, for every word (Do the Opposite's doors)
  * Each builder mirrors the Cypher in the Cloud Function it replaces (named on the function).
@@ -69,6 +72,7 @@ export const WISE_MIND_VERSION = constant('functions/src/wiseMind/index.ts', 'WI
 export const COPE_AHEAD_VERSION = constant('functions/src/copeAhead/index.ts', 'COPE_AHEAD_VERSION');
 export const SKILLS_VERSION = constant('functions/src/skills/index.ts', 'SKILLS_VERSION');
 export const SAFETY_VERSION = constant('functions/src/safety/safetyAsk.ts', 'SAFETY_VERSION');
+export const MICRO_STEPS_VERSION = constant('src/lib/microSteps.ts', 'MICRO_STEPS_VERSION');
 
 /** Refuses anything but a content-only export with no user data and no dangling relationships. */
 export function assertContentOnly(exp) {
@@ -663,8 +667,31 @@ export function buildSafety(g) {
   return { version: SAFETY_VERSION, flow: JSON.parse(flow.props.contentJson), flags, countries };
 }
 
+/**
+ * The micro-steps (DT-01 part 2): the same payload scripts/micro-steps/fixture.py writes. null when the graph has no
+ * micro-step yet (a load before schema/micro-steps.cypher's first load): the committed micro-steps.json is kept. A
+ * wrong version throws.
+ */
+export function buildMicroSteps(g) {
+  const rows = [...g.rels('ROUTES_TO', 'ActivationPattern', 'Intervention'), ...g.rels('ROUTES_TO', 'CrisisState', 'Intervention')]
+    .filter((r) => r.b.props.kind === 'micro_step');
+  if (!rows.length) return null;
+  for (const r of rows) {
+    if (r.b.props.version !== MICRO_STEPS_VERSION) throw new Error(`Micro-steps are ${r.b.props.version}; the app expects ${MICRO_STEPS_VERSION}`);
+  }
+  const bySet = new Map();
+  for (const r of rows) pushTo(bySet, r.a.props.id, { order: r.props.order, step: r.b.props });
+  const sets = {};
+  for (const id of [...bySet.keys()].sort(asc)) {
+    sets[id] = bySet.get(id).sort((a, b) => asc(a.order, b.order) || asc(a.step.id, b.step.id)).map(({ step: s }) => ({
+      id: s.id, text: s.text, subtext: s.subtext ?? null, modality: s.modality, requiresEnvironment: s.requiresEnvironment === true,
+    }));
+  }
+  return { version: MICRO_STEPS_VERSION, sets };
+}
+
 /** Files a graph may not have content for yet: missing from an export, the committed file is kept. */
-export const KEPT_WHEN_MISSING = ['wise-mind.json', 'cope-ahead.json', 'skills.json', 'safety.json'];
+export const KEPT_WHEN_MISSING = ['wise-mind.json', 'cope-ahead.json', 'skills.json', 'safety.json', 'micro-steps.json'];
 
 /**
  * All the snapshots from one export (pure apart from reading the version constants). A file in
@@ -677,6 +704,7 @@ export function buildSnapshots(exp) {
   const copeAhead = buildCopeAhead(g);
   const skills = buildSkills(g);
   const safety = buildSafety(g);
+  const microSteps = buildMicroSteps(g);
   return {
     'related-words.json': buildRelatedWords(g),
     'body-map.json': buildBodyMap(g),
@@ -691,6 +719,7 @@ export function buildSnapshots(exp) {
     ...(copeAhead ? { 'cope-ahead.json': copeAhead } : {}),
     ...(skills ? { 'skills.json': skills } : {}),
     ...(safety ? { 'safety.json': safety } : {}),
+    ...(microSteps ? { 'micro-steps.json': microSteps } : {}),
   };
 }
 
