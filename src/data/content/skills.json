@@ -1,7 +1,7 @@
 {
   "source": {
     "file": "graph-content-only-2026-11-15.json",
-    "exportedAt": "2026-11-15T22:17:11.359Z"
+    "exportedAt": "2026-11-15T22:50:15.990Z"
   },
   "content": {
     "version": "skills-v1",
@@ -16725,18 +16725,18 @@
         },
         "tables": {
           "grievanceOf": {
-            "anger-blocked-redirect": "fight",
-            "envy-unfair-effective": "unfair",
             "anger-blocked-goal": "fight",
+            "anger-blocked-redirect": "fight",
             "envy-unfair-advantage": "unfair",
+            "envy-unfair-effective": "unfair",
             "fight": "fight",
             "unfair": "unfair"
           }
         },
         "derive": [
           {
-            "name": "grievance",
             "from": "$ctx.frame",
+            "name": "grievance",
             "table": "grievanceOf"
           }
         ],
@@ -16744,6 +16744,17 @@
           {
             "id": "goal",
             "kind": "ask",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.goal",
+                    "unsafe"
+                  ]
+                }
+              }
+            ],
             "fields": [
               {
                 "id": "goal",
@@ -16761,10 +16772,37 @@
                   "list": "goal"
                 },
                 "own": {
-                  "hint": "goal_own",
-                  "countsAsPick": true
+                  "countsAsPick": true,
+                  "hint": "goal_own"
                 },
                 "required": true
+              }
+            ],
+            "hint": "goal_hint",
+            "lines": [
+              {
+                "key": "valid_fight",
+                "when": {
+                  "eq": [
+                    "$d.grievance",
+                    "fight"
+                  ]
+                }
+              },
+              {
+                "key": "valid_unfair",
+                "when": {
+                  "eq": [
+                    "$d.grievance",
+                    "unfair"
+                  ]
+                }
+              },
+              {
+                "key": "valid_plain",
+                "when": {
+                  "all": []
+                }
               }
             ],
             "title": "goal_title",
@@ -16792,45 +16830,7 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "crisis": [
-              {
-                "variant": "other_person",
-                "when": {
-                  "eq": [
-                    "$a.goal",
-                    "unsafe"
-                  ]
-                }
-              }
-            ],
-            "hint": "goal_hint",
-            "lines": [
-              {
-                "when": {
-                  "eq": [
-                    "$d.grievance",
-                    "fight"
-                  ]
-                },
-                "key": "valid_fight"
-              },
-              {
-                "when": {
-                  "eq": [
-                    "$d.grievance",
-                    "unfair"
-                  ]
-                },
-                "key": "valid_unfair"
-              },
-              {
-                "when": {
-                  "all": []
-                },
-                "key": "valid_plain"
-              }
-            ]
+            "offers": []
           },
           {
             "id": "heads_up",
@@ -16854,6 +16854,14 @@
                 "required": true
               }
             ],
+            "lines": [
+              {
+                "key": "flooded_hint",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
             "title": "flooded_title",
             "next": [
               {
@@ -16870,39 +16878,21 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "lines": [
-              {
-                "when": {
-                  "all": []
-                },
-                "key": "flooded_hint"
-              }
-            ]
+            "offers": []
           },
           {
             "id": "body_first",
             "kind": "handoff",
-            "title": "flooded_title",
-            "next": [],
-            "offers": [
+            "complete": false,
+            "done": "done",
+            "lines": [
               {
-                "exit": "cool_down",
+                "key": "flooded_hint",
                 "when": {
                   "all": []
                 }
               }
             ],
-            "complete": false,
-            "lines": [
-              {
-                "when": {
-                  "all": []
-                },
-                "key": "flooded_hint"
-              }
-            ],
-            "done": "done",
             "links": [
               {
                 "exit": "safety_open",
@@ -16912,11 +16902,49 @@
                 }
               }
             ],
-            "noClose": true
+            "noClose": true,
+            "title": "flooded_title",
+            "next": [],
+            "offers": [
+              {
+                "exit": "cool_down",
+                "when": {
+                  "all": []
+                }
+              }
+            ]
           },
           {
             "id": "unsafe",
             "kind": "handoff",
+            "complete": false,
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "done": "done",
+            "lines": [
+              {
+                "key": "unsafe_line",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
             "title": "unsafe_title",
             "next": [],
             "offers": [
@@ -16928,34 +16956,6 @@
               },
               {
                 "exit": "ending_careful",
-                "when": {
-                  "all": []
-                }
-              }
-            ],
-            "complete": false,
-            "lines": [
-              {
-                "when": {
-                  "all": []
-                },
-                "key": "unsafe_line"
-              }
-            ],
-            "done": "done",
-            "links": [
-              {
-                "exit": "safety_open",
-                "label": "safety_open",
-                "when": {
-                  "all": []
-                }
-              }
-            ],
-            "noClose": true,
-            "crisis": [
-              {
-                "variant": "other_person",
                 "when": {
                   "all": []
                 }
@@ -16994,6 +16994,7 @@
                 "required": false
               }
             ],
+            "hint": "want_hint",
             "title": "want_title",
             "next": [
               {
@@ -17014,30 +17015,14 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "hint": "want_hint"
+            "offers": []
           },
           {
             "id": "piles",
             "kind": "embed",
-            "title": "piles_title",
-            "next": [
-              {
-                "to": "pull",
-                "when": null
-              }
-            ],
-            "offers": [],
-            "embed": "twoColumns",
             "answerAs": "piles_read",
+            "embed": "twoColumns",
             "hint": "piles_hint",
-            "props": {
-              "left": "right",
-              "right": "works",
-              "leftLabel": "right_label",
-              "rightLabel": "works_label",
-              "next": "next"
-            },
             "links": [
               {
                 "exit": "safety_open",
@@ -17046,7 +17031,22 @@
                   "all": []
                 }
               }
-            ]
+            ],
+            "props": {
+              "left": "right",
+              "leftLabel": "right_label",
+              "next": "next",
+              "right": "works",
+              "rightLabel": "works_label"
+            },
+            "title": "piles_title",
+            "next": [
+              {
+                "to": "pull",
+                "when": null
+              }
+            ],
+            "offers": []
           },
           {
             "id": "pull",
@@ -17082,6 +17082,17 @@
           {
             "id": "move",
             "kind": "ask",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.move",
+                    "unsafe"
+                  ]
+                }
+              }
+            ],
             "fields": [
               {
                 "id": "move",
@@ -17162,8 +17173,8 @@
                   }
                 },
                 "own": {
-                  "hint": "move_own",
-                  "countsAsPick": true
+                  "countsAsPick": true,
+                  "hint": "move_own"
                 },
                 "required": true
               }
@@ -17231,18 +17242,7 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "crisis": [
-              {
-                "variant": "other_person",
-                "when": {
-                  "eq": [
-                    "$a.move",
-                    "unsafe"
-                  ]
-                }
-              }
-            ]
+            "offers": []
           },
           {
             "id": "set_down",
@@ -17266,6 +17266,7 @@
                 "required": false
               }
             ],
+            "hint": "set_hint",
             "title": "set_title",
             "next": [
               {
@@ -17273,12 +17274,13 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "hint": "set_hint"
+            "offers": []
           },
           {
             "id": "end",
             "kind": "handoff",
+            "complete": true,
+            "done": "done",
             "fields": [
               {
                 "id": "remind",
@@ -17289,7 +17291,77 @@
                 }
               }
             ],
+            "followUp": {
+              "type": "effective_move",
+              "whenFrom": "remind"
+            },
+            "lines": [
+              {
+                "key": "end_even_line",
+                "when": {
+                  "all": [
+                    {
+                      "eq": [
+                        "$a.pull",
+                        "right"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$a.right.ids",
+                        "pay"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "key": "end_right_line",
+                "when": {
+                  "eq": [
+                    "$a.pull",
+                    "right"
+                  ]
+                }
+              },
+              {
+                "key": "end_set_line",
+                "when": {
+                  "set": "$a.set_down"
+                }
+              },
+              {
+                "key": "end_unsure_line",
+                "when": {
+                  "eq": [
+                    "$a.pull",
+                    "unsure"
+                  ]
+                }
+              },
+              {
+                "key": "end_line",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
             "title": "end_title",
+            "titleSlots": {
+              "move": {
+                "labelOf": "move"
+              }
+            },
             "next": [],
             "offers": [
               {
@@ -17389,79 +17461,7 @@
                   ]
                 }
               }
-            ],
-            "complete": true,
-            "lines": [
-              {
-                "when": {
-                  "all": [
-                    {
-                      "eq": [
-                        "$a.pull",
-                        "right"
-                      ]
-                    },
-                    {
-                      "has": [
-                        "$a.right.ids",
-                        "pay"
-                      ]
-                    }
-                  ]
-                },
-                "key": "end_even_line"
-              },
-              {
-                "when": {
-                  "eq": [
-                    "$a.pull",
-                    "right"
-                  ]
-                },
-                "key": "end_right_line"
-              },
-              {
-                "when": {
-                  "set": "$a.set_down"
-                },
-                "key": "end_set_line"
-              },
-              {
-                "when": {
-                  "eq": [
-                    "$a.pull",
-                    "unsure"
-                  ]
-                },
-                "key": "end_unsure_line"
-              },
-              {
-                "when": {
-                  "all": []
-                },
-                "key": "end_line"
-              }
-            ],
-            "done": "done",
-            "links": [
-              {
-                "exit": "safety_open",
-                "label": "safety_open",
-                "when": {
-                  "all": []
-                }
-              }
-            ],
-            "noClose": true,
-            "titleSlots": {
-              "move": {
-                "labelOf": "move"
-              }
-            },
-            "followUp": {
-              "type": "effective_move",
-              "whenFrom": "remind"
-            }
+            ]
           },
           {
             "id": "back",
@@ -17501,9 +17501,17 @@
               }
             ],
             "reopens": {
-              "after": "end"
+              "after": "end",
+              "again": [
+                "again"
+              ]
             },
             "title": "back_title",
+            "titleSlots": {
+              "move": {
+                "labelOf": "move"
+              }
+            },
             "next": [
               {
                 "to": "unsafe",
@@ -17528,12 +17536,7 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "titleSlots": {
-              "move": {
-                "labelOf": "move"
-              }
-            }
+            "offers": []
           },
           {
             "id": "again",
@@ -17558,6 +17561,10 @@
                 "required": false
               }
             ],
+            "followUp": {
+              "type": "effective_move",
+              "whenFrom": "again"
+            },
             "title": "back_not_yet",
             "next": [
               {
@@ -17565,15 +17572,55 @@
                 "when": null
               }
             ],
-            "offers": [],
-            "followUp": {
-              "type": "effective_move",
-              "whenFrom": "again"
-            }
+            "offers": []
           },
           {
             "id": "back_end",
             "kind": "handoff",
+            "complete": true,
+            "done": "done",
+            "lines": [
+              {
+                "key": "back_helped",
+                "when": {
+                  "eq": [
+                    "$a.back",
+                    "helped"
+                  ]
+                }
+              },
+              {
+                "key": "back_didnt",
+                "when": {
+                  "eq": [
+                    "$a.back",
+                    "didnt"
+                  ]
+                }
+              },
+              {
+                "key": "back_again_set",
+                "when": {
+                  "set": "$a.again"
+                }
+              },
+              {
+                "key": "back_again_none",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
             "next": [],
             "offers": [
               {
@@ -17585,51 +17632,7 @@
                   ]
                 }
               }
-            ],
-            "complete": true,
-            "lines": [
-              {
-                "when": {
-                  "eq": [
-                    "$a.back",
-                    "helped"
-                  ]
-                },
-                "key": "back_helped"
-              },
-              {
-                "when": {
-                  "eq": [
-                    "$a.back",
-                    "didnt"
-                  ]
-                },
-                "key": "back_didnt"
-              },
-              {
-                "when": {
-                  "set": "$a.again"
-                },
-                "key": "back_again_set"
-              },
-              {
-                "when": {
-                  "all": []
-                },
-                "key": "back_again_none"
-              }
-            ],
-            "done": "done",
-            "links": [
-              {
-                "exit": "safety_open",
-                "label": "safety_open",
-                "when": {
-                  "all": []
-                }
-              }
-            ],
-            "noClose": true
+            ]
           }
         ],
         "exits": [
@@ -17708,26 +17711,6 @@
           }
         ],
         "options": {
-          "heads_up": [
-            {
-              "value": "body",
-              "label": "My body first"
-            },
-            {
-              "value": "go",
-              "label": "Try it anyway"
-            }
-          ],
-          "remind": [
-            {
-              "value": "tomorrow",
-              "label": "Tomorrow"
-            },
-            {
-              "value": "few_days",
-              "label": "In a few days"
-            }
-          ],
           "goal": [
             {
               "value": "connected",
@@ -17753,6 +17736,16 @@
               "value": "unsafe",
               "label": "Someone threatened me, scared me or hurt me",
               "danger": "other"
+            }
+          ],
+          "heads_up": [
+            {
+              "value": "body",
+              "label": "My body first"
+            },
+            {
+              "value": "go",
+              "label": "Try it anyway"
             }
           ],
           "right": [
@@ -17827,38 +17820,38 @@
             {
               "value": "fight_ask",
               "label": "Ask myself what's the best I'd really get by pushing",
-              "grievance": "fight",
-              "goal": "host"
+              "goal": "host",
+              "grievance": "fight"
             },
             {
               "value": "fight_hold",
               "label": "Put this fight on hold for a week",
-              "grievance": "fight",
-              "goal": "host"
+              "goal": "host",
+              "grievance": "fight"
             },
             {
               "value": "fight_let",
               "label": "Put the energy where it can move something",
-              "grievance": "fight",
-              "goal": "host"
+              "goal": "host",
+              "grievance": "fight"
             },
             {
               "value": "unfair_have",
               "label": "Name what I do have: time, skills, people",
-              "grievance": "unfair",
-              "goal": "host"
+              "goal": "host",
+              "grievance": "unfair"
             },
             {
               "value": "unfair_plan",
               "label": "Make a plan from where I actually start",
-              "grievance": "unfair",
-              "goal": "host"
+              "goal": "host",
+              "grievance": "unfair"
             },
             {
               "value": "unfair_own",
               "label": "Put my energy into my own path",
-              "grievance": "unfair",
-              "goal": "host"
+              "goal": "host",
+              "grievance": "unfair"
             },
             {
               "value": "conn_one",
@@ -17971,9 +17964,9 @@
             {
               "value": "unsafe",
               "label": "They might hurt me if I do anything",
+              "danger": "other",
               "goal": "none",
-              "grievance": "none",
-              "danger": "other"
+              "grievance": "none"
             }
           ],
           "set_down": [
@@ -17988,6 +17981,16 @@
             {
               "value": "start",
               "label": "How unfair the start was"
+            }
+          ],
+          "remind": [
+            {
+              "value": "tomorrow",
+              "label": "Tomorrow"
+            },
+            {
+              "value": "few_days",
+              "label": "In a few days"
             }
           ],
           "back": [
