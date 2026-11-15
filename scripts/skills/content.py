@@ -44,6 +44,7 @@ import notice_and_name  # noqa: E402
 import unpack_a_judgment  # noqa: E402
 import one_thing  # noqa: E402
 import effectively  # noqa: E402
+import wise_mind_check  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
@@ -52,7 +53,7 @@ SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKIL
           ride_it_out.SKILL, let_it_be.SKILL, mind_job.SKILL, say_no.SKILL, dear_man_one.SKILL, held.SKILL, thoughts_passing.SKILL, dear_man_prep.SKILL,
           opposite_action.SKILL, habit_plan.SKILL, please_skill.SKILL, give.SKILL, good_things.SKILL, *crisis_kit.SKILLS, values.SKILL, build_mastery.SKILL,
           finding_connection.SKILL, notice_them.SKILL, rehearse.SKILL, emotion_guide.SKILL, emotion_myths.SKILL, walk_the_wave.SKILL, mindfulness_emotions.SKILL, sleep_reset.SKILL,
-          notice_and_name.SKILL, unpack_a_judgment.SKILL, one_thing.SKILL, effectively.SKILL]
+          notice_and_name.SKILL, unpack_a_judgment.SKILL, one_thing.SKILL, effectively.SKILL, wise_mind_check.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -135,6 +136,9 @@ EMBEDS = {
     "pebbleBowl": {"ids": ["done", "partly", "skipped", "room"], "measures": ["durationSec", "doneCount"]},
     # MF-03's rebuild (docs/design/unpack-a-judgment.md): read, then *How does that sit?*.
     "describeCard": {"ids": ["read"]},
+    # MF-04's stone (docs/design/wise-mind-check.md): let go, it sinks and rests. done (it rested) / partly (moved on
+    # while it sank) / skipped (never let go), and the seconds.
+    "stoneSink": {"ids": ["done", "partly", "skipped"], "measures": ["durationSec"]},
 }
 # What each embed takes from the skill (embeds.ts EMBED_PROPS; the contract test keeps the two equal). build.py
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
@@ -507,6 +511,15 @@ EMBED_PROPS = {
         "wantLead": {"type": "copy"},
         "next": {"type": "copy"},
         "empty": {"type": "copy"},
+    },
+    "stoneSink": {
+        "line1": {"type": "copy"},
+        "line2": {"type": "copy"},
+        "line3": {"type": "copy"},
+        "seconds": {"type": "int", "min": 10, "max": 120},
+        "start": {"type": "copy"},
+        "next": {"type": "copy"},
+        "skip": {"type": "copy"},
     },
 }
 # Shared tables the graph supplies to every skill (never written here).

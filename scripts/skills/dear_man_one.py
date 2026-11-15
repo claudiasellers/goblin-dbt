@@ -95,6 +95,7 @@ COPY = {
     "done": "Done",
     "cool_title": "Your message is put together. Send it now, or give it a little time first?",
     "cool_hint": "Sending is up to you. Messages sent from a hot place tend to land harder than we mean.",
+    "wise_title": "Before you send it: ask wise mind.",
     "aloud_title": "Read it out loud once.",
     "aloud_hint": "If a part sounds sharper than you mean, change it once you've pasted it.",
     "wait_title": "Phone down. The message will keep.",
@@ -106,6 +107,15 @@ COPY = {
     "resend_title": "Your message, ready when you are.",
     "later_label": "When do you want the reminder?",
     "later_line": "Pick a time and a reminder brings it back. It won't say who it's for or what it says.",
+    "later_no_line": "Not sending is a choice too. A reminder only brings it back. It won't say who it's for or what it says.",
+    # MF-04's check answered a quiet no (Gate 2): the message stays, sending is still there.
+    "quiet_no_title": "A quiet no. Want to keep the message for later?",
+    "quiet_no_hint": "Not sending is a choice too. The message will keep either way.",
+    # The check found danger from someone: no reminder, no send (the check's `away`).
+    "wise_unsafe_title": "Getting safe comes first.",
+    "wise_unsafe_line": "The message can wait. These can help you get away from someone who might hurt you safely.",
+    "safety_open": "Talk to someone now",
+    "ending_careful": "Leaving someone who might hurt me",
     "settle_line": "Settle your body first. Pick a time and a reminder brings the message back.",
     "predict_title": "How do you think they'll take it?",
     "sure_label": "How sure are you?",
@@ -193,8 +203,12 @@ COOL = [
     ("hold", "Hold it for ten minutes"),
     ("later", "Save it and remind me"),
     ("settle", "Settle my body first. Keep the message"),
+    # MF-04's check, inline (MF-B6): the decision is this message; the check hands back its answer, and the waiting
+    # stays here (Hold it, Save it and remind me). Before *I'm good to send it* (Gate 2).
+    ("wise", "Check it with wise mind first"),
     ("send", "I'm good to send it"),
 ]
+QUIET_NO = [("keep", "Save it and remind me"), ("show", "Show me the message anyway")]
 # The ask_delayed card's window chips (scripts/practice-spine/content.py ask_delayed).
 LATER = [("hour", "In an hour"), ("today", "This evening"), ("tomorrow", "Tomorrow")]
 PREDICT = [("well", "Well"), ("mixed", "Mixed"), ("badly", "Badly"), ("no_answer", "They won't answer")]
@@ -267,7 +281,19 @@ STEPS = [
         # Settle my body first keeps the message (saved, with a reminder), so settling never costs the draft.
         "fields": [{"id": "cool", "options": {"list": "cool"}, "max": 1, "required": True}],
         "next": [{"when": is_("cool", "aloud"), "to": "aloud"}, {"when": is_("cool", "hold"), "to": "wait"},
-                 {"when": {"in": [a("cool"), ["later", "settle"]]}, "to": "later"}, {"to": "message"}],
+                 {"when": {"in": [a("cool"), ["later", "settle"]]}, "to": "later"}, {"when": is_("cool", "wise"), "to": "wise"},
+                 {"to": "message"}],
+    },
+    {
+        # MF-04's wise mind check, run inline (R8): which mind is steering, the stone, what comes back. Its answer picks
+        # the way on: wait → hold it here; a quiet no → save it and remind me (the draft kept); a yes → the card.
+        "id": "wise", "kind": "embed", "embed": "inlineSkill", "title": "wise_title", "answerAs": "wise",
+        "props": {"skill": "wise_mind_check", "enterAt": "cues", "ctx": {"situationId": "send", "frame": "hosted", "band": "$ctx.band"}},
+        # The danger flag first (R8): the check's `away` (someone who might hurt them) never books a reminder.
+        "next": [{"when": {"has": ["$a.wise.ids", "unsafe"]}, "to": "wise_unsafe"},
+                 {"when": {"has": ["$a.wise.ids", "no_go"]}, "to": "quiet_no"},
+                 {"when": {"has": ["$a.wise.ids", "wait"]}, "to": "wait"},
+                 {"to": "message"}],
     },
     {
         "id": "aloud", "kind": "embed", "embed": "messageComposer", "title": "aloud_title", "hint": "aloud_hint",
@@ -286,8 +312,20 @@ STEPS = [
         "next": [{"to": "predict"}],
     },
     {
+        "id": "quiet_no", "kind": "ask", "title": "quiet_no_title", "hint": "quiet_no_hint",
+        "fields": [{"id": "quiet_no", "options": {"list": "quiet_no"}, "max": 1, "required": True}],
+        "next": [{"when": is_("quiet_no", "keep"), "to": "later"}, {"to": "resend"}],
+    },
+    {
+        "id": "wise_unsafe", "kind": "handoff", "complete": False, "noClose": True, "title": "wise_unsafe_title",
+        "lines": [{"when": None, "key": "wise_unsafe_line"}],
+        "offers": [{"exit": "safety_open", "when": {"all": []}}, {"exit": "ending_careful", "when": {"all": []}}], "done": "done",
+        "crisis": [{"variant": "other_person", "when": {"all": []}}],
+    },
+    {
         "id": "later", "kind": "handoff", "complete": True,
-        "lines": [{"when": is_("cool", "settle"), "key": "settle_line"}, {"when": None, "key": "later_line"}],
+        "lines": [{"when": is_("cool", "settle"), "key": "settle_line"},
+                  {"when": {"has": ["$a.wise.ids", "no_go"]}, "key": "later_no_line"}, {"when": None, "key": "later_line"}],
         "fields": [{"id": "later_when", "label": "later_label", "max": 1, "options": {"list": "later"}}],
         "followUp": {"type": "ask_delayed", "whenFrom": "later_when"},
         "offers": [{"exit": "cool_down", "when": is_("cool", "settle")}], "done": "done",
@@ -330,6 +368,8 @@ STEPS = [
 EXITS = [
     {"id": "cool_down", "toolId": "cool-down"},
     {"id": "let_go", "toolId": "fast", "query": {"frame": "let_go"}},
+    {"id": "safety_open", "toolId": None, "safety": True},   # safety.open (R6): after the check found danger
+    {"id": "ending_careful", "toolId": "ending-relationships", "query": {"frame": "careful"}, "label": "ending_careful"},
     {"id": "done", "done": True},
 ]
 
@@ -343,6 +383,7 @@ def options():
     out += [("ask", v, l, {"about": ab, "validation": val}, None) for v, l, ab, val in ASKS]
     out += [("why", v, l, {}, None) for v, l in WHY]
     out += [("cool", v, l, {}, None) for v, l in COOL]
+    out += [("quiet_no", v, l, {}, None) for v, l in QUIET_NO]
     out += [("later", v, l, {}, None) for v, l in LATER]
     out += [("predict", v, l, {}, None) for v, l in PREDICT]
     out += [("sure", v, l, {}, None) for v, l in SURE]

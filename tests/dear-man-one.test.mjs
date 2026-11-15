@@ -98,7 +98,7 @@ test("skill: calm goes to the card then the prediction; hot, not sure or a stirr
   assert.equal(toMessage("calm", stirred).stepId, "cool");
   const cool = toMessage("hot");
   assert.ok(!cool.path.includes("message"), "no Copy before the cooling screen");
-  assert.deepEqual(skill.options.cool.map((o) => o.value), ["aloud", "hold", "later", "settle", "send"]);
+  assert.deepEqual(skill.options.cool.map((o) => o.value), ["aloud", "hold", "later", "settle", "wise", "send"]);
   const send = play([pick("cool", "send"), next], ctx(), cool);
   assert.equal(send.stepId, "message", "sending is never locked: the card, then the prediction");
   assert.equal(play([next], ctx(), send).stepId, "predict");

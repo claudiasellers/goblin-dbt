@@ -65,6 +65,8 @@ export const FOLLOW_UP_SESSION_TOOL: Readonly<Record<string, string>> = {
   one_thing_again: 'one-thing',
   // What works here's *Want me to ask how it went?* (MF-08): only from a What works visit (it reopens that run).
   effective_move: 'effectiveness',
+  // Wise mind's look-back (MF-04): only from a wise mind check, standalone or inline in a host (it reopens that run).
+  wise_mind_lookback: 'wise-mind',
 };
 
 /** The plan's ids, as the after card needs them. Own words are the visit's (its Today card may show them). */

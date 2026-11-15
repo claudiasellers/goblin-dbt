@@ -29,6 +29,7 @@ import { EpisodeStrip } from './EpisodeStrip';
 import { PebbleBowl } from './PebbleBowl';
 import { ThoughtDrift } from './ThoughtDrift';
 import { DescribeCard } from './DescribeCard';
+import { StoneSink } from './StoneSink';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -106,6 +107,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   inlineSkill: InlineSkillEmbed,
   pebbleBowl: PebbleBowl,
   describeCard: DescribeCard,
+  stoneSink: StoneSink,
 };
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
@@ -155,6 +157,8 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   pebbleBowl: { ids: ['done', 'partly', 'skipped', 'room'], measures: ['durationSec', 'doneCount'] },
   // MF-03's rebuild: read, then *How does that sit?*.
   describeCard: { ids: ['read'] },
+  // MF-04's stone: rested (`done`), moved on while it sank (`partly`) or never let go (`skipped`), and the seconds.
+  stoneSink: { ids: ['done', 'partly', 'skipped'], measures: ['durationSec'] },
 };
 
 /**
@@ -570,5 +574,19 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     next: { type: 'copy' },
     /** The way on when nothing was picked. */
     empty: { type: 'copy' },
+  },
+
+  // MF-04 (docs/design/wise-mind-check.md): the stone, let go, sinking through clear water to rest on the sand.
+  stoneSink: {
+    /** One line per third of the sink: on the water, drifting down, resting. */
+    line1: { type: 'copy' },
+    line2: { type: 'copy' },
+    line3: { type: 'copy' },
+    seconds: { type: 'int', min: 10, max: 120 },
+    /** The tap that lets the stone go. */
+    start: { type: 'copy' },
+    next: { type: 'copy' },
+    /** The quiet way on before the stone rests (named apart from `next` for screen readers). */
+    skip: { type: 'copy' },
   },
 };

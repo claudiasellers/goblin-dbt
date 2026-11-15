@@ -470,6 +470,8 @@ export const tools: Tool[] = [
     dbtBasis: 'DBT Mindfulness: wise mind (states of mind; ideas for practising wise mind)',
     emoji: '🪨',
     bare: true,
+    // MF-04's check (docs/design/wise-mind-check.md): under a minute before a decision, then a look back tomorrow.
+    moreCards: [{ key: 'check', name: 'Check a decision with wise mind', tagline: 'Which mind is steering, then a quiet question', emoji: '🪨', query: 'frame=check' }],
   },
   {
     id: 'notice-and-name',
@@ -589,6 +591,7 @@ export const allIntents: Intent[] = [
   { id: 'one_message', label: 'Send someone one clear message', toolId: 'dear-man', query: 'mode=one', emoji: '✉️' },
   { id: 'dreading', label: 'Something\'s coming up that I\'m dreading', toolId: 'cope-ahead', emoji: '🧭' },
   { id: 'torn', label: 'I\'m torn about what to do', toolId: 'wise-mind', emoji: '🪨' },
+  { id: 'help-decide', label: 'Check a decision before I act', toolId: 'wise-mind', query: 'frame=check', emoji: '🪨' },
   { id: 'say-no', label: 'Say no to someone', toolId: 'say-no', emoji: '🙅' },
   { id: 'give', label: 'Repair things after a fight, or keep it warm', toolId: 'give', emoji: '🤝' },
   { id: 'less-alone', label: 'Feel less alone', toolId: 'finding-connection', emoji: '🌱' },

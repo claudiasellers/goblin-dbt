@@ -49,6 +49,8 @@ export const PAGE_SKILLS: Readonly<Record<string, readonly string[]>> = {
   'rehearse': ['rehearse'],
   'crisis-kit': ['crisis_kit_use', 'crisis_kit_build'],
   'emotion-guide': ['emotion_guide', 'emotion_myths', 'walk_the_wave'],
+  // Wise mind: the hand-built practice, and its check on the player (`?frame=check`, a reopened run; MF-04).
+  'wise-mind': ['wise_mind_check'],
 };
 
 /**

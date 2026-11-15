@@ -19,3 +19,11 @@ test('What works here: the move done (helped or not) is the rep; not yet logs no
   assert.deepEqual(S.runRep(ext('effectively', [...FIRST, ans('back', 'unsafe')]), 'effectiveness'), { noRep: true });
   assert.equal(S.runRep(ext('effectively', FIRST), 'effectiveness'), null);
 });
+
+test('Wise mind check: the look-back logs no rep whatever was done; the check itself keeps its own', () => {
+  const FIRST = [ans('decision', 'send'), ans('cues', 'now'), ans('answer', 'no'), ans('look', 'tomorrow')];
+  for (const did of ['waited', 'went', 'not', 'undecided']) {
+    assert.deepEqual(S.runRep(ext('wise_mind_check', [...FIRST, ans('did', did), ans('came', 'yes')]), 'wise-mind'), { noRep: true }, did);
+  }
+  assert.equal(S.runRep(ext('wise_mind_check', FIRST), 'wise-mind'), null);
+});

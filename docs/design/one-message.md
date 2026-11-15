@@ -98,7 +98,10 @@ different skill kind, never two change skills) kept this row, FAST's and Say no'
 ## Departures from the plan
 
 - **`wise_mind_check` is an ask step**, not an embed: three chips, the runtime's own ask. MF can lift it into an embed
-  when it has a second consumer. Its answer isn't the session's ask-fresh `wiseMindAnswer`: it steers this message only.
+  when it has a second consumer. Since MF-B6 (15 Nov, [`wise-mind-check.md`](wise-mind-check.md)) the full check is
+  its own inline skill, run from the cooling screen's *Check it with wise mind first* (`wise`): `unsafe` first →
+  `wise_unsafe` (the `other_person` resources, no reminder), `wait` → hold it, a quiet no → `quiet_no` (save it and
+  remind me, or show it anyway), a yes → the card. This first step stays. Its answer isn't the session's ask-fresh `wiseMindAnswer`: it steers this message only.
 - **No `Interaction` at send.** The PRD has Mode A write one; the debrief writes it when the outcome is answered, as for
   a prep, so one ask is one Interaction. The prediction is on the prep record for the debrief's readout later.
 - **No *talk to the angry part*** on the cooling screen yet: Recover's angry-part card runs before the hand-off.

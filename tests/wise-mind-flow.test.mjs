@@ -159,7 +159,7 @@ test("the tool: listed for everyone, in Mindfulness, in the intents, bare; its c
   assert.deepEqual([t.name, t.module, t.emoji, t.bare, t.listed], ["Wise mind", "mindfulness", "🪨", true, undefined]);
   assert.equal(t.dbtBasis, "DBT Mindfulness: wise mind (states of mind; ideas for practising wise mind)");
   assert.ok(toolsMod.listedTools().some((x) => x.id === "wise-mind"));
-  assert.deepEqual(toolsMod.intents.filter((i) => i.toolId === "wise-mind").map((i) => i.label), ["I'm torn about what to do"]);
+  assert.deepEqual(toolsMod.intents.filter((i) => i.toolId === "wise-mind").map((i) => i.label), ["I'm torn about what to do", "Check a decision before I act"]);
   assert.deepEqual(close.TOOL_CLOSE_KIND["wise-mind"], { module: "mf", closeKind: "orienting" });
   assert.deepEqual(spineTools.SPINE_TOOLS["wise-mind"], { module: "mf", closeKind: "orienting" });
   assert.ok(!spineTools.NOT_WHAT_HELPS.includes("wise-mind"));

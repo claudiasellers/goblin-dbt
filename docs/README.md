@@ -110,7 +110,7 @@ Waves follow the index: 1 safety floor and platform, 2 validation and the transf
 | 40 | IE-06 | GIVE | spec only | Routing row planned, off |
 | 41 | DT-06 | ACCEPTS + attention ladder | partial | Attention-shift activity on low-energy results only |
 | 42 | ER-12 | Problem Solve completion | partial | Problem Solve ships; saves nothing, no follow-up. On the runtime in PR #71 (open) |
-| 43 | MF-04 | Wise mind | shipped | 17 Oct (PR #49); [wise-mind.md](design/wise-mind.md). Routing row off |
+| 43 | MF-04 | Wise mind | shipped | 17 Oct (PR #49); [wise-mind.md](design/wise-mind.md). The check and the 24-hour look-back built 15 Nov on the skill runtime (MF-B6, [wise-mind-check.md](design/wise-mind-check.md)), inline in One message |
 | 44 | IE-07 | What matters most (`SizeIt`) | partial | Embedded in DEAR MAN; no standalone |
 | 45 | DT-11 | Alternate rebellion | shipped | Rebel without the wreckage on the runtime (PRs #57, #65): [alternate-rebellion.md](design/alternate-rebellion.md) |
 | 46 | IE-08 | Ending a relationship that's hurting you | spec only | Built in PR #70 (open): safety first, nothing kept, quick exit. Unparked 10 Nov (modules plan D14) |
