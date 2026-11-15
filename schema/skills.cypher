@@ -1053,7 +1053,7 @@ MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"any\": [{\"eq\": [\"$a.cost\", \"yes\"]}, {\"all\": [{\"has\": [\"$a.squeeze.ids\", \"scared\"]}, {\"in\": [\"$a.noticed\", [\"yes\", \"not_sure\"]]}]}]}";
 MATCH (a:SkillStep {id: "alternate_rebellion:pick"}), (b:SkillStep {id: "alternate_rebellion:sleep_on"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "{\"in\": [\"$a.undo\", [\"no\", \"not_sure\"]]}";
+SET r += {order: 1}, r.whenJson = "{\"all\": [{\"in\": [\"$a.undo\", [\"no\", \"not_sure\"]]}, {\"not\": {\"eq\": [\"$a.still\", \"yes\"]}}]}";
 MATCH (a:SkillStep {id: "alternate_rebellion:pick"}), (b:SkillStep {id: "alternate_rebellion:card"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 2}, r.whenJson = "null";
@@ -1065,7 +1065,7 @@ MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.heads_up\", \"lighter\"]}";
 MATCH (a:SkillStep {id: "alternate_rebellion:heads_up"}), (b:SkillStep {id: "alternate_rebellion:sleep_on"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 1}, r.whenJson = "{\"in\": [\"$a.undo\", [\"no\", \"not_sure\"]]}";
+SET r += {order: 1}, r.whenJson = "{\"all\": [{\"in\": [\"$a.undo\", [\"no\", \"not_sure\"]]}, {\"not\": {\"eq\": [\"$a.still\", \"yes\"]}}]}";
 MATCH (a:SkillStep {id: "alternate_rebellion:heads_up"}), (b:SkillStep {id: "alternate_rebellion:card"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 2}, r.whenJson = "null";

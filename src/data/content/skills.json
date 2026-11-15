@@ -994,12 +994,24 @@
               {
                 "to": "sleep_on",
                 "when": {
-                  "in": [
-                    "$a.undo",
-                    [
-                      "no",
-                      "not_sure"
-                    ]
+                  "all": [
+                    {
+                      "in": [
+                        "$a.undo",
+                        [
+                          "no",
+                          "not_sure"
+                        ]
+                      ]
+                    },
+                    {
+                      "not": {
+                        "eq": [
+                          "$a.still",
+                          "yes"
+                        ]
+                      }
+                    }
                   ]
                 }
               },
@@ -1086,12 +1098,24 @@
               {
                 "to": "sleep_on",
                 "when": {
-                  "in": [
-                    "$a.undo",
-                    [
-                      "no",
-                      "not_sure"
-                    ]
+                  "all": [
+                    {
+                      "in": [
+                        "$a.undo",
+                        [
+                          "no",
+                          "not_sure"
+                        ]
+                      ]
+                    },
+                    {
+                      "not": {
+                        "eq": [
+                          "$a.still",
+                          "yes"
+                        ]
+                      }
+                    }
                   ]
                 }
               },

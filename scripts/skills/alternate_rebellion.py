@@ -198,6 +198,10 @@ OTHER_PERSON = [{"variant": "other_person", "when": SCARED}]
 NOTICED_RISK = {"all": [SCARED, {"in": [a("noticed"), ["yes", "not_sure"]]}]}
 # Own words that can't (or might not) be undone: the 24-hour check before the card.
 NO_UNDO = {"in": [a("undo"), ["no", "not_sure"]]}
+# One that can't be undone waits a day, once: after the day-later card's *Yes, still mine* (`still`), the scared or
+# treatment re-check goes back through the list with its questions asked fresh, and a no to *Could you undo it?* there
+# reaches the card. Without this, a truthful no would send them to wait again on every check, for ever.
+WAITS = {"all": [NO_UNDO, {"not": {"eq": [a("still"), "yes"]}}]}
 COSTS = {"any": [{"eq": [a("cost"), "yes"]}, NOTICED_RISK]}
 SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
 # Screen 4's list: matched to the function; only quiet ones when someone they're scared of is a squeeze; none
@@ -254,7 +258,7 @@ STEPS = [
              "showWhen": {"own": "pick"}},
         ],
         "crisis": OTHER_PERSON,
-        "next": [{"when": COSTS, "to": "heads_up"}, {"when": NO_UNDO, "to": "sleep_on"}, {"to": "card"}],
+        "next": [{"when": COSTS, "to": "heads_up"}, {"when": WAITS, "to": "sleep_on"}, {"to": "card"}],
     },
     {
         "id": "heads_up", "kind": "ask",
@@ -262,7 +266,7 @@ STEPS = [
                   {"key": "heads_up_title"}],
         "fields": [{"id": "heads_up", "options": {"list": "heads_up"}, "max": 1, "required": True}],
         "crisis": OTHER_PERSON,
-        "next": [{"when": {"eq": [a("heads_up"), "lighter"]}, "to": "pick"}, {"when": NO_UNDO, "to": "sleep_on"}, {"to": "card"}],
+        "next": [{"when": {"eq": [a("heads_up"), "lighter"]}, "to": "pick"}, {"when": WAITS, "to": "sleep_on"}, {"to": "card"}],
     },
     {
         # The 24-hour check (PRD): an own rebellion that can't be undone gets no card today. *Ask me tomorrow* books

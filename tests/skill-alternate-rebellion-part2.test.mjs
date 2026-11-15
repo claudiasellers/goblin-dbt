@@ -130,6 +130,15 @@ test("a day later with someone they're scared of, or next to treatment: yes goes
   const treat = reopen(wait(["treatment"]), "still");
   assert.match(M.copyText(ctx(), step("still").title, treat), /care team first/);
   assert.equal(run([pick("still", "yes"), next], ctx(), treat).stepId, "pick");
+  // The wait is done once: the same answers again (it still can't be undone, nobody would notice) reach the card, not
+  // another day's wait; a cost still gets its heads-up, and keeping it there reaches the card too.
+  const again = run([pick("cost", "no"), pick("noticed", "no"), pick("undo", "no"), next], ctx(), yes);
+  assert.equal(again.stepId, "card", "a completed wait isn't asked for again");
+  const t = run([pick("still", "yes"), next], ctx(), treat);
+  assert.equal(run([pick("cost", "no"), pick("undo", "not_sure"), next], ctx(), t).stepId, "card");
+  const costs = run([pick("cost", "yes"), pick("undo", "no"), next], ctx(), t);
+  assert.equal(costs.stepId, "heads_up");
+  assert.equal(run([pick("heads_up", "keep"), next], ctx(), costs).stepId, "card");
 });
 
 test("the two-part close: acted on the blow-up urge, then that urge now (urge_change)", () => {
