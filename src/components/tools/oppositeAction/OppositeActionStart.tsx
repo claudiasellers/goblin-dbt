@@ -503,14 +503,22 @@ export function OppositeActionStart({
   );
 }
 
+/** Alternatives the graph names that are a way into a built tool: the body scan is Held's outside-in scan (DT-07). */
+const ALTERNATIVE_ENTRIES: Record<string, { toolId: string; query: string }> = {
+  "body-scan": { toolId: "soothe", query: "enterAt=scan" },
+};
+
 /** Where to go for words this skill doesn't work on: the graph's alternative when the app has it, else all tools. */
 function SkippedLink({ content, ids }: { content: OppositeActionPickerContent; ids: string[] }) {
-  const tool = ids
+  const target = ids
     .map((id) => content.words[id]?.alternativeSkill)
-    .map((id) => (id ? getToolById(id.replace(/^dbt_/, "").replace(/_/g, "-")) : undefined))
-    .find((t) => !!t);
+    .map((id) => (id ? id.replace(/^dbt_/, "").replace(/_/g, "-") : undefined))
+    .map((id) => (id ? ALTERNATIVE_ENTRIES[id] ?? { toolId: id, query: "" } : undefined))
+    .map((t) => (t ? { tool: getToolById(t.toolId), query: t.query } : undefined))
+    .find((t) => !!t?.tool);
+  const tool = target?.tool;
   return (
-    <Link className="font-semibold text-[var(--color-accent)] underline underline-offset-4" to={tool ? `/tool/${tool.id}` : "/tools"}>
+    <Link className="font-semibold text-[var(--color-accent)] underline underline-offset-4" to={tool ? `/tool/${tool.id}${target.query ? `?${target.query}` : ""}` : "/tools"}>
       {tool ? `Try ${tool.name}` : "See other tools"} →
     </Link>
   );
