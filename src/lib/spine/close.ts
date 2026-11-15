@@ -54,6 +54,8 @@ export const TOOL_CLOSE_KIND: Record<string, { module: SpineModule; closeKind: C
   'effectiveness': { module: 'mf', closeKind: 'none' },
   // Take a moment apart (MF-07, docs/design/moment-apart.md): no close (the description is the outcome).
   'moment-apart': { module: 'mf', closeKind: 'none' },
+  // Kind wishes (MF-06, docs/design/kind-wishes.md): *What came up?* is asked in the flow; no close after it.
+  'kind-wishes': { module: 'mf', closeKind: 'none' },
   'help-now': { module: 'core', closeKind: 'none' },
   'micro-step': { module: 'core', closeKind: 'none' },
   'guided-activity': { module: 'core', closeKind: 'none' },

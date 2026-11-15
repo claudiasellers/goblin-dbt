@@ -56,7 +56,7 @@ reminder).
 tools on existing `PracticeSkill`s: Notice (`observe`, 1, also `five-senses`), Name (`describe`, 2, Find the feeling
 first through `MF_LEADS`, so its daily practice isn't Notice what's here again; Take a moment apart joins it with MF-B7), Without judging (`nonjudge`, 3), Wise
 mind (`wise_mind`, 5). One thing (`one_thing`, 4) joined with
-MF-B4 (MF-05) and effectively (`effectively`, 6, *What works*) with MF-B5 (MF-08), so the sequence reads as the PRD's (observe → describe → nonjudgment → one-mindfully → wise mind → effectively →
+MF-B4 (MF-05) and effectively (`effectively`, 6, *What works*) with MF-B5 (MF-08), and Kind wishes (`kind_wishes`, 7) with MF-B8 (MF-06, last, so the daily pick reaches it once the others have reps), so the sequence reads as the PRD's (observe → describe → nonjudgment → one-mindfully → wise mind → effectively →
 participate). A new MF skill joins the home by getting an `mfOrder`, no client change. `five-senses` and Find the
 feeling now log `observe` / `describe` reps (the PRD's *PracticeSkill rows for existing tools*).
 

@@ -147,7 +147,7 @@ MERGE (k:PracticeSkill {id: "label"})
 SET k.defaultFor = ["find-the-feeling"], k.displayLabel = "Name it";
 
 // --- New PracticeSkills (only their own links are refreshed) ---
-MATCH (k:PracticeSkill)-[r:PRACTICES|SUPPORTED_BY]->() WHERE k.id IN ["urge_surf", "problem_solve", "wise_mind", "cope_ahead", "observe", "describe", "nonjudge", "one_thing", "effectively"] DELETE r;
+MATCH (k:PracticeSkill)-[r:PRACTICES|SUPPORTED_BY]->() WHERE k.id IN ["urge_surf", "problem_solve", "wise_mind", "cope_ahead", "observe", "describe", "nonjudge", "one_thing", "effectively", "kind_wishes"] DELETE r;
 MERGE (k:PracticeSkill {id: "urge_surf"})
 SET k.name = "Ride the urge", k.displayLabel = "Ride the urge", k.evidenceGrade = "Preliminary", k.evidenceBasis = "Limited trials", k.family = "mind", k.why = "Watching an urge rise and fall without acting on it teaches that it passes on its own.", k.defaultFor = ["urge-surfing"], k.reviewStatus = "draft";
 MATCH (k:PracticeSkill {id: "urge_surf"}), (c:TherapyConcept {id: "urge_surfing"})
@@ -211,6 +211,13 @@ MERGE (k)-[:PRACTICES]->(c);
 UNWIND ["linehan_skills_2015"] AS srcId
 MATCH (k:PracticeSkill {id: "effectively"}), (s:ClinicalSource {id: srcId})
 MERGE (k)-[:SUPPORTED_BY]->(s);
+MERGE (k:PracticeSkill {id: "kind_wishes"})
+SET k.name = "Loving kindness", k.displayLabel = "Loving kindness", k.evidenceGrade = "Preliminary", k.evidenceBasis = "Limited trials", k.family = "mind", k.why = "Offering kind wishes on purpose, whether or not they feel true, practises warmth toward others and toward yourself.", k.defaultFor = ["kind-wishes"], k.reviewStatus = "draft";
+MATCH (k:PracticeSkill {id: "kind_wishes"}), (c:TherapyConcept {id: "dbt_loving_kindness"})
+MERGE (k)-[:PRACTICES]->(c);
+UNWIND ["linehan_skills_2015"] AS srcId
+MATCH (k:PracticeSkill {id: "kind_wishes"}), (s:ClinicalSource {id: srcId})
+MERGE (k)-[:SUPPORTED_BY]->(s);
 
 // --- The Practice home (MF-02): the MF sequence, the library's names, the other tools that practise each skill ---
 MATCH (k:PracticeSkill {id: "observe"})
@@ -225,3 +232,5 @@ MATCH (k:PracticeSkill {id: "wise_mind"})
 SET k.mfOrder = 5, k.practiceLabel = "Wise mind", k.defaultFor = ["wise-mind"];
 MATCH (k:PracticeSkill {id: "effectively"})
 SET k.mfOrder = 6, k.practiceLabel = "What works", k.defaultFor = ["effectiveness"];
+MATCH (k:PracticeSkill {id: "kind_wishes"})
+SET k.mfOrder = 7, k.practiceLabel = "Kind wishes", k.defaultFor = ["kind-wishes"];

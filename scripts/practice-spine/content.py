@@ -909,7 +909,7 @@ SKILL_FIELDS = {
 # The Practice home (MF-02, MF-B3, docs/design/practice-home.md): the MF sequence (PRD MF-02 workflow 2: observe →
 # describe → nonjudgment → one-mindfully → wise mind → effectively → participate, then cycling) as `mfOrder`, and the
 # library's plain name per skill (`practiceLabel`). Only skills with a built tool are listed; One thing (MF-05) joined
-# with MF-B4 and What works (MF-08) with MF-B5; Join in (MF-10) joins the sequence with its batch. `alsoFor`: other tools that practise
+# with MF-B4, What works (MF-08) with MF-B5 and Kind wishes (MF-06) with MF-B8; Join in (MF-10) joins the sequence with its batch. `alsoFor`: other tools that practise
 # the skill (PRD: five-senses → observe, Find the feeling → describe), added to `defaultFor` so their reps count here.
 MF_SEQUENCE = [
     ("observe", 1, "Notice", ["five-senses"]),
@@ -918,6 +918,9 @@ MF_SEQUENCE = [
     ("one_thing", 4, "One thing", []),
     ("wise_mind", 5, "Wise mind", []),
     ("effectively", 6, "What works", []),
+    # Kind wishes (MF-06): last in the order, so the daily pick reaches it once the others have reps (PRD: MF-02
+    # rotation after the first weeks; Arch Map: the easy tier in week 3).
+    ("kind_wishes", 7, "Kind wishes", []),
 ]
 
 # The tool the home opens for a skill when its first `defaultFor` is shared with an earlier skill: Notice what's here
@@ -968,6 +971,12 @@ NEW_SKILLS = [
     ("effectively", "Effectively", "Preliminary", "mind", "dbt_effectively",
      "Naming what you want out of a situation, and one move that works from how things are, can loosen the pull of being right.",
      ["linehan_skills_2015"], ["effectiveness"]),
+    # Kind wishes (MF-06, docs/design/kind-wishes.md): a completed visit is a kind_wishes rep, backdraft or not (the rep is
+    # the offering, never the feeling). Preliminary: Moderate for loving-kindness generally (Petrovic et al. 2024), but
+    # Preliminary in BPD (Feliu-Soler et al. 2017), this app's population (the PRD's two grades).
+    ("kind_wishes", "Loving kindness", "Preliminary", "mind", "dbt_loving_kindness",
+     "Offering kind wishes on purpose, whether or not they feel true, practises warmth toward others and toward yourself.",
+     ["linehan_skills_2015"], ["kind-wishes"]),
 ]
 
 SOURCES = [

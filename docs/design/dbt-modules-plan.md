@@ -269,7 +269,7 @@ lands with F2 because two lanes need it in their first batch.
 |---|---|---|---|---|---|
 | `witness` | The receive beat: echo, one witness line, skip, say it my way | `WitnessBeat.tsx`, `getWitnessLines` | Foundation | F2 | DT-04, DT-11, IE-01 direct entry, ER function lines |
 | `holdRing` | Press-and-hold or tap-start ring, slowing pulse, early release counts, growth across holds; variants `press`, `timed`, `settle` | `ProgressRing`, OA `HoldToConfirm`, Cope Ahead `Settle`, Wise mind `HoldButton`, R13 | DT | F2 | DT-01/02/04/06/07, ER-04, ER-05 settle, ER-15 |
-| `bodyCard` | One pictogram body cue with a ring: willing hands, half-smile, hand on heart, press | OA body cues, Recover compassion copy; **built** in DT-01 part 1 (`BodyEmbeds.tsx` over `src/lib/bodyModes.ts`) | DT | DT-B2 | DT-01/04/07, IE-06, MF-03 (willing hands at the close, MF-B2), MF-06 later |
+| `bodyCard` | One pictogram body cue with a ring: willing hands, half-smile, hand on heart, press | OA body cues, Recover compassion copy; **built** in DT-01 part 1 (`BodyEmbeds.tsx` over `src/lib/bodyModes.ts`) | DT | DT-B2 | DT-01/04/07, IE-06, MF-03 (willing hands at the close, MF-B2), MF-06 (hand on heart after backdraft, MF-B8) |
 | `doseTimer` | Hands-free dose with lead-in (cold, move burst, warmth) | `CoolDown.tsx` clock and audio, `ColdReset`; **built** in DT-01 part 1 (`BodyEmbeds.tsx` over `src/lib/bodyModes.ts`) | DT | DT-B2 | DT-01, DT-07 |
 | `breathPacer` | Exhale-weighted pacer, dizzy/tingly stop rule | `BreathOrb`, capacity `sigh`; **built** in DT-01 part 1 (`BodyEmbeds.tsx` over `src/lib/bodyModes.ts`) | DT | DT-B2 | DT-01, DT-07, P2 |
 | `squeezeRelease` | Squeeze on the in-breath, drop on the out-breath ×3 | FTF Shape blob; **built** in DT-01 part 1 (`BodyEmbeds.tsx` over `src/lib/bodyModes.ts`) | DT | DT-B2 | DT-01 |
@@ -577,7 +577,7 @@ batch, no capacity probe (D1), the orienting close asked in the flow, reps throu
 | MF-B5 | **MF-08** What works here (**built 15 Nov**, [`what-works.md`](what-works.md): tool `effectiveness`, intent *Being right is getting in the way*, Problem Solve's two `effectiveness` directions built with the problem type as the frame, `effective_move` reopening the run, `mfOrder` 6; fade and Do the Opposite's offer are part 2) | MF-B1 | |
 | MF-B6 | **Built** (15 Nov, [`wise-mind-check.md`](wise-mind-check.md)). **MF-04** Wise mind check (`wise_mind_check` on the `wise-mind` tool at `?frame=check`, inline in One message; the `stoneSink` embed) and the 24-hour look-back (`wise_mind_lookback`) | MF-B1 | Wise mind's practice already ships |
 | MF-B7 | **MF-07** Take a moment apart (**built 15 Nov**, [`moment-apart.md`](moment-apart.md): tool `moment-apart` on the new concept `dbt_mindful_events`, intent *Work out what a moment was made of*, a good moment kept in ER-04's Things I like, Recover and the support resources for hurt and frightening moments, a `describe` rep; fade, the silhouette and the anhedonia history rule are part 2) | MF-B1 | |
-| MF-B8 | **MF-06** Kind wishes (tiers, backdraft) | MF-B1 | |
+| MF-B8 | **MF-06** Kind wishes (tiers, backdraft) (**built 15 Nov**, [`kind-wishes.md`](kind-wishes.md): tool `kind-wishes` on the new concept `dbt_loving_kindness`, the `wishOffer` embed, a `kind_wishes` rep at `mfOrder` 7) | MF-B1 | |
 | MF-B9 | **MF-09** Doing mind, being mind; **MF-10** Join in | MF-B4 | |
 
 ### 5.4 How the lanes work together

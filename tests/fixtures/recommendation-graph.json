@@ -536,6 +536,17 @@
    "direction": "neutral",
    "addresses": []
   },
+  "dbt_loving_kindness": {
+   "appToolId": "kind-wishes",
+   "name": "Loving Kindness",
+   "description": "Offering kind wishes on purpose, to someone easy, someone neutral, yourself, someone difficult or everyone around you, whether or not they feel true",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": []
+  },
   "dbt_mindful_events": {
    "appToolId": "moment-apart",
    "name": "Mindfulness of Pleasant and Unpleasant Events",

@@ -1373,6 +1373,17 @@ SET mindful_events += {
   skill_type: "what_skill"
 };
 
+// Loving kindness (PRD MF-06): kind wishes offered on purpose to someone easy, someone neutral, yourself, someone
+// difficult or everyone around you, without needing to feel them; Kind wishes (docs/design/kind-wishes.md).
+MERGE (loving_kindness:TherapyConcept {id: "dbt_loving_kindness"})
+SET loving_kindness += {
+  name: "Loving Kindness",
+  description: "Offering kind wishes on purpose, to someone easy, someone neutral, yourself, someone difficult or everyone around you, whether or not they feel true",
+  modality: "DBT",
+  module: "Mindfulness",
+  skill_type: "how_skill"
+};
+
 MERGE (check_the_facts:TherapyConcept {id: "dbt_check_facts"})
 SET check_the_facts += {
   name: "Check the Facts",
