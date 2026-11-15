@@ -2014,6 +2014,38 @@
         "notification": "Something you set aside is ready when you are."
       },
       {
+        "id": "ride_morning",
+        "ownerModule": "dt",
+        "tier": "practice",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/urge-surfing?run={sourceSessionId}&at=morning&followUp={followUpId}",
+        "staleAfterHours": 10,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "Something you rode out. How is it now?",
+          "title": "This morning"
+        },
+        "choices": [
+          {
+            "id": "not_now",
+            "label": "Not now",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "kind": "next_local",
+          "minAheadHours": 4,
+          "time": "08:00"
+        },
+        "notification": "A check-in you asked for is ready."
+      },
+      {
         "id": "safety_checkin",
         "ownerModule": "core",
         "tier": "safety",

@@ -59,6 +59,8 @@ export const FOLLOW_UP_SESSION_TOOL: Readonly<Record<string, string>> = {
   notice_back: 'mindfulness-of-others',
   // Sleep reset's morning check (ER-13): only from a Sleep reset visit (it reopens that run).
   sleep_morning: 'sleep-reset',
+  // Ride it out's morning card (DT-05 part 2): only from a Ride it out visit (it reopens that run).
+  ride_morning: 'urge-surfing',
 };
 
 /** The plan's ids, as the after card needs them. Own words are the visit's (its Today card may show them). */

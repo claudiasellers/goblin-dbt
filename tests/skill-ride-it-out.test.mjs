@@ -26,6 +26,9 @@ const run = (events, c = ctx(), from = M.initialRun(skill)) => events.reduce((s,
 const offers = (s, c = ctx()) => M.offersFor(c, M.stepOf(skill, s.stepId), s);
 const PULL = (p = "check") => [pick("pull", p), next];
 
+// Part 2: a ride's end goes through the morning card's offer first; *No card* (the quiet way on) goes on.
+const skipCard = { type: "next", quiet: true };
+
 test("the skill: tool urge-surfing, named Ride it out, the two-part close, played by the player; the old page stays", () => {
   assert.equal(skill.toolId, "urge-surfing");
   assert.equal(skill.start, "pull");
@@ -84,18 +87,19 @@ test("the trace is categorical samples in order: recorded as the step's out and 
   assert.deepEqual(s.out.ride.ids, ["still_here", "bigger", "fading", "gone", "ended_gone"]);
   assert.equal(s.out.ride.durationSec, 200);
   assert.deepEqual(s.answers.ride.ids, ["still_here", "bigger", "fading", "gone", "ended_gone"]);
-  const t = run([out("read")], ctx(), s);
+  const t = run([out("read"), skipCard], ctx(), s);
   assert.equal(t.stepId, "end");
   assert.equal(M.handoffLine(ctx(), M.stepOf(skill, "end"), t), "You watched it come down.", "the close asks whether they acted; the card doesn't say");
   assert.deepEqual(offers(t), ["pros_cons", "habit_plan"], "make a card for this pull (DT-10), or a habit plan for a check or use pull (DT-09)");
-  assert.deepEqual(offers(run([out("read")], ctx(), run([...PULL("send"), out("still_here", "ended_gone")]))), ["pros_cons"], "send: no habit plan");
+  assert.deepEqual(offers(run([out("read"), skipCard], ctx(), run([...PULL("send"), out("still_here", "ended_gone")]))), ["pros_cons"], "send: no habit plan");
   assert.ok(!M.stepOf(skill, "end").noClose, "the two-part close follows the end card");
 });
 
 test("leaving the ride early still draws what there was; leaving before any check goes straight to the end", () => {
   assert.equal(run([...PULL(), out("still_here", "ended_left")]).stepId, "shape");
-  assert.equal(run([...PULL(), out("ended_left")]).stepId, "end");
-  const s = run([...PULL(), out("ended_left")]);
+  assert.equal(run([...PULL(), out("ended_left")]).stepId, "morning_ask", "the morning card's offer, then the end");
+  const s = run([...PULL(), out("ended_left"), skipCard]);
+  assert.equal(s.stepId, "end");
   assert.equal(M.handoffLine(ctx(), M.stepOf(skill, "end"), s), "You stayed with it. That's the skill.");
 });
 
@@ -132,11 +136,11 @@ test("not now (H21): something else per pull, never food or drink; a five-minute
   assert.equal(M.copyText(ctx(), M.stepOf(skill, "round").title, r), "Not now. A walk for five minutes, even round the room.");
   const after = run([out("done")], ctx(), r);
   assert.equal(after.stepId, "after_round");
-  const passed = run([pick("after_round", "passed"), next], ctx(), after);
+  const passed = run([pick("after_round", "passed"), next, skipCard], ctx(), after);
   assert.equal(passed.stepId, "passed", "no checks before not now: nothing to draw");
   const drawn = run([...PULL(), out("still_here", "ended_not_now"), pick("swap", "walk"), next, out("done"), pick("after_round", "passed"), next]);
   assert.equal(drawn.stepId, "shape", "a ride before the round is drawn first");
-  assert.equal(run([out("read")], ctx(), drawn).stepId, "passed");
+  assert.equal(run([out("read"), skipCard], ctx(), drawn).stepId, "passed");
   assert.equal(M.handoffLine(ctx(), M.stepOf(skill, "passed"), passed), "You told it not now, and it eased.");
   const again = run([pick("after_round", "again"), next, out("done")], ctx(), after);
   assert.equal(again.stepId, "after_round2");

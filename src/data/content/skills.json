@@ -65441,7 +65441,7 @@
       {
         "id": "ride_it_out",
         "toolId": "urge-surfing",
-        "version": "ro-v1",
+        "version": "ro-v2",
         "start": "pull",
         "accepts": [
           "band",
@@ -65452,6 +65452,11 @@
         "copy": {
           "after_round_hint": "Any answer is fine.",
           "after_round_title": "How is it now?",
+          "back_eased": "You rode it out, and here's the morning.",
+          "back_hint": "Any answer is fine. It's only to notice.",
+          "back_same": "It's still around, and you still got through it.",
+          "back_strong": "It's back. You've ridden it once, so you know you can. A card for next time could help too.",
+          "back_title": "The urge you rode out. How is it this morning?",
           "bigger": "Bigger",
           "bigger_hint": "When it keeps growing, changing what you're doing can help.",
           "bigger_title": "It's getting bigger. Want to try something else for a bit?",
@@ -65465,6 +65470,9 @@
           "heads_up_hint": "You can settle your body first, or ride it now.",
           "heads_up_title": "Your body's loud right now. It can help to settle it first.",
           "hurt_end_line": "You stayed with it. The support is still here if it comes back.",
+          "morning_hint": "Seeing it in daylight can show you got through it.",
+          "morning_skip": "No card",
+          "morning_title": "Want a card in the morning, to look back on it?",
           "next": "Next",
           "not_now": "Tell it: not now",
           "not_now_hint": "Pick one, or five minutes with nothing else.",
@@ -65473,6 +65481,7 @@
           "pull_own": "Say it your way",
           "pull_title": "What's the urge?",
           "reach_line": "Please reach out to someone now, using the support on this screen. You don't have to hold this alone.",
+          "ride_again": "Ride it out again",
           "ride_again_title": "Back to watching it.",
           "ride_next": "Stop here",
           "ride_title": "Urges rise and fall. The job is not to act while it's high.",
@@ -66038,7 +66047,7 @@
                 }
               },
               {
-                "to": "end",
+                "to": "morning_ask",
                 "when": null
               }
             ],
@@ -66575,7 +66584,7 @@
                 }
               },
               {
-                "to": "passed",
+                "to": "morning_ask",
                 "when": {
                   "eq": [
                     "$a.after_round",
@@ -66866,7 +66875,7 @@
                 }
               },
               {
-                "to": "passed",
+                "to": "morning_ask",
                 "when": {
                   "eq": [
                     "$a.after_round2",
@@ -67047,7 +67056,7 @@
                 }
               },
               {
-                "to": "end",
+                "to": "morning_ask",
                 "when": null
               }
             ],
@@ -67123,6 +67132,84 @@
                   ]
                 }
               },
+              {
+                "to": "morning_ask",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "morning_ask",
+            "kind": "ask",
+            "title": "morning_title",
+            "hint": "morning_hint",
+            "secondary": "morning_skip",
+            "crisis": [
+              {
+                "variant": "crisis",
+                "when": {
+                  "any": [
+                    {
+                      "eq": [
+                        "$a.pull",
+                        "hurt"
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "in": [
+                            "$a.safe",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.safe_again",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "fields": [
+              {
+                "id": "remind",
+                "options": {
+                  "list": "remind"
+                },
+                "max": 1,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "followUp": {
+              "type": "ride_morning",
+              "when": {
+                "eq": [
+                  "$a.remind",
+                  "morning"
+                ]
+              }
+            },
+            "next": [
               {
                 "to": "passed",
                 "when": {
@@ -67593,6 +67680,221 @@
             ]
           },
           {
+            "id": "morning",
+            "kind": "ask",
+            "title": "back_title",
+            "hint": "back_hint",
+            "crisis": [
+              {
+                "variant": "crisis",
+                "when": {
+                  "any": [
+                    {
+                      "eq": [
+                        "$a.pull",
+                        "hurt"
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "in": [
+                            "$a.safe",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.safe_again",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "fields": [
+              {
+                "id": "morning",
+                "options": {
+                  "list": "morning"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "reopens": {
+              "after": "morning_ask"
+            },
+            "clears": [
+              "morning"
+            ],
+            "next": [
+              {
+                "to": "morning_end",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "morning_end",
+            "kind": "handoff",
+            "complete": true,
+            "noClose": true,
+            "crisis": [
+              {
+                "variant": "crisis",
+                "when": {
+                  "any": [
+                    {
+                      "eq": [
+                        "$a.pull",
+                        "hurt"
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "in": [
+                            "$a.safe",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.safe_again",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "lines": [
+              {
+                "when": {
+                  "in": [
+                    "$a.morning",
+                    [
+                      "gone",
+                      "quieter"
+                    ]
+                  ]
+                },
+                "key": "back_eased"
+              },
+              {
+                "when": {
+                  "in": [
+                    "$a.morning",
+                    [
+                      "same"
+                    ]
+                  ]
+                },
+                "key": "back_same"
+              },
+              {
+                "when": {
+                  "in": [
+                    "$a.morning",
+                    [
+                      "strong"
+                    ]
+                  ]
+                },
+                "key": "back_strong"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "next": [],
+            "offers": [
+              {
+                "exit": "ride_again",
+                "when": {
+                  "in": [
+                    "$a.morning",
+                    [
+                      "strong"
+                    ]
+                  ]
+                }
+              },
+              {
+                "exit": "pros_cons",
+                "when": {
+                  "in": [
+                    "$a.morning",
+                    [
+                      "same",
+                      "strong"
+                    ]
+                  ]
+                }
+              },
+              {
+                "exit": "habit_plan",
+                "when": {
+                  "all": [
+                    {
+                      "in": [
+                        "$a.morning",
+                        [
+                          "same",
+                          "strong"
+                        ]
+                      ]
+                    },
+                    {
+                      "in": [
+                        "$a.pull",
+                        [
+                          "use",
+                          "check"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
             "id": "reach",
             "kind": "handoff",
             "complete": true,
@@ -67708,6 +68010,16 @@
             },
             "carry": [],
             "done": false
+          },
+          {
+            "id": "ride_again",
+            "toolId": "urge-surfing",
+            "query": {
+              "urgeId": "$a.pull"
+            },
+            "carry": [],
+            "done": false,
+            "label": "ride_again"
           },
           {
             "id": "safety_open",
@@ -67876,6 +68188,30 @@
               "value": "still",
               "label": "Still here",
               "again": false
+            }
+          ],
+          "remind": [
+            {
+              "value": "morning",
+              "label": "In the morning"
+            }
+          ],
+          "morning": [
+            {
+              "value": "gone",
+              "label": "Gone"
+            },
+            {
+              "value": "quieter",
+              "label": "Quieter"
+            },
+            {
+              "value": "same",
+              "label": "About the same"
+            },
+            {
+              "value": "strong",
+              "label": "Back, and strong"
             }
           ]
         }

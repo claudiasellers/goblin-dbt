@@ -87,8 +87,18 @@ and nothing cold or squeezed for hurt myself (Gate 3: a sensation substitute kee
 
 - The person's own Find the feeling shape as the object (Shape room's urge loop), Tune's sound gesture, and the shared
   motion engine with ER-08's `waveRoom`: the 2D fallback ships now. The body anchor (*where is it?*).
-- Backgrounded checks with a notification at each one (stirred, 5–20 min) and the morning card (*Last night: rode it
-  out*); they need the follow-up action's push path.
+- Backgrounded checks with a notification at each one (stirred, 5–20 min): they need push, which the app doesn't have
+  (no service worker or sender; every follow-up type has `notify.push` off). Recommended as one shared piece later,
+  not per tool; until then the checks run in the tab.
+- **Built 15 Nov 2026 (part 2), the morning card, with no push and no new runtime condition:** after a ride, before the
+  end card, *Want a card in the morning, to look back on it?* (`morning_ask`; *In the morning*, or *No card*, the quiet
+  way on). Never after Hurt myself (its own end card) or on the not-safe route. *In the morning* books `ride_morning`,
+  an in-tab card on Today with the spine's `next_local` window (08:00, at least four hours ahead: a ride at 2 a.m. gets
+  it that morning, one at 5 a.m. or later the next), content-free copy (*This morning · Something you rode out. How is
+  it now?*). It reopens the visit at `morning` (R9, asked fresh): *gone · quieter · about the same · back, and strong*,
+  then `morning_end` (no second close: the visit closed the night before) with a line for each answer; *about the
+  same* or *back* offers a pros & cons card for the pull and, for check or use, a habit plan; *back* also offers
+  *Ride it out again* (a fresh visit, the pull listed first).
 - **Built 14 Nov 2026:** Hold to wait's *Ride it out* carries its pull (`urgeId`), listed first and never selected;
   Ride it out hands its own pull on to Pros & cons and When it's a habit the same way. Still to come: FTF's chase,
   OA's urge up.
