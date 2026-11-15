@@ -70,7 +70,8 @@ test("#4 a wound word leads to Recover on every pattern but Flooded (R7 everywhe
   assert.ok(!pickIds(await cell("emotional_flooding", "flooded", { words: ["hurt"] })).includes("recovering-from-invalidation"), "flooded: body first");
   const hurt = await run(lu({ emotions: ["Hurt"] }));
   assert.equal(hurt.pattern.id, "rumination_loop", "Hurt is low-energy: On replay, and Recover now reaches it");
-  assert.deepEqual(ids(hurt), ["recovering-from-invalidation", "problem-solve"]);
+  // On replay's swap beside Recover is One thing (MF-05 leads the looping cell since MF-B4): out of the head first.
+  assert.deepEqual(ids(hurt), ["recovering-from-invalidation", "one-thing"]);
 });
 
 test("#5 nothing named (somatic skip) → Alarm: Cool Down + Find the feeling", async () => {
@@ -114,10 +115,10 @@ test("#8b Low drive, nothing sounds good (bored, apathetic, indifferent): Runnin
   }
 });
 
-test("#9 rumination steady: Problem Solve + 5-4-3-2-1", async () => {
+test("#9 rumination steady: One thing + Problem Solve (MF-05, MF-B4; 5-4-3-2-1 the backup)", async () => {
   const r = await run(lu({ emotions: ["Sad"], band: "steady", discriminatingAnswers: ans("lu_mind_looping") }));
   assert.equal(r.pattern.id, "rumination_loop");
-  assert.deepEqual(ids(r), ["problem-solve", "five-senses"]);
+  assert.deepEqual(ids(r), ["one-thing", "problem-solve"]);
   assert.equal(r.guidedActivity.activityId, "attention-shift");
 });
 

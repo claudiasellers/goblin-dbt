@@ -50329,6 +50329,1365 @@
    }
   },
   {
+   "id": "one_thing",
+   "toolId": "one-thing",
+   "version": "ot-v1",
+   "start": "thing",
+   "accepts": [
+    "band",
+    "frame",
+    "enterAt"
+   ],
+   "ownMax": 40,
+   "emotionFields": [],
+   "copy": {
+    "flooded_title": "Your body's loud right now.",
+    "flooded_hint": "This works better once your body settles. You can start with your body, or try it anyway.",
+    "body_first": "My body first",
+    "outside_title": "First, a minute outside your head.",
+    "outside_hint": "Eyes open. Pick one.",
+    "look_title": "Find five things you can see.",
+    "here": "You're here, and it's",
+    "look_task": "Tap each one as you find it. Any size, any colour.",
+    "found": "Found one",
+    "found_done": "That's five.",
+    "listen_title": "Let sounds come to you.",
+    "listen_task": "Near or far, loud or soft. When your mind wanders, tap, and come back to listening.",
+    "came_back": "Came back",
+    "bowl_start": "Start",
+    "bowl_running": "A pebble for each time.",
+    "bowl_dropped": "A pebble in the bowl.",
+    "bowl_done": "That's the time.",
+    "bowl_skip": "Move on",
+    "mode_title": "Is your mind trying to fix a feeling like a task?",
+    "mode_hint": "Going over it, working it out, trying to make it stop.",
+    "mode_yes_title": "That's doing mind. Feelings don't get solved like tasks.",
+    "mode_yes_line": "Both minds are useful. Right now, a minute of being mind might help: one thing, done fully.",
+    "mode_no_title": "Then one thing, done fully, can still give your head a rest.",
+    "one_thing_go": "One thing",
+    "not_now": "Not now",
+    "thing_title": "Pick one thing to do with your whole attention.",
+    "thing_hint": "Something ordinary you could do now or soon.",
+    "thing_own": "Something else",
+    "length_title": "For how long?",
+    "how_title": "With the phone, or without it?",
+    "how_hint": "Without it is the goal. With it, the screen stays quiet and you tap each time you come back.",
+    "do_task": "When your mind wanders, tap, and come back to it.",
+    "away_hint": "Put the phone down. Come back when you're done.",
+    "back": "I'm back",
+    "ins_hands": "The temperature of the water. Then the soap.",
+    "ins_drink": "The weight of the cup. The sound as it pours.",
+    "ins_teeth": "The taste. The feel of each tooth.",
+    "ins_walk": "Your feet meeting the ground, one step and the next.",
+    "ins_eat": "Three bites. The taste, the texture, the swallow.",
+    "ins_shower": "Where the water lands. How warm it is.",
+    "ins_song": "One sound in the song. Then the next one.",
+    "ins_washup": "The warm water. One thing at a time.",
+    "ins_own": "{thing}. All of your attention on it.",
+    "with_title": "How much were you with it?",
+    "with_line": "In and out is the practice. Each time you came back, that was it.",
+    "loop_title": "The loop in your head now?",
+    "louder_title": "It got louder. That happens.",
+    "louder_line": "When your head is this loud, something for the body or a job for your mind can help first.",
+    "end_title": "One thing, done fully. That's the skill.",
+    "end_quieter_line": "The loop quietened a bit. One thing at a time is a way out of it you can use anywhere.",
+    "again_q": "Same thing tomorrow? I'll ask how it went.",
+    "end_short_title": "A minute outside your head. That counts.",
+    "end_quieter_short": "The loop quietened a bit. Looking or listening is a way out of it you can use anywhere.",
+    "again_title": "Did you get to do {thing} with your whole attention?",
+    "again_yes_line": "That's one-mindfulness off the phone. It goes wherever you do.",
+    "again_sort_line": "Some of it counts. Coming back is the practice.",
+    "again_not_line": "Not yet is fine. It'll be there next time.",
+    "next": "Next",
+    "done": "Done"
+   },
+   "tables": {
+    "firstThingOf": {
+     "blank": "walk"
+    }
+   },
+   "derive": [
+    {
+     "name": "firstThing",
+     "from": "$ctx.frame",
+     "table": "firstThingOf"
+    }
+   ],
+   "steps": [
+    {
+     "id": "outside",
+     "kind": "ask",
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       },
+       "key": "flooded_title"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "outside_title"
+      }
+     ],
+     "fields": [
+      {
+       "id": "outside",
+       "options": {
+        "list": "outside"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "cool_down",
+         "label": "body_first",
+         "when": {
+          "eq": [
+           "$ctx.band",
+           "flooded"
+          ]
+         }
+        }
+       ]
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       },
+       "key": "flooded_hint"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "outside_hint"
+      }
+     ],
+     "next": [
+      {
+       "to": "look",
+       "when": {
+        "eq": [
+         "$a.outside",
+         "look"
+        ]
+       }
+      },
+      {
+       "to": "listen",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "look",
+     "kind": "embed",
+     "embed": "orientFind",
+     "answerAs": "look",
+     "title": "look_title",
+     "props": {
+      "variant": "find",
+      "count": 5,
+      "here": "here",
+      "task": "look_task",
+      "foundLabel": "found",
+      "done": "found_done",
+      "next": "next"
+     },
+     "next": [
+      {
+       "to": "mode",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "listen",
+     "kind": "embed",
+     "embed": "pebbleBowl",
+     "answerAs": "listen",
+     "title": "listen_title",
+     "props": {
+      "seconds": 60,
+      "task": "listen_task",
+      "start": "bowl_start",
+      "tapLabel": "came_back",
+      "running": "bowl_running",
+      "dropped": "bowl_dropped",
+      "done": "bowl_done",
+      "next": "next",
+      "skip": "bowl_skip"
+     },
+     "next": [
+      {
+       "to": "mode",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "mode",
+     "kind": "ask",
+     "title": "mode_title",
+     "fields": [
+      {
+       "id": "mode",
+       "options": {
+        "list": "mode"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "hint": "mode_hint",
+     "next": [
+      {
+       "to": "mode_no",
+       "when": {
+        "eq": [
+         "$a.mode",
+         "no"
+        ]
+       }
+      },
+      {
+       "to": "mode_yes",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "mode_yes",
+     "kind": "ask",
+     "title": "mode_yes_title",
+     "fields": [
+      {
+       "id": "go",
+       "options": {
+        "list": "go"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "mode_yes_line"
+      }
+     ],
+     "next": [
+      {
+       "to": "loop",
+       "when": {
+        "eq": [
+         "$a.go",
+         "not_now"
+        ]
+       }
+      },
+      {
+       "to": "thing",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "mode_no",
+     "kind": "ask",
+     "title": "mode_no_title",
+     "fields": [
+      {
+       "id": "go_no",
+       "options": {
+        "list": "go"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "loop",
+       "when": {
+        "eq": [
+         "$a.go_no",
+         "not_now"
+        ]
+       }
+      },
+      {
+       "to": "thing",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "thing",
+     "kind": "ask",
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       },
+       "key": "flooded_title"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "thing_title"
+      }
+     ],
+     "fields": [
+      {
+       "id": "thing",
+       "options": {
+        "list": "thing",
+        "firstFrom": "$d.firstThing",
+        "where": {
+         "not": {
+          "all": [
+           {
+            "eq": [
+             "$opt.food",
+             true
+            ]
+           },
+           {
+            "has": [
+             "$p.pleaseRows",
+             "food"
+            ]
+           }
+          ]
+         }
+        }
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "cool_down",
+         "label": "body_first",
+         "when": {
+          "eq": [
+           "$ctx.band",
+           "flooded"
+          ]
+         }
+        }
+       ],
+       "own": {
+        "hint": "thing_own",
+        "countsAsPick": true
+       }
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       },
+       "key": "flooded_hint"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "thing_hint"
+      }
+     ],
+     "next": [
+      {
+       "to": "length",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "length",
+     "kind": "ask",
+     "title": "length_title",
+     "fields": [
+      {
+       "id": "length",
+       "options": {
+        "list": "length"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "how",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "how",
+     "kind": "ask",
+     "title": "how_title",
+     "fields": [
+      {
+       "id": "how",
+       "options": {
+        "list": "how"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "hint": "how_hint",
+     "next": [
+      {
+       "to": "away",
+       "when": {
+        "eq": [
+         "$a.how",
+         "away"
+        ]
+       }
+      },
+      {
+       "to": "do_minute",
+       "when": {
+        "eq": [
+         "$a.length",
+         "minute"
+        ]
+       }
+      },
+      {
+       "to": "do_song",
+       "when": {
+        "eq": [
+         "$a.length",
+         "song"
+        ]
+       }
+      },
+      {
+       "to": "do_done",
+       "when": {
+        "eq": [
+         "$a.length",
+         "done"
+        ]
+       }
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "do_minute",
+     "kind": "embed",
+     "embed": "pebbleBowl",
+     "answerAs": "do_minute",
+     "title": [
+      {
+       "when": {
+        "own": "thing"
+       },
+       "key": "ins_own"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "hands"
+        ]
+       },
+       "key": "ins_hands"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "drink"
+        ]
+       },
+       "key": "ins_drink"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "teeth"
+        ]
+       },
+       "key": "ins_teeth"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "walk"
+        ]
+       },
+       "key": "ins_walk"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "eat"
+        ]
+       },
+       "key": "ins_eat"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "shower"
+        ]
+       },
+       "key": "ins_shower"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "song"
+        ]
+       },
+       "key": "ins_song"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "washup"
+        ]
+       },
+       "key": "ins_washup"
+      }
+     ],
+     "props": {
+      "seconds": 60,
+      "task": "do_task",
+      "start": "bowl_start",
+      "tapLabel": "came_back",
+      "running": "bowl_running",
+      "dropped": "bowl_dropped",
+      "done": "bowl_done",
+      "next": "next",
+      "skip": "bowl_skip"
+     },
+     "titleSlots": {
+      "thing": {
+       "labelOf": "thing"
+      }
+     },
+     "next": [
+      {
+       "to": "with",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "do_song",
+     "kind": "embed",
+     "embed": "pebbleBowl",
+     "answerAs": "do_song",
+     "title": [
+      {
+       "when": {
+        "own": "thing"
+       },
+       "key": "ins_own"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "hands"
+        ]
+       },
+       "key": "ins_hands"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "drink"
+        ]
+       },
+       "key": "ins_drink"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "teeth"
+        ]
+       },
+       "key": "ins_teeth"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "walk"
+        ]
+       },
+       "key": "ins_walk"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "eat"
+        ]
+       },
+       "key": "ins_eat"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "shower"
+        ]
+       },
+       "key": "ins_shower"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "song"
+        ]
+       },
+       "key": "ins_song"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "washup"
+        ]
+       },
+       "key": "ins_washup"
+      }
+     ],
+     "props": {
+      "seconds": 210,
+      "task": "do_task",
+      "start": "bowl_start",
+      "tapLabel": "came_back",
+      "running": "bowl_running",
+      "dropped": "bowl_dropped",
+      "done": "bowl_done",
+      "next": "next",
+      "skip": "bowl_skip"
+     },
+     "titleSlots": {
+      "thing": {
+       "labelOf": "thing"
+      }
+     },
+     "next": [
+      {
+       "to": "with",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "do_done",
+     "kind": "embed",
+     "embed": "pebbleBowl",
+     "answerAs": "do_done",
+     "title": [
+      {
+       "when": {
+        "own": "thing"
+       },
+       "key": "ins_own"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "hands"
+        ]
+       },
+       "key": "ins_hands"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "drink"
+        ]
+       },
+       "key": "ins_drink"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "teeth"
+        ]
+       },
+       "key": "ins_teeth"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "walk"
+        ]
+       },
+       "key": "ins_walk"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "eat"
+        ]
+       },
+       "key": "ins_eat"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "shower"
+        ]
+       },
+       "key": "ins_shower"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "song"
+        ]
+       },
+       "key": "ins_song"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "washup"
+        ]
+       },
+       "key": "ins_washup"
+      }
+     ],
+     "props": {
+      "seconds": 300,
+      "task": "do_task",
+      "start": "bowl_start",
+      "tapLabel": "came_back",
+      "running": "bowl_running",
+      "dropped": "bowl_dropped",
+      "done": "bowl_done",
+      "next": "next",
+      "skip": "bowl_skip"
+     },
+     "titleSlots": {
+      "thing": {
+       "labelOf": "thing"
+      }
+     },
+     "next": [
+      {
+       "to": "with",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "away",
+     "kind": "ask",
+     "title": [
+      {
+       "when": {
+        "own": "thing"
+       },
+       "key": "ins_own"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "hands"
+        ]
+       },
+       "key": "ins_hands"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "drink"
+        ]
+       },
+       "key": "ins_drink"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "teeth"
+        ]
+       },
+       "key": "ins_teeth"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "walk"
+        ]
+       },
+       "key": "ins_walk"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "eat"
+        ]
+       },
+       "key": "ins_eat"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "shower"
+        ]
+       },
+       "key": "ins_shower"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "song"
+        ]
+       },
+       "key": "ins_song"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.thing",
+         "washup"
+        ]
+       },
+       "key": "ins_washup"
+      }
+     ],
+     "titleSlots": {
+      "thing": {
+       "labelOf": "thing"
+      }
+     },
+     "hint": "away_hint",
+     "fields": [
+      {
+       "id": "away",
+       "options": {
+        "list": "back"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "with",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "with",
+     "kind": "ask",
+     "title": "with_title",
+     "fields": [
+      {
+       "id": "with",
+       "options": {
+        "list": "with"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "loop",
+       "when": {
+        "eq": [
+         "$ctx.frame",
+         "ruminate"
+        ]
+       }
+      },
+      {
+       "to": "end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "loop",
+     "kind": "ask",
+     "title": "loop_title",
+     "fields": [
+      {
+       "id": "loop",
+       "options": {
+        "list": "loop"
+       },
+       "max": 1,
+       "required": true,
+       "askFresh": "thenVsNow"
+      }
+     ],
+     "next": [
+      {
+       "to": "louder",
+       "when": {
+        "eq": [
+         "$a.loop",
+         "worse"
+        ]
+       }
+      },
+      {
+       "to": "end_loop",
+       "when": {
+        "set": "$a.thing"
+       }
+      },
+      {
+       "to": "end_short",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "louder",
+     "kind": "handoff",
+     "complete": true,
+     "title": "louder_title",
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "louder_line"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": [
+      {
+       "exit": "cool_down",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "mind_job",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "end",
+     "kind": "handoff",
+     "complete": true,
+     "noClose": true,
+     "title": "end_title",
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "with_line"
+      }
+     ],
+     "done": "done",
+     "fields": [
+      {
+       "id": "when",
+       "label": "again_q",
+       "max": 1,
+       "options": {
+        "list": "when"
+       }
+      }
+     ],
+     "followUp": {
+      "type": "one_thing_again",
+      "whenFrom": "when"
+     },
+     "next": [],
+     "offers": []
+    },
+    {
+     "id": "end_loop",
+     "kind": "handoff",
+     "complete": true,
+     "title": "end_title",
+     "lines": [
+      {
+       "when": {
+        "in": [
+         "$a.loop",
+         [
+          "better",
+          "much_better"
+         ]
+        ]
+       },
+       "key": "end_quieter_line"
+      }
+     ],
+     "done": "done",
+     "fields": [
+      {
+       "id": "when",
+       "label": "again_q",
+       "max": 1,
+       "options": {
+        "list": "when"
+       }
+      }
+     ],
+     "followUp": {
+      "type": "one_thing_again",
+      "whenFrom": "when"
+     },
+     "next": [],
+     "offers": []
+    },
+    {
+     "id": "end_short",
+     "kind": "handoff",
+     "complete": true,
+     "title": "end_short_title",
+     "lines": [
+      {
+       "when": {
+        "in": [
+         "$a.loop",
+         [
+          "better",
+          "much_better"
+         ]
+        ]
+       },
+       "key": "end_quieter_short"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": []
+    },
+    {
+     "id": "again",
+     "kind": "ask",
+     "title": "again_title",
+     "fields": [
+      {
+       "id": "again",
+       "options": {
+        "list": "again"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "reopens": {
+      "after": "end"
+     },
+     "clears": [
+      "again"
+     ],
+     "titleSlots": {
+      "thing": {
+       "labelOf": "thing"
+      }
+     },
+     "next": [
+      {
+       "to": "again_end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "again_end",
+     "kind": "handoff",
+     "complete": true,
+     "noClose": true,
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.again",
+         "yes"
+        ]
+       },
+       "key": "again_yes_line"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.again",
+         "sort_of"
+        ]
+       },
+       "key": "again_sort_line"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "again_not_line"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": []
+    }
+   ],
+   "exits": [
+    {
+     "id": "cool_down",
+     "toolId": "cool-down",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "done",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": true
+    },
+    {
+     "id": "mind_job",
+     "toolId": "mind-job",
+     "query": {},
+     "carry": [],
+     "done": false
+    }
+   ],
+   "options": {
+    "thing": [
+     {
+      "value": "hands",
+      "label": "Wash my hands"
+     },
+     {
+      "value": "drink",
+      "label": "Make a drink"
+     },
+     {
+      "value": "teeth",
+      "label": "Brush my teeth"
+     },
+     {
+      "value": "walk",
+      "label": "Walk somewhere",
+      "move": true
+     },
+     {
+      "value": "eat",
+      "label": "Eat a few bites",
+      "food": true
+     },
+     {
+      "value": "shower",
+      "label": "Have a shower"
+     },
+     {
+      "value": "song",
+      "label": "Listen to one song"
+     },
+     {
+      "value": "washup",
+      "label": "Wash up",
+      "move": true
+     }
+    ],
+    "length": [
+     {
+      "value": "minute",
+      "label": "One minute"
+     },
+     {
+      "value": "song",
+      "label": "One song"
+     },
+     {
+      "value": "done",
+      "label": "Until it's done"
+     }
+    ],
+    "how": [
+     {
+      "value": "phone",
+      "label": "With the phone"
+     },
+     {
+      "value": "away",
+      "label": "Without the phone"
+     }
+    ],
+    "outside": [
+     {
+      "value": "look",
+      "label": "Look"
+     },
+     {
+      "value": "listen",
+      "label": "Listen"
+     }
+    ],
+    "mode": [
+     {
+      "value": "yes",
+      "label": "Yes"
+     },
+     {
+      "value": "maybe",
+      "label": "Maybe"
+     },
+     {
+      "value": "no",
+      "label": "No"
+     }
+    ],
+    "go": [
+     {
+      "value": "go",
+      "label": "One thing"
+     },
+     {
+      "value": "not_now",
+      "label": "Not now"
+     }
+    ],
+    "with": [
+     {
+      "value": "with",
+      "label": "Mostly with it"
+     },
+     {
+      "value": "in_out",
+      "label": "In and out"
+     },
+     {
+      "value": "elsewhere",
+      "label": "Mostly elsewhere"
+     }
+    ],
+    "loop": [
+     {
+      "value": "worse",
+      "label": "Louder"
+     },
+     {
+      "value": "same",
+      "label": "About the same"
+     },
+     {
+      "value": "better",
+      "label": "Quieter"
+     },
+     {
+      "value": "much_better",
+      "label": "Much quieter"
+     }
+    ],
+    "when": [
+     {
+      "value": "morning",
+      "label": "Tomorrow morning"
+     },
+     {
+      "value": "evening",
+      "label": "Tomorrow evening"
+     }
+    ],
+    "again": [
+     {
+      "value": "yes",
+      "label": "Yes"
+     },
+     {
+      "value": "sort_of",
+      "label": "Sort of"
+     },
+     {
+      "value": "not_yet",
+      "label": "Not yet"
+     }
+    ],
+    "back": [
+     {
+      "value": "back",
+      "label": "I'm back"
+     }
+    ]
+   },
+   "entries": {
+    "outside": "outside"
+   }
+  },
+  {
    "id": "opposite_action",
    "toolId": "opposite-action",
    "version": "oa-skill-v1",

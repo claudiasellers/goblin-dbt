@@ -125,6 +125,7 @@ test("tags (WMP-04 v0 side, skillKind, direction) on the 13 app-tool concepts; D
     "mindfulness-emotions": ["acceptance", "hold", "neutral"],
     "notice-and-name": ["acceptance", "orient", "orient"],
     "unpack-a-judgment": ["acceptance", "naming", "neutral"],
+    "one-thing": ["acceptance", "redirect", "neutral"],
   });
   for (const id of Object.keys(tags)) assert.ok(toolIds.includes(id), id);
 });

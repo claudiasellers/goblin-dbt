@@ -493,6 +493,19 @@ export const tools: Tool[] = [
     emoji: '🧺',
     bare: true,
   },
+  {
+    // MF-05 on the skill runtime (docs/design/one-thing.md): one ordinary activity with your whole attention; from a
+    // looping head (`?frame=ruminate`) a minute outside it and the doing-mind card come first.
+    id: 'one-thing',
+    name: 'One thing',
+    tagline: 'Do one ordinary thing with all of your attention',
+    description: 'Pick something ordinary, like washing your hands or making a drink, and give it your whole attention for a minute or a song. Your mind will wander. Coming back is the practice.',
+    whenToUse: 'When your head is looping, or you\'re doing five things at once and none of them well.',
+    module: 'mindfulness',
+    dbtBasis: 'DBT Mindfulness: one-mindfully (Mindfulness Handouts 5, 5c)',
+    emoji: '🫖',
+    bare: true,
+  },
   // Mindfulness (parts, docs/design/parts.md: listed and opened only with the parts switch on and its copy signed off)
   {
     id: 'meet-a-part',
@@ -548,6 +561,7 @@ export const allIntents: Intent[] = [
   { id: 'put-away', label: 'Put something away until later', toolId: 'mind-job', query: 'enterAt=lid', emoji: '📦' },
   { id: 'soothe', label: 'Be kind to myself for a minute', toolId: 'soothe', emoji: '🫶' },
   { id: 'thoughts-passing', label: 'A thought feels like a fact', toolId: 'thoughts-passing', emoji: '🍂' },
+  { id: 'out-of-head', label: 'Get out of my head', toolId: 'one-thing', query: 'enterAt=outside&frame=ruminate', emoji: '🫖' },
   { id: 'hard-on-myself', label: 'I\'m being hard on myself', toolId: 'unpack-a-judgment', emoji: '🧺' },
   { id: 'blow-it-up', label: 'I want to blow it all up', toolId: 'alternate-rebellion', emoji: '🎸' },
   { id: 'reasons', label: 'Make a card for a pull that keeps coming back', toolId: 'pros-cons', emoji: '⚖️' },

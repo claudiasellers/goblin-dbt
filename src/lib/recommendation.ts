@@ -75,10 +75,14 @@ export const CARD_FRAMES: Readonly<Record<string, Readonly<Record<string, string
   'finding-connection': { reward_drive_low: 'low', conservation_freeze: 'low' },
   // Notice what's here on a watchful result opens on Listen (MF-01: a non-threat framing, PRD MF §3.2).
   'notice-and-name': { chronic_vigilance: 'listen' },
+  // One thing on a looping result starts a minute outside your head, then the doing-mind card (MF-05's rumination
+  // variant: an entry and a frame, so the value is the whole query).
+  'one-thing': { rumination_loop: 'enterAt=outside&frame=ruminate' },
 };
 
 /** The result card's link: the tool page, with the frame its pattern gives, if any. */
 export function cardHref(toolId: string, activationPatternId?: string | null): string {
   const frame = activationPatternId ? CARD_FRAMES[toolId]?.[activationPatternId] : undefined;
-  return frame ? `/tool/${toolId}?frame=${frame}` : `/tool/${toolId}`;
+  if (!frame) return `/tool/${toolId}`;
+  return `/tool/${toolId}?${frame.includes('=') ? frame : `frame=${frame}`}`;
 }

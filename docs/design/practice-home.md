@@ -53,8 +53,8 @@ reminder).
 `scripts/practice-spine/content.py` `MF_SEQUENCE` sets `mfOrder`, the library's plain name (`practiceLabel`) and extra
 tools on existing `PracticeSkill`s: Notice (`observe`, 1, also `five-senses`), Name (`describe`, 2, Find the feeling
 first through `MF_LEADS`, so its daily practice isn't Notice what's here again), Without judging (`nonjudge`, 3), Wise
-mind (`wise_mind`, 5). Order 4 is left for one-mindfully
-(MF-05) so the sequence reads as the PRD's (observe → describe → nonjudgment → one-mindfully → wise mind → effectively →
+mind (`wise_mind`, 5). One thing (`one_thing`, 4) joined with
+MF-B4 (MF-05), so the sequence reads as the PRD's (observe → describe → nonjudgment → one-mindfully → wise mind → effectively →
 participate). A new MF skill joins the home by getting an `mfOrder`, no client change. `five-senses` and Find the
 feeling now log `observe` / `describe` reps (the PRD's *PracticeSkill rows for existing tools*).
 

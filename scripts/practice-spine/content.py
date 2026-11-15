@@ -296,6 +296,20 @@ FOLLOW_UP_TYPES = [
         "notification": "Your noticing practice is ready to check.",
     },
     {
+        # One thing (MF-05, docs/design/one-thing.md): *Same thing tomorrow?* on the end card, the next morning or evening.
+        # The card reopens that visit at `again` (R9 `reopens`: *Did you get to do {thing} with your whole attention?*);
+        # a yes is an off-phone rep (runRep). Opening it is the resolution. Content-free.
+        "id": "one_thing_again", "ownerModule": "mf", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/one-thing?run={sourceSessionId}&at=again&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"morning": {"kind": "at_local", "days": 1, "time": "09:00"},
+                                             "evening": {"kind": "at_local", "days": 1, "time": "19:00"}}},
+        "staleAfterHours": 48, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Your one thing", "body": "One thing, with your whole attention. Did you get to try it?"},
+        "choices": [{"id": "dismiss", "label": "Not this time", "status": "dismissed"}],
+        "notification": "Your one thing is ready to check.",
+    },
+    {
         # The Practice home's daily minute (MF-02, MF-B3, docs/design/practice-home.md): set once in Practice's setup
         # (*morning · midday · evening*; a cue of the person's own books nothing: the cue is the reminder). No rrule yet,
         # so it rolls: opening the card resolves it, and every visit to Practice books the next one when none is
@@ -865,13 +879,14 @@ SKILL_FIELDS = {
 
 # The Practice home (MF-02, MF-B3, docs/design/practice-home.md): the MF sequence (PRD MF-02 workflow 2: observe →
 # describe → nonjudgment → one-mindfully → wise mind → effectively → participate, then cycling) as `mfOrder`, and the
-# library's plain name per skill (`practiceLabel`). Only skills with a built tool are listed; One thing (MF-05),
-# What works (MF-08) and Join in (MF-10) join the sequence with their batches. `alsoFor`: other tools that practise
+# library's plain name per skill (`practiceLabel`). Only skills with a built tool are listed; One thing (MF-05) joined
+# with MF-B4; What works (MF-08) and Join in (MF-10) join the sequence with their batches. `alsoFor`: other tools that practise
 # the skill (PRD: five-senses → observe, Find the feeling → describe), added to `defaultFor` so their reps count here.
 MF_SEQUENCE = [
     ("observe", 1, "Notice", ["five-senses"]),
     ("describe", 2, "Name", ["find-the-feeling"]),
     ("nonjudge", 3, "Without judging", []),
+    ("one_thing", 4, "One thing", []),
     ("wise_mind", 5, "Wise mind", []),
 ]
 
@@ -912,6 +927,11 @@ NEW_SKILLS = [
     ("nonjudge", "Nonjudgmentally", "Preliminary", "mind", "dbt_nonjudgmental",
      "Taking a verdict apart into what happened, what you feel and what mattered can loosen its grip without arguing with it.",
      ["linehan_skills_2015"], ["unpack-a-judgment"]),
+    # One thing (MF-05, docs/design/one-thing.md): a completed visit is a one_thing rep (an off-phone one through the
+    # one_thing_again card). Preliminary: one-mindfulness at app dose has no trial of its own (the PRD's grade).
+    ("one_thing", "One-mindfully", "Preliminary", "mind", "dbt_one_mindfully",
+     "Giving one ordinary thing all of your attention, and coming back each time you drift, gives a looping head something else to hold.",
+     ["linehan_skills_2015"], ["one-thing"]),
 ]
 
 SOURCES = [

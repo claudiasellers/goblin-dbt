@@ -76,6 +76,9 @@ export const OFF_PHONE_SKILLS: Readonly<Record<string, { toolId: string; happene
   // without the app?*): yes is the off-phone rep (PRD MF-01 fade level 3); sort of or not yet log none. The first visit
   // keeps the close's own (observe and describe).
   notice_and_name: { toolId: 'notice-and-name', happenedField: 'offphone', yes: 'yes', unansweredKeepsOwn: true },
+  // One thing's *Same thing tomorrow?* (the one_thing_again card reopens the run at *Did you get to do it with your whole
+  // attention?*): yes is the off-phone rep (PRD MF-05 fade); sort of or not yet log none. The first visit keeps its own.
+  one_thing: { toolId: 'one-thing', happenedField: 'again', yes: 'yes', unansweredKeepsOwn: true },
 };
 
 /** The rep a run's close logs: off the phone (it happened), none (it didn't), or the close's own (null). */
