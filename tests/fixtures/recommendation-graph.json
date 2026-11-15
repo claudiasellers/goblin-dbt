@@ -662,6 +662,17 @@
     "sadness"
    ]
   },
+  "dbt_participate": {
+   "appToolId": "join-in",
+   "name": "Participate",
+   "description": "Enter into experience fully; become one with the activity",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": []
+  },
   "dbt_please": {
    "appToolId": "please-skill",
    "name": "PLEASE Skills",
@@ -745,6 +756,17 @@
    "side": "acceptance",
    "skillKind": "body",
    "direction": "down",
+   "addresses": []
+  },
+  "dbt_skillful_means": {
+   "appToolId": "doing-being",
+   "name": "Doing Mind and Being Mind",
+   "description": "Both modes are needed: doing mind works things out, being mind notices and lets things be, and wise mind uses each when it fits",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
    "addresses": []
   },
   "dbt_sleep_hygiene": {

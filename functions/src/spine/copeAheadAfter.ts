@@ -67,6 +67,9 @@ export const FOLLOW_UP_SESSION_TOOL: Readonly<Record<string, string>> = {
   effective_move: 'effectiveness',
   // Wise mind's look-back (MF-04): only from a wise mind check, standalone or inline in a host (it reopens that run).
   wise_mind_lookback: 'wise-mind',
+  // Doing mind's being break (MF-09) and Join in's *Next time, with someone?* (MF-10): only from their own visits.
+  being_break: 'doing-being',
+  join_in_social: 'join-in',
 };
 
 /** The plan's ids, as the after card needs them. Own words are the visit's (its Today card may show them). */

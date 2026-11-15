@@ -31,6 +31,7 @@ import { ThoughtDrift } from './ThoughtDrift';
 import { DescribeCard } from './DescribeCard';
 import { StoneSink } from './StoneSink';
 import { WishOffer } from './WishOffer';
+import { BeatPulse } from './BeatPulse';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -110,6 +111,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   describeCard: DescribeCard,
   stoneSink: StoneSink,
   wishOffer: WishOffer,
+  beatPulse: BeatPulse,
 };
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
@@ -162,6 +164,9 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   // MF-04's stone: rested (`done`), moved on while it sank (`partly`) or never let go (`skipped`), and the seconds.
   stoneSink: { ids: ['done', 'partly', 'skipped'], measures: ['durationSec'] },
   wishOffer: { ids: ['offered', 'partly', 'skipped'], measures: ['durationSec', 'doneCount'] },
+  // MF-10's beat: the whole round (`done`), some of it (`partly`) or never started (`skipped`), the seconds, and the taps
+  // along (a measure, never shown).
+  beatPulse: { ids: ['done', 'partly', 'skipped'], measures: ['durationSec', 'doneCount'] },
 };
 
 /**
@@ -611,4 +616,23 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     /** The wish offered when nothing usable was picked. */
     fallback: { type: 'copy', optional: true },
   },
+  // MF-10 (docs/design/join-in.md): a steady beat to move, hum or tap along to for one round; sound off until turned on.
+  beatPulse: {
+    /** Beats per minute (a blank frame's quicker rounds, a stirred reading's moderate one). */
+    bpm: { type: 'int', min: 60, max: 140 },
+    seconds: { type: 'int', min: 15, max: 180 },
+    /** The one instruction, above the beat. */
+    task: { type: 'copy' },
+    start: { type: 'copy' },
+    /** The beat circle's name (it's the tap-along target). */
+    tap: { type: 'copy' },
+    running: { type: 'copy' },
+    /** The sound toggle (a fixed name; pressed while on). */
+    sound: { type: 'copy' },
+    done: { type: 'copy' },
+    next: { type: 'copy' },
+    /** The quiet way on before the round is up (else `next`). */
+    skip: { type: 'copy', optional: true },
+  },
+
 };

@@ -578,7 +578,7 @@ batch, no capacity probe (D1), the orienting close asked in the flow, reps throu
 | MF-B6 | **Built** (15 Nov, [`wise-mind-check.md`](wise-mind-check.md)). **MF-04** Wise mind check (`wise_mind_check` on the `wise-mind` tool at `?frame=check`, inline in One message; the `stoneSink` embed) and the 24-hour look-back (`wise_mind_lookback`) | MF-B1 | Wise mind's practice already ships |
 | MF-B7 | **MF-07** Take a moment apart (**built 15 Nov**, [`moment-apart.md`](moment-apart.md): tool `moment-apart` on the new concept `dbt_mindful_events`, intent *Work out what a moment was made of*, a good moment kept in ER-04's Things I like, Recover and the support resources for hurt and frightening moments, a `describe` rep; fade, the silhouette and the anhedonia history rule are part 2) | MF-B1 | |
 | MF-B8 | **MF-06** Kind wishes (tiers, backdraft) (**built 15 Nov**, [`kind-wishes.md`](kind-wishes.md): tool `kind-wishes` on the new concept `dbt_loving_kindness`, the `wishOffer` embed, a `kind_wishes` rep at `mfOrder` 7) | MF-B1 | |
-| MF-B9 | **MF-09** Doing mind, being mind; **MF-10** Join in | MF-B4 | |
+| MF-B9 | **MF-09** Doing mind, being mind; **MF-10** Join in (**built 15 Nov**, [`doing-being.md`](doing-being.md), [`join-in.md`](join-in.md): tool `doing-being` on the new concept `dbt_skillful_means` (the card, the weekly shape, Problem Solve's rumination guard as a link, the `being_break` card) and tool `join-in` on `dbt_participate` (the `beatPulse` embed, not offered flooded or angry, the `join_in_social` card, a `participate` rep at `mfOrder` 7)) | MF-B4 | |
 
 ### 5.4 How the lanes work together
 

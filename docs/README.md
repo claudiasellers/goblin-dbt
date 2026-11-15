@@ -132,11 +132,11 @@ Waves follow the index: 1 safety floor and platform, 2 validation and the transf
 | 61 | CORE-12 | Outcomes, fade and graduation | spec only | Reflect shows what helped; no outcomes or fade |
 | 62 | DT-08 | Thoughts passing through | spec only | |
 | 63 | IE-10 | Notice them | built (part 1) | What they did and what I added, and noticing someone with curiosity ([design/notice-them.md](design/notice-them.md)) |
-| 64 | MF-09 | Doing mind, being mind | spec only | |
+| 64 | MF-09 | Doing mind, being mind | built (part 1) | *Doing mind, being mind* on the skill runtime (MF-B9, 15 Nov): the mode card on its own (Problem Solve's rumination guard, the intent) with a minute of being mind or One thing, and the weekly shape from the Practice home (a being break as a cue, drifting → one small doing); a `skillful_means` rep. [`doing-being.md`](design/doing-being.md) |
 | 65 | ER-14 | It isn't working (ER troubleshooting) | shipped | On the runtime (PRs #58, #67): [er-troubleshoot.md](design/er-troubleshoot.md) |
 | 66 | WMP-09 | Where am I swinging? | spec only | |
 | 67 | IE-12 | What gets in the way (myths) | built (part 1) | DEAR MAN's prep: barriers, then the thoughts about asking ([design/dear-man-prep.md](design/dear-man-prep.md)) |
-| 68 | MF-10 | Join in (participate) | spec only | |
+| 68 | MF-10 | Join in (participate) | built (part 1) | *Join in* on the skill runtime (MF-B9, 15 Nov): pick something to throw yourself into, the `beatPulse` beat (sound off until turned on) or the phone down, *How much were you in it?*, next time with someone; not offered flooded or angry; a `participate` rep on the Practice home. [`join-in.md`](design/join-in.md) |
 | 69 | WMP-10 | Change the pattern with them | spec only | |
 | 70 | ER-15 | Rewrite the nightmare | shipped | On the runtime (PR #69), unparked 10 Nov (D14): [nightmare-rescript.md](design/nightmare-rescript.md) |
 | 71 | CORE-13 | Optional clinician sharing | spec only | Export exists in Me; no sharing |

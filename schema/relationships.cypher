@@ -491,6 +491,9 @@ MERGE (c)-[:PART_OF]->(mod);
 MATCH (c:TherapyConcept {id: "dbt_loving_kindness"}), (mod:TherapyConcept {id: "dbt_mindfulness_module"})
 MERGE (c)-[:PART_OF]->(mod);
 
+MATCH (c:TherapyConcept {id: "dbt_skillful_means"}), (mod:TherapyConcept {id: "dbt_mindfulness_module"})
+MERGE (c)-[:PART_OF]->(mod);
+
 // DBT Distress Tolerance Skills -> Module
 MATCH (c:TherapyConcept {id: "dbt_tipp"}), (mod:TherapyConcept {id: "dbt_distress_tolerance"})
 MERGE (c)-[:PART_OF]->(mod);

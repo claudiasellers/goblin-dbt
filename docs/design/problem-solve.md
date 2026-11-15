@@ -147,7 +147,8 @@ holds.
   offered the union. The runtime derives one parent from one word, and directions follow one problem type. The
   check-in's carried words come first in the chips.
 - **The rumination guard is gone.** It counted re-entries to the define screen, and the runtime has no loop counter.
-  The barrier question (*I've been thinking about it constantly* → start small) covers the same ground.
+  The barrier question (*I've been thinking about it constantly* → start small) covers the same ground, and since
+  MF-B9 that answer links Doing mind, being mind's card (*Is my mind trying to fix a feeling?*, `enterAt=mode`).
 - **The three-bucket sort is two questions, one a screen.** Facts, others and yours become *in your hands* and *up to someone
   else*; what neither question picks is a fact. There are no default buckets; the pile-sort embed (`pileSort`,
   ER-B4) can bring the sort back.

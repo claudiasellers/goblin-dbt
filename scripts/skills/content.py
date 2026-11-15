@@ -47,6 +47,8 @@ import effectively  # noqa: E402
 import wise_mind_check  # noqa: E402
 import moment_apart  # noqa: E402
 import kind_wishes  # noqa: E402
+import doing_being  # noqa: E402
+import join_in  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
@@ -56,7 +58,7 @@ SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKIL
           opposite_action.SKILL, habit_plan.SKILL, please_skill.SKILL, give.SKILL, good_things.SKILL, *crisis_kit.SKILLS, values.SKILL, build_mastery.SKILL,
           finding_connection.SKILL, notice_them.SKILL, rehearse.SKILL, emotion_guide.SKILL, emotion_myths.SKILL, walk_the_wave.SKILL, mindfulness_emotions.SKILL, sleep_reset.SKILL,
           notice_and_name.SKILL, unpack_a_judgment.SKILL, one_thing.SKILL, effectively.SKILL, wise_mind_check.SKILL,
-          moment_apart.SKILL, kind_wishes.SKILL]
+          moment_apart.SKILL, kind_wishes.SKILL, doing_being.SKILL, join_in.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -145,6 +147,9 @@ EMBEDS = {
     # MF-06's offer (docs/design/kind-wishes.md): the wishes one at a time. offered (all) / partly / skipped, the
     # seconds, and how many were offered (a measure, never shown).
     "wishOffer": {"ids": ["offered", "partly", "skipped"], "measures": ["durationSec", "doneCount"]},
+    # MF-10's beat (docs/design/join-in.md): one round to move, hum or tap along to. done / partly / skipped, the
+    # seconds, and the taps along (a measure, never shown).
+    "beatPulse": {"ids": ["done", "partly", "skipped"], "measures": ["durationSec", "doneCount"]},
 }
 # What each embed takes from the skill (embeds.ts EMBED_PROPS; the contract test keeps the two equal). build.py
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
@@ -539,6 +544,19 @@ EMBED_PROPS = {
         "chipsOnly": {"type": "int", "min": 0, "max": 1, "optional": True},
         "fallback": {"type": "copy", "optional": True},
     },
+    "beatPulse": {
+        "bpm": {"type": "int", "min": 60, "max": 140},
+        "seconds": {"type": "int", "min": 15, "max": 180},
+        "task": {"type": "copy"},
+        "start": {"type": "copy"},
+        "tap": {"type": "copy"},
+        "running": {"type": "copy"},
+        "sound": {"type": "copy"},
+        "done": {"type": "copy"},
+        "next": {"type": "copy"},
+        "skip": {"type": "copy", "optional": True},
+    },
+
 }
 # Shared tables the graph supplies to every skill (never written here).
 GRAPH_TABLES = ("parentOf", "fitsWhen", "feelingOf", "feelingGuideOf")

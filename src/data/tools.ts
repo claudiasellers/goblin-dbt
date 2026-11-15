@@ -548,6 +548,32 @@ export const tools: Tool[] = [
     emoji: '🕊️',
     bare: true,
   },
+  {
+    // MF-09 on the skill runtime (docs/design/doing-being.md): the mode card on its own and the weekly shape; One
+    // thing's rumination variant asks the same card inside its own run.
+    id: 'doing-being',
+    name: 'Doing mind, being mind',
+    tagline: 'Notice when your mind is trying to fix a feeling',
+    description: 'Doing mind works things out. Being mind notices and lets things be. Check which one is running, take a minute of being mind, or look at how your week balanced out.',
+    whenToUse: 'When you keep going over something, or a week has been all doing or no doing at all.',
+    module: 'mindfulness',
+    dbtBasis: 'DBT Mindfulness Handout 9: doing mind, being mind',
+    emoji: '🔀',
+    bare: true,
+  },
+  {
+    // MF-10 on the skill runtime (docs/design/join-in.md): throw yourself into something for a round, to a beat or
+    // with the phone down; not offered flooded or angry.
+    id: 'join-in',
+    name: 'Join in',
+    tagline: 'Throw yourself into something, no watching needed',
+    description: 'Move to a beat, hum along, tap a rhythm, or put the phone down and join a game or a chore. When you catch yourself watching yourself, drop back in.',
+    whenToUse: 'When you feel flat or switched off, or keep watching yourself instead of taking part.',
+    module: 'mindfulness',
+    dbtBasis: 'DBT Mindfulness Handout 4: participate',
+    emoji: '🥁',
+    bare: true,
+  },
   // Mindfulness (parts, docs/design/parts.md: listed and opened only with the parts switch on and its copy signed off)
   {
     id: 'meet-a-part',
@@ -607,6 +633,8 @@ export const allIntents: Intent[] = [
   { id: 'right-or-works', label: 'Being right is getting in the way', toolId: 'effectiveness', emoji: '🎯' },
   { id: 'what-it-was', label: 'Work out what a moment was made of', toolId: 'moment-apart', emoji: '🔬' },
   { id: 'kind-wishes', label: 'Practise being kind, to someone or to me', toolId: 'kind-wishes', emoji: '🕊️' },
+  { id: 'fixing-feeling', label: 'I keep trying to fix how I feel', toolId: 'doing-being', query: 'enterAt=mode', emoji: '🔀' },
+  { id: 'join-in', label: 'Stop watching myself and join in', toolId: 'join-in', emoji: '🥁' },
   { id: 'hard-on-myself', label: 'I\'m being hard on myself', toolId: 'unpack-a-judgment', emoji: '🧺' },
   { id: 'blow-it-up', label: 'I want to blow it all up', toolId: 'alternate-rebellion', emoji: '🎸' },
   { id: 'reasons', label: 'Make a card for a pull that keeps coming back', toolId: 'pros-cons', emoji: '⚖️' },

@@ -273,6 +273,48 @@
         "notification": "Ready to look back?"
       },
       {
+        "id": "being_break",
+        "ownerModule": "mf",
+        "tier": "practice",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/doing-being?run={sourceSessionId}&at=back&followUp={followUpId}",
+        "staleAfterHours": 48,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "title": "Your being break",
+          "body": "A minute of being mind, at a moment you already have. Did you get to take one?"
+        },
+        "choices": [
+          {
+            "id": "dismiss",
+            "label": "Not this time",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "kind": "chip",
+          "chips": {
+            "morning": {
+              "kind": "at_local",
+              "days": 1,
+              "time": "09:00"
+            },
+            "evening": {
+              "kind": "at_local",
+              "days": 1,
+              "time": "19:00"
+            }
+          }
+        },
+        "notification": "Your being break is ready to check."
+      },
+      {
         "id": "break_return",
         "ownerModule": "ie",
         "tier": "quality",
@@ -1001,6 +1043,48 @@
           "minutes": 10
         },
         "notification": "Something you asked to come back to is ready."
+      },
+      {
+        "id": "join_in_social",
+        "ownerModule": "mf",
+        "tier": "practice",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/join-in?run={sourceSessionId}&at=social&followUp={followUpId}",
+        "staleAfterHours": 72,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "title": "Joining in",
+          "body": "Joining in at something, with someone. Did you get to?"
+        },
+        "choices": [
+          {
+            "id": "dismiss",
+            "label": "Not this time",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "kind": "chip",
+          "chips": {
+            "tomorrow": {
+              "kind": "at_local",
+              "days": 1,
+              "time": "18:00"
+            },
+            "few_days": {
+              "kind": "at_local",
+              "days": 3,
+              "time": "18:00"
+            }
+          }
+        },
+        "notification": "Joining in is ready to check."
       },
       {
         "id": "lid_reopen",

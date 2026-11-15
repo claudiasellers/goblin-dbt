@@ -64,6 +64,8 @@ COPY = {
     "way_title_flooded": "Your body's loud right now.",
     "way_hint_flooded": "Noticing works better once your body settles. You can look or listen for a minute, or start with your body.",
     "body_first": "My body first",
+    # MF-10 (PRD: MF-01's blank branch, *another way* → Join in): nothing registering, so movement instead of noticing.
+    "join_in": "Another way: something with movement",
     # Look.
     "look_what_title": "Find three things that are…",
     "look_what_hint": "Pick one. Any shade, any size.",
@@ -143,6 +145,7 @@ ALWAYS = {"all": []}
 FLOODED = {"eq": ["$ctx.band", "flooded"]}
 NOT_FLOODED = {"not": FLOODED}
 FAR = {"eq": ["$ctx.frame", "far"]}
+BLANK = {"eq": ["$ctx.frame", "blank"]}
 WATCHFUL = {"eq": ["$ctx.frame", "listen"]}  # the frame a watchful result's card passes (chronic_vigilance)
 SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
 
@@ -218,7 +221,8 @@ STEPS = [
         None, "way", "way",
         [{"when": {"eq": [a("way"), v]}, "to": v if v not in ("look", "inside") else f"{v}_{'what' if v == 'look' else 'where'}"}
          for v, _, _ in WAYS],
-        links=[{"exit": "cool_down", "label": "body_first", "when": FLOODED}],
+        links=[{"exit": "cool_down", "label": "body_first", "when": FLOODED},
+               {"exit": "join_in", "label": "join_in", "when": {"all": [BLANK, {"not": FLOODED}]}}],
         extra={"options": {"list": "way", "firstFrom": "$d.firstWay",
                            "where": {"all": [{"not": {"all": [{"eq": ["$opt.inward", True]}, {"any": [FLOODED, FAR, WATCHFUL]}]}},
                                              {"not": {"all": [FLOODED, {"not": {"eq": ["$opt.calm", True]}}]}}]}}},
@@ -293,6 +297,7 @@ EXITS = [
     {"id": "find_the_feeling", "toolId": "find-the-feeling"},            # ER: a feeling showed up, a word for it
     {"id": "thoughts_passing", "toolId": "thoughts-passing"},            # DT-08: a thought showed up
     {"id": "five_senses", "toolId": "five-senses"},                      # eyes-open orienting after feeling far away
+    {"id": "join_in", "toolId": "join-in", "query": {"frame": "blank"}},  # MF-10: the blank frame's *another way*
     {"id": "safety_open", "toolId": None, "safety": True},               # safety.open (R6)
     {"id": "done", "done": True},
 ]
