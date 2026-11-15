@@ -566,7 +566,7 @@
   {
    "id": "alternate_rebellion",
    "toolId": "alternate-rebellion",
-   "version": "ar-v2",
+   "version": "ar-v3",
    "start": "open",
    "accepts": [
     "band",
@@ -591,9 +591,18 @@
     "pick_own": "My own rebellion",
     "cost_q": "Will this cost you tomorrow?",
     "noticed_q": "Would they notice it?",
+    "undo_q": "Could you undo it later?",
+    "sleep_title": "That one can't be undone, so it waits a day. A card tomorrow asks if you still want it.",
+    "sleep_hint": "Big choices land better after a night's sleep.",
+    "still_title": "A day later. Do you still want to do it?",
+    "still_hint": "Whatever you pick, it's your call.",
     "heads_up_title": "That one might cost you tomorrow. Keep it, or pick something lighter?",
     "heads_up_scared_title": "If they'd notice it, it could cost you. Keep it, or pick a quiet one?",
     "card_title": "Here's your rebellion. When will you do it?",
+    "later_title": "Want a card later, to ask how it went?",
+    "later_skip": "No card",
+    "back_title": "Your rebellion. Did you do it?",
+    "back_hint": "Any answer is fine. It's only to notice.",
     "itch_title": "Did it scratch the itch?",
     "itch_hint": "Go and do it first. This screen waits.",
     "real_title": "And the squeeze itself. Is it something you want to work on?",
@@ -602,6 +611,8 @@
     "next_say": "Saying it clearly, and keeping your self-respect, is a rebellion too.",
     "next_cant": "Some squeezes don't move. You still get to choose how much of you they take.",
     "next_not_now": "The rebellion's yours. The squeeze can wait until you're ready.",
+    "next_slept": "It's waiting a day. The squeeze can be looked at now, or later.",
+    "next_let_go": "Choosing not to, after sleeping on it, is a rebellion too.",
     "own_hint": "Say it your way",
     "next": "Next",
     "done": "Done",
@@ -914,6 +925,18 @@
          }
         ]
        }
+      },
+      {
+       "id": "undo",
+       "label": "undo_q",
+       "options": {
+        "list": "undo"
+       },
+       "max": 1,
+       "required": true,
+       "showWhen": {
+        "own": "pick"
+       }
       }
      ],
      "crisis": [
@@ -957,6 +980,18 @@
            }
           ]
          }
+        ]
+       }
+      },
+      {
+       "to": "sleep_on",
+       "when": {
+        "in": [
+         "$a.undo",
+         [
+          "no",
+          "not_sure"
+         ]
         ]
        }
       },
@@ -1041,7 +1076,80 @@
        }
       },
       {
+       "to": "sleep_on",
+       "when": {
+        "in": [
+         "$a.undo",
+         [
+          "no",
+          "not_sure"
+         ]
+        ]
+       }
+      },
+      {
        "to": "card",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "sleep_on",
+     "kind": "ask",
+     "title": "sleep_title",
+     "hint": "sleep_hint",
+     "fields": [
+      {
+       "id": "sleep",
+       "options": {
+        "list": "sleep"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "has": [
+         "$a.squeeze.ids",
+         "scared"
+        ]
+       }
+      }
+     ],
+     "followUp": {
+      "type": "rebellion_check",
+      "when": {
+       "eq": [
+        "$a.sleep",
+        "tomorrow"
+       ]
+      }
+     },
+     "next": [
+      {
+       "to": "pick",
+       "when": {
+        "eq": [
+         "$a.sleep",
+         "lighter"
+        ]
+       }
+      },
+      {
+       "to": "real",
        "when": null
       }
      ],
@@ -1087,6 +1195,43 @@
        }
       },
       {
+       "to": "later",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "later",
+     "kind": "ask",
+     "title": "later_title",
+     "secondary": "later_skip",
+     "fields": [
+      {
+       "id": "remind",
+       "options": {
+        "list": "remind"
+       },
+       "max": 1
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "has": [
+         "$a.squeeze.ids",
+         "scared"
+        ]
+       }
+      }
+     ],
+     "followUp": {
+      "type": "rebellion_after",
+      "whenFrom": "remind"
+     },
+     "next": [
+      {
        "to": "real",
        "when": null
       }
@@ -1119,6 +1264,144 @@
       }
      ],
      "next": [
+      {
+       "to": "real",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "back",
+     "kind": "ask",
+     "title": "back_title",
+     "hint": "back_hint",
+     "fields": [
+      {
+       "id": "did",
+       "options": {
+        "list": "did"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "has": [
+         "$a.squeeze.ids",
+         "scared"
+        ]
+       }
+      }
+     ],
+     "reopens": {
+      "after": "later"
+     },
+     "clears": [
+      "did",
+      "itch",
+      "real"
+     ],
+     "next": [
+      {
+       "to": "itch",
+       "when": {
+        "in": [
+         "$a.did",
+         [
+          "yes",
+          "a_bit"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "real",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "still",
+     "kind": "ask",
+     "title": "still_title",
+     "hint": "still_hint",
+     "fields": [
+      {
+       "id": "still",
+       "options": {
+        "list": "still"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "has": [
+         "$a.squeeze.ids",
+         "scared"
+        ]
+       }
+      }
+     ],
+     "reopens": {
+      "after": "sleep_on"
+     },
+     "clears": [
+      "still",
+      "cost",
+      "noticed",
+      "undo",
+      "heads_up",
+      "when",
+      "remind",
+      "itch",
+      "real"
+     ],
+     "next": [
+      {
+       "to": "card",
+       "when": {
+        "eq": [
+         "$a.still",
+         "yes"
+        ]
+       }
+      },
+      {
+       "to": "pick",
+       "when": {
+        "eq": [
+         "$a.still",
+         "lighter"
+        ]
+       }
+      },
       {
        "to": "real",
        "when": null
@@ -1183,6 +1466,33 @@
         ]
        },
        "key": "next_scared"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.still",
+         "no"
+        ]
+       },
+       "key": "next_let_go"
+      },
+      {
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.sleep",
+           "tomorrow"
+          ]
+         },
+         {
+          "not": {
+           "set": "$a.still"
+          }
+         }
+        ]
+       },
+       "key": "next_slept"
       },
       {
        "when": {
@@ -1807,6 +2117,76 @@
      {
       "value": "keep",
       "label": "Keep it anyway"
+     }
+    ],
+    "undo": [
+     {
+      "value": "yes",
+      "label": "Yes"
+     },
+     {
+      "value": "not_sure",
+      "label": "Not sure"
+     },
+     {
+      "value": "no",
+      "label": "No"
+     }
+    ],
+    "sleep": [
+     {
+      "value": "tomorrow",
+      "label": "Ask me tomorrow"
+     },
+     {
+      "value": "lighter",
+      "label": "Pick one I can undo"
+     }
+    ],
+    "still": [
+     {
+      "value": "yes",
+      "label": "Yes, still mine"
+     },
+     {
+      "value": "lighter",
+      "label": "Something I can undo instead"
+     },
+     {
+      "value": "no",
+      "label": "Not any more"
+     }
+    ],
+    "remind": [
+     {
+      "value": "evening",
+      "label": "This evening"
+     },
+     {
+      "value": "tomorrow",
+      "label": "Tomorrow"
+     },
+     {
+      "value": "few_days",
+      "label": "In a few days"
+     }
+    ],
+    "did": [
+     {
+      "value": "yes",
+      "label": "I did it"
+     },
+     {
+      "value": "a_bit",
+      "label": "Some of it"
+     },
+     {
+      "value": "not_yet",
+      "label": "Not yet"
+     },
+     {
+      "value": "no",
+      "label": "I let it go"
      }
     ],
     "itch": [

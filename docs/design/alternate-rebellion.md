@@ -90,9 +90,9 @@ explicitly in `schema/app-tool-ids.cypher`). Listed under Distress Tolerance for
 
 | What | Needs | Lands |
 |---|---|---|
-| Scheduled rebellions and the 24-hour check on irreversible ones; irreversible options | R5 follow-up action, a `FollowUpType` row | DT lane, after F2 |
+| ~~Scheduled rebellions and the 24-hour check on irreversible ones~~ **Built 15 Nov 2026 (part 2):** a rebellion for later today or this week gets an optional card (`later`, *No card* the quiet way on; `rebellion_after`: this evening, tomorrow, in a few days) that reopens the visit at `back` (*Did you do it?* → the itch → the squeeze, asked fresh). An own rebellion asks *Could you undo it later?*; *no* or *not sure* waits a day (`sleep_on`: no card today, `rebellion_check` a full day later reopening at `still`: still yes → the card; something undoable → the list, cost and undo asked again; not any more → the squeeze, *Choosing not to, after sleeping on it, is a rebellion too.*). Both cards are content-free. **Still deferred:** curated irreversible options (the PRD's tattoo, shaved head): a menu of permanent body changes next to a destructive urge needs the clinician pass, so only the person's own words can be irreversible | — | — |
 | Witness embed on screen 1 | F2 `witness`, Claudia's sign-off of the line (D16) | after F2 |
-| Then-vs-now on the blow-up urge | R7 `urge_change` | after F2 (DT-02 brings R7's first use) |
+| ~~Then-vs-now on the blow-up urge~~ **Built 15 Nov 2026 (part 2):** the close is `urge_change`: *And the urge to blow it all up?* (held off · went ahead · still deciding), then *And that urge now, compared to when you started?* | — | — |
 | The rebellion menu (kit cards, section `rebellion`), own rebellions kept | R4 keep, `kit_card` kind | Safety batch (DT-03) |
 | Entry from DT-02's *blow it all up · quit · end it* chip (`urgeId`); *end it* can read as suicidal, so that entry carries `safety_open` from screen 1 | DT-02 | DT-B1, second PR |
 | Entry from IE when the urge is to end a relationship impulsively (PRD) | IE's entry point | IE lane |
@@ -116,7 +116,7 @@ One `ToolSession` per visit with `ext.run` (plan C1): the path, the picks (`sque
 `heads_up`, `itch`, `real`, and `when` from the card), own words only as `valueOwn`, the offered and taken exits.
 Own words are encrypted at close by #55 (`spine/extOwn.ts`), which is why this merges and deploys after it. The itch
 answer stays in `ext.run`, not on the spine: it's this skill's own question about the rebellion, not a
-then-vs-now on the urge, and nothing outside the skill reads it. The close writes `actedOnUrge`. No new label, no profile write.
+then-vs-now on the urge, and nothing outside the skill reads it. The close writes `actedOnUrge` and, since part 2, `thenVsNow` (`urge_change`). Part 2 adds `undo`, `sleep`, `remind`, `did` and `still` to `ext.run`. No new label, no profile write.
 
 ## Routing
 
