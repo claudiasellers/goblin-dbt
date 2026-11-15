@@ -88,6 +88,7 @@ test("how much you were with it: every answer is the practice; a plain visit end
   assert.equal(skip.stepId, "skip_end");
   assert.ok(M.stepOf(skill, "skip_end").noClose);
   assert.ok(!M.stepOf(skill, "skip_end").followUp);
+  assert.equal(M.stepOf(skill, "skip_end").complete, false, "Move on before it started is no practice: not complete, no rep");
   assert.equal(skill.copy.with_line, "In and out is the practice. Each time you came back, that was it.");
 });
 

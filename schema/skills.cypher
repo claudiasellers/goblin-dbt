@@ -27590,7 +27590,7 @@ MATCH (s:Skill {id: "one_thing"}), (n:SkillStep {id: "one_thing:end_short"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 18};
 MERGE (n:SkillStep {id: "one_thing:skip_end"})
-SET n += {skillId: "one_thing", step: "skip_end", kind: "handoff", version: "ot-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"skip_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"skip_title\"}";
+SET n += {skillId: "one_thing", step: "skip_end", kind: "handoff", version: "ot-v1"}, n.specJson = "{\"complete\": false, \"done\": \"done\", \"lines\": [{\"key\": \"skip_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"skip_title\"}";
 MATCH (s:Skill {id: "one_thing"}), (n:SkillStep {id: "one_thing:skip_end"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 19};

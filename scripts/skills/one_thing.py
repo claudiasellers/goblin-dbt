@@ -259,7 +259,7 @@ STEPS = [
                                       {"when": ALWAYS, "key": "with_line"}], [], extra=AGAIN_CHIPS),
     # The rumination variant without one thing (*Not now*, or *Move on* before it started): the minute outside was it.
     handoff("end_short", "end_short_title", [{"when": {"in": [a("loop"), ["better", "much_better"]]}, "key": "end_quieter_short"}], []),
-    handoff("skip_end", "skip_title", [{"when": ALWAYS, "key": "skip_line"}], [], extra={"noClose": True}),
+    handoff("skip_end", "skip_title", [{"when": ALWAYS, "key": "skip_line"}], [], extra={"noClose": True, "complete": False}),
     # Reopened from the one_thing_again card (R9): a run that reached either end card that books it.
     ask("again", "again_title", None, "again", "again", [{"to": "again_end"}],
         step_extra={"reopens": {"after": "end", "again": ["end_loop"]}, "clears": ["again"], "titleSlots": THING_SLOT}),
