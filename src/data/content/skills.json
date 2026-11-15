@@ -28659,6 +28659,13 @@
           "burn_title": "What could you make harder to get to?",
           "card_next": "Next",
           "card_title": "If you slip, this is your plan. Read it through once.",
+          "clear_addict": "It's had a pull on you this week. DBT calls that addict mind, and your plan is still here.",
+          "clear_clean": "Feeling safe can be the risky part. DBT calls that clean mind: the bridges are still worth keeping burned.",
+          "clear_clear": "Off it, and still watching for the pull. DBT calls that clear mind.",
+          "clear_end": "Clear mind isn't a finish line. It's watching, week by week.",
+          "clear_hint": "Pick any that fit. None of them? Go on without picking.",
+          "clear_next_hint": "Check in again next week?",
+          "clear_title": "Over the last week, did any of these show up?",
           "done": "Done",
           "eating_hint": "Regular meals help keep the pull down. A doctor or an eating disorder service can help with the rest.",
           "eating_title": "This plan is about not bingeing or purging. It never means not eating.",
@@ -28703,6 +28710,8 @@
           "span_title_sub": "How long can you commit to not doing it, or to a doctor's plan for cutting down?",
           "start": "Start",
           "stop_line": "That's okay. Your plan stays here for when you're ready.",
+          "weekly_hint": "Optional. About a minute, and it won't say what it's about.",
+          "weekly_title": "Want a short check once a week on how it's going?",
           "what_hint": "Pick one. A plan works best for one thing at a time.",
           "what_own": "In my own words",
           "what_title": "What do you keep going back to?"
@@ -30115,6 +30124,42 @@
             "title": "remind_title",
             "next": [
               {
+                "to": "weekly",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "weekly",
+            "kind": "ask",
+            "title": "weekly_title",
+            "fields": [
+              {
+                "id": "weekly",
+                "options": {
+                  "list": "weekly"
+                },
+                "max": 1,
+                "required": false,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "followUp": {
+              "type": "clear_mind",
+              "whenFrom": "weekly"
+            },
+            "hint": "weekly_hint",
+            "next": [
+              {
                 "to": "keep",
                 "when": null
               }
@@ -30226,7 +30271,11 @@
               "renew",
               "after_use",
               "slipped",
-              "again_span"
+              "again_span",
+              "signs",
+              "after_use_week",
+              "slipped_week",
+              "clear_next"
             ],
             "fields": [
               {
@@ -30508,6 +30557,424 @@
                   "eq": [
                     "$a.renew",
                     "slip"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "clear",
+            "kind": "ask",
+            "title": "clear_title",
+            "fields": [
+              {
+                "id": "signs",
+                "options": {
+                  "list": "mind_signs"
+                },
+                "max": 8,
+                "required": false,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "reopens": {
+              "after": "weekly",
+              "again": [
+                "clear_next"
+              ]
+            },
+            "clears": [
+              "signs",
+              "after_use_week",
+              "slipped_week",
+              "clear_next",
+              "renew",
+              "after_use",
+              "slipped",
+              "again_span"
+            ],
+            "hint": "clear_hint",
+            "next": [
+              {
+                "to": "after_use_week",
+                "when": {
+                  "all": [
+                    {
+                      "has": [
+                        "$a.signs.ids",
+                        "did_it"
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "in": [
+                            "$a.what",
+                            [
+                              "drink",
+                              "drugs"
+                            ]
+                          ]
+                        },
+                        {
+                          "not": {
+                            "in": [
+                              "$a.what",
+                              [
+                                "drink",
+                                "drugs",
+                                "smoke",
+                                "binge",
+                                "gamble",
+                                "spend",
+                                "scroll",
+                                "check",
+                                "porn",
+                                "hurt"
+                              ]
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "slipped_week",
+                "when": {
+                  "has": [
+                    "$a.signs.ids",
+                    "did_it"
+                  ]
+                }
+              },
+              {
+                "to": "clear_next",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "after_use_week",
+            "kind": "ask",
+            "title": [
+              {
+                "when": {
+                  "not": {
+                    "in": [
+                      "$a.what",
+                      [
+                        "drink",
+                        "drugs",
+                        "smoke",
+                        "binge",
+                        "gamble",
+                        "spend",
+                        "scroll",
+                        "check",
+                        "porn",
+                        "hurt"
+                      ]
+                    ]
+                  }
+                },
+                "key": "after_use_title_own"
+              },
+              {
+                "key": "after_use_title"
+              }
+            ],
+            "fields": [
+              {
+                "id": "after_use_week",
+                "options": {
+                  "list": "ok_now"
+                },
+                "max": 1,
+                "required": false,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "medical",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "hint": "after_use_hint",
+            "next": [
+              {
+                "to": "slipped_week",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "slipped_week",
+            "kind": "embed",
+            "embed": "boundaryLine",
+            "answerAs": "slipped_week",
+            "title": "slipped_title",
+            "props": {
+              "field": "lapse",
+              "shape": "list",
+              "next": "slipped_next"
+            },
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "clear_next",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "clear_next",
+            "kind": "ask",
+            "title": [
+              {
+                "when": {
+                  "any": [
+                    {
+                      "has": [
+                        "$a.signs.ids",
+                        "did_it"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$a.signs.ids",
+                        "thinking"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$a.signs.ids",
+                        "secret"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$a.signs.ids",
+                        "excuses"
+                      ]
+                    }
+                  ]
+                },
+                "key": "clear_addict"
+              },
+              {
+                "when": {
+                  "any": [
+                    {
+                      "has": [
+                        "$a.signs.ids",
+                        "beaten"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$a.signs.ids",
+                        "slide"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$a.signs.ids",
+                        "way_back"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$a.signs.ids",
+                        "near"
+                      ]
+                    }
+                  ]
+                },
+                "key": "clear_clean"
+              },
+              {
+                "key": "clear_clear"
+              }
+            ],
+            "fields": [
+              {
+                "id": "clear_next",
+                "options": {
+                  "list": "clear_next"
+                },
+                "max": 1,
+                "required": false,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "followUp": {
+              "type": "clear_mind",
+              "whenFrom": "clear_next"
+            },
+            "hint": "clear_next_hint",
+            "next": [
+              {
+                "to": "clear_end",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "clear_end",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "all": []
+                },
+                "key": "clear_end"
+              }
+            ],
+            "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "next": [],
+            "offers": [
+              {
+                "exit": "urge_surfing",
+                "when": {
+                  "any": [
+                    {
+                      "has": [
+                        "$a.signs.ids",
+                        "did_it"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$a.signs.ids",
+                        "thinking"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$a.signs.ids",
+                        "secret"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$a.signs.ids",
+                        "excuses"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "exit": "pros_cons",
+                "when": {
+                  "any": [
+                    {
+                      "any": [
+                        {
+                          "has": [
+                            "$a.signs.ids",
+                            "did_it"
+                          ]
+                        },
+                        {
+                          "has": [
+                            "$a.signs.ids",
+                            "thinking"
+                          ]
+                        },
+                        {
+                          "has": [
+                            "$a.signs.ids",
+                            "secret"
+                          ]
+                        },
+                        {
+                          "has": [
+                            "$a.signs.ids",
+                            "excuses"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "has": [
+                            "$a.signs.ids",
+                            "beaten"
+                          ]
+                        },
+                        {
+                          "has": [
+                            "$a.signs.ids",
+                            "slide"
+                          ]
+                        },
+                        {
+                          "has": [
+                            "$a.signs.ids",
+                            "way_back"
+                          ]
+                        },
+                        {
+                          "has": [
+                            "$a.signs.ids",
+                            "near"
+                          ]
+                        }
+                      ]
+                    }
                   ]
                 }
               }
@@ -31186,6 +31653,60 @@
             {
               "value": "stop",
               "label": "I'm not ready to go again"
+            }
+          ],
+          "weekly": [
+            {
+              "value": "week",
+              "label": "Yes, once a week"
+            }
+          ],
+          "clear_next": [
+            {
+              "value": "week",
+              "label": "Same time next week"
+            }
+          ],
+          "mind_signs": [
+            {
+              "value": "did_it",
+              "label": "I did it",
+              "mind": "addict"
+            },
+            {
+              "value": "thinking",
+              "label": "Thinking about it a lot",
+              "mind": "addict"
+            },
+            {
+              "value": "secret",
+              "label": "Keeping it from people",
+              "mind": "addict"
+            },
+            {
+              "value": "excuses",
+              "label": "Telling myself it doesn't matter",
+              "mind": "addict"
+            },
+            {
+              "value": "beaten",
+              "label": "Feeling like I've beaten it",
+              "mind": "clean"
+            },
+            {
+              "value": "slide",
+              "label": "Letting the plan slide",
+              "mind": "clean"
+            },
+            {
+              "value": "way_back",
+              "label": "Leaving myself a way back, in case",
+              "mind": "clean"
+            },
+            {
+              "value": "near",
+              "label": "Going near old places or people",
+              "mind": "clean"
             }
           ]
         }

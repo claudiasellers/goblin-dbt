@@ -36,7 +36,7 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
   assert.deepEqual(types.PROFILE_NEEDS.today, ["quietHours", "parts"], "parts: the check-back card's name (part-checkback)");
   assert.deepEqual(types.PROFILE_NEEDS.witness, ["name", "ownLines", "savedLines"], "R16");
   assert.deepEqual(types.PROFILE_NEEDS["five-senses"], ["parts"], "the tag row on its close");
-  assert.deepEqual(types.PROFILE_NEEDS.pause, ["parts", "prosCons"], "the tag row on its urge close; the kept card's replay (DT-10)");
+  assert.deepEqual(types.PROFILE_NEEDS.pause, ["parts", "prosCons", "abstinencePlans"], "the tag row on its urge close; the kept card's replay (DT-10); the lapse plan after an acted yes (DT-09)");
   // The kept pros & cons cards (DT-10): Hold to wait replays them and the crisis kit (DT-03) plays them as cards; Me
   // reads every kept item through getMe.
   assert.deepEqual(types.PROFILE_NEEDS["crisis-kit"], ["crisisKit", "prosCons"], "the kept kit and pros & cons cards (DT-03)");
@@ -45,8 +45,9 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
   for (const [consumer, needs] of Object.entries(types.PROFILE_NEEDS)) {
     if (!["pause", "crisis-kit"].includes(consumer)) assert.ok(!needs.includes("prosCons"), `${consumer} reads prosCons`);
     if (!["crisis-kit", "safety"].includes(consumer)) assert.ok(!needs.includes("crisisKit"), `${consumer} reads crisisKit`);
+    if (!["pause", "urge-surfing"].includes(consumer)) assert.ok(!needs.includes("abstinencePlans"), `${consumer} reads abstinencePlans`);
   }
-  assert.deepEqual(types.PROFILE_NEEDS["urge-surfing"], ["parts"], "the tag row on its urge close");
+  assert.deepEqual(types.PROFILE_NEEDS["urge-surfing"], ["parts", "abstinencePlans"], "the tag row on its urge close; the lapse plan after an acted yes (DT-09)");
   assert.deepEqual(types.PROFILE_NEEDS["check-the-facts"], ["parts"], "the tag row on its close");
   assert.deepEqual(types.SERVER_ONLY_CONSUMERS, ["witness", "me"]);
   // The den (Me only, server-side: getDen adds the recency bucket from the log); no other consumer reads it.
@@ -57,7 +58,7 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
   // Parts: the slices exist; no tool reads them before it renders them. Meet a part reads them (it
   // renders them); Phase 3's tag row is the first render on other tools' closes: exactly the tools that
   // can show it read `parts`, and none of them partDetail (tests/part-tag.test.mjs pins TAG_ROW_TOOLS).
-  assert.deepEqual(types.SLICE_IDS.slice(-6), ["parts", "partDetail", "partAnchors", "den", "prosCons", "pleaseRows"]);
+  assert.deepEqual(types.SLICE_IDS.slice(-7), ["parts", "partDetail", "partAnchors", "den", "prosCons", "pleaseRows", "abstinencePlans"]);
   assert.deepEqual(types.PROFILE_NEEDS["meet-a-part"], ["name", "parts", "partDetail"]);
   // DEAR MAN's cope ahead (Phase 3) shows parts, their anchors and the kept lines to pick one from;
   // never partDetail (fears and jobs it never shows).

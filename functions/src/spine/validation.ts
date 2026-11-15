@@ -141,6 +141,8 @@ export function validateRecord(raw: unknown, now: Date): { start: StartInput; cl
 export const FOLLOW_UP_WINDOWS = ['hour', 'afternoon', 'evening', 'tomorrow', 'this_week', 'next_time', 'unsure', 'today', '1h', 'later', 'tonight', 'tomorrow_night', 'month',
   // Give your mind a job (DT-06): a break's return in minutes, and the lid's reopen in a few days.
   'm5', 'm15', 'm30', 'm60', 'few_days',
+  // When it's a habit's weekly clear-mind check (DT-09 part 2): the same time next week.
+  'week',
   // Good things' week plan (ER-04 level 2): the day after tomorrow.
   'day_after',
   // Sleep reset (ER-13): the wake time the person set, for the next morning's check (`sleep_morning`): the mornings by

@@ -541,6 +541,20 @@ FOLLOW_UP_TYPES = [
         "notification": "A stretch you committed to is up.",
     },
     {
+        # When it's a habit's weekly clear-mind check (DT-09 part 2, DBT DT Handouts 18 and 18a): booked on the plan's optional
+        # *once a week*. The card reopens that visit at `clear` (R9 `reopens`: which signs showed up, the week named by
+        # its loudest mind, the lapse plan after *I did it*, next week's check). Opening it is the resolution. Never
+        # names the behaviour (Today can be seen by others).
+        "id": "clear_mind", "ownerModule": "dt", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/habit-plan?run={sourceSessionId}&at=clear&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"week": {"kind": "at_local", "days": 7, "time": "18:00"}}},
+        "staleAfterHours": 72, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Your weekly check", "body": "How has the last week been? About a minute."},
+        "choices": [{"id": "not_now", "label": "Not now", "status": "dismissed"}],
+        "notification": "Your weekly check is here, if you want it.",
+    },
+    {
         # The safety route's next-morning check (CORE-01, docs/design/safety-route.md): offered at the route's exit and
         # after a *passing* answer (opt-in: yes · no thanks). The card and the notification are content-free (Today can
         # be seen by others): opening it asks *How are you this morning?* on the route's own screen (doing okay · still

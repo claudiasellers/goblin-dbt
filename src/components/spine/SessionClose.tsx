@@ -7,13 +7,15 @@ import { newId } from '../../lib/spine/ids';
 import type { ThenVsNow } from '../../data/capacityTypes';
 import type { ActedOnUrge, CloseKind } from '../../data/spineTypes';
 import { PartTagSlot } from './PartTagSlot';
+import { LapsePlanSlot } from './LapsePlanSlot';
 
 /**
  * The one-tap "did it help?" at the end of a tool (PR-S3). Graph copy (SessionCloseFlow), one tap,
  * skip always there, no numbers. Answering or skipping closes the session as completed; a skipped
  * question comes back once in Today (PR-S5). Renders nothing for tools that ask their own questions.
  * The two-part close (`urge_change`, plan R7) asks *Did you act on it?* and then then-vs-now; skipping the
- * second part keeps the first answer.
+ * second part keeps the first answer. After an acted *yes* on the urge tools, a kept habit plan's lapse plan for the
+ * same behaviour shows under the saved answer (LapsePlanSlot, DT-09 part 2).
  */
 export function SessionClose({ kind, planType, detail, onAnswered, onSkipped }: {
   kind?: CloseKind;
@@ -57,6 +59,8 @@ export function SessionClose({ kind, planType, detail, onAnswered, onSkipped }: 
     return (
       <>
         <p role="status" className="mt-4 text-sm text-center text-[var(--color-text-tertiary)]">{content.closeFlow.saved}</p>
+        {/* After an acted yes on the urge tools: the habit plan's lapse plan for the same behaviour (DT-09 part 2), first. */}
+        <LapsePlanSlot toolId={session.toolId} acted={closeActed} urgeIds={session.visitUrgeIds()} />
         <PartTagSlot toolId={session.toolId} toolSessionId={session.id} thenVsNow={closeAnswer} actedOnUrge={closeActed} saved={saved} />
       </>
     );

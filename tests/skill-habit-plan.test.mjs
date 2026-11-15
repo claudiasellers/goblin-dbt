@@ -135,7 +135,9 @@ test("the card, the check-in when the stretch ends (habit_renew, timed by the st
   const step = M.stepOf(skill, "remind");
   assert.deepEqual(M.followUpFor(ctx(), step, run([pick("remind", "yes")], ctx(), r)), { type: "habit_renew", chip: "few_days" });
   assert.equal(M.followUpFor(ctx(), step, run([pick("remind", "no")], ctx(), r)), null);
-  const k = run([pick("remind", "yes"), next], ctx(), r);
+  const w = run([pick("remind", "yes"), next], ctx(), r);
+  assert.equal(w.stepId, "weekly", "the weekly clear-mind check is offered next (part 2), optional");
+  const k = run([next], ctx(), w);
   assert.equal(k.stepId, "keep");
   const kept = M.keepFor(ctx(), M.stepOf(skill, "keep"), run([pick("keepit", "keep")], ctx(), k));
   assert.equal(kept.kind, "abstinence_plan");
@@ -150,7 +152,7 @@ test("the card, the check-in when the stretch ends (habit_renew, timed by the st
 test("the renewal: kept to it → the next stretch; a slip → the lapse plan first, then recommit; not ready → no shame", () => {
   const renew = M.stepOf(skill, "renew");
   assert.deepEqual(renew.reopens, { after: "remind", again: ["again"] });
-  const booked = run([...TO_REMIND(), pick("remind", "yes"), next, pick("keepit", "keep"), next]);
+  const booked = run([...TO_REMIND(), pick("remind", "yes"), next, next, pick("keepit", "keep"), next]);
   const r = M.resumeRun(ctx(), M.runRecord(ctx(), booked), "renew");
   assert.equal(r?.stepId, "renew");
   assert.equal(M.resumeRun(ctx(), M.runRecord(ctx(), run(TO_REMIND().slice(0, -1))), "renew"), null, "a plan that never reached the check-in doesn't reopen");

@@ -14,7 +14,7 @@ export const SLICE_IDS = [
   'name', 'quietHours', 'patterns', 'ownLines', 'savedLines',
   'people', 'bodyFlags', 'values', 'goals', 'copeAheadPlans', 'boundaryLines', 'practicePrefs',
   'fadeLevels', 'ownWords', 'thingsILike', 'thingsILikePicks', 'iCanRungs', 'crisisKit', 'safetyPlan', 'country', 'sleepAnchor',
-  'parts', 'partDetail', 'partAnchors', 'den', 'prosCons', 'pleaseRows',
+  'parts', 'partDetail', 'partAnchors', 'den', 'prosCons', 'pleaseRows', 'abstinencePlans',
 ] as const;
 export type SliceId = (typeof SLICE_IDS)[number];
 
@@ -168,6 +168,14 @@ export interface ProfileSlices {
     givesIds: string[]; givesOwn: string | null; costIds: string[]; costOwn: string | null;
     keepsIds: string[]; keepsOwn: string | null; meta: ProfileItemMeta;
   }>;
+  /**
+   * Kept habit plans (DT-09, kind `abstinence_plan`), active only, newest first: the behaviour's ids and the lapse plan
+   * only (its own words decrypted for them). The urge tools show the plan for the same behaviour after an acted *yes*
+   * (docs/design/habit-plan.md, part 2); a behaviour in own words is never matched, so it isn't read.
+   */
+  abstinencePlans: Array<{
+    id: string; whatIds: string[]; lapseIds: string[]; lapseOwn: string | null; meta: ProfileItemMeta;
+  }>;
 }
 
 /**
@@ -190,10 +198,10 @@ export const PROFILE_NEEDS = {
   // close): every tool whose close asks then-vs-now or about the urge (src/lib/partTag.ts TAG_ROW_TOOLS)
   // reads `parts`.
   'five-senses': ['parts'],
-  'pause': ['parts', 'prosCons'],              // prosCons: the kept card for the pull (DT-10's replay, on proceed)
+  'pause': ['parts', 'prosCons', 'abstinencePlans'], // prosCons: the kept card for the pull (DT-10's replay, on proceed); abstinencePlans: the lapse plan after an acted yes (DT-09)
   'crisis-kit': ['crisisKit', 'prosCons'],     // the kept kit and pros & cons cards, one card at a time (DT-03)
   'safety': ['safetyPlan', 'crisisKit'],        // Help & safety and the safety route: the plan, and its step 2's kit (CORE-02)
-  'urge-surfing': ['parts'],
+  'urge-surfing': ['parts', 'abstinencePlans'], // abstinencePlans: the lapse plan after an acted yes (DT-09)
   'let-it-be': ['parts'],                    // the tag row on its in-flow close (docs/design/let-it-be.md)
   'mind-job': ['parts', 'thingsILike'],      // the tag row on its in-flow close; level 3, their own things I like (docs/design/mind-job.md)
   'soothe': ['parts'],                       // the tag row on its in-flow close (docs/design/held.md)

@@ -163,6 +163,7 @@ export function ToolSessionProvider({ toolId, inside, deferStart = false, childr
       setSkillIds: (ids) => { skills.current = ids; },
       setEmotionIds: (ids) => { emotionIds.current = sessionEmotionIds(ids); },
       setUrgeIds: (ids) => { urgeIds.current = sessionUrgeIds(ids); },
+      visitUrgeIds: () => urgeIds.current,
       setBandAtStart: (r) => { bandAtStart.current = r; },
       setWiseMindAnswer: (a) => { wiseMindAnswer.current = a; },
       setFitsFacts: (v) => { fitsFacts.current = v; },
