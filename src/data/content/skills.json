@@ -1,7 +1,7 @@
 {
   "source": {
     "file": "graph-content-only-2026-11-15.json",
-    "exportedAt": "2026-11-15T00:34:05.680Z"
+    "exportedAt": "2026-11-15T01:01:53.611Z"
   },
   "content": {
     "version": "skills-v1",
@@ -32203,23 +32203,30 @@
           {
             "id": "scan",
             "kind": "ask",
-            "title": [
+            "crisis": [
               {
+                "variant": "crisis",
                 "when": {
                   "eq": [
-                    "$ctx.band",
-                    "flooded"
+                    "$ctx.frame",
+                    "hurt"
                   ]
-                },
-                "key": "scan_title_flooded"
-              },
-              {
-                "key": "scan_title"
+                }
               }
             ],
             "fields": [
               {
                 "id": "scan",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
                 "options": {
                   "list": "scan",
                   "where": {
@@ -32251,29 +32258,22 @@
                     ]
                   }
                 },
-                "max": 1,
-                "required": true,
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
+                "required": true
               }
             ],
             "hint": "scan_hint",
-            "crisis": [
+            "title": [
               {
-                "variant": "crisis",
+                "key": "scan_title_flooded",
                 "when": {
                   "eq": [
-                    "$ctx.frame",
-                    "hurt"
+                    "$ctx.band",
+                    "flooded"
                   ]
                 }
+              },
+              {
+                "key": "scan_title"
               }
             ],
             "next": [
@@ -32296,29 +32296,7 @@
           {
             "id": "scan_contact",
             "kind": "embed",
-            "embed": "bodyCard",
             "answerAs": "scan_contact",
-            "title": "scan_contact_title",
-            "props": {
-              "seconds": 30,
-              "step1": "scan_contact_step1",
-              "step2": "scan_contact_step2",
-              "step3": "scan_contact_step3",
-              "start": "start",
-              "running": "scan_running",
-              "done": "scan_done",
-              "next": "next",
-              "kind": "still"
-            },
-            "links": [
-              {
-                "exit": "safety_open",
-                "label": "safety_open",
-                "when": {
-                  "all": []
-                }
-              }
-            ],
             "crisis": [
               {
                 "variant": "crisis",
@@ -32330,6 +32308,28 @@
                 }
               }
             ],
+            "embed": "bodyCard",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "props": {
+              "done": "scan_done",
+              "kind": "still",
+              "next": "next",
+              "running": "scan_running",
+              "seconds": 30,
+              "start": "start",
+              "step1": "scan_contact_step1",
+              "step2": "scan_contact_step2",
+              "step3": "scan_contact_step3"
+            },
+            "title": "scan_contact_title",
             "next": [
               {
                 "to": "scan_skin",
@@ -32341,28 +32341,7 @@
           {
             "id": "scan_skin",
             "kind": "embed",
-            "embed": "doseTimer",
             "answerAs": "scan_skin",
-            "title": "scan_skin_title",
-            "props": {
-              "seconds": 30,
-              "step1": "scan_skin_step1",
-              "step2": "scan_skin_step2",
-              "step3": "scan_skin_step3",
-              "start": "start",
-              "running": "scan_running",
-              "done": "scan_done",
-              "next": "next"
-            },
-            "links": [
-              {
-                "exit": "safety_open",
-                "label": "safety_open",
-                "when": {
-                  "all": []
-                }
-              }
-            ],
             "crisis": [
               {
                 "variant": "crisis",
@@ -32374,6 +32353,27 @@
                 }
               }
             ],
+            "embed": "doseTimer",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "props": {
+              "done": "scan_done",
+              "next": "next",
+              "running": "scan_running",
+              "seconds": 30,
+              "start": "start",
+              "step1": "scan_skin_step1",
+              "step2": "scan_skin_step2",
+              "step3": "scan_skin_step3"
+            },
+            "title": "scan_skin_title",
             "next": [
               {
                 "to": "scan_where",
@@ -32385,27 +32385,6 @@
           {
             "id": "scan_where",
             "kind": "ask",
-            "title": "scan_where_title",
-            "fields": [
-              {
-                "id": "scan_where",
-                "options": {
-                  "list": "scan_where"
-                },
-                "max": 1,
-                "required": true,
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
-              }
-            ],
-            "hint": "scan_where_hint",
             "crisis": [
               {
                 "variant": "crisis",
@@ -32417,6 +32396,27 @@
                 }
               }
             ],
+            "fields": [
+              {
+                "id": "scan_where",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "scan_where"
+                },
+                "required": true
+              }
+            ],
+            "hint": "scan_where_hint",
+            "title": "scan_where_title",
             "next": [
               {
                 "to": "scan_far",
@@ -32456,28 +32456,7 @@
           {
             "id": "scan_in",
             "kind": "embed",
-            "embed": "doseTimer",
             "answerAs": "scan_in",
-            "title": "scan_in_title",
-            "props": {
-              "seconds": 30,
-              "step1": "scan_in_step1",
-              "step2": "scan_in_step2",
-              "step3": "scan_in_step3",
-              "start": "start",
-              "running": "scan_running",
-              "done": "scan_done",
-              "next": "next"
-            },
-            "links": [
-              {
-                "exit": "safety_open",
-                "label": "safety_open",
-                "when": {
-                  "all": []
-                }
-              }
-            ],
             "crisis": [
               {
                 "variant": "crisis",
@@ -32489,6 +32468,27 @@
                 }
               }
             ],
+            "embed": "doseTimer",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "props": {
+              "done": "scan_done",
+              "next": "next",
+              "running": "scan_running",
+              "seconds": 30,
+              "start": "start",
+              "step1": "scan_in_step1",
+              "step2": "scan_in_step2",
+              "step3": "scan_in_step3"
+            },
+            "title": "scan_in_title",
             "next": [
               {
                 "to": "close",
@@ -32500,29 +32500,7 @@
           {
             "id": "scan_press",
             "kind": "embed",
-            "embed": "bodyCard",
             "answerAs": "scan_press",
-            "title": "scan_press_title",
-            "props": {
-              "seconds": 20,
-              "step1": "scan_press_step1",
-              "step2": "scan_press_step2",
-              "step3": "scan_press_step3",
-              "start": "start",
-              "running": "scan_running",
-              "done": "scan_done",
-              "next": "next",
-              "kind": "press"
-            },
-            "links": [
-              {
-                "exit": "safety_open",
-                "label": "safety_open",
-                "when": {
-                  "all": []
-                }
-              }
-            ],
             "crisis": [
               {
                 "variant": "crisis",
@@ -32534,6 +32512,28 @@
                 }
               }
             ],
+            "embed": "bodyCard",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "props": {
+              "done": "scan_done",
+              "kind": "press",
+              "next": "next",
+              "running": "scan_running",
+              "seconds": 20,
+              "start": "start",
+              "step1": "scan_press_step1",
+              "step2": "scan_press_step2",
+              "step3": "scan_press_step3"
+            },
+            "title": "scan_press_title",
             "next": [
               {
                 "to": "close",
@@ -32546,31 +32546,6 @@
             "id": "scan_far",
             "kind": "handoff",
             "complete": true,
-            "lines": [
-              {
-                "when": {
-                  "all": []
-                },
-                "key": "scan_far_line"
-              },
-              {
-                "when": {
-                  "all": []
-                },
-                "key": "scan_referral"
-              }
-            ],
-            "done": "done",
-            "links": [
-              {
-                "exit": "safety_open",
-                "label": "safety_open",
-                "when": {
-                  "all": []
-                }
-              }
-            ],
-            "noClose": true,
             "crisis": [
               {
                 "variant": "crisis",
@@ -32582,6 +32557,31 @@
                 }
               }
             ],
+            "done": "done",
+            "lines": [
+              {
+                "key": "scan_far_line",
+                "when": {
+                  "all": []
+                }
+              },
+              {
+                "key": "scan_referral",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "noClose": true,
             "next": [],
             "offers": [
               {
@@ -33071,31 +33071,6 @@
           {
             "id": "practise",
             "kind": "ask",
-            "title": "practise_title",
-            "fields": [
-              {
-                "id": "practise",
-                "options": {
-                  "list": "practise"
-                },
-                "max": 1,
-                "required": false,
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
-              }
-            ],
-            "hint": "practise_hint",
-            "followUp": {
-              "type": "held_practice",
-              "whenFrom": "practise"
-            },
             "crisis": [
               {
                 "variant": "crisis",
@@ -33107,6 +33082,31 @@
                 }
               }
             ],
+            "fields": [
+              {
+                "id": "practise",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "practise"
+                },
+                "required": false
+              }
+            ],
+            "followUp": {
+              "type": "held_practice",
+              "whenFrom": "practise"
+            },
+            "hint": "practise_hint",
+            "title": "practise_title",
             "next": [
               {
                 "to": "end",
@@ -33475,16 +33475,6 @@
               "label": "Still stirred up"
             }
           ],
-          "reach": [
-            {
-              "value": "yes",
-              "label": "Yes, someone I could message"
-            },
-            {
-              "value": "not_now",
-              "label": "Not right now"
-            }
-          ],
           "scan": [
             {
               "value": "heart",
@@ -33530,6 +33520,16 @@
             {
               "value": "few_days",
               "label": "In a few days"
+            }
+          ],
+          "reach": [
+            {
+              "value": "yes",
+              "label": "Yes, someone I could message"
+            },
+            {
+              "value": "not_now",
+              "label": "Not right now"
             }
           ]
         },
