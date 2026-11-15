@@ -180,6 +180,10 @@ export async function getToday(band?: string): Promise<GetTodayResponse> {
 export async function resolveFollowUp(id: string, choiceId: string): Promise<void> {
   await resolveFn({ id, choiceId });
 }
+/** A deep-link card done on its page (the Practice home's daily card): a status, no choice. */
+export async function resolveFollowUpStatus(id: string, status: 'done' | 'dismissed'): Promise<void> {
+  await resolveFn({ id, status });
+}
 /** Cope Ahead's after card, "Did your plan help?" (functions/src/spine/validation.ts PLAN_HELPED). */
 export type PlanHelped = 'helped' | 'unsure' | 'unused';
 /**

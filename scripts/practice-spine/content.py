@@ -296,6 +296,23 @@ FOLLOW_UP_TYPES = [
         "notification": "Your noticing practice is ready to check.",
     },
     {
+        # The Practice home's daily minute (MF-02, MF-B3, docs/design/practice-home.md): set once in Practice's setup
+        # (*morning · midday · evening*; a cue of the person's own books nothing: the cue is the reminder). No rrule yet,
+        # so it rolls: opening the card resolves it, and every visit to Practice books the next one when none is
+        # waiting. Content-free on Today and in notifications (PRD: "A minute, when you're ready"); missed days make
+        # nothing (no "you missed", no reset).
+        "id": "practice_daily", "ownerModule": "mf", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/practice?followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"morning": {"kind": "next_local", "time": "08:30"},
+                                             "midday": {"kind": "next_local", "time": "12:30"},
+                                             "evening": {"kind": "next_local", "time": "19:30"}}},
+        "staleAfterHours": 12, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "A minute, when you're ready", "body": "Today's practice is there if you want it."},
+        "choices": [{"id": "dismiss", "label": "Not today", "status": "dismissed"}],
+        "notification": "A minute, when you're ready.",
+    },
+    {
         # Good things (ER-04, docs/design/good-things.md): the one good thing the person picked for today, at the time
         # they picked (now → an hour from now). The card reopens that visit at `back` (R9 `reopens`: *Did it happen?*,
         # then lighter / same / heavier and where the mind was). Opening it is the resolution. Content-free (PRD).
@@ -823,7 +840,6 @@ RESERVED = [
     ("chain_nextday", "core", "quality"),   # CORE-08
     ("missed_step", "core", "quality"),     # CORE-11
     ("diary_daily", "core", "practice"),    # CORE-04 (needs rrule)
-    ("practice_daily", "mf", "practice"),   # MF (needs rrule)
 ]
 for rid, owner, tier in RESERVED:
     FOLLOW_UP_TYPES.append({
@@ -846,6 +862,18 @@ SKILL_FIELDS = {
     "request": {"defaultFor": ["dear-man"], "displayLabel": "Ask for it"},
     "label": {"defaultFor": ["find-the-feeling"], "displayLabel": "Name it"},
 }
+
+# The Practice home (MF-02, MF-B3, docs/design/practice-home.md): the MF sequence (PRD MF-02 workflow 2: observe →
+# describe → nonjudgment → one-mindfully → wise mind → effectively → participate, then cycling) as `mfOrder`, and the
+# library's plain name per skill (`practiceLabel`). Only skills with a built tool are listed; One thing (MF-05),
+# What works (MF-08) and Join in (MF-10) join the sequence with their batches. `alsoFor`: other tools that practise
+# the skill (PRD: five-senses → observe, Find the feeling → describe), added to `defaultFor` so their reps count here.
+MF_SEQUENCE = [
+    ("observe", 1, "Notice", ["five-senses"]),
+    ("describe", 2, "Name", ["find-the-feeling"]),
+    ("nonjudge", 3, "Without judging", []),
+    ("wise_mind", 5, "Wise mind", []),
+]
 
 # New skills (id, name, grade, family, concept, why, sources). Grades follow the project scale.
 NEW_SKILLS = [

@@ -210,6 +210,15 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
       const m = /^w(\d{2})(\d{2})$/.exec(String(value.wakeIds[0] ?? ''));
       if (m) summary = `Up at ${Number(m[1])}:${m[2]}, every day`;
     }
+    // The Practice home's setup (MF-02): when the daily minute comes, as the setup said it (src/data/practiceHome.ts).
+    if (meta.kind === 'practice_prefs' && value) {
+      const when: Record<string, string> = {
+        morning: 'In the morning', midday: 'Around midday', evening: 'In the evening', teeth: 'After I brush my teeth',
+        kettle: 'When the kettle\'s on', commute: 'On the bus or train', desk: 'When I sit down at my desk',
+      };
+      const key = String(value.time ?? value.cue ?? '');
+      summary = key === 'own' && typeof value.cueOwn === 'string' ? value.cueOwn : when[key] ?? '';
+    }
     // A rewritten nightmare: its ending when the person wrote it; picked endings are ids (the title says enough).
     if (meta.kind === 'nightmare_script' && value && typeof value.endingOwn === 'string') summary = value.endingOwn;
     // A pros & cons card: the pull in their words when they wrote it, else their first reason in their words.

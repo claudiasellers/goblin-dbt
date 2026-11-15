@@ -67,9 +67,17 @@ export function Tools() {
         <div className="space-y-8">
           {populatedModules.map(({ mod, tools }) => (
             <div key={mod.id}>
-              <h3 className="text-sm font-medium text-[var(--color-text-secondary)] mb-3 px-1">
-                {mod.name}
-              </h3>
+              <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
+                <h3 className="text-sm font-medium text-[var(--color-text-secondary)] m-0">
+                  {mod.name}
+                </h3>
+                {/* MF-02: Mindfulness is practised, so its module opens on its home too. */}
+                {mod.id === 'mindfulness' && (
+                  <Link to="/practice" className="min-h-11 inline-flex items-center text-sm font-medium text-[var(--color-accent)] hover:underline" data-testid="tools-practice-link">
+                    Practice
+                  </Link>
+                )}
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {tools.flatMap(tool => [
                   <ToolCard key={tool.id} tool={tool} state={tool.id === 'meet-a-part' ? toolsMeetLink().state : undefined} />,

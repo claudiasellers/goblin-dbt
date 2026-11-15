@@ -190,6 +190,13 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions, 
         >
           Keep this one
         </Link>
+        {/* MF-02: calm is when practice sticks; a quiet offer, never above the keep, never beside a crisis banner. */}
+        {!has('crisis_banner') && (
+          <Link to="/practice" onClick={() => onToolOpen?.('practice')} data-testid="positive-practice"
+            className="mt-3 flex items-center justify-center w-full min-h-11 text-[16px] text-[var(--color-accent)] underline underline-offset-2">
+            While it's calm: a one-minute practice?
+          </Link>
+        )}
         <button
           onClick={() => onDone({ kind: 'done' })}
           className="mt-3 w-full min-h-11 text-[16px] text-[var(--color-text-secondary)] underline underline-offset-2"

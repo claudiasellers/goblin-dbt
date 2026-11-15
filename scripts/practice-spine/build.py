@@ -80,4 +80,9 @@ for sid, name, grade, fam, concept, why, sources, default_for in NEW_SKILLS:
     A(f"MATCH (k:PracticeSkill {{id: {q(sid)}}}), (c:TherapyConcept {{id: {q(concept)}}})\nMERGE (k)-[:PRACTICES]->(c);")
     if sources:
         A(f"UNWIND {q(sources)} AS srcId\nMATCH (k:PracticeSkill {{id: {q(sid)}}}), (s:ClinicalSource {{id: srcId}})\nMERGE (k)-[:SUPPORTED_BY]->(s);")
+
+A("\n// --- The Practice home (MF-02): the MF sequence, the library's names, the other tools that practise each skill ---")
+for sid, order, label, also in MF_SEQUENCE:
+    own = next(x[-1] for x in NEW_SKILLS if x[0] == sid)
+    A(f"MATCH (k:PracticeSkill {{id: {q(sid)}}})\nSET k.mfOrder = {order}, k.practiceLabel = {q(label)}, k.defaultFor = {q(own + also)};")
 print("\n".join(L))

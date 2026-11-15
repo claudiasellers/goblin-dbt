@@ -16,6 +16,15 @@ import { isAskFreshField } from '../userdata/layers';
 import { HHMM } from './meta';
 import type { ProfileAreaId, SliceId } from './types';
 
+/**
+ * The Practice home's setup (MF-02, docs/design/practice-home.md): when the daily minute comes (a time of day, which
+ * books the `practice_daily` card, or a cue of the person's own, which books nothing), and whether breath focus is okay.
+ * Ids are src/data/practiceHome.ts's (test-pinned).
+ */
+export const PRACTICE_TIMES = ['morning', 'midday', 'evening'] as const;
+export const PRACTICE_CUES = ['teeth', 'kettle', 'commute', 'desk', 'own'] as const;
+export const PRACTICE_BREATH = ['yes', 'not_sure', 'no'] as const;
+
 /** Running low's rows that Me can leave out (scripts/skills/please_skill.py HIDEABLE; a test keeps them equal). */
 export const PLEASE_HIDEABLE_ROWS = ['food', 'body', 'subs', 'moved'] as const;
 /** Rebel's rebellions that last (scripts/skills/alternate_rebellion.py `LASTING`, test-pinned): never a kit card. */
@@ -238,6 +247,24 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
       const ids = strArray(o.wakeIds ?? [], { max: 1, item: (x) => oneOf(x, SLEEP_WAKE_IDS) });
       if (ids.length !== 1) throw new ValidationError('One wake time');
       return { wakeIds: ids };
+    },
+  },
+  // The Practice home (MF-02, docs/design/practice-home.md): set once in Practice's first visit (the Done tap is the
+  // yes); one per person, a re-save replaces it. `when` is a time of day or a cue; `cueOwn` the person's own cue
+  // (encrypted). `breath`: *not sure* counts as no (PRD runtime rule 7). Read by the `practicePrefs` slice only.
+  practice_prefs: {
+    kind: 'practice_prefs', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'my_progress', slice: 'practicePrefs',
+    owner: 'MF', many: false, maxItems: 1, editor: null, ownFields: ['cueOwn'],
+    validate: (v) => {
+      const o = obj(v);
+      for (const k of Object.keys(o)) if (!['time', 'cue', 'cueOwn', 'breath'].includes(k)) throw new ValidationError('Unexpected field');
+      const out: Record<string, unknown> = { breath: oneOf(o.breath ?? 'no', PRACTICE_BREATH) };
+      if (o.time != null) out.time = oneOf(o.time, PRACTICE_TIMES);
+      if (o.cue != null) out.cue = oneOf(o.cue, PRACTICE_CUES);
+      if (out.time && out.cue) throw new ValidationError('A time or a cue');
+      if (out.cue === 'own') out.cueOwn = str(o.cueOwn, { max: 60 });
+      else if (o.cueOwn != null) throw new ValidationError('Own words go with the own cue');
+      return out;
     },
   },
   crisis_kit: {

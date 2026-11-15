@@ -36,9 +36,10 @@ export const CLOSE_STATUSES: readonly CloseStatus[] = ['completed', 'exited_earl
 export type DetailKind = 'opposite_action' | 'invalidation_recovery' | 'dear_man' | 'find_the_feeling' | 'meet_a_part' | 'two_pulls';
 export const DETAIL_KINDS: readonly DetailKind[] = ['opposite_action', 'invalidation_recovery', 'dear_man', 'find_the_feeling', 'meet_a_part', 'two_pulls'];
 
-export type RepSource = 'standalone' | 'embedded' | 'help_now' | 'followup_offphone';
-export const REP_SOURCES: readonly RepSource[] = ['standalone', 'embedded', 'help_now', 'followup_offphone'];
+/** `catch`: a judgment caught off the app, one tap on the Practice home (MF-02's catch-one, H5a's clicker). */
+export type RepSource = 'standalone' | 'embedded' | 'help_now' | 'followup_offphone' | 'catch';
+export const REP_SOURCES: readonly RepSource[] = ['standalone', 'embedded', 'help_now', 'followup_offphone', 'catch'];
 
 /** Spine tool ids that aren't app tools (embeds and one-shots). */
-export const RESERVED_TOOL_IDS = ['help-now', 'micro-step', 'guided-activity'] as const;
+export const RESERVED_TOOL_IDS = ['help-now', 'micro-step', 'guided-activity', 'practice'] as const;
 export type ReservedToolId = (typeof RESERVED_TOOL_IDS)[number];

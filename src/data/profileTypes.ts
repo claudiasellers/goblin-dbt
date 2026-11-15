@@ -68,7 +68,11 @@ export interface ProfileSlices {
   goals: never[];
   copeAheadPlans: never[];
   boundaryLines: never[];
-  practicePrefs: null;
+  /**
+   * The Practice home's setup (MF-02, kind `practice_prefs`, one per person): when the daily minute comes (a time of day
+   * or a cue; `cueOwn` decrypted) and whether breath focus is okay (*not sure* counts as no). Null until set.
+   */
+  practicePrefs: { time: 'morning' | 'midday' | 'evening' | null; cue: string | null; cueOwn: string | null; breath: 'yes' | 'not_sure' | 'no'; meta: ProfileItemMeta } | null;
   fadeLevels: Record<string, 0 | 1 | 2 | 3>;
   /**
    * Words everywhere (ER-10 part 3, docs/design/emotion-guide.md): the person's own words, most used first, as Emotion
@@ -207,6 +211,7 @@ export const PROFILE_NEEDS = {
   'five-senses': ['parts'],
   'pause': ['parts', 'prosCons', 'abstinencePlans'], // prosCons: the kept card for the pull (DT-10's replay, on proceed); abstinencePlans: the lapse plan after an acted yes (DT-09)
   'crisis-kit': ['crisisKit', 'prosCons', 'rebellionCards'], // the kept kit, pros & cons cards and rebellion cards, one card at a time (DT-03, DT-11)
+  'practice': ['practicePrefs'],                 // the Practice home (MF-02): setup once, then the daily card's time
   'safety': ['safetyPlan', 'crisisKit'],        // Help & safety and the safety route: the plan, and its step 2's kit (CORE-02)
   'urge-surfing': ['parts', 'abstinencePlans'], // abstinencePlans: the lapse plan after an acted yes (DT-09)
   'let-it-be': ['parts'],                    // the tag row on its in-flow close (docs/design/let-it-be.md)
