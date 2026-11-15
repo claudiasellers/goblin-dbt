@@ -4,7 +4,8 @@
  *
  * The cards come from what the person kept (`crisis_kit`, the `crisisKit` slice: option ids and own words per
  * section), named through the make-it skill's own options (never a copy of their labels), plus up to two kept pros &
- * cons cards. Someone who hasn't made a kit (signed out, or never made one) gets the starter cards the skill marks.
+ * cons cards and up to two kept rebellion cards (DT-11 part 3, the `rebellionCards` slice, named through Rebel's own
+ * options). Someone who hasn't made a kit (signed out, or never made one) gets the starter cards the skill marks.
  */
 import type { SkillDef } from '../data/skillTypes';
 import { keptLines, type KeptCard } from './prosConsCard';
@@ -18,7 +19,10 @@ export function crisisKitSkillFor(frame: string | null): KitSkill {
 
 /** The sections, in the kit's own order (PRD: body first). The make-it skill's field ids are the same. */
 export const KIT_SECTIONS = ['body', 'hands', 'soothe', 'words', 'place', 'reasons'] as const;
-export type KitSection = (typeof KIT_SECTIONS)[number] | 'pros_cons';
+export type KitSection = (typeof KIT_SECTIONS)[number] | 'rebellion' | 'pros_cons';
+
+/** A kept rebellion card as the `rebellionCards` slice gives it (functions/src/profile/slices.ts). */
+export interface KeptRebellion { id: string; functionIds?: string[]; pickIds?: string[]; pickOwn?: string | null }
 
 /** A kept kit as the `crisisKit` slice gives it (functions/src/profile/slices.ts). */
 export type KeptKit = { id?: string } & Partial<Record<`${(typeof KIT_SECTIONS)[number]}Ids`, string[]>>
@@ -39,6 +43,8 @@ export interface KitCard {
 
 export interface KitCopy {
   secReasons: string; secProsCons: string; placeHow: string; wordsHow: string; reasonsLabel: string;
+  /** A rebellion card's line before the function it gives (*For*: "For feeling alive"). */
+  rebellionFor?: string;
   /** Copy keys the options name (a `caution` prop), resolved by the caller. */
   copy: Readonly<Record<string, string>>;
 }
@@ -64,7 +70,8 @@ export function kitHasCards(kit: KeptKit | null | undefined): boolean {
  * cards (`starter: true` on the make-it skill's options). Kept pros & cons cards (newest first, two at most) go last.
  */
 export function kitCards(kit: KeptKit | null | undefined, build: SkillDef, copy: KitCopy,
-  pros: { cards: readonly KeptCard[]; skill: SkillDef | null } = { cards: [], skill: null }): { cards: KitCard[]; starter: boolean } {
+  pros: { cards: readonly KeptCard[]; skill: SkillDef | null } = { cards: [], skill: null },
+  rebels: { cards: readonly KeptRebellion[]; skill: SkillDef | null } = { cards: [], skill: null }): { cards: KitCard[]; starter: boolean } {
   const starter = !kitHasCards(kit);
   const out: KitCard[] = [];
   const opt = (section: string, id: string) => build.options[section]?.find((o) => o.value === id);
@@ -94,6 +101,21 @@ export function kitCards(kit: KeptKit | null | undefined, build: SkillDef, copy:
     // Their own words first: they count most.
     if (own) out.push(card(section, 'own', own));
     for (const { id, o } of picks) out.push(card(section, id, o!.label, o));
+  }
+  if (rebels.skill) {
+    // Kept rebellions (newest first, two at most): their own words, or the rebellion named by Rebel's options. One
+    // that lasts never reaches the kit (the kind refuses it); a pick Rebel no longer lists is left out.
+    const rebellion = (id: string) => rebels.skill!.options.rebellion?.find((o) => o.value === id && o.lasting !== true);
+    const fn = (id: string) => rebels.skill!.options.function?.find((o) => o.value === id)?.label;
+    for (const c of rebels.cards) {
+      if (out.filter((x) => x.section === 'rebellion').length >= 2) break;
+      const title = clean(c.pickOwn) ?? (c.pickIds?.[0] ? rebellion(c.pickIds[0])?.label : undefined);
+      // The same rebellion kept twice plays once.
+      if (!title || out.some((x) => x.section === 'rebellion' && x.title === title)) continue;
+      const f = c.functionIds?.[0] ? fn(c.functionIds[0]) : undefined;
+      const how = f && copy.rebellionFor ? `${copy.rebellionFor} ${f.charAt(0).toLowerCase()}${f.slice(1)}` : undefined;
+      out.push({ id: `rebellion:${c.id}`, section: 'rebellion', title, ...(how ? { how } : {}) });
+    }
   }
   if (pros.skill) {
     for (const c of pros.cards.slice(0, 2)) {

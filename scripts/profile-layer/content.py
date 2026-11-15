@@ -66,6 +66,10 @@ KINDS = [
     # My crisis kit (DT-03): one per person, kept on *Keep it*. Never stale: theirs until they set it aside or change it.
     ("crisis_kit", "my_plans", "My crisis kit", None,
      "", "Set aside. The kit opens with the starter cards until you bring it back."),
+    # Rebel without the wreckage (DT-11 part 3): a rebellion kept as a card in My crisis kit. Never stale: theirs until
+    # they set it aside.
+    ("rebellion_card", "my_plans", "A rebellion for my kit", None,
+     "", "Set aside. My crisis kit won't show it until you bring it back."),
     # The safety plan (CORE-02): one per person, built in calm. Revisited by its own `safety_plan_review` card a month on,
     # not Me's generic "still true?", so it isn't browsed casually (PRD open question 2).
     ("safety_plan", "my_plans", "My safety plan", None,

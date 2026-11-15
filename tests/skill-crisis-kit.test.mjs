@@ -139,7 +139,7 @@ test("the crisis_kit kind: one per person, own words encrypted, at least one car
   assert.throws(() => k.validate({ bodyIds: ["cold"], peopleIds: ["mum"] }), /Unexpected field/);
   assert.throws(() => k.validate({ placeIds: ["beach", "woods"] }), "one place");
   const types = readFileSync("functions/src/profile/types.ts", "utf8");
-  assert.match(types, /'crisis-kit': \['crisisKit', 'prosCons'\],/);
+  assert.match(types, /'crisis-kit': \['crisisKit', 'prosCons', 'rebellionCards'\],/);
 });
 
 test("make it, flooded: a heads-up and a choice after the first screen; nothing locks", () => {

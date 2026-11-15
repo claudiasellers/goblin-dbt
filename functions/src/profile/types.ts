@@ -14,7 +14,7 @@ export const SLICE_IDS = [
   'name', 'quietHours', 'patterns', 'ownLines', 'savedLines',
   'people', 'bodyFlags', 'values', 'goals', 'copeAheadPlans', 'boundaryLines', 'practicePrefs',
   'fadeLevels', 'ownWords', 'thingsILike', 'thingsILikePicks', 'iCanRungs', 'crisisKit', 'safetyPlan', 'country', 'sleepAnchor',
-  'parts', 'partDetail', 'partAnchors', 'den', 'prosCons', 'pleaseRows', 'abstinencePlans',
+  'parts', 'partDetail', 'partAnchors', 'den', 'prosCons', 'pleaseRows', 'abstinencePlans', 'rebellionCards',
 ] as const;
 export type SliceId = (typeof SLICE_IDS)[number];
 
@@ -176,6 +176,13 @@ export interface ProfileSlices {
   abstinencePlans: Array<{
     id: string; whatIds: string[]; lapseIds: string[]; lapseOwn: string | null; meta: ProfileItemMeta;
   }>;
+  /**
+   * Kept rebellion cards (DT-11 part 3, kind `rebellion_card`), active only, newest first: the function it gives and
+   * the rebellion (an id from Rebel's options, or the person's own words, decrypted for them). My crisis kit plays them.
+   */
+  rebellionCards: Array<{
+    id: string; functionIds: string[]; pickIds: string[]; pickOwn: string | null; meta: ProfileItemMeta;
+  }>;
 }
 
 /**
@@ -199,7 +206,7 @@ export const PROFILE_NEEDS = {
   // reads `parts`.
   'five-senses': ['parts'],
   'pause': ['parts', 'prosCons', 'abstinencePlans'], // prosCons: the kept card for the pull (DT-10's replay, on proceed); abstinencePlans: the lapse plan after an acted yes (DT-09)
-  'crisis-kit': ['crisisKit', 'prosCons'],     // the kept kit and pros & cons cards, one card at a time (DT-03)
+  'crisis-kit': ['crisisKit', 'prosCons', 'rebellionCards'], // the kept kit, pros & cons cards and rebellion cards, one card at a time (DT-03, DT-11)
   'safety': ['safetyPlan', 'crisisKit'],        // Help & safety and the safety route: the plan, and its step 2's kit (CORE-02)
   'urge-surfing': ['parts', 'abstinencePlans'], // abstinencePlans: the lapse plan after an acted yes (DT-09)
   'let-it-be': ['parts'],                    // the tag row on its in-flow close (docs/design/let-it-be.md)

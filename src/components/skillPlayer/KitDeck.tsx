@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import type { SkillDef } from '../../data/skillTypes';
-import { deckOutput, kitCards, playDeck, type KeptKit, type KitCard, type KitCopy } from '../../lib/crisisKit';
+import { deckOutput, kitCards, playDeck, type KeptKit, type KeptRebellion, type KitCard, type KitCopy } from '../../lib/crisisKit';
 import type { KeptCard } from '../../lib/prosConsCard';
 import { getSkillsContent, peekSkillsContent } from '../../services/skills';
 import { PaperCard, paperLine } from '../shared/PaperCard';
@@ -13,8 +13,9 @@ import type { EmbedProps } from './embeds';
  * (the tool's `crisisKit` slice) or the starter cards, ordered so each *Another card* changes the kind of card; a
  * carried flooded reading (`ctx.band`) gets body cards only, one and one swap (src/lib/crisisKit.ts, pure).
  *
- * Labels come from the make-it skill (`fromSkill`) and a kept pros & cons card's from its own skill (`prosSkill`),
- * never a copy. Reports the kinds of card shown, how many and how long it was open: measurements, never a rating.
+ * Labels come from the make-it skill (`fromSkill`), a kept pros & cons card's from its own skill (`prosSkill`) and a
+ * kept rebellion card's from Rebel's (`rebelSkill`), never a copy. Opened from a crisis route (`ctx.frame` `crisis`),
+ * the rebellion cards stay out: that kit is for getting through the next minutes, not a squeeze. Reports the kinds of card shown, how many and how long it was open: measurements, never a rating.
  * Every word arrives from the skill (copy props) or what the person kept. Presentation only.
  */
 const text = (props: Record<string, unknown>, k: string) => (typeof props[k] === 'string' ? (props[k] as string) : '');
@@ -37,6 +38,7 @@ export function KitDeck({ props, ctx, profile, onShown, onDone }: EmbedProps) {
   const { user } = useAuth();
   const build = useSkill(text(props, 'fromSkill'));
   const prosSkill = useSkill(text(props, 'prosSkill'));
+  const rebelSkill = useSkill(text(props, 'rebelSkill'));
   const [waited, setWaited] = useState(false);
   useEffect(() => {
     if (!user || profile) return;
@@ -52,12 +54,15 @@ export function KitDeck({ props, ctx, profile, onShown, onDone }: EmbedProps) {
   if (!deck && build && ready) {
     const copy: KitCopy = {
       secReasons: text(props, 'secReasons'), secProsCons: text(props, 'secProsCons'), placeHow: text(props, 'placeHow'),
-      wordsHow: text(props, 'wordsHow'), reasonsLabel: text(props, 'reasonsLabel'), copy: build.copy,
+      wordsHow: text(props, 'wordsHow'), reasonsLabel: text(props, 'reasonsLabel'), rebellionFor: text(props, 'rebellionFor'),
+      copy: build.copy,
     };
     const kit = (profile?.crisisKit ?? null) as KeptKit | null;
     const pros = Array.isArray(profile?.prosCons) ? (profile!.prosCons as KeptCard[]) : [];
+    const rebels = ctx?.frame !== 'crisis' && Array.isArray(profile?.rebellionCards) ? (profile!.rebellionCards as KeptRebellion[]) : [];
     // Set during render, once (React's "adjusting state while rendering"): no effect, no flash of an empty deck.
-    setDeck(playDeck(kitCards(kit, build, copy, { cards: pros, skill: prosSkill }), kitCards(null, build, copy).cards, flooded));
+    setDeck(playDeck(kitCards(kit, build, copy, { cards: pros, skill: prosSkill }, { cards: rebels, skill: rebelSkill }),
+      kitCards(null, build, copy).cards, flooded));
   }
 
   const [at, setAt] = useState(0);

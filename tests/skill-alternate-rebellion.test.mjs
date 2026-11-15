@@ -29,12 +29,14 @@ const toPick = (squeeze = ["rules"], fn = "freedom") => [next, ...squeeze.map((x
 // Later today or this week: the *card later?* step, skipped here (its own test is skill-alternate-rebellion-part2).
 const toReal = (squeeze, rebellion = "say_no", when = "today") => [...toPick(squeeze, "freedom"), pick("pick", rebellion), next, card(when), ...(when === "now" ? [] : [next])];
 const step = (id) => skill.steps.find((s) => s.id === id);
+// Part 3: after the squeeze, a rebellion fine for a hard night is offered to the crisis kit; *Not this time* goes on.
+const noKit = [pick("kitit", "not_now"), next];
 
 test("the screens, in order: open, squeeze, function, pick, (heads-up), (sleep on it), card, (itch | later), (back, still: reopened only), real, next", () => {
-  assert.deepEqual(skill.steps.map((s) => s.id), ["open", "squeeze", "function", "pick", "heads_up", "sleep_on", "card", "later", "itch", "back", "again_card", "still", "real", "next"]);
+  assert.deepEqual(skill.steps.map((s) => s.id), ["open", "squeeze", "function", "pick", "heads_up", "sleep_on", "card", "later", "itch", "back", "again_card", "still", "real", "kit", "next"]);
   assert.equal(skill.toolId, "alternate-rebellion");
-  const s = run([...toReal(["rules"], "say_no", "now"), pick("itch", "a_bit"), next, pick("real", "change"), next]);
-  assert.deepEqual(s.path, ["open", "squeeze", "function", "pick", "card", "itch", "real", "next"]);
+  const s = run([...toReal(["rules"], "say_no", "now"), pick("itch", "a_bit"), next, pick("real", "change"), next, ...noKit]);
+  assert.deepEqual(s.path, ["open", "squeeze", "function", "pick", "card", "itch", "real", "kit", "next"]);
   assert.deepEqual(s.offered, ["problem_solve"]);
 });
 
@@ -111,7 +113,7 @@ test("never a confrontation plan for someone they're scared of (D4): no DEAR MAN
     assert.ok(JSON.stringify(o.when).includes('{"not":{"has":["$a.squeeze.ids","scared"]}}'), `${x} is never offered with someone they're scared of`);
   }
   assert.equal(M.handoffLine(ctx(), step("next"), scared), "You named someone you're scared of. You don't have to work that out alone.");
-  const plain = run([...toReal(["controlling"]), pick("real", "say"), next]);
+  const plain = run([...toReal(["controlling"]), pick("real", "say"), next, ...noKit]);
   assert.deepEqual(plain.offered, ["dear_man", "fast"], "FAST is built (IE-B1)");
   assert.ok(!skill.exits.find((x) => x.id === "ending").planned);
 });
@@ -135,7 +137,7 @@ test("plan C6.7: no food, alcohol, shopping or scrolling in a rebellion, no amou
 
 test("an own rebellion asks if it'll cost tomorrow; yes gets a heads-up and a choice (lighter goes back, keep goes on)", () => {
   let s = run([...toPick(), own("pick", "quit my job by email tonight")]);
-  assert.deepEqual(M.shownFields(ctx(), step("pick"), s).map((f) => f.id), ["pick", "cost", "undo"]);
+  assert.deepEqual(M.shownFields(ctx(), step("pick"), s).map((f) => f.id), ["pick", "door", "cost", "undo"]);
   assert.equal(M.canGoOn(ctx(), s), false, "the cost question is asked");
   s = M.runNext(ctx(), M.runNext(ctx(), M.runNext(ctx(), s, pick("cost", "yes")), pick("undo", "yes")), next);
   assert.equal(s.stepId, "heads_up");
@@ -156,7 +158,7 @@ test("an own rebellion with someone they're scared of also asks whether they'd n
   assert.match(M.copyText(ctx(), step("heads_up").title, s), /If they'd notice it/);
   const quiet = run([...toPick(["scared"]), own("pick", "hum a song"), pick("cost", "no"), pick("noticed", "no"), pick("undo", "yes"), next]);
   assert.equal(quiet.stepId, "card");
-  assert.deepEqual(M.shownFields(ctx(), step("pick"), run([...toPick(["rules"]), own("pick", "x")])).map((f) => f.id), ["pick", "cost", "undo"], "only with someone they're scared of");
+  assert.deepEqual(M.shownFields(ctx(), step("pick"), run([...toPick(["rules"]), own("pick", "x")])).map((f) => f.id), ["pick", "door", "cost", "undo"], "only with someone they're scared of");
 });
 
 test("treatment: never a rebellion; screen 4 says to talk to the care team first, and nothing offered skips something", () => {
@@ -203,17 +205,17 @@ test("on the player (F2): the tool plays this skill, no page of its own; the car
 });
 
 test("the real squeeze (PRD step 6): change → Problem Solve, a person → DEAR MAN and FAST, can't → Let it be, not now → Done", () => {
-  const offered = (real) => run([...toReal(["rules"]), pick("real", real), next]).offered;
+  const offered = (real) => run([...toReal(["rules"]), pick("real", real), next, ...noKit]).offered;
   assert.deepEqual(offered("change"), ["problem_solve"]);
   assert.deepEqual(offered("say"), ["dear_man", "fast"]);
   assert.deepEqual(offered("cant"), ["let_it_be"]);
   assert.deepEqual(offered("not_now"), []);
-  const done = run([...toReal(["rules"]), pick("real", "not_now"), next]);
+  const done = run([...toReal(["rules"]), pick("real", "not_now"), next, ...noKit]);
   assert.equal(M.handoffLine(ctx(), step("next"), done), "The rebellion's yours. The squeeze can wait until you're ready.");
 });
 
 test("the record: no numbers, no free text but own words, within the server's schema; the urge close asks about the blow-up", () => {
-  const s = M.runNext(ctx(), run([...toPick(["rules"]), own("pick", "x".repeat(200)), pick("cost", "no"), pick("undo", "yes"), next, card("today"), next, pick("real", "change"), next]),
+  const s = M.runNext(ctx(), run([...toPick(["rules"]), own("pick", "x".repeat(200)), pick("cost", "no"), pick("undo", "yes"), next, card("today"), next, pick("real", "change"), next, ...noKit]),
     { type: "exit", exitId: "problem_solve" });
   assert.equal(s.answers.pick.own.length, 90);
   const rec = M.runRecord(ctx(), s);
