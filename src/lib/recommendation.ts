@@ -73,6 +73,8 @@ export function shownToolIds(result: { tools?: ReadonlyArray<CardInput> } | null
  */
 export const CARD_FRAMES: Readonly<Record<string, Readonly<Record<string, string>>>> = {
   'finding-connection': { reward_drive_low: 'low', conservation_freeze: 'low' },
+  // Notice what's here on a watchful result opens on Listen (MF-01: a non-threat framing, PRD MF §3.2).
+  'notice-and-name': { chronic_vigilance: 'listen' },
 };
 
 /** The result card's link: the tool page, with the frame its pattern gives, if any. */

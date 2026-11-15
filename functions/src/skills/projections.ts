@@ -72,6 +72,10 @@ export const OFF_PHONE_SKILLS: Readonly<Record<string, { toolId: string; happene
   // Notice them's afterwards (the notice_back card reopens the run at *Did you get to notice them?*): yes is the rep (the
   // PRD's `mindfulness_of_others`); forgot, couldn't or not seen log none. The first visit keeps the close's own.
   notice_them: { toolId: 'mindfulness-of-others', happenedField: 'back', yes: 'yes', unansweredKeepsOwn: true },
+  // Notice what's here's off-phone check (the offphone_rep card reopens the run at *Did you get to notice something
+  // without the app?*): yes is the off-phone rep (PRD MF-01 fade level 3); sort of or not yet log none. The first visit
+  // keeps the close's own (observe and describe).
+  notice_and_name: { toolId: 'notice-and-name', happenedField: 'offphone', yes: 'yes', unansweredKeepsOwn: true },
 };
 
 /** The rep a run's close logs: off the phone (it happened), none (it didn't), or the close's own (null). */

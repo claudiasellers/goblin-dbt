@@ -52,6 +52,8 @@ PRESENTS_LABELS = {"ProblemType", "SolutionDirection", "DecompositionAspect", "B
                    "ActionUrge",
                    # The body's places (schema/body-map.cypher): Let it be a wave's *where do you notice it?*
                    "BodyRegion",
+                   # Sensation words (schema/body-map.cypher): Notice it, name it's words for inside the body.
+                   "SensationType",
                    # DEAR MAN's prep vocabulary (schema/dear-man-content*.cypher, scripts/dear-man/content.py).
                    "DearManSituationType", "DearManBarrier", "DearManDescribeOption", "DearManFeelingChip",
                    "DearManAssertOption", "DearManReinforceOption", "DearManAnchorNeed", "DearManAnchorPhrase",

@@ -39,6 +39,8 @@ MERGE (t:FollowUpType {id: "reach_out_outcome"})
 SET t.ownerModule = "ie", t.hierarchyTier = "practice", t.resolveMode = "deeplink", t.deepLinkTemplate = "/tool/finding-connection?run={sourceSessionId}&at=back&followUp={followUpId}", t.staleAfterHours = 72, t.missedPath = "none", t.notifyPush = false, t.notifyInTab = true, t.notifyIcs = false, t.enabled = true, t.reserved = false, t.reviewStatus = "draft", t.version = "spine-v1", t.contentJson = "{\"choices\": [{\"id\": \"dismiss\", \"label\": \"Not this time\", \"status\": \"dismissed\"}], \"copy\": {\"body\": \"A step towards people you picked. Did you do it?\", \"title\": \"Your small step\"}, \"notification\": \"Your small step is ready to check.\", \"window\": {\"chips\": {\"evening\": {\"days\": 0, \"kind\": \"at_local\", \"time\": \"21:00\"}, \"few_days\": {\"days\": 3, \"kind\": \"at_local\", \"time\": \"19:00\"}, \"this_week\": {\"days\": 6, \"kind\": \"at_local\", \"time\": \"19:00\"}, \"today\": {\"kind\": \"after\", \"minutes\": 180}, \"tomorrow\": {\"days\": 1, \"kind\": \"at_local\", \"time\": \"19:00\"}}, \"kind\": \"chip\"}}";
 MERGE (t:FollowUpType {id: "notice_back"})
 SET t.ownerModule = "ie", t.hierarchyTier = "practice", t.resolveMode = "deeplink", t.deepLinkTemplate = "/tool/mindfulness-of-others?run={sourceSessionId}&at=back&followUp={followUpId}", t.staleAfterHours = 72, t.missedPath = "none", t.notifyPush = false, t.notifyInTab = true, t.notifyIcs = false, t.enabled = true, t.reserved = false, t.reviewStatus = "draft", t.version = "spine-v1", t.contentJson = "{\"choices\": [{\"id\": \"dismiss\", \"label\": \"Not this time\", \"status\": \"dismissed\"}], \"copy\": {\"body\": \"A practice in noticing someone you picked. How did it go?\", \"title\": \"Your practice\"}, \"notification\": \"Your practice is ready to check.\", \"window\": {\"chips\": {\"few_days\": {\"days\": 3, \"kind\": \"at_local\", \"time\": \"20:00\"}, \"this_week\": {\"days\": 6, \"kind\": \"at_local\", \"time\": \"20:00\"}, \"today\": {\"days\": 0, \"kind\": \"at_local\", \"time\": \"21:00\"}, \"tomorrow\": {\"days\": 1, \"kind\": \"at_local\", \"time\": \"20:00\"}}, \"kind\": \"chip\"}}";
+MERGE (t:FollowUpType {id: "offphone_rep"})
+SET t.ownerModule = "mf", t.hierarchyTier = "practice", t.resolveMode = "deeplink", t.deepLinkTemplate = "/tool/notice-and-name?run={sourceSessionId}&at=offphone&followUp={followUpId}", t.staleAfterHours = 48, t.missedPath = "none", t.notifyPush = false, t.notifyInTab = true, t.notifyIcs = false, t.enabled = true, t.reserved = false, t.reviewStatus = "draft", t.version = "spine-v1", t.contentJson = "{\"choices\": [{\"id\": \"dismiss\", \"label\": \"Not this time\", \"status\": \"dismissed\"}], \"copy\": {\"body\": \"A minute of noticing, without the app. Did you get to try it?\", \"title\": \"Your noticing practice\"}, \"notification\": \"Your noticing practice is ready to check.\", \"window\": {\"chips\": {\"evening\": {\"days\": 1, \"kind\": \"at_local\", \"time\": \"19:00\"}, \"morning\": {\"days\": 1, \"kind\": \"at_local\", \"time\": \"09:00\"}}, \"kind\": \"chip\"}}";
 MERGE (t:FollowUpType {id: "good_thing"})
 SET t.ownerModule = "er", t.hierarchyTier = "practice", t.resolveMode = "deeplink", t.deepLinkTemplate = "/tool/good-things?run={sourceSessionId}&at=back&followUp={followUpId}", t.staleAfterHours = 24, t.missedPath = "none", t.notifyPush = false, t.notifyInTab = true, t.notifyIcs = false, t.enabled = true, t.reserved = false, t.reviewStatus = "draft", t.version = "spine-v1", t.contentJson = "{\"choices\": [{\"id\": \"dismiss\", \"label\": \"Not today\", \"status\": \"dismissed\"}], \"copy\": {\"body\": \"Something good you picked earlier. Did it happen?\", \"title\": \"Your good thing\"}, \"notification\": \"Your good thing is ready to check.\", \"window\": {\"chips\": {\"afternoon\": {\"days\": 0, \"kind\": \"at_local\", \"time\": \"16:00\"}, \"day_after\": {\"days\": 2, \"kind\": \"at_local\", \"time\": \"18:00\"}, \"evening\": {\"days\": 0, \"kind\": \"at_local\", \"time\": \"20:00\"}, \"few_days\": {\"days\": 3, \"kind\": \"at_local\", \"time\": \"18:00\"}, \"hour\": {\"kind\": \"after\", \"minutes\": 60}, \"tomorrow\": {\"days\": 1, \"kind\": \"at_local\", \"time\": \"18:00\"}}, \"kind\": \"chip\"}}";
 MERGE (t:FollowUpType {id: "good_week_one"})
@@ -139,7 +141,7 @@ MERGE (k:PracticeSkill {id: "label"})
 SET k.defaultFor = ["find-the-feeling"], k.displayLabel = "Name it";
 
 // --- New PracticeSkills (only their own links are refreshed) ---
-MATCH (k:PracticeSkill)-[r:PRACTICES|SUPPORTED_BY]->() WHERE k.id IN ["urge_surf", "problem_solve", "wise_mind", "cope_ahead"] DELETE r;
+MATCH (k:PracticeSkill)-[r:PRACTICES|SUPPORTED_BY]->() WHERE k.id IN ["urge_surf", "problem_solve", "wise_mind", "cope_ahead", "observe", "describe"] DELETE r;
 MERGE (k:PracticeSkill {id: "urge_surf"})
 SET k.name = "Ride the urge", k.displayLabel = "Ride the urge", k.evidenceGrade = "Preliminary", k.evidenceBasis = "Limited trials", k.family = "mind", k.why = "Watching an urge rise and fall without acting on it teaches that it passes on its own.", k.defaultFor = ["urge-surfing"], k.reviewStatus = "draft";
 MATCH (k:PracticeSkill {id: "urge_surf"}), (c:TherapyConcept {id: "urge_surfing"})
@@ -167,4 +169,18 @@ MATCH (k:PracticeSkill {id: "cope_ahead"}), (c:TherapyConcept {id: "dbt_cope_ahe
 MERGE (k)-[:PRACTICES]->(c);
 UNWIND ["linehan_skills_2015"] AS srcId
 MATCH (k:PracticeSkill {id: "cope_ahead"}), (s:ClinicalSource {id: srcId})
+MERGE (k)-[:SUPPORTED_BY]->(s);
+MERGE (k:PracticeSkill {id: "observe"})
+SET k.name = "Observe", k.displayLabel = "Observe", k.evidenceGrade = "Moderate", k.evidenceBasis = null, k.family = "mind", k.why = "Giving attention one small job, and coming back each time it wanders, can make noticing easier when it matters.", k.defaultFor = ["notice-and-name"], k.reviewStatus = "draft";
+MATCH (k:PracticeSkill {id: "observe"}), (c:TherapyConcept {id: "dbt_observe"})
+MERGE (k)-[:PRACTICES]->(c);
+UNWIND ["linehan_skills_2015"] AS srcId
+MATCH (k:PracticeSkill {id: "observe"}), (s:ClinicalSource {id: srcId})
+MERGE (k)-[:SUPPORTED_BY]->(s);
+MERGE (k:PracticeSkill {id: "describe"})
+SET k.name = "Describe", k.displayLabel = "Describe", k.evidenceGrade = "Moderate", k.evidenceBasis = null, k.family = "mind", k.why = "Putting a plain word on what you noticed, a guess is fine, can help separate what happened from the story about it.", k.defaultFor = ["notice-and-name"], k.reviewStatus = "draft";
+MATCH (k:PracticeSkill {id: "describe"}), (c:TherapyConcept {id: "dbt_describe"})
+MERGE (k)-[:PRACTICES]->(c);
+UNWIND ["linehan_skills_2015"] AS srcId
+MATCH (k:PracticeSkill {id: "describe"}), (s:ClinicalSource {id: srcId})
 MERGE (k)-[:SUPPORTED_BY]->(s);

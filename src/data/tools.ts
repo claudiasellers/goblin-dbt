@@ -471,6 +471,17 @@ export const tools: Tool[] = [
     emoji: '🪨',
     bare: true,
   },
+  {
+    id: 'notice-and-name',
+    name: 'Notice what\'s here',
+    tagline: 'A minute of noticing, then a word for it',
+    description: 'Look, listen, touch or press your feet down for a minute, eyes open. Each time your mind wanders and comes back, a pebble drops in the bowl. Then a word or two for what it was like.',
+    whenToUse: 'When you can\'t tell what\'s going on in you, your head is loud, or you want a minute\'s practice while it\'s calm.',
+    module: 'mindfulness',
+    dbtBasis: 'DBT Mindfulness: observe and describe (Mindfulness Handouts 4, 4a, 4b)',
+    emoji: '👀',
+    bare: true,
+  },
   // Mindfulness (parts, docs/design/parts.md: listed and opened only with the parts switch on and its copy signed off)
   {
     id: 'meet-a-part',
