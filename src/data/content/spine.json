@@ -1,7 +1,7 @@
 {
   "source": {
-    "file": "graph-content-only-2026-11-13.json",
-    "exportedAt": "2026-11-13T03:32:38.479Z"
+    "file": "graph-content-only-2026-11-15.json",
+    "exportedAt": "2026-11-15T22:17:11.359Z"
   },
   "content": {
     "version": "spine-v1",
@@ -1422,8 +1422,8 @@
         },
         "enabled": true,
         "copy": {
-          "title": "Your one thing",
-          "body": "One thing, with your whole attention. Did you get to try it?"
+          "body": "One thing, with your whole attention. Did you get to try it?",
+          "title": "Your one thing"
         },
         "choices": [
           {
@@ -1433,19 +1433,19 @@
           }
         ],
         "window": {
-          "kind": "chip",
           "chips": {
-            "morning": {
-              "kind": "at_local",
-              "days": 1,
-              "time": "09:00"
-            },
             "evening": {
-              "kind": "at_local",
               "days": 1,
+              "kind": "at_local",
               "time": "19:00"
+            },
+            "morning": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "09:00"
             }
-          }
+          },
+          "kind": "chip"
         },
         "notification": "Your one thing is ready to check."
       },
