@@ -310,6 +310,20 @@ FOLLOW_UP_TYPES = [
         "notification": "Your one thing is ready to check.",
     },
     {
+        # What works here (MF-08, docs/design/what-works.md): *Want me to ask how it went?* on the end card, tomorrow or
+        # in a few days. The card reopens that visit at `back` (R9 `reopens`: *How did it go? You planned: {move}*).
+        # Opening it is the resolution. Content-free.
+        "id": "effective_move", "ownerModule": "mf", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/effectiveness?run={sourceSessionId}&at=back&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
+                                             "few_days": {"kind": "at_local", "days": 3, "time": "18:00"}}},
+        "staleAfterHours": 72, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "What works", "body": "You picked one move that works. How did it go?"},
+        "choices": [{"id": "dismiss", "label": "Not this time", "status": "dismissed"}],
+        "notification": "Your move is ready to check.",
+    },
+    {
         # The Practice home's daily minute (MF-02, MF-B3, docs/design/practice-home.md): set once in Practice's setup
         # (*morning · midday · evening*; a cue of the person's own books nothing: the cue is the reminder). No rrule yet,
         # so it rolls: opening the card resolves it, and every visit to Practice books the next one when none is
@@ -880,7 +894,7 @@ SKILL_FIELDS = {
 # The Practice home (MF-02, MF-B3, docs/design/practice-home.md): the MF sequence (PRD MF-02 workflow 2: observe →
 # describe → nonjudgment → one-mindfully → wise mind → effectively → participate, then cycling) as `mfOrder`, and the
 # library's plain name per skill (`practiceLabel`). Only skills with a built tool are listed; One thing (MF-05) joined
-# with MF-B4; What works (MF-08) and Join in (MF-10) join the sequence with their batches. `alsoFor`: other tools that practise
+# with MF-B4 and What works (MF-08) with MF-B5; Join in (MF-10) joins the sequence with its batch. `alsoFor`: other tools that practise
 # the skill (PRD: five-senses → observe, Find the feeling → describe), added to `defaultFor` so their reps count here.
 MF_SEQUENCE = [
     ("observe", 1, "Notice", ["five-senses"]),
@@ -888,6 +902,7 @@ MF_SEQUENCE = [
     ("nonjudge", 3, "Without judging", []),
     ("one_thing", 4, "One thing", []),
     ("wise_mind", 5, "Wise mind", []),
+    ("effectively", 6, "What works", []),
 ]
 
 # The tool the home opens for a skill when its first `defaultFor` is shared with an earlier skill: Notice what's here
@@ -933,6 +948,11 @@ NEW_SKILLS = [
     ("one_thing", "One-mindfully", "Preliminary", "mind", "dbt_one_mindfully",
      "Giving one ordinary thing all of your attention, and coming back each time you drift, gives a looping head something else to hold.",
      ["linehan_skills_2015"], ["one-thing"]),
+    # What works here (MF-08, docs/design/what-works.md): a completed visit is an effectively rep. Preliminary: clinical
+    # consensus only (the PRD's grade).
+    ("effectively", "Effectively", "Preliminary", "mind", "dbt_effectively",
+     "Naming what you want out of a situation, and one move that works from how things are, can loosen the pull of being right.",
+     ["linehan_skills_2015"], ["effectiveness"]),
 ]
 
 SOURCES = [

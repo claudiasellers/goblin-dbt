@@ -63,6 +63,8 @@ export const FOLLOW_UP_SESSION_TOOL: Readonly<Record<string, string>> = {
   ride_morning: 'urge-surfing',
   // One thing's *Same thing tomorrow?* (MF-05): only from a One thing visit (it reopens that run).
   one_thing_again: 'one-thing',
+  // What works here's *Want me to ask how it went?* (MF-08): only from a What works visit (it reopens that run).
+  effective_move: 'effectiveness',
 };
 
 /** The plan's ids, as the after card needs them. Own words are the visit's (its Today card may show them). */

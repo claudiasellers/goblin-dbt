@@ -471,6 +471,17 @@
    "direction": null,
    "addresses": []
   },
+  "dbt_effectively": {
+   "appToolId": "effectiveness",
+   "name": "Effectively",
+   "description": "Focus on what works; play by the rules; let go of being right",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": []
+  },
   "dbt_ending_relationships": {
    "appToolId": "ending-relationships",
    "name": "Ending relationships",

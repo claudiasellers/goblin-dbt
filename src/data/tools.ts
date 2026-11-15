@@ -506,6 +506,20 @@ export const tools: Tool[] = [
     emoji: '🫖',
     bare: true,
   },
+  {
+    // MF-08 on the skill runtime (docs/design/what-works.md): being right and getting what matters, side by side, and
+    // one move that works from how things are. Problem Solve's *Decide if this fight is worth it* and *Play the hand you
+    // have* open it with their grievance (`?frame=`).
+    id: 'effectiveness',
+    name: 'What works here',
+    tagline: 'Being right, or getting what matters',
+    description: 'When being right and getting what you want pull apart. Name what you want out of it, see both side by side, and pick one move that works from how things actually are.',
+    whenToUse: 'When a fight, a deal or something unfair has you stuck on who\'s right.',
+    module: 'mindfulness',
+    dbtBasis: 'DBT Mindfulness: effectively (Mindfulness Handout 5)',
+    emoji: '🎯',
+    bare: true,
+  },
   // Mindfulness (parts, docs/design/parts.md: listed and opened only with the parts switch on and its copy signed off)
   {
     id: 'meet-a-part',
@@ -562,6 +576,7 @@ export const allIntents: Intent[] = [
   { id: 'soothe', label: 'Be kind to myself for a minute', toolId: 'soothe', emoji: '🫶' },
   { id: 'thoughts-passing', label: 'A thought feels like a fact', toolId: 'thoughts-passing', emoji: '🍂' },
   { id: 'out-of-head', label: 'Get out of my head', toolId: 'one-thing', query: 'enterAt=outside&frame=ruminate', emoji: '🫖' },
+  { id: 'right-or-works', label: 'Being right is getting in the way', toolId: 'effectiveness', emoji: '🎯' },
   { id: 'hard-on-myself', label: 'I\'m being hard on myself', toolId: 'unpack-a-judgment', emoji: '🧺' },
   { id: 'blow-it-up', label: 'I want to blow it all up', toolId: 'alternate-rebellion', emoji: '🎸' },
   { id: 'reasons', label: 'Make a card for a pull that keeps coming back', toolId: 'pros-cons', emoji: '⚖️' },

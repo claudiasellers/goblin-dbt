@@ -16484,6 +16484,1078 @@
    }
   },
   {
+   "id": "effectively",
+   "toolId": "effectiveness",
+   "version": "eff-v1",
+   "start": "goal",
+   "accepts": [
+    "band",
+    "frame"
+   ],
+   "ownMax": 60,
+   "emotionFields": [],
+   "copy": {
+    "flooded_title": "Your body's loud right now.",
+    "flooded_hint": "Working out what works is easier once it settles. Start with your body, or go on anyway.",
+    "body_first": "My body first",
+    "valid_fight": "Maybe they are in the wrong. That's real.",
+    "valid_unfair": "It isn't fair. That's real.",
+    "valid_plain": "Being right and getting what matters can pull apart.",
+    "goal_title": "What do you want out of this, most?",
+    "goal_hint": "One for now.",
+    "goal_own": "Something else",
+    "unsafe_title": "Your safety comes first.",
+    "unsafe_line": "When someone might hurt you, what works is staying safe. Nothing here asks you to give ground to them.",
+    "want_title": "What are you after here? Tap any.",
+    "want_hint": "Both can matter.",
+    "right_label": "Being right",
+    "works_label": "Getting what matters",
+    "piles_title": "Here's what you're after.",
+    "piles_hint": "Both are real. They don't always fit together.",
+    "pull_title": "Right now, which matters more?",
+    "move_title": "Given how things actually are, one move that works.",
+    "move_title_right": "Then one move that keeps your self-respect, from how things actually are.",
+    "move_hint": "From where things stand today.",
+    "move_own": "My own move",
+    "set_title": "What could you set down, for now?",
+    "set_hint": "For now. Nothing is given up for good.",
+    "end_title": "What works here: {move}",
+    "end_set_line": "The rest can wait. Setting it down for now isn't giving in.",
+    "end_right_line": "Sometimes being right is the point. You know which this one is.",
+    "end_unsure_line": "Not knowing is fine. You have one move either way.",
+    "end_line": "Right, or what works? Asking it is the skill.",
+    "remind_q": "Want me to ask how it went?",
+    "back_title": "How did it go? You planned: {move}",
+    "back_helped": "That's what works, found and done.",
+    "back_didnt": "It was worth trying. What works can change, and you can look again.",
+    "back_not_yet": "It'll keep. The move is still there.",
+    "safety_open": "Talk to someone now",
+    "next": "Next",
+    "done": "Done"
+   },
+   "tables": {
+    "grievanceOf": {
+     "anger-blocked-goal": "fight",
+     "envy-unfair-advantage": "unfair",
+     "fight": "fight",
+     "unfair": "unfair"
+    }
+   },
+   "derive": [
+    {
+     "name": "grievance",
+     "from": "$ctx.frame",
+     "table": "grievanceOf"
+    }
+   ],
+   "steps": [
+    {
+     "id": "goal",
+     "kind": "ask",
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       },
+       "key": "flooded_title"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "goal_title"
+      }
+     ],
+     "fields": [
+      {
+       "id": "goal",
+       "options": {
+        "list": "goal"
+       },
+       "max": 1,
+       "required": true,
+       "own": {
+        "hint": "goal_own",
+        "countsAsPick": true
+       },
+       "links": [
+        {
+         "exit": "cool_down",
+         "label": "body_first",
+         "when": {
+          "eq": [
+           "$ctx.band",
+           "flooded"
+          ]
+         }
+        },
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "eq": [
+         "$a.goal",
+         "unsafe"
+        ]
+       }
+      }
+     ],
+     "hint": "goal_hint",
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       },
+       "key": "flooded_hint"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.grievance",
+         "fight"
+        ]
+       },
+       "key": "valid_fight"
+      },
+      {
+       "when": {
+        "eq": [
+         "$d.grievance",
+         "unfair"
+        ]
+       },
+       "key": "valid_unfair"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "valid_plain"
+      }
+     ],
+     "next": [
+      {
+       "to": "unsafe",
+       "when": {
+        "eq": [
+         "$a.goal",
+         "unsafe"
+        ]
+       }
+      },
+      {
+       "to": "want",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "unsafe",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "unsafe_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "title": "unsafe_title",
+     "next": [],
+     "offers": [
+      {
+       "exit": "safety_open",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "ending_careful",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "want",
+     "kind": "ask",
+     "title": "want_title",
+     "fields": [
+      {
+       "id": "right",
+       "options": {
+        "list": "right"
+       },
+       "max": 5,
+       "required": false,
+       "label": "right_label",
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      },
+      {
+       "id": "works",
+       "options": {
+        "list": "works"
+       },
+       "max": 5,
+       "required": false,
+       "label": "works_label"
+      }
+     ],
+     "hint": "want_hint",
+     "next": [
+      {
+       "to": "piles",
+       "when": {
+        "all": [
+         {
+          "set": "$a.right"
+         },
+         {
+          "set": "$a.works"
+         }
+        ]
+       }
+      },
+      {
+       "to": "pull",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "piles",
+     "kind": "embed",
+     "embed": "twoColumns",
+     "answerAs": "piles_read",
+     "title": "piles_title",
+     "hint": "piles_hint",
+     "props": {
+      "left": "right",
+      "right": "works",
+      "leftLabel": "right_label",
+      "rightLabel": "works_label",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "pull",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "pull",
+     "kind": "ask",
+     "title": "pull_title",
+     "fields": [
+      {
+       "id": "pull",
+       "options": {
+        "list": "pull"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "move",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "move",
+     "kind": "ask",
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$a.pull",
+         "right"
+        ]
+       },
+       "key": "move_title_right"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "move_title"
+      }
+     ],
+     "fields": [
+      {
+       "id": "move",
+       "options": {
+        "list": "move",
+        "where": {
+         "any": [
+          {
+           "eq": [
+            "$opt.grievance",
+            "$d.grievance"
+           ]
+          },
+          {
+           "eq": [
+            "$opt.goal",
+            "$a.goal"
+           ]
+          },
+          {
+           "all": [
+            {
+             "own": "goal"
+            },
+            {
+             "eq": [
+              "$opt.goal",
+              "any"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "max": 1,
+       "required": true,
+       "own": {
+        "hint": "move_own",
+        "countsAsPick": true
+       },
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "move_hint",
+     "next": [
+      {
+       "to": "end",
+       "when": {
+        "eq": [
+         "$a.pull",
+         "right"
+        ]
+       }
+      },
+      {
+       "to": "set_down",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "set_down",
+     "kind": "ask",
+     "title": "set_title",
+     "fields": [
+      {
+       "id": "set_down",
+       "options": {
+        "list": "set_down"
+       },
+       "max": 3,
+       "required": false,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "hint": "set_hint",
+     "next": [
+      {
+       "to": "end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "end",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.pull",
+         "right"
+        ]
+       },
+       "key": "end_right_line"
+      },
+      {
+       "when": {
+        "set": "$a.set_down"
+       },
+       "key": "end_set_line"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.pull",
+         "unsure"
+        ]
+       },
+       "key": "end_unsure_line"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "end_line"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "titleSlots": {
+      "move": {
+       "labelOf": "move"
+      }
+     },
+     "fields": [
+      {
+       "id": "remind",
+       "label": "remind_q",
+       "max": 1,
+       "options": {
+        "list": "remind"
+       }
+      }
+     ],
+     "followUp": {
+      "type": "effective_move",
+      "whenFrom": "remind"
+     },
+     "title": "end_title",
+     "next": [],
+     "offers": [
+      {
+       "exit": "give",
+       "when": {
+        "in": [
+         "$a.goal",
+         [
+          "connected",
+          "repair"
+         ]
+        ]
+       }
+      },
+      {
+       "exit": "dear_man",
+       "when": {
+        "in": [
+         "$a.goal",
+         [
+          "connected",
+          "repair",
+          "boundary"
+         ]
+        ]
+       }
+      },
+      {
+       "exit": "fast",
+       "when": {
+        "in": [
+         "$a.goal",
+         [
+          "respect",
+          "boundary"
+         ]
+        ]
+       }
+      },
+      {
+       "exit": "say_no",
+       "when": {
+        "in": [
+         "$a.goal",
+         [
+          "boundary"
+         ]
+        ]
+       }
+      },
+      {
+       "exit": "problem_solve",
+       "when": {
+        "any": [
+         {
+          "in": [
+           "$a.goal",
+           [
+            "progress"
+           ]
+          ]
+         },
+         {
+          "own": "goal"
+         }
+        ]
+       }
+      },
+      {
+       "exit": "build_mastery",
+       "when": {
+        "in": [
+         "$a.goal",
+         [
+          "progress"
+         ]
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "id": "back",
+     "kind": "ask",
+     "title": "back_title",
+     "fields": [
+      {
+       "id": "back",
+       "options": {
+        "list": "back"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "reopens": {
+      "after": "end"
+     },
+     "clears": [
+      "back"
+     ],
+     "titleSlots": {
+      "move": {
+       "labelOf": "move"
+      }
+     },
+     "next": [
+      {
+       "to": "back_end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "back_end",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.back",
+         "helped"
+        ]
+       },
+       "key": "back_helped"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.back",
+         "didnt"
+        ]
+       },
+       "key": "back_didnt"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "back_not_yet"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "noClose": true,
+     "next": [],
+     "offers": [
+      {
+       "exit": "problem_solve",
+       "when": {
+        "eq": [
+         "$a.back",
+         "didnt"
+        ]
+       }
+      }
+     ]
+    }
+   ],
+   "exits": [
+    {
+     "id": "build_mastery",
+     "toolId": "build-mastery",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "cool_down",
+     "toolId": "cool-down",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "dear_man",
+     "toolId": "dear-man",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "done",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": true
+    },
+    {
+     "id": "ending_careful",
+     "toolId": "ending-relationships",
+     "query": {
+      "frame": "careful"
+     },
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "fast",
+     "toolId": "fast",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "give",
+     "toolId": "give",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "problem_solve",
+     "toolId": "problem-solve",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "safety_open",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": false,
+     "safety": true
+    },
+    {
+     "id": "say_no",
+     "toolId": "say-no",
+     "query": {},
+     "carry": [],
+     "done": false
+    }
+   ],
+   "options": {
+    "goal": [
+     {
+      "value": "connected",
+      "label": "Stay connected with them"
+     },
+     {
+      "value": "boundary",
+      "label": "Protect a boundary"
+     },
+     {
+      "value": "progress",
+      "label": "Make progress on it"
+     },
+     {
+      "value": "repair",
+      "label": "Put right what went wrong"
+     },
+     {
+      "value": "respect",
+      "label": "Keep my self-respect"
+     },
+     {
+      "value": "unsafe",
+      "label": "I'm scared of what they'd do",
+      "danger": "other"
+     }
+    ],
+    "right": [
+     {
+      "value": "admit",
+      "label": "They admit they were wrong",
+      "pile": "right"
+     },
+     {
+      "value": "feel",
+      "label": "They feel what I felt",
+      "pile": "right"
+     },
+     {
+      "value": "seen",
+      "label": "Everyone sees it was unfair",
+      "pile": "right"
+     },
+     {
+      "value": "win",
+      "label": "I win this one",
+      "pile": "right"
+     },
+     {
+      "value": "pay",
+      "label": "They pay for it",
+      "pile": "right"
+     }
+    ],
+    "works": [
+     {
+      "value": "sorted",
+      "label": "It gets sorted out",
+      "pile": "effective"
+     },
+     {
+      "value": "together",
+      "label": "We can still work together",
+      "pile": "effective"
+     },
+     {
+      "value": "need",
+      "label": "I get what I need from this",
+      "pile": "effective"
+     },
+     {
+      "value": "better",
+      "label": "Things go better from here",
+      "pile": "effective"
+     },
+     {
+      "value": "handled",
+      "label": "I can live with how I handled it",
+      "pile": "effective"
+     }
+    ],
+    "pull": [
+     {
+      "value": "works",
+      "label": "What works"
+     },
+     {
+      "value": "right",
+      "label": "Being right about this one"
+     },
+     {
+      "value": "unsure",
+      "label": "I can't tell"
+     }
+    ],
+    "move": [
+     {
+      "value": "fight_ask",
+      "label": "Ask myself what's the best I'd really get by pushing",
+      "grievance": "fight",
+      "goal": "host"
+     },
+     {
+      "value": "fight_hold",
+      "label": "Put this fight on hold for a week",
+      "grievance": "fight",
+      "goal": "host"
+     },
+     {
+      "value": "fight_let",
+      "label": "Put the energy where it can move something",
+      "grievance": "fight",
+      "goal": "host"
+     },
+     {
+      "value": "unfair_have",
+      "label": "Name what I do have: time, skills, people",
+      "grievance": "unfair",
+      "goal": "host"
+     },
+     {
+      "value": "unfair_plan",
+      "label": "Make a plan from where I actually start",
+      "grievance": "unfair",
+      "goal": "host"
+     },
+     {
+      "value": "unfair_own",
+      "label": "Put my energy into my own path",
+      "grievance": "unfair",
+      "goal": "host"
+     },
+     {
+      "value": "conn_one",
+      "label": "Say the one thing that matters most, and leave the rest",
+      "goal": "connected",
+      "grievance": "none"
+     },
+     {
+      "value": "conn_break",
+      "label": "Take a break, then come back to it",
+      "goal": "connected",
+      "grievance": "none"
+     },
+     {
+      "value": "conn_ask",
+      "label": "Ask what they need from this",
+      "goal": "connected",
+      "grievance": "none"
+     },
+     {
+      "value": "bound_once",
+      "label": "Say the limit once, plainly",
+      "goal": "boundary",
+      "grievance": "none"
+     },
+     {
+      "value": "bound_step",
+      "label": "Step away from it for now",
+      "goal": "boundary",
+      "grievance": "none"
+     },
+     {
+      "value": "bound_plan",
+      "label": "Decide what I'll do if it's crossed",
+      "goal": "boundary",
+      "grievance": "none"
+     },
+     {
+      "value": "prog_step",
+      "label": "Find the one step that's still in my hands",
+      "goal": "progress",
+      "grievance": "none"
+     },
+     {
+      "value": "prog_who",
+      "label": "Take it to someone who can change it",
+      "goal": "progress",
+      "grievance": "none"
+     },
+     {
+      "value": "prog_where",
+      "label": "Work from where I am today",
+      "goal": "progress",
+      "grievance": "none"
+     },
+     {
+      "value": "rep_own",
+      "label": "Own my part, without the rest",
+      "goal": "repair",
+      "grievance": "none"
+     },
+     {
+      "value": "rep_ask",
+      "label": "Ask what would help put it right",
+      "goal": "repair",
+      "grievance": "none"
+     },
+     {
+      "value": "rep_show",
+      "label": "Do one thing that shows I mean it",
+      "goal": "repair",
+      "grievance": "none"
+     },
+     {
+      "value": "resp_proud",
+      "label": "Say it once, in a way I'd be proud of",
+      "goal": "respect",
+      "grievance": "none"
+     },
+     {
+      "value": "resp_leave",
+      "label": "Leave it there, without getting even",
+      "goal": "respect",
+      "grievance": "none"
+     },
+     {
+      "value": "resp_hold",
+      "label": "Hold to what I think is right, calmly",
+      "goal": "respect",
+      "grievance": "none"
+     },
+     {
+      "value": "any_step",
+      "label": "Find the one step that's still in my hands",
+      "goal": "any",
+      "grievance": "none"
+     },
+     {
+      "value": "any_pause",
+      "label": "Wait a day before I act on it",
+      "goal": "any",
+      "grievance": "none"
+     },
+     {
+      "value": "any_ask",
+      "label": "Ask for the one thing I most need",
+      "goal": "any",
+      "grievance": "none"
+     }
+    ],
+    "set_down": [
+     {
+      "value": "right",
+      "label": "Being right"
+     },
+     {
+      "value": "even",
+      "label": "Getting even"
+     },
+     {
+      "value": "start",
+      "label": "How unfair the start was"
+     }
+    ],
+    "remind": [
+     {
+      "value": "tomorrow",
+      "label": "Tomorrow"
+     },
+     {
+      "value": "few_days",
+      "label": "In a few days"
+     }
+    ],
+    "back": [
+     {
+      "value": "helped",
+      "label": "I did it, and it helped"
+     },
+     {
+      "value": "didnt",
+      "label": "I did it, and it didn't help"
+     },
+     {
+      "value": "not_yet",
+      "label": "Not yet"
+     }
+    ]
+   }
+  },
+  {
    "id": "emotion_guide",
    "toolId": "emotion-guide",
    "version": "eg-v1",
@@ -63103,10 +64175,13 @@
     {
      "id": "effectiveness",
      "toolId": "effectiveness",
-     "query": {},
-     "carry": [],
-     "done": false,
-     "planned": true
+     "query": {
+      "frame": "$a.problem"
+     },
+     "carry": [
+      "feel"
+     ],
+     "done": false
     },
     {
      "id": "ending_relationships",
