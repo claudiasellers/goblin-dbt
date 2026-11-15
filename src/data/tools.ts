@@ -522,6 +522,19 @@ export const tools: Tool[] = [
     emoji: '🎯',
     bare: true,
   },
+  {
+    // MF-07 on the skill runtime (docs/design/moment-apart.md): one moment taken apart into body, thoughts and
+    // feeling, and whether you noticed it while it happened; a good one can be kept in Things I like.
+    id: 'moment-apart',
+    name: 'Take a moment apart',
+    tagline: 'What a moment was made of',
+    description: 'Pick one moment, good, hard or in between, and see what it was made of: what your body did, what went through your mind, what you felt, and whether you noticed it at the time.',
+    whenToUse: 'In a calm minute, when a day was "good" or "bad" and you want to know what it was made of.',
+    module: 'mindfulness',
+    dbtBasis: 'DBT Mindfulness: pleasant and unpleasant events (Mindfulness Worksheets 8, 9)',
+    emoji: '🔬',
+    bare: true,
+  },
   // Mindfulness (parts, docs/design/parts.md: listed and opened only with the parts switch on and its copy signed off)
   {
     id: 'meet-a-part',
@@ -579,6 +592,7 @@ export const allIntents: Intent[] = [
   { id: 'thoughts-passing', label: 'A thought feels like a fact', toolId: 'thoughts-passing', emoji: '🍂' },
   { id: 'out-of-head', label: 'Get out of my head', toolId: 'one-thing', query: 'enterAt=outside&frame=ruminate', emoji: '🫖' },
   { id: 'right-or-works', label: 'Being right is getting in the way', toolId: 'effectiveness', emoji: '🎯' },
+  { id: 'what-it-was', label: 'Work out what a moment was made of', toolId: 'moment-apart', emoji: '🔬' },
   { id: 'hard-on-myself', label: 'I\'m being hard on myself', toolId: 'unpack-a-judgment', emoji: '🧺' },
   { id: 'blow-it-up', label: 'I want to blow it all up', toolId: 'alternate-rebellion', emoji: '🎸' },
   { id: 'reasons', label: 'Make a card for a pull that keeps coming back', toolId: 'pros-cons', emoji: '⚖️' },

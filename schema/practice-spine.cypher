@@ -216,7 +216,7 @@ MERGE (k)-[:SUPPORTED_BY]->(s);
 MATCH (k:PracticeSkill {id: "observe"})
 SET k.mfOrder = 1, k.practiceLabel = "Notice", k.defaultFor = ["notice-and-name", "five-senses"];
 MATCH (k:PracticeSkill {id: "describe"})
-SET k.mfOrder = 2, k.practiceLabel = "Name", k.defaultFor = ["find-the-feeling", "notice-and-name"];
+SET k.mfOrder = 2, k.practiceLabel = "Name", k.defaultFor = ["find-the-feeling", "notice-and-name", "moment-apart"];
 MATCH (k:PracticeSkill {id: "nonjudge"})
 SET k.mfOrder = 3, k.practiceLabel = "Without judging", k.defaultFor = ["unpack-a-judgment"];
 MATCH (k:PracticeSkill {id: "one_thing"})

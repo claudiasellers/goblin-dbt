@@ -536,6 +536,17 @@
    "direction": "neutral",
    "addresses": []
   },
+  "dbt_mindful_events": {
+   "appToolId": "moment-apart",
+   "name": "Mindfulness of Pleasant and Unpleasant Events",
+   "description": "Taking one moment apart into what the body felt, what you thought and what you felt, and noticing whether you were aware of it as it happened",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": []
+  },
   "dbt_mindfulness_current_emotion": {
    "appToolId": "mindfulness-emotions",
    "name": "Mindfulness of Current Emotion",

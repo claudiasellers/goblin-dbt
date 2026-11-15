@@ -33,6 +33,7 @@ export const PLAYER_TOOLS: Readonly<Record<string, string>> = {
   'unpack-a-judgment': 'unpack_a_judgment',
   'one-thing': 'one_thing',
   'effectiveness': 'effectively',
+  'moment-apart': 'moment_apart',
 };
 
 /**

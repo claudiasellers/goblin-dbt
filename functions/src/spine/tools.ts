@@ -95,6 +95,8 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   'one-thing': { module: 'mf', closeKind: 'regulation_down' },
   // What works here (MF-08, docs/design/what-works.md): a goal and one move; no close (the move is the outcome).
   'effectiveness': { module: 'mf', closeKind: 'none' },
+  // Take a moment apart (MF-07, docs/design/moment-apart.md): no close (the description is the outcome).
+  'moment-apart': { module: 'mf', closeKind: 'none' },
   // Reserved spine ids (one-shots and embeds).
   'help-now': { module: 'core', closeKind: 'none' },
   'micro-step': { module: 'core', closeKind: 'none' },

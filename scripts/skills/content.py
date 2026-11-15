@@ -45,6 +45,7 @@ import unpack_a_judgment  # noqa: E402
 import one_thing  # noqa: E402
 import effectively  # noqa: E402
 import wise_mind_check  # noqa: E402
+import moment_apart  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
@@ -53,7 +54,8 @@ SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKIL
           ride_it_out.SKILL, let_it_be.SKILL, mind_job.SKILL, say_no.SKILL, dear_man_one.SKILL, held.SKILL, thoughts_passing.SKILL, dear_man_prep.SKILL,
           opposite_action.SKILL, habit_plan.SKILL, please_skill.SKILL, give.SKILL, good_things.SKILL, *crisis_kit.SKILLS, values.SKILL, build_mastery.SKILL,
           finding_connection.SKILL, notice_them.SKILL, rehearse.SKILL, emotion_guide.SKILL, emotion_myths.SKILL, walk_the_wave.SKILL, mindfulness_emotions.SKILL, sleep_reset.SKILL,
-          notice_and_name.SKILL, unpack_a_judgment.SKILL, one_thing.SKILL, effectively.SKILL, wise_mind_check.SKILL]
+          notice_and_name.SKILL, unpack_a_judgment.SKILL, one_thing.SKILL, effectively.SKILL, wise_mind_check.SKILL,
+          moment_apart.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
