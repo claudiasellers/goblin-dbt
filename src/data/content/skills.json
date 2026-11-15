@@ -1,7 +1,7 @@
 {
   "source": {
     "file": "graph-content-only-2026-11-15.json",
-    "exportedAt": "2026-11-15T02:38:44.273Z"
+    "exportedAt": "2026-11-15T03:45:49.821Z"
   },
   "content": {
     "version": "skills-v1",
@@ -1045,10 +1045,10 @@
               },
               {
                 "id": "door",
+                "max": 1,
                 "options": {
                   "list": "door"
                 },
-                "max": 1,
                 "required": false,
                 "showWhen": {
                   "all": [
@@ -2112,27 +2112,6 @@
           {
             "id": "kit",
             "kind": "ask",
-            "title": "kit_title",
-            "hint": "kit_hint",
-            "fields": [
-              {
-                "id": "kitit",
-                "options": {
-                  "list": "kitit"
-                },
-                "max": 1,
-                "required": true,
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
-              }
-            ],
             "crisis": [
               {
                 "variant": "other_person",
@@ -2144,22 +2123,43 @@
                 }
               }
             ],
+            "fields": [
+              {
+                "id": "kitit",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "kitit"
+                },
+                "required": true
+              }
+            ],
+            "hint": "kit_hint",
             "keep": {
-              "kind": "rebellion_card",
-              "many": true,
+              "done": "kit_done",
               "from": [
                 "function",
                 "pick"
               ],
+              "kind": "rebellion_card",
+              "many": true,
               "when": {
                 "eq": [
                   "$a.kitit",
                   "keep"
                 ]
-              },
-              "done": "kit_done"
+              }
             },
             "primary": "kit_primary",
+            "title": "kit_title",
             "next": [
               {
                 "to": "next",
@@ -2800,57 +2800,73 @@
             {
               "value": "tattoo",
               "label": "Get the tattoo you've been thinking about, at a studio",
+              "cost": "none",
               "functions": [
                 "seen",
                 "freedom",
                 "alive"
               ],
-              "when": "week",
-              "visibility": "public",
+              "lasting": true,
               "reversible": false,
-              "cost": "none",
-              "lasting": true
+              "visibility": "public",
+              "when": "week"
             },
             {
               "value": "piercing",
               "label": "Get the piercing you've wanted, at a studio",
+              "cost": "none",
               "functions": [
                 "seen",
                 "alive"
               ],
-              "when": "week",
-              "visibility": "public",
+              "lasting": true,
               "reversible": false,
-              "cost": "none",
-              "lasting": true
+              "visibility": "public",
+              "when": "week"
             },
             {
               "value": "hair_short",
               "label": "Have your hair cut really short, or shaved off",
+              "cost": "none",
               "functions": [
                 "freedom",
                 "control",
                 "seen"
               ],
-              "when": "week",
-              "visibility": "public",
+              "lasting": true,
               "reversible": false,
-              "cost": "none",
-              "lasting": true
+              "visibility": "public",
+              "when": "week"
             },
             {
               "value": "hair_colour",
               "label": "Have your hair dyed a colour nobody expects",
+              "cost": "none",
               "functions": [
                 "seen",
                 "alive",
                 "freedom"
               ],
-              "when": "week",
-              "visibility": "public",
+              "lasting": true,
               "reversible": false,
-              "cost": "none",
-              "lasting": true
+              "visibility": "public",
+              "when": "week"
+            }
+          ],
+          "door": [
+            {
+              "value": "lasting",
+              "label": "Something that lasts"
+            }
+          ],
+          "kitit": [
+            {
+              "value": "keep",
+              "label": "Keep it in my kit"
+            },
+            {
+              "value": "not_now",
+              "label": "Not this time"
             }
           ],
           "cost": [
@@ -2999,22 +3015,6 @@
             {
               "value": "not_now",
               "label": "Not right now"
-            }
-          ],
-          "door": [
-            {
-              "value": "lasting",
-              "label": "Something that lasts"
-            }
-          ],
-          "kitit": [
-            {
-              "value": "keep",
-              "label": "Keep it in my kit"
-            },
-            {
-              "value": "not_now",
-              "label": "Not this time"
             }
           ]
         }
