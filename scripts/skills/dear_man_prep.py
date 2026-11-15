@@ -328,6 +328,14 @@ COPY = {
     "card_prev": "Previous card",
     "card_skip": "Done with the cards",
     "card_felt": "I felt",
+    # How firmly to ask (IE-07), on the say card: the final level after the nudge, short.
+    "card_level": "How firmly",
+    "card_level_hint": "A light first mention is enough",
+    "card_level_gentle": "Gently. A no can be okay for now",
+    "card_level_plain": "Plainly, and listen",
+    "card_level_firm": "Firmly, and keep asking",
+    "card_level_firm_hold": "Firmly, and keep coming back to it",
+    "card_level_firm_heads_up": "Firmly, once. Calmly again if needed",
     "card_middle": "Middle ground I could live with",
     "card_walk": "I won't accept",
     "card_drift": "If it drifts: say the ask again, same words.",
@@ -372,6 +380,10 @@ CARD = {
     "labelAField": "middle", "labelA": "card_middle", "labelBField": "walk", "labelB": "card_walk",
     # Handout 5's Mindful: the broken record and ignoring attacks, on the card the person holds in the moment.
     "steadyNoteA": "card_drift", "steadyNoteB": "card_attack",
+    # How firmly to ask, the final level after the nudge (heads-up's firm levels ask once); none when not sized.
+    "levelNote": [{"when": {"all": [HEADS_UP, final_is("firm", FIRM)]}, "key": "card_level_firm_heads_up"}]
+                 + [{"when": final_is(k), "key": f"card_level_{k}"} for k in ASK_LEVELS],
+    "levelLabel": "card_level",
 }
 
 STEPS = [

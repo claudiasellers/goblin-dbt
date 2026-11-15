@@ -192,7 +192,9 @@ export type EmbedPropSpec =
   /** Context for another run: context key → a ref read in this run (`$a.`, `$d.`, `$ctx.`, `$each`) as it renders. */
   | { type: 'ctx'; optional?: boolean }
   /** A ref (`$d.`, `$a.`, `$ctx.`) whose value keys a shared table's row; the embed receives the row (or nothing). */
-  | { type: 'row'; table: 'feelingOf'; optional?: boolean };
+  | { type: 'row'; table: 'feelingOf'; optional?: boolean }
+  /** Copy picked by condition as it renders, like a conditional title: `[{when?, key}]`, first that holds (or none). */
+  | { type: 'copyWhen'; optional?: boolean };
 
 /**
  * What an embed may report through `onDone` (src/components/skillPlayer/embeds.ts EMBED_OUTPUTS, mirrored in

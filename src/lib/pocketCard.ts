@@ -3,10 +3,12 @@
  * three cards, each listing its fields' picks in order (labels, own words last). An ask with a [blank] reads the fill
  * field's words in its place (DEAR MAN's "I'd like help with [this]" + "the shopping this week"); a blank nobody
  * filled stays as written. One field can be joined into a sentence behind a lead ("I felt hurt and unheard"), up to
- * two can carry a small label ("I won't accept"), and the steady card can end with fixed notes. Empty cards drop out,
+ * two can carry a small label ("I won't accept"), the say card can open with how firmly to ask (IE-07), and the
+ * steady card can end with fixed notes. Empty cards drop out,
  * so the card never shows an empty side.
  */
-export interface PocketLine { label?: string; text: string }
+/** `note`: a line from the skill (the ask level), not the person's own words: shown quieter. */
+export interface PocketLine { label?: string; text: string; note?: boolean }
 export interface PocketCardSide { key: 'say' | 'steady' | 'push'; lines: PocketLine[] }
 
 export interface PocketProps {
@@ -17,6 +19,8 @@ export interface PocketProps {
   labels?: Readonly<Record<string, string>>;
   /** Fixed lines at the end of the steady card (non-empty only). */
   steadyNotes?: readonly string[];
+  /** A line at the top of the say card (how firmly to ask, IE-07), with its small label; only on a card with picks. */
+  lead?: PocketLine;
 }
 
 const BLANK = /\[[^\]]*\]/g;
@@ -48,12 +52,13 @@ export function pocketSides(props: PocketProps, picked: Readonly<Record<string, 
     const label = props.labels?.[f];
     return ls.map((text) => (label ? { label, text } : { text }));
   };
-  const side = (key: PocketCardSide['key'], fields: readonly string[] | undefined, notes: readonly string[] = []): PocketCardSide => {
+  const side = (key: PocketCardSide['key'], fields: readonly string[] | undefined, notes: readonly string[] = [], lead?: PocketLine): PocketCardSide => {
     const lines = (fields ?? []).flatMap(linesOf);
-    // Notes never make a card on their own: they ride on a card that has the person's own picks.
-    return { key, lines: lines.length ? [...lines, ...notes.filter(Boolean).map((text) => ({ text }))] : [] };
+    // Notes (and the lead) never make a card on their own: they ride on a card that has the person's own picks.
+    if (!lines.length) return { key, lines: [] };
+    return { key, lines: [...(lead?.text ? [{ ...lead, note: true }] : []), ...lines, ...notes.filter(Boolean).map((text) => ({ text }))] };
   };
-  return [side('say', props.say), side('steady', props.steady, props.steadyNotes), side('push', props.push)].filter((s) => s.lines.length > 0);
+  return [side('say', props.say, [], props.lead), side('steady', props.steady, props.steadyNotes), side('push', props.push)].filter((s) => s.lines.length > 0);
 }
 
 /** One line as text: its label, a colon, then the line. */

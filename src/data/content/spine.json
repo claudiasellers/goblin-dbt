@@ -614,10 +614,20 @@
               "kind": "at_local",
               "time": "16:00"
             },
+            "day_after": {
+              "days": 2,
+              "kind": "at_local",
+              "time": "18:00"
+            },
             "evening": {
               "days": 0,
               "kind": "at_local",
               "time": "20:00"
+            },
+            "few_days": {
+              "days": 3,
+              "kind": "at_local",
+              "time": "18:00"
             },
             "hour": {
               "kind": "after",

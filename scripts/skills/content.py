@@ -170,6 +170,9 @@ EMBED_PROPS = {
         "labelBField": {"type": "field", "optional": True}, "labelB": {"type": "copy", "optional": True},
         # Fixed lines at the end of the steady card (only when it has the person's own picks).
         "steadyNoteA": {"type": "copy", "optional": True}, "steadyNoteB": {"type": "copy", "optional": True},
+        # How firmly to ask (DEAR MAN's sizing, IE-07): a line at the top of the say card, picked by condition, with
+        # its small label. Nothing when the sizing wasn't asked.
+        "levelNote": {"type": "copyWhen", "optional": True}, "levelLabel": {"type": "copy", "optional": True},
     },
     "batteryRead": {"fields": {"type": "fields"}, "low": {"type": "field"}, "names": {"type": "copy"},
                     "line": {"type": "copy", "optional": True}, "next": {"type": "copy"},

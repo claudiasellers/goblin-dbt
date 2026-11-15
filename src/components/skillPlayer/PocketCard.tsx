@@ -26,6 +26,7 @@ export function PocketCard({ props, picked, onShown, onDone }: EmbedProps) {
     say: list('say'), steady: list('steady'), push: list('push'), fill: field('fill'), detail: field('detail'),
     joinField: field('joinField'), joinLead: text('joinLead') || undefined, labels,
     steadyNotes: [text('steadyNoteA'), text('steadyNoteB')].filter(Boolean),
+    ...(text('levelNote') ? { lead: { text: text('levelNote'), ...(text('levelLabel') ? { label: text('levelLabel') } : {}) } } : {}),
   }, picked);
   const heading = (k: PocketCardSide['key']) => text(`${k}Label`);
   const [at, setAt] = useState(0);
@@ -72,7 +73,7 @@ export function PocketCard({ props, picked, onShown, onDone }: EmbedProps) {
           {side.lines.map((l, i) => (
             <div key={i}>
               {l.label && <p className="text-xs text-[var(--color-text-tertiary)]">{l.label}</p>}
-              <p className={paperLine}>{l.text}</p>
+              <p className={l.note ? 'text-sm italic text-[var(--color-text-secondary)]' : paperLine}>{l.text}</p>
             </div>
           ))}
         </div>

@@ -145,7 +145,8 @@ Added by F1 (docs/design/dbt-modules-plan.md §4, 10 Nov 2026):
   and the whole report goes in `out`. Own words from an embed are kept once, in `out`.
 - **Embed props** (F2). Each embed declares what it takes in `EMBED_PROPS` (`copy`, `int` with a range, `enum`,
   `field`, `id`, and since ER-10 `row`: a ref whose value keys a shared table, the player handing the embed that
-  table's row, or no prop when nothing matches; any may be `optional`), mirrored in content.py. `build.py` refuses an undeclared, mistyped or
+  table's row, or no prop when nothing matches; and since IE-07's card `copyWhen`: a list of `{when?, key}` read like
+  a conditional title as it renders, the first that holds, or no prop; any may be `optional`), mirrored in content.py. `build.py` refuses an undeclared, mistyped or
   missing prop on any embed step or slot, and a `copy` prop must name a key in the skill's copy: the player
   passes its text (`resolveEmbedProps`), so an embed never carries its own words. Embeds also get `answerIds`.
   Shared embeds: `holdRing` (`press` · `timed` · `settle`; `src/lib/holdRing.ts`), `waitLock` (DT-02), `prosConsCard` / `prosConsReplay` (DT-10) and `witness` (the receive beat,
@@ -373,8 +374,8 @@ every other content file), and runs it inside the page's `ToolSessionProvider`:
   when the lookup finds no row. One field instead of one per earlier answer keeps the record small. Since ER-10 it may
   also name a `feelingOf` derive with `field: 'ladder'` (Know this feeling's *Which of these is closest?*).
 - **A quiet way on, and a keep's confirmation** (ER-B2, Gate 2). An ask step's `secondary` (a copy key) is a quiet
-  button under the primary that goes on without the step's keep or follow-up (Cope Ahead's *Not now* under *Keep
-  this*); `keep.done` is a line shown on the next screen once the keep saved. A crisis slot that already holds as a
+  button under the primary that goes on without the step's answers, keep or follow-up (Cope Ahead's *Not now* under *Keep
+  this*; Good things' *Leave it*, where a day tapped first is dropped, so nothing reads it as moved); `keep.done` is a line shown on the next screen once the keep saved. A crisis slot that already holds as a
   step opens (raised on an earlier screen) renders under the title, not under the step's chips, so it is never
   pushed below the fold.
 - **Projections** (R14, `functions/src/skills/projections.ts`). Cope Ahead's is the first: at close, `ext.ca` from

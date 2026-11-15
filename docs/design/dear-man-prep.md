@@ -111,7 +111,7 @@ reading skips both screens (the short path).
 
 Departures: Handout 8's ask column has about ten factors. Self-respect and the relationship are what *what matters most*
 already asks; authority, long term vs short term and give and take are dropped (give and take is folded into
-*reasonable*), to keep it to one phone screen. The level isn't on the pocket card or in the projection yet.
+*reasonable*), to keep it to one phone screen. The level is on the pocket card (14 Nov 2026, below); it isn't in the projection yet.
 
 ## The pocket card (`pocketCard`, Mode C)
 
@@ -124,6 +124,10 @@ answer it. Come back to the ask.* (only when the person picked something for it)
 *Previous card* / *Next card* (never disabled under focus) and a live line naming the card in view; Copy puts all
 three on the clipboard, or selects the whole plan where the clipboard is blocked. The quiet way on before the last
 card is *Done with the cards*. It reports `seen_all` and `copied` as `card_how`. No input on the card itself.
+The say card opens with how firmly to ask, the level after the nudge in a few words under *How firmly* (*Gently. A
+no can be okay for now*, *Firmly, and keep asking*; *Firmly, once. Calmly again if needed* for the firm levels with
+someone it tends to go badly with), through the runtime's `copyWhen` prop `levelNote`; nothing when the sizing
+wasn't asked (a carried flooded reading). It reads quieter than their own lines (a note, in italics) and goes in Copy with the rest.
 
 ## What it writes
 
