@@ -13,7 +13,7 @@ Regenerate:  python3 scripts/skills/build.py > /tmp/s.cypher && mv /tmp/s.cypher
 ID = "alternate_rebellion"
 TOOL_ID = "alternate-rebellion"
 CONCEPT = "dbt_alternate_rebellion"
-VERSION = "ar-v3"
+VERSION = "ar-v4"
 OWN_MAX = 140
 OWN_REBELLION_MAX = 90  # a rebellion fits on the card
 
@@ -38,6 +38,9 @@ COPY = {
     # Someone they're scared of (C6.4, C6.6): only rebellions nobody else would notice are offered.
     "pick_title_scared": "Pick one that gives you that, and that nobody else has to see.",
     "pick_own": "My own rebellion",
+    # Part 3: the door to rebellions that last (a tattoo, a piercing, hair). Never with someone they're scared of, next
+    # to treatment or on a carried flooded reading; whichever is picked waits a day, like an own one that can't be undone.
+    "pick_title_lasting": "These last, so whichever you pick waits a day before it's yours.",
     "cost_q": "Will this cost you tomorrow?",
     # Own words with someone they're scared of: cost isn't the only risk (C6.4).
     "noticed_q": "Would they notice it?",
@@ -45,6 +48,7 @@ COPY = {
     "undo_q": "Could you undo it later?",
     "sleep_title": "That one can't be undone, so it waits a day. A card tomorrow asks if you still want it.",
     "sleep_title_unsure": "That one might not undo, so it waits a day. A card tomorrow asks if you still want it.",
+    "sleep_title_lasting": "That one lasts, so it waits a day. A card tomorrow asks if you still want it.",
     "sleep_hint": "Big choices land better after a night's sleep.",
     # The card a day later (rebellion_check), and what follows.
     "still_title": "A day later. Do you still want to do it?",
@@ -67,6 +71,11 @@ COPY = {
     # Screen 7: the real squeeze (PRD step 6).
     "real_title": "And the squeeze itself. Is it something you want to work on?",
     # Hand-off lines (first that holds).
+    # Part 3: keep the rebellion as a card in My crisis kit (kind `rebellion_card`), for the next time the squeeze comes.
+    "kit_title": "Keep this rebellion in your crisis kit, for next time?",
+    "kit_hint": "It shows up as one of the kit's cards when you open it.",
+    "kit_primary": "Next",
+    "kit_done": "It's in your kit.",
     "next_scared": "You named someone you're scared of. You don't have to work that out alone.",
     "next_change": "When the squeeze can change, working on it is the bigger rebellion.",
     "next_say": "Saying it clearly, and keeping your self-respect, is a rebellion too.",
@@ -163,6 +172,22 @@ REBELLIONS = [
     ("walk_fast", "Go outside and walk faster than you need to", ["alive"], "now", "private", EXERTS),
 ]
 
+# --- Part 3: rebellions that last (the PRD's tattoo and shaved head). (id, label, functions). Never on screen unless
+# the person opens the door (`door`, *Something that lasts*), which is never offered with someone they're scared of
+# (anyone could see it), next to *Treatment I didn't pick* (a body change next to treatment, eating-disorder treatment
+# above all, is the care team's call) or on a carried flooded reading. Every one is done by a professional (a studio,
+# a hairdresser), never at home with a needle or a blade, and whichever is picked waits a day (`sleep_on`, the
+# `rebellion_check` card), exactly as an own rebellion that can't be undone does. None is kept in the crisis kit.
+LASTING = [
+    ("tattoo", "Get the tattoo you've been thinking about, at a studio", ["seen", "freedom", "alive"]),
+    ("piercing", "Get the piercing you've wanted, at a studio", ["seen", "alive"]),
+    ("hair_short", "Have your hair cut really short, or shaved off", ["freedom", "control", "seen"]),
+    ("hair_colour", "Have your hair dyed a colour nobody expects", ["seen", "alive", "freedom"]),
+]
+LASTING_IDS = [v for v, _, _ in LASTING]
+LASTING_FUNCTIONS = sorted({f for _, _, fns in LASTING for f in fns})
+DOOR = [("lasting", "Something that lasts")]
+
 COST = [("no", "No"), ("a_little", "A little"), ("yes", "Yes")]
 NOTICED = [("no", "No"), ("not_sure", "Not sure"), ("yes", "Yes")]
 HEADS_UP = [("lighter", "Pick something lighter"), ("keep", "Keep it anyway")]
@@ -175,6 +200,7 @@ REMIND = [("evening", "This evening", {"today": True}), ("tomorrow", "Tomorrow",
           ("few_days", "In a few days", {"week": True})]
 DID = [("yes", "I did it"), ("a_bit", "Some of it"), ("not_yet", "Not yet"), ("no", "I let it go")]
 ITCH = [("yes", "Yes"), ("a_bit", "A bit"), ("no", "No"), ("not_yet", "Not yet")]
+KITIT = [("keep", "Keep it in my kit"), ("not_now", "Not this time")]
 REAL = [
     ("change", "It could change, and I want to try"),
     ("say", "Someone I want to say something to"),
@@ -200,8 +226,27 @@ NOTICED_RISK = {"all": [SCARED, {"in": [a("noticed"), ["yes", "not_sure"]]}]}
 NO_UNDO = {"in": [a("undo"), ["no", "not_sure"]]}
 # One that can't be undone waits a day, once: after the day-later card's *Yes, still mine* (`still`), the scared or
 # treatment re-check goes back through the list with its questions asked fresh, and a no to *Could you undo it?* there
-# reaches the card. Without this, a truthful no would send them to wait again on every check, for ever.
-WAITS = {"all": [NO_UNDO, {"not": {"eq": [a("still"), "yes"]}}]}
+# reaches the card. Without this, a truthful no would send them to wait again on every check, for ever. The exemption
+# holds only on that re-check: any other way back to the list after the yes (the back button from the card) waits
+# again, so a different rebellion that lasts can't borrow the day another one waited. (On the re-check itself the door
+# is shut: someone they're scared of or treatment.)
+# A rebellion that lasts (part 3) waits the same day, whatever the undo answer.
+LASTING_PICK = {"in": [a("pick"), LASTING_IDS]}
+WAITS = {"all": [{"any": [NO_UNDO, LASTING_PICK]}, {"not": {"all": [{"eq": [a("still"), "yes"]}, {"any": [SCARED, TREATMENT]}]}}]}
+# The door to rebellions that last: never with someone they're scared of, next to treatment or flooded; only for a
+# function one of them gives; and closed for good once the person has asked for something lighter or undoable.
+LIGHTER = {"any": [{"eq": [a(f), "lighter"]} for f in ("heads_up", "sleep", "still")]}
+DOOR_OFFERED = {"all": [{"not": SCARED}, {"not": TREATMENT}, {"not": FLOODED}, {"in": [a("function"), LASTING_FUNCTIONS]},
+                        {"not": LIGHTER}]}
+DOOR_OPEN = {"all": [DOOR_OFFERED, {"set": a("door")}]}
+# The crisis kit's card (part 3): only a rebellion that's fine to reach for on a hard night. Never one that lasts or
+# an own one that might not undo or would cost (those had their own checks, and the kit plays at 2 a.m.), never
+# with someone they're scared of (the kit is on their phone), never after letting it go, and asked once a visit.
+KIT_OK = {"all": [
+    {"not": SCARED}, {"set": a("pick")}, {"not": LASTING_PICK},
+    {"any": [{"not": {"own": "pick"}}, {"all": [{"eq": [a("undo"), "yes"]}, {"not": {"eq": [a("cost"), "yes"]}}]}]},
+    {"not": {"eq": [a("still"), "no"]}}, {"not": {"eq": [a("sleep"), "tomorrow"]}}, {"not": {"set": a("kitit")}},
+]}
 COSTS = {"any": [{"eq": [a("cost"), "yes"]}, NOTICED_RISK]}
 SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
 # Screen 4's list: matched to the function; only quiet ones when someone they're scared of is a squeeze; none
@@ -210,6 +255,8 @@ PICK_WHERE = {"all": [
     {"has": ["$opt.functions", a("function")]},
     {"any": [{"not": SCARED}, {"eq": ["$opt.quiet", True]}]},
     {"any": [{"not": TREATMENT}, {"all": [{"not": {"eq": ["$opt.skips", True]}}, {"not": {"eq": ["$opt.exerts", True]}}]}]},
+    # The door open: only the ones that last; shut (the default): never one of them.
+    {"any": [{"all": [DOOR_OPEN, {"eq": ["$opt.lasting", True]}]}, {"all": [{"not": DOOR_OPEN}, {"not": {"eq": ["$opt.lasting", True]}}]}]},
 ]}
 
 STEPS = [
@@ -243,13 +290,16 @@ STEPS = [
     },
     {
         "id": "pick", "kind": "ask",
-        "title": [{"when": {"all": [TREATMENT, SCARED]}, "key": "pick_title_treatment_scared"},
+        "title": [{"when": DOOR_OPEN, "key": "pick_title_lasting"},
+                  {"when": {"all": [TREATMENT, SCARED]}, "key": "pick_title_treatment_scared"},
                   {"when": TREATMENT, "key": "pick_title_treatment"}, {"when": SCARED, "key": "pick_title_scared"},
                   {"key": "pick_title"}],
         "fields": [
             {"id": "pick", "options": {"list": "rebellion", "where": PICK_WHERE},
              "max": 1, "required": True, "own": {"hint": "pick_own", "countsAsPick": True, "max": OWN_REBELLION_MAX},
              "links": [SAFETY_LINK]},
+            # Part 3: a quiet chip under the list; tapping it shows the ones that last, tapping it again hides them.
+            {"id": "door", "options": {"list": "door"}, "max": 1, "required": False, "showWhen": DOOR_OFFERED},
             {"id": "cost", "label": "cost_q", "options": {"list": "cost"}, "max": 1, "required": True,
              "showWhen": {"own": "pick"}},
             {"id": "noticed", "label": "noticed_q", "options": {"list": "noticed"}, "max": 1, "required": True,
@@ -272,7 +322,8 @@ STEPS = [
         # The 24-hour check (PRD): an own rebellion that can't be undone gets no card today. *Ask me tomorrow* books
         # rebellion_check, a day later; *Pick one I can undo* goes back to the list.
         "id": "sleep_on", "kind": "ask", "hint": "sleep_hint",
-        "title": [{"when": {"eq": [a("undo"), "not_sure"]}, "key": "sleep_title_unsure"}, {"key": "sleep_title"}],
+        "title": [{"when": LASTING_PICK, "key": "sleep_title_lasting"},
+                  {"when": {"eq": [a("undo"), "not_sure"]}, "key": "sleep_title_unsure"}, {"key": "sleep_title"}],
         "fields": [{"id": "sleep", "options": {"list": "sleep"}, "max": 1, "required": True, "links": [SAFETY_LINK]}],
         "crisis": OTHER_PERSON,
         "followUp": {"type": "rebellion_check", "when": {"eq": [a("sleep"), "tomorrow"]}},
@@ -334,6 +385,17 @@ STEPS = [
         "id": "real", "kind": "ask", "title": "real_title",
         "fields": [{"id": "real", "options": {"list": "real"}, "max": 1, "required": True}],
         "crisis": OTHER_PERSON,
+        "next": [{"when": KIT_OK, "to": "kit"}, {"to": "next"}],
+    },
+    {
+        # Part 3 (the rebellion menu in the kit): *Keep it in my kit* keeps `rebellion_card` (R4; the tap is the yes),
+        # which My crisis kit plays as one of its cards. Its answer comes back on a reopened visit, so it's asked once.
+        "id": "kit", "kind": "ask", "title": "kit_title", "hint": "kit_hint",
+        "fields": [{"id": "kitit", "options": {"list": "kitit"}, "max": 1, "required": True, "links": [SAFETY_LINK]}],
+        "crisis": OTHER_PERSON,
+        "keep": {"kind": "rebellion_card", "many": True, "from": ["function", "pick"],
+                 "when": {"eq": [a("kitit"), "keep"]}, "done": "kit_done"},
+        "primary": "kit_primary",
         "next": [{"to": "next"}],
     },
     {
@@ -381,6 +443,10 @@ def options():
     out += [("function", v, label, {}, "RebellionFunction") for v, label in FUNCTIONS]
     out += [("rebellion", v, label, {"functions": fns, "when": when, "visibility": vis, "reversible": True, "cost": "none",
                                      **props}, "RebellionOption") for v, label, fns, when, vis, props in REBELLIONS]
+    out += [("rebellion", v, label, {"functions": fns, "when": "week", "visibility": "public", "reversible": False, "cost": "none",
+                                     "lasting": True}, "RebellionOption") for v, label, fns in LASTING]
+    out += [("door", v, label, {}, None) for v, label in DOOR]
+    out += [("kitit", v, label, {}, None) for v, label in KITIT]
     out += [("cost", v, label, {}, None) for v, label in COST]
     out += [("noticed", v, label, {}, None) for v, label in NOTICED]
     out += [("heads_up", v, label, {}, None) for v, label in HEADS_UP]

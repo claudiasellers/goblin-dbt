@@ -37,7 +37,7 @@ test("later today or this week: an optional card to ask how it went; now asks th
 });
 
 test("the card later reopens the visit at back: did you do it → the itch → the squeeze, asked fresh", () => {
-  const booked = run([...toPick(), pick("pick", "say_no"), next, card("week"), pick("remind", "few_days"), next, pick("real", "change"), next]);
+  const booked = run([...toPick(), pick("pick", "say_no"), next, card("week"), pick("remind", "few_days"), next, pick("real", "change"), next, pick("kitit", "not_now"), next]);
   assert.equal(booked.stepId, "next");
   const r = reopen(booked, "back");
   assert.equal(r.stepId, "back");
@@ -75,9 +75,10 @@ test("an own rebellion that can't be undone waits a day: no card today, a card t
   // A heads-up kept goes on to the wait, not the card.
   const kept = run([...toPick(), own("pick", "quit by email"), pick("cost", "yes"), pick("undo", "no"), next, pick("heads_up", "keep"), next]);
   assert.equal(kept.stepId, "sleep_on");
-  // A curated rebellion is never asked: every one is reversible.
+  // A curated rebellion is never asked: every one on the list is reversible (the ones that last sit behind their own
+  // door and always wait; skill-alternate-rebellion-part3).
   assert.equal(run([...toPick(), pick("pick", "say_no"), next]).stepId, "card");
-  assert.ok(skill.options.rebellion.every((o) => o.reversible === true));
+  assert.ok(skill.options.rebellion.every((o) => o.reversible === true || o.lasting === true));
 });
 
 test("a day later: still yes → the card; something undoable → the list, asked again; not any more → the squeeze", () => {

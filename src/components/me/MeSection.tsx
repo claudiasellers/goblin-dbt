@@ -151,7 +151,7 @@ export function MeSection() {
           {i.label === 'Person' && (
             <ForgetPerson itemRef={ref(i)} after={after} />
           )}
-          {(i.label === 'OwnLine' || i.meta.kind === 'nightmare_script' || i.meta.kind === 'cope_ahead_plan' || i.meta.kind === 'pros_cons' || i.meta.kind === 'abstinence_plan' || i.meta.kind === 'thing_i_like' || i.meta.kind === 'crisis_kit' || i.meta.kind === 'safety_plan' || i.meta.kind === 'values' || i.meta.kind === 'i_can' || i.meta.kind === 'please_rows' || i.meta.kind === 'sleep_anchor' || i.label === 'Person') && i.meta.status === 'active' && (
+          {(i.label === 'OwnLine' || i.meta.kind === 'nightmare_script' || i.meta.kind === 'cope_ahead_plan' || i.meta.kind === 'pros_cons' || i.meta.kind === 'abstinence_plan' || i.meta.kind === 'thing_i_like' || i.meta.kind === 'crisis_kit' || i.meta.kind === 'rebellion_card' || i.meta.kind === 'safety_plan' || i.meta.kind === 'values' || i.meta.kind === 'i_can' || i.meta.kind === 'please_rows' || i.meta.kind === 'sleep_anchor' || i.label === 'Person') && i.meta.status === 'active' && (
             <button type="button" onClick={() => { after(setAsideProfileItem(ref(i))).catch(() => { /* stays */ }); }}
               className="min-h-11 text-sm text-[var(--color-text-tertiary)] underline underline-offset-2">
               Set aside

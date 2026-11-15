@@ -7,7 +7,7 @@ import { callable } from '../shared/callable';
 import { readTx } from '../shared/neo4j';
 import { int } from '../shared/values';
 import { metaFrom } from './meta';
-import { readNameSlice, readProfileVersion, RUNG_OPTION, THING_LABELS, THING_OPTION, VALUE_OPTION } from './slices';
+import { readNameSlice, readProfileVersion, REBELLION_OPTION, RUNG_OPTION, THING_LABELS, THING_OPTION, VALUE_OPTION } from './slices';
 import type { ProfileAreaId, ProfileItemMeta } from './types';
 import { statsByPart } from '../parts/stats';
 import { readStatsRows } from '../parts/statsQueries';
@@ -216,6 +216,14 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
     if (meta.kind === 'pros_cons' && value) {
       const own = [value.pullOwn, value.longOwn, value.keepsOwn].find((x) => typeof x === 'string' && x.trim());
       if (typeof own === 'string') summary = own;
+    }
+    // A rebellion card (DT-11 part 3): the rebellion in their words, or named from the graph after the loop.
+    if (meta.kind === 'rebellion_card' && value) {
+      if (typeof value.pickOwn === 'string' && value.pickOwn.trim()) summary = value.pickOwn;
+      else {
+        const id = Array.isArray(value.pickIds) ? value.pickIds.find((x): x is string => typeof x === 'string') : undefined;
+        if (id) thingIds = [REBELLION_OPTION + id];
+      }
     }
     // A habit plan: the behaviour in their words when they wrote it (picked behaviours are ids; the title says enough).
     if (meta.kind === 'abstinence_plan' && value && typeof value.whatOwn === 'string' && value.whatOwn.trim()) summary = value.whatOwn;

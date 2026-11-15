@@ -566,7 +566,7 @@
   {
    "id": "alternate_rebellion",
    "toolId": "alternate-rebellion",
-   "version": "ar-v3",
+   "version": "ar-v4",
    "start": "open",
    "accepts": [
     "band",
@@ -589,11 +589,13 @@
     "pick_title_treatment_scared": "Treatment you didn't pick is a real squeeze. Changing it is a talk with your care team first. Pick one nobody else has to see.",
     "pick_title_scared": "Pick one that gives you that, and that nobody else has to see.",
     "pick_own": "My own rebellion",
+    "pick_title_lasting": "These last, so whichever you pick waits a day before it's yours.",
     "cost_q": "Will this cost you tomorrow?",
     "noticed_q": "Would they notice it?",
     "undo_q": "Could you undo it later?",
     "sleep_title": "That one can't be undone, so it waits a day. A card tomorrow asks if you still want it.",
     "sleep_title_unsure": "That one might not undo, so it waits a day. A card tomorrow asks if you still want it.",
+    "sleep_title_lasting": "That one lasts, so it waits a day. A card tomorrow asks if you still want it.",
     "sleep_hint": "Big choices land better after a night's sleep.",
     "still_title": "A day later. Do you still want to do it?",
     "still_title_treatment": "A day later. Changing treatment is a talk with your care team first. Do you still want to do it?",
@@ -609,6 +611,10 @@
     "itch_title": "Did it scratch the itch?",
     "itch_hint": "Go and do it first. This screen waits.",
     "real_title": "And the squeeze itself. Is it something you want to work on?",
+    "kit_title": "Keep this rebellion in your crisis kit, for next time?",
+    "kit_hint": "It shows up as one of the kit's cards when you open it.",
+    "kit_primary": "Next",
+    "kit_done": "It's in your kit.",
     "next_scared": "You named someone you're scared of. You don't have to work that out alone.",
     "next_change": "When the squeeze can change, working on it is the bigger rebellion.",
     "next_say": "Saying it clearly, and keeping your self-respect, is a rebellion too.",
@@ -775,6 +781,79 @@
        "when": {
         "all": [
          {
+          "all": [
+           {
+            "not": {
+             "has": [
+              "$a.squeeze.ids",
+              "scared"
+             ]
+            }
+           },
+           {
+            "not": {
+             "has": [
+              "$a.squeeze.ids",
+              "treatment"
+             ]
+            }
+           },
+           {
+            "not": {
+             "eq": [
+              "$ctx.band",
+              "flooded"
+             ]
+            }
+           },
+           {
+            "in": [
+             "$a.function",
+             [
+              "alive",
+              "control",
+              "freedom",
+              "seen"
+             ]
+            ]
+           },
+           {
+            "not": {
+             "any": [
+              {
+               "eq": [
+                "$a.heads_up",
+                "lighter"
+               ]
+              },
+              {
+               "eq": [
+                "$a.sleep",
+                "lighter"
+               ]
+              },
+              {
+               "eq": [
+                "$a.still",
+                "lighter"
+               ]
+              }
+             ]
+            }
+           }
+          ]
+         },
+         {
+          "set": "$a.door"
+         }
+        ]
+       },
+       "key": "pick_title_lasting"
+      },
+      {
+       "when": {
+        "all": [
+         {
           "has": [
            "$a.squeeze.ids",
            "treatment"
@@ -874,6 +953,174 @@
              ]
             }
            ]
+          },
+          {
+           "any": [
+            {
+             "all": [
+              {
+               "all": [
+                {
+                 "all": [
+                  {
+                   "not": {
+                    "has": [
+                     "$a.squeeze.ids",
+                     "scared"
+                    ]
+                   }
+                  },
+                  {
+                   "not": {
+                    "has": [
+                     "$a.squeeze.ids",
+                     "treatment"
+                    ]
+                   }
+                  },
+                  {
+                   "not": {
+                    "eq": [
+                     "$ctx.band",
+                     "flooded"
+                    ]
+                   }
+                  },
+                  {
+                   "in": [
+                    "$a.function",
+                    [
+                     "alive",
+                     "control",
+                     "freedom",
+                     "seen"
+                    ]
+                   ]
+                  },
+                  {
+                   "not": {
+                    "any": [
+                     {
+                      "eq": [
+                       "$a.heads_up",
+                       "lighter"
+                      ]
+                     },
+                     {
+                      "eq": [
+                       "$a.sleep",
+                       "lighter"
+                      ]
+                     },
+                     {
+                      "eq": [
+                       "$a.still",
+                       "lighter"
+                      ]
+                     }
+                    ]
+                   }
+                  }
+                 ]
+                },
+                {
+                 "set": "$a.door"
+                }
+               ]
+              },
+              {
+               "eq": [
+                "$opt.lasting",
+                true
+               ]
+              }
+             ]
+            },
+            {
+             "all": [
+              {
+               "not": {
+                "all": [
+                 {
+                  "all": [
+                   {
+                    "not": {
+                     "has": [
+                      "$a.squeeze.ids",
+                      "scared"
+                     ]
+                    }
+                   },
+                   {
+                    "not": {
+                     "has": [
+                      "$a.squeeze.ids",
+                      "treatment"
+                     ]
+                    }
+                   },
+                   {
+                    "not": {
+                     "eq": [
+                      "$ctx.band",
+                      "flooded"
+                     ]
+                    }
+                   },
+                   {
+                    "in": [
+                     "$a.function",
+                     [
+                      "alive",
+                      "control",
+                      "freedom",
+                      "seen"
+                     ]
+                    ]
+                   },
+                   {
+                    "not": {
+                     "any": [
+                      {
+                       "eq": [
+                        "$a.heads_up",
+                        "lighter"
+                       ]
+                      },
+                      {
+                       "eq": [
+                        "$a.sleep",
+                        "lighter"
+                       ]
+                      },
+                      {
+                       "eq": [
+                        "$a.still",
+                        "lighter"
+                       ]
+                      }
+                     ]
+                    }
+                   }
+                  ]
+                 },
+                 {
+                  "set": "$a.door"
+                 }
+                ]
+               }
+              },
+              {
+               "not": {
+                "eq": [
+                 "$opt.lasting",
+                 true
+                ]
+               }
+              }
+             ]
+            }
+           ]
           }
          ]
         }
@@ -894,6 +1141,77 @@
          }
         }
        ]
+      },
+      {
+       "id": "door",
+       "options": {
+        "list": "door"
+       },
+       "max": 1,
+       "required": false,
+       "showWhen": {
+        "all": [
+         {
+          "not": {
+           "has": [
+            "$a.squeeze.ids",
+            "scared"
+           ]
+          }
+         },
+         {
+          "not": {
+           "has": [
+            "$a.squeeze.ids",
+            "treatment"
+           ]
+          }
+         },
+         {
+          "not": {
+           "eq": [
+            "$ctx.band",
+            "flooded"
+           ]
+          }
+         },
+         {
+          "in": [
+           "$a.function",
+           [
+            "alive",
+            "control",
+            "freedom",
+            "seen"
+           ]
+          ]
+         },
+         {
+          "not": {
+           "any": [
+            {
+             "eq": [
+              "$a.heads_up",
+              "lighter"
+             ]
+            },
+            {
+             "eq": [
+              "$a.sleep",
+              "lighter"
+             ]
+            },
+            {
+             "eq": [
+              "$a.still",
+              "lighter"
+             ]
+            }
+           ]
+          }
+         }
+        ]
+       }
       },
       {
        "id": "cost",
@@ -991,19 +1309,54 @@
        "when": {
         "all": [
          {
-          "in": [
-           "$a.undo",
-           [
-            "no",
-            "not_sure"
-           ]
+          "any": [
+           {
+            "in": [
+             "$a.undo",
+             [
+              "no",
+              "not_sure"
+             ]
+            ]
+           },
+           {
+            "in": [
+             "$a.pick",
+             [
+              "tattoo",
+              "piercing",
+              "hair_short",
+              "hair_colour"
+             ]
+            ]
+           }
           ]
          },
          {
           "not": {
-           "eq": [
-            "$a.still",
-            "yes"
+           "all": [
+            {
+             "eq": [
+              "$a.still",
+              "yes"
+             ]
+            },
+            {
+             "any": [
+              {
+               "has": [
+                "$a.squeeze.ids",
+                "scared"
+               ]
+              },
+              {
+               "has": [
+                "$a.squeeze.ids",
+                "treatment"
+               ]
+              }
+             ]
+            }
            ]
           }
          }
@@ -1095,19 +1448,54 @@
        "when": {
         "all": [
          {
-          "in": [
-           "$a.undo",
-           [
-            "no",
-            "not_sure"
-           ]
+          "any": [
+           {
+            "in": [
+             "$a.undo",
+             [
+              "no",
+              "not_sure"
+             ]
+            ]
+           },
+           {
+            "in": [
+             "$a.pick",
+             [
+              "tattoo",
+              "piercing",
+              "hair_short",
+              "hair_colour"
+             ]
+            ]
+           }
           ]
          },
          {
           "not": {
-           "eq": [
-            "$a.still",
-            "yes"
+           "all": [
+            {
+             "eq": [
+              "$a.still",
+              "yes"
+             ]
+            },
+            {
+             "any": [
+              {
+               "has": [
+                "$a.squeeze.ids",
+                "scared"
+               ]
+              },
+              {
+               "has": [
+                "$a.squeeze.ids",
+                "treatment"
+               ]
+              }
+             ]
+            }
            ]
           }
          }
@@ -1126,6 +1514,20 @@
      "kind": "ask",
      "hint": "sleep_hint",
      "title": [
+      {
+       "when": {
+        "in": [
+         "$a.pick",
+         [
+          "tattoo",
+          "piercing",
+          "hair_short",
+          "hair_colour"
+         ]
+        ]
+       },
+       "key": "sleep_title_lasting"
+      },
       {
        "when": {
         "eq": [
@@ -1615,6 +2017,144 @@
        }
       }
      ],
+     "next": [
+      {
+       "to": "kit",
+       "when": {
+        "all": [
+         {
+          "not": {
+           "has": [
+            "$a.squeeze.ids",
+            "scared"
+           ]
+          }
+         },
+         {
+          "set": "$a.pick"
+         },
+         {
+          "not": {
+           "in": [
+            "$a.pick",
+            [
+             "tattoo",
+             "piercing",
+             "hair_short",
+             "hair_colour"
+            ]
+           ]
+          }
+         },
+         {
+          "any": [
+           {
+            "not": {
+             "own": "pick"
+            }
+           },
+           {
+            "all": [
+             {
+              "eq": [
+               "$a.undo",
+               "yes"
+              ]
+             },
+             {
+              "not": {
+               "eq": [
+                "$a.cost",
+                "yes"
+               ]
+              }
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "not": {
+           "eq": [
+            "$a.still",
+            "no"
+           ]
+          }
+         },
+         {
+          "not": {
+           "eq": [
+            "$a.sleep",
+            "tomorrow"
+           ]
+          }
+         },
+         {
+          "not": {
+           "set": "$a.kitit"
+          }
+         }
+        ]
+       }
+      },
+      {
+       "to": "next",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "kit",
+     "kind": "ask",
+     "title": "kit_title",
+     "hint": "kit_hint",
+     "fields": [
+      {
+       "id": "kitit",
+       "options": {
+        "list": "kitit"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "has": [
+         "$a.squeeze.ids",
+         "scared"
+        ]
+       }
+      }
+     ],
+     "keep": {
+      "kind": "rebellion_card",
+      "many": true,
+      "from": [
+       "function",
+       "pick"
+      ],
+      "when": {
+       "eq": [
+        "$a.kitit",
+        "keep"
+       ]
+      },
+      "done": "kit_done"
+     },
+     "primary": "kit_primary",
      "next": [
       {
        "to": "next",
@@ -2251,6 +2791,77 @@
       "reversible": true,
       "cost": "none",
       "exerts": true
+     },
+     {
+      "value": "tattoo",
+      "label": "Get the tattoo you've been thinking about, at a studio",
+      "functions": [
+       "seen",
+       "freedom",
+       "alive"
+      ],
+      "when": "week",
+      "visibility": "public",
+      "reversible": false,
+      "cost": "none",
+      "lasting": true
+     },
+     {
+      "value": "piercing",
+      "label": "Get the piercing you've wanted, at a studio",
+      "functions": [
+       "seen",
+       "alive"
+      ],
+      "when": "week",
+      "visibility": "public",
+      "reversible": false,
+      "cost": "none",
+      "lasting": true
+     },
+     {
+      "value": "hair_short",
+      "label": "Have your hair cut really short, or shaved off",
+      "functions": [
+       "freedom",
+       "control",
+       "seen"
+      ],
+      "when": "week",
+      "visibility": "public",
+      "reversible": false,
+      "cost": "none",
+      "lasting": true
+     },
+     {
+      "value": "hair_colour",
+      "label": "Have your hair dyed a colour nobody expects",
+      "functions": [
+       "seen",
+       "alive",
+       "freedom"
+      ],
+      "when": "week",
+      "visibility": "public",
+      "reversible": false,
+      "cost": "none",
+      "lasting": true
+     }
+    ],
+    "door": [
+     {
+      "value": "lasting",
+      "label": "Something that lasts"
+     }
+    ],
+    "kitit": [
+     {
+      "value": "keep",
+      "label": "Keep it in my kit"
+     },
+     {
+      "value": "not_now",
+      "label": "Not this time"
      }
     ],
     "cost": [
@@ -7443,7 +8054,7 @@
   {
    "id": "crisis_kit_build",
    "toolId": "crisis-kit",
-   "version": "kit-v1",
+   "version": "kit-v2",
    "start": "body",
    "accepts": [
     "band",
@@ -7471,7 +8082,7 @@
     "place_own": "Describe it",
     "keep_title": "Keep this kit? It opens from Help me now and from Tools.",
     "keep_title_has": "Keep this kit? It replaces the one you have now.",
-    "keep_hint": "Your pros & cons cards go in by themselves.",
+    "keep_hint": "Your pros & cons cards and kept rebellions go in by themselves.",
     "keep_primary": "Next",
     "end_kept": "It's kept. Try one card on an ordinary hard day this week, so it feels familiar when you need it.",
     "end_not_kept": "That's fine. You can make it whenever you like.",
@@ -8247,7 +8858,7 @@
   {
    "id": "crisis_kit_use",
    "toolId": "crisis-kit",
-   "version": "kit-v1",
+   "version": "kit-v2",
    "start": "deck",
    "accepts": [
     "band",
@@ -8267,6 +8878,8 @@
     "sec_place": "Your safe place",
     "sec_reasons": "Your reasons to get through tonight",
     "sec_pros_cons": "Your pros & cons card",
+    "sec_rebellion": "A rebellion without the wreckage",
+    "rebellion_for": "What it gives you:",
     "place_how": "Picture it. What can you see there? What can you hear? You can come back from it whenever you like.",
     "words_how": "Read it slowly, twice.",
     "reasons_label": "You wrote these on a calmer day.",
@@ -8312,6 +8925,7 @@
      "props": {
       "fromSkill": "crisis_kit_build",
       "prosSkill": "pros_cons",
+      "rebelSkill": "alternate_rebellion",
       "starter": "deck_starter",
       "another": "deck_another",
       "enough": "deck_done",
@@ -8322,6 +8936,8 @@
       "secPlace": "sec_place",
       "secReasons": "sec_reasons",
       "secProsCons": "sec_pros_cons",
+      "secRebellion": "sec_rebellion",
+      "rebellionFor": "rebellion_for",
       "placeHow": "place_how",
       "wordsHow": "words_how",
       "reasonsLabel": "reasons_label"

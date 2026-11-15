@@ -82,6 +82,10 @@ MERGE (k:ProfileKind {id: "crisis_kit"})
 SET k.area = "my_plans", k.label = "My crisis kit", k.revisitAfterDays = null, k.stillTrueCopy = "", k.setAsideCopy = "Set aside. The kit opens with the starter cards until you bring it back.", k.reviewStatus = "draft";
 MATCH (k:ProfileKind {id: "crisis_kit"}), (a:ProfileArea {id: "my_plans"})
 MERGE (k)-[:IN_AREA]->(a);
+MERGE (k:ProfileKind {id: "rebellion_card"})
+SET k.area = "my_plans", k.label = "A rebellion for my kit", k.revisitAfterDays = null, k.stillTrueCopy = "", k.setAsideCopy = "Set aside. My crisis kit won't show it until you bring it back.", k.reviewStatus = "draft";
+MATCH (k:ProfileKind {id: "rebellion_card"}), (a:ProfileArea {id: "my_plans"})
+MERGE (k)-[:IN_AREA]->(a);
 MERGE (k:ProfileKind {id: "safety_plan"})
 SET k.area = "my_plans", k.label = "My safety plan", k.revisitAfterDays = null, k.stillTrueCopy = "", k.setAsideCopy = "Set aside. Help & safety won't open it until you bring it back.", k.reviewStatus = "draft";
 MATCH (k:ProfileKind {id: "safety_plan"}), (a:ProfileArea {id: "my_plans"})
