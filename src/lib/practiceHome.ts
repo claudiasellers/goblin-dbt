@@ -56,8 +56,11 @@ export function levelOf(reps: number): number {
   return masteryOf(reps).level;
 }
 
-/** This week's ring: a week's worth is seven, and the ring never empties because of a missed day. */
-export const WEEK_GOAL = 7;
+/**
+ * This week's ring: three reps fill it (the PRD's *a few days a week*, so a full ring is in reach for a busy week), and
+ * it never empties because of a missed day.
+ */
+export const WEEK_GOAL = 3;
 export function weekFraction(weekReps: number): number {
   return Math.min(1, Math.max(0, weekReps) / WEEK_GOAL);
 }

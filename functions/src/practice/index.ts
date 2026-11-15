@@ -7,7 +7,7 @@
 import { callable } from '../shared/callable';
 import { readTx } from '../shared/neo4j';
 import { practiceHome } from './compute';
-import type { PracticeHomeResponse, RepRow, SkillMetaRow } from './types';
+import type { DailyCardRow, PracticeHomeResponse, RepRow, SkillMetaRow } from './types';
 
 const SKILLS_QUERY = `MATCH (k:PracticeSkill) WHERE k.mfOrder IS NOT NULL
   RETURN k.id AS id, coalesce(k.practiceLabel, k.displayLabel, k.name) AS label, k.mfOrder AS mfOrder,
@@ -20,10 +20,16 @@ const REPS_QUERY = `MATCH (:User {id: $uid})-[:HAS_SKILL_PRACTICE]->(sp:SkillPra
          toString(sp.at) AS at, coalesce(sp.offPhone, false) AS offPhone, coalesce(sp.source, '') AS source
   ORDER BY sp.at DESC LIMIT 2000`;
 
-// Waiting = scheduled and not yet stale (staleAfterHours 12): a missed day's card never blocks the next one.
-const DAILY_QUERY = `OPTIONAL MATCH (:User {id: $uid})-[:HAS_FOLLOW_UP]->(f:FollowUp {type: 'practice_daily', status: 'scheduled'})
-  WHERE f.dueAt > datetime() - duration({hours: 12})
-  RETURN count(f) > 0 AS pending`;
+// Waiting = scheduled and not yet stale (staleAfterHours 12): a missed day's card never blocks the next one, and the
+// home dismisses the stale ones.
+const DAILY_QUERY = `MATCH (:User {id: $uid})-[:HAS_FOLLOW_UP]->(f:FollowUp {type: 'practice_daily', status: 'scheduled'})
+  RETURN f.id AS id, f.dueAt > datetime() - duration({hours: 12}) AS waiting
+  ORDER BY f.dueAt DESC LIMIT 20`;
+
+// The last closed Notice what's here: *further away* (worse) opens the next one outside-only.
+const NOTICE_QUERY = `MATCH (:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts:ToolSession {toolId: 'notice-and-name'})
+  WHERE ts.thenVsNow IS NOT NULL
+  RETURN ts.thenVsNow AS last ORDER BY coalesce(ts.endedAt, ts.startedAt) DESC LIMIT 1`;
 
 const num = (v: unknown): number => (typeof v === 'number' ? v : typeof (v as { toNumber?: () => number })?.toNumber === 'function' ? (v as { toNumber: () => number }).toNumber() : Number(v));
 
@@ -34,6 +40,7 @@ export const getPracticeHome = callable<unknown, PracticeHomeResponse>(
     const skills = await tx.run(SKILLS_QUERY);
     const reps = await tx.run(REPS_QUERY, { uid });
     const daily = await tx.run(DAILY_QUERY, { uid });
+    const notice = await tx.run(NOTICE_QUERY, { uid });
     const meta: SkillMetaRow[] = skills.records.map((r) => ({
       id: r.get('id') as string, label: r.get('label') as string, order: num(r.get('mfOrder')),
       tools: (r.get('tools') as unknown[]).filter((t): t is string => typeof t === 'string'),
@@ -43,6 +50,8 @@ export const getPracticeHome = callable<unknown, PracticeHomeResponse>(
       practiceId: r.get('practiceId') as string, at: r.get('at') as string,
       offPhone: r.get('offPhone') === true, source: r.get('source') as string,
     }));
-    return practiceHome(meta, rows, daily.records[0]?.get('pending') === true, Date.now());
+    const cards: DailyCardRow[] = daily.records.map((r) => ({ id: r.get('id') as string, waiting: r.get('waiting') === true }));
+    const last = notice.records[0]?.get('last');
+    return practiceHome(meta, rows, cards, typeof last === 'string' ? last : null, Date.now());
   }),
 );

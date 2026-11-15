@@ -172,9 +172,11 @@ test("the fork: something can be done → Problem Solve, DEAR MAN, Do the Opposi
   const fork = run([...FIRST.wave, pick("check1", "much_better"), next]);
   const end = (v) => run([pick("fork", v), next], ctx(), fork);
   assert.deepEqual(offers(end("change")), ["problem_solve", "dear_man", "opposite_action"]);
-  assert.deepEqual(offers(end("accept")), ["let_it_be"], "Let it be (DT-04, built)");
-  assert.deepEqual(offers(end("park")), ["mind_job"], "Give your mind a job (DT-06, built)");
-  assert.deepEqual(offers(end("through")), []);
+  assert.deepEqual(offers(end("accept")), ["let_it_be", "notice"], "Let it be (DT-04, built)");
+  assert.deepEqual(offers(end("park")), ["mind_job", "notice"], "Give your mind a job (DT-06, built)");
+  // Quieter, and nothing to change: a minute's noticing, outward (MF-01, MF-B3).
+  assert.deepEqual(offers(end("through")), ["notice"]);
+  assert.deepEqual(skill.exits.find((e) => e.id === "notice").query, { frame: "far" });
   const planned = Object.fromEntries(skill.exits.map((e) => [e.id, !!e.planned]));
   assert.deepEqual([planned.let_it_be, planned.mind_job, planned.crisis_kit], [false, false, false], "the kit is built (DT-03)");
   assert.match(M.handoffLine(ctx(), M.stepOf(skill, "end"), end("through")), /You got through it/);

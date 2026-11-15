@@ -25,7 +25,7 @@ test("types mirror: src/data/profileTypes.ts equals functions/src/profile/types.
 
 test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 Phase A needs", () => {
   for (const [consumer, needs] of Object.entries(types.PROFILE_NEEDS)) {
-    assert.ok(toolIds.has(consumer) || ["checkin", "today", "witness", "me", "safety"].includes(consumer), consumer);
+    assert.ok(toolIds.has(consumer) || ["checkin", "today", "witness", "me", "safety", "practice"].includes(consumer), consumer);
     for (const s of needs) assert.ok(types.SLICE_IDS.includes(s), `${consumer}: ${s}`);
   }
   assert.deepEqual(types.PROFILE_NEEDS["recovering-from-invalidation"], ["name"]);

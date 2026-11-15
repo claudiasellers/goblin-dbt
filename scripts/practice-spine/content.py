@@ -875,6 +875,10 @@ MF_SEQUENCE = [
     ("wise_mind", 5, "Wise mind", []),
 ]
 
+# The tool the home opens for a skill when its first `defaultFor` is shared with an earlier skill: Notice what's here
+# practises observe and describe, so Name's daily practice is Find the feeling (a different kind, PRD MF-02).
+MF_LEADS = {"describe": "find-the-feeling"}
+
 # New skills (id, name, grade, family, concept, why, sources). Grades follow the project scale.
 NEW_SKILLS = [
     ("urge_surf", "Ride the urge", "Preliminary", "mind", "urge_surfing",

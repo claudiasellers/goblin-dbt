@@ -28,6 +28,19 @@ export interface PracticeHomeResponse {
   recentTools: string[];
   /** A `practice_daily` card is booked and not yet stale: the home doesn't book another. */
   dailyPending: boolean;
+  /** That card's id (null when none waits): a changed time of day dismisses it before booking the new one. */
+  dailyWaitingId: string | null;
+  /** Booked cards past their 12 h: the home dismisses them, so a missed day leaves nothing behind. */
+  staleDailyIds: string[];
+  /** The last Notice what's here closed *further away*: the daily pick opens it outside-only (`frame=far`). */
+  noticeFar: boolean;
+}
+
+/** The person's booked `practice_daily` cards as the query returns them. */
+export interface DailyCardRow {
+  id: string;
+  /** Booked and not yet stale. */
+  waiting: boolean;
 }
 
 /** One SkillPractice as the query returns it. */

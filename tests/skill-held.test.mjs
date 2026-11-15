@@ -173,6 +173,17 @@ test("outward: always offered, never pushed (skipping goes on)", () => {
   assert.deepEqual(offers(yes), []);
 });
 
+test("once it helped, the end card offers a minute's noticing (MF-01, MF-B3); not after a close that didn't", () => {
+  const helped = run([...HEART, pick("close", "much_better"), next, pick("reach", "not_now"), next, next]);
+  assert.equal(helped.stepId, "end");
+  assert.deepEqual(offers(helped), ["notice"]);
+  assert.equal(skill.exits.find((e) => e.id === "notice").toolId, "notice-and-name");
+  const same = run([...HEART, pick("close", "same"), next]);
+  const end = same.stepId === "end" ? same : run([pick("reach", "not_now"), next], ctx(), same);
+  assert.equal(end.stepId, "end");
+  assert.deepEqual(offers(end), []);
+});
+
 test("every screen has a quiet way to someone; nothing asks the person to close their eyes", () => {
   for (const st of skill.steps) {
     const links = [...(st.links ?? []), ...(st.fields ?? []).flatMap((f) => f.links ?? [])];

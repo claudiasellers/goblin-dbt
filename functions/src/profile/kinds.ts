@@ -253,7 +253,7 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
   // yes); one per person, a re-save replaces it. `when` is a time of day or a cue; `cueOwn` the person's own cue
   // (encrypted). `breath`: *not sure* counts as no (PRD runtime rule 7). Read by the `practicePrefs` slice only.
   practice_prefs: {
-    kind: 'practice_prefs', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'my_progress', slice: 'practicePrefs',
+    kind: 'practice_prefs', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'about_me', slice: 'practicePrefs',
     owner: 'MF', many: false, maxItems: 1, editor: null, ownFields: ['cueOwn'],
     validate: (v) => {
       const o = obj(v);

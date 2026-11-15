@@ -2,11 +2,17 @@
  * The Practice home's numbers (MF-02), pure: the skill rows in the MF sequence, this week's reps and the recent tools.
  * The handler only reads; tests load this file directly.
  */
-import type { PracticeHomeResponse, PracticeSkillRow, RepRow, SkillMetaRow } from './types';
+import type { DailyCardRow, PracticeHomeResponse, PracticeSkillRow, RepRow, SkillMetaRow } from './types';
 
 const WEEK_MS = 7 * 86_400_000;
 
-export function practiceHome(meta: SkillMetaRow[], reps: RepRow[], dailyPending: boolean, now: number): PracticeHomeResponse {
+/**
+ * `daily`: the person's booked `practice_daily` cards; `lastNotice`: the then-vs-now of their last closed Notice what's
+ * here (`worse` is its *further away*).
+ */
+export function practiceHome(
+  meta: SkillMetaRow[], reps: RepRow[], daily: DailyCardRow[], lastNotice: string | null, now: number,
+): PracticeHomeResponse {
   const since = now - WEEK_MS;
   const inWeek = (r: RepRow) => Date.parse(r.at) >= since;
   const self = (r: RepRow) => r.offPhone || r.source === 'catch';
@@ -33,6 +39,9 @@ export function practiceHome(meta: SkillMetaRow[], reps: RepRow[], dailyPending:
     weekReps: byVisit.filter(inWeek).length,
     offPhoneReps: byVisit.filter(self).length,
     recentTools,
-    dailyPending,
+    dailyPending: daily.some((d) => d.waiting),
+    dailyWaitingId: daily.find((d) => d.waiting)?.id ?? null,
+    staleDailyIds: daily.filter((d) => !d.waiting).map((d) => d.id),
+    noticeFar: lastNotice === 'worse',
   };
 }

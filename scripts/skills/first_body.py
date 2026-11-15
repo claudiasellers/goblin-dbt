@@ -128,6 +128,7 @@ COPY = {
     "end_park": "Then it can wait, with a time to come back to it.",
     "end_through": "You got through it. That's the skill.",
     "held_offer": "A hand on my heart",
+    "notice_offer": "A minute noticing what's around you",
     "safety_open": "Talk to someone now",
     "next": "Next",
     "done": "Done",
@@ -305,6 +306,9 @@ STEPS = [
             *[{"exit": x, "when": FORK("change")} for x in ("problem_solve", "dear_man", "opposite_action")],
             {"exit": "let_it_be", "when": FORK("accept")},
             {"exit": "mind_job", "when": FORK("park")},
+            # MF-01, outward (frame far): it's quieter now, so a minute's noticing can land (MF Arch Map §2 row 3). Not beside
+            # the change tools: something to do comes first there.
+            {"exit": "notice", "when": {"not": FORK("change")}},
         ],
         "done": "done", "links": [SAFETY_LINK],
     },
@@ -319,6 +323,7 @@ EXITS = [
     {"id": "mind_job", "toolId": "mind-job", "query": {"enterAt": "lid"}},  # DT-06 the lid: not right now, with a return
     {"id": "held", "toolId": "soothe", "query": {"enterAt": "hand", "frame": "hurt"}, "label": "held_offer"},  # DT-07 Held, at the hand
     {"id": "crisis_kit", "toolId": "crisis-kit", "query": {"frame": "crisis"}},       # DT-03 My crisis kit, opened from a crisis route (the banner on every card)
+    {"id": "notice", "toolId": "notice-and-name", "query": {"frame": "far"}, "label": "notice_offer"},  # MF-01, outward only
     {"id": "safety_open", "toolId": None, "safety": True},               # safety.open (R6)
     {"id": "done", "done": True},
 ]

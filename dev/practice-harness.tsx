@@ -21,10 +21,10 @@ const skill = (id: string, label: string, order: number, tools: string[], reps: 
 const home: PracticeHomeResponse = view === 'new'
   ? { skills: [skill('observe', 'Notice', 1, ['notice-and-name', 'five-senses'], 0), skill('describe', 'Name', 2, ['notice-and-name', 'find-the-feeling'], 0),
       skill('nonjudge', 'Without judging', 3, ['unpack-a-judgment'], 0), skill('wise_mind', 'Wise mind', 5, ['wise-mind'], 0)],
-    weekReps: 0, offPhoneReps: 0, recentTools: [], dailyPending: false }
+    weekReps: 0, offPhoneReps: 0, recentTools: [], dailyPending: false, dailyWaitingId: null, staleDailyIds: [], noticeFar: false }
   : { skills: [skill('observe', 'Notice', 1, ['notice-and-name', 'five-senses'], 9, 3, 2), skill('describe', 'Name', 2, ['notice-and-name', 'find-the-feeling'], 4, 2),
       skill('nonjudge', 'Without judging', 3, ['unpack-a-judgment'], 1, 1, 1), skill('wise_mind', 'Wise mind', 5, ['wise-mind'], 0)],
-    weekReps: 4, offPhoneReps: 3, recentTools: ['notice-and-name'], dailyPending: true };
+    weekReps: 2, offPhoneReps: 3, recentTools: ['notice-and-name'], dailyPending: true, dailyWaitingId: 'f1', staleDailyIds: [], noticeFar: false };
 const prefs = view === 'setup' || view === 'new' ? null
   : { time: 'evening', cue: null, cueOwn: null, breath: 'no', meta: { id: 'p', kind: 'practice_prefs', area: 'my_progress', status: 'active', source: 'user', confirmedAt: null, revisitAt: null, prompt: 'none' } };
 answers({

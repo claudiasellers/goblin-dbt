@@ -233,7 +233,7 @@ export const PROFILE_NEEDS = {
   'values-clarification': ['values'],         // the start screen (*Your values are here*) and a step for one kept before (docs/design/values.md)
   // Wise mind's step back (parts on only): the person's parts in the room, with their names, shapes,
   // tender and safety flags. Empty while parts are off, so the tool shows its two-minds form.
-  'wise-mind': ['parts'],
+  'wise-mind': ['parts', 'practicePrefs'],
   // Me → Parts of me → See them together (the den). Server-side only: getDen reads it and adds recency.
   'me': ['den'],
   // Other tools declare 'parts' in the phase that renders them, never before.

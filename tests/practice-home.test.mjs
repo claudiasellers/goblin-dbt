@@ -38,7 +38,7 @@ test("practiceHome: the sequence's order, reps per skill, a visit counted once, 
     { skillId: "observe", sessionKey: "u:c", practiceId: "practice", at: day(2), offPhone: true, source: "followup_offphone" },
     { skillId: "wise_mind", sessionKey: "u:d", practiceId: "wise-mind", at: day(10), offPhone: false, source: "in_app" },
   ];
-  const r = compute.practiceHome(META, reps, true, NOW);
+  const r = compute.practiceHome(META, reps, [{ id: "f1", waiting: true }, { id: "f0", waiting: false }], "worse", NOW);
   assert.deepEqual(r.skills.map((s) => s.id), ["observe", "describe", "nonjudge", "wise_mind"]);
   assert.deepEqual(r.skills.map((s) => s.reps), [2, 1, 1, 1]);
   assert.deepEqual(r.skills.map((s) => s.weekReps), [2, 1, 1, 0]);
@@ -48,11 +48,16 @@ test("practiceHome: the sequence's order, reps per skill, a visit counted once, 
   assert.equal(r.offPhoneReps, 2);
   assert.deepEqual(r.recentTools, ["notice-and-name", "wise-mind"]);
   assert.equal(r.dailyPending, true);
-  assert.deepEqual(compute.practiceHome(META, [], false, NOW).skills.map((s) => s.reps), [0, 0, 0, 0]);
+  assert.equal(r.dailyWaitingId, "f1");
+  assert.deepEqual(r.staleDailyIds, ["f0"]);
+  assert.equal(r.noticeFar, true);
+  const empty = compute.practiceHome(META, [], [], "better", NOW);
+  assert.deepEqual(empty.skills.map((s) => s.reps), [0, 0, 0, 0]);
+  assert.deepEqual([empty.dailyPending, empty.dailyWaitingId, empty.noticeFar], [false, null, false]);
 });
 
 test("dailyPick: least practised first, never the last tool, the swap a different tool; unbuilt tools skipped", () => {
-  const rows = compute.practiceHome(META, [], false, NOW).skills;
+  const rows = compute.practiceHome(META, [], [], null, NOW).skills;
   const all = () => true;
   assert.deepEqual(lib.dailyPick(rows, [], all).pick, { skillId: "observe", toolId: "notice-and-name" });
   // observe and describe share a tool: the swap skips to the next skill with a different one.
@@ -75,7 +80,8 @@ test("booking, levels and the ring: a time books when none waits; a cue books no
   assert.equal(lib.shouldBookDaily(null, false), false);
   assert.deepEqual([0, 1, 3, 7, 15, 30, 99].map(lib.levelOf), [0, 1, 2, 3, 4, 5, 5]);
   assert.equal(lib.weekFraction(0), 0);
-  assert.equal(lib.weekFraction(3), 3 / 7);
+  assert.equal(lib.weekFraction(2), 2 / 3);
+  assert.equal(lib.weekFraction(3), 1);
   assert.equal(lib.weekFraction(20), 1);
 });
 
@@ -89,6 +95,9 @@ test("catch-one: only the two catches record under `practice`; a catch is refuse
   assert.throws(() => v.validateRecord(rec({ skillIds: ["nonjudge", "observe"], repSource: "catch" }), now));
   assert.throws(() => v.validateRecord(rec({ skillIds: ["nonjudge"], repSource: "catch", status: "exited_early" }), now));
   assert.throws(() => v.validateRecord(rec({}), now));
+  // Nothing else rides on a catch: no feelings, detail or follow-ups.
+  assert.throws(() => v.validateRecord(rec({ skillIds: ["nonjudge"], repSource: "catch", emotionIds: ["anxiety"] }), now));
+  assert.throws(() => v.validateRecord(rec({ skillIds: ["nonjudge"], repSource: "catch", urgeIds: ["send"] }), now));
   assert.throws(() => v.validateRecord({ id: ID, toolId: "wise-mind", entry: "direct", status: "completed", skillIds: ["nonjudge"], repSource: "catch" }, now));
   // `practice` is reserved (no visit of its own) and mirrored on the client.
   assert.deepEqual(tools.SPINE_TOOLS.practice, { module: "mf", closeKind: "none" });
@@ -96,7 +105,7 @@ test("catch-one: only the two catches record under `practice`; a catch is refuse
   assert.deepEqual([...tools.RESERVED_ENTRIES.practice], ["direct"]);
 });
 
-test("server: the catch is a self-report, startToolSession refuses `practice`, closeToolSession refuses a catch", () => {
+test("server: the catch is logged as a self-report (the refusals run over the fake driver in functions/test/unit/practiceHome.test.cjs)", () => {
   const src = readFileSync("functions/src/spine/toolSession.ts", "utf8");
   assert.match(src, /repSource === 'catch' \? 'self_report'/);
   assert.match(src, /'practice'/);

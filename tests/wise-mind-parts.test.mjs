@@ -65,7 +65,7 @@ test("the page: the slot's gate, waiting only for a parts-on person, the room la
   assert.match(page, /const \{ pending, slot \} = useStepBackSlot\(\);\s*if \(pending\) return <ToolLoading \/>;\s*return <Suspense fallback=\{<ToolLoading \/>\}><LazyWiseMind stepBack=\{slot\} \/><\/Suspense>;/);
   assert.equal(W.PUSHED_PARTS_LINE, "wm_pushed");
   const types = read("functions/src/profile/types.ts");
-  assert.match(types, /'wise-mind': \['parts'\],/, "PROFILE_NEEDS: the parts slice (name, shape, tender, status, safety)");
+  assert.match(types, /'wise-mind': \['parts', 'practicePrefs'\],/, "PROFILE_NEEDS: the parts slice (name, shape, tender, status, safety), and MF-02's breath answer");
   assert.match(read("functions/src/profile/slices.ts"), /\.name, \.tender, \.shapeSig[\s\S]*AS safety/);
 });
 

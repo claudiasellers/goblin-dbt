@@ -217,7 +217,7 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
         kettle: 'When the kettle\'s on', commute: 'On the bus or train', desk: 'When I sit down at my desk',
       };
       const key = String(value.time ?? value.cue ?? '');
-      summary = key === 'own' && typeof value.cueOwn === 'string' ? value.cueOwn : when[key] ?? '';
+      summary = !key ? 'No reminder' : key === 'own' && typeof value.cueOwn === 'string' ? value.cueOwn : when[key] ?? '';
     }
     // A rewritten nightmare: its ending when the person wrote it; picked endings are ids (the title says enough).
     if (meta.kind === 'nightmare_script' && value && typeof value.endingOwn === 'string') summary = value.endingOwn;

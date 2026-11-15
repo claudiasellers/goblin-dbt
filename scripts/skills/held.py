@@ -148,6 +148,7 @@ COPY = {
     "practise_title": "Want to practise this once when things are calmer?",
     "practise_hint": "It comes more easily on a hard night if you've done it on an okay day.",
     "safety_open": "Talk to someone now",
+    "notice_offer": "A minute noticing what's around you",
     "next": "Next",
     "done": "Done",
 }
@@ -375,7 +376,9 @@ STEPS = [
              {"when": {"all": [{"not": {"set": a("again")}}, {"in": [a("close"), ["better", "much_better"]]}]}, "key": "end_warmer"},
              {"when": {"all": [{"not": {"set": a("again")}}, {"eq": [a("close"), "same"]}]}, "key": "end_same"},
              {"when": {"eq": [a("reach"), "yes"]}, "key": "end_reach"}],
-            [], no_close=False),
+            # MF-01 in calm, once it helped (MF Arch Map §2 row 4); never after Hurt myself.
+            [{"exit": "notice", "when": {"all": [{"not": AFTER_HURT}, {"in": [a("close"), ["better", "much_better"]]}]}}],
+            no_close=False),
 ]
 
 STEPS = [{**s, "crisis": CRISIS} for s in STEPS]
@@ -383,6 +386,7 @@ STEPS = [{**s, "crisis": CRISIS} for s in STEPS]
 EXITS = [
     {"id": "cool_down", "toolId": "cool-down"},                          # DT-01 First, the body (press, backdraft)
     {"id": "five_senses", "toolId": "five-senses"},                      # 5-4-3-2-1: far away in the scan, back outside
+    {"id": "notice", "toolId": "notice-and-name", "label": "notice_offer"},  # MF-01: a minute's noticing, once it helped
     {"id": "safety_open", "toolId": None, "safety": True},               # safety.open (R6)
     {"id": "done", "done": True},
 ]

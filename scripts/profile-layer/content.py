@@ -65,7 +65,7 @@ KINDS = [
      "Still your time?", "Set aside. Sleep reset asks for a time fresh until you bring it back."),
     # The Practice home (MF-02): when the daily minute comes and whether breath focus is okay, set once in Practice's
     # first visit. Never stale: a setting, changed from Practice.
-    ("practice_prefs", "my_progress", "My practice", None,
+    ("practice_prefs", "about_me", "My practice", None,
      "", "Set aside. Practice asks when again next time, and no daily card comes until then."),
     # My crisis kit (DT-03): one per person, kept on *Keep it*. Never stale: theirs until they set it aside or change it.
     ("crisis_kit", "my_plans", "My crisis kit", None,

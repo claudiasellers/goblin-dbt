@@ -48,6 +48,12 @@ export async function bookDaily(time: string): Promise<string | null> {
   return ids[0] ?? null;
 }
 
+/** A stale card, or one booked for a time the person has since changed: dismissed, nothing else said. */
+export async function dismissDaily(followUpId: string): Promise<void> {
+  const { resolveFollowUpStatus } = await import('./spine');
+  await resolveFollowUpStatus(followUpId, 'dismissed');
+}
+
 /** The daily card opened the home: it's done (the home books the next one). */
 export async function completeDaily(followUpId: string): Promise<void> {
   const { resolveFollowUpStatus } = await import('./spine');

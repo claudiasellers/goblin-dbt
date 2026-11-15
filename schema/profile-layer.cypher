@@ -79,8 +79,8 @@ SET k.area = "my_body", k.label = "My wake time", k.revisitAfterDays = 30, k.sti
 MATCH (k:ProfileKind {id: "sleep_anchor"}), (a:ProfileArea {id: "my_body"})
 MERGE (k)-[:IN_AREA]->(a);
 MERGE (k:ProfileKind {id: "practice_prefs"})
-SET k.area = "my_progress", k.label = "My practice", k.revisitAfterDays = null, k.stillTrueCopy = "", k.setAsideCopy = "Set aside. Practice asks when again next time, and no daily card comes until then.", k.reviewStatus = "draft";
-MATCH (k:ProfileKind {id: "practice_prefs"}), (a:ProfileArea {id: "my_progress"})
+SET k.area = "about_me", k.label = "My practice", k.revisitAfterDays = null, k.stillTrueCopy = "", k.setAsideCopy = "Set aside. Practice asks when again next time, and no daily card comes until then.", k.reviewStatus = "draft";
+MATCH (k:ProfileKind {id: "practice_prefs"}), (a:ProfileArea {id: "about_me"})
 MERGE (k)-[:IN_AREA]->(a);
 MERGE (k:ProfileKind {id: "crisis_kit"})
 SET k.area = "my_plans", k.label = "My crisis kit", k.revisitAfterDays = null, k.stillTrueCopy = "", k.setAsideCopy = "Set aside. The kit opens with the starter cards until you bring it back.", k.reviewStatus = "draft";

@@ -134,9 +134,11 @@ export function validateRecord(raw: unknown, now: Date): { start: StartInput; cl
   const close = validateClose(raw, now, start.closeKind);
   if (start.toolId === 'practice') {
     // The Practice home's catch-one (MF-02): one tap, one rep. A caught judgment is a `nonjudge` catch; one done without
-    // the app is an off-phone `observe` rep. Nothing else rides on it.
+    // the app is an off-phone `observe` rep. Nothing else rides on it: no words, follow-ups, feelings or detail.
     const ok = close.status === 'completed' && close.skillIds?.length === 1 &&
-      PRACTICE_CATCHES.some(([skill, source]) => close.skillIds![0] === skill && close.repSource === source);
+      PRACTICE_CATCHES.some(([skill, source]) => close.skillIds![0] === skill && close.repSource === source) &&
+      close.ext === null && close.schedule.length === 0 && close.detail === null && close.emotionIds.length === 0 &&
+      close.urgeIds.length === 0 && start.emotionIds.length === 0;
     if (!ok) throw new ValidationError('Not a practice catch');
   } else if (close.repSource === 'catch') throw new ValidationError('A catch is the Practice home\'s');
   return { start, close };
