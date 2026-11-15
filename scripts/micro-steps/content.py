@@ -1,9 +1,10 @@
 """The micro-steps (DT-01 part 2, docs/design/first-the-body.md): the lowest-difficulty interventions in the app.
 
 The one editable source. `python3 scripts/micro-steps/build.py` writes schema/micro-steps.cypher (the graph is the source
-of truth: `Intervention` nodes, `ROUTES_TO` from each `ActivationPattern` or `CrisisState`), and `fixture.py --ship`
-writes src/data/content/micro-steps.json, the file the app ships (scripts/content-snapshot/build.mjs makes the same file
-from the live graph after every load). They used to be hand-written in src/data/microSteps.ts (clinical content in the
+of truth: `Intervention` nodes, `ROUTES_TO` from each `ActivationPattern` or `CrisisState`), and `fixture.py`
+writes tests/fixtures/micro-steps-content.json. The file the app ships, src/data/content/micro-steps.json, is made by
+scripts/content-snapshot/build.mjs (`buildMicroSteps`) from the live graph after every load (`npm run content:refresh`),
+or from the schema replay (`schema_export.py`, then `build.mjs --from`) before one. They used to be hand-written in src/data/microSteps.ts (clinical content in the
 frontend, plan F-rule); that file is gone.
 
 They are served when someone taps *That feels like too much right now* on a check-in result (StateResult,

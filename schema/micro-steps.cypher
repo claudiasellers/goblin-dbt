@@ -10,6 +10,9 @@
 MERGE (c:CrisisState {id: "fallback"})
 SET c += {description: "No pattern matched, or Help me now: universally safe, low-load steps that need nothing", version: "micro-steps-v1"};
 
+MATCH (:ActivationPattern)-[r:ROUTES_TO]->(:Intervention) DELETE r;
+MATCH (:CrisisState)-[r:ROUTES_TO]->(:Intervention) DELETE r;
+
 // --- acute_alarm ---
 MERGE (n:Intervention {id: "aa-1"})
 SET n += {kind: "micro_step", text: "Push your feet into the floor.", subtext: "Press down hard. Feel the pressure.", modality: "proprioceptive", requiresEnvironment: false, version: "micro-steps-v1"};

@@ -179,10 +179,11 @@ CREATE CONSTRAINT trail_rule_id IF NOT EXISTS FOR (n:TrailRule) REQUIRE n.id IS 
 CREATE CONSTRAINT trail_context_id IF NOT EXISTS FOR (n:TrailContext) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT parts_policy_id IF NOT EXISTS FOR (n:PartsPolicy) REQUIRE n.id IS UNIQUE;
 
-// --- Wise mind (docs/design/wise-mind.md, schema/wise-mind.cypher) ---
-// Micro-steps (DT-01 part 2, schema/micro-steps.cypher)
+// --- Micro-steps (DT-01 part 2, schema/micro-steps.cypher) ---
 CREATE CONSTRAINT intervention_id IF NOT EXISTS FOR (n:Intervention) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT crisis_state_id IF NOT EXISTS FOR (n:CrisisState) REQUIRE n.id IS UNIQUE;
+
+// --- Wise mind (docs/design/wise-mind.md, schema/wise-mind.cypher) ---
 CREATE CONSTRAINT wise_mind_flow_id IF NOT EXISTS FOR (n:WiseMindFlow) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT wise_mind_question_id IF NOT EXISTS FOR (n:WiseMindQuestion) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT mind_voice_id IF NOT EXISTS FOR (n:MindVoice) REQUIRE n.id IS UNIQUE;

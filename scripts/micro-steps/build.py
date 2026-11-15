@@ -2,7 +2,7 @@
 
 Usage (repo root; write to a temp file first so a failed build never empties the file):
   python3 scripts/micro-steps/build.py > /tmp/ms.cypher && mv /tmp/ms.cypher schema/micro-steps.cypher
-  python3 scripts/micro-steps/fixture.py --ship
+  python3 scripts/micro-steps/fixture.py   # tests/fixtures/micro-steps-content.json
   python3 scripts/micro-steps/build.py --check   # exits 1 when schema/micro-steps.cypher is stale
 """
 import json, os, re, sys
@@ -52,6 +52,11 @@ def build():
 """)
     for cid, why in CRISIS_STATES.items():
         A(f"MERGE (c:CrisisState {{id: {q(cid)}}})\nSET c += {{description: {q(why)}, version: {q(VERSION)}}};")
+    A("")
+    # The edges are rebuilt whole: a step dropped from a set, or moved to another, must not keep its old edge (MERGE
+    # only adds). Only the micro-step edges: ROUTES_TO is also Find the feeling's (FeelingUrge → TherapyConcept).
+    A("MATCH (:ActivationPattern)-[r:ROUTES_TO]->(:Intervention) DELETE r;")
+    A("MATCH (:CrisisState)-[r:ROUTES_TO]->(:Intervention) DELETE r;")
     A("")
     for sid, steps in SETS.items():
         src = "ActivationPattern" if sid in PATTERNS else "CrisisState"
