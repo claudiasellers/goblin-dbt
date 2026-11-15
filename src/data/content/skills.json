@@ -1,7 +1,7 @@
 {
   "source": {
     "file": "graph-content-only-2026-11-15.json",
-    "exportedAt": "2026-11-15T02:14:13.827Z"
+    "exportedAt": "2026-11-15T02:38:44.273Z"
   },
   "content": {
     "version": "skills-v1",
@@ -906,10 +906,10 @@
               {
                 "id": "undo",
                 "label": "undo_q",
+                "max": 1,
                 "options": {
                   "list": "undo"
                 },
-                "max": 1,
                 "required": true,
                 "showWhen": {
                   "own": "pick"
@@ -1129,40 +1129,6 @@
           {
             "id": "sleep_on",
             "kind": "ask",
-            "title": [
-              {
-                "when": {
-                  "eq": [
-                    "$a.undo",
-                    "not_sure"
-                  ]
-                },
-                "key": "sleep_title_unsure"
-              },
-              {
-                "key": "sleep_title"
-              }
-            ],
-            "hint": "sleep_hint",
-            "fields": [
-              {
-                "id": "sleep",
-                "options": {
-                  "list": "sleep"
-                },
-                "max": 1,
-                "required": true,
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
-              }
-            ],
             "crisis": [
               {
                 "variant": "other_person",
@@ -1174,6 +1140,25 @@
                 }
               }
             ],
+            "fields": [
+              {
+                "id": "sleep",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "sleep"
+                },
+                "required": true
+              }
+            ],
             "followUp": {
               "type": "rebellion_check",
               "when": {
@@ -1183,6 +1168,21 @@
                 ]
               }
             },
+            "hint": "sleep_hint",
+            "title": [
+              {
+                "key": "sleep_title_unsure",
+                "when": {
+                  "eq": [
+                    "$a.undo",
+                    "not_sure"
+                  ]
+                }
+              },
+              {
+                "key": "sleep_title"
+              }
+            ],
             "next": [
               {
                 "to": "pick",
@@ -1249,11 +1249,30 @@
           {
             "id": "later",
             "kind": "ask",
-            "title": "later_title",
-            "secondary": "later_skip",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "has": [
+                    "$a.squeeze.ids",
+                    "scared"
+                  ]
+                }
+              }
+            ],
             "fields": [
               {
                 "id": "remind",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
                 "options": {
                   "list": "remind",
                   "where": {
@@ -1292,27 +1311,6 @@
                       }
                     ]
                   }
-                },
-                "max": 1,
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
-              }
-            ],
-            "crisis": [
-              {
-                "variant": "other_person",
-                "when": {
-                  "has": [
-                    "$a.squeeze.ids",
-                    "scared"
-                  ]
                 }
               }
             ],
@@ -1320,6 +1318,8 @@
               "type": "rebellion_after",
               "whenFrom": "remind"
             },
+            "secondary": "later_skip",
+            "title": "later_title",
             "next": [
               {
                 "to": "real",
@@ -1364,26 +1364,11 @@
           {
             "id": "back",
             "kind": "ask",
-            "title": "back_title",
-            "hint": "back_hint",
-            "fields": [
-              {
-                "id": "did",
-                "options": {
-                  "list": "did"
-                },
-                "max": 1,
-                "required": true,
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
-              }
+            "clears": [
+              "did",
+              "itch",
+              "real",
+              "remind_again"
             ],
             "crisis": [
               {
@@ -1396,18 +1381,33 @@
                 }
               }
             ],
+            "fields": [
+              {
+                "id": "did",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "did"
+                },
+                "required": true
+              }
+            ],
+            "hint": "back_hint",
             "reopens": {
               "after": "later",
               "again": [
                 "again_card"
               ]
             },
-            "clears": [
-              "did",
-              "itch",
-              "real",
-              "remind_again"
-            ],
+            "title": "back_title",
             "next": [
               {
                 "to": "itch",
@@ -1440,26 +1440,6 @@
           {
             "id": "again_card",
             "kind": "ask",
-            "title": "again_title",
-            "secondary": "later_skip",
-            "fields": [
-              {
-                "id": "remind_again",
-                "options": {
-                  "list": "remind"
-                },
-                "max": 1,
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
-              }
-            ],
             "crisis": [
               {
                 "variant": "other_person",
@@ -1471,10 +1451,30 @@
                 }
               }
             ],
+            "fields": [
+              {
+                "id": "remind_again",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "remind"
+                }
+              }
+            ],
             "followUp": {
               "type": "rebellion_after",
               "whenFrom": "remind_again"
             },
+            "secondary": "later_skip",
+            "title": "again_title",
             "next": [
               {
                 "to": "real",
@@ -1486,54 +1486,6 @@
           {
             "id": "still",
             "kind": "ask",
-            "title": [
-              {
-                "when": {
-                  "has": [
-                    "$a.squeeze.ids",
-                    "treatment"
-                  ]
-                },
-                "key": "still_title_treatment"
-              },
-              {
-                "key": "still_title"
-              }
-            ],
-            "hint": "still_hint",
-            "fields": [
-              {
-                "id": "still",
-                "options": {
-                  "list": "still"
-                },
-                "max": 1,
-                "required": true,
-                "links": [
-                  {
-                    "exit": "safety_open",
-                    "label": "safety_open",
-                    "when": {
-                      "all": []
-                    }
-                  }
-                ]
-              }
-            ],
-            "crisis": [
-              {
-                "variant": "other_person",
-                "when": {
-                  "has": [
-                    "$a.squeeze.ids",
-                    "scared"
-                  ]
-                }
-              }
-            ],
-            "reopens": {
-              "after": "sleep_on"
-            },
             "clears": [
               "still",
               "sleep",
@@ -1546,6 +1498,54 @@
               "remind_again",
               "itch",
               "real"
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "has": [
+                    "$a.squeeze.ids",
+                    "scared"
+                  ]
+                }
+              }
+            ],
+            "fields": [
+              {
+                "id": "still",
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ],
+                "max": 1,
+                "options": {
+                  "list": "still"
+                },
+                "required": true
+              }
+            ],
+            "hint": "still_hint",
+            "reopens": {
+              "after": "sleep_on"
+            },
+            "title": [
+              {
+                "key": "still_title_treatment",
+                "when": {
+                  "has": [
+                    "$a.squeeze.ids",
+                    "treatment"
+                  ]
+                }
+              },
+              {
+                "key": "still_title"
+              }
             ],
             "next": [
               {
@@ -1691,22 +1691,22 @@
                 }
               },
               {
+                "key": "next_cant",
                 "when": {
                   "eq": [
                     "$a.real",
                     "cant"
                   ]
-                },
-                "key": "next_cant"
+                }
               },
               {
+                "key": "next_not_now",
                 "when": {
                   "eq": [
                     "$a.real",
                     "not_now"
                   ]
-                },
-                "key": "next_not_now"
+                }
               }
             ],
             "next": [],
@@ -2296,42 +2296,6 @@
               "label": "Keep it anyway"
             }
           ],
-          "itch": [
-            {
-              "value": "yes",
-              "label": "Yes"
-            },
-            {
-              "value": "a_bit",
-              "label": "A bit"
-            },
-            {
-              "value": "no",
-              "label": "No"
-            },
-            {
-              "value": "not_yet",
-              "label": "Not yet"
-            }
-          ],
-          "real": [
-            {
-              "value": "change",
-              "label": "It could change, and I want to try"
-            },
-            {
-              "value": "say",
-              "label": "Someone I want to say something to"
-            },
-            {
-              "value": "cant",
-              "label": "It won't change"
-            },
-            {
-              "value": "not_now",
-              "label": "Not right now"
-            }
-          ],
           "undo": [
             {
               "value": "yes",
@@ -2404,6 +2368,42 @@
             {
               "value": "no",
               "label": "I let it go"
+            }
+          ],
+          "itch": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "a_bit",
+              "label": "A bit"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            },
+            {
+              "value": "not_yet",
+              "label": "Not yet"
+            }
+          ],
+          "real": [
+            {
+              "value": "change",
+              "label": "It could change, and I want to try"
+            },
+            {
+              "value": "say",
+              "label": "Someone I want to say something to"
+            },
+            {
+              "value": "cant",
+              "label": "It won't change"
+            },
+            {
+              "value": "not_now",
+              "label": "Not right now"
             }
           ]
         }
