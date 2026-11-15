@@ -65,6 +65,7 @@ SIGNED_OFF = {
     "rf_chronic_vigilance_words_anticipatory_check-the-facts": "2026-11-12",
     "rf_chronic_vigilance_words_worry_check-the-facts": "2026-11-12",
     "rf_social_threat_shame_words_self-worth_check-the-facts": "2026-11-12",
+    "rf_social_threat_shame_words_self-worth_unpack-a-judgment": "2026-11-15",
     "rf_reactive_aggression_words_grievance_check-the-facts": "2026-11-12",
     "rf_rumination_loop_words_guilt_check-the-facts": "2026-11-12",
     # Same rule (12 Nov): FAST and Wise mind.
@@ -229,6 +230,10 @@ CONCEPT_TAGS["soothe"] = {"concept": "dbt_self_soothe", "side": "acceptance", "s
 # Notice what's here (MF-01, docs/design/notice-and-name.md): eyes-open noticing, outside in; orienting, like Five senses.
 CONCEPT_TAGS["notice-and-name"] = {"concept": "dbt_observe", "side": "acceptance", "skillKind": "orient", "direction": "orient"}
 CONCEPT_TAGS["thoughts-passing"] = {"concept": "dbt_mindfulness_current_thoughts", "side": "acceptance", "skillKind": "hold", "direction": "neutral"}
+# Unpack a judgment (MF-03, appToolId 'unpack-a-judgment' on dbt_nonjudgmental, docs/design/unpack-a-judgment.md): a
+# describe operation on a verdict (`naming`, the kind Find the feeling and Wise mind carry), acceptance side, neutral. No
+# ADDRESSES edges (as Notice them): its word row routes it, so the legacy ranker behind the kill switch is unchanged.
+CONCEPT_TAGS["unpack-a-judgment"] = {"concept": "dbt_nonjudgmental", "side": "acceptance", "skillKind": "naming", "direction": "neutral"}
 # Keep it warm (IE-06, appToolId 'give', docs/design/give.md) has shipped on the skill runtime: out of PLANNED, tagged,
 # and one word row, live (12 Nov 2026): *remorseful* on replay, beside Check the Facts (facts first, then repair). The
 # review's two planned rows don't fit what was built and were dropped: *let down* already
@@ -415,6 +420,8 @@ WORD_RULES = [
     # --- Social threat ---
     {"key": "exposed", "pattern": "social_threat_shame", "tool": "cool-down", "priority": WORD_LEAD, "words": ["exposed", "humiliated"],
      "why": "Hot shame: Cool Down (TIPP cold water triggers the dive reflex, slowing the heart and narrowing peripheral blood vessels), then Recover. Humiliated is a wound word, so Recover still leads it (R7)."},
+    {"key": "self-worth", "pattern": "social_threat_shame", "tool": "unpack-a-judgment", "priority": 1.45, "words": ["insecure", "inadequate", "inferior", "insignificant", "weak", "worthless"],
+     "why": "MF-03 (PRD: the second card for Social threat): these words are verdicts about the self, often the only words a person has for shame, so Unpack a judgment takes the swap beside Recover. Check the Facts stays the next row and is its justified branch (It feels like a fact, with shame) (15 Nov 2026)."},
     {"key": "self-worth", "pattern": "social_threat_shame", "tool": "check-the-facts", "priority": 1.5, "words": ["insecure", "inadequate", "inferior", "insignificant", "weak", "worthless"],
      "why": "Planned: Check the Facts beside Do the Opposite (unhiding) for shame about the self."},
     {"key": "ask-for-it", "pattern": "social_threat_shame", "tool": "dear-man", "priority": 1.5, "words": ["let_down", "excluded"], "beside": ["recovering-from-invalidation"],

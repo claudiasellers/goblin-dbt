@@ -41,6 +41,7 @@ import walk_the_wave  # noqa: E402
 import mindfulness_emotions  # noqa: E402
 import sleep_reset  # noqa: E402
 import notice_and_name  # noqa: E402
+import unpack_a_judgment  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
@@ -49,7 +50,7 @@ SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKIL
           ride_it_out.SKILL, let_it_be.SKILL, mind_job.SKILL, say_no.SKILL, dear_man_one.SKILL, held.SKILL, thoughts_passing.SKILL, dear_man_prep.SKILL,
           opposite_action.SKILL, habit_plan.SKILL, please_skill.SKILL, give.SKILL, good_things.SKILL, *crisis_kit.SKILLS, values.SKILL, build_mastery.SKILL,
           finding_connection.SKILL, notice_them.SKILL, rehearse.SKILL, emotion_guide.SKILL, emotion_myths.SKILL, walk_the_wave.SKILL, mindfulness_emotions.SKILL, sleep_reset.SKILL,
-          notice_and_name.SKILL]
+          notice_and_name.SKILL, unpack_a_judgment.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -130,6 +131,8 @@ EMBEDS = {
     # MF-01's bowl (MF-owned; src/components/skillPlayer/PebbleBowl.tsx): one noticing task for a set time, a pebble
     # per return. done / partly / skipped, the seconds, and the pebbles (a measure, never shown as a number).
     "pebbleBowl": {"ids": ["done", "partly", "skipped", "room"], "measures": ["durationSec", "doneCount"]},
+    # MF-03's rebuild (docs/design/unpack-a-judgment.md): read, then *How does that sit?*.
+    "describeCard": {"ids": ["read"]},
 }
 # What each embed takes from the skill (embeds.ts EMBED_PROPS; the contract test keeps the two equal). build.py
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
@@ -492,6 +495,16 @@ EMBED_PROPS = {
         "next": {"type": "copy"},
         "skip": {"type": "copy", "optional": True},
         "room": {"type": "copy", "optional": True},
+    },
+    "describeCard": {
+        "happened": {"type": "field", "optional": True},
+        "cost": {"type": "field", "optional": True},
+        "feel": {"type": "field", "optional": True},
+        "want": {"type": "field", "optional": True},
+        "feelLead": {"type": "copy"},
+        "wantLead": {"type": "copy"},
+        "next": {"type": "copy"},
+        "empty": {"type": "copy"},
     },
 }
 # Shared tables the graph supplies to every skill (never written here).

@@ -89,6 +89,7 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   'wise-mind': { module: 'mf', closeKind: 'orienting' },
   // Notice what's here (MF-01, docs/design/notice-and-name.md): the orienting close asked in the flow.
   'notice-and-name': { module: 'mf', closeKind: 'orienting' },
+  'unpack-a-judgment': { module: 'mf', closeKind: 'none' },
   // Reserved spine ids (one-shots and embeds).
   'help-now': { module: 'core', closeKind: 'none' },
   'micro-step': { module: 'core', closeKind: 'none' },

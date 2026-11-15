@@ -482,6 +482,17 @@ export const tools: Tool[] = [
     emoji: '👀',
     bare: true,
   },
+  {
+    id: 'unpack-a-judgment',
+    name: 'Unpack a judgment',
+    tagline: 'Take a verdict apart without arguing with it',
+    description: 'Name the judgment, set it down for a few minutes, and look at what\'s under it: what happened, what it cost, what you feel and what you wanted. Then put it back together in plain words.',
+    whenToUse: 'When you\'re being hard on yourself, on a feeling, on someone else, or on how things are.',
+    module: 'mindfulness',
+    dbtBasis: 'DBT Mindfulness: nonjudgmentally (Mindfulness Handouts 5, 5a)',
+    emoji: '🧺',
+    bare: true,
+  },
   // Mindfulness (parts, docs/design/parts.md: listed and opened only with the parts switch on and its copy signed off)
   {
     id: 'meet-a-part',
@@ -537,6 +548,7 @@ export const allIntents: Intent[] = [
   { id: 'put-away', label: 'Put something away until later', toolId: 'mind-job', query: 'enterAt=lid', emoji: '📦' },
   { id: 'soothe', label: 'Be kind to myself for a minute', toolId: 'soothe', emoji: '🫶' },
   { id: 'thoughts-passing', label: 'A thought feels like a fact', toolId: 'thoughts-passing', emoji: '🍂' },
+  { id: 'hard-on-myself', label: 'I\'m being hard on myself', toolId: 'unpack-a-judgment', emoji: '🧺' },
   { id: 'blow-it-up', label: 'I want to blow it all up', toolId: 'alternate-rebellion', emoji: '🎸' },
   { id: 'reasons', label: 'Make a card for a pull that keeps coming back', toolId: 'pros-cons', emoji: '⚖️' },
   { id: 'habit-plan', label: 'Something I keep doing', toolId: 'habit-plan', emoji: '🌉' },

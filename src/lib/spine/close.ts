@@ -49,6 +49,7 @@ export const TOOL_CLOSE_KIND: Record<string, { module: SpineModule; closeKind: C
   'two-pulls': { module: 'mf', closeKind: 'orienting' },
   'wise-mind': { module: 'mf', closeKind: 'orienting' },
   'notice-and-name': { module: 'mf', closeKind: 'orienting' },
+  'unpack-a-judgment': { module: 'mf', closeKind: 'none' },
   'help-now': { module: 'core', closeKind: 'none' },
   'micro-step': { module: 'core', closeKind: 'none' },
   'guided-activity': { module: 'core', closeKind: 'none' },
