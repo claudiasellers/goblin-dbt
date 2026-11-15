@@ -1366,6 +1366,48 @@
         "notification": "Your noticing practice is ready to check."
       },
       {
+        "id": "one_thing_again",
+        "ownerModule": "mf",
+        "tier": "practice",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/one-thing?run={sourceSessionId}&at=again&followUp={followUpId}",
+        "staleAfterHours": 48,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "title": "Your one thing",
+          "body": "One thing, with your whole attention. Did you get to try it?"
+        },
+        "choices": [
+          {
+            "id": "dismiss",
+            "label": "Not this time",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "kind": "chip",
+          "chips": {
+            "morning": {
+              "kind": "at_local",
+              "days": 1,
+              "time": "09:00"
+            },
+            "evening": {
+              "kind": "at_local",
+              "days": 1,
+              "time": "19:00"
+            }
+          }
+        },
+        "notification": "Your one thing is ready to check."
+      },
+      {
         "id": "part_checkback",
         "ownerModule": "mf",
         "tier": "quality",

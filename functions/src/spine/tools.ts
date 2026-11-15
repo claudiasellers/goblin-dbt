@@ -90,6 +90,9 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   // Notice what's here (MF-01, docs/design/notice-and-name.md): the orienting close asked in the flow.
   'notice-and-name': { module: 'mf', closeKind: 'orienting' },
   'unpack-a-judgment': { module: 'mf', closeKind: 'none' },
+  // One thing (MF-05, docs/design/one-thing.md): the loop close (louder · quieter) asked in the flow on a rumination
+  // entry; a plain entry's end asks none (`noClose`: the with-it answer is the close).
+  'one-thing': { module: 'mf', closeKind: 'regulation_down' },
   // Reserved spine ids (one-shots and embeds).
   'help-now': { module: 'core', closeKind: 'none' },
   'micro-step': { module: 'core', closeKind: 'none' },

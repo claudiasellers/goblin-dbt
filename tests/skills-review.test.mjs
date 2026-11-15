@@ -16,7 +16,7 @@ test("every step of every shipped skill has a path from the start, and the revie
     for (const st of sk.steps) {
       const p = paths[st.id];
       assert.ok(p, `${sk.id}.${st.id} unreachable`);
-      assert.equal(p[0], sk.start);
+      assert.ok(p[0] === sk.start || Object.values(sk.entries ?? {}).includes(p[0]), `${sk.id}.${st.id}: a path starts at the start or a page entry`);
       assert.equal(p.at(-1), st.id);
       // each hop is a transition, the reopen after its step, or the re-entry into a `resumeAt` step a check-in opens (R15, IE-08)
       for (let i = 1; i < p.length; i++) {

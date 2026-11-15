@@ -93,7 +93,8 @@ SIGNED_OFF = {
     "rf_reactive_aggression_flooded_cool-down": "2026-10-05",
     "rf_reactive_aggression_flooded_five-senses": "2026-10-05",
     "rf_rumination_loop_default_problem-solve": "2026-10-05",
-    "rf_rumination_loop_default_five-senses": "2026-10-05",
+    "rf_rumination_loop_default_one-thing": "2026-11-15",
+    "rf_rumination_loop_backup_five-senses": "2026-11-15",
     "rf_rumination_loop_flooded_cool-down": "2026-10-05",
     "rf_rumination_loop_flooded_five-senses": "2026-10-05",
     "rf_reward_drive_low_default_opposite-action": "2026-10-05",
@@ -229,6 +230,8 @@ CONCEPT_TAGS["soothe"] = {"concept": "dbt_self_soothe", "side": "acceptance", "s
 # contraindicatedTools list mindfulness_of_thoughts, schema/pattern-co-occurrence.cypher).
 # Notice what's here (MF-01, docs/design/notice-and-name.md): eyes-open noticing, outside in; orienting, like Five senses.
 CONCEPT_TAGS["notice-and-name"] = {"concept": "dbt_observe", "side": "acceptance", "skillKind": "orient", "direction": "orient"}
+# One thing (MF-05, docs/design/one-thing.md): one ordinary activity with your whole attention, absorbing a looping head.
+CONCEPT_TAGS["one-thing"] = {"concept": "dbt_one_mindfully", "side": "acceptance", "skillKind": "redirect", "direction": "neutral"}
 CONCEPT_TAGS["thoughts-passing"] = {"concept": "dbt_mindfulness_current_thoughts", "side": "acceptance", "skillKind": "hold", "direction": "neutral"}
 # Unpack a judgment (MF-03, appToolId 'unpack-a-judgment' on dbt_nonjudgmental, docs/design/unpack-a-judgment.md): a
 # describe operation on a verdict (`naming`, the kind Find the feeling and Wise mind carry), acceptance side, neutral. No
@@ -325,7 +328,8 @@ TABLE = {
         "flooded": ("cool-down", "five-senses", "Flooded: bottom-up only."),
     },
     "rumination_loop": {
-        "default": ("problem-solve", "five-senses", "Problem Solve (its barrier flow is the rumination guard) with an external-attention alternative (Index §5.2 C)."),
+        "default": ("one-thing", "problem-solve", "One thing leads (MF-05, opened on a minute outside your head and the doing-mind card: external absorption before working the problem, 15 Nov 2026; the Index splits steady → MF-05 and stirred → Give your mind a job, but rf-v2 has no band split and the two redirect tools can't share a result); Problem Solve beside it (its barrier flow is the rumination guard) (Index §5.2 C)."),
+        "backup": ("five-senses", "Orienting stays available when One thing and Problem Solve are both filtered."),
         "flooded": ("cool-down", "five-senses", "Flooded: bottom-up only."),
     },
     "reward_drive_low": {

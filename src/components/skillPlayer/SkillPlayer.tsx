@@ -350,11 +350,14 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
       return;
     }
     // A hand-off that asks no close (`noClose`: after a danger route) leaves at once, the session closed completed.
-    // So does a run that writes nothing (R15): there is nothing to ask the close for.
-    if (stepOf(skill, st.stepId).noClose || persistence(ctx, st) !== 'save') {
+    // So does a run that writes nothing (R15): there is nothing to ask the close for. A hand-off marked
+    // `complete: false` (a gate, a skip before the practice, a danger route) closes as left early, so it logs a rep
+    // only when something was practised on the way (the server's rule), never for reaching the card.
+    const ending = stepOf(skill, st.stepId);
+    if (ending.noClose || persistence(ctx, st) !== 'save') {
       setQuietLeave(true);
       // Not asked here, and not asked later either: Today's outcome card skips a session whose ask was dismissed.
-      void toolSession.close({ status: 'completed' })
+      void toolSession.close({ status: ending.complete === false ? 'exited_early' : 'completed' })
         .then((r) => (r ? answerToolOutcome(toolSession.id, { dismissed: true }) : null))
         .catch(() => { /* signed out, or offline: nothing to dismiss */ });
       go(exit);

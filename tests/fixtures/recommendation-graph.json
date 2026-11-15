@@ -602,6 +602,17 @@
    "direction": "orient",
    "addresses": []
   },
+  "dbt_one_mindfully": {
+   "appToolId": "one-thing",
+   "name": "One-Mindfully",
+   "description": "Do one thing at a time; focus attention on present moment",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": "acceptance",
+   "skillKind": "redirect",
+   "direction": "neutral",
+   "addresses": []
+  },
   "dbt_opposite_action": {
    "appToolId": "opposite-action",
    "name": "Opposite Action",
@@ -3894,14 +3905,14 @@
    "rationale": "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."
   },
   {
-   "id": "rf_rumination_loop_default_five-senses",
+   "id": "rf_rumination_loop_backup_five-senses",
    "conceptId": "se_orienting",
    "patternId": "rumination_loop",
    "bands": [
     "steady",
     "stirred"
    ],
-   "priority": 2.0,
+   "priority": 3.0,
    "direction": "orient",
    "side": null,
    "requiresPrior": null,
@@ -3915,11 +3926,11 @@
    "active": true,
    "version": "rf-v2",
    "reviewStatus": "approved",
-   "rationale": "Problem Solve (its barrier flow is the rumination guard) with an external-attention alternative (Index §5.2 C)."
+   "rationale": "Orienting stays available when One thing and Problem Solve are both filtered."
   },
   {
-   "id": "rf_rumination_loop_default_problem-solve",
-   "conceptId": "dbt_problem_solving",
+   "id": "rf_rumination_loop_default_one-thing",
+   "conceptId": "dbt_one_mindfully",
    "patternId": "rumination_loop",
    "bands": [
     "steady",
@@ -3939,7 +3950,31 @@
    "active": true,
    "version": "rf-v2",
    "reviewStatus": "approved",
-   "rationale": "Problem Solve (its barrier flow is the rumination guard) with an external-attention alternative (Index §5.2 C)."
+   "rationale": "One thing leads (MF-05, opened on a minute outside your head and the doing-mind card: external absorption before working the problem, 15 Nov 2026; the Index splits steady → MF-05 and stirred → Give your mind a job, but rf-v2 has no band split and the two redirect tools can't share a result); Problem Solve beside it (its barrier flow is the rumination guard) (Index §5.2 C)."
+  },
+  {
+   "id": "rf_rumination_loop_default_problem-solve",
+   "conceptId": "dbt_problem_solving",
+   "patternId": "rumination_loop",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 2.0,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": null,
+   "words": [],
+   "beside": [],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "approved",
+   "rationale": "One thing leads (MF-05, opened on a minute outside your head and the doing-mind card: external absorption before working the problem, 15 Nov 2026; the Index splits steady → MF-05 and stirred → Give your mind a job, but rf-v2 has no band split and the two redirect tools can't share a result); Problem Solve beside it (its barrier flow is the rumination guard) (Index §5.2 C)."
   },
   {
    "id": "rf_rumination_loop_flooded_cool-down",

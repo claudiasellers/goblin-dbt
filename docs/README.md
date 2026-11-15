@@ -115,7 +115,7 @@ Waves follow the index: 1 safety floor and platform, 2 validation and the transf
 | 45 | DT-11 | Alternate rebellion | shipped | Rebel without the wreckage on the runtime (PRs #57, #65): [alternate-rebellion.md](design/alternate-rebellion.md) |
 | 46 | IE-08 | Ending a relationship that's hurting you | spec only | Built in PR #70 (open): safety first, nothing kept, quick exit. Unparked 10 Nov (modules plan D14) |
 | 47 | IE-11 | When it didn't work (troubleshooting) | partial | DEAR MAN's debrief |
-| 48 | MF-05 | One thing (one-mindfully) | spec only | |
+| 48 | MF-05 | One thing (one-mindfully) | built (part 1) | *One thing* on the skill runtime (MF-B4, 15 Nov): one ordinary activity with your whole attention for a minute, a song or until it's done, with the phone (a pebble each time you come back) or without it; from a looping head a minute outside it and MF-09's mode card first, the loop asked in the flow; intent *Get out of my head*, leads the looping result; *Same thing tomorrow?* for the off-phone rep ([design/one-thing.md](design/one-thing.md)). Fade and the hosted card are part 2 |
 | 49 | WMP-07 | Both can be true (dialectics) | spec only | Parts' Two pulls covers some of the ground for parts-on people |
 | | | **Wave 4** | | |
 | 50 | CORE-10 | Weekly review | spec only | |

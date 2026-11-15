@@ -239,7 +239,7 @@ test("rows left out in Me: each row's transitions skip them, the readout leaves 
   assert.match(battery, /\.filter\(\(c\) => !hidden\.has\(c\.id\)\)/, "a left-out row gets no cell");
 });
 
-test("the setting: kind please_rows in My body, one per person, the four rows but sleep; the slice for please-skill only", async () => {
+test("the setting: kind please_rows in My body, one per person, the four rows but sleep; the slice for please-skill and One thing's eating chip only", async () => {
   const kinds = readFileSync("functions/src/profile/kinds.ts", "utf8");
   assert.match(kinds, /export const PLEASE_HIDEABLE_ROWS = \['food', 'body', 'subs', 'moved'\] as const;/);
   assert.match(kinds, /please_rows: \{\n\s+kind: 'please_rows', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'my_body', slice: 'pleaseRows',\n\s+owner: 'ER', many: false, maxItems: 1, editor: 'please_rows', ownFields: \[\],/);
@@ -260,8 +260,9 @@ test("the setting: kind please_rows in My body, one per person, the four rows bu
   const types = await importTs("functions/src/profile/types.ts");
   assert.deepEqual([...types.PROFILE_NEEDS["please-skill"]], ["pleaseRows"]);
   for (const [consumer, needs] of Object.entries(types.PROFILE_NEEDS)) {
-    if (consumer !== "please-skill") assert.ok(!needs.includes("pleaseRows"), consumer);
+    if (consumer !== "please-skill" && consumer !== "one-thing") assert.ok(!needs.includes("pleaseRows"), consumer);
   }
+  assert.deepEqual([...types.PROFILE_NEEDS["one-thing"]], ["pleaseRows"], "One thing reads it only to hide *Eat a few bites*");
   assert.match(readFileSync("functions/src/profile/slices.ts", "utf8"), /pleaseRows: `MATCH \(:User \{id: \$uid\}\)-\[:HAS_PROFILE_FACT\]->\(p:ProfileFact \{kind: 'please_rows', status: 'active'\}\)/);
   assert.match(readFileSync("scripts/profile-layer/content.py", "utf8"), /\("please_rows", "my_body", "Left out of Running low", None,/);
   const me = readFileSync("src/components/me/MeSection.tsx", "utf8");

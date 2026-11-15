@@ -26,6 +26,13 @@ export function stepPaths(skill: SkillDef): Record<string, string[]> {
     }
   };
   walk([skill.start]);
+  // A page entry (`entries`, `?enterAt=`) is a start of its own: a step only an entry reaches (One thing's minute
+  // outside) has its path from there.
+  for (const at of Object.values(skill.entries ?? {})) {
+    if (paths[at]) continue;
+    paths[at] = [at];
+    walk([at]);
+  }
   for (const st of skill.steps.filter((s) => s.reopens && !paths[s.id] && paths[s.reopens.after])) {
     paths[st.id] = [...paths[st.reopens!.after], st.id];
     walk([st.id]);
@@ -95,9 +102,11 @@ export function reviewRun(skill: SkillDef, stepId: string) {
   return { skillId: skill.id, versionId: skill.version, path: reopens ? path.slice(0, -1) : path, answers };
 }
 
-/** Steps in the order a person would meet them (path length, then the skill's own order); unreachable ones last. */
+/** Steps in the order a person would meet them (path length, then the skill's own order; a page entry's after); unreachable ones last. */
 export function reviewOrder(skill: SkillDef): string[] {
   const paths = stepPaths(skill);
   const ix = (id: string) => skill.steps.findIndex((s) => s.id === id);
-  return skill.steps.map((s) => s.id).sort((a, b) => (paths[a]?.length ?? 99) - (paths[b]?.length ?? 99) || ix(a) - ix(b));
+  // A page entry's own steps come after the visit from the start.
+  const len = (id: string) => (paths[id] ? paths[id].length + (paths[id][0] === skill.start ? 0 : 50) : 99);
+  return skill.steps.map((s) => s.id).sort((a, b) => len(a) - len(b) || ix(a) - ix(b));
 }

@@ -101,8 +101,9 @@ const pageOf = (id) => {
  * Rehearse it (IE-02): its close asks how saying it for real feels, about a conversation that hasn't happened.
  * Notice what's here (MF-01): a calm-time noticing practice whose close is about being here, not a pull or a feeling
  * that came down; a part question after it would turn the noticing inward (docs/design/notice-and-name.md).
+ * One thing (MF-05): a way out of a looping head; a part question after it would send the person back in.
  */
-const NEVER_HOSTS = ["meet-a-part", "two-pulls", "wise-mind", "crisis-kit", "rehearse", "notice-and-name"];
+const NEVER_HOSTS = ["meet-a-part", "two-pulls", "wise-mind", "crisis-kit", "rehearse", "notice-and-name", "one-thing"];
 
 test("hosts: every tool whose close asks then-vs-now or about the urge, minus Meet a part, Two pulls and Wise mind, each declaring parts", () => {
   // Derived from the close kinds, so a new tool with a then-vs-now or an urge close joins (or fails here).

@@ -44,6 +44,13 @@ export interface DailyCardRow {
 }
 
 /** One SkillPractice as the query returns it. */
+/** All-time counts, read apart from the bounded recent rows (levels never go down). */
+export interface LifetimeTotals {
+  bySkill: Record<string, { reps: number; offPhone: number }>;
+  /** Off-phone or caught visits, each counted once. */
+  offPhoneVisits: number;
+}
+
 export interface RepRow {
   skillId: string;
   /** The ToolSession the rep came from: one visit can log two MF skills. */

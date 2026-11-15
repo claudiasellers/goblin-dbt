@@ -212,6 +212,7 @@ export const PROFILE_NEEDS = {
   'pause': ['parts', 'prosCons', 'abstinencePlans'], // prosCons: the kept card for the pull (DT-10's replay, on proceed); abstinencePlans: the lapse plan after an acted yes (DT-09)
   'crisis-kit': ['crisisKit', 'prosCons', 'rebellionCards'], // the kept kit, pros & cons cards and rebellion cards, one card at a time (DT-03, DT-11)
   'practice': ['practicePrefs'],                 // the Practice home (MF-02): setup once, then the daily card's time
+  'one-thing': ['pleaseRows'],                  // One thing (MF-05): no eating chip when food is left out of Running low
   'safety': ['safetyPlan', 'crisisKit'],        // Help & safety and the safety route: the plan, and its step 2's kit (CORE-02)
   'urge-surfing': ['parts', 'abstinencePlans'], // abstinencePlans: the lapse plan after an acted yes (DT-09)
   'let-it-be': ['parts'],                    // the tag row on its in-flow close (docs/design/let-it-be.md)

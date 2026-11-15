@@ -31,6 +31,7 @@ export const PLAYER_TOOLS: Readonly<Record<string, string>> = {
   'finding-connection': 'finding_connection',
   'notice-and-name': 'notice_and_name',
   'unpack-a-judgment': 'unpack_a_judgment',
+  'one-thing': 'one_thing',
 };
 
 /**

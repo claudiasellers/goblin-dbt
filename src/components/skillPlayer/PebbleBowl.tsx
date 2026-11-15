@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from 'motion/react';
-import { useDeadlineTimer } from '../../hooks/useDeadlineTimer';
+import { useDeadlineTimer, useKeepAwake } from '../../hooks/useDeadlineTimer';
 import { BOWL, BOWL_SHOWN, bowlMs, bowlOutput, pebbleSpot } from '../../lib/pebbleBowl';
 import { buzz } from '../tools/regulation/hooks';
 import { linkButton, primaryButton } from '../tools/oppositeAction/styles';
@@ -33,6 +33,8 @@ export function PebbleBowl({ props, onShown, onDone, covered }: EmbedProps) {
   useEffect(() => { coveredRef.current = !!covered; }, [covered]);
   const timer = useDeadlineTimer({ durationMs: ms, tickMs: 250, chime: false, onDone: () => { if (!coveredRef.current) buzz(30); setEnded(true); } });
   const running = timer.state === 'running';
+  // The phone is set aside for up to five minutes (One thing): the screen stays on so the tap target is there.
+  useKeepAwake(running);
   const tapRef = useRef<HTMLButtonElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
   // Focus follows the screen: Start → the tap target; the end → Next (not while something covers the step).

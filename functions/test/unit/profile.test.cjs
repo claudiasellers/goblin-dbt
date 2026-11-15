@@ -85,6 +85,9 @@ test('confirm / set aside / restore: whitelisted label, owner-scoped key, never 
   assert.match(f.calls[0].query, /-\[:HAS_PROFILE_FACT\]->\(p:ProfileFact \{key: \$key\}\)[\s\S]*p\.status = 'set_aside'/);
   assert.match(f.calls[1].query, /-\[:HAS_PATTERN\]->\(p:MyPattern \{key: \$key\}\)[\s\S]*p\.revisitAt = CASE/);
   assert.ok(f.calls.every((c) => !/DELETE/.test(c.query)));
+  // Setting My practice aside dismisses the waiting daily card in the same write (MF-02); only that kind.
+  assert.match(f.calls[0].query, /FollowUp \{type: 'practice_daily', status: 'scheduled'\}\)\s+WHERE p\.kind = 'practice_prefs'[\s\S]*SET f\.status = 'dismissed'/);
+  assert.ok(!/practice_daily/.test(f.calls[1].query), 'confirm touches no card');
   await assert.rejects(fns.restoreProfileItem.run({ auth: auth(), data: { id: 'x', label: 'CheckIn' } }), (e) => e.code === 'invalid-argument');
   setDriver(fakeDriver(() => []).driver);
   await assert.rejects(fns.restoreProfileItem.run({ auth: auth(), data: { id: 'x', label: 'MyPattern' } }), (e) => e.code === 'not-found');

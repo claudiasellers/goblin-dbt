@@ -165,7 +165,9 @@ Added by F1 (docs/design/dbt-modules-plan.md §4, 10 Nov 2026):
   labels; the skill's copy is still checked, and no option may hold a *!*.
 - **Practice and `noClose`** (DT-02): a whole-screen embed's output other than `skipped` marks the session
   practiced; leaving a `noClose` card also dismisses Today's outcome card for the session (`answerToolOutcome`
-  `dismissed`), so the question it didn't ask isn't asked later.
+  `dismissed`), so the question it didn't ask isn't asked later. A `noClose` card marked `complete: false` (a gate, a
+  skip before the practice, a danger route) closes the visit as left early, so it logs a rep only when something was
+  practised on the way (MF-B4); before 15 Nov it closed completed and logged one.
 - **Done as the button** (DT-02): a hand-off card with nothing to offer shows Done as its primary button, not a
   quiet link (Gate 2: easy to miss when flooded).
 - **Urge ids** (DT-02): an option's `urge` prop names the `ActionUrge` it stands for; the player sets the session's
