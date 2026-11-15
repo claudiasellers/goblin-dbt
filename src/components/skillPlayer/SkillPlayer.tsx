@@ -542,10 +542,10 @@ function AskStep({ ctx, step, st, send, onExit, onShown, onPrimary, busy }: {
     <button type="button" className={primaryButton} disabled={busy || !canGoOn(ctx, st)} aria-busy={busy} onClick={onPrimary}>
       {(step.primary && c[step.primary]) || c.next || 'Next'}
     </button>
-    {/* `secondary`: a quiet way on that skips the step's keep and follow-up (the primary tap is the yes). */}
+    {/* `secondary`: a quiet way on that skips the step's answers, keep and follow-up (the primary tap is the yes). */}
     {step.secondary && c[step.secondary] && (
       <div className="flex justify-center">
-        <button type="button" className={linkButton} disabled={busy || !canGoOn(ctx, st)} onClick={() => send({ type: 'next' })}>{c[step.secondary]}</button>
+        <button type="button" className={linkButton} disabled={busy || !canGoOn(ctx, st)} onClick={() => send({ type: 'next', quiet: true })}>{c[step.secondary]}</button>
       </div>
     )}
   </>);

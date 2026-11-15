@@ -73,7 +73,7 @@ export function PocketCard({ props, picked, onShown, onDone }: EmbedProps) {
           {side.lines.map((l, i) => (
             <div key={i}>
               {l.label && <p className="text-xs text-[var(--color-text-tertiary)]">{l.label}</p>}
-              <p className={paperLine}>{l.text}</p>
+              <p className={l.note ? 'text-sm italic text-[var(--color-text-secondary)]' : paperLine}>{l.text}</p>
             </div>
           ))}
         </div>

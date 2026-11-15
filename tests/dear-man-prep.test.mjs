@@ -326,7 +326,7 @@ test("pocket card: how firmly to ask, the level after the nudge, opens the say c
   // On the card: the level first on the say side, with its label; never a card on its own.
   const lead = { label: skill.copy.card_level, text: skill.copy.card_level_plain };
   const sides = PC.pocketSides({ say: props.say, lead }, { describe: ["They said they'd do something"] });
-  assert.deepEqual(sides[0].lines[0], lead);
+  assert.deepEqual(sides[0].lines[0], { ...lead, note: true }, "the level line is the skill's, shown quieter than their words");
   assert.deepEqual(PC.pocketSides({ say: props.say, lead }, {}), []);
   assert.match(PC.pocketText(sides, () => "SAY"), new RegExp(`^SAY\\n${skill.copy.card_level}: ${skill.copy.card_level_plain}\\n`));
   assert.match(read("src/components/skillPlayer/SkillPlayer.tsx"), /spec\.type === 'copyWhen'/);

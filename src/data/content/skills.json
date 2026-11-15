@@ -11570,7 +11570,7 @@
           "card_level_firm_heads_up": "Firmly, once. Calmly again if needed",
           "card_level_firm_hold": "Firmly, and keep coming back to it",
           "card_level_gentle": "Gently. A no can be okay for now",
-          "card_level_hint": "A light first mention, or wait",
+          "card_level_hint": "A light first mention is enough",
           "card_level_plain": "Plainly, and listen",
           "card_middle": "Middle ground I could live with",
           "card_next_card": "Next card",
@@ -27325,7 +27325,8 @@
           "keepit_label": "Add it to Things I like?",
           "mind_label": "Was your mind mostly here, or somewhere else?",
           "more_label": "Another one?",
-          "move_hint": "Or leave it. Not today is a real answer.",
+          "move_hint": "Not today is a real answer.",
+          "move_leave": "Leave it",
           "move_line": "It's moved. A card will come that day.",
           "move_title": "Want to try it another day?",
           "name_end": "You found one. Noticing it is the practice.",
@@ -28540,7 +28541,8 @@
                 "when": null
               }
             ],
-            "offers": []
+            "offers": [],
+            "secondary": "move_leave"
           },
           {
             "id": "move_w2",
@@ -28576,7 +28578,8 @@
                 "when": null
               }
             ],
-            "offers": []
+            "offers": [],
+            "secondary": "move_leave"
           },
           {
             "id": "move_w3",
@@ -28612,7 +28615,8 @@
                 "when": null
               }
             ],
-            "offers": []
+            "offers": [],
+            "secondary": "move_leave"
           },
           {
             "id": "keep_more_w1",
@@ -29214,7 +29218,8 @@
                 "when": null
               }
             ],
-            "offers": []
+            "offers": [],
+            "secondary": "move_leave"
           },
           {
             "id": "not_today",

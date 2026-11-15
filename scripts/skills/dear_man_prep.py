@@ -330,7 +330,7 @@ COPY = {
     "card_felt": "I felt",
     # How firmly to ask (IE-07), on the say card: the final level after the nudge, short.
     "card_level": "How firmly",
-    "card_level_hint": "A light first mention, or wait",
+    "card_level_hint": "A light first mention is enough",
     "card_level_gentle": "Gently. A no can be okay for now",
     "card_level_plain": "Plainly, and listen",
     "card_level_firm": "Firmly, and keep asking",

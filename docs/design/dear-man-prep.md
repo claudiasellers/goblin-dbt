@@ -127,7 +127,7 @@ card is *Done with the cards*. It reports `seen_all` and `copied` as `card_how`.
 The say card opens with how firmly to ask, the level after the nudge in a few words under *How firmly* (*Gently. A
 no can be okay for now*, *Firmly, and keep asking*; *Firmly, once. Calmly again if needed* for the firm levels with
 someone it tends to go badly with), through the runtime's `copyWhen` prop `levelNote`; nothing when the sizing
-wasn't asked (a carried flooded reading). It goes in Copy with the rest.
+wasn't asked (a carried flooded reading). It reads quieter than their own lines (a note, in italics) and goes in Copy with the rest.
 
 ## What it writes
 

@@ -7,7 +7,8 @@
  * steady card can end with fixed notes. Empty cards drop out,
  * so the card never shows an empty side.
  */
-export interface PocketLine { label?: string; text: string }
+/** `note`: a line from the skill (the ask level), not the person's own words: shown quieter. */
+export interface PocketLine { label?: string; text: string; note?: boolean }
 export interface PocketCardSide { key: 'say' | 'steady' | 'push'; lines: PocketLine[] }
 
 export interface PocketProps {
@@ -55,7 +56,7 @@ export function pocketSides(props: PocketProps, picked: Readonly<Record<string, 
     const lines = (fields ?? []).flatMap(linesOf);
     // Notes (and the lead) never make a card on their own: they ride on a card that has the person's own picks.
     if (!lines.length) return { key, lines: [] };
-    return { key, lines: [...(lead?.text ? [lead] : []), ...lines, ...notes.filter(Boolean).map((text) => ({ text }))] };
+    return { key, lines: [...(lead?.text ? [{ ...lead, note: true }] : []), ...lines, ...notes.filter(Boolean).map((text) => ({ text }))] };
   };
   return [side('say', props.say, [], props.lead), side('steady', props.steady, props.steadyNotes), side('push', props.push)].filter((s) => s.lines.length > 0);
 }

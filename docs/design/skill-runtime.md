@@ -374,8 +374,8 @@ every other content file), and runs it inside the page's `ToolSessionProvider`:
   when the lookup finds no row. One field instead of one per earlier answer keeps the record small. Since ER-10 it may
   also name a `feelingOf` derive with `field: 'ladder'` (Know this feeling's *Which of these is closest?*).
 - **A quiet way on, and a keep's confirmation** (ER-B2, Gate 2). An ask step's `secondary` (a copy key) is a quiet
-  button under the primary that goes on without the step's keep or follow-up (Cope Ahead's *Not now* under *Keep
-  this*); `keep.done` is a line shown on the next screen once the keep saved. A crisis slot that already holds as a
+  button under the primary that goes on without the step's answers, keep or follow-up (Cope Ahead's *Not now* under *Keep
+  this*; Good things' *Leave it*, where a day tapped first is dropped, so nothing reads it as moved); `keep.done` is a line shown on the next screen once the keep saved. A crisis slot that already holds as a
   step opens (raised on an earlier screen) renders under the title, not under the step's chips, so it is never
   pushed below the fold.
 - **Projections** (R14, `functions/src/skills/projections.ts`). Cope Ahead's is the first: at close, `ext.ca` from

@@ -109,7 +109,8 @@ COPY = {
     "no_title": "That's okay.",
     # Not today: move it to another day (the same card, booked again), or leave it.
     "move_title": "Want to try it another day?",
-    "move_hint": "Or leave it. Not today is a real answer.",
+    "move_hint": "Not today is a real answer.",
+    "move_leave": "Leave it",
     "move_line": "It's moved. A card will come that day.",
     "no_line": "A smaller one tomorrow still counts.",
     "no_low": "If energy's been low for a while, Running low looks at sleep, food and the body.",
@@ -287,7 +288,7 @@ def back_week(n):
 
 def move_week(n):
     # Not today on slot n's card: its own card again, on another day (or leave it).
-    return ask(f"move_w{n}", "move_title", "move_hint", [field(f"mv{n}", "move", required=False)], [{"to": "not_today"}],
+    return ask(f"move_w{n}", "move_title", "move_hint", [field(f"mv{n}", "move", required=False)], [{"to": "not_today"}], secondary="move_leave",
                followUp={"type": f"good_week_{WORD[n]}", "whenFrom": f"mv{n}"})
 
 
@@ -366,7 +367,7 @@ STEPS = [
         {"when": LIGHTER, "key": "after_lighter"},
         {"when": ALWAYS, "key": "after_flat"},
     ], [{"exit": "cool_down", "when": HEAVIER}, {"exit": "please_skill", "when": HEAVIER}], no_close=True),
-    ask("move", "move_title", "move_hint", [field("move", "move", required=False)], [{"to": "not_today"}],
+    ask("move", "move_title", "move_hint", [field("move", "move", required=False)], [{"to": "not_today"}], secondary="move_leave",
         followUp={"type": "good_thing", "whenFrom": "move"}),
     handoff("not_today", "no_title",
             [{"when": MOVED, "key": "move_line"}, {"when": ALWAYS, "key": "no_line"}, {"when": ALWAYS, "key": "no_low"}],

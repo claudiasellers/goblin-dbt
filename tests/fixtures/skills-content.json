@@ -11606,7 +11606,7 @@
     "card_skip": "Done with the cards",
     "card_felt": "I felt",
     "card_level": "How firmly",
-    "card_level_hint": "A light first mention, or wait",
+    "card_level_hint": "A light first mention is enough",
     "card_level_gentle": "Gently. A no can be okay for now",
     "card_level_plain": "Plainly, and listen",
     "card_level_firm": "Firmly, and keep asking",
@@ -27341,7 +27341,8 @@
     "after_heavier": "That happens sometimes. It isn't a sign you did it wrong.",
     "no_title": "That's okay.",
     "move_title": "Want to try it another day?",
-    "move_hint": "Or leave it. Not today is a real answer.",
+    "move_hint": "Not today is a real answer.",
+    "move_leave": "Leave it",
     "move_line": "It's moved. A card will come that day.",
     "no_line": "A smaller one tomorrow still counts.",
     "no_low": "If energy's been low for a while, Running low looks at sleep, food and the body.",
@@ -28524,6 +28525,7 @@
        ]
       }
      ],
+     "secondary": "move_leave",
      "followUp": {
       "type": "good_week_one",
       "whenFrom": "mv1"
@@ -28560,6 +28562,7 @@
        ]
       }
      ],
+     "secondary": "move_leave",
      "followUp": {
       "type": "good_week_two",
       "whenFrom": "mv2"
@@ -28596,6 +28599,7 @@
        ]
       }
      ],
+     "secondary": "move_leave",
      "followUp": {
       "type": "good_week_three",
       "whenFrom": "mv3"
@@ -29198,6 +29202,7 @@
        ]
       }
      ],
+     "secondary": "move_leave",
      "followUp": {
       "type": "good_thing",
       "whenFrom": "move"
