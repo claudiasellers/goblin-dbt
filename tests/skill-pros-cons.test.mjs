@@ -142,7 +142,7 @@ test("the prosCons slice: kept cards only, active, newest first, own words decry
   const src = readFileSync("functions/src/profile/slices.ts", "utf8");
   assert.match(src, /prosCons: async \(tx, uid, now\) => \{[\s\S]*?ownDecrypter\(tx, uid\)/);
   const types = await importTs("functions/src/profile/types.ts");
-  assert.deepEqual(types.PROFILE_NEEDS.pause, ["parts", "prosCons"]);
+  assert.deepEqual(types.PROFILE_NEEDS.pause, ["parts", "prosCons", "abstinencePlans"]);
 });
 
 test("Hold to wait replays the kept card for the same pull, on proceed, between what matters and the move", () => {
