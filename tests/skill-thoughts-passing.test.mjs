@@ -12,6 +12,7 @@ const content = JSON.parse(readFileSync("tests/fixtures/skills-content.json", "u
 const skill = content.skills.find((s) => s.id === "thoughts_passing");
 const embedOutputs = {
   doseTimer: { ids: ["done", "partly", "skipped"], measures: ["durationSec"] },
+  thoughtDrift: { ids: ["done", "partly", "skipped"], measures: ["durationSec", "doneCount"] },
   boundaryLine: { ids: ["copied"] },
   orientFind: { ids: ["done", "partly", "skipped"], measures: ["doneCount"] },
 };
@@ -103,7 +104,7 @@ test("one way to hold it further off, each to the room, then the close; silly vo
   for (const [mv, sec] of [["slow", 30], ["leaf", 45], ["screen", 45]]) {
     const s = run([pick("move", mv), next], ctx(), m);
     assert.equal(s.stepId, mv);
-    assert.equal(M.stepOf(skill, mv).embed, "doseTimer");
+    assert.equal(M.stepOf(skill, mv).embed, mv === "screen" ? "doseTimer" : "thoughtDrift");
     assert.equal(M.stepOf(skill, mv).props.seconds, sec);
     const room = run([timed], ctx(), s);
     assert.equal(room.stepId, "room");

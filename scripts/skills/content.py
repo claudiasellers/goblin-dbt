@@ -81,6 +81,7 @@ EMBEDS = {
     # DT-01's body modes (plan C3b, DT-owned; src/components/skillPlayer/BodyEmbeds.tsx): each reports done, partly or
     # skipped and the seconds it ran (the breath pacer also `dizzy`: its stop rule); measurements, never ratings.
     "doseTimer": {"ids": ["done", "partly", "skipped"], "measures": ["durationSec"]},
+    "thoughtDrift": {"ids": ["done", "partly", "skipped"], "measures": ["durationSec", "doneCount"]},
     "bodyCard": {"ids": ["done", "partly", "skipped"], "measures": ["durationSec"]},
     "breathPacer": {"ids": ["done", "partly", "skipped", "dizzy"], "measures": ["durationSec"]},
     "squeezeRelease": {"ids": ["done", "partly", "skipped"], "measures": ["durationSec", "doneCount"]},
@@ -362,6 +363,19 @@ EMBED_PROPS = {
         "start": {"type": "copy"},
         "running": {"type": "copy"},
         "lead": {"type": "copy", "optional": True},
+        "done": {"type": "copy"},
+        "next": {"type": "copy"},
+    },
+    "thoughtDrift": {
+        "variant": {"type": "enum", "values": ["slow", "leaf"]},
+        "field": {"type": "field"},
+        "seconds": {"type": "int", "min": 5, "max": 300},
+        "step1": {"type": "copy", "optional": True},
+        "step2": {"type": "copy", "optional": True},
+        "step3": {"type": "copy", "optional": True},
+        "start": {"type": "copy"},
+        "running": {"type": "copy"},
+        "another": {"type": "copy", "optional": True},
         "done": {"type": "copy"},
         "next": {"type": "copy"},
     },

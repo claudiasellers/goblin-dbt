@@ -70092,7 +70092,7 @@
   {
    "id": "thoughts_passing",
    "toolId": "thoughts-passing",
-   "version": "tp-v1",
+   "version": "tp-v2",
    "start": "catch",
    "accepts": [
     "band"
@@ -70120,12 +70120,12 @@
     "frame_step2": "Once more: “I notice I'm having the thought that”, then the thought.",
     "frame_step3": "Notice any change in how close it feels.",
     "slow_title": "Slow it right down.",
-    "slow_step1": "Say the thought in your head, one word at a time.",
-    "slow_step2": "Leave a long gap between the words.",
+    "slow_step1": "Your thought arrives one word at a time.",
+    "slow_step2": "Say each word in your head as it comes, with a long gap.",
     "slow_step3": "Notice it's made of words.",
     "leaf_title": "Set it on a leaf.",
-    "leaf_step1": "Picture a stream with leaves floating past.",
-    "leaf_step2": "Put the thought on a leaf. Let it float at its own pace.",
+    "leaf_step1": "Your thought is on a leaf, on a stream.",
+    "leaf_step2": "Let it float at its own pace, and watch.",
     "leaf_step3": "If it stays or comes back, that's okay. Put it on the next leaf.",
     "screen_title": "Watch it on a screen.",
     "screen_step1": "Picture the thought as words on a screen across the room.",
@@ -70135,6 +70135,7 @@
     "running_frame": "Saying it",
     "running_slow": "Slowly",
     "running_leaf": "Floating",
+    "leaf_another": "Another leaf",
     "running_screen": "Watching",
     "move_done": "That's it.",
     "room_title": "Back to the room.",
@@ -70574,10 +70575,12 @@
     {
      "id": "slow",
      "kind": "embed",
-     "embed": "doseTimer",
+     "embed": "thoughtDrift",
      "answerAs": "slow",
      "title": "slow_title",
      "props": {
+      "variant": "slow",
+      "field": "catch",
       "seconds": 30,
       "step1": "slow_step1",
       "step2": "slow_step2",
@@ -70607,10 +70610,12 @@
     {
      "id": "leaf",
      "kind": "embed",
-     "embed": "doseTimer",
+     "embed": "thoughtDrift",
      "answerAs": "leaf",
      "title": "leaf_title",
      "props": {
+      "variant": "leaf",
+      "field": "catch",
       "seconds": 45,
       "step1": "leaf_step1",
       "step2": "leaf_step2",
@@ -70618,7 +70623,8 @@
       "start": "start",
       "running": "running_leaf",
       "done": "move_done",
-      "next": "next"
+      "next": "next",
+      "another": "leaf_another"
      },
      "links": [
       {
