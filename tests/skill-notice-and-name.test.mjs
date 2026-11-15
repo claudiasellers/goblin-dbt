@@ -221,6 +221,7 @@ test("the off-phone rep: optional chips book offphone_rep, which reopens the run
   assert.equal(M.resumeRun(ctx(), M.runRecord(ctx(), run(LISTEN)), "offphone"), null, "a run that never reached the end doesn't reopen");
   const spine = JSON.parse(readFileSync("src/data/content/spine.json", "utf8")).content.followUpTypes.find((t) => t.id === "offphone_rep");
   assert.ok(spine, "spine.json ships the type");
+  assert.match(readFileSync("functions/src/spine/toolSession.ts", "utf8"), /OPEN_RESOLVES = \[[^\]]*'offphone_rep'/, "opening the card resolves it (Codex, PR #145)");
   assert.equal(spine.deepLinkTemplate, "/tool/notice-and-name?run={sourceSessionId}&at=offphone&followUp={followUpId}");
   const ps = readFileSync("schema/practice-spine.cypher", "utf8");
   assert.match(ps, /FollowUpType \{id: "offphone_rep"\}/);
