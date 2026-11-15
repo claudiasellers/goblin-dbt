@@ -29,7 +29,7 @@ stepping back from it becomes a habit. About two minutes. Not for hot rumination
 | `harm` | The crisis banner, *That's a heavy thought to carry. Someone to talk to comes first.* and someone to talk to; no exercise, no close | voice.md S9: a crisis thought gets no coping tool |
 | `move` | *Pick one way to hold it a little further off.* (*Nothing to argue with. Only a little distance.*) Put words in front of it · Slow it down · Set it on a leaf · Watch it on a screen | Step 3 |
 | `having` → `frame` | The thought on paper (`boundaryLine`, their words or the chip), then 20 s saying *“I'm having the thought that”*, then the thought, then once more with *“I notice I'm having the thought that”* | "I'm having the thought that…" |
-| `slow` / `leaf` / `screen` | Each a `doseTimer` with three lines: one word at a time with long gaps (30 s); on a leaf down a stream, at its own pace, and if it stays or comes back that's okay (45 s); words on a screen across the room, like subtitles, staying or scrolling off in their own time (45 s). Each ring has its own label (*Slowly*, *Floating*, *Watching*) | The other three moves |
+| `slow` / `leaf` / `screen` | `slow` and `leaf` are the `thoughtDrift` embed with the caught thought on screen (part 2, below): its words arriving one at a time with wide gaps (30 s); on a leaf floating across a stream at its own pace, *Another leaf* when it stays or comes back (45 s). `screen` stays a `doseTimer`: words on a screen across the room, like subtitles, staying or scrolling off in their own time (45 s). Each has its own running label (*Slowly*, *Floating*, *Watching*) | The other three moves |
 | `room` | *Back to the room.* Find three things you can see (`orientFind`, eyes open) | Step 4 (MF's rule: every practice ends outward) |
 | `close` | *How is the thought now?* Louder · About as loud · A bit further away · Much further away (`askFresh: 'thenVsNow'`, `regulation_down`) | Step 5, plus *louder* (the spine's in-flow close is exactly four) |
 | `louder` | *Watching a thought can make it louder for a bit. That happens.* Offers First, the body | — |
@@ -63,10 +63,34 @@ the Facts + Ride it out), and a row would displace one of them. The vocabulary h
 rumination and dissociation + rumination co-occurrences, whose `contraindicatedTools` already list
 `mindfulness_of_thoughts` (`schema/pattern-co-occurrence.cypher`).
 
+## Part 2: the thought on screen (15 Nov 2026)
+
+*Slow it down* and *Set it on a leaf* show the person's own thought (`catch`: the chip's words or their own) through
+one embed, `thoughtDrift` (`src/components/skillPlayer/ThoughtDrift.tsx` over the pure `src/lib/thoughtDrift.ts`),
+`variant` `slow` or `leaf`, on the deadline clock (tap to start, tap again to stop; the way on there from the start).
+
+- **slow**: the words arrive one at a time across the first 80% of the dose, wide gaps and spaced letters, then the
+  whole line sits. At most 24 words (a long paragraph turns it into reading).
+- **leaf**: a stream with the thought already resting on a leaf upstream (cut at a word to 48 characters); start sets
+  it floating. A leaf crosses in about 30 s, slow on purpose, whole in view for most of the way and drifting out past
+  the edge at the end. *Another leaf* puts the thought on the next one any time while it runs, and the one before keeps
+  floating: a new leaf never takes an old one off the water (H15a: if it stays or comes back, that's okay; up to four
+  on the water). An empty stream while it runs says *The stream keeps going. If the thought comes back, it gets another
+  leaf.* `doneCount` is how many leaves went on the water (a restart's fresh leaf included), a measurement, never shown.
+- **Reduced motion**: the words appear without fading; the leaf rests mid-stream and a new leaf replaces it in place
+  (nothing can drift, so nothing piles up).
+- **Long thoughts**: an unbroken own-words thought wraps anywhere rather than scrolling the page; a screen reader hears
+  the slowed thought once, whole (the arriving words are hidden from it), and the stream as the thought's label.
+- Departures from the deferred note: no dragging the thought onto the leaf (it is on one already: one gesture fewer,
+  and dragging your own painful sentence reads as handling it); the screen move stays a timer (subtitles already sit
+  still; nothing to show that the three lines don't). *Slow it down* starts from an empty card, since the arrival is
+  the exercise.
+- Copy: the steps now describe what's on screen (*Your thought arrives one word at a time.*, *Your thought is on a
+  leaf, on a stream.*); `leaf_another` *Another leaf*. Nothing pushes it away: no *float off*, test-pinned.
+
 ## Deferred (DT-08 part 2)
 
-- **The stretching words** (*slow it down*: the thought's words stretch across the screen) and **the drifting leaf**
-  (drag it onto a leaf; Stage / Shape) as embeds. Part 1 does both as a guided minute on `doseTimer`.
+- ~~The stretching words and the drifting leaf as embeds~~: built 15 Nov 2026 as `thoughtDrift` (below).
 - **MF's practice home and fade** (reps through CORE's `SkillPractice`, *caught one* off-phone).
 - **CORE-08's chain links** and the **MF practice library** as hosts; the debrief's *Thoughts* step itself as a host
   (part 1 hands on from its fix card).

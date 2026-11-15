@@ -40,7 +40,7 @@ _spec.loader.exec_module(DM)
 ID = "thoughts_passing"
 TOOL_ID = "thoughts-passing"
 CONCEPT = "dbt_mindfulness_current_thoughts"
-VERSION = "tp-v1"
+VERSION = "tp-v2"
 OWN_MAX = 60  # the thought in a few words (the record keeps every own-words field)
 
 COPY = {
@@ -69,12 +69,12 @@ COPY = {
     "frame_step2": "Once more: \u201cI notice I'm having the thought that\u201d, then the thought.",
     "frame_step3": "Notice any change in how close it feels.",
     "slow_title": "Slow it right down.",
-    "slow_step1": "Say the thought in your head, one word at a time.",
-    "slow_step2": "Leave a long gap between the words.",
+    "slow_step1": "Your thought arrives one word at a time.",
+    "slow_step2": "Say each word in your head as it comes, with a long gap.",
     "slow_step3": "Notice it's made of words.",
     "leaf_title": "Set it on a leaf.",
-    "leaf_step1": "Picture a stream with leaves floating past.",
-    "leaf_step2": "Put the thought on a leaf. Let it float at its own pace.",
+    "leaf_step1": "Your thought is on a leaf, on a stream.",
+    "leaf_step2": "Let it float at its own pace, and watch.",
     "leaf_step3": "If it stays or comes back, that's okay. Put it on the next leaf.",
     "screen_title": "Watch it on a screen.",
     "screen_step1": "Picture the thought as words on a screen across the room.",
@@ -84,6 +84,8 @@ COPY = {
     "running_frame": "Saying it",
     "running_slow": "Slowly",
     "running_leaf": "Floating",
+    "leaf_another": "Another leaf",
+    "leaf_empty": "The stream keeps going. If the thought comes back, it gets another leaf.",
     "running_screen": "Watching",
     "move_done": "That's it.",
     # Back to the room.
@@ -174,6 +176,16 @@ def timer(step_id, prefix, seconds):
             "links": [SAFETY_LINK], "next": [{"to": "room"}]}
 
 
+def drift(variant, seconds):
+    """Slow it down and the leaf with the thought's own words on screen (`thoughtDrift`, part 2): the caught thought."""
+    step = timer(variant, variant, seconds)
+    step["embed"] = "thoughtDrift"
+    step["props"] = {"variant": variant, "field": "catch", **step["props"]}
+    if variant == "leaf":
+        step["props"].update({"another": "leaf_another", "empty": "leaf_empty"})
+    return step
+
+
 STEPS = [
     ask("catch", "catch_title", "catch_hint", "catch", "catch",
         [{"when": FLOODED, "to": "heads_up"}, {"to": "file"}], own="catch_own"),
@@ -199,8 +211,8 @@ STEPS = [
      "props": {"field": "catch", "shape": "list", "next": "having_next"},
      "links": [SAFETY_LINK], "next": [{"to": "frame"}]},
     timer("frame", "frame", 20),
-    timer("slow", "slow", 30),
-    timer("leaf", "leaf", 45),
+    drift("slow", 30),
+    drift("leaf", 45),
     timer("screen", "screen", 45),
     # Back to the room (MF's rule: every practice ends outward, eyes open).
     {"id": "room", "kind": "embed", "embed": "orientFind", "answerAs": "room", "title": "room_title",

@@ -26,6 +26,7 @@ import { TwoColumns } from './TwoColumns';
 import { RehearsalStage } from './RehearsalStage';
 import { FeelingCard } from './FeelingCard';
 import { EpisodeStrip } from './EpisodeStrip';
+import { ThoughtDrift } from './ThoughtDrift';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -81,6 +82,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   prosConsCard: ProsConsCard,
   prosConsReplay: ProsConsReplay,
   doseTimer: DoseTimer,
+  thoughtDrift: ThoughtDrift,
   bodyCard: BodyCard,
   breathPacer: BreathPacer,
   squeezeRelease: SqueezeRelease,
@@ -119,6 +121,7 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   prosConsCard: { ids: ['read'], measures: ['durationSec'] },
   prosConsReplay: {},
   doseTimer: { ids: ['done', 'partly', 'skipped'], measures: ['durationSec'] },
+  thoughtDrift: { ids: ['done', 'partly', 'skipped'], measures: ['durationSec', 'doneCount'] },
   bodyCard: { ids: ['done', 'partly', 'skipped'], measures: ['durationSec'] },
   breathPacer: { ids: ['done', 'partly', 'skipped', 'dizzy'], measures: ['durationSec'] },
   squeezeRelease: { ids: ['done', 'partly', 'skipped'], measures: ['durationSec', 'doneCount'] },
@@ -364,6 +367,20 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     start: { type: 'copy' },
     running: { type: 'copy' },
     lead: { type: 'copy', optional: true },
+    done: { type: 'copy' },
+    next: { type: 'copy' },
+  },
+  thoughtDrift: {
+    variant: { type: 'enum', values: ['slow', 'leaf'] },
+    field: { type: 'field' },
+    seconds: { type: 'int', min: 5, max: 300 },
+    step1: { type: 'copy', optional: true },
+    step2: { type: 'copy', optional: true },
+    step3: { type: 'copy', optional: true },
+    start: { type: 'copy' },
+    running: { type: 'copy' },
+    another: { type: 'copy', optional: true },
+    empty: { type: 'copy', optional: true },
     done: { type: 'copy' },
     next: { type: 'copy' },
   },
