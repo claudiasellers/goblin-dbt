@@ -38,7 +38,7 @@ TOOL_ID = "crisis-kit"
 CONCEPT = "dbt_crisis_survival_kit"
 BUILD_ID = "crisis_kit_build"
 USE_ID = "crisis_kit_use"
-VERSION = "kit-v1"
+VERSION = "kit-v2"
 OWN_MAX = 80  # one line: a card in their words, a reason, a place
 
 # The sections, in the kit's own order (PRD: body first, people last but visible). The use deck reads the same ids.
@@ -131,7 +131,7 @@ COPY_BUILD = {
     "place_own": "Describe it",
     "keep_title": "Keep this kit? It opens from Help me now and from Tools.",
     "keep_title_has": "Keep this kit? It replaces the one you have now.",
-    "keep_hint": "Your pros & cons cards go in by themselves.",
+    "keep_hint": "Your pros & cons cards and kept rebellions go in by themselves.",
     "keep_primary": "Next",
     "end_kept": "It's kept. Try one card on an ordinary hard day this week, so it feels familiar when you need it.",
     "end_not_kept": "That's fine. You can make it whenever you like.",
@@ -156,6 +156,10 @@ COPY_USE = {
     "sec_place": "Your safe place",
     "sec_reasons": "Your reasons to get through tonight",
     "sec_pros_cons": "Your pros & cons card",
+    # DT-11 part 3: a rebellion kept from Rebel without the wreckage (kind `rebellion_card`), up to two, never on a
+    # crisis route's kit. The line names what it gives, from Rebel's own options.
+    "sec_rebellion": "A rebellion without the wreckage",
+    "rebellion_for": "What it gives you:",
     "place_how": "Picture it. What can you see there? What can you hear? You can come back from it whenever you like.",
     "words_how": "Read it slowly, twice.",
     "reasons_label": "You wrote these on a calmer day.",
@@ -241,10 +245,10 @@ USE_STEPS = [
     {
         "id": "deck", "kind": "embed", "embed": "kitDeck", "answerAs": "deck", "title": "deck_title",
         "crisis": USE_CRISIS, "links": [SAFETY_LINK],
-        "props": {"fromSkill": BUILD_ID, "prosSkill": "pros_cons", "starter": "deck_starter", "another": "deck_another",
+        "props": {"fromSkill": BUILD_ID, "prosSkill": "pros_cons", "rebelSkill": "alternate_rebellion", "starter": "deck_starter", "another": "deck_another",
                   "enough": "deck_done", "secBody": "sec_body", "secHands": "sec_hands", "secSoothe": "sec_soothe",
                   "secWords": "sec_words", "secPlace": "sec_place", "secReasons": "sec_reasons",
-                  "secProsCons": "sec_pros_cons", "placeHow": "place_how", "wordsHow": "words_how",
+                  "secProsCons": "sec_pros_cons", "secRebellion": "sec_rebellion", "rebellionFor": "rebellion_for", "placeHow": "place_how", "wordsHow": "words_how",
                   "reasonsLabel": "reasons_label"},
         "next": [{"to": "close"}],
     },

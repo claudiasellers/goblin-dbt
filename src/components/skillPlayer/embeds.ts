@@ -146,7 +146,7 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   feelingCard: { ids: ['read'] },
   // ER-10 part 2's strip: read, then on.
   episodeStrip: { ids: ['read'] },
-  kitDeck: { ids: ['body', 'hands', 'soothe', 'words', 'place', 'reasons', 'pros_cons', 'starter'], measures: ['durationSec', 'doneCount'] },
+  kitDeck: { ids: ['body', 'hands', 'soothe', 'words', 'place', 'reasons', 'rebellion', 'pros_cons', 'starter'], measures: ['durationSec', 'doneCount'] },
   inlineSkill: { ids: ['finished', 'left', 'stopped', 'body', 'unsafe'] },
   // MF-01's bowl: the time noticed, and how many pebbles dropped (returns: a measure, never shown).
   // `room`: the person took the quiet *Back to the room* during the noticing (PRD MF rule 3).
@@ -162,6 +162,7 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
   kitDeck: {
     fromSkill: { type: 'id' },
     prosSkill: { type: 'id' },
+    rebelSkill: { type: 'id' },
     starter: { type: 'copy' },
     another: { type: 'copy' },
     enough: { type: 'copy' },
@@ -172,6 +173,8 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     secPlace: { type: 'copy' },
     secReasons: { type: 'copy' },
     secProsCons: { type: 'copy' },
+    secRebellion: { type: 'copy' },
+    rebellionFor: { type: 'copy' },
     placeHow: { type: 'copy' },
     wordsHow: { type: 'copy' },
     reasonsLabel: { type: 'copy' },

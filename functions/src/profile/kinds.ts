@@ -18,6 +18,9 @@ import type { ProfileAreaId, SliceId } from './types';
 
 /** Running low's rows that Me can leave out (scripts/skills/please_skill.py HIDEABLE; a test keeps them equal). */
 export const PLEASE_HIDEABLE_ROWS = ['food', 'body', 'subs', 'moved'] as const;
+/** Rebel's rebellions that last (scripts/skills/alternate_rebellion.py `LASTING`, test-pinned): never a kit card. */
+export const REBELLION_LASTING = ['tattoo', 'piercing', 'hair_short', 'hair_colour'] as const;
+
 /**
  * Sleep reset's wake times (scripts/skills/sleep_reset.py `WAKE`, test-pinned): 6:00 to 9:30 by half hours, then shift and
  * night times by the hour. The anchor a person keeps is one of them.
@@ -256,6 +259,28 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
       for (const k of Object.keys(o)) if (!/^(body|hands|soothe|words|place|reasons)(Ids|Own)$/.test(k)) throw new ValidationError('Unexpected field');
       const has = (Object.keys(most) as string[]).some((f) => ((out[`${f}Ids`] as string[] | undefined)?.length ?? 0) > 0 || !!out[`${f}Own`]);
       if (!has) throw new ValidationError('A kit has at least one card');
+      return out;
+    },
+  },
+  rebellion_card: {
+    // DT-11 part 3 (docs/design/alternate-rebellion.md): a rebellion the person kept on *Keep it in my kit*, which My
+    // crisis kit plays as one of its cards (the `rebellionCards` slice). Its own kind, not a section of `crisis_kit`:
+    // that one is kept whole from the kit's own screens (keeping it again replaces it), and a rebellion is kept one at a
+    // time from Rebel's, so a card added here never rewrites the kit. The function it gives and the rebellion (a
+    // curated id, or the person's own words). Never one that lasts: those wait a day and stay out of the kit.
+    kind: 'rebellion_card', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'my_plans', slice: 'rebellionCards',
+    owner: 'DT', many: true, maxItems: 12, editor: null, ownFields: ['pickOwn'],
+    validate: (v) => {
+      const o = obj(v);
+      const out: Record<string, unknown> = {};
+      if (o.functionIds !== undefined) out.functionIds = strArray(o.functionIds, { max: 1, item: (x) => str(x, { max: 40, pattern: OPTION_ID }) });
+      if (o.pickIds !== undefined) {
+        out.pickIds = strArray(o.pickIds, { max: 1, item: (x) => str(x, { max: 40, pattern: OPTION_ID }) });
+        if ((out.pickIds as string[]).some((id) => (REBELLION_LASTING as readonly string[]).includes(id))) throw new ValidationError('A rebellion that lasts stays out of the kit');
+      }
+      if (o.pickOwn !== undefined) out.pickOwn = str(o.pickOwn, { max: 90 });
+      for (const k of Object.keys(o)) if (!['functionIds', 'pickIds', 'pickOwn'].includes(k)) throw new ValidationError('Unexpected field');
+      if (!(out.pickIds as string[] | undefined)?.length && !out.pickOwn) throw new ValidationError('A card holds one rebellion');
       return out;
     },
   },

@@ -145,7 +145,7 @@ No routing rows by design: the kit opens from crisis routes, Help me now and Too
 
 - The kit's cards inside CORE-02's safety plan (step 2 references `section:optionId`) and from CORE-01's crisis
   screen: the next safety-batch PRs.
-- Alternate rebellion's menu card and Held's soothe cards as kit sources.
+- ~~Alternate rebellion's menu card~~ built 15 Nov 2026 (DT-11 part 3, `alternate-rebellion.md`): kept rebellions (`rebellion_card`, the `rebellionCards` slice) play as up to two *A rebellion without the wreckage* cards, never on a crisis route's kit. Held's soothe cards as kit sources.
 - Review / reorder, per-card then-vs-now, a practice nudge follow-up.
 
 ## DBT handouts, step by step

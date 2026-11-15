@@ -122,7 +122,7 @@ EMBEDS = {
     "rehearsalStage": {"ids": ["again", "acknowledge", "name", "middle", "turn", "break", "done", "aloud",
                                "finished", "stopped", "lost_it", "stepped_out"], "measures": ["doneCount"]},
     # DT-03's deck (plan C3b `cardDeck`, DT-owned): the kit one card at a time; reports which kinds of card it showed.
-    "kitDeck": {"ids": ["body", "hands", "soothe", "words", "place", "reasons", "pros_cons", "starter"], "measures": ["durationSec", "doneCount"]},
+    "kitDeck": {"ids": ["body", "hands", "soothe", "words", "place", "reasons", "rebellion", "pros_cons", "starter"], "measures": ["durationSec", "doneCount"]},
     # R8: another skill run inline (runtime-owned); its `inline.ends` / `flags` give these ids.
     "inlineSkill": {"ids": ["finished", "left", "stopped", "body", "unsafe"]},
     # ER-10's feeling card: read, then on.
@@ -138,6 +138,7 @@ EMBED_PROPS = {
     "kitDeck": {
         "fromSkill": {"type": "id"},
         "prosSkill": {"type": "id"},
+        "rebelSkill": {"type": "id"},
         "starter": {"type": "copy"},
         "another": {"type": "copy"},
         "enough": {"type": "copy"},
@@ -148,6 +149,8 @@ EMBED_PROPS = {
         "secPlace": {"type": "copy"},
         "secReasons": {"type": "copy"},
         "secProsCons": {"type": "copy"},
+        "secRebellion": {"type": "copy"},
+        "rebellionFor": {"type": "copy"},
         "placeHow": {"type": "copy"},
         "wordsHow": {"type": "copy"},
         "reasonsLabel": {"type": "copy"},

@@ -101,6 +101,11 @@ export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
     WITH p ORDER BY p.confirmedAt DESC, p.id LIMIT 12
     RETURN p {.id, .kind, .area, .status, .source, .valueJson,
               confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p`,
+  // Kept rebellion cards (DT-11 part 3), active only, newest first; own words decrypted in the resolver.
+  rebellionCards: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'rebellion_card', status: 'active'})
+    WITH p ORDER BY p.confirmedAt DESC, p.id LIMIT 12
+    RETURN p {.id, .kind, .area, .status, .source, .valueJson,
+              confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p`,
   // Kept habit plans (DT-09), active only, newest first; the behaviour's ids and the lapse plan (own words decrypted).
   abstinencePlans: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'abstinence_plan', status: 'active'})
     WITH p ORDER BY p.confirmedAt DESC, p.id LIMIT 6
@@ -139,6 +144,8 @@ export const THING_OPTION: Record<'kind' | 'pick', string> = { kind: 'good_thing
 export const VALUE_OPTION = 'values:value:';
 /** The `SkillOption` id prefix a kept I can step names (scripts/skills/build_mastery.py: the `rung` ladders). */
 export const RUNG_OPTION = 'build_mastery:rung:';
+/** The `SkillOption` id prefix a kept rebellion card names (scripts/skills/alternate_rebellion.py: the `rebellion` list). */
+export const REBELLION_OPTION = 'alternate_rebellion:rebellion:';
 
 /**
  * A stored person's value (profile/kinds.ts `person`), its label decrypted; null when it can't be read (a label that
@@ -423,6 +430,22 @@ const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
         id: String(p.id), pullIds: strings(v.pullIds), pullOwn: own('pullOwn'), longIds: strings(v.longIds), longOwn: own('longOwn'),
         givesIds: strings(v.givesIds), givesOwn: own('givesOwn'), costIds: strings(v.costIds), costOwn: own('costOwn'),
         keepsIds: strings(v.keepsIds), keepsOwn: own('keepsOwn'), meta: metaFrom(p, now),
+      });
+    }
+    return out;
+  },
+  rebellionCards: async (tx, uid, now) => {
+    const r = await tx.run(SLICE_QUERIES.rebellionCards!, { uid });
+    if (!r.records.length) return [];
+    const decrypt = await ownDecrypter(tx, uid);
+    const out: ProfileSlices['rebellionCards'] = [];
+    for (const rec of r.records) {
+      const p = rec.get('p') as Record<string, unknown>;
+      let v: Record<string, unknown>;
+      try { v = JSON.parse(String(p.valueJson)) as Record<string, unknown>; } catch { continue; }
+      out.push({
+        id: String(p.id), functionIds: strings(v.functionIds), pickIds: strings(v.pickIds),
+        pickOwn: typeof v.pickOwn === 'string' ? decrypt(v.pickOwn) : null, meta: metaFrom(p, now),
       });
     }
     return out;
