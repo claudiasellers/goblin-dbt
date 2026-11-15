@@ -38,7 +38,7 @@ export function offerWishes(picked: readonly string[] | undefined, chipCount: nu
 }
 
 /** What the offer reports: every wish offered, some, or none (the person moved on first). */
-export function offerResult(count: number, offered: number): 'offered' | 'partly' | 'skipped' {
-  if (offered <= 0) return 'skipped';
+export function offerResult(count: number, offered: number, begun = false): 'offered' | 'partly' | 'skipped' {
+  if (offered <= 0) return begun ? 'partly' : 'skipped';
   return offered >= count ? 'offered' : 'partly';
 }

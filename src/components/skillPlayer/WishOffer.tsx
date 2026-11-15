@@ -12,8 +12,9 @@ import type { EmbedProps } from './embeds';
  * stays on screen; a second tap stops it there. A short buzz marks each wish's end (no chime), for anyone offering
  * with their eyes closed. The next wish waits for its own tap: no auto-advance, no countdown, no digits. The quiet way
  * on is always there (never a lock). While something covers the step (safety.open, P2) the ring stops where it was,
- * without moving on, and takes no focus. Reports `offered` (every wish), `partly` or `skipped`, with the seconds and
- * how many wishes were offered (a measure, never shown).
+ * without moving on, and takes no focus. Reports `offered` (every wish), `partly` (some, or a ring tapped and stopped
+ * before it filled) or `skipped` (no ring tapped), with the seconds and how many wishes were offered (a measure,
+ * never shown).
  *
  * Props (copy props arrive as text): `wishes` (the field whose picks are the wishes, own words last), `line` (the
  * template, *May you {wish}.*), `seconds` (per wish), `start` (inside the ring; the ring's name is the wish and this),
@@ -29,6 +30,8 @@ export function WishOffer({ props, picked, answerIds, onShown, onDone, covered }
     text('line'),
   ));
   const [index, setIndex] = useState(0);
+  // A ring tapped at all is an offering, even stopped before it filled: Move on then is partly, never skipped.
+  const [begun, setBegun] = useState(false);
   const [startedAt] = useState(() => Date.now());
   const finished = index >= lines.length;
   const wishId = useId();
@@ -37,7 +40,7 @@ export function WishOffer({ props, picked, answerIds, onShown, onDone, covered }
   useEffect(() => { if (!shown.current) { shown.current = true; onShown(); } }, [onShown]);
   useEffect(() => { if (finished && !covered) nextRef.current?.focus({ preventScroll: true }); }, [finished, covered]);
   const finish = (offered: number) => onDone?.({
-    ids: [offerResult(lines.length, offered)],
+    ids: [offerResult(lines.length, offered, begun)],
     durationSec: Math.max(0, Math.round((Date.now() - startedAt) / 1000)),
     doneCount: offered,
   });
@@ -55,7 +58,7 @@ export function WishOffer({ props, picked, answerIds, onShown, onDone, covered }
     <section className="space-y-5" data-testid="wish-offer" data-state="offering" data-wish={index}>
       <p id={wishId} className="font-serif text-2xl text-center text-[var(--color-text-primary)] text-balance">{lines[index]}</p>
       <WishRing key={index} seconds={seconds} first={index === 0} wishId={wishId} label={text('start')} hint={text('hint')} covered={!!covered}
-        onEnd={(full) => { if (full) setIndex((i) => i + 1); }} />
+        onStart={() => setBegun(true)} onEnd={(full) => { if (full) setIndex((i) => i + 1); }} />
       {lines.length > 1 && (
         <ol aria-hidden="true" className="flex justify-center gap-2">
           {lines.map((_, i) => (
@@ -74,8 +77,8 @@ export function WishOffer({ props, picked, answerIds, onShown, onDone, covered }
  * One wish's ring: a tap starts a slow, hands-free fill; a second tap stops it, and a tap again starts it over. Its
  * name is the wish and the fixed label (*May you rest. Offer it*); `aria-pressed` carries whether it is filling.
  */
-function WishRing({ seconds, first, wishId, label, hint, covered, onEnd }: {
-  seconds: number; first: boolean; wishId: string; label: string; hint: string; covered: boolean; onEnd: (full: boolean) => void;
+function WishRing({ seconds, first, wishId, label, hint, covered, onStart, onEnd }: {
+  seconds: number; first: boolean; wishId: string; label: string; hint: string; covered: boolean; onStart: () => void; onEnd: (full: boolean) => void;
 }) {
   const hintId = useId();
   const labelId = useId();
@@ -93,7 +96,7 @@ function WishRing({ seconds, first, wishId, label, hint, covered, onEnd }: {
   useEffect(() => { if (covered && running) timer.stop(); }, [covered, running, timer]);
   const toggle = () => {
     if (running) { timer.stop(); onEnd(false); }
-    else timer.start();
+    else { timer.start(); onStart(); }
   };
   return (
     <div className="flex justify-center">
