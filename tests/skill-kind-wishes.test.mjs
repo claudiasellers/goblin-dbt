@@ -149,6 +149,8 @@ test("the wishes and the offer: up to three or own words; May you / May I / May 
   assert.equal(step("offer_other").props.chipsOnly, undefined);
   assert.deepEqual(K.wishLines(undefined, "May you {wish}."), []);
   assert.deepEqual([K.offerResult(3, 3), K.offerResult(3, 1), K.offerResult(3, 0), K.offerResult(0, 0)], ["offered", "partly", "skipped", "skipped"]);
+  // A ring tapped and stopped before it filled is an offering: Move on then is partly (What came up?, a rep), never skipped.
+  assert.equal(K.offerResult(3, 0, true), "partly");
 });
 
 test("what came up: warmth or nothing much ends; sadness or stirred is backdraft, named, with the hand, someone easier or stop", () => {
