@@ -281,7 +281,7 @@ START_SMALL = {r["id"]: "yes" for rows in PS["subs"].values() for r in rows if r
 # --- Exits: every tool the content names. Unbuilt ones are planned: written, never offered or linked. ---
 BUILT = {"cool-down", "five-senses", "pause", "cope-ahead", "dear-man", "fast", "opposite-action", "check-the-facts",
          "find-the-feeling", "ending-relationships", "let-it-be", "please-skill", "give", "values-clarification", "build-mastery",
-         "finding-connection", "mindfulness-emotions"}
+         "finding-connection", "mindfulness-emotions", "effectiveness"}
 
 
 def exit_id(tool):
@@ -315,6 +315,11 @@ ENTRY_ALIASES = {
 EXITS = [{**{k: v for k, v in e.items() if k != "planned"}, "toolId": ENTRY_ALIASES[e["toolId"]][0],
           "query": {"enterAt": ENTRY_ALIASES[e["toolId"]][1]}, "label": ENTRY_ALIASES[e["toolId"]][2], "carry": ["feel"]}
          if e["toolId"] in ENTRY_ALIASES else e for e in EXITS]
+# What works here (MF-08) is opened from two directions (*Decide if this fight is worth it*, *Play the hand you have*):
+# the problem type rides along as its frame, so it opens with that grievance validated and that direction's steps first.
+# What works here gets the direction picked (anger-blocked-redirect, envy-unfair-effective): a piled-up problem's focus
+# carries the same way as a single one.
+EXITS = [{**e, "query": {"frame": "$a.solutions"}} if e["toolId"] == "effectiveness" else e for e in EXITS]
 EXITS += [{"id": "safety_open", "safety": True}, {"id": "done", "done": True}]
 
 
