@@ -34,7 +34,7 @@ export function BeatPulse({ props, onShown, onDone, covered }: EmbedProps) {
   const [on, setOn] = useState(false);
   const taps = useRef(0);
   const coveredRef = useRef(!!covered);
-  coveredRef.current = !!covered;
+  useEffect(() => { coveredRef.current = !!covered; }, [covered]);
   const timer = useDeadlineTimer({
     durationMs: ms, tickMs: 250, chime: false,
     onDone: () => { if (!coveredRef.current) buzz(30); setRanMs(ms); setEnded(true); },
@@ -42,7 +42,7 @@ export function BeatPulse({ props, onShown, onDone, covered }: EmbedProps) {
   const running = timer.state === 'running';
   const reduce = timer.reduceMotion;
   const soundRef = useRef(sound);
-  soundRef.current = sound;
+  useEffect(() => { soundRef.current = sound; }, [sound]);
   const cues = timer.cues;
 
   // The beat itself: a swell on every beat, settling back within it, while the round runs.
@@ -58,14 +58,10 @@ export function BeatPulse({ props, onShown, onDone, covered }: EmbedProps) {
     return () => { window.clearInterval(id); window.clearTimeout(off); setOn(false); };
   }, [running, interval, cues]);
 
-  // Covered while running: the beat stops there and the round ends as it was.
-  useEffect(() => {
-    if (covered && running) {
-      setRanMs(timer.elapsedMs);
-      timer.stop();
-      setEnded(true);
-    }
-  }, [covered, running, timer]);
+  // Covered while running: the beat stops there and the round ends as it was (through a ref, as RescriptCard does).
+  const stopNow = useRef(() => {});
+  useEffect(() => { stopNow.current = () => { setRanMs(timer.elapsedMs); timer.stop(); setEnded(true); }; });
+  useEffect(() => { if (covered && running) stopNow.current(); }, [covered, running]);
 
   const tapRef = useRef<HTMLButtonElement>(null);
   const endRef = useRef<HTMLParagraphElement>(null);
