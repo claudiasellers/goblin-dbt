@@ -29746,3 +29746,369 @@ SET o:SkillOption, o += {skillId: "moment_apart", list: "keepit", value: "not_no
 MATCH (s:Skill {id: "moment_apart"}), (o:SkillOption {id: "moment_apart:keepit:not_now"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "keepit", order: 74};
+
+// --- kind_wishes (kw-v1) ---
+MERGE (s:Skill {id: "kind_wishes"})
+SET s += {toolId: "kind-wishes", version: "kw-v1", contentVersion: "skills-v1", start: "who", ownMax: 40, emotionFields: [], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"backdraft_line\": \"It's called backdraft, and it isn't failure.\", \"backdraft_title\": \"That's common. Warmth can wake old hurts.\", \"body_first\": \"My body first\", \"body_first_line\": \"Kind wishes will keep for a calmer minute.\", \"body_first_title\": \"Settle your body first.\", \"came_hint\": \"Any of these is fine.\", \"came_title\": \"What came up?\", \"check_hint\": \"Kind wishes are never owed to someone who hurts you.\", \"check_title\": \"Has this person hurt you, or could they?\", \"done\": \"Done\", \"end_easy\": \"Next time, someone easy again is a good place to start.\", \"end_line\": \"Next time, try your own words, or someone one step further out.\", \"end_stopped\": \"You stopped when it got heavy. That's looking after yourself.\", \"end_title\": \"You offered kind wishes. That's the practice.\", \"ending_careful\": \"Leaving someone who might hurt me\", \"hand_done\": \"That's enough for now.\", \"hand_offer\": \"A hand on my heart\", \"hand_running\": \"Resting here\", \"hand_start\": \"Start\", \"hand_step1\": \"One hand on your chest, or both hands around a warm mug.\", \"hand_step2\": \"Notice any warmth in your hand.\", \"hand_step3\": \"Let your breath move under it, slowly.\", \"hand_title\": \"A hand on your heart for a few breaths.\", \"heads_up_line\": \"Your body's loud right now. Settle it first, or offer them to someone easy.\", \"heads_up_title\": \"Kind wishes work best on a calmer day.\", \"line_all\": \"May everyone around me {wish}.\", \"line_me\": \"May I {wish}.\", \"line_you\": \"May you {wish}.\", \"next\": \"Next\", \"not_them_line\": \"Send the wishes somewhere else today. Support is here if you want it.\", \"not_them_title\": \"Then not this one. Your safety comes first.\", \"offer_again_title\": \"Picture someone easy, and offer them the same wishes.\", \"offer_done\": \"All offered.\", \"offer_hint\": \"The wishes don't need to feel true. Offering them is the practice.\", \"offer_ring_hint\": \"Tap to offer this wish. The ring fills slowly. Tap again to stop.\", \"offer_running\": \"Offering\", \"offer_self_title\": \"Offer them to yourself, one at a time.\", \"offer_skip\": \"Move on\", \"offer_start\": \"Offer it\", \"offer_title\": \"Offer them one at a time.\", \"safety_open\": \"Talk to someone now\", \"twice_line\": \"That happens. It's worth talking through with someone you trust. Next time, start with someone easy.\", \"twice_title\": \"Warmth keeps stirring things up today.\", \"who_flooded\": \"Someone easy, for today.\", \"who_hint\": \"Someone easy is a good place to start.\", \"who_stirred\": \"With things stirred up, someone easy or someone neutral works best today.\", \"who_title\": \"Who will you send kind wishes to?\", \"wish_own\": \"My own words\", \"wishes_all\": \"Pick two or three wishes for everyone around you.\", \"wishes_hint\": \"Pick the ones that sound kind. They don't need to feel true.\", \"wishes_other\": \"Pick two or three wishes for them.\", \"wishes_self\": \"Pick two or three wishes for yourself.\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+MATCH (t:TherapyConcept {id: "dbt_loving_kindness"}), (s:Skill {id: "kind_wishes"})
+MERGE (t)-[:HAS_SKILL]->(s);
+MATCH (:SkillStep {skillId: "kind_wishes"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
+MATCH (:Skill {id: "kind_wishes"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
+MERGE (n:SkillStep {id: "kind_wishes:who"})
+SET n += {skillId: "kind_wishes", step: "who", kind: "ask", version: "kw-v1"}, n.specJson = "{\"fields\": [{\"id\": \"who\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"who\", \"where\": {\"not\": {\"has\": [\"$opt.hideIn\", \"$ctx.band\"]}}}, \"required\": true}], \"hint\": \"who_hint\", \"lines\": [{\"key\": \"who_flooded\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"who_stirred\", \"when\": {\"eq\": [\"$ctx.band\", \"stirred\"]}}], \"title\": \"who_title\"}";
+MATCH (s:Skill {id: "kind_wishes"}), (n:SkillStep {id: "kind_wishes:who"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 0};
+MERGE (n:SkillStep {id: "kind_wishes:heads_up"})
+SET n += {skillId: "kind_wishes", step: "heads_up", kind: "ask", version: "kw-v1"}, n.specJson = "{\"fields\": [{\"id\": \"heads_up\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"heads_up\"}, \"required\": true}], \"lines\": [{\"key\": \"heads_up_line\", \"when\": {\"all\": []}}], \"title\": \"heads_up_title\"}";
+MATCH (s:Skill {id: "kind_wishes"}), (n:SkillStep {id: "kind_wishes:heads_up"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 1};
+MERGE (n:SkillStep {id: "kind_wishes:body_first"})
+SET n += {skillId: "kind_wishes", step: "body_first", kind: "handoff", version: "kw-v1"}, n.specJson = "{\"complete\": false, \"done\": \"done\", \"lines\": [{\"key\": \"body_first_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"body_first_title\"}";
+MATCH (s:Skill {id: "kind_wishes"}), (n:SkillStep {id: "kind_wishes:body_first"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 2};
+MERGE (n:SkillStep {id: "kind_wishes:check"})
+SET n += {skillId: "kind_wishes", step: "check", kind: "ask", version: "kw-v1"}, n.specJson = "{\"fields\": [{\"id\": \"check\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"check\"}, \"required\": true}], \"hint\": \"check_hint\", \"title\": \"check_title\"}";
+MATCH (s:Skill {id: "kind_wishes"}), (n:SkillStep {id: "kind_wishes:check"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 3};
+MERGE (n:SkillStep {id: "kind_wishes:not_them"})
+SET n += {skillId: "kind_wishes", step: "not_them", kind: "ask", version: "kw-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"all\": []}}], \"fields\": [{\"id\": \"instead\", \"links\": [{\"exit\": \"ending_careful\", \"label\": \"ending_careful\", \"when\": {\"all\": []}}, {\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"instead\"}, \"required\": true}], \"lines\": [{\"key\": \"not_them_line\", \"when\": {\"all\": []}}], \"title\": \"not_them_title\"}";
+MATCH (s:Skill {id: "kind_wishes"}), (n:SkillStep {id: "kind_wishes:not_them"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 4};
+MERGE (n:SkillStep {id: "kind_wishes:wishes"})
+SET n += {skillId: "kind_wishes", step: "wishes", kind: "ask", version: "kw-v1"}, n.specJson = "{\"fields\": [{\"id\": \"wishes\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 3, \"options\": {\"list\": \"wishes\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"wish_own\"}, \"required\": true}], \"hint\": \"wishes_hint\", \"title\": [{\"key\": \"wishes_self\", \"when\": {\"any\": [{\"eq\": [\"$a.instead\", \"self\"]}, {\"all\": [{\"not\": {\"set\": \"$a.instead\"}}, {\"eq\": [\"$a.who\", \"self\"]}]}]}}, {\"key\": \"wishes_all\", \"when\": {\"any\": [{\"eq\": [\"$a.instead\", \"everyone\"]}, {\"all\": [{\"not\": {\"set\": \"$a.instead\"}}, {\"eq\": [\"$a.who\", \"everyone\"]}]}]}}, {\"key\": \"wishes_other\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "kind_wishes"}), (n:SkillStep {id: "kind_wishes:wishes"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 5};
+MERGE (n:SkillStep {id: "kind_wishes:offer_other"})
+SET n += {skillId: "kind_wishes", step: "offer_other", kind: "embed", version: "kw-v1"}, n.specJson = "{\"answerAs\": \"offered\", \"embed\": \"wishOffer\", \"hint\": \"offer_hint\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"done\": \"offer_done\", \"hint\": \"offer_ring_hint\", \"line\": \"line_you\", \"next\": \"next\", \"running\": \"offer_running\", \"seconds\": 20, \"skip\": \"offer_skip\", \"start\": \"offer_start\", \"wishes\": \"wishes\"}, \"title\": \"offer_title\"}";
+MATCH (s:Skill {id: "kind_wishes"}), (n:SkillStep {id: "kind_wishes:offer_other"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 6};
+MERGE (n:SkillStep {id: "kind_wishes:offer_self"})
+SET n += {skillId: "kind_wishes", step: "offer_self", kind: "embed", version: "kw-v1"}, n.specJson = "{\"answerAs\": \"offered_self\", \"embed\": \"wishOffer\", \"hint\": \"offer_hint\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"done\": \"offer_done\", \"hint\": \"offer_ring_hint\", \"line\": \"line_me\", \"next\": \"next\", \"running\": \"offer_running\", \"seconds\": 20, \"skip\": \"offer_skip\", \"start\": \"offer_start\", \"wishes\": \"wishes\"}, \"title\": \"offer_self_title\"}";
+MATCH (s:Skill {id: "kind_wishes"}), (n:SkillStep {id: "kind_wishes:offer_self"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 7};
+MERGE (n:SkillStep {id: "kind_wishes:offer_all"})
+SET n += {skillId: "kind_wishes", step: "offer_all", kind: "embed", version: "kw-v1"}, n.specJson = "{\"answerAs\": \"offered_all\", \"embed\": \"wishOffer\", \"hint\": \"offer_hint\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"done\": \"offer_done\", \"hint\": \"offer_ring_hint\", \"line\": \"line_all\", \"next\": \"next\", \"running\": \"offer_running\", \"seconds\": 20, \"skip\": \"offer_skip\", \"start\": \"offer_start\", \"wishes\": \"wishes\"}, \"title\": \"offer_title\"}";
+MATCH (s:Skill {id: "kind_wishes"}), (n:SkillStep {id: "kind_wishes:offer_all"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 8};
+MERGE (n:SkillStep {id: "kind_wishes:came"})
+SET n += {skillId: "kind_wishes", step: "came", kind: "ask", version: "kw-v1"}, n.specJson = "{\"fields\": [{\"id\": \"came\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"came\"}, \"required\": true}], \"hint\": \"came_hint\", \"title\": \"came_title\"}";
+MATCH (s:Skill {id: "kind_wishes"}), (n:SkillStep {id: "kind_wishes:came"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 9};
+MERGE (n:SkillStep {id: "kind_wishes:backdraft"})
+SET n += {skillId: "kind_wishes", step: "backdraft", kind: "ask", version: "kw-v1"}, n.specJson = "{\"fields\": [{\"id\": \"step_down\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"step_down\", \"where\": {\"any\": [{\"not\": {\"eq\": [\"$opt.value\", \"easier\"]}}, {\"not\": {\"any\": [{\"eq\": [\"$a.instead\", \"easy\"]}, {\"all\": [{\"not\": {\"set\": \"$a.instead\"}}, {\"eq\": [\"$a.who\", \"easy\"]}]}]}}]}}, \"required\": true}], \"lines\": [{\"key\": \"backdraft_line\", \"when\": {\"all\": []}}], \"title\": \"backdraft_title\"}";
+MATCH (s:Skill {id: "kind_wishes"}), (n:SkillStep {id: "kind_wishes:backdraft"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 10};
+MERGE (n:SkillStep {id: "kind_wishes:hand"})
+SET n += {skillId: "kind_wishes", step: "hand", kind: "embed", version: "kw-v1"}, n.specJson = "{\"answerAs\": \"hand\", \"embed\": \"bodyCard\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"done\": \"hand_done\", \"kind\": \"hand_heart\", \"next\": \"next\", \"running\": \"hand_running\", \"seconds\": 30, \"start\": \"hand_start\", \"step1\": \"hand_step1\", \"step2\": \"hand_step2\", \"step3\": \"hand_step3\"}, \"title\": \"hand_title\"}";
+MATCH (s:Skill {id: "kind_wishes"}), (n:SkillStep {id: "kind_wishes:hand"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 11};
+MERGE (n:SkillStep {id: "kind_wishes:offer_again"})
+SET n += {skillId: "kind_wishes", step: "offer_again", kind: "embed", version: "kw-v1"}, n.specJson = "{\"answerAs\": \"offered_again\", \"embed\": \"wishOffer\", \"hint\": \"offer_hint\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"done\": \"offer_done\", \"hint\": \"offer_ring_hint\", \"line\": \"line_you\", \"next\": \"next\", \"running\": \"offer_running\", \"seconds\": 20, \"skip\": \"offer_skip\", \"start\": \"offer_start\", \"wishes\": \"wishes\"}, \"title\": \"offer_again_title\"}";
+MATCH (s:Skill {id: "kind_wishes"}), (n:SkillStep {id: "kind_wishes:offer_again"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 12};
+MERGE (n:SkillStep {id: "kind_wishes:came_again"})
+SET n += {skillId: "kind_wishes", step: "came_again", kind: "ask", version: "kw-v1"}, n.specJson = "{\"fields\": [{\"id\": \"came_again\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"came\"}, \"required\": true}], \"hint\": \"came_hint\", \"title\": \"came_title\"}";
+MATCH (s:Skill {id: "kind_wishes"}), (n:SkillStep {id: "kind_wishes:came_again"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 13};
+MERGE (n:SkillStep {id: "kind_wishes:twice"})
+SET n += {skillId: "kind_wishes", step: "twice", kind: "handoff", version: "kw-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"twice_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": \"twice_title\"}";
+MATCH (s:Skill {id: "kind_wishes"}), (n:SkillStep {id: "kind_wishes:twice"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 14};
+MERGE (n:SkillStep {id: "kind_wishes:end"})
+SET n += {skillId: "kind_wishes", step: "end", kind: "handoff", version: "kw-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"end_easy\", \"when\": {\"any\": [{\"in\": [\"$a.came\", [\"sad\", \"stirred\"]]}, {\"in\": [\"$a.came_again\", [\"sad\", \"stirred\"]]}]}}, {\"key\": \"end_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true, \"title\": [{\"key\": \"end_stopped\", \"when\": {\"eq\": [\"$a.step_down\", \"stop\"]}}, {\"key\": \"end_title\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "kind_wishes"}), (n:SkillStep {id: "kind_wishes:end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 15};
+MERGE (x:SkillExit {id: "kind_wishes:cool_down"})
+SET x += {skillId: "kind_wishes", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = "body_first";
+MATCH (s:Skill {id: "kind_wishes"}), (x:SkillExit {id: "kind_wishes:cool_down"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "kind_wishes:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "kind_wishes:held_hand"})
+SET x += {skillId: "kind_wishes", exit: "held_hand", toolId: "soothe", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"enterAt\": \"hand\"}", x.label = "hand_offer";
+MATCH (s:Skill {id: "kind_wishes"}), (x:SkillExit {id: "kind_wishes:held_hand"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "kind_wishes:held_hand"}), (t:TherapyConcept {appToolId: "soothe"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "kind_wishes:ending_careful"})
+SET x += {skillId: "kind_wishes", exit: "ending_careful", toolId: "ending-relationships", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"careful\"}", x.label = "ending_careful";
+MATCH (s:Skill {id: "kind_wishes"}), (x:SkillExit {id: "kind_wishes:ending_careful"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "kind_wishes:ending_careful"}), (t:TherapyConcept {appToolId: "ending-relationships"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "kind_wishes:safety_open"})
+SET x += {skillId: "kind_wishes", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "kind_wishes"}), (x:SkillExit {id: "kind_wishes:safety_open"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MERGE (x:SkillExit {id: "kind_wishes:done"})
+SET x += {skillId: "kind_wishes", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}", x.label = null;
+MATCH (s:Skill {id: "kind_wishes"}), (x:SkillExit {id: "kind_wishes:done"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (a:SkillStep {id: "kind_wishes:who"}), (b:SkillStep {id: "kind_wishes:heads_up"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"all\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"not\": {\"set\": \"$a.heads_up\"}}]}";
+MATCH (a:SkillStep {id: "kind_wishes:who"}), (b:SkillStep {id: "kind_wishes:check"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.who\", \"difficult\"]}";
+MATCH (a:SkillStep {id: "kind_wishes:who"}), (b:SkillStep {id: "kind_wishes:wishes"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "kind_wishes:who"}), (x:SkillExit {id: "kind_wishes:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "who", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "kind_wishes:heads_up"}), (b:SkillStep {id: "kind_wishes:body_first"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.heads_up\", \"body\"]}";
+MATCH (a:SkillStep {id: "kind_wishes:heads_up"}), (b:SkillStep {id: "kind_wishes:wishes"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "kind_wishes:heads_up"}), (x:SkillExit {id: "kind_wishes:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "heads_up", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "kind_wishes:body_first"}), (x:SkillExit {id: "kind_wishes:cool_down"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "kind_wishes:body_first"}), (x:SkillExit {id: "kind_wishes:held_hand"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "kind_wishes:body_first"}), (x:SkillExit {id: "kind_wishes:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "kind_wishes:check"}), (b:SkillStep {id: "kind_wishes:not_them"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"all\": [{\"eq\": [\"$a.who\", \"difficult\"]}, {\"in\": [\"$a.check\", [\"yes\", \"unsure\"]]}]}";
+MATCH (a:SkillStep {id: "kind_wishes:check"}), (b:SkillStep {id: "kind_wishes:wishes"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "kind_wishes:check"}), (x:SkillExit {id: "kind_wishes:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "check", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "kind_wishes:not_them"}), (b:SkillStep {id: "kind_wishes:wishes"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "kind_wishes:not_them"}), (x:SkillExit {id: "kind_wishes:ending_careful"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "instead", label: "ending_careful"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "kind_wishes:not_them"}), (x:SkillExit {id: "kind_wishes:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 1, field: "instead", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "kind_wishes:wishes"}), (b:SkillStep {id: "kind_wishes:offer_self"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"any\": [{\"eq\": [\"$a.instead\", \"self\"]}, {\"all\": [{\"not\": {\"set\": \"$a.instead\"}}, {\"eq\": [\"$a.who\", \"self\"]}]}]}";
+MATCH (a:SkillStep {id: "kind_wishes:wishes"}), (b:SkillStep {id: "kind_wishes:offer_all"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"any\": [{\"eq\": [\"$a.instead\", \"everyone\"]}, {\"all\": [{\"not\": {\"set\": \"$a.instead\"}}, {\"eq\": [\"$a.who\", \"everyone\"]}]}]}";
+MATCH (a:SkillStep {id: "kind_wishes:wishes"}), (b:SkillStep {id: "kind_wishes:offer_other"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "kind_wishes:wishes"}), (x:SkillExit {id: "kind_wishes:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "wishes", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "kind_wishes:offer_other"}), (b:SkillStep {id: "kind_wishes:came"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "kind_wishes:offer_other"}), (x:SkillExit {id: "kind_wishes:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "kind_wishes:offer_self"}), (b:SkillStep {id: "kind_wishes:came"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "kind_wishes:offer_self"}), (x:SkillExit {id: "kind_wishes:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "kind_wishes:offer_all"}), (b:SkillStep {id: "kind_wishes:came"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "kind_wishes:offer_all"}), (x:SkillExit {id: "kind_wishes:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "kind_wishes:came"}), (b:SkillStep {id: "kind_wishes:backdraft"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"in\": [\"$a.came\", [\"sad\", \"stirred\"]]}";
+MATCH (a:SkillStep {id: "kind_wishes:came"}), (b:SkillStep {id: "kind_wishes:end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "kind_wishes:came"}), (x:SkillExit {id: "kind_wishes:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "came", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "kind_wishes:backdraft"}), (b:SkillStep {id: "kind_wishes:hand"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.step_down\", \"hand\"]}";
+MATCH (a:SkillStep {id: "kind_wishes:backdraft"}), (b:SkillStep {id: "kind_wishes:offer_again"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.step_down\", \"easier\"]}";
+MATCH (a:SkillStep {id: "kind_wishes:backdraft"}), (b:SkillStep {id: "kind_wishes:end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "kind_wishes:backdraft"}), (x:SkillExit {id: "kind_wishes:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "step_down", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "kind_wishes:hand"}), (b:SkillStep {id: "kind_wishes:end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "kind_wishes:hand"}), (x:SkillExit {id: "kind_wishes:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "kind_wishes:offer_again"}), (b:SkillStep {id: "kind_wishes:came_again"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "kind_wishes:offer_again"}), (x:SkillExit {id: "kind_wishes:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "kind_wishes:came_again"}), (b:SkillStep {id: "kind_wishes:twice"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"in\": [\"$a.came_again\", [\"sad\", \"stirred\"]]}";
+MATCH (a:SkillStep {id: "kind_wishes:came_again"}), (b:SkillStep {id: "kind_wishes:end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "kind_wishes:came_again"}), (x:SkillExit {id: "kind_wishes:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "came_again", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "kind_wishes:twice"}), (x:SkillExit {id: "kind_wishes:held_hand"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "kind_wishes:twice"}), (x:SkillExit {id: "kind_wishes:safety_open"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "kind_wishes:twice"}), (x:SkillExit {id: "kind_wishes:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "kind_wishes:end"}), (x:SkillExit {id: "kind_wishes:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MERGE (o:SkillOption {id: "kind_wishes:heads_up:body"})
+SET o:SkillOption, o += {skillId: "kind_wishes", list: "heads_up", value: "body", label: "My body first", version: "kw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:heads_up:body"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up", order: 0};
+MERGE (o:SkillOption {id: "kind_wishes:heads_up:go"})
+SET o:SkillOption, o += {skillId: "kind_wishes", list: "heads_up", value: "go", label: "Someone easy, anyway", version: "kw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:heads_up:go"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up", order: 1};
+MERGE (o:SkillOption {id: "kind_wishes:who:easy"})
+SET o:SkillOption:KindWishRecipientTier, o += {skillId: "kind_wishes", list: "who", value: "easy", label: "Someone easy to like, a friend or a pet", version: "kw-v1"}, o.propsJson = "{\"hideIn\": []}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:who:easy"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "who", order: 2};
+MERGE (o:SkillOption {id: "kind_wishes:who:neutral"})
+SET o:SkillOption:KindWishRecipientTier, o += {skillId: "kind_wishes", list: "who", value: "neutral", label: "Someone I saw today and don't know well", version: "kw-v1"}, o.propsJson = "{\"hideIn\": [\"flooded\"]}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:who:neutral"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "who", order: 3};
+MERGE (o:SkillOption {id: "kind_wishes:who:self"})
+SET o:SkillOption:KindWishRecipientTier, o += {skillId: "kind_wishes", list: "who", value: "self", label: "Me", version: "kw-v1"}, o.propsJson = "{\"hideIn\": [\"stirred\", \"flooded\"]}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:who:self"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "who", order: 4};
+MERGE (o:SkillOption {id: "kind_wishes:who:difficult"})
+SET o:SkillOption:KindWishRecipientTier, o += {skillId: "kind_wishes", list: "who", value: "difficult", label: "Someone I find difficult", version: "kw-v1"}, o.propsJson = "{\"hideIn\": [\"stirred\", \"flooded\"]}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:who:difficult"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "who", order: 5};
+MERGE (o:SkillOption {id: "kind_wishes:who:everyone"})
+SET o:SkillOption:KindWishRecipientTier, o += {skillId: "kind_wishes", list: "who", value: "everyone", label: "Everyone around me right now", version: "kw-v1"}, o.propsJson = "{\"hideIn\": [\"flooded\"]}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:who:everyone"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "who", order: 6};
+MERGE (o:SkillOption {id: "kind_wishes:check:no"})
+SET o:SkillOption, o += {skillId: "kind_wishes", list: "check", value: "no", label: "No", version: "kw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:check:no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "check", order: 7};
+MERGE (o:SkillOption {id: "kind_wishes:check:yes"})
+SET o:SkillOption, o += {skillId: "kind_wishes", list: "check", value: "yes", label: "Yes", version: "kw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:check:yes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "check", order: 8};
+MERGE (o:SkillOption {id: "kind_wishes:check:unsure"})
+SET o:SkillOption, o += {skillId: "kind_wishes", list: "check", value: "unsure", label: "I'm not sure", version: "kw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:check:unsure"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "check", order: 9};
+MERGE (o:SkillOption {id: "kind_wishes:instead:self"})
+SET o:SkillOption, o += {skillId: "kind_wishes", list: "instead", value: "self", label: "Send them to me instead", version: "kw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:instead:self"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "instead", order: 10};
+MERGE (o:SkillOption {id: "kind_wishes:instead:easy"})
+SET o:SkillOption, o += {skillId: "kind_wishes", list: "instead", value: "easy", label: "Someone easy instead", version: "kw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:instead:easy"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "instead", order: 11};
+MERGE (o:SkillOption {id: "kind_wishes:wishes:safe"})
+SET o:SkillOption:KindWish, o += {skillId: "kind_wishes", list: "wishes", value: "safe", label: "Be safe", version: "kw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:wishes:safe"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wishes", order: 12};
+MERGE (o:SkillOption {id: "kind_wishes:wishes:ease"})
+SET o:SkillOption:KindWish, o += {skillId: "kind_wishes", list: "wishes", value: "ease", label: "Be at ease", version: "kw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:wishes:ease"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wishes", order: 13};
+MERGE (o:SkillOption {id: "kind_wishes:wishes:cared"})
+SET o:SkillOption:KindWish, o += {skillId: "kind_wishes", list: "wishes", value: "cared", label: "Be looked after", version: "kw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:wishes:cared"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wishes", order: 14};
+MERGE (o:SkillOption {id: "kind_wishes:wishes:rest"})
+SET o:SkillOption:KindWish, o += {skillId: "kind_wishes", list: "wishes", value: "rest", label: "Rest", version: "kw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:wishes:rest"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wishes", order: 15};
+MERGE (o:SkillOption {id: "kind_wishes:wishes:free"})
+SET o:SkillOption:KindWish, o += {skillId: "kind_wishes", list: "wishes", value: "free", label: "Be free from this pain", version: "kw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:wishes:free"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "wishes", order: 16};
+MERGE (o:SkillOption {id: "kind_wishes:came:warmth"})
+SET o:SkillOption, o += {skillId: "kind_wishes", list: "came", value: "warmth", label: "Some warmth", version: "kw-v1"}, o.propsJson = "{\"backdraft\": false}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:came:warmth"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "came", order: 17};
+MERGE (o:SkillOption {id: "kind_wishes:came:nothing"})
+SET o:SkillOption, o += {skillId: "kind_wishes", list: "came", value: "nothing", label: "Nothing much", version: "kw-v1"}, o.propsJson = "{\"backdraft\": false}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:came:nothing"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "came", order: 18};
+MERGE (o:SkillOption {id: "kind_wishes:came:sad"})
+SET o:SkillOption, o += {skillId: "kind_wishes", list: "came", value: "sad", label: "Sadness", version: "kw-v1"}, o.propsJson = "{\"backdraft\": true}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:came:sad"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "came", order: 19};
+MERGE (o:SkillOption {id: "kind_wishes:came:stirred"})
+SET o:SkillOption, o += {skillId: "kind_wishes", list: "came", value: "stirred", label: "Stirred up or angry", version: "kw-v1"}, o.propsJson = "{\"backdraft\": true}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:came:stirred"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "came", order: 20};
+MERGE (o:SkillOption {id: "kind_wishes:step_down:hand"})
+SET o:SkillOption, o += {skillId: "kind_wishes", list: "step_down", value: "hand", label: "A hand on my heart", version: "kw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:step_down:hand"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step_down", order: 21};
+MERGE (o:SkillOption {id: "kind_wishes:step_down:easier"})
+SET o:SkillOption, o += {skillId: "kind_wishes", list: "step_down", value: "easier", label: "Try someone easier", version: "kw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:step_down:easier"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step_down", order: 22};
+MERGE (o:SkillOption {id: "kind_wishes:step_down:stop"})
+SET o:SkillOption, o += {skillId: "kind_wishes", list: "step_down", value: "stop", label: "Stop here", version: "kw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "kind_wishes"}), (o:SkillOption {id: "kind_wishes:step_down:stop"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step_down", order: 23};

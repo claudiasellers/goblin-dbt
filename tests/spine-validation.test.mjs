@@ -25,7 +25,7 @@ test("every interactive tool declares its close; client and server registries ag
   const playedIds = [...played.slice(played.indexOf("PLAYER_TOOLS")).matchAll(/^\s*'([a-z-]+)': '/gm)].map((m) => m[1]);
   // A port keeps its old page in the tree until a follow-up deletes it (C8.4), so a tool can be in both lists.
   const components = [...new Set([...[...block.matchAll(/'([a-z-]+)':/g)].map((m) => m[1]), ...playedIds])];
-  assert.equal(components.length, 43); // + moment-apart (MF-07), + effectiveness (MF-08), + sleep-reset (ER-13), + emotion-guide (ER-10), + mindfulness-of-others (IE-10), + rehearse (IE-02), + mindfulness-emotions (ER-08), + notice-and-name (MF-01), + unpack-a-judgment (MF-03), + one-thing (MF-05)
+  assert.equal(components.length, 44); // + kind-wishes (MF-06), + moment-apart (MF-07), + effectiveness (MF-08), + sleep-reset (ER-13), + emotion-guide (ER-10), + mindfulness-of-others (IE-10), + rehearse (IE-02), + mindfulness-emotions (ER-08), + notice-and-name (MF-01), + unpack-a-judgment (MF-03), + one-thing (MF-05)
   for (const id of components) {
     assert.ok(tools.SPINE_TOOLS[id], `${id}: add it to functions/src/spine/tools.ts`);
     assert.ok(close.TOOL_CLOSE_KIND[id], `${id}: add it to src/lib/spine/close.ts`);

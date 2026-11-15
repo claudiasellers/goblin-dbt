@@ -46,6 +46,7 @@ import one_thing  # noqa: E402
 import effectively  # noqa: E402
 import wise_mind_check  # noqa: E402
 import moment_apart  # noqa: E402
+import kind_wishes  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
@@ -55,7 +56,7 @@ SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKIL
           opposite_action.SKILL, habit_plan.SKILL, please_skill.SKILL, give.SKILL, good_things.SKILL, *crisis_kit.SKILLS, values.SKILL, build_mastery.SKILL,
           finding_connection.SKILL, notice_them.SKILL, rehearse.SKILL, emotion_guide.SKILL, emotion_myths.SKILL, walk_the_wave.SKILL, mindfulness_emotions.SKILL, sleep_reset.SKILL,
           notice_and_name.SKILL, unpack_a_judgment.SKILL, one_thing.SKILL, effectively.SKILL, wise_mind_check.SKILL,
-          moment_apart.SKILL]
+          moment_apart.SKILL, kind_wishes.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -141,6 +142,9 @@ EMBEDS = {
     # MF-04's stone (docs/design/wise-mind-check.md): let go, it sinks and rests. done (it rested) / partly (moved on
     # while it sank) / skipped (never let go), and the seconds.
     "stoneSink": {"ids": ["done", "partly", "skipped"], "measures": ["durationSec"]},
+    # MF-06's offer (docs/design/kind-wishes.md): the wishes one at a time. offered (all) / partly / skipped, the
+    # seconds, and how many were offered (a measure, never shown).
+    "wishOffer": {"ids": ["offered", "partly", "skipped"], "measures": ["durationSec", "doneCount"]},
 }
 # What each embed takes from the skill (embeds.ts EMBED_PROPS; the contract test keeps the two equal). build.py
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
@@ -520,6 +524,17 @@ EMBED_PROPS = {
         "line3": {"type": "copy"},
         "seconds": {"type": "int", "min": 10, "max": 120},
         "start": {"type": "copy"},
+        "next": {"type": "copy"},
+        "skip": {"type": "copy"},
+    },
+    "wishOffer": {
+        "wishes": {"type": "field"},
+        "line": {"type": "copy"},
+        "seconds": {"type": "int", "min": 10, "max": 60},
+        "start": {"type": "copy"},
+        "running": {"type": "copy"},
+        "hint": {"type": "copy"},
+        "done": {"type": "copy"},
         "next": {"type": "copy"},
         "skip": {"type": "copy"},
     },

@@ -34,6 +34,7 @@ export const PLAYER_TOOLS: Readonly<Record<string, string>> = {
   'one-thing': 'one_thing',
   'effectiveness': 'effectively',
   'moment-apart': 'moment_apart',
+  'kind-wishes': 'kind_wishes',
 };
 
 /**

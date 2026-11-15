@@ -535,6 +535,19 @@ export const tools: Tool[] = [
     emoji: '🔬',
     bare: true,
   },
+  {
+    // MF-06 on the skill runtime (docs/design/kind-wishes.md): kind wishes offered on purpose, to someone easy, someone
+    // neutral, yourself, someone difficult or everyone around you; backdraft named, never failure.
+    id: 'kind-wishes',
+    name: 'Kind wishes',
+    tagline: 'Practise warmth, even when it doesn\'t feel true',
+    description: 'Pick someone, start with someone easy, and offer them two or three kind wishes, one at a time. The wishes don\'t need to feel true. Offering them is the practice.',
+    whenToUse: 'On a calmer day, when you\'re hard on yourself or sore after being turned away.',
+    module: 'mindfulness',
+    dbtBasis: 'DBT Mindfulness: loving kindness',
+    emoji: '🕊️',
+    bare: true,
+  },
   // Mindfulness (parts, docs/design/parts.md: listed and opened only with the parts switch on and its copy signed off)
   {
     id: 'meet-a-part',
@@ -593,6 +606,7 @@ export const allIntents: Intent[] = [
   { id: 'out-of-head', label: 'Get out of my head', toolId: 'one-thing', query: 'enterAt=outside&frame=ruminate', emoji: '🫖' },
   { id: 'right-or-works', label: 'Being right is getting in the way', toolId: 'effectiveness', emoji: '🎯' },
   { id: 'what-it-was', label: 'Work out what a moment was made of', toolId: 'moment-apart', emoji: '🔬' },
+  { id: 'kind-wishes', label: 'Practise being kind, to someone or to me', toolId: 'kind-wishes', emoji: '🕊️' },
   { id: 'hard-on-myself', label: 'I\'m being hard on myself', toolId: 'unpack-a-judgment', emoji: '🧺' },
   { id: 'blow-it-up', label: 'I want to blow it all up', toolId: 'alternate-rebellion', emoji: '🎸' },
   { id: 'reasons', label: 'Make a card for a pull that keeps coming back', toolId: 'pros-cons', emoji: '⚖️' },

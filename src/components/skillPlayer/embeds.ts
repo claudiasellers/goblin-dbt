@@ -30,6 +30,7 @@ import { PebbleBowl } from './PebbleBowl';
 import { ThoughtDrift } from './ThoughtDrift';
 import { DescribeCard } from './DescribeCard';
 import { StoneSink } from './StoneSink';
+import { WishOffer } from './WishOffer';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -108,6 +109,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   pebbleBowl: PebbleBowl,
   describeCard: DescribeCard,
   stoneSink: StoneSink,
+  wishOffer: WishOffer,
 };
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
@@ -159,6 +161,7 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   describeCard: { ids: ['read'] },
   // MF-04's stone: rested (`done`), moved on while it sank (`partly`) or never let go (`skipped`), and the seconds.
   stoneSink: { ids: ['done', 'partly', 'skipped'], measures: ['durationSec'] },
+  wishOffer: { ids: ['offered', 'partly', 'skipped'], measures: ['durationSec', 'doneCount'] },
 };
 
 /**
@@ -587,6 +590,22 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     start: { type: 'copy' },
     next: { type: 'copy' },
     /** The quiet way on before the stone rests (named apart from `next` for screen readers). */
+    skip: { type: 'copy' },
+  },
+
+  // MF-06 (docs/design/kind-wishes.md): the picked wishes, one at a time, each offered with a slow ring.
+  wishOffer: {
+    /** The field whose picks are the wishes (labels, own words last). */
+    wishes: { type: 'field' },
+    /** The template each wish goes into: *May you {wish}.* */
+    line: { type: 'copy' },
+    seconds: { type: 'int', min: 10, max: 60 },
+    start: { type: 'copy' },
+    running: { type: 'copy' },
+    hint: { type: 'copy' },
+    done: { type: 'copy' },
+    next: { type: 'copy' },
+    /** The quiet way on before the last wish (named apart from `next` for screen readers). */
     skip: { type: 'copy' },
   },
 };

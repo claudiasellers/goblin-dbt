@@ -25,6 +25,7 @@ UNWIND [
   {c: "dbt_nonjudgmental", t: "unpack-a-judgment"},
   {c: "dbt_one_mindfully", t: "one-thing"},
   {c: "dbt_mindful_events", t: "moment-apart"},
+  {c: "dbt_loving_kindness", t: "kind-wishes"},
   {c: "dbt_effectively", t: "effectiveness"},
   {c: "dbt_cope_ahead", t: "cope-ahead"},
   {c: "dbt_check_facts", t: "check-the-facts"},
