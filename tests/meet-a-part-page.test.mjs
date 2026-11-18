@@ -62,17 +62,18 @@ test("listed only with parts on and its copy shipped (the gate ToolPage opens it
   assert.equal(T.getToolById("two-pulls").listed, false, "Two pulls: by link only, never listed");
   // Lists read only listed tools: Tools.tsx through getToolsByModule, with `parts` from Meet a part's own gate.
   const tools = read("src/pages/Tools.tsx");
-  assert.match(tools, /import \{ getToolById, getToolsByModule, intents \} from '\.\.\/data\/tools'/, "getToolById: only the admin official-name line under an intent");
+  assert.match(tools, /import \{ STARTER_INTENT_IDS, getToolById, getToolsByModule, intents, type Intent \} from '\.\.\/data\/tools'/, "getToolById: the admin official-name line under an intent, and an intent's module for its group");
   assert.match(tools, /const parts = useToolGate\('meet-a-part'\) === 'open';/, "false while the gate loads: no flicker");
   assert.match(tools, /getToolsByModule\(mod\.id, \{ parts \}\)/);
   // A visit that starts from the list says so ('tools'); every other card carries no state.
-  assert.match(tools, /<ToolCard key=\{tool\.id\} tool=\{tool\} state=\{tool\.id === 'meet-a-part' \? toolsMeetLink\(\)\.state : undefined\} \/>/);
+  assert.match(tools, /\{ key: tool\.id, node: <ToolCard tool=\{tool\} state=\{tool\.id === 'meet-a-part' \? toolsMeetLink\(\)\.state : undefined\} \/> \}/);
   assert.deepEqual(S.parseMeetEntry(PM.toolsMeetLink().state), { trailheadKind: "tools", partId: null, candidateId: null, moveId: null });
   assert.equal(PM.toolsMeetLink().pathname, "/tool/meet-a-part");
   assert.equal(V.validateStartPartSession(S.startRequest(SID, { move: "hide", partId: null }, S.parseMeetEntry(PM.toolsMeetLink().state))).trailheadKind, "tools", "the server takes it");
   // (A mode card, Tool.moreCards, adds its query; Meet a part has none, so its link is the tool's own.)
   assert.match(read("src/components/ToolCard.tsx"), /to=\{`\/tool\/\$\{tool\.id\}\$\{mode \? `\?\$\{mode\.query\}` : ''\}`\}\s+state=\{state\}/);
-  assert.match(tools, /\{intents\.map\(/, "the intents are the fixed list");
+  assert.match(tools, /STARTER_INTENT_IDS\.flatMap\(id => intents\.filter\(/, "the intents are the fixed list: six lead");
+  assert.match(tools, /list: intents\.filter\(i => !starters\.includes\(i\)/, "the intents are the fixed list: the rest behind More");
   const page = read("src/pages/ToolPage.tsx");
   assert.match(page, /'meet-a-part': MeetAPart,/);
   assert.match(page, /if \(!tool \|\| gate === 'closed'\) \{/, "parts off or copy missing: the existing not-found state");
