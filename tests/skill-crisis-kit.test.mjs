@@ -262,6 +262,6 @@ test("Make my crisis kit has its own card under Distress Tolerance beside the ki
   // The mode card leads with its own name even with official names on, so it never reads as a copy of the kit's card (Cludes, 12 Nov).
   assert.match(readFileSync("src/components/ToolCard.tsx", "utf8"), /\{mode \? mode\.name : label\(tool\)\}/);
   const page = readFileSync("src/pages/Tools.tsx", "utf8");
-  assert.match(page, /\(tool\.moreCards \?\? \[\]\)\.map\(m => <ToolCard key=\{`\$\{tool\.id\}:\$\{m\.key\}`\} tool=\{tool\} mode=\{m\} \/>\)/);
+  assert.match(page, /\(tool\.moreCards \?\? \[\]\)\.map\(m => \(\{ key: `\$\{tool\.id\}:\$\{m\.key\}`, node: <ToolCard tool=\{tool\} mode=\{m\} \/> \}\)\)/);
   assert.match(readFileSync("src/components/ToolCard.tsx", "utf8"), /to=\{`\/tool\/\$\{tool\.id\}\$\{mode \? `\?\$\{mode\.query\}` : ''\}`\}/);
 });

@@ -667,6 +667,12 @@ export const allIntents: Intent[] = [
   { id: 'nightmares', label: 'The same nightmare keeps coming back', toolId: 'nightmare-rescript', emoji: '🌙' },
 ];
 
+/**
+ * The six intents the Tools page leads with (D5 of the UI fix plan, 18 Nov 2026), in this order; the rest wait
+ * behind *More*, grouped by module. Six plus *More* keeps the first screen to seven choices (src/lib/choiceChunks.ts).
+ */
+export const STARTER_INTENT_IDS = ['calm-fast', 'thoughts-passing', 'mind-job', 'running-low', 'hurt', 'urge'] as const;
+
 /** The intents the Tools page lists: those whose tool is listed for everyone. */
 export const intents: Intent[] = allIntents.filter(i => tools.find(t => t.id === i.toolId)?.listed === undefined);
 

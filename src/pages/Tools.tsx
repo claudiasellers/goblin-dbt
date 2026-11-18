@@ -1,6 +1,8 @@
+import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { modules } from '../data/modules';
-import { getToolById, getToolsByModule, intents } from '../data/tools';
+import { STARTER_INTENT_IDS, getToolById, getToolsByModule, intents, type Intent } from '../data/tools';
+import { chunkSize } from '../lib/choiceChunks';
 import { ToolCard } from '../components/ToolCard';
 import { useToolGate } from '../hooks/useToolGate';
 import { toolsMeetLink } from '../lib/partsOfMe';
@@ -8,6 +10,27 @@ import { toolsIntro } from '../lib/toolsIntro';
 import { useAuth } from '../contexts/AuthContext';
 import { OfficialNamesToggle } from '../components/admin/OfficialNamesToggle';
 import { useOfficialNames } from '../hooks/useOfficialNames';
+
+const moreButton = 'min-h-11 px-2 text-sm font-semibold text-[var(--color-accent)] bg-transparent border-none cursor-pointer hover:underline';
+
+/**
+ * A list shown in chunks (the tools' seven-choice rule, src/lib/choiceChunks.ts): up to seven when they fit, else
+ * six and a *More* button that adds the next six as their own group, so no group on screen holds more than seven.
+ */
+function Chunked({ items, more, className }: { items: { key: string; node: ReactNode }[]; more: string; className: string }) {
+  const size = chunkSize(items.length, 0);
+  const [chunks, setChunks] = useState(1);
+  const groups: { key: string; node: ReactNode }[][] = [];
+  for (let i = 0; i < Math.min(items.length, chunks * size); i += size) groups.push(items.slice(i, i + size));
+  return (
+    <div className="space-y-3">
+      {groups.map((g, i) => <ul key={i} className={className}>{g.map((it) => <li key={it.key}>{it.node}</li>)}</ul>)}
+      {chunks * size < items.length && (
+        <div className="flex justify-center"><button type="button" className={moreButton} onClick={() => setChunks((n) => n + 1)}>{more}</button></div>
+      )}
+    </div>
+  );
+}
 
 export function Tools() {
   const { phase } = useAuth();
@@ -19,6 +42,27 @@ export function Tools() {
   const populatedModules = modules
     .map(mod => ({ mod, tools: getToolsByModule(mod.id, { parts }) }))
     .filter(({ tools }) => tools.length > 0);
+  // Six intents lead (D5); the rest wait behind *More*, grouped by the module of the tool each opens.
+  const [allIntentsOpen, setAllIntentsOpen] = useState(false);
+  const starters = STARTER_INTENT_IDS.flatMap(id => intents.filter(i => i.id === id));
+  const intentGroups = modules
+    .map(mod => ({ mod, list: intents.filter(i => !starters.includes(i) && getToolById(i.toolId)?.module === mod.id) }))
+    .filter(({ list }) => list.length > 0);
+  const intentLink = (intent: Intent) => (
+      <Link
+        to={`/tool/${intent.toolId}${intent.query ? `?${intent.query}` : ''}`}
+        className="flex items-center gap-3 min-h-14 px-4 py-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-card)] text-[var(--color-text-primary)] font-medium lift-card"
+      >
+        <span className="text-xl" aria-hidden="true">{intent.emoji}</span>
+        <span className="min-w-0">
+          <span className="block">{intent.label}</span>
+          {names && (() => {
+            const t = getToolById(intent.toolId);
+            return t && names[t.id] ? <span className="block text-xs font-normal text-[var(--color-text-tertiary)]">{label(t)}</span> : null;
+          })()}
+        </span>
+      </Link>
+  );
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -39,24 +83,24 @@ export function Tools() {
           What do you need?
         </h2>
         <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {intents.map(intent => (
-            <li key={intent.id}>
-              <Link
-                to={`/tool/${intent.toolId}${intent.query ? `?${intent.query}` : ''}`}
-                className="flex items-center gap-3 min-h-14 px-4 py-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-card)] text-[var(--color-text-primary)] font-medium lift-card"
-              >
-                <span className="text-xl" aria-hidden="true">{intent.emoji}</span>
-                <span className="min-w-0">
-                  <span className="block">{intent.label}</span>
-                  {names && (() => {
-                    const t = getToolById(intent.toolId);
-                    return t && names[t.id] ? <span className="block text-xs font-normal text-[var(--color-text-tertiary)]">{label(t)}</span> : null;
-                  })()}
-                </span>
-              </Link>
-            </li>
-          ))}
+          {starters.map(i => <li key={i.id}>{intentLink(i)}</li>)}
         </ul>
+        {!allIntentsOpen ? (
+          <div className="mt-3 flex justify-center">
+            <button type="button" className={moreButton} aria-expanded="false" onClick={() => setAllIntentsOpen(true)} data-testid="tools-more-intents">
+              More
+            </button>
+          </div>
+        ) : (
+          <div className="mt-6 space-y-6">
+            {intentGroups.map(({ mod, list }) => (
+              <div key={mod.id}>
+                <h3 className="text-sm font-medium text-[var(--color-text-secondary)] mb-3 px-1">{mod.name}</h3>
+                <Chunked items={list.map(i => ({ key: i.id, node: intentLink(i) }))} more={`More for ${mod.name}`} className="grid grid-cols-1 sm:grid-cols-2 gap-2" />
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Full directory, grouped by DBT module as secondary information */}
@@ -78,12 +122,14 @@ export function Tools() {
                   </Link>
                 )}
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {tools.flatMap(tool => [
-                  <ToolCard key={tool.id} tool={tool} state={tool.id === 'meet-a-part' ? toolsMeetLink().state : undefined} />,
-                  ...(tool.moreCards ?? []).map(m => <ToolCard key={`${tool.id}:${m.key}`} tool={tool} mode={m} />),
+              <Chunked
+                more={`More in ${mod.name}`}
+                className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+                items={tools.flatMap(tool => [
+                  { key: tool.id, node: <ToolCard tool={tool} state={tool.id === 'meet-a-part' ? toolsMeetLink().state : undefined} /> },
+                  ...(tool.moreCards ?? []).map(m => ({ key: `${tool.id}:${m.key}`, node: <ToolCard tool={tool} mode={m} /> })),
                 ])}
-              </div>
+              />
             </div>
           ))}
         </div>

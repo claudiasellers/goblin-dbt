@@ -23,6 +23,7 @@ import {
   type Answer, type RunContext, type RunEvent, type RunState,
 } from '../../lib/skillRuntime/machine';
 import { holds, resolve } from '../../lib/skillRuntime/conditions';
+import { chunkOf } from '../../lib/choiceChunks';
 import { getSkillRun, getSkillsContent } from '../../services/skills';
 import { answerToolOutcome, getSpineContent, scheduleFollowUps } from '../../services/spine';
 import { keepProfileItem } from '../../services/profile';
@@ -645,25 +646,40 @@ function FieldView({ ctx, field, st, send, onMore, onExit }: {
   const label = field.label ? c[field.label] : null;
   const pick = (value: string) => send({ type: 'pick', fieldId: field.id, value });
 
+  // The tools' seven-choice rule (src/lib/choiceChunks.ts): at most seven chips at once, counting *add your own*
+  // and a picker's *more*; a longer list comes in chunks behind one *More options* chip, picks always kept in view.
+  const [page, setPage] = useState(0);
+  const ownChip = !!field.own && !field.own.open;
+  const chunkChip = (pages: number, at: number) => pages > 1 && (
+    <Chip label={at < pages - 1 ? (c.more_options ?? 'More options') : (c.first_options ?? 'Back to the first ones')}
+      onClick={() => setPage((n) => n + 1)} />
+  );
+
   let chips: ReactNode;
   if (field.options.emotions) {
+    const more = !!field.options.moreKey && !!c[field.options.moreKey];
+    const k = chunkOf(emotionChoices(ctx, field, answersOf(ctx, st)), page, more ? 1 : 0, picked);
     chips = (
       <div className="flex flex-wrap gap-2.5">
-        {emotionChoices(ctx, field, answersOf(ctx, st)).map((id) => (
+        {k.shown.map((id) => (
           <Chip key={id} label={getEmotionById(id)?.name ?? id} pressed={picked(id)} onClick={() => pick(id)} />
         ))}
-        {field.options.moreKey && c[field.options.moreKey] && <Chip label={c[field.options.moreKey]} onClick={onMore} />}
+        {chunkChip(k.pages, k.page)}
+        {more && <Chip label={c[field.options.moreKey!]} onClick={onMore} />}
       </div>
     );
   } else {
     const groups = optionGroups(ctx, field, answersOf(ctx, st));
-    chips = groups.map((g) => (
+    const k = chunkOf(groups.flatMap((g) => g.options.map((o) => ({ g, o }))), page, ownChip ? 1 : 0, (x) => picked(x.o.value));
+    const shown = groups.map((g) => ({ g, options: k.shown.filter((x) => x.g === g).map((x) => x.o) })).filter((x) => x.options.length > 0);
+    chips = shown.map(({ g, options }, i) => (
       <div key={g.key ?? 'all'} className="space-y-2">
         {g.label && <p className={`font-serif text-lg text-[var(--color-text-primary)] ${g.own ? 'italic' : ''}`}>{g.label}</p>}
         <div className="flex flex-wrap gap-2.5">
-          {g.options.map((o) => <Chip key={o.value} label={o.label} pressed={picked(o.value)} onClick={() => pick(o.value)} />)}
-          {field.own && !field.own.open && g === groups[groups.length - 1] && (
-            <Chip label={c[field.own.hint] ?? c.own_hint} pressed={ownOpen} own onClick={() => setOwnOpen((x) => !x)} />
+          {options.map((o) => <Chip key={o.value} label={o.label} pressed={picked(o.value)} onClick={() => pick(o.value)} />)}
+          {i === shown.length - 1 && chunkChip(k.pages, k.page)}
+          {ownChip && i === shown.length - 1 && (
+            <Chip label={c[field.own!.hint] ?? c.own_hint} pressed={ownOpen} own onClick={() => setOwnOpen((x) => !x)} />
           )}
         </div>
       </div>
