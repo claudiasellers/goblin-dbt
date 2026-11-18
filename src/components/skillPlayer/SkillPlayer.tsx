@@ -671,7 +671,10 @@ function FieldView({ ctx, field, st, send, onMore, onExit }: {
   } else {
     const groups = optionGroups(ctx, field, answersOf(ctx, st));
     const k = chunkOf(groups.flatMap((g) => g.options.map((o) => ({ g, o }))), page, ownChip ? 1 : 0, (x) => picked(x.o.value));
-    const shown = groups.map((g) => ({ g, options: k.shown.filter((x) => x.g === g).map((x) => x.o) })).filter((x) => x.options.length > 0);
+    const kept = groups.map((g) => ({ g, options: k.shown.filter((x) => x.g === g).map((x) => x.o) })).filter((x) => x.options.length > 0);
+    // A list that filtered down to nothing still shows its row, so *add your own* is always there (What matters
+    // to me's keep step after only own words).
+    const shown = kept.length || !ownChip ? kept : [{ g: { key: null, label: null, own: false, options: [] }, options: [] }];
     chips = shown.map(({ g, options }, i) => (
       <div key={g.key ?? 'all'} className="space-y-2">
         {g.label && <p className={`font-serif text-lg text-[var(--color-text-primary)] ${g.own ? 'italic' : ''}`}>{g.label}</p>}
