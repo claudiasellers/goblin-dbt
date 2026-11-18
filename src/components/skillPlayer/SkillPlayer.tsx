@@ -496,7 +496,8 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
             // says it's still loud (R3, as the hand-built DEAR MAN prep's heads-up did).
             if (r.thenVsNow === 'much_better') setCtxIn((c) => { if (!('band' in c)) return c; const { band: _gone, ...rest } = c; void _gone; return rest; });
           }} />
-          <div ref={setExitSlot} className="contents" />
+          {/* Inert under P2, as the step is: the dialog has no focus trap, so the link must not be reachable behind it. */}
+          <div ref={setExitSlot} className="contents" inert={p2Open} />
         </div>
       )}
     </div>
