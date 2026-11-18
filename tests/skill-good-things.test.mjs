@@ -36,7 +36,7 @@ test("the skill: tool good-things, concept dbt_accumulate_positives, no close qu
   assert.match(readFileSync("functions/src/spine/tools.ts", "utf8"), /'good-things': \{ module: 'er', closeKind: 'none' \}/);
   assert.match(readFileSync("src/lib/spine/close.ts", "utf8"), /'good-things': \{ module: 'er', closeKind: 'none' \}/);
   const tools = readFileSync("src/data/tools.ts", "utf8");
-  assert.match(tools, /id: 'good-things',\n\s+name: 'Good Things',[\s\S]*?module: 'emotion-regulation'/);
+  assert.match(tools, /id: 'good-things',\n\s+name: 'Good things',[\s\S]*?module: 'emotion-regulation'/);
   assert.match(tools, /label: 'Find something good', toolId: 'good-things'/, "the PRD's Tools intent");
   assert.match(readFileSync("src/lib/skillRuntime/playerTools.ts", "utf8"), /'good-things': 'good_things'/);
   assert.match(readFileSync("schema/app-tool-ids.cypher", "utf8"), /\{c: "dbt_accumulate_positives", t: "good-things"\}/);

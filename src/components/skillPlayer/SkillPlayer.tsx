@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import type { HandoffResult, ThenVsNow } from '../../data/capacityTypes';
 import { PROFILE_NEEDS, type ClientProfileConsumer } from '../../data/profileTypes';
@@ -177,6 +178,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
   const [safetyOpen, setSafetyOpen] = useState(false);
   // P2 (This is too much right now) over the step: an embed hears it as `covered`, with safety.open.
   const [p2Open, setP2Open] = useState(false);
+  const [exitSlot, setExitSlot] = useState<HTMLElement | null>(null);
   const [st, setSt] = useState<RunState>(() => (inline ? inlineStart(ctx, inline.enterAt) : pageStart(ctx)));
   // A new step starts uncovered (P2 left open by a path that didn't say so never stops a later clock).
   useEffect(() => { setP2Open(false); }, [st.stepId]);
@@ -456,7 +458,8 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
     // A step whose way on reads the profile (`$p.*` in a transition, such as Running low's left-out rows) waits for it
     // to answer, so a quick Next can't take the path the person turned off.
     const waitsOnProfile = !profileSettled && step.next.some((t) => JSON.stringify(t.when ?? null).includes('"$p.'));
-    body = <AskStep ctx={ctx} step={step} st={st} send={send} onExit={leave} onShown={onShown} onPrimary={primary} busy={busy || waitsOnProfile} />;
+    body = <AskStep ctx={ctx} step={step} st={st} send={send} onExit={leave} onShown={onShown} onPrimary={primary} busy={busy || waitsOnProfile}
+      exitSlot={!inline && !leaving && !safetyOpen ? exitSlot : null} />;
   }
 
   // R16 with more than one pick: which one this screen is about, and its place (a small header, not a heading).
@@ -483,23 +486,29 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRec
         </div>
       )}
       {!inline && !leaving && !safetyOpen && (
-        <div className="flex justify-center">
-          <TooMuchLink host={skill.toolId} onOpen={() => setP2Open(true)} onClose={() => setP2Open(false)} onResult={(r) => {
+        // The ways out, one row under Next on every screen (the UI fix plan, 18 Nov): too much for now, and an ask
+        // step's *Talk to someone now* (AskStep portals it into `exitSlot`), in the same place every time.
+        <div className="flex flex-wrap items-center justify-center gap-x-6" data-testid="skill-exits">
+          <TooMuchLink host={skill.toolId} className={linkButton} onOpen={() => setP2Open(true)} onClose={() => setP2Open(false)} onResult={(r) => {
             handoffs.current.push(r);
             toolSession.setExt({ run: { handoffs: handoffExt(handoffs.current) } });
             // The reread said much quieter: the band carried in is no longer what they told us, so nothing after this
             // says it's still loud (R3, as the hand-built DEAR MAN prep's heads-up did).
             if (r.thenVsNow === 'much_better') setCtxIn((c) => { if (!('band' in c)) return c; const { band: _gone, ...rest } = c; void _gone; return rest; });
           }} />
+          {/* Inert under P2, as the step is: the dialog has no focus trap, so the link must not be reachable behind it. */}
+          <div ref={setExitSlot} className="contents" inert={p2Open} />
         </div>
       )}
     </div>
   );
 }
 
-function AskStep({ ctx, step, st, send, onExit, onShown, onPrimary, busy }: {
+function AskStep({ ctx, step, st, send, onExit, onShown, onPrimary, busy, exitSlot = null }: {
   ctx: RunContext; step: StepDef; st: RunState; send: (e: RunEvent) => void; onExit: (x: ExitDef) => void; onShown: (record: string) => void;
   onPrimary: () => void; busy: boolean;
+  /** The player's exit row under Next: a field's safety link goes there; inline (no row), it stays under Next. */
+  exitSlot?: HTMLElement | null;
 }) {
   const c = ctx.skill.copy;
   const sc = scope(ctx, st);
@@ -530,6 +539,12 @@ function AskStep({ ctx, step, st, send, onExit, onShown, onPrimary, busy }: {
   });
   // An ask step's conditional line (`lines`, as a hand-off's): context the question reads from, above its hint.
   const askLine = handoffLine(ctx, step, st);
+  // *Talk to someone now* (a safety exit on any field) leaves the chips and sits with the other way out, under Next.
+  const safetyLinks = fields.flatMap((f) => fieldLinks(ctx, f, st)).filter((l) => l.exit.safety)
+    .filter((l, i, all) => all.findIndex((x) => x.exit.id === l.exit.id) === i);
+  const safetyRow = safetyLinks.map((l) => (
+    <button key={l.exit.id} type="button" className={`${linkButton} !text-[var(--color-accent)]`} data-step-link={l.exit.id} onClick={() => onExit(l.exit)}>{l.label}</button>
+  ));
   return (<>
     {title && <Prompt>{title}</Prompt>}
     {askLine && <Line>{askLine}</Line>}
@@ -555,6 +570,7 @@ function AskStep({ ctx, step, st, send, onExit, onShown, onPrimary, busy }: {
         <button type="button" className={linkButton} disabled={busy || !canGoOn(ctx, st)} onClick={() => send({ type: 'next', quiet: true })}>{c[step.secondary]}</button>
       </div>
     )}
+    {safetyRow.length > 0 && (exitSlot ? createPortal(safetyRow, exitSlot) : <div className="flex justify-center">{safetyRow}</div>)}
   </>);
 }
 
@@ -651,42 +667,51 @@ function FieldView({ ctx, field, st, send, onMore, onExit }: {
   const [page, setPage] = useState(0);
   const ownChip = !!field.own && !field.own.open;
   const chunkChip = (pages: number, at: number) => pages > 1 && (
-    <Chip label={at < pages - 1 ? (c.more_options ?? 'More options') : (c.first_options ?? 'Back to the first ones')}
+    <Chip control label={at < pages - 1 ? (c.more_options ?? 'More options') : (c.first_options ?? 'Back to the first ones')}
       onClick={() => setPage((n) => n + 1)} />
   );
+  const ownChipEl = ownChip && (
+    <Chip control label={c[field.own!.hint] ?? c.own_hint} pressed={ownOpen} own onClick={() => setOwnOpen((x) => !x)} />
+  );
+  // The controls that aren't answers (*More options*, *add your own*, a picker's *more*) sit on their own row.
+  const controlRow = (...els: ReactNode[]) => els.some(Boolean) && <div className="flex flex-wrap gap-2.5">{els}</div>;
 
   let chips: ReactNode;
   if (field.options.emotions) {
     const more = !!field.options.moreKey && !!c[field.options.moreKey];
     const k = chunkOf(emotionChoices(ctx, field, answersOf(ctx, st)), page, more ? 1 : 0, picked);
-    chips = (
+    chips = (<>
       <div className="flex flex-wrap gap-2.5">
         {k.shown.map((id) => (
           <Chip key={id} label={getEmotionById(id)?.name ?? id} pressed={picked(id)} onClick={() => pick(id)} />
         ))}
-        {chunkChip(k.pages, k.page)}
-        {more && <Chip label={c[field.options.moreKey!]} onClick={onMore} />}
       </div>
-    );
+      {controlRow(chunkChip(k.pages, k.page), more && <Chip key="more" control label={c[field.options.moreKey!]} onClick={onMore} />)}
+    </>);
   } else {
     const groups = optionGroups(ctx, field, answersOf(ctx, st));
-    const k = chunkOf(groups.flatMap((g) => g.options.map((o) => ({ g, o }))), page, ownChip ? 1 : 0, (x) => picked(x.o.value));
-    const kept = groups.map((g) => ({ g, options: k.shown.filter((x) => x.g === g).map((x) => x.o) })).filter((x) => x.options.length > 0);
-    // A list that filtered down to nothing still shows its row, so *add your own* is always there (What matters
-    // to me's keep step after only own words).
-    const shown = kept.length || !ownChip ? kept : [{ g: { key: null, label: null, own: false, options: [] }, options: [] }];
-    chips = shown.map(({ g, options }, i) => (
-      <div key={g.key ?? 'all'} className="space-y-2">
-        {g.label && <p className={`font-serif text-lg text-[var(--color-text-primary)] ${g.own ? 'italic' : ''}`}>{g.label}</p>}
-        <div className="flex flex-wrap gap-2.5">
-          {options.map((o) => <Chip key={o.value} label={o.label} pressed={picked(o.value)} onClick={() => pick(o.value)} />)}
-          {i === shown.length - 1 && chunkChip(k.pages, k.page)}
-          {ownChip && i === shown.length - 1 && (
-            <Chip label={c[field.own!.hint] ?? c.own_hint} pressed={ownOpen} own onClick={() => setOwnOpen((x) => !x)} />
-          )}
+    // A medical answer (`danger: 'medical'`: chest pain, fainting) isn't one of the feelings: its own marked line.
+    const isAlert = (o: object) => (o as { danger?: unknown }).danger === 'medical';
+    const alerts = groups.flatMap((g) => g.options.filter(isAlert));
+    const plain = groups.map((g) => ({ ...g, options: g.options.filter((o) => !isAlert(o)) }));
+    const k = chunkOf(plain.flatMap((g) => g.options.map((o) => ({ g, o }))), page, (ownChip ? 1 : 0) + alerts.length, (x) => picked(x.o.value));
+    const shown = plain.map((g) => ({ g, options: k.shown.filter((x) => x.g === g).map((x) => x.o) })).filter((x) => x.options.length > 0);
+    chips = (<>
+      {shown.map(({ g, options }) => (
+        <div key={g.key ?? 'all'} className="space-y-2">
+          {g.label && <p className={`font-serif text-lg text-[var(--color-text-primary)] ${g.own ? 'italic' : ''}`}>{g.label}</p>}
+          <div className="flex flex-wrap gap-2.5">
+            {options.map((o) => <Chip key={o.value} label={o.label} pressed={picked(o.value)} onClick={() => pick(o.value)} />)}
+          </div>
         </div>
-      </div>
-    ));
+      ))}
+      {controlRow(chunkChip(k.pages, k.page), ownChipEl)}
+      {alerts.map((o) => (
+        <button key={o.value} type="button" className="den-alert" aria-pressed={picked(o.value) ? 'true' : 'false'} onClick={() => pick(o.value)}>
+          <span aria-hidden="true">⚠️</span><span className="font-semibold">{o.label}</span>
+        </button>
+      ))}
+    </>);
   }
 
   return (
@@ -705,7 +730,7 @@ function FieldView({ ctx, field, st, send, onMore, onExit }: {
           className="w-full p-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] font-serif text-lg focus:ring-2 focus:ring-[var(--color-accent)]" />
       )}
       {field.own?.seed && !startersHidden && chips}
-      {fieldLinks(ctx, field, st).map((l) => (
+      {fieldLinks(ctx, field, st).filter((l) => !l.exit.safety).map((l) => (
         <div key={l.exit.id} className="flex justify-center">
           <button type="button" className={linkButton} onClick={() => onExit(l.exit)}>{l.label}</button>
         </div>

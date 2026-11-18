@@ -238,7 +238,7 @@ export const tools: Tool[] = [
   {
     // ER-14 on the skill runtime (docs/design/er-troubleshoot.md): for when a skill was done and didn't help.
     id: 'er-troubleshoot',
-    name: 'It Isn\'t Working',
+    name: 'It isn\'t working',
     tagline: 'Find what got in the way of a skill',
     description: 'When you used a skill and it didn\'t help, go through the usual reasons one tap at a time, and find one thing to try next.',
     whenToUse: 'When you did a skill and nothing changed.',
@@ -251,7 +251,7 @@ export const tools: Tool[] = [
     // ER-15 on the skill runtime (docs/design/nightmare-rescript.md): a nightmare that keeps coming back, changed
     // while awake. Not for one that replays something real (a clinician's), never from the check-in or night mode.
     id: 'nightmare-rescript',
-    name: 'Rewrite the Nightmare',
+    name: 'Rewrite the nightmare',
     tagline: 'Write a new version of a recurring nightmare, while you\'re awake',
     description: 'Pick a nightmare that keeps coming back, change it before the bad part, give it a new ending, and read the new version through. Stop at any point.',
     whenToUse: 'When the same nightmare keeps coming back. Best in the daytime.',
@@ -263,7 +263,7 @@ export const tools: Tool[] = [
   {
     // ER-07 on the skill runtime (docs/design/running-low.md): PLEASE, for a day when everything is too loud.
     id: 'please-skill',
-    name: 'Running Low',
+    name: 'Running low',
     tagline: 'Check what your body is running on today',
     description: 'Sleep, food, your body, last night and moving, one tap each. See which one is turning the volume up, and pick one small thing for it today.',
     whenToUse: 'When everything feels like too much today and you don\'t know why.',
@@ -275,7 +275,7 @@ export const tools: Tool[] = [
   {
     // ER-13 on the skill runtime (docs/design/sleep-reset.md): sleep hygiene, the wake-time anchor and the night.
     id: 'sleep-reset',
-    name: 'Sleep Reset',
+    name: 'Sleep reset',
     tagline: 'For a night you can\'t sleep, or to set up your sleep times',
     description: 'Awake at night: put the thought down, breathe slowly, and get up for a bit instead of lying there. Or pick one time to get up every day and one thing to wind down with, and check in the next morning.',
     whenToUse: 'When you can\'t sleep, or when sleep has been all over the place and everything feels louder for it.',
@@ -287,7 +287,7 @@ export const tools: Tool[] = [
   {
     // ER-04 on the skill runtime (docs/design/good-things.md): accumulating positives, and the things I like list.
     id: 'good-things',
-    name: 'Good Things',
+    name: 'Good things',
     tagline: 'Find one okay thing, or plan one good thing for today',
     description: 'Notice one thing that\'s even a little okay and stay with it for a moment, or pick one small good thing to do today. Keep what helped in Things I like.',
     whenToUse: 'When nothing sounds good, or when something is good and you want to keep it.',
@@ -299,7 +299,7 @@ export const tools: Tool[] = [
   {
     // ER-09 on the skill runtime (docs/design/values.md): values and priorities, and one small step for one.
     id: 'values-clarification',
-    name: 'What Matters to Me',
+    name: 'What matters to me',
     tagline: 'Find what matters to you, then take one small step for it',
     description: 'Sort plain-word value cards, keep up to three for now, and pick one small step this week for one of them. Not sure yet is a full answer.',
     whenToUse: 'When you\'re not sure what you care about, or a choice feels hard and you want a direction.',
@@ -311,7 +311,7 @@ export const tools: Tool[] = [
   {
     // ER-11 on the skill runtime (docs/design/build-mastery.md): the "I can" ladder, one thing that's hard but doable.
     id: 'build-mastery',
-    name: 'Build Mastery',
+    name: 'Build mastery',
     tagline: 'One thing that\'s a stretch you can manage today',
     description: 'Pick a part of life and one step on a three-rung ladder, from easier to harder. Done beats done well, and smaller is still mastery.',
     whenToUse: 'When you want proof you can do hard things, or a big goal feels like too much.',
@@ -324,7 +324,7 @@ export const tools: Tool[] = [
     // ER-10 on the skill runtime (docs/design/emotion-guide.md): the feeling card and its family ladder; `?frame=myths`
     // plays the myth cards (part 4), its second skill.
     id: 'emotion-guide',
-    name: 'Know This Feeling',
+    name: 'Know this feeling',
     tagline: 'What a feeling is for, and a closer word for it',
     description: 'Pick a feeling to see what it\'s for, what often sets it off, where it shows up in the body and the pull it can bring. Then find the word in its family that\'s closest.',
     whenToUse: 'When you\'ve named a feeling and want to understand it, or the word you have feels too big or too vague.',

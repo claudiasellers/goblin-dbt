@@ -11,6 +11,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { OfficialNamesToggle } from '../components/admin/OfficialNamesToggle';
 import { useOfficialNames } from '../hooks/useOfficialNames';
 
+const moreControl = 'mt-2 w-full min-h-14 rounded-xl border-[1.5px] border-dashed border-[var(--color-border)] text-[var(--color-text-secondary)] bg-transparent cursor-pointer hover:text-[var(--color-text-primary)]';
 const moreButton = 'min-h-11 px-2 text-sm font-semibold text-[var(--color-accent)] bg-transparent border-none cursor-pointer hover:underline';
 
 /**
@@ -44,6 +45,7 @@ export function Tools() {
     .filter(({ tools }) => tools.length > 0);
   // Six intents lead (D5); the rest wait behind *More*, grouped by the module of the tool each opens.
   const [allIntentsOpen, setAllIntentsOpen] = useState(false);
+  const [openModule, setOpenModule] = useState<string | null>(null);
   const starters = STARTER_INTENT_IDS.flatMap(id => intents.filter(i => i.id === id));
   const intentGroups = modules
     .map(mod => ({ mod, list: intents.filter(i => !starters.includes(i) && getToolById(i.toolId)?.module === mod.id) }))
@@ -86,11 +88,9 @@ export function Tools() {
           {starters.map(i => <li key={i.id}>{intentLink(i)}</li>)}
         </ul>
         {!allIntentsOpen ? (
-          <div className="mt-3 flex justify-center">
-            <button type="button" className={moreButton} aria-expanded="false" onClick={() => setAllIntentsOpen(true)} data-testid="tools-more-intents">
-              More
-            </button>
-          </div>
+          <button type="button" className={moreControl} aria-expanded="false" onClick={() => setAllIntentsOpen(true)} data-testid="tools-more-intents">
+            Something else? See {intents.length - starters.length} more
+          </button>
         ) : (
           <div className="mt-6 space-y-6">
             {intentGroups.map(({ mod, list }) => (
@@ -108,30 +108,45 @@ export function Tools() {
         <h2 id="browse-heading" className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)] mb-4 px-1">
           Browse all tools
         </h2>
-        <div className="space-y-8">
-          {populatedModules.map(({ mod, tools }) => (
-            <div key={mod.id}>
-              <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
-                <h3 className="text-sm font-medium text-[var(--color-text-secondary)] m-0">
-                  {mod.name}
-                </h3>
-                {/* MF-02: Mindfulness is practised, so its module opens on its home too. */}
-                {mod.id === 'mindfulness' && (
-                  <Link to="/practice" className="min-h-11 inline-flex items-center text-sm font-medium text-[var(--color-accent)] hover:underline" data-testid="tools-practice-link">
-                    Practice
-                  </Link>
+        {/* One row per module (what it's for, how many), opened in place: four choices, not every card at once. */}
+        <div className="space-y-2.5">
+          {populatedModules.map(({ mod, tools }) => {
+            const cards = tools.flatMap(tool => [
+              { key: tool.id, node: <ToolCard tool={tool} state={tool.id === 'meet-a-part' ? toolsMeetLink().state : undefined} /> },
+              ...(tool.moreCards ?? []).map(m => ({ key: `${tool.id}:${m.key}`, node: <ToolCard tool={tool} mode={m} /> })),
+            ]);
+            const open = openModule === mod.id;
+            return (
+              <div key={mod.id}>
+                <button type="button" aria-expanded={open} aria-controls={`module-${mod.id}`} data-testid={`tools-module-${mod.id}`}
+                  onClick={() => setOpenModule(open ? null : mod.id)}
+                  className="w-full flex items-center justify-between gap-3 min-h-16 px-4 py-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-card)] text-left text-[var(--color-text-primary)] lift-card cursor-pointer">
+                  <span className="min-w-0">
+                    <span className="block font-semibold">{mod.name}</span>
+                    <span className="block text-sm text-[var(--color-text-tertiary)]">{mod.blurb} · {cards.length}</span>
+                  </span>
+                  <span aria-hidden="true" className={`text-xl text-[var(--color-text-secondary)] transition-transform ${open ? 'rotate-90' : ''}`}>›</span>
+                </button>
+                {open && (
+                  <div id={`module-${mod.id}`} className="mt-3 mb-5 space-y-3">
+                    {/* MF-02: Mindfulness is practised, so its module opens on its home too. */}
+                    {mod.id === 'mindfulness' && (
+                      <div className="flex justify-end px-1">
+                        <Link to="/practice" className="min-h-11 inline-flex items-center text-sm font-medium text-[var(--color-accent)] hover:underline" data-testid="tools-practice-link">
+                          Practice
+                        </Link>
+                      </div>
+                    )}
+                    <Chunked
+                      more={`More in ${mod.name}`}
+                      className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+                      items={cards}
+                    />
+                  </div>
                 )}
               </div>
-              <Chunked
-                more={`More in ${mod.name}`}
-                className="grid grid-cols-1 sm:grid-cols-2 gap-3"
-                items={tools.flatMap(tool => [
-                  { key: tool.id, node: <ToolCard tool={tool} state={tool.id === 'meet-a-part' ? toolsMeetLink().state : undefined} /> },
-                  ...(tool.moreCards ?? []).map(m => ({ key: `${tool.id}:${m.key}`, node: <ToolCard tool={tool} mode={m} /> })),
-                ])}
-              />
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
     </div>

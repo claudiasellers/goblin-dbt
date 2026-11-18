@@ -29,7 +29,7 @@ const NIGHT = (why) => [pick("mode", "awake"), next, pick("night", why), next];
 const PLAN = (wake = "w0700", remind = true) =>
   [pick("mode", "plan"), next, pick("wake", wake), next, pick("wind", "screens"), ...(remind ? [pick("remind", "yes")] : [])];
 
-test("the skill: tool sleep-reset, named Sleep Reset under Emotion Regulation, its own concept, no close question", () => {
+test("the skill: tool sleep-reset, named Sleep reset under Emotion Regulation, its own concept, no close question", () => {
   assert.equal(skill.toolId, "sleep-reset");
   assert.equal(skill.start, "mode");
   assert.match(readFileSync("schema/skills.cypher", "utf8"), /MATCH \(t:TherapyConcept \{id: "dbt_sleep_hygiene"\}\), \(s:Skill \{id: "sleep_reset"\}\)/);
@@ -37,7 +37,7 @@ test("the skill: tool sleep-reset, named Sleep Reset under Emotion Regulation, i
   assert.match(readFileSync("schema/relationships.cypher", "utf8"), /\{id: "dbt_sleep_hygiene"\}\), \(rv:TherapyConcept \{id: "dbt_reducing_vulnerability"\}\)/);
   assert.match(readFileSync("src/lib/skillRuntime/playerTools.ts", "utf8"), /'sleep-reset': 'sleep_reset',/);
   const tools = readFileSync("src/data/tools.ts", "utf8");
-  assert.match(tools, /id: 'sleep-reset',\n\s+name: 'Sleep Reset',[\s\S]*?module: 'emotion-regulation'/);
+  assert.match(tools, /id: 'sleep-reset',\n\s+name: 'Sleep reset',[\s\S]*?module: 'emotion-regulation'/);
   assert.match(tools, /label: 'I can\\'t sleep', toolId: 'sleep-reset'/);
   for (const f of ["src/lib/spine/close.ts", "functions/src/spine/tools.ts"])
     assert.match(readFileSync(f, "utf8"), /'sleep-reset': \{ module: 'er', closeKind: 'none' \}/, f);

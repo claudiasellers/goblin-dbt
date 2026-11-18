@@ -32,7 +32,7 @@ test("the skill: tool values-clarification, concept dbt_values_priorities, no cl
   assert.match(readFileSync("functions/src/spine/tools.ts", "utf8"), /'values-clarification': \{ module: 'er', closeKind: 'none' \}/);
   assert.match(readFileSync("src/lib/spine/close.ts", "utf8"), /'values-clarification': \{ module: 'er', closeKind: 'none' \}/);
   const tools = readFileSync("src/data/tools.ts", "utf8");
-  assert.match(tools, /id: 'values-clarification',\n\s+name: 'What Matters to Me',[\s\S]*?module: 'emotion-regulation'/);
+  assert.match(tools, /id: 'values-clarification',\n\s+name: 'What matters to me',[\s\S]*?module: 'emotion-regulation'/);
   assert.match(tools, /toolId: 'values-clarification'/, "a Tools intent");
   assert.match(readFileSync("src/lib/skillRuntime/playerTools.ts", "utf8"), /'values-clarification': 'values'/);
   assert.match(readFileSync("schema/app-tool-ids.cypher", "utf8"), /\{c: "dbt_values_priorities", t: "values-clarification"\}/);

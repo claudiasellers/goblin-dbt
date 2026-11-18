@@ -31,7 +31,7 @@ test("the skill: tool build-mastery, concept dbt_build_mastery, no close questio
   assert.match(readFileSync("functions/src/spine/tools.ts", "utf8"), /'build-mastery': \{ module: 'er', closeKind: 'none' \}/);
   assert.match(readFileSync("src/lib/spine/close.ts", "utf8"), /'build-mastery': \{ module: 'er', closeKind: 'none' \}/);
   const tools = readFileSync("src/data/tools.ts", "utf8");
-  assert.match(tools, /id: 'build-mastery',\n\s+name: 'Build Mastery',[\s\S]*?module: 'emotion-regulation'/);
+  assert.match(tools, /id: 'build-mastery',\n\s+name: 'Build mastery',[\s\S]*?module: 'emotion-regulation'/);
   assert.match(tools, /label: 'Get one thing done', toolId: 'build-mastery'/, "the PRD's Tools intent");
   assert.match(readFileSync("src/lib/skillRuntime/playerTools.ts", "utf8"), /'build-mastery': 'build_mastery'/);
   assert.match(readFileSync("schema/app-tool-ids.cypher", "utf8"), /\{c: "dbt_build_mastery", t: "build-mastery"\}/);
