@@ -61,10 +61,11 @@ export function DashboardLayout() {
         <header className="flex-shrink-0 z-30 bg-[var(--color-glass-panel)] backdrop-blur-xl border-b border-[var(--color-glass-border)] pt-[env(safe-area-inset-top)]">
           <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between gap-4">
             {focusedLayout ? (
-              /* Compact bar: exercise pages keep their own title as the principal heading */
+              /* Compact bar: exercise pages keep their own title as the principal heading. From md the sidebar
+                 carries the name, so the bar doesn't say it twice (the UI fix plan, 18 Nov). */
               <Link
                 to="/tools"
-                className="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
+                className="md:invisible inline-flex items-center gap-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
               >
                 <span aria-hidden="true">🌿</span>
                 <span>Goblin</span>

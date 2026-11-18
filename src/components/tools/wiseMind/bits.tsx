@@ -39,10 +39,14 @@ function useFocusOnMount<T extends HTMLElement>(on: boolean) {
   return ref;
 }
 
-export function Chip({ label, pressed, onClick, own = false }: { label: ReactNode; pressed?: boolean; onClick: () => void; own?: boolean }) {
+/**
+ * `control`: a chip that isn't an answer (*add your own*, *More options*): dashed, so it never reads as one more
+ * option (the UI fix plan, 18 Nov).
+ */
+export function Chip({ label, pressed, onClick, own = false, control = false }: { label: ReactNode; pressed?: boolean; onClick: () => void; own?: boolean; control?: boolean }) {
   return (
     <button type="button" aria-pressed={pressed ? 'true' : 'false'} onClick={onClick}
-      className={`den-chip den-chip--small ${own ? 'font-serif' : ''} ${pressed ? '!text-[var(--color-on-accent)]' : ''}`}>{label}</button>
+      className={`den-chip den-chip--small ${control ? 'den-chip--control' : ''} ${own && !control ? 'font-serif' : ''} ${pressed ? '!text-[var(--color-on-accent)]' : ''}`}>{label}</button>
   );
 }
 

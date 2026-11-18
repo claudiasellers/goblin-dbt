@@ -36,7 +36,7 @@ test("the skill: tool please-skill, five rows in the PRD's order, no close quest
   assert.match(readFileSync("functions/src/spine/tools.ts", "utf8"), /'please-skill': \{ module: 'er', closeKind: 'none' \}/);
   assert.match(readFileSync("src/lib/spine/close.ts", "utf8"), /'please-skill': \{ module: 'er', closeKind: 'none' \}/);
   const tools = readFileSync("src/data/tools.ts", "utf8");
-  assert.match(tools, /id: 'please-skill',\n\s+name: 'Running Low',[\s\S]*?module: 'emotion-regulation'/);
+  assert.match(tools, /id: 'please-skill',\n\s+name: 'Running low',[\s\S]*?module: 'emotion-regulation'/);
   assert.match(tools, /toolId: 'please-skill'/, "an intent opens it from the Tools page");
   assert.match(readFileSync("src/lib/skillRuntime/playerTools.ts", "utf8"), /'please-skill': 'please_skill'/);
 });

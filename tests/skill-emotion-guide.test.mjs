@@ -118,7 +118,7 @@ test("the skill: tool emotion-guide on dbt_model_of_emotions, no close, listed u
   assert.match(readFileSync("functions/src/spine/tools.ts", "utf8"), /'emotion-guide': \{ module: 'er', closeKind: 'none' \}/);
   assert.match(readFileSync("src/lib/spine/close.ts", "utf8"), /'emotion-guide': \{ module: 'er', closeKind: 'none' \}/);
   const tools = readFileSync("src/data/tools.ts", "utf8");
-  assert.match(tools, /id: 'emotion-guide',\n\s+name: 'Know This Feeling',[\s\S]*?module: 'emotion-regulation'/);
+  assert.match(tools, /id: 'emotion-guide',\n\s+name: 'Know this feeling',[\s\S]*?module: 'emotion-regulation'/);
   assert.match(tools, /label: 'Get to know a feeling', toolId: 'emotion-guide'/);
   assert.match(readFileSync("src/lib/skillRuntime/playerTools.ts", "utf8"), /'emotion-guide': \['emotion_guide', 'emotion_myths', 'walk_the_wave'\]/);
   assert.match(readFileSync("schema/app-tool-ids.cypher", "utf8"), /\{c: "dbt_model_of_emotions", t: "emotion-guide"\}/);
